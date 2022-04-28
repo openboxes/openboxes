@@ -67,7 +67,6 @@ class StockRequestDashboard extends Component {
     this.state = {
       stockRequests: [],
       isLoading: true,
-      currentPage: 0,
       pageCount: 0,
     };
     this.fetchStockMovementItems = this.fetchStockMovementItems.bind(this);
@@ -85,7 +84,6 @@ class StockRequestDashboard extends Component {
 
   fetchStockMovementItems(page, pageSize) {
     const url = '/openboxes/api/stockMovements/list';
-    console.log(`page: ${page} pageSize: ${pageSize} offset ${page * pageSize}`);
     const params = {
       direction: 'INBOUND',
       offset: page * pageSize,
@@ -133,9 +131,7 @@ class StockRequestDashboard extends Component {
           sortable={false}
           pages={this.state.pageCount}
           manual
-          page={this.state.currentPage}
           resizable={false}
-          onPageChange={page => this.setState({ currentPage: page })}
           className="-striped -highlight stock-request-table "
           previousText={<i className="fa fa-chevron-left" aria-hidden="true" />}
           nextText={<i className="fa fa-chevron-right" aria-hidden="true" />}

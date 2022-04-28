@@ -39,7 +39,7 @@ class StockMovementApiController {
         StockMovement stockMovement = new StockMovement()
         stockMovement.stockMovementDirection = stockMovementDirection
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset])
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, orderBy: "requisition.dateRequested" ])
 
         render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }

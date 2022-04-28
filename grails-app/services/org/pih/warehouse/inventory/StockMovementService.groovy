@@ -410,8 +410,14 @@ class StockMovementService {
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
+            def orderBy = "dateCreated"
 
-            order("dateCreated", "desc")
+            if(params.orderBy == "requisition.dateRequested") {
+                createAlias("requisition","_requisition")
+                orderBy = "_requisition.dateRequested"
+            }
+
+            order(orderBy, "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->
             if (shipment.requisition) {
