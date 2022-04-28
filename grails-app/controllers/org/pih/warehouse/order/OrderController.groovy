@@ -569,14 +569,15 @@ class OrderController {
             csv.printRecord("Ordered by", "${orderInstance?.orderedBy?.name} ${orderInstance?.orderedBy?.email}")
             csv.println()  // print a newline between text (above) and column headers (immediately following)
             csv.printRecord(
-                    warehouse.message(code: 'product.productCode.label'),
-                    warehouse.message(code: 'product.name.label'),
-                    warehouse.message(code: 'product.supplierCode.label'),
-                    warehouse.message(code: 'orderItem.quantity.label'),
-                    warehouse.message(code: 'product.unitOfMeasure.label'),
-                    warehouse.message(code: 'orderItem.unitPrice.label'),
-                    warehouse.message(code: 'orderItem.totalPrice.label'),
-                    warehouse.message(code: 'orderItem.budgetCode.label')
+                warehouse.message(code: 'product.productCode.label'),
+                warehouse.message(code: 'product.name.label'),
+                warehouse.message(code: 'product.supplierCode.label'),
+                warehouse.message(code: 'product.manufacturerCode.label'),
+                warehouse.message(code: 'orderItem.quantity.label'),
+                warehouse.message(code: 'product.unitOfMeasure.label'),
+                warehouse.message(code: 'orderItem.unitPrice.label'),
+                warehouse.message(code: 'orderItem.totalPrice.label'),
+                warehouse.message(code: 'orderItem.budgetCode.label')
             )
 
             def totalPrice = 0.0
@@ -589,14 +590,15 @@ class OrderController {
                 }
 
                 csv.printRecord(
-                        orderItem?.product?.productCode,
-                        orderItem?.product?.name,
-                        orderItem?.productSupplier?.supplierCode,
-                        CSVUtils.formatInteger(number: orderItem?.quantity),
-                        CSVUtils.formatUnitOfMeasure(orderItem?.quantityUom?.code, orderItem?.quantityPerUom),
-                        CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
-                        CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
-                        orderItem?.budgetCode?.code
+                    orderItem?.product?.productCode,
+                    orderItem?.product?.name,
+                    orderItem?.productSupplier?.supplierCode,
+                    orderItem?.productSupplier?.manufacturerCode,
+                    CSVUtils.formatInteger(number: orderItem?.quantity),
+                    CSVUtils.formatUnitOfMeasure(orderItem?.quantityUom?.code, orderItem?.quantityPerUom),
+                    CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
+                    CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
+                    orderItem?.budgetCode?.code
                 )
             }
 
