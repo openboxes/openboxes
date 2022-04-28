@@ -158,6 +158,7 @@ class ReplenishmentSecondPage extends Component {
     this.state = {
       values: { replenishment: { ...this.props.initialValues } },
       sorted: false,
+      initialSorted: false,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -199,6 +200,10 @@ class ReplenishmentSecondPage extends Component {
             },
           },
         }, () => this.props.hideSpinner());
+      })
+      .then(() => {
+        this.sortByBins();
+        this.setState({ initialSorted: true });
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -295,12 +300,13 @@ class ReplenishmentSecondPage extends Component {
   }
 
   sortByBins() {
-    if (this.state.sorted) {
+    if (this.state.sorted || !this.state.initialSorted) {
+      const sortedPickItemsByBinId = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['id']) }));
       this.setState({
         values: {
           replenishment: {
             ...this.state.values.replenishment,
-            replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['product.productCode']),
+            replenishmentItems: _.sortBy(sortedPickItemsByBinId, ['product.productCode']),
           },
         },
         sorted: false,
@@ -308,11 +314,12 @@ class ReplenishmentSecondPage extends Component {
       return;
     }
 
+    const sortedPickItemsByBinName = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['zone.name', 'binLocation.name']) }));
     this.setState({
       values: {
         replenishment: {
           ...this.state.values.replenishment,
-          replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
+          replenishmentItems: _.sortBy(sortedPickItemsByBinName, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
         },
       },
       sorted: true,
