@@ -69,13 +69,18 @@ const FIELD = {
       },
       zone: {
         type: LabelField,
-        label: 'react.replenishment.currentZone.label',
+        label: 'react.replenishment.zone.label',
         defaultMessage: 'Zone',
+        headerAlign: 'left',
+        attributes: {
+          className: 'text-left',
+        },
       },
       'binLocation.name': {
         type: LabelField,
-        label: 'react.replenishment.currentBinLocation.label',
+        label: 'react.replenishment.bin.label',
         defaultMessage: 'Bin',
+        headerAlign: 'left',
         attributes: {
           formatValue: (value) => {
             if (value) {
@@ -83,6 +88,7 @@ const FIELD = {
             }
             return 'DEFAULT';
           },
+          className: 'text-left',
         },
       },
       quantityInBin: {
