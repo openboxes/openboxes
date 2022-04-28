@@ -43,7 +43,7 @@ class CSVUtils {
         if (StringUtils.isBlank(s)) {
             throw new IllegalArgumentException("${fieldName} is empty or unset")
         }
-        DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
+        DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale) as DecimalFormat
         format.parseBigDecimal = true
         /*
          * OB releases <=0.8.16, in certain locales, erroneously (and uniquely)
@@ -52,7 +52,7 @@ class CSVUtils {
          */
         try {
             return format.parse(s.replace("†", ""))
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             throw new IllegalArgumentException("Unable to parse expected numeric value ${fieldName}=${s}")
         }
     }
@@ -63,9 +63,47 @@ class CSVUtils {
     static int parseInteger(String s, String fieldName = "unknown_field") {
         try {
             return parseNumber(s, fieldName).intValueExact()
-        } catch (ArithmeticException e) {
+        } catch (ArithmeticException ignored) {
             throw new IllegalArgumentException("Expected integer value for ${fieldName}=${s}")
         }
+    }
+
+    /**
+     * Format an identifier for inclusion in a CSV file.
+     *
+     * @param id an arbitrary identifier encoded as a string -- ok if null
+     * @return a string representation of `id` suitable for CSV export
+     *
+     * You might wonder why converting a string to a string would be
+     * needed for CSV export. Well, it turns out that Excel's CSV
+     * importer will parse, say, the ZIP code 02199, as the number 2199.
+     */
+    static String formatId(String id) {
+
+        if ((id?.startsWith("0") && id?.isNumber()) ||
+            (id ==~ /^[\d.-\/]+$/) && (id?.contains("-") || id?.contains("/"))) {
+            /*
+             * If the supplied ID could be interpreted as a number or as
+             * a numerical date, why not just prefix it with a literal tab?
+             * (Apparently, this tells Excel not to attempt to parse it.)
+             *
+             * https://superuser.com/questions/318420/formatting-a-comma-delimited-csv-to-force-excel-to-interpret-value-as-a-string
+             *
+             * Unfortunately, no other spreadsheet software does this :-(
+             *
+             * The following kludge plays nicely enough with Excel, Google
+             * Sheets, LibreOffice, and Numbers (Mac), but it could easily
+             * confuse other CSV parsers. (Not sure what we can do: Excel
+             * is our most important client software, by far.)
+             */
+            return "=\"${id}\"".toString()
+        }
+        return id
+    }
+
+    /* FIXME replace with @NamedVariant after grails migration */
+    static String formatId(Map args) {
+        return formatId(args?.get("id") as String)
     }
 
     /**
@@ -87,7 +125,7 @@ class CSVUtils {
 
     /* FIXME replace with @NamedVariant after grails migration */
     static String formatInteger(Map args) {
-        return formatInteger(args.get("number"))
+        return formatInteger(args.get("number") as Number)
     }
 
     /**
@@ -110,7 +148,7 @@ class CSVUtils {
      * It is the caller's responsibility to call escapeCsv() if appropriate.
      */
     static String formatCurrency(Number number, String currencyCode = null, boolean isUnitPrice = false) {
-        DecimalFormat format = DecimalFormat.getCurrencyInstance(LocalizationUtil.localizationService.currentLocale)
+        DecimalFormat format = DecimalFormat.getCurrencyInstance(LocalizationUtil.localizationService.currentLocale) as DecimalFormat
         format.groupingUsed = false
 
         if (currencyCode != null) {
@@ -130,7 +168,10 @@ class CSVUtils {
 
     /* FIXME replace with @NamedVariant after grails migration */
     static String formatCurrency(Map args) {
-        return formatCurrency(args.get("number"), args.get("currencyCode"), args.get("isUnitPrice", false))
+        return formatCurrency(
+            args.get("number") as Number,
+            args.get("currencyCode") as String,
+            args.get("isUnitPrice", false) as Boolean)
     }
 
     /**
@@ -140,7 +181,7 @@ class CSVUtils {
         // FIXME default value should be localized, but presently is "EA" everywhere
         def numerator = quantityUom ?: "EA"
         def denominator = formatInteger(quantityPerUom ?: 1)
-        return "${quantityUom}/${quantityPerUom}"
+        return "${numerator}/${denominator}"
     }
 
     /**

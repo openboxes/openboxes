@@ -590,10 +590,10 @@ class OrderController {
                 }
 
                 csv.printRecord(
-                    orderItem?.product?.productCode,
+                    CSVUtils.formatId(orderItem?.product?.productCode),
                     orderItem?.product?.name,
-                    orderItem?.productSupplier?.supplierCode,
-                    orderItem?.productSupplier?.manufacturerCode,
+                    CSVUtils.formatId(orderItem?.productSupplier?.supplierCode),
+                    CSVUtils.formatId(orderItem?.productSupplier?.manufacturerCode),
                     CSVUtils.formatInteger(number: orderItem?.quantity),
                     CSVUtils.formatUnitOfMeasure(orderItem?.quantityUom?.code, orderItem?.quantityPerUom),
                     CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
@@ -790,22 +790,22 @@ class OrderController {
 
             orderInstance?.listOrderItems()?.each { orderItem ->
                 csv.printRecord(
-                        orderItem?.id,
-                        orderItem?.product?.productCode,
-                        orderItem?.product?.name,
-                        orderItem?.productSupplier?.code,
-                        orderItem?.productSupplier?.name,
-                        orderItem?.productSupplier?.supplierCode,
-                        orderItem?.productSupplier?.manufacturer?.name,
-                        orderItem?.productSupplier?.manufacturerCode,
-                        CSVUtils.formatInteger(number: orderItem?.quantity),
-                        orderItem?.unitOfMeasure,
-                        CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
-                        CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
-                        orderItem?.recipient?.name,
-                        orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
-                        orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
-                        orderItem?.budgetCode?.code
+                    CSVUtils.formatId(orderItem?.id),
+                    CSVUtils.formatId(orderItem?.product?.productCode),
+                    orderItem?.product?.name,
+                    CSVUtils.formatId(orderItem?.productSupplier?.code),
+                    orderItem?.productSupplier?.name,
+                    CSVUtils.formatId(orderItem?.productSupplier?.supplierCode),
+                    orderItem?.productSupplier?.manufacturer?.name,
+                    CSVUtils.formatId(orderItem?.productSupplier?.manufacturerCode),
+                    CSVUtils.formatInteger(number: orderItem?.quantity),
+                    orderItem?.unitOfMeasure,
+                    CSVUtils.formatCurrency(number: orderItem?.unitPrice, currencyCode: orderItem?.currencyCode, isUnitPrice: true),
+                    CSVUtils.formatCurrency(number: orderItem?.totalPrice(), currencyCode: orderItem?.currencyCode),
+                    orderItem?.recipient?.name,
+                    orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
+                    orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+                    orderItem?.budgetCode?.code
                 )
             }
             render(contentType: "text/csv", text: csv.out.toString())
