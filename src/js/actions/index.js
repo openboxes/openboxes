@@ -243,6 +243,7 @@ function fetchGraphIndicator(
         type: indicatorConfig.graphType,
         data: indicatorData.data,
         timeFilter: indicatorConfig.timeFilter,
+        yearTypeFilter: indicatorConfig.yearTypeFilter,
         locationFilter: indicatorConfig.locationFilter,
         timeLimit: indicatorConfig.timeLimit,
         link: indicatorData.link,

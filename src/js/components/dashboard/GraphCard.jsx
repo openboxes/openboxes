@@ -17,7 +17,8 @@ import NumbersTableCard from 'components/dashboard/NumbersTableCard';
 import TableCard from 'components/dashboard/TableCard';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-
+// TODO: OBPIH-4384 Refactor FilterComponent to be more generic.
+// It should be built from config instead of being hardcoded (and move it out to separate file)
 class FilterComponent extends Component {
   constructor(props) {
     super(props);
@@ -25,6 +26,7 @@ class FilterComponent extends Component {
     this.state = {
       timeFrame: 6,
       locationSelected: '',
+      yearType: '',
     };
   }
 
@@ -44,6 +46,10 @@ class FilterComponent extends Component {
       params = `querySize=${dropdown.value}`;
       params = location !== null ? `${params}&destinationLocation=${location.id}` : params;
       this.setState({ timeFrame: dropdown.value });
+    }
+    if (element.target.id === 'yearTypeSelector' && this.props.yearTypeFilter) {
+      params = `${this.props.yearTypeFilter.parameter || 'querySize'}=${dropdown.value}`;
+      this.setState({ yearType: dropdown.value });
     }
 
     if (params !== '') {
@@ -97,7 +103,21 @@ class FilterComponent extends Component {
             : null }
           </select> : null
         }
-
+        {this.props.yearTypeFilter && (
+          <select
+            className="time-filter custom-select"
+            onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
+            disabled={!this.props.yearTypeFilter}
+            defaultValue={this.state.yearType || this.props.yearTypeFilter.defaultValue}
+            id="yearTypeSelector"
+          >
+            {this.props.yearTypeFilter.options && this.props.yearTypeFilter.options.map(option => (
+              <option value={option.value}>
+                {this.props.translate(option.label, option.label)}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
     );
   }
@@ -122,6 +142,7 @@ const GraphCard = SortableElement(({
   options,
   loadIndicator,
   timeFilter = false,
+  yearTypeFilter = null,
   timeLimit = 24,
   locationFilter = false,
   allLocations,
@@ -217,6 +238,7 @@ const GraphCard = SortableElement(({
           locationFilter={locationFilter}
           timeLimit={timeLimit}
           timeFilter={timeFilter}
+          yearTypeFilter={yearTypeFilter}
           label={label}
           data={data.length === 0 ? null : data}
           allLocations={allLocations}
@@ -248,11 +270,17 @@ GraphCard.propTypes = {
 FilterComponent.defaultProps = {
   timeFilter: false,
   locationFilter: false,
+  yearTypeFilter: null,
 };
 
 FilterComponent.propTypes = {
   locationFilter: PropTypes.bool,
   timeFilter: PropTypes.bool,
+  yearTypeFilter: PropTypes.shape({
+    parameter: PropTypes.string,
+    defaultValue: PropTypes.string,
+    options: PropTypes.arrayOf(PropTypes.shape({})),
+  }),
   timeLimit: PropTypes.number.isRequired,
   label: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   cardId: PropTypes.number.isRequired,

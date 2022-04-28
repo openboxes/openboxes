@@ -386,6 +386,26 @@ openboxes.dashboard.newsSummary.newsItems = []
 openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
+
+openboxes {
+    dashboard {
+        yearTypes {
+            fiscalYear {
+                start = "07/01" // format: MM/DD, For PIH and the Govt of Dominica fiscal year start July 1
+                end = "06/30" // format: MM/DD
+                labelYearPrefix = "FY "
+                yearFormat = "yy"
+            }
+            calendarYear {
+                start = "01/01"
+                end = "12/31"
+                labelYearPrefix = ""
+                yearFormat = "yyyy"
+            }
+        }
+    }
+}
+
 openboxes {
     dashboardConfig {
         dashboards {
@@ -591,6 +611,7 @@ openboxes {
                 ]
             }
         }
+        // TODO: OBPIH-4384 Refactor indicator filters to be more generic (currently filters are hardcoded on the frontend, these should be defined here and rendered there basing on config)
         dashboardWidgets {
             inProgressPutaways {
                 enabled = true
@@ -692,6 +713,22 @@ openboxes {
                 endpoint = "/${appName}/api/dashboard/fillRateSnapshot"
             }
 
+            requisitionCountByYear {
+                enabled = true
+                title = "react.dashboard.requisitionCountByYear.title.label"
+                info = "react.dashboard.requisitionCountByYear.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/requisitionsByYear"
+                yearTypeFilter {
+                    parameter = "yearType"
+                    defaultValue = "fiscalYear"
+                    options = [
+                        [label: "react.dashboard.fiscalYear.label", value: "fiscalYear"],
+                        [label: "react.dashboard.calendarYear.label", value: "calendarYear"]
+                    ]
+                }
+            }
             inventorySummary {
                 enabled = true
                 title = "react.dashboard.inventorySummaryData.title.label"

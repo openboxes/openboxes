@@ -16,6 +16,7 @@ class IndicatorDataService {
 
     def dashboardService
     def dataService
+    def grailsApplication
     def messageService
 
     GraphData getExpirationSummaryData(Location location, def params) {
@@ -382,6 +383,66 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData)
 
+        return graphData
+    }
+
+    GraphData getRequisitionsByYear(Location location, def params) {
+        def yearTypes = grailsApplication.config.openboxes.dashboard.yearTypes ?: [:]
+        def defaultType = yearTypes.fiscalYear ?: yearTypes.calendarYear
+        def yearType = params.yearType ? yearTypes[params.yearType] : defaultType
+
+        if (!yearType) {
+            throw new IllegalArgumentException("Missing year type definition in configuration")
+        }
+
+        def currentYear = new Date().year
+        def startYear = currentYear - 5 // Take only last 5 years into account
+
+        def startDate = new Date("${yearType.start}/${startYear}")
+        def endDate = new Date("${yearType.end}/${startYear}")
+
+        // data fetch
+        def data = Requisition.executeQuery("""
+            SELECT 
+                COUNT(r.id), DATE(r.dateCreated) 
+            FROM Requisition r 
+            WHERE r.origin = :location AND r.dateCreated >= :startDate
+            GROUP BY DATE(r.dateCreated) """, ['location': location, 'startDate': startDate])
+
+        // Parse results
+        def results = [:]
+        def listLabel = []
+        data.each { it ->
+            // it[0] = requisition count, it[1] = date created
+
+            // Parse sql date into util date for easy comparison
+            def createdAt = new Date(it[1].getTime())
+            def year = createdAt.format(yearType.yearFormat).toInteger()
+            // Set proper year for year label. If day is after year type's end day, then year += 1 (especially required
+            // for year types that has end day in the middle of year, eg. fiscal year)
+            if (createdAt.month >= endDate.month && createdAt.day > endDate.day) {
+                year += 1
+            }
+            def yearLabel = yearType.labelYearPrefix + year.toString()
+
+            // Add COUNT value into proper results sections
+            if (results[yearLabel]) {
+                results[yearLabel] += it[0]
+            } else {
+                results[yearLabel] = it[0]
+            }
+
+            // Get result label list
+            if (!listLabel.contains(yearLabel)) {
+                listLabel << yearLabel
+            }
+        }
+
+        List<IndicatorDatasets> datasets = [
+            new IndicatorDatasets('Requisition count by year', results.values().toList())
+        ]
+        IndicatorData indicatorData = new IndicatorData(datasets, listLabel)
+        GraphData graphData = new GraphData(indicatorData)
         return graphData
     }
 
