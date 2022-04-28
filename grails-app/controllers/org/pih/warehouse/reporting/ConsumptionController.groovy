@@ -17,7 +17,9 @@ import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -126,6 +128,12 @@ class ConsumptionController {
                     command.rows[product] = new ShowConsumptionRowCommand()
                     command.rows[product].command = command
                     command.rows[product].product = product
+                }
+
+                User user = session.user as User
+
+                if(!user.roles.contains(RoleType.ROLE_FINANCE)) {
+                    command.rows[product].product.pricePerUnit = 0
                 }
 
                 // Keep track of quantity out based on transaction type
