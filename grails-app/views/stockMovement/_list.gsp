@@ -40,10 +40,10 @@
             <g:sortableColumn property="requestedBy" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.requestedBy.label', default: 'Requested by')}" />
 
-            <g:sortableColumn property="dateRequested" params="${pageParams}"
-                              title="${warehouse.message(code: 'stockMovement.dateRequested.label', default: 'Date requested')}" />
 
             <th><g:message code="default.dateCreated.label"/></th>
+
+            <th><g:message code="stockMovement.expectedReceiptDate.message"/></th>
 
         </tr>
         </thead>
@@ -99,10 +99,10 @@
                     ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
                 </td>
                 <td>
-                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateRequested}"/>
+                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
                 </td>
                 <td>
-                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
+                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.expectedDeliveryDate}"/>
                 </td>
             </tr>
         </g:each>
