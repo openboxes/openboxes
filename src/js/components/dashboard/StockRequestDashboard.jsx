@@ -27,6 +27,7 @@ const COLUMNS = [
     accessor: 'shipmentStatus',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
+    maxWidth: 180,
   },
   {
     Header: 'Description',
@@ -56,6 +57,7 @@ const COLUMNS = [
     accessor: 'dateRequested',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
+    maxWidth: 180,
   },
 ];
 
@@ -83,6 +85,7 @@ class StockRequestDashboard extends Component {
 
   fetchStockMovementItems(page, pageSize) {
     const url = '/openboxes/api/stockMovements/list';
+    console.log(`page: ${page} pageSize: ${pageSize} offset ${page * pageSize}`);
     const params = {
       direction: 'INBOUND',
       offset: page * pageSize,

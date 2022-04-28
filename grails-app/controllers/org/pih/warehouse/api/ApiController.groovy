@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -65,11 +66,25 @@ class ApiController {
     }
 
     def getMenuConfig = {
-        User user = User.get(session?.user?.id)
-        Map menuConfig = userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) ? grailsApplication.config.openboxes.requestorMegamenu : grailsApplication.config.openboxes.megamenu
+        Map menuConfig = grailsApplication.config.openboxes.megamenu;
+        def menu = []
+        def enabled = true
         Location location = Location.get(session.warehouse?.id)
-        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
-        render([data: [menuConfig: translatedMenu]] as JSON)
+
+        if (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST)) {
+            enabled = false
+        }
+
+        if (enabled) {
+            User user = User.get(session?.user?.id)
+
+            if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+                menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
+            }
+            menu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
+        }
+
+        render([data: [menuConfig: menu]] as JSON)
     }
 
     def getAppContext = {

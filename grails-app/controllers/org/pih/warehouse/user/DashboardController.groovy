@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -146,7 +147,15 @@ class DashboardController {
 
     @Cacheable("megamenuCache")
     def megamenu = {
+        Location location = Location.get(session.warehouse?.id)
+        def enabled = true
+
+        if (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST)) {
+            enabled = false
+        }
+
         [
+                enabled               : enabled,
                 isSuperuser           : userService.isSuperuser(session?.user),
                 megamenuConfig        : grailsApplication.config.openboxes.megamenu,
                 quickCategories       : productService.quickCategories,
