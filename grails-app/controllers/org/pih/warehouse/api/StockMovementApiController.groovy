@@ -41,7 +41,7 @@ class StockMovementApiController {
 
         def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset])
 
-        render([data: stockMovements] as JSON)
+        render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }
 
     def read = {
