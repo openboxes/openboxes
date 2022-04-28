@@ -120,23 +120,21 @@ class OrderStatusNotificationController {
                     log.info "Requisition item " + requisitionItem
                     Integer quantity = orderItem.quantity
                     if (quantity == 0) {
-                        log.info "Cancel quantity " + orderItemUuid
+                        // Cancel the original or modified item
                         if (requisitionItem?.modificationItem) {
                             requisitionItem.undoChanges()
-                            requisitionItem?.cancelQuantity(ReasonCode.REJECTED, "Rejected quantity change")
                         }
+                        requisitionItem?.cancelQuantity(ReasonCode.REJECTED, "Rejected quantity change")
                     }
                     else {
-                        // Approve the modification
+                        // Approve the original or modified item
                         if (requisitionItem?.modificationItem) {
-                            log.info "Approve quantity " + orderItemUuid
-                            log.info "quantity " + requisitionItem?.modificationItem?.quantity
-                            log.info "quantityAdjusted " + requisitionItem?.modificationItem?.quantityAdjusted
-                            log.info "quantityApproved " + requisitionItem?.modificationItem?.quantityApproved
-                            log.info "quantityCanceled " + requisitionItem?.modificationItem?.quantityCanceled
                             requisitionItem?.modificationItem?.approveQuantity()
-                            requisitionItem?.save()
                         }
+                        else {
+                            requisitionItem?.approveQuantity()
+                        }
+                        requisitionItem?.save()
                     }
                 }
 
