@@ -1186,7 +1186,7 @@ class AddItemsPage extends Component {
             if (spinner) this.props.showSpinner();
             return this.saveRequisitionItemsInCurrentStep(lineItems)
               .then(res => callback(res))
-              .catch(err => {
+              .catch(() => {
                 if (spinner) this.props.hideSpinner();
               });
           },
