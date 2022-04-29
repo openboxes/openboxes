@@ -602,7 +602,7 @@ class OrderController {
                 )
             }
 
-            csv.printRecord(null, null, null, null, null, null, CSVUtils.formatCurrency(number: totalPrice, currencyCode: lastCurrencyCode), null)
+            csv.printRecord(null, null, null, null, null, null, null, CSVUtils.formatCurrency(number: totalPrice, currencyCode: lastCurrencyCode), null)
             render(contentType: "text/csv", text: csv.out.toString())
 
         }
