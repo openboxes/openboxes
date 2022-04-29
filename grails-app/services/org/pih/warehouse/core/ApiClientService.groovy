@@ -12,8 +12,10 @@ package org.pih.warehouse.core
 import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
+import org.apache.http.NameValuePair
 import org.apache.http.client.HttpClient
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpGet
@@ -23,6 +25,7 @@ import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicHeader
+import org.apache.http.message.BasicNameValuePair
 import org.apache.http.protocol.HTTP
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -34,8 +37,8 @@ class ApiClientService {
         return execute(new HttpGet(url))
     }
 
-    JSONObject post(String url, Map requestData) {
-        return execute(new HttpPost(url), requestData)
+    JSONObject post(String url, Map requestData, Map requestHeaders = [:]) {
+        return execute(new HttpPost(url), requestData, requestHeaders)
     }
 
     def delete(String url) {
@@ -46,14 +49,22 @@ class ApiClientService {
         return execute(new HttpPut(url), requestData)
     }
 
-    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData) {
-        if (requestData) {
-            JSONObject jsonObject = new JSONObject(requestData)
-            StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
-            BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/json");
-            entity.setContentType(basicHeader);
-            request.setEntity(entity)
+    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData, Map requestHeaders = [:]) {
+//        if (requestData) {
+//            JSONObject jsonObject = new JSONObject(requestData)
+//            StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
+//            BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
+//            entity.setContentType(basicHeader);
+//            request.setEntity(entity)
+//        }
+
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        requestData.each { key, value ->
+            params.add(new BasicNameValuePair(key, value));
         }
+        BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
+        StringEntity entity = new UrlEncodedFormEntity(params, HTTP.UTF_8)
+        request.setEntity(entity);
         return execute(request)
     }
 

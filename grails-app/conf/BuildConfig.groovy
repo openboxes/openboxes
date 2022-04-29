@@ -129,6 +129,12 @@ grails.project.dependency.resolution = {
         // amazon sdk
         compile 'com.amazonaws:aws-java-sdk-sns:1.12.128'
 
+        // json web token
+        compile 'io.jsonwebtoken:jjwt-api:0.11.5'
+        runtime 'io.jsonwebtoken:jjwt-impl:0.11.5',
+                'io.jsonwebtoken:jjwt-jackson:0.11.5',
+                'io.jsonwebtoken:jjwt-gson:0.11.5'
+
     }
     plugins {
 

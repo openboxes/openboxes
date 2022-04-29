@@ -10,9 +10,13 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwt
+import io.jsonwebtoken.impl.DefaultJwtParser
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.User
+import grails.converters.JSON
 
 class AuthController {
 
@@ -23,6 +27,8 @@ class AuthController {
     def recaptchaService
     def ravenClient
     def userAgentIdentService
+    def apiClientService
+    def userDataService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -47,15 +53,89 @@ class AuthController {
      * Allows user to log into the system.
      */
     def login = {
+
+        String redirectUri = "https://openboxes.ngrok.io/openboxes/auth/callback"
+        redirect(url: "https://openboxes-auth.ngrok.io/realms/openboxes/protocol/openid-connect/auth?client_id=openboxes&scope=email+profile+openid+roles&response_type=code&redirect_uri=${redirectUri}&nonce=1234567890")
+        return;
+
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
+            return
         }
 
         if (userAgentIdentService.isMobile()) {
             redirect(controller: "mobile", action: "login")
             return
         }
+
+    }
+
+    def callback = {
+        log.info "params: " + params
+
+        if (params.code) {
+            String tokenEndpointUrl = "http://openboxes-auth.ngrok.io/realms/openboxes/protocol/openid-connect/token"
+            String code = params.code
+
+            def requestData = [
+                    code         : code,
+                    client_id    : "openboxes",
+                    client_secret: "",
+                    scope: "openid profile email roles",
+                    redirect_uri : "https://openboxes.ngrok.io/openboxes/auth/callback",
+                    grant_type   : "authorization_code"
+            ]
+
+            def requestHeaders = [
+                    "Content-Type": "application/x-www-form-urlencoded"
+            ]
+
+            def token = apiClientService.post(tokenEndpointUrl, requestData, requestHeaders)
+
+            if (token && !token.error) {
+                log.info "token " + token
+
+                String[] splitToken = token.id_token.split("\\.");
+	            String unsignedToken = splitToken[0] + "." + splitToken[1] + ".";
+
+                Jwt jwt = new DefaultJwtParser().parse(unsignedToken)
+                Claims claims = (Claims) jwt.getBody();
+
+                String nonce = claims.get("nonce")
+                String email = claims.get("email")
+                String username = claims.get("preferred_username")
+                User user = User.findByUsernameOrEmail(username, email)
+                if (user) {
+                    session.user = user
+                }
+                else {
+
+                    Map userData = [
+                        email: claims.get("email"),
+                        username: claims.get("preferred_username"),
+                        firstName: claims.get("given_name"),
+                        lastName: claims.get("family_name"),
+                    ]
+                    user = userDataService.createOrUpdateUser(userData)
+                    if (user && user.save(flush: true, failOnError: true)) {
+
+                        //user.addToRoles()
+                        //claims.get("roles")
+
+                        session.user = user
+                    }
+                    else {
+                        render("Unauthorized user")
+                        return
+                    }
+                }
+                redirect(controller: "dashboard", action: "index")
+                return
+            }
+            render ([token:token] as JSON)
+        }
+
 
     }
 
@@ -140,7 +220,9 @@ class AuthController {
         } else {
             flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"
             session.invalidate()
-            redirect(action: 'login')
+            redirect(url: "http://openboxes-auth.ngrok.io/realms/openboxes/protocol/openid-connect/logout")
+
+            //redirect(action: 'login')
         }
     }
 

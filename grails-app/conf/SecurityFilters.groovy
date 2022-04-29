@@ -17,11 +17,11 @@ import org.pih.warehouse.util.RequestUtil
 
 class SecurityFilters {
 
-    static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors', 'productNotification', 'orderNotification', 'orderStatusNotification']
-    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
+    static ArrayList controllersWithAuthUserNotRequired = ['auth', 'test', 'errors', 'productNotification', 'orderNotification', 'orderStatusNotification']
+    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu', 'callback']
 
-    static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api', 'productNotification', 'orderNotification', 'orderStatusNotification']
-    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
+    static ArrayList controllersWithLocationNotRequired = ['auth', 'categoryApi', 'productApi', 'genericApi', 'api', 'productNotification', 'orderNotification', 'orderStatusNotification']
+    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu', 'callback']
 
     def authService
     def filters = {
