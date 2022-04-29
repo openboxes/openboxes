@@ -11,7 +11,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
-import apiClient from 'utils/apiClient';
+import apiClient, { flattenRequest } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -209,8 +209,11 @@ class ReplenishmentSecondPage extends Component {
     if (this.state.values.replenishment.status === 'PLACED') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
-      const payload = { status: 'COMPLETED' };
-      apiClient.post(url, payload)
+      const payload = {
+        status: 'COMPLETED',
+        replenishmentItems: this.state.values.replenishment.replenishmentItems,
+      };
+      apiClient.post(url, flattenRequest(payload))
         .then(() => {
           this.props.hideSpinner();
           window.location = `/openboxes/order/show/${this.props.match.params.replenishmentId}`;

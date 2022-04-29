@@ -12,9 +12,9 @@ import org.pih.warehouse.product.Product
 class ReplenishmentItem {
     String id
     Product product
-    Location replenishmentLocation  // origin
-    Location location // destination depot
-    Location binLocation // destination
+    Location replenishmentLocation // origin bin location
+    Location location // depot
+    Location binLocation // destination bin location
     InventoryItem inventoryItem
     Integer quantity
     Integer quantityInBin // QoH in bin
@@ -102,10 +102,14 @@ class ReplenishmentItem {
             inventoryItem                   : inventoryItem,
             lotNumber                       : inventoryItem?.lotNumber,
             expirationDate                  : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-            replenishmentLocation           : replenishmentLocation,
-            replenishmentZone               : replenishmentLocation?.zone,
-            currentBinLocation              : binLocation,
-            currentZone                     : binLocation?.zone,
+            "replenishmentLocation.id"      : replenishmentLocation?.id,
+            "replenishmentLocation.name"    : replenishmentLocation?.name,
+            "replenishmentZone.id"          : replenishmentLocation?.zone?.id,
+            "replenishmentZone.name"        : replenishmentLocation?.zone?.name,
+            "currentBinLocation.id"         : binLocation?.id,
+            "currentBinLocation.name"       : binLocation?.name,
+            "currentZone.id"                : binLocation?.zone?.id,
+            "currentZone.name"              : binLocation?.zone?.name,
             quantity                        : quantity,
             quantityInBin                   : quantityInBin,
             minQuantity                     : minQuantity,

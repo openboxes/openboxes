@@ -14,7 +14,7 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/replenishment/EditPickModal';
-import apiClient from 'utils/apiClient';
+import apiClient, { flattenRequest } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -244,8 +244,11 @@ class ReplenishmentSecondPage extends Component {
     if (this.state.values.replenishment.status === 'PENDING') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
-      const payload = { status: 'PLACED' };
-      apiClient.post(url, payload)
+      const payload = {
+        status: 'PLACED',
+        replenishmentItems: this.state.values.replenishment.replenishmentItems,
+      };
+      apiClient.post(url, flattenRequest(payload))
         .then(() => {
           this.props.hideSpinner();
           this.props.nextPage(this.state.values);

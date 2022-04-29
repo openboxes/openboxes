@@ -20,9 +20,6 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
-import org.pih.warehouse.product.Product
-
-import javax.xml.bind.ValidationException
 
 class ReplenishmentApiController {
 
@@ -58,7 +55,7 @@ class ReplenishmentApiController {
         Replenishment replenishment = new Replenishment()
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-
+        replenishmentService.validateRequirement(replenishment)
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
         if (order.hasErrors() || !order.save(flush: true)) {
             throw new ValidationException("Invalid order", order.errors)
@@ -80,9 +77,8 @@ class ReplenishmentApiController {
 
         Replenishment replenishment = new Replenishment()
         replenishment.id = params.id
-
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-
+        replenishmentService.validateReplenishment(replenishment)
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {
@@ -124,9 +120,8 @@ class ReplenishmentApiController {
             if (!replenishmentItem.location) {
                 replenishmentItem.location = replenishment.destination
             }
-            replenishmentService.validateRequirement(replenishmentItem)
 
-            replenishmentItemMap.pickItems.each { pickItemMap ->
+            replenishmentItemMap.picklistItems.each { pickItemMap ->
                 ReplenishmentItem pickItem = new ReplenishmentItem()
                 bindData(pickItem, pickItemMap)
                 if (!pickItem.location) {
@@ -136,6 +131,7 @@ class ReplenishmentApiController {
             }
 
             replenishment.replenishmentItems.add(replenishmentItem)
+
         }
 
         return replenishment
