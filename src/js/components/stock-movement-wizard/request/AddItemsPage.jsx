@@ -339,9 +339,15 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
           cellClassName: 'text-right',
         },
         getDynamicAttr: ({
-          rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow,
         }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            const valuesWithUpdatedQtyRequested = values;
+            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
+                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            updateRow(valuesWithUpdatedQtyRequested, rowIndex);
+          },
         }),
       },
       quantityRequested: {
