@@ -339,9 +339,15 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
           cellClassName: 'text-right',
         },
         getDynamicAttr: ({
-          rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow,
         }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            const valuesWithUpdatedQtyRequested = values;
+            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
+                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            updateRow(valuesWithUpdatedQtyRequested, rowIndex);
+          },
         }),
       },
       quantityRequested: {
@@ -882,8 +888,8 @@ class AddItemsPage extends Component {
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
     this.saveRequisitionItemsInCurrentStepWithAlert({
       lineItems,
-      beforeCB: () => this.props.showSpinner(),
-      thenCB: () => {
+      spinner: true,
+      callback: () => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
             fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
@@ -891,7 +897,6 @@ class AddItemsPage extends Component {
           })
           .catch(() => this.props.hideSpinner());
       },
-      catchCB: () => this.props.hideSpinner(),
     });
   }
 
@@ -1165,9 +1170,8 @@ class AddItemsPage extends Component {
   }
   saveRequisitionItemsInCurrentStepWithAlert({
     lineItems,
-    beforeCB = () => {},
-    thenCB = () => {},
-    catchCB = () => {},
+    spinner = false,
+    callback = () => {},
   }) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
@@ -1179,10 +1183,12 @@ class AddItemsPage extends Component {
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
-            beforeCB();
+            if (spinner) this.props.showSpinner();
             return this.saveRequisitionItemsInCurrentStep(lineItems)
-              .then(res => thenCB(res))
-              .catch(err => catchCB(err));
+              .then(res => callback(res))
+              .catch(err => {
+                if (spinner) this.props.hideSpinner();
+              });
           },
         },
         {
@@ -1270,7 +1276,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStepWithAlert({
         lineItems: formValues.lineItems,
-        thenCB: () => {
+        callback: () => {
           window.location = '/openboxes/stockMovement/list?direction=INBOUND';
         },
       });
@@ -1302,12 +1308,11 @@ class AddItemsPage extends Component {
   saveItems(lineItems) {
     this.saveRequisitionItemsInCurrentStepWithAlert({
       lineItems,
-      beforeCB: () => this.props.showSpinner(),
-      thenCB: () => {
+      spinner: true,
+      callback: () => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       },
-      catchCB: () => this.props.hideSpinner(),
     });
   }
 
@@ -1404,7 +1409,7 @@ class AddItemsPage extends Component {
     if (!invalid) {
       this.saveRequisitionItemsInCurrentStepWithAlert({
         lineItems: values.lineItems,
-        thenCB: () => this.props.previousPage(values),
+        callback: () => this.props.previousPage(values),
       });
     } else {
       confirmAlert({
