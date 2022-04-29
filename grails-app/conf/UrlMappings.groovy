@@ -480,6 +480,11 @@ class UrlMappings {
             action = [GET: "getInventorySummary"]
         }
 
+        "/api/dashboard/requisitionsByYear"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getRequisitionsByYear"]
+        }
+
         "/api/dashboard/sentStockMovements"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getSentStockMovements"]

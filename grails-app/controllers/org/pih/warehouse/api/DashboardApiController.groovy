@@ -131,6 +131,13 @@ class DashboardApiController {
     }
 
     @Cacheable("dashboardCache")
+    def getRequisitionsByYear = {
+        Location location = Location.get(params.locationId)
+        def requisitionsByYear = indicatorDataService.getRequisitionsByYear(location, params)
+        render(requisitionsByYear.toJson() as JSON)
+    }
+
+    @Cacheable("dashboardCache")
     def getReceivedStockMovements = {
         Location location = Location.get(params.locationId)
         def receivedStockMovements = indicatorDataService.getReceivedStockData(location, params)

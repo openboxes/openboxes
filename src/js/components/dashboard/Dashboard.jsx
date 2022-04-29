@@ -28,6 +28,7 @@ import 'components/dashboard/Dashboard.scss';
 // Disable charts legends by default.
 defaults.scale.ticks.beginAtZero = true;
 
+// TODO: OBPIH-4385 Refactor/Split this file into separate components
 
 // eslint-disable-next-line no-shadow
 const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) => (
@@ -47,6 +48,7 @@ const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) 
           timeFilter={value.timeFilter}
           timeLimit={value.timeLimit}
           locationFilter={value.locationFilter}
+          yearTypeFilter={value.yearTypeFilter}
           options={value.options}
           loadIndicator={loadIndicator}
           allLocations={allLocations}
