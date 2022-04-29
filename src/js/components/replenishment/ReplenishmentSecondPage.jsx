@@ -296,11 +296,12 @@ class ReplenishmentSecondPage extends Component {
 
   sortByBins() {
     if (this.state.sorted) {
+      const sortedPickItemsByDefault = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['binLocation.name', 'quantity']) }));
       this.setState({
         values: {
           replenishment: {
             ...this.state.values.replenishment,
-            replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['product.productCode']),
+            replenishmentItems: _.sortBy(sortedPickItemsByDefault, ['product.productCode']),
           },
         },
         sorted: false,
@@ -308,11 +309,12 @@ class ReplenishmentSecondPage extends Component {
       return;
     }
 
+    const sortedPickItemsByBinName = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['zone.name', 'binLocation.name']) }));
     this.setState({
       values: {
         replenishment: {
           ...this.state.values.replenishment,
-          replenishmentItems: _.sortBy(this.state.values.replenishment.replenishmentItems, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
+          replenishmentItems: _.sortBy(sortedPickItemsByBinName, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
         },
       },
       sorted: true,
