@@ -6,7 +6,7 @@
 <%@page import="org.pih.warehouse.requisition.RequisitionStatus"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
 <ul class="megamenu">
-    <g:if test="${enabled}">
+    <g:hideIfIsNonInventoryManagedAndCanSubmitRequest>
         <g:if test="${megamenuConfig.dashboard.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
                 <li class="mm-item">
@@ -913,6 +913,6 @@
             </li>
             </g:isUserInRole>
         </g:if>
-    </g:if>
+     </g:hideIfIsNonInventoryManagedAndCanSubmitRequest>
 </ul>
 <!--MegaMenu Ends-->

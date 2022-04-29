@@ -370,8 +370,8 @@ class StockMovementService {
     }
 
 
-    def getInboundStockMovements(Integer maxResults, Integer offset) {
-        return getInboundStockMovements(new StockMovement(), [maxResults:maxResults, offset:offset])
+    def getInboundStockMovements(Map params = [:]) {
+        return getInboundStockMovements(new StockMovement(), params)
     }
 
     def getInboundStockMovements(StockMovement criteria, Map params) {
@@ -410,14 +410,14 @@ class StockMovementService {
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
-            def orderBy = "dateCreated"
 
-            if(params.orderBy == "requisition.dateRequested") {
-                createAlias("requisition","_requisition")
-                orderBy = "_requisition.dateRequested"
+            if (params.orderBy == "requisition.dateRequested") {
+                requisition {
+                    order("dateRequested", "desc")
+                }
+            } else {
+                order("dateCreated", "desc")
             }
-
-            order(orderBy, "desc")
         }
         def stockMovements = shipments.collect { Shipment shipment ->
             if (shipment.requisition) {

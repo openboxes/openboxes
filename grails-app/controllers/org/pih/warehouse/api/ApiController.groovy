@@ -66,25 +66,21 @@ class ApiController {
     }
 
     def getMenuConfig = {
-        Map menuConfig = grailsApplication.config.openboxes.megamenu;
-        def menu = []
-        def enabled = true
         Location location = Location.get(session.warehouse?.id)
 
         if (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST)) {
-            enabled = false
+            render([data: [menuConfig: []]] as JSON)
+            return
         }
 
-        if (enabled) {
-            User user = User.get(session?.user?.id)
+        Map menuConfig = grailsApplication.config.openboxes.megamenu;
+        User user = User.get(session?.user?.id)
 
-            if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
-                menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
-            }
-            menu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
+        if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+            menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
         }
-
-        render([data: [menuConfig: menu]] as JSON)
+        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
+        render([data: [menuConfig: translatedMenu]] as JSON)
     }
 
     def getAppContext = {
