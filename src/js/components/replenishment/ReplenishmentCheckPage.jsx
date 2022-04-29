@@ -210,7 +210,7 @@ class ReplenishmentSecondPage extends Component {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = {
-        status: 'PLACED',
+        status: 'COMPLETED',
         replenishmentItems: this.state.values.replenishment.replenishmentItems,
       };
       apiClient.post(url, flattenRequest(payload))

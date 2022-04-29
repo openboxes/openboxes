@@ -92,8 +92,10 @@ class PicklistItem implements Serializable {
             reasonCode          : reasonCode,
             comment             : comment,
             // Used in Bin Replenishment feature
-            binLocation         : binLocation,
-            zone                : binLocation?.zone,
+            "binLocation.id"    : binLocation?.id,
+            "binLocation.name"  : binLocation?.name,
+            "zone.id"           : binLocation?.zone?.id,
+            "zone.name"         : binLocation?.zone?.name,
             product             : inventoryItem?.product,
             inventoryItem       : inventoryItem,
             lotNumber           : inventoryItem?.lotNumber,

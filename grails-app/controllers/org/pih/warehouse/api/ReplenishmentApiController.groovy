@@ -20,9 +20,6 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
-import org.pih.warehouse.product.Product
-
-import javax.xml.bind.ValidationException
 
 class ReplenishmentApiController {
 
@@ -80,18 +77,15 @@ class ReplenishmentApiController {
 
         Replenishment replenishment = new Replenishment()
         replenishment.id = params.id
-
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-
+        replenishmentService.validateReplenishment(replenishment)
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {
-            replenishmentService.validateReplenishmentQuantity(replenishment)
             Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
             if (order.hasErrors() || !order.save(flush: true)) {
                 throw new ValidationException("Invalid order", order.errors)
             }
-            // if you copy the validate here, the breakpoint doesn't even go there, it seems like it works until 90-th line. So I left it (the validation) in 89th line.
         }
 
         render status: 200
@@ -116,7 +110,6 @@ class ReplenishmentApiController {
             replenishment.replenishmentNumber = identifierService.generateOrderIdentifier()
         }
 
-
         if (jsonObject.status) {
             replenishment.status = ReplenishmentStatus.valueOf(jsonObject.status)
         }
@@ -126,10 +119,6 @@ class ReplenishmentApiController {
             bindData(replenishmentItem, replenishmentItemMap)
             if (!replenishmentItem.location) {
                 replenishmentItem.location = replenishment.destination
-            }
-
-            if (!replenishmentItem.replenishmentLocation) {
-                replenishmentItem.replenishmentLocation = replenishment.destination
             }
 
             replenishmentItemMap.picklistItems.each { pickItemMap ->

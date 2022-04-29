@@ -28,6 +28,8 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
+
 import javax.xml.bind.ValidationException
 
 class ReplenishmentService {
@@ -48,10 +50,8 @@ class ReplenishmentService {
                 eq("status", inventoryLevelStatus)
             }
             eq("location", location)
-            // those two lines below have to be commented in my case for development, because only one item has binLocation and it would be difficult for me to test it,
-            // because below functions filter out the items with "DEFAULT"
-//            isNotNull("binLocation")
-//            gt("quantityAvailable", 0)
+            isNotNull("binLocation")
+            gt("quantityAvailable", 0)
         }
 
         return requirements?.unique {[it.product, it.location, it.binLocation]}?.sort { a, b ->
@@ -143,7 +143,6 @@ class ReplenishmentService {
     }
 
     Order completeReplenishment(Replenishment replenishment) {
-        validateReplenishment(replenishment)
 
         // Save the replenishment as an order
         Order order = createOrUpdateOrderFromReplenishment(replenishment)
@@ -166,64 +165,49 @@ class ReplenishmentService {
 
     void validateRequirement(Replenishment replenishment) {
         replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
-            validateRequirement(replenishmentItem)
+            validateRequirement(replenishment.origin, replenishmentItem)
         }
     }
 
-    void validateRequirement(ReplenishmentItem item) {
-        // Below, this "Integer quantity" I just tried to check if assigning this method to variable maybe makes it not work, but no, it works well
-        // Integer quantity = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)
-        if (item.quantity > productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.location, item.binLocation, item.product)) {
+    void validateRequirement(Location replenishingLocation, ReplenishmentItem item) {
+        def qtyAvailable = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(replenishingLocation, item.binLocation, item.product)
+        if (item.quantity > qtyAvailable) {
             throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
         }
-    }
-
-    void validateReplenishmentQuantity(Replenishment replenishment) {
-        replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
-            validateReplenishmentQuantity(replenishmentItem)
-        }
-    }
-
-    void validateReplenishmentQuantity(ReplenishmentItem item) {
-        Integer quantityPicked = item.picklistItems.quantity.sum { it.toInteger() }
-        Integer quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(item.replenishmentLocation, item.binLocation, item.product)
-        def quantityAvailableToPromiseWithPicked = quantityAvailableToPromise + quantityPicked
-        if (item.quantity > quantityAvailableToPromiseWithPicked) {
-            throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
-        }
-
     }
 
     void validateReplenishment(Replenishment replenishment) {
         replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
-            validateReplenishmentItem(replenishmentItem)
+            validateReplenishmentItem(replenishment.origin, replenishmentItem)
         }
     }
 
-    void validateReplenishmentItem(ReplenishmentItem replenishmentItem) {
+    void validateReplenishmentItem(Location replenishingLocation, ReplenishmentItem replenishmentItem) {
         def quantity = replenishmentItem.quantity
 
         if (replenishmentItem.picklistItems) {
             quantity = replenishmentItem.picklistItems.sum { it.quantity }
         }
 
-        validateQuantityAvailable(replenishmentItem.replenishmentLocation, replenishmentItem.inventoryItem, quantity)
+        validateQuantityAvailable(replenishingLocation, replenishmentItem, quantity)
     }
 
-    void validateQuantityAvailable(Location replenishmentLocation, InventoryItem inventoryItem, BigDecimal quantity) {
-
-        if (!replenishmentLocation) {
+    void validateQuantityAvailable(Location replenishingLocation, ReplenishmentItem replenishmentItem, Integer quantityPicked) {
+        if (!replenishingLocation) {
             throw new IllegalArgumentException("Location is required")
         }
-        Integer quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(inventoryItem, replenishmentLocation)
-        log.info "Quantity: ${quantity} vs ${quantityAvailable}"
 
-        if (quantityAvailable < 0) {
-            throw new IllegalStateException("The inventory item is no longer available at the specified location ${replenishmentLocation}")
-        }
+        Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(
+            replenishingLocation,
+            replenishmentItem.binLocation,
+            replenishmentItem.product
+        )
 
-        if (quantity > quantityAvailable) {
-            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to replenish ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
+        Integer quanttityAvailableWithPicked = quantityAvailable + quantityPicked
+        log.info "Quantity: ${quantityPicked} vs ${quanttityAvailableWithPicked}"
+
+        if (quantityPicked > quanttityAvailableWithPicked) {
+            throw new IllegalStateException("Quantity available ${quanttityAvailableWithPicked} is less than quantity to replenish ${quantityPicked} for product ${replenishmentItem.product.productCode} ${replenishmentItem.product.name}")
         }
     }
 
