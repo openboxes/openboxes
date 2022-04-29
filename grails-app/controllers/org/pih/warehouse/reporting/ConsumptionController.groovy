@@ -17,9 +17,8 @@ import org.apache.commons.collections.list.LazyList
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
@@ -41,6 +40,7 @@ class ConsumptionController {
     ProductService productService
     InventoryService inventoryService
     ConsumptionService consumptionService
+    UserService userService
 
     def show = { ShowConsumptionCommand command ->
 
@@ -130,9 +130,7 @@ class ConsumptionController {
                     command.rows[product].product = product
                 }
 
-                User user = session.user as User
-
-                if(!user.roles.contains(RoleType.ROLE_FINANCE)) {
+                if(!userService.hasRoleFinance(session?.user)) {
                     command.rows[product].product.pricePerUnit = 0
                 }
 
@@ -146,7 +144,7 @@ class ConsumptionController {
 
                     if (!transferOutQuantity) {
                         command.rows[product].transferOutMap[transaction.destination] = 0
-                    } else if (transaction.order.orderType.code != "PUTAWAY_ORDER" && transaction.order.orderType.code != OrderTypeCode.TRANSFER_ORDER.name()) {
+                    } else if (transaction.order.orderType.code != Constants.PUTAWAY_ORDER && transaction.order.orderType.code != OrderTypeCode.TRANSFER_ORDER.name()) {
                         command.rows[product].issuedQuantity += transferOutQuantity
                     } else {
                         command.rows[product].returnedQuantity += transferOutQuantity
