@@ -2,13 +2,13 @@
 <div class="buttonBar">
     <div class="button-container">
         <button id="btnAddBinLocation" class="button">
-            <g:message code="default.add.label" args="[g.message(code:'location.binLocation.label')]"/>
+            <g:message code="default.add.label" args="[g.message(code:'location.internalLocation.label', default: 'Internal Location')]"/>
         </button>
         <button id="btnImportBinLocations" class="button">
-            <g:message code="default.import.label" args="[g.message(code:'location.binLocations.label')]"/>
+            <g:message code="default.import.label" args="[g.message(code:'location.internalLocations.label', default: 'Internal Locations')]"/>
         </button>
         <button id="btnExportBinLocations" class="button" data-href="${g.createLink(controller: 'location', action: 'exportBinLocations', id: params.id)}">
-            <g:message code="default.export.label" args="[g.message(code:'location.binLocations.label')]"/>
+            <g:message code="default.export.label" args="[g.message(code:'location.internalLocations.label', default: 'Internal Location')]"/>
         </button>
     </div>
 </div>
@@ -23,8 +23,8 @@
                     <th width="1%"><g:message code="warehouse.active.label" default="Active"/></th>
                     <th><g:message code="location.binLocation.label" default="Bin Location"/></th>
                     <th><g:message code="location.locationNumber.label"/></th>
-                    <th><g:message code="location.zone.label"/></th>
                     <th><g:message code="location.locationType.label"/></th>
+                    <th><g:message code="location.zone.label"/></th>
                     <th><g:message code="default.actions.label"></g:message></th>
                 </tr>
                 </thead>
@@ -48,10 +48,10 @@
                             ${binLocation?.locationNumber}
                         </td>
                         <td>
-                            ${binLocation?.zone?.name}
+                            ${binLocation?.locationType?.name}
                         </td>
                         <td>
-                            ${binLocation?.locationType?.name}
+                            ${binLocation?.zone?.name}
                         </td>
                         <td>
                             <a href="javascript:void(-1)" class="btnShowContents button" data-id="${binLocation?.id}" fragment="location-details-tab">

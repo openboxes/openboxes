@@ -14,7 +14,7 @@
 							code="requisition.requestedDeliveryDate.label" /></label>
 					</td>
 					<td valign="top"
-						class="value ${hasErrors(bean: documentInstance, field: 'requestedDeliveryDate', 'errors')}">
+						class="value ${hasErrors(bean: stockMovement, field: 'requestedDeliveryDate', 'errors')}">
 						<g:datePicker name="requestedDeliveryDate" value="${stockMovement?.requestedDeliveryDate}"/>
 					</td>
 				</tr>
@@ -23,7 +23,7 @@
 							code="shipping.expectedShippingDate.label" /></label>
 					</td>
 					<td valign="top"
-						class="value ${hasErrors(bean: documentInstance, field: 'expectedShippingDate', 'errors')}">
+						class="value ${hasErrors(bean: stockMovement, field: 'expectedShippingDate', 'errors')}">
 						<g:datePicker name="expectedShippingDate" value="${stockMovement?.expectedShippingDate}"/>
 					</td>
 				</tr>
@@ -32,8 +32,45 @@
 							code="shipping.expectedDeliveryDate.label" /></label>
 					</td>
 					<td valign="top"
-						class="value ${hasErrors(bean: documentInstance, field: 'expectedDeliveryDate', 'errors')}">
+						class="value ${hasErrors(bean: stockMovement, field: 'expectedDeliveryDate', 'errors')}">
 						<g:datePicker name="expectedDeliveryDate" value="${stockMovement?.expectedDeliveryDate}"/>
+					</td>
+				</tr>
+			</tbody>
+			</table>
+			<table>
+			<tbody>
+				<tr class="prop">
+					<td valign="top" class="name"><label><warehouse:message
+							code="stockMovement.receivingLocation.label"  default="Receiving Location"/></label>
+					</td>
+					<td valign="top"
+						class="value ${hasErrors(bean: stockMovement, field: 'receivingLocation', 'errors')}">
+						<g:selectInternalLocation name="receivingLocation.id" value="${stockMovement?.receivingLocation?.id}"
+												  class="chzn-select-deselect" noSelection="['':'']"
+												  activityCode="${org.pih.warehouse.core.ActivityCode.RECEIVE_STOCK}"/>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label><warehouse:message
+							code="stockMovement.packingLocation.label" default="Packing Location" /></label>
+					</td>
+					<td valign="top"
+						class="value ${hasErrors(bean: stockMovement, field: 'packingLocation', 'errors')}">
+						<g:selectInternalLocation name="packingLocation.id" value="${stockMovement?.packingLocation?.id}"
+												  class="chzn-select-deselect" noSelection="['':'']"
+												  activityCode="${org.pih.warehouse.core.ActivityCode.PACK_STOCK}"/>
+					</td>
+				</tr>
+				<tr class="prop">
+					<td valign="top" class="name"><label><warehouse:message
+							code="stockMovement.loadingLocation.label" default="Loading Location"/></label>
+					</td>
+					<td valign="top"
+						class="value ${hasErrors(bean: stockMovement, field: 'loadingLocation', 'errors')}">
+						<g:selectInternalLocation name="loadingLocation.id" value="${stockMovement?.loadingLocation?.id}"
+												  class="chzn-select-deselect" noSelection="['':'']"
+												  activityCode="${org.pih.warehouse.core.ActivityCode.LOAD_STOCK}"/>
 					</td>
 				</tr>
 

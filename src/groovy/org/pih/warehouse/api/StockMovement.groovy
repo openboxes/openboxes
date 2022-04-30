@@ -73,6 +73,10 @@ class StockMovement {
     String currentStatus
     Float totalValue
 
+    Location packingLocation
+    Location loadingLocation
+    Location receivingLocation
+
     StockMovementType stockMovementType
     StockMovementStatusCode stockMovementStatusCode
 
@@ -341,6 +345,9 @@ class StockMovement {
                 createdBy: shipment.createdBy,
                 updatedBy: shipment.updatedBy,
                 shipment: shipment,
+                receivingLocation: shipment?.receivingScheduled?.eventLocation,
+                packingLocation: shipment?.packingScheduled?.eventLocation,
+                loadingLocation: shipment?.loadingScheduled?.eventLocation,
                 isFromOrder: shipment?.isFromPurchaseOrder,
                 isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
                 isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
@@ -396,6 +403,9 @@ class StockMovement {
             requestedDeliveryDate: requisition?.requestedDeliveryDate,
             expectedShippingDate: shipment?.expectedShippingDate,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
+            receivingLocation: shipment?.receivingScheduled?.eventLocation,
+            packingLocation: shipment?.packingScheduled?.eventLocation,
+            loadingLocation: shipment?.loadingScheduled?.eventLocation,
             driverName: shipment?.driverName,
             trackingNumber: trackingNumber?.identifier,
             currentStatus: shipment?.currentStatus,
