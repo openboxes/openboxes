@@ -216,7 +216,9 @@ class TmsIntegrationService {
         SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
         Date acceptanceTimestamp = new Date()
         try {
-            acceptanceTimestamp = dateFormatter.parse(acceptanceStatus.acceptanceTimestamp)
+            if (acceptanceStatus.acceptanceTimestamp) {
+                acceptanceTimestamp = dateFormatter.parse(acceptanceStatus.acceptanceTimestamp)
+            }
         } catch (ParseException e) {
             log.error("Unable to parse acceptance timestamp, using current timestamp (${acceptanceTimestamp}): ", e)
         }
