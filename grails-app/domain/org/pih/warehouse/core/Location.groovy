@@ -336,7 +336,15 @@ class Location implements Comparable<Location>, java.io.Serializable {
         switch (locationTypeCode) {
             case LocationTypeCode.INTERNAL:
             case LocationTypeCode.BIN_LOCATION:
-                return [id: id, name: name, locationTypeCode: locationType?.locationTypeCode?.name(), zoneId: zone?.id, zoneName: zone?.name]
+                return [
+                        id: id,
+                        name: name,
+                        locationNumber: locationNumber,
+                        locationType: locationType?.name,
+                        locationTypeCode: locationType?.locationTypeCode?.name(),
+                        zoneId: zone?.id,
+                        zoneName: zone?.name
+                ]
 
             default:
                 return toJson()
