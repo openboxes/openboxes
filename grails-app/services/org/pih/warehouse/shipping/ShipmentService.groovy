@@ -267,6 +267,7 @@ class ShipmentService {
                     }
                 }
             }
+            order("expectedShippingDate", "asc")
         }
     }
 
