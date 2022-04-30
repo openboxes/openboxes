@@ -10,9 +10,10 @@
 package org.pih.warehouse.shipping
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.BaseDomainApiController
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.product.Product
+import org.pih.warehouse.requisition.RequisitionStatus
 
 class ShipmentApiController extends BaseDomainApiController {
 
@@ -22,7 +23,8 @@ class ShipmentApiController extends BaseDomainApiController {
         Location origin = params.origin ? Location.get(params?.origin?.id) : null
         Location destination = params.destination ? Location.get(params?.destination?.id) : null
         ShipmentStatusCode shipmentStatusCode = params.shipmentStatusCode ? params.shipmentStatusCode as ShipmentStatusCode : null
-        List<Shipment> shipments = shipmentService.getShipmentsByLocation(origin, destination, shipmentStatusCode)
+        List<RequisitionStatus> requisitionStatuses = params.list("requisitionStatus").collect { it as RequisitionStatus }
+        List<Shipment> shipments = shipmentService.getShipmentsByLocation(origin, destination, shipmentStatusCode, requisitionStatuses)
         render ([data: shipments] as JSON)
     }
 

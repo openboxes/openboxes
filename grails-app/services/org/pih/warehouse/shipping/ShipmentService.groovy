@@ -47,6 +47,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
 
@@ -246,7 +247,7 @@ class ShipmentService {
      * @param location
      * @return
      */
-    List<Shipment> getShipmentsByLocation(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode) {
+    List<Shipment> getShipmentsByLocation(Location origin, Location destination, ShipmentStatusCode shipmentStatusCode, List<RequisitionStatus> requisitionStatuses = []) {
         return Shipment.withCriteria {
             and {
                 or {
@@ -259,6 +260,11 @@ class ShipmentService {
                 }
                 if (shipmentStatusCode) {
                     eq("currentStatus", shipmentStatusCode)
+                }
+                if (requisitionStatuses) {
+                    requisition {
+                        'in'("status", requisitionStatuses)
+                    }
                 }
             }
         }
