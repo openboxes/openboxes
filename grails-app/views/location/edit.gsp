@@ -49,8 +49,8 @@
                     <%--<li><a href="#location-binLocations-tab"><g:message code="location.binLocations.label" default="Bin Locations"/></a></li>--%>
                         <li><a href="${request.contextPath}/location/showBinLocations/${locationInstance?.id}"
                                id="location-binLocations-tab">
-                            <g:message code="location.binLocations.label"
-                                       default="Bin Locations"/></a>
+                            <g:message code="location.internalLocations.label"
+                                       default="Internal Locations"/></a>
                         </li>
 
                     </g:if>
