@@ -16,6 +16,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.EventTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -109,7 +110,10 @@ class Shipment implements Comparable, Serializable {
             "consigneeAddress",
             "receipt",
             "isFromPurchaseOrder",
-            "orders"
+            "orders",
+            "packingScheduled",
+            "loadingScheduled",
+            "receivingScheduled"
     ]
 
     static mappedBy = [
@@ -626,6 +630,50 @@ class Shipment implements Comparable, Serializable {
     Date dateCustomsRelease() {
         Event event = events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.CUSTOMS_RELEASE }
         return event?.eventDate
+    }
+
+    void createOrUpdateEvent(Event event) {
+        createOrUpdateEvent(event.eventType.eventCode, event.eventLocation, event.eventDate, event.observedBy)
+    }
+
+    void createOrUpdateEvent(EventTypeCode eventTypeCode, Location eventLocation, Date eventDate, User observedBy) {
+        EventType eventType = EventType.findByEventCode(eventTypeCode)
+        if (!eventType) {
+            throw new IllegalArgumentException("Unable to save event because there is no event type for ${eventTypeCode}")
+        }
+
+        Event event = events.find { Event event -> event?.eventType == eventType }
+        if (!event) {
+            event = new Event(eventType: eventType)
+        }
+        event.eventLocation = eventLocation
+        event.eventDate = eventDate
+        event.observedBy = observedBy
+        addToEvents(event)
+    }
+
+    Event getPackingScheduled() {
+        return events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.PACKING_SCHEDULED }
+    }
+
+    void setPackingScheduled(Location eventLocation, Date eventDate, User observedBy) {
+        createOrUpdateEvent(EventTypeCode.PACKING_SCHEDULED, eventLocation, eventDate, observedBy)
+    }
+
+    Event getLoadingScheduled() {
+        return events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.LOADING_SCHEDULED }
+    }
+
+    void setLoadingScheduled(Location eventLocation, Date eventDate, User observedBy) {
+        createOrUpdateEvent(EventTypeCode.LOADING_SCHEDULED, eventLocation, eventDate, observedBy)
+    }
+
+    Event getReceivingScheduled() {
+        return events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.RECEIVING_SCHEDULED }
+    }
+
+    void setReceivingScheduled(Location eventLocation, Date eventDate, User observedBy) {
+        createOrUpdateEvent(EventTypeCode.RECEIVING_SCHEDULED, eventLocation, eventDate, observedBy)
     }
 
     Map toJson() {

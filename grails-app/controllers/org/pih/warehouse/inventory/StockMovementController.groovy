@@ -23,6 +23,7 @@ import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
@@ -402,6 +403,15 @@ class StockMovementController {
         if (shipment) {
             shipment.expectedDeliveryDate = params.expectedDeliveryDate
             shipment.expectedShippingDate = params.expectedShippingDate
+            if (params?.receivingLocation?.id) {
+                shipment.setReceivingScheduled(Location.load(params.receivingLocation.id), new Date(), User.load(session.user.id))
+            }
+            if (params?.packingLocation?.id) {
+                shipment.setPackingScheduled(Location.load(params.packingLocation.id), new Date(), User.load(session.user.id))
+            }
+            if (params?.loadingLocation?.id) {
+                shipment.setLoadingScheduled(Location.load(params.loadingLocation.id), new Date(), User.load(session.user.id))
+            }
             shipment.save()
         }
 
