@@ -383,8 +383,8 @@ class StockMovementService {
     }
 
 
-    def getInboundStockMovements(Integer maxResults, Integer offset) {
-        return getInboundStockMovements(new StockMovement(), [:], maxResults, offset)
+    def getInboundStockMovements(Map params = [:]) {
+        return getInboundStockMovements(new StockMovement(), params)
     }
 
     def getInboundStockMovements(StockMovement criteria, Map params) {
@@ -507,14 +507,14 @@ class StockMovementService {
         return new PagedResultList(stockMovements, shipments.totalCount)
     }
 
-    def getOutboundStockMovements(Integer maxResults, Integer offset, Map params = [:]) {
+    def getOutboundStockMovements(Map params = [:]) {
         log.info("outbound stock filter param:${params}")
         StockMovement stockMovement = new StockMovement()
         stockMovement.stockMovementStatusCode = params?.status ? params?.status as StockMovementStatusCode : null
         stockMovement.origin = params?.origin?.id ? Location.get(params.origin.id) : null
         stockMovement.name = params.name ? "%" + params?.name + "%" : null
         stockMovement.identifier = params.identifier ? params?.identifier + "%" : null
-        return getOutboundStockMovements(stockMovement, [maxResults:maxResults, offset:offset])
+        return getOutboundStockMovements(stockMovement, params)
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {

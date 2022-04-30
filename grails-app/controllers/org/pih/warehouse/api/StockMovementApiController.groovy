@@ -32,13 +32,15 @@ class StockMovementApiController {
     def stockMovementService
 
     def list = {
-        int max = Math.min(params.max ? params.int('max') : 10, 1000)
-        int offset = params.offset ? params.int("offset") : 0
-        // Origin should default to current location if not specified by API client
+        if (params.max || params.offset) {
+            params.max = Math.min(params.max ? params.int('max') : 10, 1000)
+            params.offset = params.offset ? params.int("offset") : 0
+        }
+        // Origin should default to current location if not specified by API client (used for outbound)
         params["origin.id"] = params.origin ? params.origin.id : session.warehouse.id
         def stockMovements = params.direction == "INBOUND" ?
-                stockMovementService.getInboundStockMovements(max, offset) :
-                stockMovementService.getOutboundStockMovements(max, offset, params)
+                stockMovementService.getInboundStockMovements(params) :
+                stockMovementService.getOutboundStockMovements(params)
 
         stockMovements = stockMovements.collect { StockMovement stockMovement ->
             Map json = stockMovement.toJson()
