@@ -103,6 +103,10 @@ class Shipment implements Comparable, Serializable {
             "containersByType",
             "mostRecentEvent",
             "status",
+            "packingStatus",
+            "totalItemCount",
+            "packedItemCount",
+            "unpackedItemCount",
             "actualShippingDate",
             "actualDeliveryDate",
             "recipients",
@@ -244,6 +248,26 @@ class Shipment implements Comparable, Serializable {
 
     Collection<ShipmentItem> getUnpackedShipmentItems() {
         return shipmentItems.findAll { !it.container }
+    }
+
+    Collection<ShipmentItem> getPackedShipmentItems() {
+        return shipmentItems.findAll { it.container }
+    }
+
+    Integer getUnpackedItemCount() {
+        return unpackedShipmentItems?.size()?:0
+    }
+
+    Integer getPackedItemCount() {
+        return packedShipmentItems?.size()?:0
+    }
+
+    Integer getTotalItemCount() {
+        return allShipmentItems?.size()?:0
+    }
+
+    String getPackingStatus() {
+        return "${packedItemCount} / ${totalItemCount}"
     }
 
     /**
@@ -691,6 +715,8 @@ class Shipment implements Comparable, Serializable {
                 name                : name,
                 shipmentNumber      : shipmentNumber,
                 status              : status?.code?.name(),
+                requisitionStatus   : requisition.status?.name(),
+                packingStatus       : packingStatus,
                 origin              : [
                         id  : origin?.id,
                         name: origin?.name,
@@ -706,6 +732,10 @@ class Shipment implements Comparable, Serializable {
                 actualShippingDate  : actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
                 expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
                 actualDeliveryDate  : actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+                packingLocation     : packingScheduled?.eventLocation?.name ?: "Unassigned",
+                loadingLocation     : loadingScheduled?.eventLocation?.name ?: "Unassigned",
+                totalCount          : totalItemCount,
+                unpackedCount       : unpackedItemCount,
                 shippedCount        : shipmentItemCount,
                 receivedCount       : shipmentItems?.findAll { it.isFullyReceived() }.size(),
                 shipmentItems       : shipmentItems,
