@@ -25,6 +25,7 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -117,6 +118,8 @@ class ConsumptionController {
         // FIXME Hard-code transaction types (OBPIH-2059)
         command.transactionTypes = transactions*.transactionType.unique()
 
+        def userHasFinanceRole = userService.hasRoleFinance(session?.user)
+
         // Iterate over all transactions
         transactions.each { Transaction transaction ->
 
@@ -130,7 +133,7 @@ class ConsumptionController {
                     command.rows[product].product = product
                 }
 
-                if(!userService.hasRoleFinance(session?.user)) {
+                if(!userHasFinanceRole) {
                     command.rows[product].product.pricePerUnit = 0
                 }
 
@@ -144,10 +147,12 @@ class ConsumptionController {
 
                     if (!transferOutQuantity) {
                         command.rows[product].transferOutMap[transaction.destination] = 0
-                    } else if (transaction.order.orderType.code != Constants.PUTAWAY_ORDER && transaction.order.orderType.code != OrderTypeCode.TRANSFER_ORDER.name()) {
-                        command.rows[product].issuedQuantity += transferOutQuantity
-                    } else {
-                        command.rows[product].returnedQuantity += transferOutQuantity
+                    }
+
+                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
+
+                    if (transaction?.order?.orderType?.code != Constants.PUTAWAY_ORDER && transaction?.order?.orderType?.code != OrderTypeCode.TRANSFER_ORDER.name()) {
+                        command.rows[product].issuedQuantity += transactionEntry.quantity
                     }
 
                 } else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
@@ -168,8 +173,15 @@ class ConsumptionController {
 
                     // Add to the total transfer out per location
                     command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
+
+                    if(transaction?.order?.orderType?.code == Constants.RETURN_ORDER) {
+                        command.rows[product].returnedQuantity += transactionEntry.quantity
+                        command.rows[product].transferOutMap[transaction.destination] -= transactionEntry.quantity
+                    }
+
                 } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
                     command.rows[product].consumedQuantity += transactionEntry.quantity
+                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
                 }
 
                 command.rows[product].returnedQuantity *= -1
@@ -188,14 +200,27 @@ class ConsumptionController {
                     if (!transferOutMonthlyQuantity) {
                         command.rows[product].transferOutMonthlyMap[dateKey] = 0
                     }
-                    command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
+
+                    if (transaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
+                        if (transaction?.order?.orderType?.code != Constants.PUTAWAY_ORDER && transaction?.order?.orderType?.code != OrderTypeCode.TRANSFER_ORDER.name()) {
+                            command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
+                        }
+                    } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
+                        command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
+                    }
+
                 } else if (transaction.transactionType.transactionCode == TransactionCode.CREDIT) {
                     // Add to total transfer in by month (initialize transfer out by month map)
                     def transferInMonthlyQuantity = command.rows[product].transferInMonthlyMap[dateKey]
                     if (!transferInMonthlyQuantity) {
                         command.rows[product].transferInMonthlyMap[dateKey] = 0
                     }
-                    command.rows[product].transferInMonthlyMap[dateKey] += transactionEntry.quantity
+
+                    if (transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
+                            && transaction?.order?.orderType?.code == Constants.RETURN_ORDER) {
+                        command.rows[product].transferInMonthlyMap[dateKey] -= transactionEntry.quantity
+
+                    }
                 }
 
                 // All transactions
@@ -539,7 +564,7 @@ class ShowConsumptionRowCommand {
     }
 
     Float getMonthlyQuantity() {
-        transferBalance / command.numberOfMonths
+        totalConsumptionQuantity / command.numberOfMonths
     }
 
     Float getWeeklyQuantity() {
