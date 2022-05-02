@@ -11,6 +11,9 @@
                     <warehouse:message code="default.actions.label"/>
                 </th>
                 <th>
+                    <warehouse:message code="inventoryItem.lotStatus.label" default="Status"/>
+                </th>
+                <th>
                     <warehouse:message code="inventory.binLocation.label" default="Bin Location"/>
                 </th>
                 <th>
@@ -26,7 +29,7 @@
                     <warehouse:message code="stockCard.qtyAvailable.label"/>
                 </th>
                 <th>
-                    <warehouse:message code="inventoryItem.lotStatus.label" default="Status"/>
+                    <warehouse:message code="stockCard.qtyAllocated.label" default="Allocated"/>
                 </th>
             </tr>
         </thead>
@@ -45,12 +48,27 @@
                                   model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantityOnHand,isSuperuser:isSuperuser]" />
                     </td>
                     <td>
+                        <g:if test="${entry?.status == AvailableItemStatus.PICKED}">
+                            <a href="javascript:void(0);" onclick="$('#showPendingOutboundTabLink').click();">
+                                <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
+                            </a>
+                        </g:if>
+                        <g:else>
+                            <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
+                        </g:else>
+                        <div class="small">
+                            ${entry?.inventoryItem?.lotStatus}
+                        </div>
+                    </td>
+                    <td>
                         <div class="line">
                             <g:if test="${entry?.binLocation}">
                                 <g:if test="${entry?.binLocation?.zone}">
                                     <span class="line-base" title="${entry?.binLocation?.zone?.name}">
-                                        <g:link controller="location" action="edit" id="${entry.binLocation?.zone?.id}">${entry?.binLocation?.zone?.name}</g:link>
-                                    </span>:&nbsp;
+                                        <g:link controller="location" action="edit" id="${entry.binLocation?.zone?.id}">
+                                            ${entry?.binLocation?.zone?.name}
+                                        </g:link>
+                                    </span>&nbsp;&rsaquo;&nbsp;
                                 </g:if>
                                 <span class="line-extension" title="${entry?.binLocation?.name}">
                                     <g:link controller="location" action="edit" id="${entry.binLocation?.id}">${entry?.binLocation?.name}</g:link>
@@ -67,6 +85,7 @@
                     <td>
                         <g:expirationDate date="${entry?.inventoryItem?.expirationDate}"/>
                     </td>
+
                     <td>
                         ${g.formatNumber(number: entry?.quantityOnHand, format: '###,###,###') }
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
@@ -76,25 +95,22 @@
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
                     </td>
                     <td>
-                        <g:if test="${entry?.status == AvailableItemStatus.PICKED}">
-                            <a href="javascript:void(0);" onclick="$('#showPendingOutboundTabLink').click();">
-                                <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
-                            </a>
+                        <g:if test="${entry?.quantityAllocated}">
+                            ${g.formatNumber(number: entry?.quantityAllocated, format: '###,###,###') }
+                            ${entry?.inventoryItem?.product?.unitOfMeasure}
                         </g:if>
-                        <g:else>
-                            <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
-                        </g:else>
-                        <div class="small">
-                            ${entry?.inventoryItem?.lotStatus}
-                        </div>
-
-
+                        <g:each var="requisitionNumber" in="${entry.pickedRequisitionNumbers}">
+                            <g:link controller="stockMovement" action="show" id="${requisitionNumber}">
+                                ${requisitionNumber}
+                            </g:link>
+                        </g:each>
                     </td>
+
                 </tr>
             </g:each>
             <g:unless test="${commandInstance.availableItems}">
                 <tr>
-                    <td colspan="6">
+                    <td colspan="8">
                         <div class="fade empty center">
                             <warehouse:message code="inventory.noItemsCurrentlyInStock.message"
                                                args="[format.product(product:commandInstance?.product)]"/>
@@ -105,8 +121,8 @@
         </tbody>
         <tfoot>
             <tr class="odd" style="border-top: 1px solid lightgrey; border-bottom: 0px solid lightgrey">
-                <td colspan="4" class="right">
-                    <!-- This space intentially left blank -->
+                <td colspan="5" class="right">
+                    <!-- This space intentionally left blank -->
                 </td>
                 <td>
                     <div class="large">
@@ -145,9 +161,6 @@
                             </g:else>
                         </span>
                     </div>
-                </td>
-                <td>
-                    <!-- This space intentially left blank -->
                 </td>
                 <g:hasErrors bean="${flash.itemInstance}">
                     <td style="border: 0px;">

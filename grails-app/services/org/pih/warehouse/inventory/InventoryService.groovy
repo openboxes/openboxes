@@ -70,6 +70,12 @@ class InventoryService implements ApplicationContextAware {
         return applicationContext.getBean("orderService")
     }
 
+    /**
+     * @return stock movement service
+     */
+    def getStockMovementService() {
+        return applicationContext.getBean("stockMovementService")
+    }
 
     /**
      * Saves the specified warehouse
@@ -1233,11 +1239,18 @@ class InventoryService implements ApplicationContextAware {
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantityOnHand != 0) {
+
+                        def picklists = stockMovementService.getPicklistByLocationAndProduct(binLocation, inventoryItem)
+                        List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
+
                         availableItems << new AvailableItem(
                                 inventoryItem: inventoryItem,
                                 binLocation: binLocation,
                                 quantityOnHand: quantityOnHand,
-                                quantityAvailable: quantityAvailable
+                                quantityAvailable: quantityAvailable,
+                                quantityPicked: picklists*.picklistItems?.flatten()?.sum { it.quantityPicked },
+                                quantityAllocated: picklists*.picklistItems?.flatten()?.sum { it.quantity },
+                                pickedRequisitionNumbers: pickedRequisitionNumbers
                         )
                     }
                 }

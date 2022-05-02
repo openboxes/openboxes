@@ -310,6 +310,8 @@ class AvailableItem {
     Location binLocation
     BigDecimal quantityAvailable
     BigDecimal quantityOnHand
+    BigDecimal quantityAllocated = 0
+    BigDecimal quantityPicked = 0
 
     List<String> pickedRequisitionNumbers
 
@@ -331,6 +333,9 @@ class AvailableItem {
         }
         if (quantityAvailable > 0 && quantityAvailable < quantityOnHand) {
             return AvailableItemStatus.PICKED
+        }
+        if (quantityAllocated > 0) {
+            return AvailableItemStatus.ALLOCATED
         }
         if (quantityAvailable > 0) {
             return AvailableItemStatus.AVAILABLE
@@ -380,7 +385,7 @@ class AvailableItem {
 }
 
 enum AvailableItemStatus {
-    AVAILABLE, PICKED, RECALLED, HOLD, NOT_AVAILABLE
+    AVAILABLE, ALLOCATED, PICKED, RECALLED, HOLD, NOT_AVAILABLE
 }
 
 class SuggestedItem extends AvailableItem {

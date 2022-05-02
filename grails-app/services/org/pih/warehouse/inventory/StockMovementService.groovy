@@ -706,7 +706,7 @@ class StockMovementService {
     }
 
     StockMovement getStockMovement(String id, String stepNumber, Boolean includeDocuments = Boolean.TRUE) {
-        Requisition requisition = Requisition.get(id)
+        Requisition requisition = Requisition.findByIdOrRequestNumber(id, id)
         if (requisition) {
             return getRequisitionBasedStockMovement(requisition, stepNumber, includeDocuments)
         } else {
