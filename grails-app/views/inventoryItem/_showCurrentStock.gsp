@@ -26,10 +26,13 @@
                     <warehouse:message code="stockCard.qtyOnHand.label"/>
                 </th>
                 <th>
+                    <warehouse:message code="stockCard.qtyAllocated.label" default="Allocated"/>
+                </th>
+                <th>
                     <warehouse:message code="stockCard.qtyAvailable.label"/>
                 </th>
                 <th>
-                    <warehouse:message code="stockCard.qtyAllocated.label" default="Allocated"/>
+                    <warehouse:message code="stockMovements.label" default="Stock Movements"/>
                 </th>
             </tr>
         </thead>
@@ -48,7 +51,7 @@
                                   model="[commandInstance:commandInstance,binLocation:entry.binLocation,itemInstance:entry.inventoryItem,itemQuantity:entry.quantityOnHand,isSuperuser:isSuperuser]" />
                     </td>
                     <td>
-                        <g:if test="${entry?.status == AvailableItemStatus.PICKED}">
+                        <g:if test="${entry?.status in [AvailableItemStatus.PICKED, org.pih.warehouse.api.AvailableItemStatus.ALLOCATED]}">
                             <a href="javascript:void(0);" onclick="$('#showPendingOutboundTabLink').click();">
                                 <warehouse:message code="stockCard.enum.AvailableItemStatus.${entry?.status}"/>
                             </a>
@@ -91,14 +94,16 @@
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
                     </td>
                     <td>
-                        ${g.formatNumber(number: entry?.quantityAvailable, format: '###,###,###') }
-                        ${entry?.inventoryItem?.product?.unitOfMeasure}
-                    </td>
-                    <td>
                         <g:if test="${entry?.quantityAllocated}">
                             ${g.formatNumber(number: entry?.quantityAllocated, format: '###,###,###') }
                             ${entry?.inventoryItem?.product?.unitOfMeasure}
                         </g:if>
+                    </td>
+                    <td>
+                        ${g.formatNumber(number: entry?.quantityAvailable, format: '###,###,###') }
+                        ${entry?.inventoryItem?.product?.unitOfMeasure}
+                    </td>
+                    <td>
                         <g:each var="requisitionNumber" in="${entry.pickedRequisitionNumbers}">
                             <g:link controller="stockMovement" action="show" id="${requisitionNumber}">
                                 ${requisitionNumber}
@@ -133,14 +138,24 @@
                         <span style="${styleClass }" id="totalQuantity">
                             ${g.formatNumber(number: commandInstance.totalQuantity, format: '###,###,###') }
                         </span>
-                        <span class="">
-                            <g:if test="${commandInstance?.product?.unitOfMeasure }">
-                                <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
-                            </g:if>
-                            <g:else>
-                                ${warehouse.message(code:'default.each.label') }
-                            </g:else>
-                        </span>
+                        <g:if test="${commandInstance?.product?.unitOfMeasure }">
+                            <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code:'default.each.label') }
+                        </g:else>
+                    </div>
+                </td>
+                <td>
+                    <div class="large">
+                        <g:set var="totalQuantityAllocated" value="${commandInstance?.availableItems?.sum { it?.quantityAllocated?:0 }}"/>
+                        ${g.formatNumber(number: totalQuantityAllocated, format: '###,###,###') }
+                        <g:if test="${commandInstance?.product?.unitOfMeasure }">
+                            <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code:'default.each.label') }
+                        </g:else>
                     </div>
                 </td>
                 <td>
@@ -152,15 +167,16 @@
                         <span style="${styleClass }" id="totalQuantityAvailableToPromise">
                             ${g.formatNumber(number: commandInstance.totalQuantityAvailableToPromise, format: '###,###,###') }
                         </span>
-                        <span class="">
-                            <g:if test="${commandInstance?.product?.unitOfMeasure }">
-                                <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
-                            </g:if>
-                            <g:else>
-                                ${warehouse.message(code:'default.each.label') }
-                            </g:else>
-                        </span>
+                        <g:if test="${commandInstance?.product?.unitOfMeasure }">
+                            <format:metadata obj="${commandInstance?.product?.unitOfMeasure}"/>
+                        </g:if>
+                        <g:else>
+                            ${warehouse.message(code:'default.each.label') }
+                        </g:else>
                     </div>
+                </td>
+                <td>
+                    <!-- this space intentionally left blank -->
                 </td>
                 <g:hasErrors bean="${flash.itemInstance}">
                     <td style="border: 0px;">
