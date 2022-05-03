@@ -19,11 +19,14 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
+import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
+import org.pih.warehouse.order.OrderAllocationStrategy
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -678,10 +681,85 @@ class ProductAvailabilityService {
         return availableItems
     }
 
+    OrderAllocationStrategy getOrderAllocationStrategy() {
+        OrderAllocationStrategy defaultOrderAllocationStrategy =
+                grailsApplication.config.openboxes.order.allocation.strategy?:OrderAllocationStrategy.FEFO
+        Location currentLocation = AuthService.currentLocation.get()
+        log.info "current location " + currentLocation.supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_CUSTOM)
+        if (currentLocation && currentLocation.orderAllocationStrategy) {
+            return currentLocation.orderAllocationStrategy
+        }
+        return defaultOrderAllocationStrategy
+    }
+
+    /**
+     * Sort based on order allocation strategy
+     */
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        switch (orderAllocationStrategy) {
+            case OrderAllocationStrategy.FEFO:
+                return sortAvailableItemsByFefo(availableItems, quantityRequired)
+            case OrderAllocationStrategy.FIFO:
+                return sortAvailableItemsByFifo(availableItems, quantityRequired)
+            case OrderAllocationStrategy.LIFO:
+                return sortAvailableItemsByFifo(availableItems, quantityRequired).reverse()
+            case OrderAllocationStrategy.CUSTOM:
+                return sortAvailableItemsByCustom(availableItems, quantityRequired)
+        }
+    }
+
     /**
      * Sorting used by first expiry, first out algorithm
      */
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+    List<AvailableItem> sortAvailableItemsByFefo(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        log.info "Sorting available items by FEFO ... "
+        // Sort bins  by available quantity
+        availableItems = availableItems.sort { a, b ->
+            a?.quantityAvailable <=> b?.quantityAvailable
+        }
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            !a?.inventoryItem?.expirationDate ?
+                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
+                    !b?.inventoryItem?.expirationDate ? -1 :
+                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
+        }
+
+        // Move items with zero available quantity to the end
+        availableItems = availableItems.sort { a, b ->
+            (a?.quantityAvailable <= 0) <=> (b?.quantityAvailable <= 0)
+        }
+
+        return availableItems
+    }
+
+    /**
+     * Sorting used by first in, first out algorithm
+     */
+    List<AvailableItem> sortAvailableItemsByFifo(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        log.info "Sorting available items by FIFO ... "
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            !a?.inventoryItem?.dateCreated ?
+                    !b?.inventoryItem?.dateCreated ? 0 : 1 :
+                    !b?.inventoryItem?.dateCreated ? -1 :
+                            a?.inventoryItem?.dateCreated <=> b?.inventoryItem?.dateCreated
+        }
+        return availableItems
+    }
+
+    /**
+     * Sorting used by custom algorithm based on quantity
+     *
+     * @param availableItems
+     * @param quantityRequired
+     * @return
+     */
+    List sortAvailableItemsByCustom(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+
+        log.info "Sorting available items by custom ... "
 
         // In order to sort the available items properly we need to know the quantity required
         if (quantityRequired) {
@@ -689,26 +767,6 @@ class ProductAvailabilityService {
                 it.quantityRequired = quantityRequired
             }
         }
-
-        log.info "Sorting available items "
-
-//        // Sort bins  by available quantity
-//        availableItems = availableItems.sort { a, b ->
-//            a?.quantityAvailable <=> b?.quantityAvailable
-//        }
-//
-//        // Sort empty expiration dates last
-//        availableItems = availableItems.sort { a, b ->
-//            !a?.inventoryItem?.expirationDate ?
-//                    !b?.inventoryItem?.expirationDate ? 0 : 1 :
-//                    !b?.inventoryItem?.expirationDate ? -1 :
-//                            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate
-//        }
-//
-//        // Move items with zero available quantity to the end
-//        availableItems = availableItems.sort { a, b ->
-//            (a?.quantityAvailable <= 0) <=> (b?.quantityAvailable <= 0)
-//        }
 
         // if quantity required has any exact matches then we sort by matching (floor, racking, bulk)
         // check exact match OR quantityAvailable % quantityRequired == 0
@@ -731,6 +789,7 @@ class ProductAvailabilityService {
 
         return availableItems
     }
+
 
     private static List collectQuantityOnHandByBinLocation(List<ProductAvailability> productAvailabilities) {
 

@@ -15,6 +15,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderAllocationStrategy
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 
@@ -99,7 +100,15 @@ class Location implements Comparable<Location>, java.io.Serializable {
         cache true
     }
 
-    static transients = ["transactions", "events", "shipments", "requests", "orders", "managedLocally"]
+    static transients = [
+            "transactions",
+            "events",
+            "shipments",
+            "requests",
+            "orders",
+            "managedLocally",
+            "orderAllocationStrategy"
+    ]
 
     List getTransactions() { return Transaction.findAllByDestinationOrSource(this, this) }
 
@@ -308,6 +317,22 @@ class Location implements Comparable<Location>, java.io.Serializable {
     Boolean requiresMobilePicking() {
         return supports(ActivityCode.REQUIRE_MOBILE_PICKING)
     }
+
+    OrderAllocationStrategy getOrderAllocationStrategy() {
+        if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_FEFO)) {
+            return OrderAllocationStrategy.FEFO
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_FIFO)) {
+            return OrderAllocationStrategy.FIFO
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_LIFO)) {
+            return OrderAllocationStrategy.LIFO
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_CUSTOM)) {
+            return OrderAllocationStrategy.CUSTOM
+        }
+    }
+
 
     Map toJson() {
         return [
