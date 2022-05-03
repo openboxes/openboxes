@@ -84,6 +84,11 @@ class UrlMappings {
             action = [GET: "load"]
         }
 
+        "/api/helpscout/configuration" {
+            controller = { "helpScoutApi" }
+            action = [GET: "configuration"]
+        }
+
         // Stock Movement Item API
 
         "/api/stockMovementItems"(parseRequest: true) {

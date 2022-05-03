@@ -24,18 +24,20 @@
       }(window, document, window.Beacon || function () {
       });
       window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.key}")
-      window.Beacon("config", {
-        "color": "${grailsApplication.config.openboxes.helpscout.widget.color}",
-        "enableFabAnimation": false
-      })
-      /*
-       * Use a scriptlet block to prevent html-escaping localization labels, which are JSON.
-       * More modern grails versions have a built-in raw() method to do this, but...
-       * https://stackoverflow.com/questions/1337464/overriding-grails-views-default-codec-html-config-back-to-none
-       */
-      window.Beacon("config", <%=LocalizationApiController.localizeHelpScoutLabels(grailsApplication, session?.user?.locale)%>)
     </script>
     <!-- end magical HelpScout incantations -->
+
+    <!-- now, configure the widget the above code created for us -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"
+            integrity="sha512-lTLt+W7MrmDfKam+r3D2LURu0F47a3QaW5nF0c6Hl0JDZ57ruei+ovbg7BrZ+0bjVJ5YgzsAWE+RreERbpPE1g=="
+            referrerpolicy="no-referrer">
+    </script>
+    <script>
+      axios.get('/openboxes/api/helpscout/configuration/')
+        .then((response) => {
+          window.Beacon('config', response.data);
+        });
+    </script>
 </g:if>
 
 <div id="header" class="yui-b">

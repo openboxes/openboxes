@@ -74,10 +74,7 @@ class Header extends Component {
             {
               this.props.isHelpScoutEnabled &&
               <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.helpScoutKey}>
-                <SupportButton
-                  buttonColor={this.props.helpScoutColor}
-                  text="react.default.button.help.label"
-                />
+                <SupportButton text="react.default.button.help.label" />
               </LiveChatLoaderProvider>
             }
           </div>
@@ -93,7 +90,6 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
   logoUrl: state.session.logoUrl,
   logoLabel: state.session.logoLabel,
-  helpScoutColor: state.session.helpScoutColor,
   helpScoutKey: state.session.helpScoutKey,
   isHelpScoutEnabled: state.session.isHelpScoutEnabled,
 });
@@ -110,13 +106,11 @@ Header.propTypes = {
   /** Id of the current location */
   logoLabel: PropTypes.string.isRequired,
   highestRole: PropTypes.string.isRequired,
-  helpScoutColor: PropTypes.string,
   helpScoutKey: PropTypes.string,
   isHelpScoutEnabled: PropTypes.bool,
 };
 
 Header.defaultProps = {
-  helpScoutColor: '',
   helpScoutKey: '',
   isHelpScoutEnabled: false,
 };

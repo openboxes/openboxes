@@ -73,7 +73,6 @@ const initialState = {
   breadcrumbsParams: [],
   breadcrumbsConfig: [],
   currencyCode: '',
-  helpScoutColor: '',
   helpScoutKey: '',
   isHelpScoutEnabled: false,
 };
@@ -108,7 +107,6 @@ export default function (state = initialState, action) {
         logoUrl: _.get(action, 'payload.data.data.logoUrl'),
         supportedLocales: _.get(action, 'payload.data.data.supportedLocales'),
         currencyCode: _.get(action, 'payload.data.data.currencyCode'),
-        helpScoutColor: _.get(action, 'payload.data.data.helpScoutColor'),
         helpScoutKey: _.get(action, 'payload.data.data.helpScoutKey'),
         isHelpScoutEnabled: _.get(action, 'payload.data.data.isHelpScoutEnabled'),
       };
