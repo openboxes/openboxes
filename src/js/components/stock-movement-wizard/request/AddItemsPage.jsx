@@ -403,6 +403,8 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
       },
       quantityOnHand: {
         ...FIELDS.quantityOnHandAtRequestSite,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH',
         flexWidth: '1',
         required: true,
         headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
