@@ -192,7 +192,6 @@ class StockMovementItemApiController {
                 expirationDate: availableItem.inventoryItem?.expirationDate,
                 quantityAvailable: availableItem.quantityAvailable,
                 quantityOnHand: availableItem.quantityOnHand,
-                isFullPallet: availableItem.quantityAvailable == quantityRequired,
                 pickClassification: availableItem?.pickClassification
             ]
     }
@@ -209,7 +208,6 @@ class StockMovementItemApiController {
                 expirationDate: availableItem.inventoryItem?.expirationDate,
                 quantityAvailable: availableItem.quantityAvailable,
                 quantityOnHand: availableItem.quantityOnHand,
-                isFullPallet: availableItem.quantityAvailable == quantityRequired,
                 pickClassification: availableItem?.pickClassification,
                 isSuggested: isSuggested
             ]
