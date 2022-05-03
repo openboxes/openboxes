@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.validation.ValidationException
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -118,6 +119,22 @@ class StockMovementController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         [stockMovement: stockMovement]
     }
+
+    def validatePicklist = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        try {
+            if (stockMovementService.validatePicklist(params.id)) {
+                flash.message = "Validated"
+            }
+        } catch (ValidationException e) {
+            flash.errors = e.errors
+        }
+
+        redirect(action: "show", id: params.id)
+    }
+
+
 
     def list = {
 

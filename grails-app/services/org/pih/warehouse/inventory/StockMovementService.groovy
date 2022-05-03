@@ -1455,7 +1455,7 @@ class StockMovementService {
             return calculateAvailableItemsStatus(requisitionItem, availableItems)
         }
 
-        return productAvailabilityService.sortAvailableItems(availableItems)
+        return productAvailabilityService.sortAvailableItems(availableItems, requisitionItem.calculateQuantityRequired())
     }
 
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {

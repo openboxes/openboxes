@@ -310,6 +310,7 @@ class AvailableItem {
     Location binLocation
     BigDecimal quantityAvailable
     BigDecimal quantityOnHand
+    BigDecimal quantityRequired
     BigDecimal quantityAllocated = 0
     BigDecimal quantityPicked = 0
 
@@ -362,6 +363,14 @@ class AvailableItem {
         return inventoryItem.unavailable
     }
 
+    PickClassification getPickClassification() {
+        quantityRequired ?
+                (quantityRequired == quantityAvailable) ? PickClassification.EXACT :
+                        (quantityRequired.intValue() % quantityAvailable.intValue() == 0) ? PickClassification.MULTIPLE :
+                                PickClassification.PIECE : PickClassification.NONE
+    }
+
+
     Map toJson() {
         return [
                 "inventoryItem.id"      : inventoryItem?.id,
@@ -374,12 +383,34 @@ class AvailableItem {
                 zone                    : binLocation?.zone,
                 quantityAvailable       : quantityAvailable > 0 ? quantityAvailable : 0,
                 quantityOnHand          : quantityOnHand,
+                quantityRequired        : quantityRequired?:null,
+                pickClassification      : pickClassification,
                 status                  : status?.name(),
                 pickedRequisitionNumbers: pickedRequisitionNumbers ? pickedRequisitionNumbers?.join(",") : "",
                 // deprecated
                 "binLocation.id"        : binLocation?.id,
                 "binLocation.name"      : binLocation?.name,
         ]
+    }
+
+}
+
+enum PickClassification {
+
+    EXACT(0),
+    MULTIPLE(1),
+    PIECE(2),
+    RANDOM(3),
+    NONE(4)
+
+    final Integer sortOrder
+
+    PickClassification(Integer sortOrder) {
+        this.sortOrder = sortOrder
+    }
+
+    static list() {
+        [EXACT, MULTIPLE, PIECE, RANDOM, NONE]
     }
 
 }

@@ -17,6 +17,11 @@
     <g:if test="${flash.error}">
         <div class="error">${flash.error}</div>
     </g:if>
+    <g:hasErrors bean="${flash.errors}">
+        <div class="errors">
+            <g:renderErrors bean="${flash.errors}" as="list" />
+        </div>
+    </g:hasErrors>
 
     <g:render template="summary" model="[shipmentInstance:stockMovement?.shipment, requisition: stockMovement?.requisition]"/>
 
@@ -105,6 +110,16 @@
                 </g:if>
             </div>
         </g:if>
+        <g:isSuperuser>
+            <div class="button-group">
+                <g:if test="${stockMovement?.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+                    <g:link controller="stockMovement" action="validatePicklist" class="button" id="${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.validatePicklist.label" default="Validate picklist" />
+                    </g:link>
+                </g:if>
+            </div>
+        </g:isSuperuser>
     </div>
     <div class="yui-gf">
         <div class="yui-u first">
