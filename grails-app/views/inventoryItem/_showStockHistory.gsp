@@ -1,4 +1,5 @@
-<%@ page import="org.pih.warehouse.order.OrderTypeCode; org.pih.warehouse.product.Product"%>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
 <html>
@@ -340,7 +341,7 @@
 
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <div >
-                                        <g:if test="${stockHistoryEntry?.transaction?.order?.code == org.pih.warehouse.order.OrderTypeCode.PURCHASE_ORDER.name()}">
+                                        <g:if test="${stockHistoryEntry?.transaction?.order?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                             <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
                                                     <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
@@ -350,7 +351,7 @@
                                             </g:link>
                                         </g:if>
 
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.order?.code == org.pih.warehouse.core.Constants.RETURN_ORDER}">
+                                        <g:elseif test="${stockHistoryEntry?.transaction?.order?.code == Constants.RETURN_ORDER}">
                                             <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
                                                     <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
