@@ -888,7 +888,6 @@ class AddItemsPage extends Component {
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
     this.saveRequisitionItemsInCurrentStepWithAlert({
       lineItems,
-      spinner: true,
       callback: () => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
@@ -1170,7 +1169,6 @@ class AddItemsPage extends Component {
   }
   saveRequisitionItemsInCurrentStepWithAlert({
     lineItems,
-    spinner = false,
     callback = () => {},
   }) {
     confirmAlert({
@@ -1183,11 +1181,11 @@ class AddItemsPage extends Component {
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
-            if (spinner) this.props.showSpinner();
+            this.props.showSpinner();
             return this.saveRequisitionItemsInCurrentStep(lineItems)
               .then(res => callback(res))
               .catch(() => {
-                if (spinner) this.props.hideSpinner();
+                this.props.hideSpinner();
               });
           },
         },
@@ -1308,7 +1306,6 @@ class AddItemsPage extends Component {
   saveItems(lineItems) {
     this.saveRequisitionItemsInCurrentStepWithAlert({
       lineItems,
-      spinner: true,
       callback: () => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
