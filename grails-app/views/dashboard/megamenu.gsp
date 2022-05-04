@@ -478,6 +478,20 @@
                     </div>
                 </div>
                 <div class="mm-content-section">
+                    <h3><warehouse:message code="report.orderReports.label" default="Order Reports" /></h3>
+                    <div class="mm-menu-item">
+                        <g:link controller="report" action="showForecastReport">
+                            <warehouse:message code="report.forecastReport.label" default="Forecast Report"/>
+                        </g:link>
+                    </div>
+                    <div class="mm-menu-item">
+                        <g:link controller="inventory" action="reorderReport">
+                            <warehouse:message code="report.reorderReport.label" default="Reorder Report"/>
+                        </g:link>
+                    </div>
+                </div>
+
+                <div class="mm-content-section">
                     <h3><warehouse:message code="report.transactionReports.label" default="Transaction Reports" /></h3>
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showTransactionReport">
@@ -492,11 +506,6 @@
                     <div class="mm-menu-item">
                         <g:link controller="report" action="showRequestDetailReport">
                             <warehouse:message code="report.requestDetailReport.label" default="Request Detail Report"/>
-                        </g:link>
-                    </div>
-                    <div class="mm-menu-item">
-                        <g:link controller="report" action="showForecastReport">
-                            <warehouse:message code="report.forecastReport.label" default="Forecast Report"/>
                         </g:link>
                     </div>
                 </div>

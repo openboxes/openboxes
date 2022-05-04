@@ -565,15 +565,21 @@ class DashboardService {
                 return false;
             }
 
-            def quantityATP = inventoryItem.quantityAvailableToPromise as Number
-
             def minQuantity = inventoryLevel?.minQuantity
-            if (minQuantity && quantityATP >= minQuantity) {
+
+            if(minQuantity == null) {
                 return false
             }
 
             def reorderQuantity = inventoryLevel?.reorderQuantity
-            if (reorderQuantity && quantityATP >= reorderQuantity) {
+
+            if(reorderQuantity == null) {
+                return false
+            }
+
+            def quantityATP = inventoryItem.quantityAvailableToPromise as Number
+
+            if (quantityATP >= minQuantity || quantityATP >= reorderQuantity) {
                 return false
             }
 
