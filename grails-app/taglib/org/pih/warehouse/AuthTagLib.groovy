@@ -43,6 +43,19 @@ class AuthTagLib {
         }
     }
 
+    def hideIfIsNonInventoryManagedAndCanSubmitRequest = {attrs, body ->
+        def warehouseInstance = Location.get(session.warehouse.id)
+        def authorized = true
+
+        authorized = authorized && !warehouseInstance.supports(ActivityCode.MANAGE_INVENTORY)
+        authorized = authorized && warehouseInstance.supports(ActivityCode.SUBMIT_REQUEST)
+
+        // If the location does not have MANAGE_INVENTORY activity code and have SUBMIT_REQUEST activity code, then return empty body
+        if (!authorized) {
+            out << body {}
+        }
+    }
+
     def isSuperuser = { attrs, body ->
         if (userService.isSuperuser(session?.user))
             out << body()

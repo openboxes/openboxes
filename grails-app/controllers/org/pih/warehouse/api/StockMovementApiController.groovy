@@ -34,21 +34,14 @@ class StockMovementApiController {
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
         int offset = params.offset ? params.int("offset") : 0
-        def stockMovements = params.direction == "INBOUND" ?
-                stockMovementService.getInboundStockMovements(max, offset) :
-                stockMovementService.getOutboundStockMovements(max, offset)
+        StockMovementDirection stockMovementDirection = params.direction ? params.direction as StockMovementDirection : null
 
-        stockMovements = stockMovements.collect { StockMovement stockMovement ->
-            Map json = stockMovement.toJson()
-            def excludes = params.list("exclude")
-            if (excludes) {
-                excludes.each { exclude ->
-                    json.remove(exclude)
-                }
-            }
-            return json
-        }
-        render([data: stockMovements] as JSON)
+        StockMovement stockMovement = new StockMovement()
+        stockMovement.stockMovementDirection = stockMovementDirection
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, orderBy: "requisition.dateRequested" ])
+
+        render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }
 
     def read = {

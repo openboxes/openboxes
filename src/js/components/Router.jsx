@@ -60,6 +60,11 @@ const AsyncDashboard = Loadable({
   loading: Loading,
 });
 
+const AsyncStockRequestDashboard = Loadable({
+  loader: () => import('components/dashboard/StockRequestDashboard'),
+  loading: Loading,
+});
+
 // TODO add megamenu and menu config
 const AsyncInvoice = Loadable({
   loader: () => import('components/invoice/InvoiceWizard'),
@@ -116,62 +121,70 @@ const AsyncResetInstancePage = Loadable({
   loading: Loading,
 });
 
-const Router = props => (
-  <div>
-    <BrowserRouter>
-      <Switch>
-        <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
-        <MainLayoutRoute path="/**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
-        <MainLayoutRoute path="/**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
-        <MainLayoutRoute path="/**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
-        <MainLayoutRoute path="/**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
-        <MainLayoutRoute path="/**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
-        <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
-        <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
-        <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
-        <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
-        <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
-        <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
-        <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
-        <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
-        <MainLayoutRoute path="/**/productsConfiguration/index" component={AsyncProductsConfiguration} />
-        <MainLayoutRoute path="/**/locationsConfiguration/create/:locationId?" component={AsyncLocationsConfiguration} />
-        <MainLayoutRoute path="/**/locationsConfiguration/upload" component={AsyncImportLocations} />
-        <Route path="/**/locationsConfiguration/index" >
-          <AsyncWelcomePage />
-        </Route>
-        <Route path="/**/loadData/index" ><AsyncLoadDataPage /></Route>
-        <Route path="/**/resettingInstanceInfo/index">
-          <AsyncResetInstancePage />
-        </Route>
-        <MainLayoutRoute path="/**/dashboard/:configId?" component={AsyncDashboard} />
-        <MainLayoutRoute path="/**/" component={AsyncDashboard} />
-      </Switch>
-    </BrowserRouter>
-    <div className="spinner-container">
-      <ClimbingBoxLoader
-        color="#0c769e"
-        loading={props.spinner}
-        style={{ top: '40%', lefft: '50%' }}
+const Router = (props) => {
+  const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
+    ? AsyncStockRequestDashboard
+    : AsyncDashboard;
+
+  return (
+    <div>
+      <BrowserRouter>
+        <Switch>
+          <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
+          <MainLayoutRoute path="/**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
+          <MainLayoutRoute path="/**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
+          <MainLayoutRoute path="/**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
+          <MainLayoutRoute path="/**/stockMovement/createRequest/:stockMovementId?" component={AsyncStockMovementRequest} />
+          <MainLayoutRoute path="/**/stockMovement/verifyRequest/:stockMovementId?" component={AsyncStockMovementVerifyRequest} />
+          <MainLayoutRoute path="/**/stockMovement/create/:stockMovementId?" component={AsyncStockMovement} />
+          <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
+          <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
+          <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
+          <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
+          <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
+          <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
+          <MainLayoutRoute path="/**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
+          <MainLayoutRoute path="/**/productsConfiguration/index" component={AsyncProductsConfiguration} />
+          <MainLayoutRoute path="/**/locationsConfiguration/create/:locationId?" component={AsyncLocationsConfiguration} />
+          <MainLayoutRoute path="/**/locationsConfiguration/upload" component={AsyncImportLocations} />
+          <Route path="/**/locationsConfiguration/index" >
+            <AsyncWelcomePage />
+          </Route>
+          <Route path="/**/loadData/index" ><AsyncLoadDataPage /></Route>
+          <Route path="/**/resettingInstanceInfo/index">
+            <AsyncResetInstancePage />
+          </Route>
+          <MainLayoutRoute path="/**/dashboard/:configId?" component={Dashboard} />
+          <MainLayoutRoute path="/**/" component={Dashboard} />
+        </Switch>
+      </BrowserRouter>
+      <div className="spinner-container">
+        <ClimbingBoxLoader
+          color="#0c769e"
+          loading={props.spinner}
+          style={{ top: '40%', lefft: '50%' }}
+        />
+      </div>
+      <Alert
+        timeout="none"
+        stack={{ limit: 3 }}
+        offset={20}
+        html
+        position="top-right"
+        effect="bouncyflip"
       />
     </div>
-    <Alert
-      timeout="none"
-      stack={{ limit: 3 }}
-      offset={20}
-      html
-      position="top-right"
-      effect="bouncyflip"
-    />
-  </div>
-);
+  );
+};
 
 const mapStateToProps = state => ({
   spinner: state.spinner.show,
+  supportedActivities: state.session.supportedActivities,
 });
 
 export default connect(mapStateToProps, {})(Router);
 
 Router.propTypes = {
   spinner: PropTypes.bool.isRequired,
+  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
