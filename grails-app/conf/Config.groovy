@@ -1208,17 +1208,17 @@ openboxes {
 
 
 // UserVoice widget
-openboxes.uservoice.widget.enabled = true
+openboxes.uservoice.widget.enabled = false
 openboxes.uservoice.widget.position = "right"
 
-// UserVoice widget
+// Zopim widget
 openboxes.zopim.widget.enabled = false
 openboxes.zopim.widget.url = "//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA"
 
 // HelpScout beacon
-openboxes.helpscout.widget.color = "#ff9800"
+openboxes.helpscout.widget.color = "#3AB4B1"
 openboxes.helpscout.widget.enabled = true
-openboxes.helpscout.widget.key = "5eafcb3f-9e7e-4943-8ebb-669f60a696cd"
+openboxes.helpscout.widget.key = "44ee4f01-5334-4b93-ad25-03037903eb80"
 
 // JIRA Issue Collector
 openboxes.jira.issue.collector.enabled = false

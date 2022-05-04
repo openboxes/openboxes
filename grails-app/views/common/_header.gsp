@@ -1,5 +1,43 @@
-<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.api.LocalizationApiController; org.pih.warehouse.core.RoleType" %>
 <!-- Block which includes the logo and login banner -->
+<g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
+    <!--
+      -- Place magical HelpScout incantations early to make
+      -- window.Beacon accessible to any included divs, etc.
+      -->
+    <script type="text/javascript">
+      !function (e, t, n) {
+        function a() {
+          var e = t.getElementsByTagName("script")[0],
+            n = t.createElement("script");
+          n.type = "text/javascript", n.async = !0, n.src = "https://beacon-v2.helpscout.net", e.parentNode.insertBefore(n, e)
+        }
+
+        if (e.Beacon = n = function (t, n, a) {
+          e.Beacon.readyQueue.push({
+            method: t,
+            options: n,
+            data: a
+          })
+        }, n.readyQueue = [], "complete" === t.readyState) return a();
+        e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
+      }(window, document, window.Beacon || function () {
+      });
+      window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.key}")
+      window.Beacon("config", {
+        "color": "${grailsApplication.config.openboxes.helpscout.widget.color}",
+        "enableFabAnimation": false
+      })
+      /*
+       * Use a scriptlet block to prevent html-escaping localization labels, which are JSON.
+       * More modern grails versions have a built-in raw() method to do this, but...
+       * https://stackoverflow.com/questions/1337464/overriding-grails-views-default-codec-html-config-back-to-none
+       */
+      window.Beacon("config", <%=LocalizationApiController.localizeHelpScoutLabels(grailsApplication, session?.user?.locale)%>)
+    </script>
+    <!-- end magical HelpScout incantations -->
+</g:if>
+
 <div id="header" class="yui-b">
 	<div id="banner" class="yui-gd">
         <div class="yui-u first" >
@@ -8,7 +46,7 @@
 
         <div class="yui-u">
             <div id="loggedIn">
-                <ul>
+                <ul class="banner-menu">
                     <li>
                         <g:globalSearch id="globalSearch" cssClass="globalSearch" name="searchTerms" size="300"
                                         jsonUrl="${request.contextPath }/json/globalSearch"></g:globalSearch>
@@ -17,8 +55,8 @@
                         <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 
                         <li>
-                            <span class="action-menu" >
-                                <button class="action-hover-btn button">
+                            <span class="action-menu">
+                                <button class="action-hover-btn button top">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'user.png')}"/>
                                     <span id="username">${session?.user?.name}</span>
                                     <span id="userrole">[<g:userRole user="${session.user}"/>]</span>
@@ -64,7 +102,7 @@
                         </li>
                         <g:if test="${session?.warehouse}">
                             <li>
-                                <button class="btn-show-dialog button"
+                                <button class="btn-show-dialog button top"
                                         data-title="${g.message(code:'dashboard.chooseLocation.label')}" data-height="300"
                                         data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" />
@@ -72,59 +110,15 @@
                                 </button>
                             </li>
                         </g:if>
-
                     </g:if>
-
-                    <li>
-                        <span class="action-menu">
-                            <button class="action-hover-btn button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}" />
-                                <g:message code="default.support.label" default="Support"/>
+                    <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
+                        <li>
+                            <button class="action-hover-btn button helpscout top" onclick="Beacon('toggle');">
+                                <i class="far fa-life-ring"></i>
+                                <g:message code="default.support.label" default="Support" />
                             </button>
-                            <ul class="actions" style="text-align:left;">
-                                <li class="action-menu-item">
-                                    <g:link url="https://openboxes.com/community" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'comments.png')}"/>&nbsp;
-                                        <warehouse:message code="default.discussionForum.label" default="Discussion Forum"/>
-                                    </g:link>
-                                </li>
-                                <li class="action-menu-item">
-                                    <g:link url="https://docs.openboxes.com/en/develop/" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'book.png')}"/>&nbsp;
-                                        <warehouse:message code="docs.userGuide.label" default="User Guide"/>
-                                    </g:link>
-                                </li>
-                                <li class="action-menu-item">
-                                    <g:link url="https://openboxes.com/tutorials" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'film.png')}"/>&nbsp;
-                                        <warehouse:message code="default.tutorials.label" default="Tutorials"/>
-                                    </g:link>
-                                </li>
-                                <li class="action-menu-item">
-                                    <g:link url="https://openboxes.com/roadmap" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'date.png')}"/>&nbsp;
-                                        <warehouse:message code="default.roadmap.label" default="RoadMap"/>
-                                    </g:link>
-                                </li>
-                                <li class="action-menu-item">
-                                    <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}"/>&nbsp;
-                                        <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/>
-                                    </g:link>
-                                </li>
-                                <li>
-                                    <hr/>
-                                </li>
-                                <li class="action-menu-item">
-                                    <g:link url="https://openboxes.com/support" style="color: #666;" target="_blank">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'help.png')}"/>&nbsp;
-                                        <warehouse:message code="default.generalSupport.label" default="General Support"/>
-                                    </g:link>
-                                </li>
-
-                            </ul>
-                        </span>
-                    </li>
+                        </li>
+                    </g:if>
                 </ul>
             </div>
         </div>
