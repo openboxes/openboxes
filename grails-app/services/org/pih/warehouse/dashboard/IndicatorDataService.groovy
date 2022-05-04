@@ -395,23 +395,33 @@ class IndicatorDataService {
             throw new IllegalArgumentException("Missing year type definition in configuration")
         }
 
-        def currentYear = new Date().year
-        def startYear = currentYear - 5 // Take only last 5 years into account
+        def currentDate = new Date()
+        def currentYear = currentDate.year
+        def startYear = currentYear - 4 // Take only last 5 years into account
 
-        def startDate = new Date("${yearType.start}/${startYear}")
-        def endDate = new Date("${yearType.end}/${startYear}")
+        def startDate = new Date("${yearType.start}/${startYear}") // for extracting data
+        def endDate = new Date("${yearType.end}/${startYear}") // for determining year interval for data extracted
 
-        // data fetch
+        // Data fetch
         def data = Requisition.executeQuery("""
             SELECT 
                 COUNT(r.id), DATE(r.dateCreated) 
             FROM Requisition r 
-            WHERE r.origin = :location AND r.dateCreated >= :startDate
+            WHERE r.origin = :location AND r.dateCreated >= :startDate AND r.isTemplate = false 
             GROUP BY DATE(r.dateCreated) """, ['location': location, 'startDate': startDate])
 
-        // Parse results
+        // Prepare list of labels for last 5 years and fill it with 0s by default in case there are no requisitions in a specific year range
+        def currentYearFormatted = currentDate.format(yearType.yearFormat).toInteger()
+        if (currentDate.month > endDate.month || (currentDate.month == endDate.month && currentDate.date > endDate.date)) {
+            currentYearFormatted += 1
+        }
+        def listLabel = ((currentYearFormatted - 4)..currentYearFormatted).collect { Integer it ->
+            yearType.labelYearPrefix + it.toString()
+        }
         def results = [:]
-        def listLabel = []
+        listLabel.each { results[it] = 0 }
+
+        // Process fetched data
         data.each { it ->
             // it[0] = requisition count, it[1] = date created
 
@@ -420,7 +430,7 @@ class IndicatorDataService {
             def year = createdAt.format(yearType.yearFormat).toInteger()
             // Set proper year for year label. If day is after year type's end day, then year += 1 (especially required
             // for year types that has end day in the middle of year, eg. fiscal year)
-            if (createdAt.month >= endDate.month && createdAt.day > endDate.day) {
+            if (createdAt.month > endDate.month || (createdAt.month == endDate.month && createdAt.date > endDate.date)) {
                 year += 1
             }
             def yearLabel = yearType.labelYearPrefix + year.toString()
@@ -432,7 +442,7 @@ class IndicatorDataService {
                 results[yearLabel] = it[0]
             }
 
-            // Get result label list
+            // Check if the list with labels contains yearLabel
             if (!listLabel.contains(yearLabel)) {
                 listLabel << yearLabel
             }
