@@ -339,9 +339,15 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
           cellClassName: 'text-right',
         },
         getDynamicAttr: ({
-          rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow,
         }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            const valuesWithUpdatedQtyRequested = values;
+            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
+                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            updateRow(valuesWithUpdatedQtyRequested, rowIndex);
+          },
         }),
       },
       quantityRequested: {
@@ -607,6 +613,8 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
+    this.saveRequisitionItemsInCurrentStepWithAlert =
+      this.saveRequisitionItemsInCurrentStepWithAlert.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -878,19 +886,19 @@ class AddItemsPage extends Component {
    * @public
    */
   saveItemsAndExportTemplate(formValues, lineItems) {
-    this.props.showSpinner();
-
     const { movementNumber, stockMovementId } = formValues;
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep(lineItems)
-      .then(() => {
+    this.saveRequisitionItemsInCurrentStepWithAlert({
+      lineItems,
+      callback: () => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
             fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
             this.props.hideSpinner();
           })
           .catch(() => this.props.hideSpinner());
-      });
+      },
+    });
   }
 
   /**
@@ -1161,6 +1169,34 @@ class AddItemsPage extends Component {
 
     return Promise.resolve();
   }
+  saveRequisitionItemsInCurrentStepWithAlert({
+    lineItems,
+    callback = () => {},
+  }) {
+    confirmAlert({
+      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
+      message: this.props.translate(
+        'react.stockMovement.QOHWillNotBeSaved.message',
+        'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Are you sure you want to proceed?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.props.showSpinner();
+            return this.saveRequisitionItemsInCurrentStep(lineItems)
+              .then(res => callback(res))
+              .catch(() => {
+                this.props.hideSpinner();
+              });
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
 
   /**
    * Saves list of requisition items in current step (without step change). Used to export template.
@@ -1238,10 +1274,12 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
-        .then(() => {
+      this.saveRequisitionItemsInCurrentStepWithAlert({
+        lineItems: formValues.lineItems,
+        callback: () => {
           window.location = '/openboxes/stockMovement/list?direction=INBOUND';
-        });
+        },
+      });
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
@@ -1268,14 +1306,13 @@ class AddItemsPage extends Component {
    * @public
    */
   saveItems(lineItems) {
-    this.props.showSpinner();
-
-    this.saveRequisitionItemsInCurrentStep(lineItems)
-      .then(() => {
+    this.saveRequisitionItemsInCurrentStepWithAlert({
+      lineItems,
+      callback: () => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
-      })
-      .catch(() => this.props.hideSpinner());
+      },
+    });
   }
 
   /**
@@ -1369,8 +1406,10 @@ class AddItemsPage extends Component {
    */
   previousPage(values, invalid) {
     if (!invalid) {
-      this.saveRequisitionItemsInCurrentStep(values.lineItems)
-        .then(() => this.props.previousPage(values));
+      this.saveRequisitionItemsInCurrentStepWithAlert({
+        lineItems: values.lineItems,
+        callback: () => this.props.previousPage(values),
+      });
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
