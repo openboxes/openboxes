@@ -66,35 +66,6 @@
                                         <warehouse:message code="inventory.browse.label"/>
                                     </g:link>
                                 </div>
-                                <g:if test='${quickCategories }'>
-                                    <g:each var="category" in="${quickCategories}">
-                                        <div class="mm-menu-item">
-                                            <g:link class="outline" controller="inventory" action="browse" params="[subcategoryId:category.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                                <format:category category="${category}"/> (${category?.products?.size() })
-                                            </g:link>
-                                        </div>
-                                        <g:if test="${category.categories}">
-                                            <g:each var="childCategory" in="${category.categories}">
-                                                <div class="mm-menu-item">
-                                                    <g:link controller="inventory" action="browse" params="[subcategoryId:childCategory.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                                        <format:category category="${childCategory}"/> (${childCategory?.products?.size() })
-                                                    </g:link>
-                                                </div>
-                                            </g:each>
-                                        </g:if>
-                                    </g:each>
-                                </g:if>
-                                <g:elseif test='${categories }'>
-                                    <g:each var="entry" in="${categories}">
-                                        <g:each var="category" in="${entry.value }">
-                                            <div class="mm-menu-item">
-                                                <g:link controller="inventory" action="browse" params="[subcategoryId:category?.id,resetSearch:true,searchPerformed:true,showOutOfStockProducts:'on']">
-                                                    ${category } (${category.products.size() })
-                                                </g:link>
-                                            </div>
-                                        </g:each>
-                                    </g:each>
-                                </g:elseif>
                             </div>
                         </div>
                         <div class="mm-content-section">
