@@ -262,7 +262,7 @@ class ReplenishmentSecondPage extends Component {
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const revertPicklistUrl = `/openboxes/api/replenishments/${itemId}/picklists`;
+    const revertPicklistUrl = `/openboxes/api/replenishments/${itemId}/picklistItem`;
 
     apiClient.post(revertPicklistUrl, {})
       .then(() => {

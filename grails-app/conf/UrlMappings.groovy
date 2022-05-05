@@ -413,6 +413,11 @@ class UrlMappings {
             action = [GET: "getPicklist", POST: "createPicklist", PUT: "updatePicklist", DELETE: "deletePicklist"]
         }
 
+        "/api/replenishments/$id/picklistItem"(parseRequest: true) {
+            controller = { "replenishmentApi" }
+            action = [POST: "createPicklistItem"]
+        }
+
         // Dashboard API
 
         "/api/dashboard/config"(parseRequest: true) {
