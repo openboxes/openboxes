@@ -55,7 +55,6 @@ class ReplenishmentApiController {
         Replenishment replenishment = new Replenishment()
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-        replenishmentService.validateRequirement(replenishment)
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
         if (order.hasErrors() || !order.save(flush: true)) {
             throw new ValidationException("Invalid order", order.errors)
@@ -78,7 +77,6 @@ class ReplenishmentApiController {
         Replenishment replenishment = new Replenishment()
         replenishment.id = params.id
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-        replenishmentService.validateReplenishment(replenishment)
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {

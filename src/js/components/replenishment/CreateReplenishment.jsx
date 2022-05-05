@@ -282,7 +282,6 @@ class CreateReplenishment extends Component {
       replenishmentItems: values.requirements.filter(item => item.checked && item.quantity > 0),
     };
 
-
     apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         this.props.hideSpinner();

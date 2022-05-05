@@ -103,6 +103,12 @@ class ReplenishmentService {
             updateOrderItem(replenishmentItem, orderItem)
         }
 
+        if (replenishment.status <= ReplenishmentStatus.PENDING) {
+            validateRequirement(replenishment)
+        } else {
+            validateReplenishment(order)
+        }
+
         order.save(failOnError: true)
         return order
     }
@@ -175,38 +181,38 @@ class ReplenishmentService {
         }
     }
 
-    void validateReplenishment(Replenishment replenishment) {
-        replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
-            validateReplenishmentItem(replenishment.origin, replenishmentItem)
+    void validateReplenishment(Order order) {
+        order.orderItems.each { OrderItem orderItem ->
+            validateReplenishmentItem(order.origin, orderItem)
         }
     }
 
-    void validateReplenishmentItem(Location replenishingLocation, ReplenishmentItem replenishmentItem) {
-        def quantity = replenishmentItem.quantity
+    void validateReplenishmentItem(Location replenishingLocation, OrderItem orderItem) {
+        def quantity = orderItem.quantity
 
-        if (replenishmentItem.picklistItems) {
-            quantity = replenishmentItem.picklistItems.sum { it.quantity }
+        if (orderItem.picklistItems) {
+            quantity = orderItem.picklistItems.sum { it.quantity }
         }
 
-        validateQuantityAvailable(replenishingLocation, replenishmentItem, quantity)
+        validateQuantityAvailable(replenishingLocation, orderItem, quantity)
     }
 
-    void validateQuantityAvailable(Location replenishingLocation, ReplenishmentItem replenishmentItem, Integer quantityPicked) {
+    void validateQuantityAvailable(Location replenishingLocation, OrderItem orderItem, Integer quantityPicked) {
         if (!replenishingLocation) {
             throw new IllegalArgumentException("Location is required")
         }
 
         Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(
             replenishingLocation,
-            replenishmentItem.binLocation,
-            replenishmentItem.product
+            orderItem.destinationBinLocation,
+            orderItem.product
         )
 
-        Integer quanttityAvailableWithPicked = quantityAvailable + quantityPicked
-        log.info "Quantity: ${quantityPicked} vs ${quanttityAvailableWithPicked}"
+        Integer quantityAvailableWithPicked = quantityAvailable + quantityPicked
+        log.info "Quantity: ${quantityPicked} vs ${quantityAvailableWithPicked}"
 
-        if (quantityPicked > quanttityAvailableWithPicked) {
-            throw new IllegalStateException("Quantity available ${quanttityAvailableWithPicked} is less than quantity to replenish ${quantityPicked} for product ${replenishmentItem.product.productCode} ${replenishmentItem.product.name}")
+        if (quantityPicked > quantityAvailableWithPicked) {
+            throw new IllegalStateException("Quantity available ${quantityAvailableWithPicked} is less than quantity to replenish ${quantityPicked} for product ${orderItem.product.productCode} ${orderItem.product.name}")
         }
     }
 

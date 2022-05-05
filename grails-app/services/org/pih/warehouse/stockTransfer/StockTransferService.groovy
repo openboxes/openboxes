@@ -365,6 +365,7 @@ class StockTransferService {
             throw new IllegalArgumentException("Location is required")
         }
 
+        // Get quantity available as not picked, we allow transferring from on hold bins or recalled in this workflow
         Integer quantityAvailable
         if (originBinLocation) {
             quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, location, originBinLocation)
