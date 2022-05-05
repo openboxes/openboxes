@@ -163,6 +163,7 @@ class ReplenishmentSecondPage extends Component {
     this.revertUserPick = this.revertUserPick.bind(this);
     this.fetchReplenishment = this.fetchReplenishment.bind(this);
     this.nextPage = this.nextPage.bind(this);
+    this.printTransferOrder = this.printTransferOrder.bind(this);
   }
 
   componentDidMount() {
@@ -256,6 +257,11 @@ class ReplenishmentSecondPage extends Component {
     }
   }
 
+  printTransferOrder() {
+    const url = `/openboxes/replenishment/print/${this.props.match.params.replenishmentId}`;
+    window.open(url, '_blank');
+  }
+
   revertUserPick(itemId) {
     this.props.showSpinner();
 
@@ -330,6 +336,16 @@ class ReplenishmentSecondPage extends Component {
         render={({ handleSubmit }) => (
           <div className="d-flex flex-column">
             <div className="submit-buttons d-flex justify-content-end buttons-container">
+              <button
+                type="button"
+                onClick={() => this.printTransferOrder()}
+                className="mb-1 btn btn-outline-secondary btn-xs ml-1"
+              >
+                <span>
+                  <i className="fa fa-print pr-2" />
+                  <Translate id="react.stockTransfer.printTransferOrder.label" defaultMessage="Print Transfer Order" />
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={() => this.refresh()}

@@ -9,6 +9,8 @@
  **/
 
 package org.pih.warehouse.inventory
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.picklist.Picklist
 
 class ReplenishmentController {
 
@@ -18,5 +20,18 @@ class ReplenishmentController {
 
     def create = {
         render(template: "/common/react", params: params)
+    }
+
+    def print = {
+        Order transferOrder = Order.get(params.id)
+        def picklist = Picklist.findByOrder(transferOrder)
+
+        def lineItems = transferOrder.orderItems.findAll { !it.parentOrderItem }.sort { it.product.name }
+
+        def headerItems = [orderNumber: transferOrder.orderNumber,
+                           createdBy: transferOrder.createdBy,
+                           dateCreated: transferOrder.dateCreated]
+
+        [lineItems: lineItems, picklist: picklist, headerItems: headerItems]
     }
 }
