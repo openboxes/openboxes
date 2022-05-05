@@ -420,14 +420,26 @@ class StockMovementController {
         if (shipment) {
             shipment.expectedDeliveryDate = params.expectedDeliveryDate
             shipment.expectedShippingDate = params.expectedShippingDate
+
             if (params?.receivingLocation?.id) {
                 shipment.setReceivingScheduled(Location.load(params.receivingLocation.id), new Date(), User.load(session.user.id))
             }
+            else {
+                shipment.removeEvent(shipment?.receivingScheduled)
+            }
+
             if (params?.packingLocation?.id) {
                 shipment.setPackingScheduled(Location.load(params.packingLocation.id), new Date(), User.load(session.user.id))
             }
+            else {
+                shipment.removeEvent(shipment?.packingScheduled)
+            }
+
             if (params?.loadingLocation?.id) {
                 shipment.setLoadingScheduled(Location.load(params.loadingLocation.id), new Date(), User.load(session.user.id))
+            }
+            else {
+                shipment.removeEvent(shipment?.loadingScheduled)
             }
             shipment.save()
         }

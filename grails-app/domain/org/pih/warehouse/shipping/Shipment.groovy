@@ -676,6 +676,16 @@ class Shipment implements Comparable, Serializable {
         addToEvents(event)
     }
 
+    void removeEvent(Event event) {
+        if (event) {
+            if (currentEvent == event) {
+                currentEvent = null
+            }
+            removeFromEvents(event)
+            event.delete()
+        }
+    }
+
     Event getPackingScheduled() {
         return events.find { Event event -> event?.eventType?.eventCode == EventTypeCode.PACKING_SCHEDULED }
     }
