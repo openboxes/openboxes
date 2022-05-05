@@ -162,22 +162,25 @@ class StockMovement {
                 lineItems            : lineItems,
                 lineItemCount        : lineItemCount,
                 picklist             : requisition?.picklist,
-                associations         : [
+                associations     : [
                         requisition: [id: requisition?.id, requestNumber: requisition?.requestNumber, status: requisition?.status?.name()],
-                        picklist: requisition?.picklist,
+                        picklist   : requisition?.picklist,
                         shipment   : [id: shipment?.id, shipmentNumber: shipment?.shipmentNumber, status: shipment?.currentStatus?.name()],
                         shipments  : requisition?.shipments?.collect {
                             [id: it?.id, shipmentNumber: it?.shipmentNumber, status: it?.currentStatus?.name()]
                         },
                         documents  : documents
                 ],
-                isFromOrder          : isFromOrder,
-                isShipped            : isShipped,
-                isReceived           : isReceived,
-                shipped              : isShipped,
-                received             : isReceived,
-                requestType          : requestType,
-                sourceType           : sourceType?.name(),
+                isFromOrder      : isFromOrder,
+                isShipped        : isShipped,
+                isReceived       : isReceived,
+                shipped          : isShipped,
+                received         : isReceived,
+                requestType      : requestType,
+                sourceType       : sourceType?.name(),
+                receivingLocation: shipment?.receivingScheduled?.eventLocation,
+                packingLocation  : shipment?.packingScheduled?.eventLocation,
+                loadingLocation  : shipment?.loadingScheduled?.eventLocation,
         ]
     }
 
