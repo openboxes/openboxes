@@ -1457,7 +1457,7 @@ openboxes {
                             defaultLabel: "Stock Movements",
                             menuItems: [
                                     [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
-                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest", requiredRole: [RoleType.ROLE_REQUESTOR]],
+                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
                                     [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
                                     [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/${appName}/stockTransfer/createInboundReturn"]
                             ]
