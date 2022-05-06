@@ -44,6 +44,7 @@ class InventoryController {
     def uploadService
     def documentService
     def identifierService
+    def forecastingService
 
     static allowedMethods = [show: "GET", search: "POST", download: "GET"]
 
@@ -602,6 +603,8 @@ class InventoryController {
             def status = inventoryItem.status
             def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
 
+            def monthlyDemand = forecastingService.getDemand(location, null, product)?.monthlyDemand ?: 0
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
@@ -611,7 +614,7 @@ class InventoryController {
             csv += (inventoryLevel?.minQuantity ?: "") + ","
             csv += (inventoryLevel?.reorderQuantity ?: "") + ","
             csv += (inventoryLevel?.maxQuantity ?: "") + ","
-            csv += (inventoryLevel?.forecastQuantity ?: "") + ","
+            csv += monthlyDemand + ","
             csv += (inventoryItem.quantityAvailableToPromise ?: "0") + ","
             csv += (inventoryItem.quantityToOrder ?: "0") + ","
 
