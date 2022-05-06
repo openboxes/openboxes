@@ -34,12 +34,15 @@ class StockMovementApiController {
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
         int offset = params.offset ? params.int("offset") : 0
+        String orderBy = params.orderBy ?: "requisition.dateRequested"
         StockMovementDirection stockMovementDirection = params.direction ? params.direction as StockMovementDirection : null
+        Location destination = params.destination ? Location.get(params.destination) : null
 
         StockMovement stockMovement = new StockMovement()
         stockMovement.stockMovementDirection = stockMovementDirection
+        stockMovement.destination = destination
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, orderBy: "requisition.dateRequested" ])
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, orderBy: orderBy ])
 
         render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }

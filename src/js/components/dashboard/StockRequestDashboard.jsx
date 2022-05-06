@@ -41,7 +41,7 @@ const COLUMNS = [
     ),
   },
   {
-    Header: 'Fullfilling Depot',
+    Header: 'Fulfiling Depot',
     accessor: 'destination.name',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
@@ -85,6 +85,7 @@ class StockRequestDashboard extends Component {
   fetchStockMovementItems(page, pageSize) {
     const url = '/openboxes/api/stockMovements/list';
     const params = {
+      destination: this.props.currentLocation.id,
       direction: 'INBOUND',
       offset: page * pageSize,
       max: pageSize,
@@ -148,6 +149,7 @@ class StockRequestDashboard extends Component {
 
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
+  currentLocation: state.session.currentLocation,
 });
 
 export default connect(mapStateToProps, { fetchTranslations })(StockRequestDashboard);
@@ -155,4 +157,12 @@ export default connect(mapStateToProps, { fetchTranslations })(StockRequestDashb
 StockRequestDashboard.propTypes = {
   fetchTranslations: PropTypes.func.isRequired,
   locale: PropTypes.string.isRequired,
+  currentLocation: PropTypes.shape({
+    name: PropTypes.string,
+    id: PropTypes.string,
+    locationType: PropTypes.shape({
+      description: PropTypes.string,
+      locationTypeCode: PropTypes.string,
+    }),
+  }).isRequired,
 };
