@@ -183,6 +183,18 @@ class ReplenishmentApiController {
         render status: 201
     }
 
+    def createPicklistItem = {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderItem) {
+            throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
+        }
+
+        picklistService.createPicklist(orderItem)
+
+        render status: 200
+
+    }
+
     def updatePicklist = {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
