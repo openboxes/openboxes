@@ -410,7 +410,6 @@ class StockMovementService {
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
-
             if (params.orderBy == "requisition.dateRequested") {
                 requisition {
                     order("dateRequested", "desc")
