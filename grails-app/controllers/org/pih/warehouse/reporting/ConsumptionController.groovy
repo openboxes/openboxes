@@ -143,13 +143,15 @@ class ConsumptionController {
                     command.rows[product].transferOutTransactions << transaction
 
                     // Initialize transfer out by location map
-                    def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
+                    if(transaction.destination) {
+                        def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
 
-                    if (!transferOutQuantity) {
-                        command.rows[product].transferOutMap[transaction.destination] = 0
+                        if (!transferOutQuantity) {
+                            command.rows[product].transferOutMap[transaction.destination] = 0
+                        }
+
+                        command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
                     }
-
-                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
 
                     if (transaction?.order?.orderType?.code != Constants.PUTAWAY_ORDER && transaction?.order?.orderType?.code != OrderTypeCode.TRANSFER_ORDER.name()) {
                         command.rows[product].issuedQuantity += transactionEntry.quantity
@@ -181,12 +183,14 @@ class ConsumptionController {
 
                 } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
                     command.rows[product].consumedQuantity += transactionEntry.quantity
-                    command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
+                    if(transaction.destination) {
+                        command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
+                    }
                 }
 
                 command.rows[product].returnedQuantity *= -1
 
-                command.rows[product].totalConsumptionQuantity += command.rows[product].issuedQuantity
+                command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity
                     + command.rows[product].consumedQuantity
                     + command.rows[product].returnedQuantity
 
