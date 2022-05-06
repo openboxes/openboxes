@@ -910,7 +910,10 @@ class ProductAvailabilityService {
             eq("location", location)
             eq("product", product)
             if (binLocation) {
-                ne("binLocation", binLocation)
+                or {
+                    ne("binLocation", binLocation)
+                    isNull("binLocation")
+                }
             } else {
                 isNotNull("binLocation")
             }

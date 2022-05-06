@@ -209,14 +209,11 @@ class ReplenishmentSecondPage extends Component {
     if (this.state.values.replenishment.status === 'PLACED') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
-      const payload = {
-        status: 'COMPLETED',
-        replenishmentItems: this.state.values.replenishment.replenishmentItems,
-      };
+      const payload = { status: 'COMPLETED' };
       apiClient.post(url, flattenRequest(payload))
         .then(() => {
-          this.props.hideSpinner();
           window.location = `/openboxes/order/show/${this.props.match.params.replenishmentId}`;
+          this.props.hideSpinner();
         })
         .catch(() => this.props.hideSpinner());
     }
