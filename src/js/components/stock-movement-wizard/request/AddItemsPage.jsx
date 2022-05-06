@@ -617,6 +617,7 @@ class AddItemsPage extends Component {
     this.updateProductData = this.updateProductData.bind(this);
     this.saveRequisitionItemsInCurrentStepWithAlert =
       this.saveRequisitionItemsInCurrentStepWithAlert.bind(this);
+    this.submitRequest = this.submitRequest.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -1171,6 +1172,7 @@ class AddItemsPage extends Component {
 
     return Promise.resolve();
   }
+
   saveRequisitionItemsInCurrentStepWithAlert({
     lineItems,
     callback = () => {},
@@ -1197,6 +1199,14 @@ class AddItemsPage extends Component {
           label: this.props.translate('react.default.no.label', 'No'),
         },
       ],
+    });
+  }
+
+  submitRequest(lineItems) {
+    this.confirmSubmit(() => {
+      const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
+      this.saveRequisitionItems(nonEmptyLineItems)
+        .then(() => this.transitionToNextStep('REQUESTED'));
     });
   }
 
@@ -1394,7 +1404,12 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
-          window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+          let redirectTo = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+
+          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+            redirectTo = '/openboxes/dashboard';
+          }
+          window.location = redirectTo;
         });
     }
     return Promise.resolve();
@@ -1592,11 +1607,7 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => {
-                    if (!invalid) {
-                      this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('REQUESTED')));
-                    }
-                  }}
+                  onClick={() => this.submitRequest(values.lineItems)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={invalid}
                 ><Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
@@ -1619,6 +1630,7 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   currentLocationId: state.session.currentLocation.id,
+  supportedActivities: state.session.supportedActivities,
 });
 
 export default (connect(mapStateToProps, {
@@ -1653,4 +1665,5 @@ AddItemsPage.propTypes = {
   isPaginated: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   currentLocationId: PropTypes.string.isRequired,
+  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
