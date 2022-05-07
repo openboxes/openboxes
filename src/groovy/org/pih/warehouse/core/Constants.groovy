@@ -144,4 +144,7 @@ class Constants {
     static final String ROOT_CATEGORY_NAME = "ROOT"
 
     static final String DEFAULT_ORGANIZATION_CODE = "ORG"
+
+    // Order number suffix for bin replenishment case
+    static final String REPLENISHMENT_CODE = "_R"
 }
