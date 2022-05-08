@@ -10,9 +10,11 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.User
+import grails.converters.JSON
 
 class AuthController {
 
@@ -23,6 +25,9 @@ class AuthController {
     def recaptchaService
     def ravenClient
     def userAgentIdentService
+    def apiClientService
+    def userDataService
+    def openIdConnectService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -47,9 +52,17 @@ class AuthController {
      * Allows user to log into the system.
      */
     def login = {
+
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
+            return
+        }
+
+        if (openIdConnectService.enabled && (openIdConnectService.alwaysRedirect || params.keycloak)) {
+            String authUrl = openIdConnectService.authenticationUrl
+            redirect(url: authUrl)
+            return;
         }
 
         if (userAgentIdentService.isMobile()) {
@@ -57,6 +70,45 @@ class AuthController {
             return
         }
 
+    }
+
+    def callback = {
+        log.info "params: " + params
+
+        if (params.code) {
+
+            JSONObject token = openIdConnectService.fetchToken(params.code)
+
+            if (token.error) {
+                log.error "Unexpected error while retrieving token: " + token
+                throw new IllegalArgumentException("Unexpected error while retrieving token: " + token.error)
+            }
+
+            if (!token.id_token) {
+                throw new IllegalArgumentException("Expected token to contain id_token")
+            }
+
+            if (token && !token.error) {
+
+                // FIXME hack to avoid having to validate token
+                String[] splitToken = token.id_token.split("\\.");
+                String idToken = splitToken[0] + "." + splitToken[1] + ".";
+                Map idTokenData = openIdConnectService.parseToken(idToken)
+
+                splitToken = token.access_token.split("\\.");
+                String accessToken = splitToken[0] + "." + splitToken[1] + ".";
+                Map accessTokenData = openIdConnectService.parseToken(accessToken)
+
+                Map userData = idTokenData + accessTokenData
+                User user = openIdConnectService.findOrCreateUser(userData)
+                if (user) {
+                    session.user = user
+                    redirect(controller: "dashboard", action: "index")
+                    return
+                }
+            }
+        }
+        redirect(controller: "auth", action: "login")
     }
 
 
@@ -140,7 +192,7 @@ class AuthController {
         } else {
             flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"
             session.invalidate()
-            redirect(action: 'login')
+            redirect(url: openIdConnectService.endSessionEndpointUrl)
         }
     }
 

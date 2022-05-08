@@ -17,11 +17,11 @@ import org.pih.warehouse.util.RequestUtil
 
 class SecurityFilters {
 
-    static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors', 'productNotification', 'orderNotification', 'orderStatusNotification']
-    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
+    static ArrayList controllersWithAuthUserNotRequired = ['auth', 'test', 'errors', 'productNotification', 'orderNotification', 'orderStatusNotification']
+    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu', 'callback']
 
-    static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api', 'productNotification', 'orderNotification', 'orderStatusNotification']
-    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
+    static ArrayList controllersWithLocationNotRequired = ['auth', 'categoryApi', 'productApi', 'genericApi', 'api', 'productNotification', 'orderNotification', 'orderStatusNotification']
+    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu', 'callback']
 
     def authService
     def filters = {
@@ -107,13 +107,13 @@ class SecurityFilters {
 
                 // When a user has been authenticated, we want to check if they have an active account
                 if (session?.user && !session?.user?.active) {
+                    User currentUser = session.user
                     session.user = null
-
                     if (RequestUtil.isAjax(request)) {
                         redirect(controller: "errors", action: "handleUnauthorized")
                         return false
                     }
-
+                    flash.message = "User (${currentUser?.username}) has been created but is not active yet. Please contact your system administrator."
                     redirect(controller: 'auth', action: 'login')
                     return false
                 }

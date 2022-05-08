@@ -883,6 +883,22 @@ openboxes.ajaxRequest.timeout = 120000
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
+// OIDC configuration
+openboxes {
+    auth {
+        keycloak {
+            enabled = false
+            alwaysRedirect = true
+            clientId = "openboxes"
+            clientSecret = ""
+            domainHint = ""
+            responseType = "code"
+            scope = "openid profile email roles" // "openid profile email"
+            openIdConfigurationUrl = ""
+        }
+    }
+}
+
 // Fullstory integration
 openboxes.fullstory.enabled = false
 openboxes.fullstory.debug = false

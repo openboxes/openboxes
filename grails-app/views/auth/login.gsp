@@ -54,14 +54,19 @@
 										</button>
 									</td>
 								</tr>
-
+                                <tr class="">
+                                    <td class="middle center" colspan="2">
+                                        <g:link class="list" controller="auth" action="login" params="[keycloak:true]">
+											OR <warehouse:message code="auth.loginWithKeycloak.label" default="Login with Keycloak"/>
+										</g:link>
+                                    </td>
+                                </tr>
                                 <tr class="">
                                     <td class="middle left" colspan="2">
                                         <warehouse:message code="auth.newuser.text"/>
                                         <g:link class="list" controller="auth" action="signup"><warehouse:message code="auth.signup.label" default="Signup"/></g:link>
                                     </td>
                                 </tr>
-
                             </tbody>
 						</table>
 					</div>
