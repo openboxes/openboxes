@@ -42,6 +42,7 @@ grails.project.dependency.resolution = {
         mavenRepo "https://repo.grails.org/grails/plugins/"
         mavenRepo "https://repo.grails.org/grails/core/"
         mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
+        mavenRepo "http://insecure.repo1.maven.org/maven2"
     }
 
     dependencies {
@@ -134,6 +135,8 @@ grails.project.dependency.resolution = {
         runtime 'io.jsonwebtoken:jjwt-impl:0.11.5',
                 'io.jsonwebtoken:jjwt-jackson:0.11.5',
                 'io.jsonwebtoken:jjwt-gson:0.11.5'
+
+        compile "com.nimbusds:nimbus-jose-jwt:9.9"
 
     }
     plugins {

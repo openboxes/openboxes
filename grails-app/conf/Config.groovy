@@ -883,6 +883,22 @@ openboxes.ajaxRequest.timeout = 120000
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
+// OIDC configuration
+openboxes {
+    auth {
+        keycloak {
+            enabled = true
+            alwaysRedirect = true
+            clientId = "openboxes"
+            clientSecret = ""
+            domainHint = ""
+            responseType = "code"
+            scope = "openid profile email roles" // "openid profile email"
+            openIdConfigurationUrl = "http://openboxes-auth.ngrok.io/realms/openboxes/.well-known/openid-configuration"
+        }
+    }
+}
+
 // Fullstory integration
 openboxes.fullstory.enabled = false
 openboxes.fullstory.debug = false

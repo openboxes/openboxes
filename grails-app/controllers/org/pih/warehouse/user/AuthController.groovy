@@ -10,9 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwt
-import io.jsonwebtoken.impl.DefaultJwtParser
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.auth.UserSignupEvent
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.User
@@ -29,6 +27,7 @@ class AuthController {
     def userAgentIdentService
     def apiClientService
     def userDataService
+    def openIdConnectService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
 
@@ -54,14 +53,16 @@ class AuthController {
      */
     def login = {
 
-        String redirectUri = "https://openboxes.ngrok.io/openboxes/auth/callback"
-        redirect(url: "https://openboxes-auth.ngrok.io/realms/openboxes/protocol/openid-connect/auth?client_id=openboxes&scope=email+profile+openid+roles&response_type=code&redirect_uri=${redirectUri}&nonce=1234567890")
-        return;
-
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
             return
+        }
+
+        if (openIdConnectService.enabled && (openIdConnectService.alwaysRedirect || params.keycloak)) {
+            String authUrl = openIdConnectService.authenticationUrl
+            redirect(url: authUrl)
+            return;
         }
 
         if (userAgentIdentService.isMobile()) {
@@ -75,68 +76,39 @@ class AuthController {
         log.info "params: " + params
 
         if (params.code) {
-            String tokenEndpointUrl = "http://openboxes-auth.ngrok.io/realms/openboxes/protocol/openid-connect/token"
-            String code = params.code
 
-            def requestData = [
-                    code         : code,
-                    client_id    : "openboxes",
-                    client_secret: "",
-                    scope: "openid profile email roles",
-                    redirect_uri : "https://openboxes.ngrok.io/openboxes/auth/callback",
-                    grant_type   : "authorization_code"
-            ]
+            JSONObject token = openIdConnectService.fetchToken(params.code)
 
-            def requestHeaders = [
-                    "Content-Type": "application/x-www-form-urlencoded"
-            ]
+            if (token.error) {
+                log.error "Unexpected error while retrieving token: " + token
+                throw new IllegalArgumentException("Unexpected error while retrieving token: " + token.error)
+            }
 
-            def token = apiClientService.post(tokenEndpointUrl, requestData, requestHeaders)
+            if (!token.id_token) {
+                throw new IllegalArgumentException("Expected token to contain id_token")
+            }
 
             if (token && !token.error) {
-                log.info "token " + token
 
+                // FIXME hack to avoid having to validate token
                 String[] splitToken = token.id_token.split("\\.");
-	            String unsignedToken = splitToken[0] + "." + splitToken[1] + ".";
+                String idToken = splitToken[0] + "." + splitToken[1] + ".";
+                Map idTokenData = openIdConnectService.parseToken(idToken)
 
-                Jwt jwt = new DefaultJwtParser().parse(unsignedToken)
-                Claims claims = (Claims) jwt.getBody();
+                splitToken = token.access_token.split("\\.");
+                String accessToken = splitToken[0] + "." + splitToken[1] + ".";
+                Map accessTokenData = openIdConnectService.parseToken(accessToken)
 
-                String nonce = claims.get("nonce")
-                String email = claims.get("email")
-                String username = claims.get("preferred_username")
-                User user = User.findByUsernameOrEmail(username, email)
+                Map userData = idTokenData + accessTokenData
+                User user = openIdConnectService.findOrCreateUser(userData)
                 if (user) {
                     session.user = user
+                    redirect(controller: "dashboard", action: "index")
+                    return
                 }
-                else {
-
-                    Map userData = [
-                        email: claims.get("email"),
-                        username: claims.get("preferred_username"),
-                        firstName: claims.get("given_name"),
-                        lastName: claims.get("family_name"),
-                    ]
-                    user = userDataService.createOrUpdateUser(userData)
-                    if (user && user.save(flush: true, failOnError: true)) {
-
-                        //user.addToRoles()
-                        //claims.get("roles")
-
-                        session.user = user
-                    }
-                    else {
-                        render("Unauthorized user")
-                        return
-                    }
-                }
-                redirect(controller: "dashboard", action: "index")
-                return
             }
-            render ([token:token] as JSON)
         }
-
-
+        redirect(controller: "auth", action: "login")
     }
 
 
@@ -220,9 +192,7 @@ class AuthController {
         } else {
             flash.message = "${warehouse.message(code: 'auth.logoutSuccess.message')}"
             session.invalidate()
-            redirect(url: "http://openboxes-auth.ngrok.io/realms/openboxes/protocol/openid-connect/logout")
-
-            //redirect(action: 'login')
+            redirect(url: openIdConnectService.endSessionEndpointUrl)
         }
     }
 
