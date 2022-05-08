@@ -887,14 +887,14 @@ openboxes.ajaxRequest.timeout = 120000
 openboxes {
     auth {
         keycloak {
-            enabled = true
+            enabled = false
             alwaysRedirect = true
             clientId = "openboxes"
             clientSecret = ""
             domainHint = ""
             responseType = "code"
             scope = "openid profile email roles" // "openid profile email"
-            openIdConfigurationUrl = "http://openboxes-auth.ngrok.io/realms/openboxes/.well-known/openid-configuration"
+            openIdConfigurationUrl = ""
         }
     }
 }
