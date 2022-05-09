@@ -212,7 +212,7 @@ class ReplenishmentSecondPage extends Component {
       const payload = { status: 'COMPLETED' };
       apiClient.post(url, flattenRequest(payload))
         .then(() => {
-          window.location = `/openboxes/order/show/${this.props.match.params.replenishmentId}`;
+          window.location = `/openboxes/stockTransfer/show/${this.props.match.params.replenishmentId}`;
           this.props.hideSpinner();
         })
         .catch(() => this.props.hideSpinner());
