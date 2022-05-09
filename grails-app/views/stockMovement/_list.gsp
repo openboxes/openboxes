@@ -40,10 +40,16 @@
             <g:sortableColumn property="requestedBy" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.requestedBy.label', default: 'Requested by')}" />
 
+            <g:if test="${params.direction && params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
+                <g:sortableColumn property="dateRequested" params="${pageParams}"
+                                  title="${warehouse.message(code: 'stockMovement.dateRequested.label', default: 'Date requested')}" />
+            </g:if>
 
             <th><g:message code="default.dateCreated.label"/></th>
 
-            <th><g:message code="stockMovement.expectedReceiptDate.message"/></th>
+            <g:if test="${params.direction && params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
+                <th><g:message code="stockMovement.expectedReceiptDate.message"/></th>
+            </g:if>
 
         </tr>
         </thead>
@@ -98,12 +104,19 @@
                 <td>
                     ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}
                 </td>
+                <g:if test="${params.direction && params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
+                    <td>
+                        <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateRequested}"/>
+                    </td>
+                </g:if>
                 <td>
                     <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
                 </td>
-                <td>
-                    <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.expectedDeliveryDate}"/>
-                </td>
+                <g:if test="${params.direction && params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
+                    <td>
+                        <g:formatDate format="MMM dd, yyyy" date="${stockMovement?.expectedDeliveryDate}"/>
+                    </td>
+                </g:if>
             </tr>
         </g:each>
         </tbody>
