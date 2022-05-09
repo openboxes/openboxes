@@ -45,6 +45,14 @@
                 <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
             </g:link>
         </g:elseif>
+        <g:elseif test="${orderInstance.orderNumber.startsWith(grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix)}">
+            <g:link controller="replenishment" action="create" id="${orderInstance?.id}" class="button"
+                    disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                    disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
+            </g:link>
+        </g:elseif>
         <g:else>
             <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"

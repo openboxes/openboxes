@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevelStatus
@@ -105,7 +106,7 @@ class ReplenishmentApiController {
         }
 
         if (!replenishment.replenishmentNumber) {
-            replenishment.replenishmentNumber = identifierService.generateOrderIdentifier()
+            replenishment.replenishmentNumber = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix + identifierService.generateOrderIdentifier()
         }
 
         if (jsonObject.status) {
