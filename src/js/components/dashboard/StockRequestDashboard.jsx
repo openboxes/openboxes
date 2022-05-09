@@ -42,7 +42,7 @@ const COLUMNS = [
   },
   {
     Header: 'Fulfiling Depot',
-    accessor: 'destination.name',
+    accessor: 'origin.name',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
   },
