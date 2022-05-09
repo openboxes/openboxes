@@ -43,36 +43,24 @@
         </td>
         <td class="top">
             <table border="0">
-                <tr class="header">
-                    <td class="name right">
-                        <label><warehouse:message code="order.orderNumber.label"/>:</label>
-                    </td>
-                    <td>
-                        ${headerItems.orderNumber}
-                    </td>
-                </tr>
-                <tr class="header">
-                    <td class="name right">
-                        <label><warehouse:message code="default.createdBy.label"/>:</label>
-                    </td>
-                    <td>
-                        ${headerItems.createdBy}
-                    </td>
-                </tr>
-                <tr class="header">
-                    <td class="name right">
-                        <label><warehouse:message code="default.dateCreated.label"/>:</label>
-                    </td>
-                    <td>
-                        <g:formatDate date="${headerItems?.dateCreated}" format="MM/dd/yyyy"/>
-                    </td>
-                </tr>
+                <g:each var="headerItem" status="i" in="${headerItems.keySet()}">
+                    <tr class="header">
+                        <td class="name right">
+                            <label><warehouse:message code="${'order.' + headerItem + '.label'}"/>:</label>
+                        </td>
+                        <td>
+                            ${headerItems[headerItem]}
+                        </td>
+                    </tr>
+                </g:each>
             </table>
         </td>
     </tr>
 
 </table>
+
 <g:set var="zoneNames" value='${itemsMap.keySet()}'/>
+
 <g:each var="zoneName" status="i" in="${zoneNames}">
 
     <g:set var="lineItems" value='${itemsMap[zoneName].lineItems}'/>
@@ -80,7 +68,6 @@
 
     <g:set var="showZoneName" value='${zoneName || zoneNames.size() > 1}'/>
 
-    <g:set var="pickListItemsByOrder" value='${pickListItems?.groupBy { it?.orderItem?.id } ?: [:]}'/>
     <h1 class="subtitle">
         ${zoneName ?: g.message(code: 'location.noZone.label', default: 'No zone')}
     </h1>
@@ -94,7 +81,7 @@
             <g:if test="${lineItems[lineItemKey].size() > 0}">
                 <g:set var="groupName" value="${g.message(code:'product.'+lineItemKey+'.label')}"/>
                 <g:set var="pageBreakAfter" value="${enablePageBreak && !showZoneName ?'always':'avoid'}"/>
-                <g:render template="printPage" model="[lineItems:lineItems[lineItemKey], groupName: groupName, pickListItemsByOrder: pickListItemsByOrder, pageBreakAfter: pageBreakAfter]"/>
+                <g:render template="printPage" model="[lineItems:lineItems[lineItemKey], groupName: groupName, pickListItems: pickListItems, pageBreakAfter: pageBreakAfter]"/>
             </g:if>
         </g:each>
     </div>

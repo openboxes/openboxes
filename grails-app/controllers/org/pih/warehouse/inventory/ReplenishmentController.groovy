@@ -28,7 +28,7 @@ class ReplenishmentController {
 
         def zoneNames = orderItems?.collect { it?.originBinLocation?.zone?.name }?.unique()?.sort { a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }
         def orderItemsByZone = orderItems?.groupBy { it?.originBinLocation?.zone?.name } ?: [:]
-        def allPickListItems = orderItems*.retrievePicklistItems()?.flatten()
+        def pickListItems = orderItems*.retrievePicklistItems()?.flatten()?.findAll { it.quantity > 0 }.groupBy { it?.orderItem }
 
         Map<Object, Map> itemsMap = [:]
         zoneNames.each { zoneName ->
@@ -38,13 +38,12 @@ class ReplenishmentController {
                     'hazardousMaterial'  : orderItemsByZone[zoneName].findAll { it?.product['hazardousMaterial'] },
                     'generalGoods'       : orderItemsByZone[zoneName].findAll { !it?.product['coldChain'] && !it?.product['controlledSubstance'] && !it?.product['hazardousMaterial'] },
             ]
-            itemsMap.put(zoneName, [lineItems: groupedLineItemsMap, pickListItems: allPickListItems]);
+            itemsMap.put(zoneName, [lineItems: groupedLineItemsMap, pickListItems: pickListItems]);
         }
-
         def headerItems = [
                 orderNumber: transferOrder.orderNumber,
                 createdBy  : transferOrder.createdBy,
-                dateCreated: transferOrder.dateCreated
+                dateCreated: transferOrder.dateCreated.format('MM/dd/yyyy')
         ]
 
         [itemsMap: itemsMap, headerItems: headerItems]

@@ -31,15 +31,10 @@
                     </td>
                 </tr>
             </g:unless>
-            <g:each in="${lineItems}" status="i" var="lineItem">
+            <g:each var="lineItem" in="${lineItems}" status="i">
 
-                <g:set var="picklistItems" value="${pickListItemsByOrder[lineItem.id]?.findAll { it.quantity > 0 }}"/>
-                <g:set var="numInventoryItem" value="${picklistItems?.size() ?: 1}"/>
-
-                <g:set var="splitItems" value="${lineItem?.orderItems?.sort { a, b ->
-                    a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
-                            b.quantity <=> a.quantity }}"
-                />
+                <g:set var="groupedPicklistItems" value="${pickListItems[lineItem]}"/>
+                <g:set var="numInventoryItem" value="${groupedPicklistItems?.size() ?: 1}"/>
                 <g:set var="backgroundColor" value="${(i % 2) == 0 ? '#fff' : '#f7f7f7'}"/>
                 <g:set var="j" value="${0}"/>
 
@@ -62,32 +57,22 @@
                                 <g:formatDate date="${lineItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
                             </td>
                             <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                <g:if test="${splitItems}">
-                                    ${splitItems[j]?.destinationBinLocation?.name}
-                                </g:if>
-                                <g:else>
-                                    ${lineItem?.destinationBinLocation?.name}
-                                </g:else>
+                                ${lineItem?.destinationBinLocation?.name}
                             </td>
                             <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                <g:if test="${splitItems}">
-                                    ${splitItems[j]?.quantity}
-                                </g:if>
-                                <g:else>
-                                    ${lineItem?.quantity}
-                                </g:else>
+                                ${lineItem?.quantity}
                             </td>
                         </g:if>
                         <td class="center middle">
-                            <g:if test="${picklistItems}">
+                            <g:if test="${groupedPicklistItems}">
                                 <div class="binLocation">
-                                    ${picklistItems[j]?.binLocation?.name}
+                                    ${groupedPicklistItems[j]?.binLocation?.name}
                                 </div>
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems}">
-                                ${picklistItems[j]?.quantity ?: 0}
+                            <g:if test="${groupedPicklistItems}">
+                                ${groupedPicklistItems[j]?.quantity ?: 0}
                                 ${lineItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
