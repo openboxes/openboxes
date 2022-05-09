@@ -72,24 +72,15 @@
     </tr>
 
 </table>
-
-<g:set var="lineItemsByZone" value='${lineItems?.groupBy { it?.originBinLocation?.zone?.name } ?: [:]}'/>
-
-<g:set var="allPickListItems" value='${lineItems*.retrievePicklistItems()?.flatten()}'/>
-<g:set var="zoneNames" value='${allPickListItems?.collect { it?.binLocation?.zone?.name }?.unique()?.sort{ a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }}'/>
-<g:set var="pickListItemsByZone" value='${allPickListItems?.groupBy { it?.binLocation?.zone?.name } ?: [:]}'/>
-
+<g:set var="zoneNames" value='${itemsMap.keySet()}'/>
 <g:each var="zoneName" status="i" in="${zoneNames}">
 
-    <g:set var="zoneLineItems" value='${lineItemsByZone[zoneName] ?: [:]}'/>
-    <g:set var="zoneLineItemsColdChain" value='${zoneLineItems.findAll { it?.product?.coldChain }}'/>
-    <g:set var="zoneLineItemsControlled" value='${zoneLineItems.findAll {it?.product?.controlledSubstance}}'/>
-    <g:set var="zoneLineItemsHazmat" value='${zoneLineItems.findAll {it?.product?.hazardousMaterial}}'/>
-    <g:set var="zoneLineItemsOther" value='${zoneLineItems.findAll {!it?.product?.hazardousMaterial && !it?.product?.coldChain && !it?.product?.controlledSubstance}}'/>
+    <g:set var="lineItems" value='${itemsMap[zoneName].lineItems}'/>
+    <g:set var="pickListItems" value='${itemsMap[zoneName].pickListItems}'/>
 
     <g:set var="showZoneName" value='${zoneName || zoneNames.size() > 1}'/>
 
-    <g:set var="pickListItemsByOrder" value='${pickListItemsByZone[zoneName]?.groupBy { it?.orderItem?.id } ?: [:]}'/>
+    <g:set var="pickListItemsByOrder" value='${pickListItems?.groupBy { it?.orderItem?.id } ?: [:]}'/>
     <h1 class="subtitle">
         ${zoneName ?: g.message(code: 'location.noZone.label', default: 'No zone')}
     </h1>
@@ -99,27 +90,13 @@
                 ${zoneName ?: g.message(code: 'location.noZone.label', default: 'No zone')}
             </h1>
         </g:if>
-
-        <g:if test="${zoneLineItemsColdChain}">`
-            <g:set var="groupName" value="${g.message(code:'product.coldChain.label', default:'Cold Chain')}"/>
-            <g:set var="pageBreakAfter" value="${enablePageBreak && !showZoneName && (zoneLineItemsControlled||zoneLineItemsHazmat||zoneLineItemsOther) ? 'always':'avoid'}"/>
-            <g:render template="printPage" model="[lineItems:zoneLineItemsColdChain, groupName: groupName, picklist:picklist, pickListItemsByOrder: pickListItemsByOrder, pageBreakAfter: pageBreakAfter]"/>
-        </g:if>
-        <g:if test="${zoneLineItemsControlled}">
-            <g:set var="groupName" value="${g.message(code:'product.controlledSubstance.label', default:'Controlled Substance')}"/>
-            <g:set var="pageBreakAfter" value="${enablePageBreak && !showZoneName && (zoneLineItemsHazmat||zoneLineItemsOther)?'always':'avoid'}"/>
-            <g:render template="printPage" model="[lineItems:zoneLineItemsControlled, groupName: groupName, picklist:picklist, pickListItemsByOrder: pickListItemsByOrder, pageBreakAfter: pageBreakAfter]"/>
-        </g:if>
-        <g:if test="${zoneLineItemsHazmat}">
-            <g:set var="groupName" value="${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous Material')}"/>
-            <g:set var="pageBreakAfter" value="${enablePageBreak && !showZoneName && (zoneLineItemsOther)?'always':'avoid'}"/>
-            <g:render template="printPage" model="[lineItems:zoneLineItemsHazmat, groupName: groupName, picklist:picklist, pickListItemsByOrder: pickListItemsByOrder, pageBreakAfter: pageBreakAfter]"/>
-        </g:if>
-        <g:if test="${zoneLineItemsOther}">
-            <g:set var="groupName" value="${warehouse.message(code:'product.generalGoods.label', default:'General Goods')}"/>
-            <g:set var="pageBreakAfter" value="${enablePageBreak && !showZoneName ?'always':'avoid'}"/>
-            <g:render template="printPage" model="[lineItems:zoneLineItemsOther, groupName: groupName, picklist:picklist, pickListItemsByOrder: pickListItemsByOrder, pageBreakAfter:pageBreakAfter]"/>
-        </g:if>
+        <g:each  var="lineItemKey" in="${lineItems.keySet()}">
+            <g:if test="${lineItems[lineItemKey].size() > 0}">
+                <g:set var="groupName" value="${g.message(code:'product.'+lineItemKey+'.label')}"/>
+                <g:set var="pageBreakAfter" value="${enablePageBreak && !showZoneName ?'always':'avoid'}"/>
+                <g:render template="printPage" model="[lineItems:lineItems[lineItemKey], groupName: groupName, pickListItemsByOrder: pickListItemsByOrder, pageBreakAfter: pageBreakAfter]"/>
+            </g:if>
+        </g:each>
     </div>
 
 </g:each>

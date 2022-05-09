@@ -10,7 +10,6 @@
 
 package org.pih.warehouse.inventory
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.picklist.Picklist
 
 class ReplenishmentController {
 
@@ -24,14 +23,30 @@ class ReplenishmentController {
 
     def print = {
         Order transferOrder = Order.get(params.id)
-        def picklist = Picklist.findByOrder(transferOrder)
 
-        def lineItems = transferOrder.orderItems.findAll { !it.parentOrderItem }.sort { it.product.name }
+        def orderItems = transferOrder.orderItems.findAll { !it.parentOrderItem }.sort { it.product.name }
 
-        def headerItems = [orderNumber: transferOrder.orderNumber,
-                           createdBy: transferOrder.createdBy,
-                           dateCreated: transferOrder.dateCreated]
+        def zoneNames = orderItems?.collect { it?.originBinLocation?.zone?.name }?.unique()?.sort { a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }
+        def orderItemsByZone = orderItems?.groupBy { it?.originBinLocation?.zone?.name } ?: [:]
+        def allPickListItems = orderItems*.retrievePicklistItems()?.flatten()
 
-        [lineItems: lineItems, picklist: picklist, headerItems: headerItems]
+        Map<Object, Map> itemsMap = [:]
+        zoneNames.each { zoneName ->
+            def groupedLineItemsMap = [
+                    'coldChain'          : orderItemsByZone[zoneName].findAll { it?.product['coldChain'] },
+                    'controlledSubstance': orderItemsByZone[zoneName].findAll { it?.product['controlledSubstance'] },
+                    'hazardousMaterial'  : orderItemsByZone[zoneName].findAll { it?.product['hazardousMaterial'] },
+                    'generalGoods'       : orderItemsByZone[zoneName].findAll { !it?.product['coldChain'] && !it?.product['controlledSubstance'] && !it?.product['hazardousMaterial'] },
+            ]
+            itemsMap.put(zoneName, [lineItems: groupedLineItemsMap, pickListItems: allPickListItems]);
+        }
+
+        def headerItems = [
+                orderNumber: transferOrder.orderNumber,
+                createdBy  : transferOrder.createdBy,
+                dateCreated: transferOrder.dateCreated
+        ]
+
+        [itemsMap: itemsMap, headerItems: headerItems]
     }
 }
