@@ -145,6 +145,6 @@ class Constants {
 
     static final String DEFAULT_ORGANIZATION_CODE = "ORG"
 
-    // Order number suffix for bin replenishment case
-    static final String REPLENISHMENT_CODE = "_R"
+    // Order number prefix for bin replenishment case
+    static final String REPLENISHMENT_PREFIX = "R-"
 }

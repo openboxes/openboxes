@@ -108,7 +108,7 @@ class ReplenishmentApiController {
         }
 
         if (!replenishment.replenishmentNumber) {
-            replenishment.replenishmentNumber = identifierService.generateOrderIdentifier() + Constants.REPLENISHMENT_CODE
+            replenishment.replenishmentNumber = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix + identifierService.generateOrderIdentifier()
         }
 
         if (jsonObject.status) {

@@ -45,7 +45,7 @@
                 <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
             </g:link>
         </g:elseif>
-        <g:elseif test="${orderInstance.orderNumber.contains(Constants.REPLENISHMENT_CODE)}">
+        <g:elseif test="${orderInstance.orderNumber.startsWith(grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix)}">
             <g:link controller="replenishment" action="create" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
                     disabledMessage="${disabledMessage}">

@@ -1975,3 +1975,6 @@ grails.gorm.default.mapping = {
 grails.gorm.default.constraints = {
     expirationDateConstraint(nullable: true, min: openboxes.expirationDate.minValue)
 }
+
+// Order number prefix for bin replenishment case
+openboxes.stockTransfer.binReplenishment.prefix = Constants.REPLENISHMENT_PREFIX
