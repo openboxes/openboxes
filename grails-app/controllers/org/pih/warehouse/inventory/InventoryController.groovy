@@ -605,6 +605,10 @@ class InventoryController {
 
             def monthlyDemand = forecastingService.getDemand(location, null, product)?.monthlyDemand ?: 0
 
+            def quantityAvailableToPromise = inventoryItem.quantityAvailableToPromise ?: 0
+
+            def quantityToOrder = inventoryLevel?.maxQuantity == null ? "No Max qty set  - review based on monthly demand" : inventoryLevel.maxQuantity - quantityAvailableToPromise
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.name) + ","
@@ -615,8 +619,8 @@ class InventoryController {
             csv += (inventoryLevel?.reorderQuantity ?: "") + ","
             csv += (inventoryLevel?.maxQuantity ?: "") + ","
             csv += monthlyDemand + ","
-            csv += (inventoryItem.quantityAvailableToPromise ?: "0") + ","
-            csv += (inventoryItem.quantityToOrder ?: "0") + ","
+            csv += quantityAvailableToPromise + ","
+            csv += quantityToOrder + ","
 
             if(hasRoleFinance) {
                 csv += '"' + (inventoryItem.unitCost ?: "") + '"' + ","
