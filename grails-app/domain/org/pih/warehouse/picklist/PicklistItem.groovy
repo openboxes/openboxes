@@ -74,7 +74,15 @@ class PicklistItem implements Serializable {
         sortOrder(nullable: true)
     }
 
-    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', "quantityRemaining", "pickable"]
+    static transients = [
+            'associatedLocation',
+            'associatedProducts',
+            'disableRefresh',
+            "quantityRemaining",
+            "quantityCanceled",
+            "pickable",
+            "shortage",
+    ]
 
     String getAssociatedLocation() {
         return requisitionItem ? requisitionItem?.requisition?.origin?.id : orderItem?.order?.origin?.id
@@ -88,54 +96,75 @@ class PicklistItem implements Serializable {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 
-    Integer getQuantityRemaining() {
-        Integer quantityRemaining = (quantity?:0) - (quantityPicked?:0)
-        return (quantityRemaining > 0) ? quantityRemaining : 0
+    Boolean isShortage() {
+        return (reasonCode != null)
     }
+
+    Integer getQuantityRemaining() {
+        if (shortage) {
+            return 0
+        }
+        else {
+            Integer quantityRemaining = (quantity?:0) - (quantityPicked?:0)
+            return (quantityRemaining > 0) ? quantityRemaining : 0
+        }
+    }
+
+    Integer getQuantityCanceled() {
+        if (shortage) {
+            Integer quantityRemaining = (quantity?:0) - (quantityPicked?:0)
+            return (quantityRemaining > 0) ? quantityRemaining : 0
+        }
+        else {
+            return 0
+        }
+    }
+
 
 
     Map toJson() {
         [
-            id                  : id,
-            version             : version,
-            status              : status,
-            requisitionItemId   : requisitionItem?.id,
-            orderItemId         : orderItem?.id,
-            binLocationId       : binLocation?.id,
-            inventoryItemId     : inventoryItem?.id,
-            quantity            : quantity?:0,
-            reasonCode          : reasonCode,
-            comment             : comment,
+                id                    : id,
+                version               : version,
+                status                : status,
+                requisitionItemId     : requisitionItem?.id,
+                orderItemId           : orderItem?.id,
+                binLocationId         : binLocation?.id,
+                inventoryItemId       : inventoryItem?.id,
+                quantity              : quantity ?: 0,
+                reasonCode            : reasonCode,
+                comment               : comment,
 
-            // Used in Bin Replenishment feature
-            binLocation         : binLocation,
-            zone                : binLocation?.zone,
-            product             : inventoryItem?.product,
-            inventoryItem       : inventoryItem,
-            lotNumber           : inventoryItem?.lotNumber,
-            expirationDate      : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                // Used in Bin Replenishment feature
+                binLocation           : binLocation,
+                zone                  : binLocation?.zone,
+                product               : inventoryItem?.product,
+                inventoryItem         : inventoryItem,
+                lotNumber             : inventoryItem?.lotNumber,
+                expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
 
-            // Used in React Native app
-            "picklist.id"         : picklist?.id,
-            "requisitionItem.id"  : requisitionItem?.id,
-            "product.id"          : inventoryItem?.product?.id,
-            "product.name"        : inventoryItem?.product?.name,
-            "productCode"         : inventoryItem?.product?.productCode,
-            "inventoryItem.id"    : inventoryItem?.id,
-            lotNumber             : inventoryItem?.lotNumber,
-            expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-            "binLocation.id"      : binLocation?.id,
-            "binLocation.name"    : binLocation?.name,
-            "binLocation.zoneId"  : binLocation?.zone?.id,
-            "binLocation.zoneName": binLocation?.zone?.name,
-            quantityRequested     : requisitionItem?.quantity?:0,
-            quantityRemaining     : quantityRemaining?:0,
-            quantityToPick        : quantity?:0,
-            quantityPicked        : quantityPicked?:0,
-            unitOfMeasure         : requisitionItem?.product?.unitOfMeasure?:"EA",
-            "picker.id"           : picker,
-            datePicked            : datePicked,
-
+                // Used in React Native app
+                "picklist.id"         : picklist?.id,
+                "requisitionItem.id"  : requisitionItem?.id,
+                "product.id"          : inventoryItem?.product?.id,
+                "product.name"        : inventoryItem?.product?.name,
+                "productCode"         : inventoryItem?.product?.productCode,
+                "inventoryItem.id"    : inventoryItem?.id,
+                lotNumber             : inventoryItem?.lotNumber,
+                expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "binLocation.id"      : binLocation?.id,
+                "binLocation.name"    : binLocation?.name,
+                "binLocation.zoneId"  : binLocation?.zone?.id,
+                "binLocation.zoneName": binLocation?.zone?.name,
+                quantityRequested     : requisitionItem?.quantity ?: 0,
+                quantityRemaining     : quantityRemaining ?: 0,
+                quantityToPick        : quantity ?: 0,
+                quantityPicked        : quantityPicked ?: 0,
+                quantityCanceled      : quantityCanceled ?: 0,
+                unitOfMeasure         : requisitionItem?.product?.unitOfMeasure ?: "EA",
+                shortage              : shortage,
+                picker                : picker,
+                datePicked            : datePicked
         ]
     }
 }

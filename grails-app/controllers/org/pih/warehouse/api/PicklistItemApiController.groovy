@@ -47,8 +47,14 @@ class PicklistItemApiController extends BaseDomainApiController {
         String productId = jsonObject["product.id"]
         BigDecimal quantityPicked = new BigDecimal(jsonObject.quantityPicked)
         String pickerId = session?.user?.id
+        String reasonCode = params?.shortageReasonCode
+        Boolean shortage = params.boolean("shortage")
 
-        picklistService.updatePicklistItem(picklistItemId, productId, quantityPicked, pickerId)
+        if (shortage && !reasonCode) {
+            throw new IllegalArgumentException("Must include reason code when entering a shortage")
+        }
+
+        picklistService.updatePicklistItem(picklistItemId, productId, quantityPicked, pickerId, reasonCode)
 
         render HttpStatus.SC_OK
     }

@@ -61,7 +61,7 @@ class PicklistService {
         return picklist.save()
     }
 
-    def updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickerId) {
+    def updatePicklistItem(String picklistItemId, String productId, BigDecimal quantityPicked, String pickerId, String reasonCode) {
         PicklistItem picklistItem = PicklistItem.get(picklistItemId)
 
         Product product = Product.get(productId)
@@ -81,6 +81,11 @@ class PicklistService {
         picklistItem.quantityPicked += quantityPicked
         picklistItem.datePicked = new Date()
         picklistItem.picker = User.load(pickerId)
+
+        // Used to mark a pick item as shorted
+        if(reasonCode) {
+            picklistItem.reasonCode = reasonCode
+        }
         if (picklistItem.hasErrors() || !picklistItem.save(flush:true)) {
             throw new ValidationException("Unable to save picklist item", picklistItem.errors)
         }
