@@ -612,8 +612,7 @@ class ProductAvailabilityService {
                         inventoryItem: it[1],
                         binLocation: it[2],
                         quantityAvailable: it[4],
-                        quantityOnHand: it[3],
-                        status: AvailableItemStatus.AVAILABLE
+                        quantityOnHand: it[3]
                 )
             }
         }
