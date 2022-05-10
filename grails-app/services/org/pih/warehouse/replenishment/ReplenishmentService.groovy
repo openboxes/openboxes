@@ -230,7 +230,7 @@ class ReplenishmentService {
 
             // Get Picklist related data
             OrderItem orderItem = OrderItem.get(replenishmentItem.id)
-            replenishmentItem.picklistItems = picklistService.getPicklistItems(orderItem)
+            replenishmentItem.picklistItems = picklistService.getPicklistItems(orderItem).findAll{ it.quantity > 0 }
             replenishmentItem.availableItems = picklistService.getAvailableItems(replenishmentItem.location, orderItem)
             replenishmentItem.suggestedItems = picklistService.getSuggestedItems(replenishmentItem.availableItems, replenishmentItem.quantity, replenishment.origin)
         }}
