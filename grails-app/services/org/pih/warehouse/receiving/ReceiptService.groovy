@@ -148,6 +148,13 @@ class ReceiptService {
         partialReceiptItem.lotNumber = shipmentItem.inventoryItem?.lotNumber
         partialReceiptItem.expirationDate = shipmentItem.inventoryItem?.expirationDate
         partialReceiptItem.quantityShipped = shipmentItem?.quantity ?: 0
+        if (!shipmentItem.inventoryItem) {
+            shipmentItem.inventoryItem =
+                    inventoryService.findOrCreateInventoryItem(
+                            shipmentItem.product,
+                            shipmentItem?.lotNumber,
+                            shipmentItem?.expirationDate)
+        }
         partialReceiptItem.quantityOnHand = productAvailabilityService.getQuantityOnHand(shipmentItem.inventoryItem)
 
         return partialReceiptItem
