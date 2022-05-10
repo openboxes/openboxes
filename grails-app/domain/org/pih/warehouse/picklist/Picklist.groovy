@@ -75,7 +75,7 @@ class Picklist implements Serializable {
         updatedBy(nullable: true)
     }
 
-    static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId', 'isFullyPicked']
+    static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId', 'isFullyPicked', 'pickers']
 
     Boolean getIsFullyPicked() {
         return !picklistItems.any { PicklistItem picklistItem ->
@@ -97,6 +97,19 @@ class Picklist implements Serializable {
 
     def getPicklistItemsByLot(Product product)  {
         return getPicklistItems(product)?.groupBy {it.inventoryItem.lotNumber}
+    }
+
+    Set<Person> getPickers() {
+        Set<Person> pickers = []
+        if (picker) {
+            pickers.add(picker)
+        }
+        picklistItems.each {PicklistItem picklistItem ->
+            if (picklistItem.picker) {
+                pickers.add(picklistItem.picker)
+            }
+        }
+        return pickers
     }
 
     String toString() {

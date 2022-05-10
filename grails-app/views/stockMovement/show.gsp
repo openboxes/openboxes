@@ -113,6 +113,10 @@
         <g:isSuperuser>
             <div class="button-group">
                 <g:if test="${stockMovement?.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+                    <g:link controller="picklist" action="print" class="button" id="${stockMovement?.id}" target="_blank">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+                        <warehouse:message code="default.print.label" args="[g.message(code: 'picklist.label', default: 'Picklist')]" default="Print picklist" />
+                    </g:link>
                     <g:link controller="stockMovement" action="validatePicklist" class="button" id="${stockMovement?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.validatePicklist.label" default="Validate picklist" />

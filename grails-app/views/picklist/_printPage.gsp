@@ -18,7 +18,7 @@
     <table id="requisition-items" class="fs-repeat-header" border="0">
         <thead style="display: table-row-group">
             <tr class="">
-                <td colspan="11">
+                <td colspan="13">
                     <h4 class="title">${groupName}</h4>
                 </td>
             </tr>
@@ -28,11 +28,13 @@
                 <th>${warehouse.message(code: 'product.label')}</th>
                 <th class="center border-right">${warehouse.message(code: 'requisitionItem.quantityRequested.label')}</th>
                 <th class="center" style="min-width: 150px;">${warehouse.message(code: 'inventoryItem.lotNumber.label')}</th>
-                <th class="center">${warehouse.message(code: 'inventoryItem.expirationDate.label')}</th>
+                <th class="center">${warehouse.message(code: 'inventoryItem.expiry.label', default: 'Expiry')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
-                <th class="center">${warehouse.message(code: 'picklistItem.quantityRequired.label', default: 'Required')}</th>
+                <th class="center">${warehouse.message(code:'picklistItem.quantityRequired.label', default: 'Required')}</th>
                 <th class="center">${warehouse.message(code:'picklistItem.quantityPicked.label', default: 'Picked')}</th>
-                <th class="center">${warehouse.message(code:'requisitionItem.confirmedPick.label')}</th>
+                <th class="center">${warehouse.message(code:'picklistItem.quantityCanceled.label', default: 'Canceled')}</th>
+                <th class="center">${warehouse.message(code:'picklistItem.quantityRemaining.label', default: 'Remaining')}</th>
+                <th class="center">${warehouse.message(code:'requisitionItem.confirmedPick.label', default: 'Confirmed')}</th>
                 <th class="center" style="min-width: 100px">${warehouse.message(code:'stockMovement.comments.label')}</th>
             </tr>
         </thead>
@@ -86,7 +88,7 @@
                                 <div class="${requisitionItem?.status}">
                                     ${requisitionItem?.product?.productCode}
                                 </div>
-                                <g:displayBarcode showData="${false}" data="${requisitionItem?.product?.productCode}"/>
+                                <g:displayBarcode showData="${true}" data="${requisitionItem?.product?.productCode}"/>
 
                             </td>
                             <td class="center" rowspan="${numInventoryItem}">
@@ -114,6 +116,7 @@
                         <td class="middle center">
                             <g:if test="${picklistItems}">
                                 <span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
+                                <g:displayBarcode showData="${true}" data="${picklistItems[j]?.inventoryItem?.lotNumber}"/>
                             </g:if>
                         </td>
                         <td class="middle center">
@@ -132,22 +135,43 @@
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems}">
+                            <g:if test="${picklistItems[j]}">
                                 ${picklistItems[j]?.quantity ?: 0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems}">
+                            <g:if test="${picklistItems[j]}">
                                 ${picklistItems[j]?.quantityPicked ?: 0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
-                        <td class="center middle">
-                            <!-- Checked by -->
+                        <td class="middle center">
+                            <g:if test="${picklistItems[j]}">
+                                ${picklistItems[j]?.quantityCanceled?:0}
+                                ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </g:if>
+                        </td>
+                        <td class="middle center">
+                            <g:if test="${picklistItems[j]}">
+                                ${picklistItems[j]?.quantityRemaining?:0}
+                                ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
+                            </g:if>
+                        </td>
+                        <td class="middle center">
+                            <!-- Confirmed quantity -->
                         </td>
                         <td class="middle">
                             <!-- Comments -->
+                            ${picklistItems[j].status}
+                            <g:if test="${picklistItems[j].shortage}">
+                                <small>Shortage of ${picklistItems[j]?.quantityCanceled}
+                                    ${requisitionItem?.product?.unitOfMeasure ?: "EA"} recorded by ${picklistItems[j]?.picker}
+                                (${picklistItems[j]?.reasonCode})</small>
+                            </g:if>
+                            <g:elseif test="${picklistItems[j].picker}">
+                                Picked by ${picklistItems[j].picker}
+                            </g:elseif>
                         </td>
                         <% j++ %>
                     </tr>
