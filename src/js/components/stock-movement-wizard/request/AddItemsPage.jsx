@@ -1289,7 +1289,11 @@ class AddItemsPage extends Component {
       this.saveRequisitionItemsInCurrentStepWithAlert({
         lineItems: formValues.lineItems,
         callback: () => {
-          window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+          let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+            redirectTo = '/openboxes/dashboard';
+          }
+          window.location = redirectTo;
         },
       });
     } else {
@@ -1302,7 +1306,13 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = '/openboxes/stockMovement/list?direction=INBOUND'; },
+            onClick: () => {
+              let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+              if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+                redirectTo = '/openboxes/dashboard';
+              }
+              window.location = redirectTo;
+            },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
