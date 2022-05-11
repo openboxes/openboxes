@@ -43,7 +43,7 @@ class CSVUtils {
         if (StringUtils.isBlank(s)) {
             throw new IllegalArgumentException("${fieldName} is empty or unset")
         }
-        DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale) as DecimalFormat
+        DecimalFormat format = DecimalFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
         format.parseBigDecimal = true
         /*
          * OB releases <=0.8.16, in certain locales, erroneously (and uniquely)
@@ -52,7 +52,7 @@ class CSVUtils {
          */
         try {
             return format.parse(s.replace("†", ""))
-        } catch (Exception ignored) {
+        } catch (Exception) {
             throw new IllegalArgumentException("Unable to parse expected numeric value ${fieldName}=${s}")
         }
     }
@@ -63,7 +63,7 @@ class CSVUtils {
     static int parseInteger(String s, String fieldName = "unknown_field") {
         try {
             return parseNumber(s, fieldName).intValueExact()
-        } catch (ArithmeticException ignored) {
+        } catch (ArithmeticException) {
             throw new IllegalArgumentException("Expected integer value for ${fieldName}=${s}")
         }
     }
@@ -148,7 +148,7 @@ class CSVUtils {
      * It is the caller's responsibility to call escapeCsv() if appropriate.
      */
     static String formatCurrency(Number number, String currencyCode = null, boolean isUnitPrice = false) {
-        DecimalFormat format = DecimalFormat.getCurrencyInstance(LocalizationUtil.localizationService.currentLocale) as DecimalFormat
+        DecimalFormat format = DecimalFormat.getCurrencyInstance(LocalizationUtil.localizationService.currentLocale)
         format.groupingUsed = false
 
         if (currencyCode != null) {
@@ -179,9 +179,9 @@ class CSVUtils {
      */
     static String formatUnitOfMeasure(String quantityUom, Number quantityPerUom) {
         // FIXME default value should be localized, but presently is "EA" everywhere
-        def numerator = quantityUom ?: "EA"
-        def denominator = formatInteger(quantityPerUom ?: 1)
-        return "${numerator}/${denominator}"
+        def formattedUom = quantityUom ?: "EA"
+        def formattedQuantity = formatInteger(quantityPerUom ?: 1)
+        return "${formattedUom}/${formattedQuantity}"
     }
 
     /**
