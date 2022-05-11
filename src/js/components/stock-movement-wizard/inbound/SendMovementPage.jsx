@@ -23,6 +23,7 @@ import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -415,7 +416,12 @@ class SendMovementPage extends Component {
           values: {
             ...this.state.values,
             dateShipped: stockMovementData.dateShipped,
-            shipmentType: _.get(stockMovementData, 'shipmentType.id'),
+            shipmentType: {
+              id: stockMovementData.shipmentType.id,
+              name: stockMovementData.shipmentType.name,
+              label: splitTranslation(stockMovementData.shipmentType.name, this.props.locale),
+              value: stockMovementData.shipmentType.id,
+            },
             trackingNumber: stockMovementData.trackingNumber,
             driverName: stockMovementData.driverName,
             comments: stockMovementData.comments,
