@@ -1537,7 +1537,9 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => {
-                  window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+                  window.location = !this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')
+                    ? '/openboxes/dashboard'
+                    : '/openboxes/stockMovement/list?direction=INBOUND';
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
@@ -1595,6 +1597,7 @@ const mapStateToProps = state => ({
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  supportedActivities: state.session.supportedActivities,
 });
 
 export default connect(mapStateToProps, {
@@ -1626,4 +1629,5 @@ EditItemsPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
+  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
