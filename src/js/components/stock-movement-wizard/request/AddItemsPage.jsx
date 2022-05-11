@@ -10,6 +10,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
@@ -1414,12 +1415,12 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
-          let redirectTo = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
-
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            redirectTo = '/openboxes/dashboard';
+            Alert.success(`${this.props.translate('react.stockMovement.request.submitMessage.label', 'Thank you for submitting your request. You can check the status of your request using stock movement number')} ${movementNumber}`);
+            this.props.history.push('/openboxes/');
+          } else {
+            window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
           }
-          window.location = redirectTo;
         });
     }
     return Promise.resolve();
@@ -1643,7 +1644,7 @@ const mapStateToProps = state => ({
   supportedActivities: state.session.supportedActivities,
 });
 
-export default (connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   showSpinner, hideSpinner, fetchUsers,
 })(AddItemsPage));
 
@@ -1676,4 +1677,7 @@ AddItemsPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
   currentLocationId: PropTypes.string.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };
