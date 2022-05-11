@@ -105,7 +105,8 @@
                     </td>
                     <td>
                         <g:each var="requisitionNumber" in="${entry.pickedRequisitionNumbers}">
-                            <g:link controller="stockMovement" action="show" id="${requisitionNumber}">
+                            <g:set var="message">Packing: ${entry?.stockMovements?.packingLocation?:'Unassigned'}, Loading: ${entry?.stockMovements?.loadingLocation?:'Unassigned'}</g:set>
+                            <g:link controller="stockMovement" action="show" id="${requisitionNumber}" title="${message}">
                                 ${requisitionNumber}
                             </g:link>
                         </g:each>
