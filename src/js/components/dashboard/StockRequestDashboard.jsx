@@ -8,6 +8,7 @@ import { fetchTranslations } from 'actions';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
+import 'react-table/react-table.css';
 import './StockRequestDashboard.scss';
 
 const COLUMNS = [
