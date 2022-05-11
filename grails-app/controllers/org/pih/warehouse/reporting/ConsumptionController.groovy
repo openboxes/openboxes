@@ -190,9 +190,7 @@ class ConsumptionController {
 
                 command.rows[product].returnedQuantity *= -1
 
-                command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity
-                    + command.rows[product].consumedQuantity
-                    + command.rows[product].returnedQuantity
+                command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity + command.rows[product].consumedQuantity + command.rows[product].returnedQuantity
 
                 String dateKey = transaction.transactionDate.format("yyyy-MM")
                 command.selectedDates.add(dateKey)
@@ -316,9 +314,9 @@ class ConsumptionController {
                         'Qty Returned'                                : g.formatNumber(number: row.returnedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Total Consumption (Issued+Consumed-Returned)': g.formatNumber(number: row.totalConsumptionQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Value Consumed'                              : g.formatNumber(number: valueConsumed, format: '###.#', maxFractionDigits: 1),
-                        'Average Monthly Consumption'                 : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Average Monthly Consumption'                 : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 4) ?: '',
                         'Quantity on hand'                            : g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Months remaining'                            : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 1) ?: '',
+                        'Months remaining'                            : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 0) ?: '',
                 ]
 
                 if (command.selectedProperties) {
@@ -568,7 +566,7 @@ class ShowConsumptionRowCommand {
     }
 
     Float getMonthlyQuantity() {
-        totalConsumptionQuantity / command.numberOfMonths
+        totalConsumptionQuantity / command.numberOfDays * 30
     }
 
     Float getWeeklyQuantity() {
