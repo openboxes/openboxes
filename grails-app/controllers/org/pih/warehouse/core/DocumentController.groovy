@@ -17,14 +17,19 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
 import org.pih.warehouse.core.Constants
 
+import static org.springframework.util.StringUtils.stripFilenameExtension
+
 class DocumentController {
 
+    def documentTemplateService
     def fileService
     def grailsApplication
+    def shipmentService
     def templateService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -381,6 +386,40 @@ class DocumentController {
                 flash.message = "${e.message}"
                 redirect(action: "edit", id: params.id)
             }
+        }
+    }
+
+    def renderInvoiceTemplate = {
+        Shipment shipmentInstance = Shipment.get(params.shipmentId)
+
+        if (!shipmentInstance) {
+            throw new Exception("Unable to locate shipment with ID ${params.id}")
+        }
+
+        // If we get the id of document, then render it otherwise find invoice template on shipment workflow
+        Document documentInstance
+        if (params.id) {
+            documentInstance = Document.get(params.id)
+        } else {
+            ShipmentWorkflow shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
+            documentInstance = shipmentWorkflow.documentTemplates?.find {it.documentType?.documentCode == DocumentCode.INVOICE_TEMPLATE}
+        }
+
+        if (!documentInstance) {
+            throw new Exception("Unable to locate document with type ${DocumentCode.INVOICE_TEMPLATE}. Please add ${DocumentCode.INVOICE_TEMPLATE} document to shipment workflow.")
+        }
+
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+            documentTemplateService.renderInvoiceTemplate(documentInstance, shipmentInstance, outputStream)
+            response.setHeader("Content-disposition",
+                "attachment; filename=\"${stripFilenameExtension(documentInstance.filename)}-${shipmentInstance.shipmentNumber}.${documentInstance.extension}\"")
+            response.setContentType(documentInstance.contentType)
+            outputStream.writeTo(response.outputStream)
+            response.outputStream.flush()
+        } catch (Exception e) {
+            log.error("Unable to render document template ${documentInstance.name} for shipment ${shipmentInstance?.id}", e)
+            throw e
         }
     }
 
