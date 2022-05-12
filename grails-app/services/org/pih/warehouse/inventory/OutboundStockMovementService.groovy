@@ -31,13 +31,6 @@ class OutboundStockMovementService {
         // }
     }
 
-    def warmCache() {
-        def ids = OutboundStockMovementListItem.executeQuery('select id from OutboundStockMovementListItem')
-        for (id in ids) {
-            OutboundStockMovementListItem.get(id)
-        }
-    }
-
     def getStockMovements(StockMovement stockMovement, Map params) {
         params.includeStockMovementItems = false
 
