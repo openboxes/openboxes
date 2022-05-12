@@ -344,6 +344,7 @@
                                         <g:if test="${stockHistoryEntry?.transaction?.order?.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                             <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
+                                                    <g:message code="default.orderType.purchase"/> &rsaquo;
                                                     <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
                                                     &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
@@ -354,6 +355,7 @@
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order?.orderType?.code == Constants.RETURN_ORDER}">
                                             <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
+                                                    <g:message code="default.orderType.return"/> &rsaquo;
                                                     <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
                                                     &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
