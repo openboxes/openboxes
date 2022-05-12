@@ -10,6 +10,9 @@
 
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.api.StockMovementDirection
+import org.pih.warehouse.api.StockMovementType
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
@@ -82,6 +85,10 @@ class StockTransferController {
         } catch (IllegalArgumentException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
             redirect(action: "list")
+        }
+        if (params.stockMovementType == Constants.RETURN_ORDER) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+            return
         }
         redirect(action: "list")
     }
