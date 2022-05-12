@@ -27,6 +27,10 @@ class StockTransferController {
         render(template: "/common/react", params: params)
     }
 
+    def edit = {
+        redirect(action: "createOutboundReturn", params: params)
+    }
+
     def createOutboundReturn = {
         render(template: "/common/react", params: params)
     }

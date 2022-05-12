@@ -76,19 +76,27 @@ class StockMovementController {
 
     def edit = {
         Location currentLocation = Location.get(session.warehouse.id)
-        StockMovement stockMovement = params.id ? stockMovementService.getStockMovement(params.id) : null
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement =  stockMovementService.getStockMovement(params.id)
+        }
+        if (stockMovement.hasProperty("stockMovementType") && stockMovement.stockMovementType == StockMovementType.RETURN_ORDER) {
+            redirect(controller: "stockTransfer", action: "edit", params: params)
+            return
+        }
 
         if(!stockMovement.isEditAuthorized(currentLocation)) {
             flash.error = stockMovementService.getDisabledMessage(stockMovement, currentLocation, true)
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
         }
+        StockMovementDirection stockMovementDirection = null;
+        if(currentLocation == stockMovement.origin)
+            stockMovementDirection = StockMovementDirection.OUTBOUND
+        else if(currentLocation == stockMovement.destination || stockMovement?.origin?.isSupplier())
+            stockMovementDirection = StockMovementDirection.INBOUND
 
-        StockMovementDirection stockMovementDirection = currentLocation == stockMovement.origin ?
-                StockMovementDirection.OUTBOUND : currentLocation == stockMovement.destination || stockMovement?.origin?.isSupplier() ?
-                        StockMovementDirection.INBOUND : null
-
-        if (stockMovementDirection == StockMovementDirection.OUTBOUND && stockMovement.requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+        if (stockMovementDirection == StockMovementDirection.OUTBOUND && stockMovement?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
             redirect(action: "verifyRequest", params: params)
         }
         else if (stockMovementDirection == StockMovementDirection.INBOUND) {
