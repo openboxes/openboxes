@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
@@ -297,9 +298,10 @@ class ProductApiController extends BaseDomainApiController {
     }
 
     def search = {
-        def jsonObject = request.JSON
-        List<Product> products = productService.findProducts([jsonObject?.value])
-        render([data: products] as JSON)
+        JSONObject jsonObject = request.JSON
+        String [] terms = jsonObject.value?.split(" ")
+        def products = productService.searchProducts(terms, [])
+        render([data: products?.unique()] as JSON)
     }
 
 }
