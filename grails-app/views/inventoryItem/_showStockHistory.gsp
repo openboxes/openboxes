@@ -341,13 +341,12 @@
 
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <div >
-                                        <g:if test="${stockHistoryEntry?.transaction?.order?.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
-                                            <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
-                                                <div title="${stockHistoryEntry?.transaction?.order?.name }">
+                                        <g:if test="${stockHistoryEntry?.transaction?.incomingShipment?.getIsFromPurchaseOrder()}">
+                                            <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.incomingShipment?.id }">
+                                                <div title="${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.incomingShipment?.name }">
                                                     <g:message code="default.orderType.purchase"/> &rsaquo;
-                                                    <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
-                                                    &rsaquo;
-                                                    ${stockHistoryEntry?.transaction?.order?.orderNumber }
+                                                    ${stockHistoryEntry?.transaction?.incomingShipment?.shipmentNumber }
+                                                    ${stockHistoryEntry?.transaction.incomingShipment?.name }
                                                 </div>
                                             </g:link>
                                         </g:if>
