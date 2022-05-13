@@ -10,7 +10,9 @@
 
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
+import org.pih.warehouse.api.StockTransferDirection
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -21,6 +23,7 @@ import org.pih.warehouse.order.OrderTypeCode
 class StockTransferController {
 
     def stockTransferService
+    def stockMovementService
 
     def index = {
         redirect(action: "list", params: params)
@@ -86,10 +89,36 @@ class StockTransferController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
             redirect(action: "list")
         }
-        if (params.stockMovementType == Constants.RETURN_ORDER) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+        redirect(action: "list")
+    }
+
+    def deleteInboundOrOutboundReturn = {
+        Location currentLocation = Location.get(session.warehouse.id)
+        Order orderInstance = Order.get(params.orderId)
+
+        // Inbound return case
+        if (orderInstance.isInbound(currentLocation)) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockTransferDirection.INBOUND])
+            try {
+                stockTransferService.deleteStockTransfer(params.orderId)
+                stockMovementService.deleteStockMovement(params.id)
+            } catch (IllegalArgumentException e) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+                redirect(action: "list")
+            }
             return
         }
-        redirect(action: "list")
+
+        // Outbound return case
+        if (orderInstance.isOutbound(currentLocation)) {
+            try {
+                stockTransferService.deleteStockTransfer(params.orderId)
+            } catch (IllegalArgumentException e) {
+                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+                redirect(action: "list")
+            }
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockTransferDirection.OUTBOUND])
+            return
+        }
     }
 }
