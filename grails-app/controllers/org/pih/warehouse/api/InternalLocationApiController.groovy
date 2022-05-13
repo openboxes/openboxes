@@ -54,8 +54,8 @@ class InternalLocationApiController {
             throw new IllegalArgumentException("Must provide shipmentNumber as a request parameter")
         }
 
-        ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
-        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION]
+        ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : [ActivityCode.RECEIVE_STOCK]
+        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION, LocationTypeCode.INTERNAL]
 
         List receivingLocationNames = locationService.getDefaultReceivingLocationNames()
         receivingLocationNames << locationService.getReceivingLocationName(shipmentNumber)

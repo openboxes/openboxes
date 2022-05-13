@@ -79,8 +79,9 @@ class ReceiptService {
         partialReceipt.dateDelivered = shipment.actualDeliveryDate ?: new Date()
 
         String[] receivingLocationNames = [locationService.getReceivingLocationName(shipment?.shipmentNumber), "Receiving ${shipment?.shipmentNumber}"]
-        Location defaultBinLocation = !shipment.destination.hasBinLocationSupport() ? null :
+        Location defaultReceivingLocation = !shipment.destination.hasBinLocationSupport() ? null :
                 locationService.findInternalLocation(shipment.destination, receivingLocationNames)
+        Location receivingLocation = shipment?.receivingScheduled?.eventLocation?:shipment?.mostRecentReceiptItem?.binLocation?:defaultReceivingLocation
 
         def shipmentItemsByContainer = shipment.sortShipmentItemsBySortOrder().groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -89,7 +90,7 @@ class ReceiptService {
             partialReceipt.partialReceiptContainers.add(partialReceiptContainer)
 
             shipmentItems.each { ShipmentItem shipmentItem ->
-                partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, defaultBinLocation))
+                partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, receivingLocation))
             }
         }
         return partialReceipt
@@ -111,8 +112,10 @@ class ReceiptService {
         partialReceipt.dateDelivered = receipt.actualDeliveryDate
 
         String[] receivingLocationNames = [locationService.getReceivingLocationName(receipt.shipment?.shipmentNumber), "Receiving ${receipt.shipment?.shipmentNumber}"]
-        Location defaultBinLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
+        Location defaultReceivingLocation = !receipt.shipment.destination.hasBinLocationSupport() ? null :
                 locationService.findInternalLocation(receipt.shipment.destination, receivingLocationNames)
+
+        Location receivingLocation = receipt?.shipment?.receivingScheduled?.eventLocation?:receipt?.shipment?.mostRecentReceiptItem?.binLocation?:defaultReceivingLocation
 
         def shipmentItemsByContainer = receipt.shipment.sortShipmentItemsBySortOrder().groupBy { it.container }
         shipmentItemsByContainer.collect { container, shipmentItems ->
@@ -128,7 +131,7 @@ class ReceiptService {
                         partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(receiptItem))
                     }
                 } else if (includeShipmentItems) {
-                    partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, defaultBinLocation))
+                    partialReceiptContainer.partialReceiptItems.add(buildPartialReceiptItem(shipmentItem, receivingLocation))
                 }
             }
 

@@ -192,8 +192,8 @@ const TABLE_FIELDS = {
             />),
         fieldKey: '',
         flexWidth: '2',
-        label: 'react.partialReceiving.binLocation.label',
-        defaultMessage: 'Bin Location',
+        label: 'react.partialReceiving.internalLocation.label',
+        defaultMessage: 'Internal Location',
         getDynamicAttr: ({
           bins, hasBinLocationSupport, shipmentReceived, fieldValue,
         }) => ({
