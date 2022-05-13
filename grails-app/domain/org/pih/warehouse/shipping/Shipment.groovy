@@ -109,7 +109,9 @@ class Shipment implements Comparable, Serializable {
             "consigneeAddress",
             "receipt",
             "isFromPurchaseOrder",
-            "orders"
+            "orders",
+            "isFromReturnOrder",
+            "returnOrder"
     ]
 
     static mappedBy = [
@@ -292,6 +294,10 @@ class Shipment implements Comparable, Serializable {
         return containerMap
 
     }
+    // for inbounds and outbounds only
+    Order getReturnOrder() {
+        return orders.find{ it.isReturnOrder }
+    }
 
     List<Order> getOrders() {
         return this.shipmentItems*.orderItems?.order?.flatten()?.unique()
@@ -315,6 +321,10 @@ class Shipment implements Comparable, Serializable {
 
     Boolean getIsFromPurchaseOrder() {
         return !shipmentItems?.orderItems?.flatten()?.isEmpty()
+    }
+
+    Boolean getIsFromReturnOrder() {
+        return orders.any{ it.isReturnOrder}
     }
 
     Boolean isStockMovement() {

@@ -425,18 +425,18 @@ class Order implements Serializable {
         return orderAdjustments.findAll {!it.canceled }
     }
 
-    Boolean isReturnOrder() {
+    Boolean getIsReturnOrder() {
         return orderType?.isReturnOrder()
     }
 
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isInbound(Location currentLocation) {
-        return returnOrder && destination == currentLocation && origin != currentLocation
+        return isReturnOrder && destination == currentLocation && origin != currentLocation
     }
 
     // isOutbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isOutbound(Location currentLocation) {
-        return returnOrder && origin == currentLocation && destination != currentLocation
+        return isReturnOrder && origin == currentLocation && destination != currentLocation
     }
 
     Map toJson() {
