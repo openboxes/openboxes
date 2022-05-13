@@ -26,6 +26,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
 
 class Shipment implements Comparable, Serializable {
@@ -102,6 +103,8 @@ class Shipment implements Comparable, Serializable {
             "unpackedShipmentItems",
             "containersByType",
             "mostRecentEvent",
+            "mostRecentReceipt",
+            "mostRecentReceiptItem",
             "status",
             "packingStatus",
             "totalItemCount",
@@ -402,6 +405,17 @@ class Shipment implements Comparable, Serializable {
             return events.iterator().next()
         }
         return null
+    }
+
+    Receipt getMostRecentReceipt() {
+        def sortedReceipts = receipts.sort { it.dateCreated }.reverse()
+        return sortedReceipts?.empty ? sortedReceipts.first() : null
+    }
+
+    ReceiptItem getMostRecentReceiptItem() {
+        def sortedReceiptItems =
+                receipts?.receiptItems.flatten()?.sort { it.dateCreated }.reverse()
+        return !sortedReceiptItems?.empty ? sortedReceiptItems.first() : null
     }
 
     ShipmentStatus getStatus() {
