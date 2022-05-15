@@ -75,13 +75,18 @@ class ReplenishmentApiController {
             throw new IllegalArgumentException("User must be logged into a location to update replenishment")
         }
 
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No replenishment found for order ID ${params.id}")
+        }
+
         Replenishment replenishment = new Replenishment()
         replenishment.id = params.id
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {
-            Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
+            order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
             if (order.hasErrors() || !order.save(flush: true)) {
                 throw new ValidationException("Invalid order", order.errors)
             }
