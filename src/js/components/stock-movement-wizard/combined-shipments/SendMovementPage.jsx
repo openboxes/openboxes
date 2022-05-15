@@ -422,10 +422,8 @@ class SendMovementPage extends Component {
             ...this.state.values,
             dateShipped: stockMovementData.dateShipped,
             shipmentType: {
-              id: stockMovementData.shipmentType.id,
-              name: stockMovementData.shipmentType.name,
+              ...stockMovementData.shipmentType,
               label: splitTranslation(stockMovementData.shipmentType.name, this.props.locale),
-              value: stockMovementData.shipmentType.id,
             },
             trackingNumber: stockMovementData.trackingNumber,
             driverName: stockMovementData.driverName,
