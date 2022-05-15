@@ -773,8 +773,8 @@ class ProductAvailabilityService {
         // if quantity required is less than
 
         availableItems = availableItems.sort {a, b ->
-            log.info "a:${a.binLocation?.name}:${a.binLocation?.locationType?.sortOrder}"
-            log.info "b:${b.binLocation?.name}:${b.binLocation?.locationType?.sortOrder}"
+            log.info "a:${a.binLocation?.locationNumber}:${a.binLocation?.locationType?.sortOrder}:${a.quantityRequired}:${a.quantityAvailable}:${a.quantityPicked}"
+            log.info "b:${b.binLocation?.locationNumber}:${b.binLocation?.locationType?.sortOrder}:${b.quantityRequired}:${b.quantityAvailable}:${b.quantityPicked}"
             log.info "\tcompare: ${(a?.binLocation?.name <=> b?.binLocation?.name)}"
 
             (a?.pickClassification) <=> (b?.pickClassification) ?:
