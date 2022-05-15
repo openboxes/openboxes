@@ -104,11 +104,22 @@
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
                     </td>
                     <td>
-                        <g:each var="requisitionNumber" in="${entry.pickedRequisitionNumbers}">
-                            <g:link controller="stockMovement" action="show" id="${requisitionNumber}">
-                                ${requisitionNumber}
-                            </g:link>
-                        </g:each>
+                        <g:if test="${entry?.stockMovements}">
+                            <g:each var="stockMovement" in="${entry?.stockMovements}">
+<g:set var="tooltipMessage">
+Identifier: ${stockMovement.identifier}
+Destination: ${stockMovement.destination?.name}
+Expected: ${g.formatDate(date: stockMovement?.expectedShippingDate)}
+Status: ${stockMovement?.stockMovementStatusCode?.name}
+Packing: ${stockMovement?.packingLocation?:'Unassigned'}
+Loading: ${stockMovement?.loadingLocation?:'Unassigned'}
+</g:set>
+                                <g:link controller="stockMovement" action="show" id="${requisitionNumber}" title="${tooltipMessage}">
+                                    ${stockMovement?.identifier}
+                                </g:link>
+                                <br/>
+                            </g:each>
+                        </g:if>
                     </td>
 
                 </tr>

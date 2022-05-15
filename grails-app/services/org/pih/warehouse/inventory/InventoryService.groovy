@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.api.AvailableItem
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -1243,6 +1244,8 @@ class InventoryService implements ApplicationContextAware {
                         def picklists = stockMovementService.getPicklistByLocationAndProduct(binLocation, inventoryItem)
                         List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
 
+                        List<StockMovement> stockMovements = pickedRequisitionNumbers.collect { stockMovementService.getStockMovement(it, false)}
+
                         availableItems << new AvailableItem(
                                 inventoryItem: inventoryItem,
                                 binLocation: binLocation,
@@ -1250,7 +1253,8 @@ class InventoryService implements ApplicationContextAware {
                                 quantityAvailable: quantityAvailable,
                                 quantityPicked: picklists*.picklistItems?.flatten()?.sum { it.quantityPicked },
                                 quantityAllocated: picklists*.picklistItems?.flatten()?.sum { it.quantity },
-                                pickedRequisitionNumbers: pickedRequisitionNumbers
+                                pickedRequisitionNumbers: pickedRequisitionNumbers,
+                                stockMovements: stockMovements
                         )
                     }
                 }

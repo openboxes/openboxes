@@ -314,6 +314,7 @@ class AvailableItem {
     BigDecimal quantityAllocated = 0
     BigDecimal quantityPicked = 0
 
+    List<StockMovement> stockMovements
     List<String> pickedRequisitionNumbers
 
     static constraints = {
