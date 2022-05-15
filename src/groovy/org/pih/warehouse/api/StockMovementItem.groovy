@@ -364,7 +364,7 @@ class AvailableItem {
     }
 
     PickClassification getPickClassification() {
-        quantityRequired ?
+        quantityRequired && quantityAvailable ?
                 (quantityRequired == quantityAvailable) ? PickClassification.EXACT :
                         (quantityRequired.intValue() % quantityAvailable.intValue() == 0) ? PickClassification.MULTIPLE :
                                 PickClassification.PIECE : PickClassification.NONE
