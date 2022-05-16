@@ -10,6 +10,7 @@
 
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
@@ -25,6 +26,17 @@ class StockTransferController {
 
     def create = {
         render(template: "/common/react", params: params)
+    }
+
+    def edit = {
+        Location currentLocation = Location.get(session.warehouse.id)
+        def orderInstance = Order.get(params.id)
+
+        if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
+            redirect(action: "createInboundReturn", params: params)
+        } else if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND) {
+            redirect(action: "createOutboundReturn", params: params)
+        }
     }
 
     def createOutboundReturn = {

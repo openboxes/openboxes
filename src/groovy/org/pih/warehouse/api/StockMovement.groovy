@@ -66,6 +66,7 @@ class StockMovement {
     Boolean isFromOrder = Boolean.FALSE
     Boolean isShipped = Boolean.FALSE
     Boolean isReceived = Boolean.FALSE
+    Boolean isReturn = Boolean.FALSE
 
     Requisition stocklist
     Requisition requisition
@@ -143,6 +144,7 @@ class StockMovement {
                 documents  : documents
             ],
             isFromOrder         : isFromOrder,
+            isReturn            : isReturn,
             isShipped           : isShipped,
             isReceived          : isReceived,
             shipped             : isShipped,
@@ -169,6 +171,20 @@ class StockMovement {
     Float getTotalValue() {
         def itemsWithPrice = shipment?.shipmentItems?.findAll { it.product.pricePerUnit }
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
+    }
+
+    /**
+     * Return the stock movement directions based on a given location
+     *
+     * @return
+     */
+    StockMovementDirection getStockMovementDirection (Location currentLocation) {
+        if(currentLocation == origin)
+            return StockMovementDirection.OUTBOUND
+        else if(currentLocation == destination || origin?.isSupplier())
+            return StockMovementDirection.INBOUND
+        else
+            return null
     }
 
     Boolean isPending() {
@@ -272,6 +288,8 @@ class StockMovement {
                 createdBy: shipment.createdBy,
                 updatedBy: shipment.updatedBy,
                 shipment: shipment,
+                order: shipment?.returnOrder,
+                isReturn: shipment?.isFromReturnOrder,
                 isFromOrder: shipment?.isFromPurchaseOrder,
                 isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
                 isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
@@ -329,6 +347,7 @@ class StockMovement {
             currentStatus: shipment?.currentStatus,
             stocklist: requisition?.requisitionTemplate,
             isFromOrder: Boolean.FALSE,
+            isReturn: Boolean.FALSE,
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,

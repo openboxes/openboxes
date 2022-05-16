@@ -65,7 +65,7 @@
             <%-- TODO  Move status to stock movement; make consistent across all types --%>
             <g:set var="hasBeenPlaced" value="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
-            <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
+            <g:link controller="stockTransfer" action="edit" id="${stockMovement?.id}" class="button">
                 <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
                 <warehouse:message code="default.button.edit.label" />
             </g:link>

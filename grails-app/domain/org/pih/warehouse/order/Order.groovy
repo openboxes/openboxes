@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.invoice.InvoiceItem
@@ -203,6 +204,18 @@ class Order implements Serializable {
         BigDecimal minimumAmount = ConfigurationHolder.config.openboxes.purchasing.approval.minimumAmount
         return (origin?.supports([ActivityCode.APPROVE_ORDER]) ||
                 destination?.supports(ActivityCode.APPROVE_ORDER)) && total > minimumAmount
+    }
+
+    StockMovementDirection getStockMovementDirection(Location currentLocation) {
+        if (origin == destination) {
+            return StockMovementDirection.INTERNAL
+        } else if (currentLocation == origin) {
+            return StockMovementDirection.OUTBOUND
+        } else if (currentLocation == destination || origin?.isSupplier()) {
+            return StockMovementDirection.INBOUND
+        } else {
+            return null
+        }
     }
 
 
@@ -425,18 +438,18 @@ class Order implements Serializable {
         return orderAdjustments.findAll {!it.canceled }
     }
 
-    Boolean isReturnOrder() {
+    Boolean getIsReturnOrder() {
         return orderType?.isReturnOrder()
     }
 
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isInbound(Location currentLocation) {
-        return returnOrder && destination == currentLocation && origin != currentLocation
+        return isReturnOrder && destination == currentLocation && origin != currentLocation
     }
 
     // isOutbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isOutbound(Location currentLocation) {
-        return returnOrder && origin == currentLocation && destination != currentLocation
+        return isReturnOrder && origin == currentLocation && destination != currentLocation
     }
 
     Map toJson() {

@@ -283,7 +283,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/openboxes/stockTransfer/show/${this.props.match.params.inboundReturnId}`;
+          window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`;
         });
     } else {
       confirmAlert({
@@ -295,7 +295,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockTransfer/show/${this.props.match.params.inboundReturnId}`; },
+            onClick: () => { window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
