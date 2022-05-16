@@ -36,17 +36,9 @@ class DashboardController {
     def dashboardService
     def productService
     def userService
-    def sessionFactory
     def grailsApplication
     def locationService
     def userAgentIdentService
-
-    def showCacheStatistics = {
-        def statistics = sessionFactory.statistics
-        log.info(statistics)
-        render statistics
-    }
-
 
     def globalSearch = {
 
@@ -163,13 +155,6 @@ class DashboardController {
         redirect(action: "index")
     }
 
-    def chooseLayout = {
-        if (params.layout) {
-            session.layout = params.layout
-        }
-        redirect(controller: 'dashboard', action: 'index')
-    }
-
     def chooseLocation = {
 
         // If the user has selected a new location from the topnav bar, we need
@@ -255,8 +240,6 @@ class DashboardController {
                 def values = row.values().collect { value ->
                     if (value?.toString()?.isNumber()) {
                         value
-                    } else if (value instanceof Collection) {
-                        StringEscapeUtils.escapeCsv(value.toString())
                     } else {
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
@@ -271,7 +254,7 @@ class DashboardController {
     }
 
     def downloadFastMoversAsCsv = {
-        println "exportFastMoversAsCsv: " + params
+        log.info "exportFastMoversAsCsv: " + params
         def location = Location.get(params?.location?.id ?: session?.warehouse?.id)
 
         def date = new Date()
@@ -293,8 +276,6 @@ class DashboardController {
                 def values = row.values().collect { value ->
                     if (value?.toString()?.isNumber()) {
                         value
-                    } else if (value instanceof Collection) {
-                        StringEscapeUtils.escapeCsv(value.toString())
                     } else {
                         StringEscapeUtils.escapeCsv(value.toString())
                     }
@@ -309,7 +290,4 @@ class DashboardController {
         render(contentType: "text/csv", text: sw.toString())
         return
     }
-
 }
-
-

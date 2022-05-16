@@ -57,7 +57,6 @@ import java.text.SimpleDateFormat
 
 class JsonController {
 
-    def dataSource
     def dataService
     def dashboardService
     def inventoryService
@@ -304,6 +303,7 @@ class JsonController {
         def quantityOnHand = inventoryService.getQuantityOnHand(location, product)
         render(quantityOnHand ?: "0")
     }
+
     @Cacheable("inventoryBrowserCache")
     def flushInventoryBrowserCache = {
         redirect(controller: "inventory", action: "browse")
@@ -381,13 +381,6 @@ class JsonController {
 
         render([aaData: stockValueByProduct] as JSON)
     }
-
-
-    @CacheFlush("dashboardTotalStockValueCache")
-    def refreshTotalStockValue = {
-        render([success: true] as JSON)
-    }
-
 
     def getInventorySnapshots = {
 
@@ -495,55 +488,6 @@ class JsonController {
         results = results.unique().collect { [value: it, label: it] }
         render results as JSON
     }
-
-
-    def findProductNames = {
-        def searchTerm = "%" + params.term + "%"
-        def c = Product.createCriteria()
-        def productNames = c.list {
-            projections {
-                property "name"
-            }
-            eq("active", true)
-            ilike("name", searchTerm)
-        }
-
-        def results = productNames.unique().collect { [value: it, label: it] }
-        render results as JSON
-    }
-
-    def findPrograms = {
-        log.info "find programs " + params
-        def searchTerm = params.term + "%"
-        def c = Requisition.createCriteria()
-
-        def names = c.list {
-            projections {
-                property "recipientProgram"
-            }
-            ilike("recipientProgram", searchTerm)
-        }
-        // Try again
-        if (names.isEmpty()) {
-            searchTerm = "%" + params.term + "%"
-            c = Requisition.createCriteria()
-            names = c.list {
-                projections {
-                    property "recipientProgram"
-                }
-                ilike("recipientProgram", searchTerm)
-            }
-        }
-
-        if (names.isEmpty()) {
-            names = []
-            names << params.term
-        }
-
-        def results = names.collect { [value: it, label: it] }
-        render results as JSON
-    }
-
 
     def getInventoryItem = {
         render InventoryItem.get(params.id).toJson() as JSON
@@ -900,55 +844,6 @@ class JsonController {
         render locations as JSON
     }
 
-    def findRequestItems = {
-
-        log.info("find request items by name " + params)
-
-        //def items = new TreeSet();
-        def items = []
-        if (params.term) {
-            // Match full name
-            def products = Product.withCriteria {
-                ilike("name", "%" + params.term + "%")
-            }
-            items.addAll(products)
-
-            def productGroups = ProductGroup.withCriteria {
-                ilike("name", "%" + params.term + "%")
-            }
-            productGroups.each { items << [id: it.id, name: it.name, class: it.class] }
-
-            def categories = Category.withCriteria {
-                ilike("name", "%" + params.term + "%")
-            }
-            items.addAll(categories)
-        }
-
-        // Convert from products to json objects
-        if (items) {
-            // Make sure items are unique
-            items = items.collect() { item ->
-                def type = item.class.simpleName
-                def localizedName = localizationService.getLocalizedString(item.name)
-                // Convert product attributes to JSON object attributes
-                [
-                        value    : type + ":" + item.id,
-                        type     : type,
-                        label    : localizedName + "(" + type + ")",
-                        valueText: localizedName,
-                ]
-            }
-        }
-
-        if (items.size() == 0) {
-            items << [value: null, label: warehouse.message(code: 'product.noProductsFound.message')]
-        }
-
-        log.info "Returning " + items.size() + " results for search " + params.term
-        render items as JSON
-    }
-
-
     def searchProductPackages = {
 
         log.info "Search product packages " + params
@@ -1188,31 +1083,10 @@ class JsonController {
         render(data.productGroupSummary as JSON)
     }
 
-    def mostRecentQuantityOnHand = {
-        def product = Product.get(params.id)
-        def location = Location.get(session?.warehouse?.id)
-        def object = inventoryService.getMostRecentQuantityOnHand(product, location)
-        render([mostRecentQuantityOnHand: object] as JSON)
-    }
-
-
-    def mostRecentQuantityOnHandByLocation = {
-        def location = Location.get(session?.warehouse?.id)
-        def results = inventoryService.getMostRecentQuantityOnHand(location)
-        render([results: results] as JSON)
-    }
-
     def quantityMap = {
         def location = Location.get(session?.warehouse?.id)
         def quantityMap = inventoryService.getQuantityMap(location)
         render([quantityMap: quantityMap] as JSON)
-    }
-
-
-    def distinctProducts = {
-        def location = Location.get(session?.warehouse?.id)
-        def products = inventoryService.getDistinctProducts(location)
-        render([products: null] as JSON)
     }
 
     def scanBarcode = {

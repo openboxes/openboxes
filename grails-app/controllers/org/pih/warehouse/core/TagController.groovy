@@ -106,10 +106,6 @@ class TagController {
         }
     }
 
-    def doSomething = {
-        println "do something " + params
-    }
-
     def addToProducts = {
         println "add to products " + params
         Tag tag = Tag.get(params.id)

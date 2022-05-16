@@ -16,11 +16,7 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.springframework.web.multipart.MultipartFile
 
-import javax.print.Doc
-import javax.print.DocFlavor
-import javax.print.DocPrintJob
 import javax.print.PrintService
-import javax.print.SimpleDoc
 import java.awt.print.PrinterJob
 import java.util.concurrent.FutureTask
 
@@ -36,34 +32,12 @@ class AdminController {
 
     def index = {}
 
-
-    def controllerActions = {
-
-        List actionNames = []
-        grailsApplication.controllerClasses.sort { it.logicalPropertyName }.each { controller ->
-
-            controller.reference.propertyDescriptors.each { pd ->
-                def closure = controller.getPropertyOrStaticPropertyOrFieldValue(pd.name, Closure)
-                if (closure) {
-                    if (pd.name != 'beforeInterceptor' && pd.name != 'afterInterceptor') {
-                        actionNames << controller.logicalPropertyName + "." + pd.name + ".label = " + pd.name
-                    }
-                }
-            }
-            println "$controller.clazz.simpleName: $actionNames"
-        }
-
-        [actionNames: actionNames]
-    }
-
     def cache = {
         [cacheStatistics: sessionFactory.getStatistics()]
     }
 
     def plugins = {}
     def status = {}
-
-    def static LOCAL_TEMP_WEBARCHIVE_PATH = "warehouse.war"
 
     def showUpgrade = { UpgradeCommand command ->
         log.info "show upgrade " + params
@@ -95,10 +69,9 @@ class AdminController {
         redirect(action: "showSettings")
     }
 
-
     def sendMail = {
 
-        println "sendMail: " + params
+        log.info "sendMail: " + params
 
         if (request.method == "POST") {
             try {
@@ -137,10 +110,7 @@ class AdminController {
                 flash.message = "Unable to send email due to error: " + e.message
             }
         }
-
-
     }
-
 
     def download = { UpgradeCommand command ->
         log.info "download " + params
@@ -156,7 +126,6 @@ class AdminController {
 
         chain(action: "showUpgrade", model: [command: command])
     }
-
 
     def deploy = { UpgradeCommand command ->
         log.info "deploy " + params
@@ -215,7 +184,6 @@ class AdminController {
             }
         }
 
-
         [
                 quartzScheduler         : quartzScheduler,
                 printServices           : printServices,
@@ -230,39 +198,11 @@ class AdminController {
         ]
     }
 
-
-    def downloadWar = {
-        log.info params
-        log.info("Updating war file " + params)
-        redirect(action: "showSettings")
-    }
-
-    def cancelUpdateWar = {
-        log.info params
-        if (session.future) {
-            session.future.cancel(true)
-            new File(LOCAL_TEMP_WEBARCHIVE_PATH).delete()
-        }
-        redirect(action: "showSettings")
-    }
-
-    def deployWar = { UpgradeCommand ->
-        log.info params
-        def source = session.command.localWebArchive
-
-        def backup = new File(session.command.localWebArchive.absolutePath + ".backup")
-        log.info "Backing up " + source.absolutePath + " to " + backup.absolutePath
-        backup.bytes = source.bytes
-
-        redirect(action: "showSettings")
-    }
-
     def triggerStockAlerts = {
         SendStockAlertsJob.triggerNow([:])
         flash.message = "Triggered send stock alerts job in background"
         redirect(controller: "admin", action: "showSettings")
     }
-
 }
 
 class UpgradeCommand {

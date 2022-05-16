@@ -17,8 +17,6 @@ import org.pih.warehouse.product.Product
 class RequisitionTemplateController {
 
     def requisitionService
-    def inventoryService
-    def productService
     def userService
 
     static allowedMethods = [save: "POST", update: "POST"]
@@ -316,31 +314,6 @@ class RequisitionTemplateController {
         redirect(action: "list")
     }
 
-    def changeSortOrderAlpha = {
-        def requisition = Requisition.get(params.id)
-        if (requisition) {
-            def sortedItems = requisition.requisitionItems.sort { it.product.name }
-            sortedItems.eachWithIndex { requisitionItem, orderIndex ->
-                requisitionItem.orderIndex = orderIndex
-            }
-            requisition.save(flush: true)
-        }
-        redirect(action: "edit", id: requisition.id)
-    }
-
-    def changeSortOrderChrono = {
-        def requisition = Requisition.get(params.id)
-        if (requisition) {
-            def sortedItems = requisition.requisitionItems.sort { it.id }
-            sortedItems.eachWithIndex { requisitionItem, orderIndex ->
-                requisitionItem.orderIndex = orderIndex
-            }
-            requisition.save(flush: true)
-        }
-        redirect(action: "edit", id: requisition.id)
-    }
-
-
     def addToRequisitionItems = {
         def requisition = Requisition.get(params.id)
         if (requisition) {
@@ -558,29 +531,5 @@ class RequisitionTemplateController {
             flash.message = "Imported ${insertCount} stock list items; updated ${updateCount} stock list items; ignored ${ignoreCount} stock list items"
         }
         redirect(action: "batch", id: params.id)
-
-    }
-
-    private List<Location> getDepots() {
-        Location.list().findAll { location -> location.id != session.warehouse.id && location.isWarehouse() }.sort {
-            it.name
-        }
-    }
-
-    private List<Location> getWardsPharmacies() {
-        def current = Location.get(session.warehouse.id)
-        def locations = []
-        if (current) {
-            if (current?.locationGroup == null) {
-                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            } else {
-                locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            }
-        }
-        return locations
     }
 }

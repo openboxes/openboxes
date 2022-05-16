@@ -32,7 +32,6 @@ class MigrationController {
 
     def dataService
     def migrationService
-    def inventoryService
     def locationService
     def productAvailabilityService
 
@@ -288,14 +287,6 @@ class MigrationController {
     def locationsWithInventoryTransactions = {
         def locations = migrationService.getLocationsWithTransactions([TransactionCode.INVENTORY])
         render([count: locations.size(), locations: locations] as JSON)
-    }
-
-
-    def productsWithInventoryTransactions = {
-        def location = Location.get(session.warehouse.id)
-        def products = migrationService.getProductsWithTransactions(location, [TransactionCode.INVENTORY])
-        products = products.collect { [productCode: it.productCode] }
-        render([products: products] as JSON)
     }
 
     def nextInventoryTransaction = {

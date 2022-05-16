@@ -287,59 +287,6 @@ class RequisitionItemController {
 
     }
 
-
-    /** =========================================================================================================================,  */
-
-    /**
-     *
-     */
-    def cancelPicking = {
-        log.info "Cancel requisition item " + params
-
-        def requisitionItem = RequisitionItem.get(params.id)
-        if (requisitionItem) {
-            requisitionItem.cancelQuantity(params.reasonCode, params.comments)
-            redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem.id])
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            redirect(controller: "requisition", action: "list")
-
-        }
-    }
-
-
-    def undoCancelPicking = {
-        println params
-        def requisitionItem = RequisitionItem.get(params.id)
-        if (requisitionItem) {
-            requisitionItem.quantityCanceled = 0
-            requisitionItem.cancelComments = null
-            requisitionItem.cancelReasonCode = null
-            requisitionItem.save(flush: true)
-            redirect(controller: "requisition", action: "pick", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem.id])
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            redirect(controller: "requisition", action: "list")
-
-        }
-    }
-
-    def undoCancelReviewing = {
-        println "Undo changes: " + params
-        def requisitionItem = RequisitionItem.get(params.id)
-        if (requisitionItem) {
-            requisitionItem.quantityCanceled = 0
-            requisitionItem.cancelComments = null
-            requisitionItem.cancelReasonCode = null
-            requisitionItem.save(flush: true)
-            redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id, params: ['requisitionItem.id': requisitionItem.id])
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            redirect(controller: "requisition", action: "list")
-
-        }
-    }
-
     def addAddition = {
         log.info "add addition " + params
         redirect(controller: "requisition", action: "review", id: requisition?.id)
@@ -348,21 +295,6 @@ class RequisitionItemController {
     def addSubstitution = {
         log.info "add substitution " + params
         redirect(controller: "requisition", action: "review", id: requisition?.id)
-    }
-
-
-    def undoChangeQuantity = {
-        def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-
-        try {
-            requisitionItem.cancelComments = null
-            requisitionItem.cancelReasonCode = null
-            requisitionItem.quantityCanceled = 0
-            requisitionItem.save(flush: true)
-        } catch (Exception e) {
-            flash.message = "Unable to undo quantity change: " + e.message
-        }
-        redirect(controller: "requisition", action: "review", id: requisitionItem?.requisition?.id)
     }
 
     def substitute = {

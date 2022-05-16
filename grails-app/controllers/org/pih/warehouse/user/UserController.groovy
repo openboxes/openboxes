@@ -47,9 +47,7 @@ class UserController {
      */
     def list = {
 
-        println params
-        def userInstanceList = []
-        def userInstanceTotal = 0
+        log.debug params
 
         params.max = Math.min(params.max ? params.int('max') : 15, 100)
 
@@ -531,28 +529,6 @@ class UserController {
             flash.message = "${warehouse.message(code: 'email.sent.message')}"
         }
         catch (Exception e) {
-            flash.message = "${warehouse.message(code: 'email.notSent.message', args: [userInstance.email])}: ${e.message}"
-        }
-    }
-
-    /**
-     * Grails 'mail' way to send an email
-     *
-     * @param userInstance
-     * @return
-     */
-    def sendUserConfirmed(User userInstance) {
-
-        try {
-            sendMail {
-                to "${userInstance.email}"
-                subject "${warehouse.message(code: 'email.userConfirmed.message', args: [userInstance.username])}"
-                html "${g.render(template: "/email/userConfirmed", model: [userInstance: userInstance])}"
-            }
-            flash.message = "${warehouse.message(code: 'email.sent.message')}: ${e.message}"
-            //flash.message = “Confirmation email sent to ${userInstance.emailAddress}”
-        } catch (Exception e) {
-            log.error "Problem sending email $e.message", e
             flash.message = "${warehouse.message(code: 'email.notSent.message', args: [userInstance.email])}: ${e.message}"
         }
     }

@@ -37,24 +37,10 @@ class BatchController {
 
     def dataService
     def documentService
-    def inventoryService
-    def grailsApplication
     def genericApiService
     def uploadService
 
     def index = {}
-
-
-    def uploadData = { ImportDataCommand command ->
-
-        if (request instanceof DefaultMultipartHttpServletRequest) {
-            def uploadFile = request.getFile('xlsFile')
-            if (!uploadFile.empty) {
-                def localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                uploadFile.transferTo(localFile)
-            }
-        }
-    }
 
 
     def downloadExcel = {
@@ -99,7 +85,6 @@ class BatchController {
             response.status = 404
         }
     }
-
 
     def importData = { ImportDataCommand command ->
 

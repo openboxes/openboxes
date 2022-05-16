@@ -25,17 +25,11 @@ import org.pih.warehouse.core.ValidationCode
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
 
 class OrderController {
     def orderService
     def stockMovementService
-    def reportService
-    def shipmentService
-    def uomService
-    def userService
     def productSupplierDataService
     def documentTemplateService
 
@@ -254,16 +248,6 @@ class OrderController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list", params: [orderType: orderInstance.orderType])
-        }
-    }
-
-    def addAdjustment = {
-        def orderInstance = Order.get(params?.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: new OrderAdjustment()])
         }
     }
 
@@ -526,28 +510,6 @@ class OrderController {
         } else {
             return [orderInstance: orderInstance]
         }
-    }
-
-    def addOrderItemToShipment = {
-
-        def orderInstance = Order.get(params?.id)
-        def orderItem = OrderItem.get(params?.orderItem?.id)
-        def shipmentInstance = Shipment.get(params?.shipment?.id)
-
-        if (orderItem) {
-            def shipmentItem = new ShipmentItem(orderItem.properties)
-            shipmentInstance.addToShipmentItems(shipmentItem)
-            if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush: true)) {
-                // TODO: Refactor this part
-            } else {
-                flash.message = "${warehouse.message(code: 'order.shipmentItemErrors.message')}"
-                render(view: "fulfill", model: [orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
-                return
-            }
-        }
-
-        redirect(action: "fulfill", id: orderInstance?.id)
-
     }
 
     def download = {

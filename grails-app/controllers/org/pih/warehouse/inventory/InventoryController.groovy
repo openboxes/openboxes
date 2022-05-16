@@ -21,7 +21,6 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -33,11 +32,9 @@ import java.text.SimpleDateFormat
 
 class InventoryController {
 
-    def dataSource
     def productService
     def dashboardService
     def inventoryService
-    def requisitionService
     def inventorySnapshotService
     def productAvailabilityService
     def userService
@@ -84,46 +81,6 @@ class InventoryController {
         InventoryItem inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(product, params.lotNumber)
         Integer quantity = inventoryService.getQuantityFromBinLocation(location, binLocation, inventoryItem)
         [location: location, binLocation: binLocation, inventoryItem: inventoryItem, quantity: quantity]
-    }
-
-    def saveInventoryChanges = { ManageInventoryCommand command ->
-        Transaction transaction = new Transaction(params)
-        try {
-            //transaction.transactionDate = params.transactionDate
-            transaction.createdBy = User.load(session.user.id)
-            transaction.inventory = Location.load(session.warehouse.id).inventory
-
-            command.entries.each { entry ->
-                if (entry?.quantity > 0) {
-                    def transactionEntry = new TransactionEntry()
-                    transactionEntry.inventoryItem = entry.inventoryItem
-                    transactionEntry.product = entry.inventoryItem.product
-                    transactionEntry.quantity = entry.quantity
-                    transaction.addToTransactionEntries(transactionEntry)
-                }
-            }
-
-            log.info("size " + transaction?.transactionEntries?.size())
-
-            if (!transaction?.transactionEntries) {
-                throw new ValidationException("Transaction entries must not be empty", transaction.errors)
-            }
-
-            log.info("validate: " + transaction.validate())
-
-            if (transaction.validate() && transaction.save()) {
-                flash.message = "Transaction ${transaction.id} saved"
-            } else {
-                throw new ValidationException("Transaction errors", transaction.errors)
-            }
-        } catch (Exception e) {
-            command.errors = transaction.errors
-            chain(action: "manage", model: [command: command], params: params)
-            return
-        }
-
-        redirect(action: "manage", params: [tags: params.tags])
-
     }
 
     /**
@@ -348,26 +305,6 @@ class InventoryController {
         redirect(action: "show")
 
     }
-
-
-    def addToInventory = {
-        def inventoryInstance = Inventory.get(params.id)
-        def productInstance = Product.get(params.product.id)
-
-        if (!productInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params?.product?.id])}"
-            redirect(action: "browse")
-        } else {
-            def itemInstance = new InventoryItem(product: productInstance)
-            if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
-                redirect(action: "browse", id: inventoryInstance.id)
-            } else {
-                flash.message = "${warehouse.message(code: 'inventory.unableToCreateItem.message')}"
-            }
-        }
-    }
-
 
     def edit = {
         def inventoryInstance = Inventory.get(params.id)
@@ -924,18 +861,6 @@ class InventoryController {
                                                  transactionCount       : transactions.totalCount, transactionTypeSelected: transactionType])
     }
 
-
-    def listPendingTransactions = {
-        def transactions = Transaction.findAllByConfirmedOrConfirmedIsNull(Boolean.FALSE)
-        render(view: "listTransactions", model: [transactionInstanceList: transactions])
-    }
-
-    def listConfirmedTransactions = {
-        def transactions = Transaction.findAllByConfirmed(Boolean.TRUE)
-        render(view: "listTransactions", model: [transactionInstanceList: transactions])
-    }
-
-
     def deleteTransaction = {
         def transactionInstance = Transaction.get(params.id)
 
@@ -955,7 +880,6 @@ class InventoryController {
             redirect(action: "listTransactions")
         }
     }
-
 
     def saveTransaction = {
         log.debug "save transaction: " + params
@@ -1025,23 +949,6 @@ class InventoryController {
 
         render(view: "showTransactionDialog", model: model)
 
-    }
-
-
-    def confirmTransaction = {
-        def transactionInstance = Transaction.get(params?.id)
-        if (transactionInstance?.confirmed) {
-            transactionInstance?.confirmed = Boolean.FALSE
-            transactionInstance?.confirmedBy = null
-            transactionInstance?.dateConfirmed = null
-            flash.message = "${warehouse.message(code: 'inventory.transactionHasBeenUnconfirmed.message')}"
-        } else {
-            transactionInstance?.confirmed = Boolean.TRUE
-            transactionInstance?.confirmedBy = User.get(session?.user?.id)
-            transactionInstance?.dateConfirmed = new Date()
-            flash.message = "${warehouse.message(code: 'inventory.transactionHasBeenConfirmed.message')}"
-        }
-        redirect(action: "listAllTransactions")
     }
 
     def createInboundTransfer = {
@@ -1410,43 +1317,6 @@ class InventoryController {
         render(view: "editTransaction", model: model)
 
     }
-
-
-    /**
-     * TODO These are the same methods used in the inventory browser.  Need to figure out a better
-     * way to handle this (e.g. through a generic ajax call or taglib).
-     */
-    def removeCategoryFilter = {
-        def category = Category.get(params?.categoryId)
-        if (category)
-            session.inventoryCategoryFilters.remove(category?.id)
-        redirect(action: browse)
-    }
-
-    def clearAllFilters = {
-        session.inventoryCategoryFilters = []
-        session.inventorySearchTerms = []
-        redirect(action: browse)
-    }
-    def addCategoryFilter = {
-        def category = Category.get(params?.categoryId)
-        if (category && !session.inventoryCategoryFilters.contains(category?.id))
-            session.inventoryCategoryFilters << category?.id
-        redirect(action: browse)
-    }
-    def narrowCategoryFilter = {
-        def category = Category.get(params?.categoryId)
-        session.inventoryCategoryFilters = []
-        if (category && !session.inventoryCategoryFilters.contains(category?.id))
-            session.inventoryCategoryFilters << category?.id
-        redirect(action: browse)
-    }
-    def removeSearchTerm = {
-        if (params.searchTerm)
-            session.inventorySearchTerms.remove(params.searchTerm)
-        redirect(action: browse)
-    }
-
 
     def upload = {
         def inventoryList = [:]

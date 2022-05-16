@@ -13,7 +13,16 @@ import au.com.bytecode.opencsv.CSVWriter
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.krysalis.barcode4j.impl.code128.Code128Bean
-import org.pih.warehouse.core.*
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventType
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionException
 import org.pih.warehouse.product.Product
@@ -1043,14 +1052,6 @@ class ShipmentController {
          itemInstance     : new ShipmentItem()]
     }
 
-    def addReferenceNumber = {
-        def referenceNumber = new ReferenceNumber(params)
-        def shipment = Shipment.get(params.shipmentId)
-        shipment.addToReferenceNumbers(referenceNumber)
-        flash.message = "${warehouse.message(code: 'shipping.addedReferenceNumber.message')}"
-        redirect(action: 'show', id: params.shipmentId)
-    }
-
     def form = {
         [shipments: Shipment.list()]
     }
@@ -1211,6 +1212,3 @@ class ReceiveShipmentCommand implements Serializable {
     }
 
 }
-
-
-

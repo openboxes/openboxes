@@ -21,7 +21,7 @@ class ProductGroupController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         def productGroupTotal
-        def productGroups = []
+        def productGroups
 
         if (params.q) {
             productGroups = ProductGroup.findAllByNameLike("%" + params.q + "%", params)
@@ -204,34 +204,6 @@ class ProductGroupController {
 
         render(view: "create", model: [productGroupInstance: productGroupInstance, productGroups: productGroups])
     }
-
-    /**
-     * From the edit produt group page.
-     */
-
-    def removeProductsFromProductGroup = {
-        println params
-
-        def productGroupInstance = ProductGroup.get(params.id)
-        def products = productService.getProducts(params['delete-product.id'])
-        products.each { product ->
-            productGroupInstance.removeFromProducts(product)
-        }
-
-        render(view: "edit", model: [productGroupInstance: productGroupInstance])
-    }
-    def addProductsToProductGroup = {
-        println params
-
-        def productGroupInstance = ProductGroup.get(params.id)
-        def products = productService.getProducts(params['add-product.id'])
-        products.each { product ->
-            productGroupInstance.addToProducts(product)
-        }
-
-        render(view: "edit", model: [productGroupInstance: productGroupInstance])
-    }
-
 
     /**
      * Add a product group to existing product

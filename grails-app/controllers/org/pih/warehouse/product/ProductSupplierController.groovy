@@ -12,9 +12,10 @@ package org.pih.warehouse.product
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.core.ProductPrice
+
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
-import org.pih.warehouse.core.ProductPrice
 
 class ProductSupplierController {
 

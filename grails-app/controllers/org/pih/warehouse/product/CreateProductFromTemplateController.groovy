@@ -9,14 +9,7 @@
  **/
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.MailService
-import org.pih.warehouse.inventory.InventoryService
-
 class CreateProductFromTemplateController {
-
-    MailService mailService
-    ProductService productService
-    InventoryService inventoryService
 
     def index = {
         redirect(action: "create")
@@ -119,5 +112,3 @@ class CreateProductFromTemplateController {
         }
     }
 }
-
-

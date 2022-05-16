@@ -818,22 +818,6 @@ class InventoryItemController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
     }
 
-
-    def deleteTransactionEntry = {
-        def transactionEntry = TransactionEntry.get(params.id)
-        def productInstance
-        if (transactionEntry) {
-            productInstance = transactionEntry.inventoryItem.product
-            transactionEntry.delete()
-        }
-        redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
-    }
-
-    def addToInventory = {
-        def product = Product.get(params.id)
-        render warehouse.message(code: 'inventoryItem.productAddedToInventory.message', args: [product.name])
-        //return product as XML
-    }
     /**
      * Add a shipment item to a shipment
      */
@@ -895,29 +879,6 @@ class InventoryItemController {
         redirect(action: "showStockCard", params: ['product.id': productInstance?.id])
     }
 
-
-    def saveInventoryLevel = {
-        // Get existing inventory level
-        def inventoryLevelInstance = InventoryLevel.get(params.id)
-        def productInstance = Product.get(params?.product?.id)
-
-        if (inventoryLevelInstance) {
-            inventoryLevelInstance.properties = params
-        } else {
-            inventoryLevelInstance = new InventoryLevel(params)
-        }
-
-        if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save()) {
-
-        } else {
-            flash.message = "${warehouse.message(code: 'inventoryItem.errorSavingInventoryLevels.message')}<br/>"
-            inventoryLevelInstance.errors.allErrors.each {
-                flash.message += it + "<br/>"
-            }
-        }
-        redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
-    }
-
     def create = {
         def inventoryItem = new InventoryItem(params)
         if (InventoryItem && inventoryItem.save()) {
@@ -944,63 +905,6 @@ class InventoryItemController {
         }
 
         redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
-    }
-
-    def deleteInventoryItem = {
-        def inventoryItem = InventoryItem.get(params.id)
-        def productInstance = inventoryItem?.product
-        def inventoryInstance = Inventory.get(inventoryItem?.inventory?.id)
-
-        if (inventoryItem && inventoryInstance) {
-            inventoryInstance.removeFromInventoryItems(inventoryItem).save()
-            inventoryItem.delete()
-        } else {
-            inventoryItem.errors.reject("inventoryItem.error", "Could not delete inventory item")
-            params.put("product.id", productInstance?.id)
-            params.put("inventory.id", inventoryInstance?.id)
-            log.info "Params " + params
-            chain(action: "createInventoryItem", model: [inventoryItem: inventoryItem], params: params)
-            return
-        }
-        redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
-
-    }
-
-
-    def saveTransactionEntry = {
-        def productInstance = Product.get(params?.product?.id)
-        if (!productInstance) {
-            flash.message = "${warehouse.message(code: 'default.notfound.message', args: [warehouse.message(code: 'product.label', default: 'Product'), productInstance.id])}"
-            redirect(action: "showStockCard", id: productInstance?.id)
-        } else {
-            def inventoryItem = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber ?: null)
-            if (!inventoryItem) {
-                flash.message = "${warehouse.message(code: 'default.notfound.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), params.lotNumber])}"
-            } else {
-                def transactionInstance = new Transaction(params)
-                def transactionEntry = new TransactionEntry(params)
-
-                // If we're transferring stock to another location OR consuming stock,
-                // then we need to make sure the quantity is negative
-                if (transactionInstance?.destination?.id != session?.warehouse?.id
-                        || transactionInstance?.transactionType?.name == 'Consumption') {
-                    if (transactionEntry.quantity > 0) {
-                        transactionEntry.quantity = -transactionEntry.quantity
-                    }
-                }
-
-                transactionEntry.inventoryItem = inventoryItem
-                if (!transactionEntry.hasErrors() &&
-                        transactionInstance.addToTransactionEntries(transactionEntry).save(flush: true)) {
-                    flash.message = "${warehouse.message(code: 'inventoryItem.savedTransactionEntry.label')}"
-                } else {
-                    transactionInstance.errors.each { log.info it }
-                    transactionEntry.errors.each { log.info it }
-                    flash.message = "${warehouse.message(code: 'inventoryItem.inventoryItem.unableToSaveTransactionEntry.message.label')}"
-                }
-            }
-        }
-        redirect(action: "showStockCard", params: ['product.id': productInstance?.id])
     }
 
     def recall = {

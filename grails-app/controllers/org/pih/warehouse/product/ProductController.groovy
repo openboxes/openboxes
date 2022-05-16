@@ -34,7 +34,6 @@ import java.math.RoundingMode
 
 class ProductController {
 
-    def dataService
     def userService
     MailService mailService
     def productService
@@ -79,15 +78,6 @@ class ProductController {
 
         [commandInstance: cmd, products: cmd.productInstanceList ?: [], categoryInstance: category]
     }
-
-    def batchEditProperties = {
-        def startTime = System.currentTimeMillis()
-
-        println "batch edit products: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        [products: product]
-    }
-
 
     def batchSave = { BatchEditCommand cmd ->
 
@@ -501,15 +491,6 @@ class ProductController {
         }
     }
 
-
-    /**
-     *
-     */
-    def importDependencies = {
-        redirect(controller: "product", action: "importProducts")
-    }
-
-
     /**
      * @param userInstance
      * @return
@@ -673,47 +654,6 @@ class ProductController {
             }
         }
     }
-
-    def upnDatabase = {
-
-        def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
-        def rows = []
-        try {
-            def line = ""
-            file.withReader { reader ->
-                while ((line = reader.readLine()) != null) {
-                    rows << [
-                            line                  : line,
-                            upn                   : line[0..19].trim(),
-                            supplier              : line[20..54].trim(),
-                            division              : line[55..89].trim(),
-                            tradeName             : line[90..124].trim(),
-                            description           : line[125..204].trim(),
-                            uom                   : line[205..206].trim(),
-                            qty                   : line[207..214].trim(),
-                            partno                : line[215..234].trim(),
-                            saleable              : line[235..235].trim(),
-                            upnQualifierCode      : line[236..237].trim(),
-                            srcCode               : line[238..239].trim(),
-                            trackingRequired      : line[240..240].trim(),
-                            upnCreateDate         : line[241..248].trim(),
-                            upnEditDate           : line[249..256].trim(),
-                            statusCode            : line[257..258].trim(),
-                            actionCode            : line[259..260].trim(),
-                            reference             : line[261..280].trim(),
-                            referenceQualifierCode: line[281..282].trim()
-                    ]
-                }
-            }
-
-
-        } catch (RuntimeException e) {
-            log.error(e.message)
-        }
-
-        [rows: rows]
-    }
-
 
     def renderImage = {
         def documentInstance = Document.get(params.id)
@@ -1133,6 +1073,3 @@ class ProductController {
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
 }
-
-
-

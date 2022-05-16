@@ -174,15 +174,6 @@ class RequisitionController {
         redirect(action: "review", id: requisition.id)
     }
 
-    def normalizeAll = {
-        def requisitions = Requisition.list()
-        requisitions.each { requisition ->
-            requisitionService.normalizeRequisition(requisition)
-        }
-
-    }
-
-
     def review = {
         def requisition = Requisition.get(params.id)
 
@@ -360,36 +351,6 @@ class RequisitionController {
                                                   requisitionItem: requisitionItem,
                                                   availableItems : availableItems])
     }
-
-    def pickNextItem = {
-        def nextItem
-        def requisition = Requisition.get(params?.id)
-        def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-        if (!requisitionItem) {
-            nextItem = requisition?.requisitionItems?.first()
-        } else {
-            def currentIndex = requisition?.requisitionItems?.findIndexOf { it == requisitionItem }
-            nextItem = requisition?.requisitionItems[currentIndex + 1] ?: requisition?.requisitionItems?.first()
-        }
-        redirect(action: "pick", id: requisition?.id,
-                params: ["requisitionItem.id": nextItem?.id])
-    }
-
-    def pickPreviousItem = {
-        def requisition = Requisition.get(params?.id)
-        def requisitionItem = RequisitionItem.get(params.requisitionItem.id)
-        if (!requisitionItem) {
-            requisitionItem = requisition?.requisitionItems?.first()
-        }
-        def lastItem = requisition?.requisitionItems?.size() - 1
-        def currentIndex = requisition.requisitionItems.findIndexOf { it == requisitionItem }
-        def previousItem = requisition?.requisitionItems[currentIndex - 1] ?: requisition?.requisitionItems[lastItem]
-
-        redirect(action: "pick", id: requisition?.id,
-                params: ["requisitionItem.id": previousItem?.id])
-
-    }
-
 
     def picked = {
         def requisition = Requisition.get(params.id)
@@ -570,30 +531,6 @@ class RequisitionController {
             }
         }
         redirect(action: "pick", id: command?.requisition?.id)
-    }
-
-
-    private List<Location> getDepots() {
-        Location.list().findAll { location -> location.id != session.warehouse.id && location.isWarehouse() }.sort {
-            it.name
-        }
-    }
-
-    private List<Location> getWardsPharmacies() {
-        def current = Location.get(session.warehouse.id)
-        def locations = []
-        if (current) {
-            if (current?.locationGroup == null) {
-                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            } else {
-                locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            }
-        }
-        return locations
     }
 
     /**

@@ -9,10 +9,8 @@
  **/
 package org.pih.warehouse.core
 
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Product
-import org.springframework.transaction.TransactionStatus
 import org.grails.plugins.csv.CSVWriter
+import org.springframework.transaction.TransactionStatus
 
 class OrganizationController {
 
@@ -122,15 +120,4 @@ class OrganizationController {
             redirect(action: "edit", id: params.id)
         }
     }
-
-
-    def resetSequence = {
-        IdentifierTypeCode identifierTypeCode = params.identifierTypeCode as IdentifierTypeCode
-        Integer sequenceNumber = params.sequenceNumber?:0 as Integer
-        def organizationInstance = Organization.get(params.id)
-        organizationInstance.sequences.put(identifierTypeCode.toString(), sequenceNumber.toString())
-        organizationInstance.save()
-        redirect(action: "edit", id: params.id)
-    }
-
 }

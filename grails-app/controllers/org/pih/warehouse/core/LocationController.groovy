@@ -208,19 +208,6 @@ class LocationController {
         }
     }
 
-
-    def renderLogo = {
-        def location = Location.get(params.id)
-        if (location?.logo) {
-            response.setContentLength(location.logo.length)
-            response.outputStream.write(location.logo)
-        } else {
-            // Sends 404 error if no photo
-            response.sendError(404)
-        }
-    }
-
-
     def uploadLogo = {
         def locationInstance = Location.get(params.id)
 

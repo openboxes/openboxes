@@ -17,13 +17,11 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
-
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
@@ -34,14 +32,12 @@ import java.text.SimpleDateFormat
 
 class ReportController {
 
-    def dataSource
     def dataService
     def documentService
     def inventoryService
     def productService
     def reportService
     def messageService
-    def inventorySnapshotService
     def productAvailabilityService
     def stockMovementService
     def forecastingService
@@ -262,14 +258,6 @@ class ReportController {
 
     }
 
-
-    def showConsumptionReport = {
-
-        def transactions = Transaction.findAllByTransactionDateBetween(new Date() - 10, new Date())
-
-        [transactions: transactions]
-    }
-
     def showTransactionReport = {
         InventoryReportCommand command = new InventoryReportCommand()
         command.location = Location.get(session.warehouse.id)
@@ -299,14 +287,6 @@ class ReportController {
     }
 
     def showShippingReport = { ChecklistReportCommand command ->
-        command.rootCategory = productService.getRootCategory()
-        if (!command?.hasErrors()) {
-            reportService.generateShippingReport(command)
-        }
-        [command: command]
-    }
-
-    def showPaginatedPackingListReport = { ChecklistReportCommand command ->
         command.rootCategory = productService.getRootCategory()
         if (!command?.hasErrors()) {
             reportService.generateShippingReport(command)
@@ -344,33 +324,6 @@ class ReportController {
             e.printStackTrace()
         }
         [command: command]
-    }
-
-
-    def downloadTransactionReport = {
-        def baseUri = request.scheme + "://" + request.serverName + ":" + request.serverPort
-
-        // JSESSIONID is required because otherwise the login page is rendered
-        def url = baseUri + params.url + ";jsessionid=" + session.getId()
-        url += "?print=true"
-        url += "&location.id=" + params.location.id
-        url += "&category.id=" + params.category.id
-        url += "&startDate=" + params.startDate
-        url += "&endDate=" + params.endDate
-        url += "&showTransferBreakdown=" + params.showTransferBreakdown
-        url += "&hideInactiveProducts=" + params.hideInactiveProducts
-        url += "&insertPageBreakBetweenCategories=" + params.insertPageBreakBetweenCategories
-        url += "&includeChildren=" + params.includeChildren
-        url += "&includeEntities=true"
-
-        // Let the browser know what content type to expect
-        response.setContentType("application/pdf")
-
-        // Render pdf to the response output stream
-        log.info "BaseUri is $baseUri"
-        log.info("Session ID: " + session.id)
-        log.info "Fetching url $url"
-        reportService.generatePdf(url, response.getOutputStream())
     }
 
     def downloadShippingReport = {

@@ -1224,10 +1224,6 @@ openboxes.helpscout.widget.key = "44ee4f01-5334-4b93-ad25-03037903eb80"
 openboxes.jira.issue.collector.enabled = false
 openboxes.jira.issue.collector.url = "https://openboxes.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_USgc5zl3-1988229788/6318/12/1.4.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=fb813fdb"
 
-// OpenBoxes Feedback
-openboxes.mail.feedback.enabled = false
-openboxes.mail.feedback.recipients = ["feedback@openboxes.com"]
-
 // OpenBoxes Error Emails (bug reports)
 openboxes.mail.errors.enabled = true
 openboxes.mail.errors.recipients = ["errors@openboxes.com"]
