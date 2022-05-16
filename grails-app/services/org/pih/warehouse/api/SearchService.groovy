@@ -24,6 +24,7 @@ class SearchService {
     def productService
     def locationService
     def shipmentService
+    def productAvailabilityService
 
     boolean transactional = true
 
@@ -55,7 +56,15 @@ class SearchService {
                                     if (transaction) return transaction
                                     else {
                                         InventoryItem inventoryItem = InventoryItem.findByLotNumber(identifier)
-                                        if (inventoryItem) return inventoryItem
+                                        if (inventoryItem) {
+                                            List<AvailableItem> availableItems =
+                                                    productAvailabilityService.getAvailableItems(currentLocation, inventoryItem)
+
+                                            if (availableItems && availableItems.size() == 1) {
+                                                return availableItems[0]
+                                            }
+                                            return inventoryItem
+                                        }
                                     }
                                 }
                             }
