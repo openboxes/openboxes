@@ -31,6 +31,7 @@ class DocumentTemplateService {
 
     boolean transactional = true
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
+    def requisitionService
 
     def renderGroovyServerPageDocumentTemplate(Document documentTemplate, Map model) {
         StringWriter output = new StringWriter()
@@ -45,8 +46,12 @@ class DocumentTemplateService {
         Context context = new Context()
         context.putVar("invoiceItems", shipmentInstance?.shipmentItems)
         context.putVar("datePrinted", Constants.EUROPEAN_DATE_FORMATTER.format(new Date()))
-        context.putVar("requisition", shipmentInstance?.requisition?.requestNumber ?: '')
-        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Result!A1")
+        context.putVar("requisition", shipmentInstance?.requisition)
+        context.putVar("origin", shipmentInstance?.origin)
+        context.putVar("destination", shipmentInstance?.destination)
+        context.putVar("originRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.origin))
+        context.putVar("destinationRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.destination))
+        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Sheet1!A1")
     }
 
     def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {

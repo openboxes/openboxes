@@ -30,11 +30,11 @@ class RequisitionService {
 
     boolean transactional = true
 
+    def grailsApplication
     def identifierService
+    def inventoryService
     def productService
     def shipmentService
-    def inventoryService
-
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
         return getRequisitionStatistics(destination, origin, user, null, null)
@@ -745,5 +745,40 @@ class RequisitionService {
         }
     }
 
+    def getRequisitionCountInCurrentFiscalYear(Location location) {
+        def fiscalYearConfig = grailsApplication.config.openboxes.dashboard.yearTypes.fiscalYear
 
+        if (!fiscalYearConfig) {
+            throw new IllegalArgumentException("Missing fiscal year type definition in configuration")
+        }
+
+        def currentDate = new Date()
+        def currentYear = currentDate.year + 1900
+        def fiscalYearStart = fiscalYearConfig.start.split("/") // fiscalYearStart[0] = month, fiscalYearStart[1] = day
+
+        if (fiscalYearStart.size() != 2) {
+            throw new IllegalArgumentException("Wrong fiscal year type definition in configuration. Start date should have format 'MM/DD'")
+        }
+
+        String startMonth = fiscalYearStart[0]
+        String startDay = fiscalYearStart[1]
+
+        def startYear = currentYear - 1 // by default assume that we are in fiscal year that started in previous year
+        def endYear = currentYear
+        if (currentDate.month > startMonth.toInteger() || (currentDate.month == startMonth.toInteger() && currentDate.date >= startDay.toInteger())) {
+            startYear = currentYear
+            endYear = currentYear + 1
+        }
+
+        def startDate = new Date("${fiscalYearConfig.start}/${startYear}")
+        def endDate = new Date("${fiscalYearConfig.end}/${endYear}")
+
+        // Data fetch
+        return Requisition.executeQuery("""
+            SELECT 
+                COUNT(r.id) 
+            FROM Requisition r 
+            WHERE r.origin = :location AND r.dateCreated >= :startDate AND r.dateCreated <= :endDate AND r.isTemplate = false 
+            """, ['location': location, 'startDate': startDate, 'endDate': endDate])[0] ?: 0
+    }
 }

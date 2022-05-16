@@ -239,7 +239,7 @@
                                                     <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>
                                                 </td>
                                                 <td>
-                                                    <g:link controller="shipment" action="downloadInvoiceTemplateDocument" params="['shipment.id': shipmentInstance?.id]">
+                                                    <g:link controller="document" action="renderInvoiceTemplate" params="[shipmentId: shipmentInstance?.id]">
                                                         <label><g:message code="shipping.invoiceTemplate.label" default="Invoice template (Excel)"/></label>
                                                     </g:link>
                                                 </td>
@@ -616,14 +616,14 @@
                                         </td>
                                         <td>
                                             <div>
-                                                <g:link controller="shipment" action="downloadInvoiceTemplateDocument" params="['shipment.id': shipmentInstance?.id]">
+                                                <g:link controller="document" action="renderInvoiceTemplate" params="[shipmentId: shipmentInstance?.id]">
                                                     <label><g:message code="shipping.invoiceTemplate.label" default="Invoice template (Excel)"/></label>
                                                 </g:link>
                                             </div>
 
                                         </td>
                                         <td class="right">
-                                            <g:link controller="shipment" action="downloadInvoiceTemplateDocument" params="['shipment.id': shipmentInstance?.id]" class="button">
+                                            <g:link controller="document" action="renderInvoiceTemplate" params="[shipmentId: shipmentInstance?.id]" class="button">
                                                 <warehouse:message code="default.button.download.label"/>
                                             </g:link>
 

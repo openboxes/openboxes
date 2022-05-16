@@ -2604,13 +2604,6 @@ class StockMovementService {
                             uri         : g.createLink(controller: 'doc4j', action: "downloadCertificateOfDonation", id: stockMovement?.shipment?.id, absolute: true)
                     ],
                     [
-                            name        : g.message(code: "shipping.invoiceTemplate.label"),
-                            documentType: DocumentGroupCode.INVOICE.name(),
-                            contentType : "application/vnd.ms-excel",
-                            stepNumber  : 5,
-                            uri         : g.createLink(controller: 'shipment', action: "downloadInvoiceTemplateDocument", params: ['shipment.id': stockMovement?.shipment?.id], absolute: true)
-                    ],
-                    [
                             name        : g.message(code: "goodsReceiptNote.label"),
                             documentType: DocumentGroupCode.GOODS_RECEIPT_NOTE.name(),
                             contentType : "text/html",
@@ -2626,12 +2619,13 @@ class StockMovementService {
             log.info "Shipment workflow " + shipmentWorkflow
             if (shipmentWorkflow) {
                 shipmentWorkflow.documentTemplates.each { Document documentTemplate ->
-                    def action = documentTemplate.documentType.documentCode == DocumentCode.INVOICE_TEMPLATE ? "download" : "render"
+                    def action = getActionByDocumentCode(documentTemplate.documentType?.documentCode)
+                    def isInvoiceTemplate = documentTemplate.documentType?.documentCode == DocumentCode.INVOICE_TEMPLATE
                     documentList << [
                             name        : documentTemplate?.name,
                             documentType: documentTemplate?.documentType?.name,
                             contentType : documentTemplate?.contentType,
-                            stepNumber  : null,
+                            stepNumber  : isInvoiceTemplate ? 5 : null,
                             uri         : documentTemplate?.fileUri ?: g.createLink(controller: 'document', action: action,
                                     id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                     absolute: true, title: documentTemplate?.filename),
@@ -2641,7 +2635,7 @@ class StockMovementService {
             }
 
             stockMovement?.shipment?.documents.each { Document document ->
-                def action = document.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE ? "render" : "download"
+                def action = getActionByDocumentCode(document.documentType?.documentCode)
                 documentList << [
                         id          : document?.id,
                         name        : document?.name,
@@ -2658,6 +2652,21 @@ class StockMovementService {
         }
 
         return documentList
+    }
+
+    String getActionByDocumentCode(DocumentCode documentCode) {
+        String action = ""
+        switch (documentCode) {
+            case DocumentCode.INVOICE_TEMPLATE:
+                action = "renderInvoiceTemplate"
+                break
+            case DocumentCode.SHIPPING_TEMPLATE:
+                action = "render"
+                break
+            default:
+                action = "download"
+        }
+        return action
     }
 
     List buildStockMovementItemList(StockMovement stockMovement) {
