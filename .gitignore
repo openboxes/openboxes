@@ -40,3 +40,4 @@ grails-app/views/common/_react.gsp
 docker/mysql
 docker/openboxes.war
 .~*#
+/coverage
