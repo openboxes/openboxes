@@ -51,7 +51,7 @@ class DocumentTemplateService {
         context.putVar("destination", shipmentInstance?.destination)
         context.putVar("originRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.origin))
         context.putVar("destinationRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.destination))
-        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Template!A1")
+        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Sheet1!A1")
     }
 
     def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
