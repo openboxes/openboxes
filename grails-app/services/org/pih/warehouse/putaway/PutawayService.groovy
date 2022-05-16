@@ -57,7 +57,7 @@ class PutawayService {
                 // Get the next available putaway location based on criteria (available vs unavailable, volume, weight, etc)
                 Location putawayLocation = getNextAvailablePutawayLocation(location, putawayCandidate.product)
                 if (!putawayLocation) {
-                    log.warn("No available putaway location for ${putawayCandidate?.product?.productCode}, Quantity=${putawayCandidate.quantity}, Lot Number=${putawayCandidate?.inventoryItem?.lotNumber}, Current Location=${putawayCandidate.currentFacility} . ${putawayCandidate?.currentLocation}")
+                    log.warn("No available putaway location for ${putawayCandidate?.product?.productCode}, lotNumber: ${putawayCandidate?.inventoryItem?.lotNumber?:'Default'}, currentLocation: ${putawayCandidate.currentFacility}.${putawayCandidate?.currentLocation}, quantity=${putawayCandidate.quantity}")
                     return
                 }
 
