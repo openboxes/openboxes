@@ -67,6 +67,26 @@ jobs:
       run: npm run bundle
 
     - name: grails test-app :unit
-      run: '$HOME/grails-1.3.9/bin/grails test-app unit: --non-interactive -echoOut -echoErr'
+      run: '$HOME/grails-1.3.9/bin/grails test-app unit: -coverage -xml --non-interactive -echoOut -echoErr'
     - name: npm test
       run: npm test
+
+    - name: Code Coverage Summary Report
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: target/test-reports/cobertura/coverage.xml
+        badge: true
+        fail_below_min: true
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: true
+        indicators: true
+        output: both
+        thresholds: '60 80'
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
