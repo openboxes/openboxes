@@ -2281,6 +2281,13 @@ class ShipmentService {
                     shipmentItem.quantity = picklistItem?.quantity ?: shipmentItem.quantity
                 } else {
                     shipmentItem.quantity = orderItem.quantity
+                    shipmentItem.lotNumber = orderItem?.inventoryItem?.lotNumber
+                    shipmentItem.expirationDate = orderItem?.inventoryItem?.expirationDate
+                    shipmentItem.product = orderItem?.product
+                    shipmentItem.quantity = orderItem?.quantity
+                    shipmentItem.recipient = orderItem?.recipient
+                    shipmentItem.inventoryItem = orderItem?.inventoryItem
+                    shipmentItem.sortOrder = shipmentItems?.size()
                 }
             }
             return shipmentItems
