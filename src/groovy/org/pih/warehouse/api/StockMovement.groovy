@@ -173,6 +173,20 @@ class StockMovement {
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
     }
 
+    /**
+     * Return the stock movement directions based on a given location
+     *
+     * @return
+     */
+    StockMovementDirection getStockMovementDirection (Location currentLocation) {
+        if(currentLocation == origin)
+            return StockMovementDirection.OUTBOUND
+        else if(currentLocation == destination || origin?.isSupplier())
+            return StockMovementDirection.INBOUND
+        else
+            return null
+    }
+
     Boolean isPending() {
         return shipment?.currentStatus == ShipmentStatusCode.PENDING
     }

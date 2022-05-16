@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.invoice.InvoiceItem
@@ -205,6 +206,17 @@ class Order implements Serializable {
                 destination?.supports(ActivityCode.APPROVE_ORDER)) && total > minimumAmount
     }
 
+    StockMovementDirection getStockMovementDirection(Location currentLocation) {
+        if (origin == destination) {
+            return StockMovementDirection.INTERNAL
+        } else if (currentLocation == origin) {
+            return StockMovementDirection.OUTBOUND
+        } else if (currentLocation == destination || origin?.isSupplier()) {
+            return StockMovementDirection.INBOUND
+        } else {
+            return null
+        }
+    }
 
     /**
      * @return a boolean indicating whether the order is pending

@@ -10,11 +10,8 @@
 
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.api.StockMovement
+
 import org.pih.warehouse.api.StockMovementDirection
-import org.pih.warehouse.api.StockTransferDirection
-import org.pih.warehouse.api.StockMovementType
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
@@ -97,8 +94,8 @@ class StockTransferController {
         Order orderInstance = Order.get(params.orderId)
 
         // Inbound return case
-        if (orderInstance.isInbound(currentLocation)) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockTransferDirection.INBOUND])
+        if (orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND])
             try {
                 stockTransferService.deleteStockTransfer(params.orderId)
                 stockMovementService.deleteStockMovement(params.id)
@@ -110,14 +107,14 @@ class StockTransferController {
         }
 
         // Outbound return case
-        if (orderInstance.isOutbound(currentLocation)) {
+        if (orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND) {
             try {
                 stockTransferService.deleteStockTransfer(params.orderId)
             } catch (IllegalArgumentException e) {
                 flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
                 redirect(action: "list")
             }
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockTransferDirection.OUTBOUND])
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
             return
         }
     }
