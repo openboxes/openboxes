@@ -68,9 +68,6 @@
 
     <g:set var="showZoneName" value='${zoneName || zoneNames.size() > 1}'/>
 
-    <h1 class="subtitle">
-        ${zoneName ?: g.message(code: 'location.noZone.label', default: 'No zone')}
-    </h1>
     <div class="page" style="page-break-after: ${enablePageBreak && showZoneName && i < zoneNames.size() - 1 ? 'always':'avoid'};">
         <g:if test="${showZoneName}">
             <h1 class="subtitle">
