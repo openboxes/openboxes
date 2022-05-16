@@ -84,11 +84,15 @@ class StockTransferApiController {
             throw new IllegalArgumentException("User must be logged into a location to update stock transfer")
         }
 
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No stock transfer found for order ID ${params.id}")
+        }
+
         StockTransfer stockTransfer = new StockTransfer()
 
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
-        Order order
         Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)
         if (isReturnType && (stockTransfer?.status == StockTransferStatus.PLACED)) {
             order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
