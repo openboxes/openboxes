@@ -10,7 +10,7 @@
 
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.api.StockTransferDirection
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
@@ -32,15 +32,9 @@ class StockTransferController {
         Location currentLocation = Location.get(session.warehouse.id)
         def orderInstance = Order.get(params.id)
 
-        StockTransferDirection stockTransferDirection = null;
-        if(currentLocation == orderInstance.origin)
-            stockTransferDirection = StockTransferDirection.OUTBOUND
-        else if(currentLocation == orderInstance.destination || orderInstance?.origin?.isSupplier())
-            stockTransferDirection = StockTransferDirection.INBOUND
-
-        if(stockTransferDirection == StockTransferDirection.INBOUND) {
+        if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
             redirect(action: "createInboundReturn", params: params)
-        } else if(stockTransferDirection == StockTransferDirection.OUTBOUND) {
+        } else if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND) {
             redirect(action: "createOutboundReturn", params: params)
         }
     }

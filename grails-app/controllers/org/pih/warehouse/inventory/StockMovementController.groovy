@@ -83,18 +83,13 @@ class StockMovementController {
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
         }
-        StockMovementDirection stockMovementDirection = null;
-        if(currentLocation == stockMovement.origin)
-            stockMovementDirection = StockMovementDirection.OUTBOUND
-        else if(currentLocation == stockMovement.destination || stockMovement?.origin?.isSupplier())
-            stockMovementDirection = StockMovementDirection.INBOUND
 
         if(stockMovement.isReturn) {
             redirect(controller: "stockTransfer", action: "edit", params: params)
-        } else if (stockMovementDirection == StockMovementDirection.OUTBOUND && stockMovement?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
+        } else if (stockMovement?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND && stockMovement?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
             redirect(action: "verifyRequest", params: params)
         }
-        else if (stockMovementDirection == StockMovementDirection.INBOUND) {
+        else if (stockMovement?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
 
             if (stockMovement.isFromOrder) {
                 redirect(action: "createCombinedShipments", params: params)
