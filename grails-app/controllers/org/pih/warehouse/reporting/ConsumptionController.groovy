@@ -52,7 +52,8 @@ class ConsumptionController {
 
         String[] defaultTransactionTypeIds = [
                 Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
-                Constants.CONSUMPTION_TRANSACTION_TYPE_ID
+                Constants.CONSUMPTION_TRANSACTION_TYPE_ID,
+                Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
         ]
 
         command.defaultTransactionTypes = defaultTransactionTypeIds.collect {TransactionType.get(it)}
