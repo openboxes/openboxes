@@ -109,6 +109,7 @@ class Shipment implements Comparable, Serializable {
             "consigneeAddress",
             "receipt",
             "isFromPurchaseOrder",
+            "purchaseOrder",
             "orders",
             "isFromReturnOrder",
             "returnOrder"
@@ -299,9 +300,14 @@ class Shipment implements Comparable, Serializable {
         return containerMap
 
     }
+
     // for inbounds and outbounds only
     Order getReturnOrder() {
-        return orders.find{ it.isReturnOrder }
+        return orders?.find { it.isReturnOrder }
+    }
+
+    Order getPurchaseOrder() {
+        return orders?.find { it.isPurchaseOrder }
     }
 
     List<Order> getOrders() {
@@ -325,11 +331,11 @@ class Shipment implements Comparable, Serializable {
     }
 
     Boolean getIsFromPurchaseOrder() {
-        return !shipmentItems?.orderItems?.flatten()?.isEmpty()
+        return !orders?.isEmpty() && orders.every { it.isPurchaseOrder }
     }
 
     Boolean getIsFromReturnOrder() {
-        return orders.any{ it.isReturnOrder}
+        return !orders?.isEmpty() && orders?.every { it.isReturnOrder }
     }
 
     Boolean isStockMovement() {

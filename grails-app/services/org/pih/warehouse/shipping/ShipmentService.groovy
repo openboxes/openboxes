@@ -1505,8 +1505,6 @@ class ShipmentService {
             debitTransaction.requisition = shipmentInstance.requisition
             debitTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
 
-            debitTransaction.order = shipmentInstance.orders.findResult {Order it -> it.isReturnOrder() ? it : null}
-
             addTransactionEntries(debitTransaction, shipmentInstance)
 
             if (!debitTransaction.save()) {
