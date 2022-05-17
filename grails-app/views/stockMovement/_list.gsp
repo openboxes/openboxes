@@ -32,8 +32,12 @@
                               title="${warehouse.message(code: 'stockMovement.identifier.label', default: 'Stock movement number')}" />
 
             <th><g:message code="default.name.label"/></th>
+            <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
             <th><g:message code="stockMovement.origin.label"/></th>
+            </g:if>
+            <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
             <th><g:message code="stockMovement.destination.label"/></th>
+            </g:if>
             <th><g:message code="stockMovement.stocklist.label"/></th>
 
 
@@ -89,17 +93,24 @@
                 </td>
                 <td>
                     <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
-                        <div title="${stockMovement.name}">${stockMovement.description}</div>
+                        <g:if test="${stockMovement?.hasProperty('stockMovementType')}">
+                            <format:metadata obj="${stockMovement?.stockMovementType}"/> &rsaquo;
+                        </g:if>
+                        <span title="${stockMovement.name}">${stockMovement.description?:stockMovement?.name}</span>
                     </g:link>
                 </td>
+                <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.INBOUND}">
                 <td>
                     ${stockMovement?.origin?.name}
                 </td>
+                </g:if>
+                <g:if test="${!params.direction || params.direction as StockMovementDirection == StockMovementDirection.OUTBOUND}">
                 <td>
                     ${stockMovement?.destination?.name}
                 </td>
+                </g:if>
                 <td>
-                    ${stockMovement?.stocklist?.name?:"N/A"}
+                    ${stockMovement?.stocklist?.name?:"None"}
                 </td>
                 <td>
                     ${stockMovement.requestedBy?:warehouse.message(code:'default.noone.label')}

@@ -170,7 +170,7 @@
                                 <g:message code="stockMovement.stocklist.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.stocklist?.name?:"N/A"}
+                                ${stockMovement?.stocklist?.name?:"None"}
                             </td>
                         </tr>
                         <tr class="prop">
@@ -202,7 +202,12 @@
                                 <g:message code="shipping.shipmentType.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                <g:if test="${stockMovement?.shipmentType}">
+                                    <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                </g:if>
+                                <g:else>
+                                    ${g.message(code:"default.none.label")}
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
