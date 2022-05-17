@@ -57,11 +57,11 @@
                                 ${lineItem?.quantity}
                             </td>
                         </g:if>
-                        <td class="center" width="1%">
-                            <g:formatDate date="${groupedPicklistItems[j]?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
-                        </td>
                         <td class="center" width="1%" >
                             ${groupedPicklistItems[j]?.inventoryItem?.lotNumber}
+                        </td>
+                        <td class="center" width="1%">
+                            <g:formatDate date="${groupedPicklistItems[j]?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
                         </td>
                         <td class="center middle">
                             <g:if test="${groupedPicklistItems}">
