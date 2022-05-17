@@ -218,6 +218,7 @@ class Order implements Serializable {
         }
     }
 
+
     /**
      * @return a boolean indicating whether the order is pending
      */

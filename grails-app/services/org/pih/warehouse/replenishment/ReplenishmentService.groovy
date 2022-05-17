@@ -188,31 +188,30 @@ class ReplenishmentService {
     }
 
     void validateReplenishmentItem(Location replenishingLocation, OrderItem orderItem) {
-        def quantity = orderItem.quantity
-
         if (orderItem.picklistItems) {
-            quantity = orderItem.picklistItems.sum { it.quantity }
+            orderItem.picklistItems.toArray().each { PicklistItem picklistItem ->
+                validateQuantityAvailable(replenishingLocation, picklistItem, picklistItem.quantity)
+            }
         }
-
-        validateQuantityAvailable(replenishingLocation, orderItem, quantity)
     }
 
-    void validateQuantityAvailable(Location replenishingLocation, OrderItem orderItem, Integer quantityPicked) {
+    void validateQuantityAvailable(Location replenishingLocation, PicklistItem picklistItem, Integer quantityPicked) {
         if (!replenishingLocation) {
             throw new IllegalArgumentException("Location is required")
         }
 
-        Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(
+        Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromise(
             replenishingLocation,
-            orderItem.destinationBinLocation,
-            orderItem.product
+            picklistItem.binLocation,
+            picklistItem.inventoryItem,
         )
 
-        Integer quantityAvailableWithPicked = quantityAvailable + quantityPicked
+        Integer quantityAvailableWithPicked = quantityAvailable + quantityPicked >= 0 ? quantityAvailable + quantityPicked : 0
         log.info "Quantity: ${quantityPicked} vs ${quantityAvailableWithPicked}"
 
+        def product = picklistItem.inventoryItem.product
         if (quantityPicked > quantityAvailableWithPicked) {
-            throw new IllegalStateException("Quantity available ${quantityAvailableWithPicked} is less than quantity to replenish ${quantityPicked} for product ${orderItem.product.productCode} ${orderItem.product.name}")
+            throw new IllegalStateException("Quantity available ${quantityAvailableWithPicked} is less than quantity to replenish ${quantityPicked} for product ${product.productCode} ${product.name}")
         }
     }
 

@@ -22,10 +22,18 @@
                 </g:link>
             </div>
             <div class="action-menu-item">
-                <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
-                    &nbsp;${warehouse.message(code: 'default.edit.label', args:[warehouse.message(code:'stockMovement.label')])}
-                </g:link>
+                <g:if test="${stockMovement?.order}">
+                    <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
+                        &nbsp;${warehouse.message(code: 'default.edit.label', args:[warehouse.message(code:'stockMovement.label')])}
+                    </g:link>
+                </g:if>
+                <g:else>
+                    <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />
+                        &nbsp;${warehouse.message(code: 'default.edit.label', args:[warehouse.message(code:'stockMovement.label')])}
+                    </g:link>
+                </g:else>
             </div>
             <g:isUserAdmin>
                 <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">

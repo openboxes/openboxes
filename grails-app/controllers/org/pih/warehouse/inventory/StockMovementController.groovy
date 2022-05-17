@@ -76,7 +76,7 @@ class StockMovementController {
 
     def edit = {
         Location currentLocation = Location.get(session.warehouse.id)
-        StockMovement stockMovement = params.id ? stockMovementService.getStockMovement(params.id) : null
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
         if(!stockMovement.isEditAuthorized(currentLocation)) {
             flash.error = stockMovementService.getDisabledMessage(stockMovement, currentLocation, true)
@@ -84,14 +84,13 @@ class StockMovementController {
             return
         }
 
-        StockMovementDirection stockMovementDirection = currentLocation == stockMovement.origin ?
-                StockMovementDirection.OUTBOUND : currentLocation == stockMovement.destination || stockMovement?.origin?.isSupplier() ?
-                        StockMovementDirection.INBOUND : null
-
-        if (stockMovementDirection == StockMovementDirection.OUTBOUND && stockMovement.requisition.sourceType == RequisitionSourceType.ELECTRONIC) {
+        if(stockMovement.isReturn) {
+            redirect(controller: "stockTransfer", action: "edit", params: params)
+        } else if (stockMovement?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND && stockMovement?.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
             redirect(action: "verifyRequest", params: params)
         }
-        else if (stockMovementDirection == StockMovementDirection.INBOUND) {
+        else if (stockMovement?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
+
             if (stockMovement.isFromOrder) {
                 redirect(action: "createCombinedShipments", params: params)
             } else if (stockMovement.requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
@@ -114,6 +113,7 @@ class StockMovementController {
 
     def show = {
         def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        // For inbound stockMovement
         if (!stockMovement) {
             stockMovement =  stockMovementService.getStockMovement(params.id)
         }

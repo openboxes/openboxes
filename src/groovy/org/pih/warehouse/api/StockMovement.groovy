@@ -347,7 +347,7 @@ class StockMovement {
             currentStatus: shipment?.currentStatus,
             stocklist: requisition?.requisitionTemplate,
             isFromOrder: Boolean.FALSE,
-                isReturn: Boolean.FALSE,
+            isReturn: Boolean.FALSE,
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,

@@ -7,7 +7,6 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.Requisition
@@ -133,19 +132,20 @@ class OutboundStockMovement implements Serializable {
 
     Map toJson() {
         return [
-                id                  : id,
-                name                : name,
-                description         : description,
-                statusCode          : statusCode?.toString(),
-                identifier          : identifier,
-                origin              : origin,
-                destination         : destination,
-                hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
-                stocklist           : [
+                id                : id,
+                name              : name,
+                description       : description,
+                stockMovementType : stockMovementType,
+                statusCode        : statusCode?.toString(),
+                identifier        : identifier,
+                origin            : origin,
+                destination       : destination,
+                hasManageInventory: origin?.supports(ActivityCode.MANAGE_INVENTORY),
+                stocklist         : [
                         id  : stocklist?.id,
                         name: stocklist?.name
                 ],
-                replenishmentType   : stocklist?.replenishmentTypeCode,
+                replenishmentType : stocklist?.replenishmentTypeCode,
                 dateRequested       : dateRequested?.format("MM/dd/yyyy"),
                 dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
                 expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),

@@ -67,10 +67,18 @@
             <%-- TODO  Move status to stock movement; make consistent across all types --%>
             <g:set var="hasBeenPlaced" value="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
-            <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                <warehouse:message code="default.button.edit.label" />
-            </g:link>
+            <g:if test="${stockMovement?.order}">
+                <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                    <warehouse:message code="default.button.edit.label" />
+                </g:link>
+            </g:if>
+            <g:else>
+                <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                    <warehouse:message code="default.button.edit.label" />
+                </g:link>
+            </g:else>
             <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
                 <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
                 <warehouse:message code="default.button.receive.label" />
@@ -162,7 +170,7 @@
                                 <g:message code="stockMovement.stocklist.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.stocklist?.name?:"N/A"}
+                                ${stockMovement?.stocklist?.name?:"None"}
                             </td>
                         </tr>
                         <tr class="prop">
@@ -194,7 +202,12 @@
                                 <g:message code="shipping.shipmentType.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                <g:if test="${stockMovement?.shipmentType}">
+                                    <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                </g:if>
+                                <g:else>
+                                    ${g.message(code:"default.none.label")}
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
