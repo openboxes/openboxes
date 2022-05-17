@@ -97,4 +97,29 @@ class StockTransferController {
         }
         redirect(action: "list")
     }
+
+    def deleteStockTransfer = {
+        Location currentLocation = Location.get(session.warehouse.id)
+        Order orderInstance = Order.get(params.orderId ?: params.id)
+        StockMovementDirection direction = orderInstance?.getStockMovementDirection(currentLocation)
+
+        if (!orderInstance) {
+            throw new IllegalArgumentException("Order instance not found for this stock transfer")
+        }
+
+        try {
+            stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        }
+
+        if (direction == StockMovementDirection.INBOUND) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND])
+        } else if (direction == StockMovementDirection.OUTBOUND) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+        } else {
+            redirect(action: "list")
+        }
+
+    }
 }

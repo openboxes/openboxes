@@ -489,6 +489,9 @@ class OrderService {
 
 
     void deleteOrder(Order orderInstance) {
+        orderInstance.shipments?.each { Shipment it ->
+            shipmentService.deleteShipment(it)
+        }
         deleteTransactions(orderInstance)
         orderInstance.delete(flush: true)
     }
