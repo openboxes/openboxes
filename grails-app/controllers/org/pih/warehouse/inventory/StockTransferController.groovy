@@ -20,7 +20,6 @@ import org.pih.warehouse.order.OrderTypeCode
 class StockTransferController {
 
     def stockTransferService
-    def stockMovementService
 
     def index = {
         redirect(action: "list", params: params)
@@ -89,33 +88,28 @@ class StockTransferController {
         redirect(action: "list")
     }
 
-    def deleteInboundOrOutboundReturn = {
+    def deleteStockTransfer = {
         Location currentLocation = Location.get(session.warehouse.id)
-        Order orderInstance = Order.get(params.orderId)
+        Order orderInstance = Order.get(params.orderId ?: params.id)
+        StockMovementDirection direction = orderInstance?.getStockMovementDirection(currentLocation)
 
-        // Inbound return case
-        if (orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
+        if (!orderInstance) {
+            throw new IllegalArgumentException("Order instance not found for this stock transfer")
+        }
+
+        try {
+            stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        }
+
+        if (direction == StockMovementDirection.INBOUND) {
             redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND])
-            try {
-                stockTransferService.deleteStockTransfer(params.orderId)
-                stockMovementService.deleteStockMovement(params.id)
-            } catch (IllegalArgumentException e) {
-                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
-                redirect(action: "list")
-            }
-            return
+        } else if (direction == StockMovementDirection.OUTBOUND) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+        } else {
+            redirect(action: "list")
         }
 
-        // Outbound return case
-        if (orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND) {
-            try {
-                stockTransferService.deleteStockTransfer(params.orderId)
-            } catch (IllegalArgumentException e) {
-                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
-                redirect(action: "list")
-            }
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
-            return
-        }
     }
 }
