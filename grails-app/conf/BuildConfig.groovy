@@ -7,24 +7,17 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-//grails.server.port.http = 8081
 
 grails.project.class.dir = "target/classes"
 grails.project.docs.output.dir = "web-app/docs"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
-//grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.plugin.location.spock = 'spock/'
 grails.plugin.location.liquibase = 'liquibase/'
 
-// Development configuration property used to enable xrebel features
-//grails.tomcat.jvmArgs = ["-javaagent:/home/jmiranda/Desktop/xrebel/xrebel.jar"]
-
 grails.project.dependency.resolution = {
-    // inherit Grails' default dependencies
     inherits("global") {
-        // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
         excludes(
                 "commons-logging",  // use jcl-over-slf4j instead
                 "log4j",  // use reload4j instead
@@ -52,7 +45,11 @@ grails.project.dependency.resolution = {
          */
         compile "org.slf4j:slf4j-reload4j:1.7.33"
         compile "ch.qos.reload4j:reload4j:1.2.18.2"
-        // override hidden grails dependencies to work with reload4j
+        /*
+         * This *should* be a `compile` dependency, but grails 1.3.9 logs
+         * warnings like these if we don't make it a `build` dependency:
+         * SLF4J: The requested version ... by your slf4j binding is not compatible with ...
+         */
         build "org.slf4j:slf4j-api:1.7.33"
         compile "org.slf4j:slf4j-api:1.7.33"
         compile "org.slf4j:jcl-over-slf4j:1.7.33"
@@ -66,7 +63,7 @@ grails.project.dependency.resolution = {
 
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-codec', 'commons-io'
+            excludes 'commons-codec', 'commons-io'  // not sure why these are excluded
         }
 
         // Required for barcode4j
@@ -75,14 +72,13 @@ grails.project.dependency.resolution = {
         compile "org.apache.commons:commons-email:1.5"
         compile "org.apache.commons:commons-text:1.3"  // last Java 7-compatible release
         compile 'commons-lang:commons-lang:2.6'
-        compile "org.jadira.usertype:usertype.jodatime:1.9"
+        compile 'org.jadira.usertype:usertype.jodatime:1.9'  // org.joda.time.* is redundant in Java 8
         compile "org.apache.commons:commons-csv:1.6"  // last Java 7-compatible release
 
         // Required by LDAP
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
 
-        // Render Zebra labels
-        compile "fr.w3blog:zebra-zpl:0.0.3"
+        compile 'fr.w3blog:zebra-zpl:0.0.3'  // ZebraUtils.printZpl(), Labelary API, etc.
 
         // Required by rendering plugin (NoClassDefFoundError: org/springframework/mock/web/MockHttpServletRequest)
         // and also for the SendStockAlertsJob which needs to use the GSP template engine
@@ -128,8 +124,10 @@ grails.project.dependency.resolution = {
         compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
 
-        // Unknown
+        // used only in scripts/VerifyClasspath.groovy
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
+
+        // used once in DocumentController.groovy -- refactor to use org.apache.*HttpClient
         compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
             excludes "commons-codec", "commons-lang", "groovy", "xercesImpl"
         }
@@ -156,77 +154,103 @@ grails.project.dependency.resolution = {
         runtime(':tomcat:1.3.9')
         runtime(':hibernate:1.3.9') { excludes 'antlr' }
 
-        // Required by functionality (need to be upgraded or replaced)
+        // enables <jq:*> tags, which we don't use
         runtime(":jquery:1.7.2")
+        // enables <jqui:*> tags, which we only use for imports
         runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
+
+        // enables *RenderingService and renderPdf()
         compile ":rendering:0.4.4"
-        compile ":raven:0.5.8"
+
+        /*
+         * This dependency has an easy migration to Grails 3,
+         * but we may want to investigate using POI directly.
+         * (see https://github.com/gpc/grails-excel-import)
+         */
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
+
+        // no evidence of use: see https://github.com/bluesliverx/grails-external-config-reload
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
+
         runtime(':quartz2:2.1.6.2')
         compile(":csv:0.3.1")  // FIXME continue migrating to commons-csv instead
 
         // Unsure if used
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
-        runtime(':constraints:0.6.0')
-        runtime(':jquery-validation:1.9') { // 1.7.3
+        runtime(':constraints:0.6.0')  // not used (at least not correctly)
+
+        /*
+         * abandonware https://web.archive.org/web/20170705122757/http://grails.org/plugin/jquery-validation
+         * abandonware http://limcheekin.github.io/jquery-validation-ui/docs/guide/single.html
+         *
+         * Replace with <g:renderErrors>? (which we use elsewhere and works with Grails 1-4+)
+         *
+         * https://grails.github.io/grails2-doc/1.3.9/guide/single.html#7.3%20Validation%20on%20the%20Client
+         * https://docs.grails.org/3.1.1/guide/validation.html#validationOnTheClient
+         */
+        runtime(':jquery-validation:1.9') { // 1.7.3  // enables <jqval:*>
             excludes 'constraints'
         }
-        runtime(':jquery-validation-ui:1.4.7') { // 1.1.1
+        runtime(':jquery-validation-ui:1.4.7') { // enables <jqvalui:*>
             excludes 'constraints', 'spock'
         }
 
-        // Can probably be removed after migration
-        runtime(":cache-headers:1.1.5")
-        runtime(":resources:1.1.6")
+        // plugins that improve page rendering, may not be needed in Grails 3+
         runtime(":zipped-resources:1.0") { excludes 'resources' }
-        runtime(":cached-resources:1.0") {
-            excludes 'resources', 'cache-headers'
-        }
+        runtime(":cached-resources:1.0") { excludes 'resources', 'cache-headers' }
+        runtime ':cache-headers:1.1.5'  // not used directly (?)
+        runtime ':resources:1.1.6'  // enables <r:*> tags: https://grails-plugins.github.io/grails-resources/guide/
 
-        // Still used but probably can be replaced
+        // these plugins "just work" with no code changes
+        compile ':console:1.1'  // enables `grails console` command
+        compile ':google-analytics:1.0'  // also enables <ga:*> tags
+        compile ':raven:0.5.8'  // consider https://github.com/agorapulse/grails-sentry
+        test ':code-coverage:1.2.5' // enables `grails test-app -coverage`
+
+        /*
+         * Used only once, in ShipmentController: barcode4jService.render()
+         * Replace with com.google.zxing.oned.Code128Writer().
+         */
         compile(":barcode4j:0.2.1")
+
+        /*
+         * Enables prettytime.display(), which we use only three times.
+         * Easy migration to Grails 3, see https://github.com/cazacugmihai/grails-pretty-time
+         */
         compile(":pretty-time:0.3")
-        compile(":console:1.1")
-        compile(":image-builder:0.2")
-        compile(":joda-time:1.4")
-        compile(":springcache:1.3.1")
-        compile(":webflow:1.3.8")
+
+        // FIXME replace with Image.getScaledInstance()
+        compile ':image-builder:0.2'  // used once, in DocumentService.groovy
+
+        compile ':joda-time:1.4'  // enables <joda:*> tags, not sure we use this
+        compile ':springcache:1.3.1'  // enables import grails.plugin.springcache.*
+        compile ':webflow:1.3.8'  // supports Spring Web Flow, but not Grails 3 :-(
+
+        /*
+         * abandonware, but we only use it in one place to fetch a stylesheet
+         * https://web.archive.org/web/20120304112327/http://grails.org/plugin/yui
+         */
         compile(":yui:2.8.2.1")
+
+        /*
+         * Enables publishEvent, but development stopped in Grails 2.
+         * Replace with https://docs.grails.org/3.2.3/guide/async.html#events
+         */
         compile(":spring-events:1.2")
+
+        /*
+         * Enables userAgentIdentService.isMobile() and <browser:is*> tags.
+         * Straightforward migration to Grails 3.
+         */
         compile(":browser-detection:0.4.3")
-        //compile(":bubbling:2.1.4")
 
-        // Not critical to application (might require code changes)
-        //build(":codenarc:0.17")
-        //compile(":dynamic-controller:0.3")
-        compile(":google-analytics:1.0")
-        //compile(":google-visualization:0.6.2")
-        //compile(":grails-ui:1.2.3")
-        //compile(":clickstream:0.2.0")
-        //compile(":profile-template:0.1")
-        //runtime(":runtime-logging:0.4")
-        //compile(":ui-performance:1.2.2")
-
-        // Not critical to application (can be removed without changes)
-        //compile(":famfamfam:1.0.1")
-        //compile(":template-cache:0.1")
-        //compile(":ldap:0.8.2")
-
-        // Test dependencies (used but should be replaced with new version)
-        //test(":spock:0.6") {
-        //    exclude "spock-grails-support"
-        //}
+        // this plugin has a straightforward migration to Grails 3
         test(name: 'geb', version: '0.6.3') {}
-        test ":code-coverage:1.2.5" //2.0.3-3
+
+        /*
+         * Pretty sure we don't use this, but it's well maintained through grails 5.
+         * https://longwa.github.io/build-test-data/
+         */
         compile ":build-test-data:1.1.1"
-
-        // Dependencies that we want to use but cannot due to errors
-        //compile ":standalone:1.0"
-        //compile ":burning-image:0.5.1"
-        //compile ":settings:1.4"
-        //compile ":symmetricds:2.4.0"
-        //compile ":grails-melody:1.46"
-
     }
 }
