@@ -272,7 +272,12 @@ class Shipment implements Comparable, Serializable {
                     a?.container?.parentContainer?.sortOrder <=> b?.container?.parentContainer?.sortOrder ?:
                             a?.container?.sortOrder <=> b?.container?.sortOrder ?:
                                     a?.requisitionItem?.orderIndex <=> b?.requisitionItem?.orderIndex ?:
-                                            a?.sortOrder <=> b?.sortOrder
+                                            a?.sortOrder <=> b?.sortOrder ?:
+                                                    a?.inventoryItem?.product?.name <=> b?.inventoryItem?.product?.name ?:
+                                                            a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber ?:
+                                                                    a?.product?.name <=> b?.product?.name ?:
+                                                                            a?.lotNumber <=> b?.lotNumber ?:
+                                                                                    b?.quantity <=> a?.quantity
             return sortOrder
         }
 
