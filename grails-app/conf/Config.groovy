@@ -41,14 +41,6 @@ if (configLocation) {
 
 println "Using configuration locations ${grails.config.locations} [${GrailsUtil.environment}]"
 
-//grails.plugins.reloadConfig.files = []
-//grails.plugins.reloadConfig.includeConfigLocations = true
-//grails.plugins.reloadConfig.interval = 5000
-//grails.plugins.reloadConfig.enabled = true
-//grails.plugins.reloadConfig.notifyPlugins = []
-//grails.plugins.reloadConfig.automerge = true
-//grails.plugins.reloadConfig.notifyWithConfig = true
-
 grails.exceptionresolver.params.exclude = ['password', 'passwordConfirm']
 
 // if(System.properties["${appName}.config.location"]) {

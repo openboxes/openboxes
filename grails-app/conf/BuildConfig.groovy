@@ -162,9 +162,6 @@ grails.project.dependency.resolution = {
          */
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
 
-        // no evidence of use: see https://github.com/bluesliverx/grails-external-config-reload
-        runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }
-
         runtime(':quartz2:2.1.6.2')
         compile(":csv:0.3.1")  // FIXME continue migrating to commons-csv instead
 
