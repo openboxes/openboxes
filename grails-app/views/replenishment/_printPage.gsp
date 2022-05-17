@@ -14,8 +14,8 @@
                 <th>${warehouse.message(code: 'product.name.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.transferToBin.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.qtyToTransfer.label')}</th>
-                <th class="center">${warehouse.message(code: 'orderItem.expiry.label')}</th>
                 <th class="center" style="min-width: 150px;">${warehouse.message(code: 'default.lotSerialNo.label')}</th>
+                <th class="center">${warehouse.message(code: 'orderItem.expiry.label')}</th>
                 <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.suggestedPick.label')}</th>
                 <th class="center" style="min-width: 100px">${warehouse.message(code:'default.notes.label')}</th>
