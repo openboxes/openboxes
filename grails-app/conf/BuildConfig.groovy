@@ -167,7 +167,6 @@ grails.project.dependency.resolution = {
 
         // Unsure if used
         runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
-        runtime(':constraints:0.6.0')  // not used (at least not correctly)
 
         /*
          * abandonware https://web.archive.org/web/20170705122757/http://grails.org/plugin/jquery-validation
