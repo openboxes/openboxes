@@ -374,26 +374,27 @@ class AvailableItem {
 
     Map toJson() {
         return [
-                "inventoryItem.id"      : inventoryItem?.id,
-                "product.name"          : inventoryItem?.product?.name,
-                "product"               : inventoryItem?.product,
-                "productCode"           : inventoryItem?.product?.productCode,
-                lotNumber               : inventoryItem?.lotNumber,
-                expirationDate          : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                binLocation             : binLocation,
-                zone                    : binLocation?.zone,
-                quantityAvailable       : quantityAvailable > 0 ? quantityAvailable : 0,
-                quantityOnHand          : quantityOnHand,
-                quantityRequired        : quantityRequired?:null,
-                pickClassification      : pickClassification,
-                status                  : status?.name(),
-                pickedRequisitionNumbers: pickedRequisitionNumbers ? pickedRequisitionNumbers?.join(",") : "",
+                "inventoryItem.id"        : inventoryItem?.id,
+                "product.name"            : inventoryItem?.product?.name,
+                "product"                 : inventoryItem?.product,
+                "productCode"             : inventoryItem?.product?.productCode,
+                lotNumber                 : inventoryItem?.lotNumber,
+                expirationDate            : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocation               : binLocation,
+                zone                      : binLocation?.zone,
+                quantityAvailable         : quantityAvailable > 0 ? quantityAvailable : 0,
+                quantityOnHand            : quantityOnHand,
+                quantityRequired          : quantityRequired ?: null,
+                pickClassification        : pickClassification,
+                status                    : status?.name(),
+                pickedRequisitionNumbers  : pickedRequisitionNumbers ? pickedRequisitionNumbers?.join(",") : "",
+                inventoryItem             : inventoryItem,
                 // deprecated
-                "binLocation.id"        : binLocation?.id,
-                "binLocation.name"      : binLocation?.name,
+                "binLocation.id"          : binLocation?.id,
+                "binLocation.name"        : binLocation?.name,
+                quantityAvailableToPromise: quantityAvailable > 0 ? quantityAvailable : 0,
         ]
     }
-
 }
 
 enum PickClassification {

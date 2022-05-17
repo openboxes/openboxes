@@ -30,6 +30,10 @@ class SearchService {
 
     def globalSearch(String identifier) {
 
+        if (!identifier) {
+            return
+        }
+
         Product product = Product.findByProductCode(identifier)
         if (product) return product
         else {
@@ -60,6 +64,9 @@ class SearchService {
                                             List<AvailableItem> availableItems =
                                                     productAvailabilityService.getAvailableItems(currentLocation, inventoryItem)
 
+                                            // Filter out inventory items that don't have on hand quantity
+                                            availableItems =
+                                                    availableItems.findAll { AvailableItem availableItem -> availableItem?.quantityOnHand > 0 }
                                             if (availableItems && availableItems.size() == 1) {
                                                 return availableItems[0]
                                             }
