@@ -52,8 +52,7 @@ class ConsumptionController {
 
         String[] defaultTransactionTypeIds = [
                 Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
-                Constants.CONSUMPTION_TRANSACTION_TYPE_ID,
-                Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
+                Constants.CONSUMPTION_TRANSACTION_TYPE_ID
         ]
 
         command.defaultTransactionTypes = defaultTransactionTypeIds.collect {TransactionType.get(it)}
@@ -96,9 +95,12 @@ class ConsumptionController {
         command.debits = inventoryService.getDebitsBetweenDates(command.fromLocations,
                 command.selectedLocations, command.fromDate, toDate,
                 command.selectedTransactionTypes)
+        // Get credits for INBOUND RETURNS, selectedLocations = sources, fromLocation = destination inventory
+        command.credits = inventoryService.getCreditsBetweenDates(command.selectedLocations, command.fromLocations, command.fromDate, toDate)
 
         def transactions = []
         transactions.addAll(command.debits)
+        transactions.addAll(command.credits?.findAll { it.incomingShipment?.isFromReturnOrder })
 
         // Sort transaction by date ascending
         transactions = transactions.sort { it.transactionDate }
@@ -110,9 +112,14 @@ class ConsumptionController {
 
         // Some transactions don't have a destination (e.g. expired, consumed, etc)
         if (toLocationsEmpty) {
-            command.toLocations = transactions.findAll { it.destination != null }.collect {
+            def debitLocations = transactions.findAll { it.destination != null }.collect {
                 it.destination
             }
+            def creditLocations = transactions.findAll { it.source != null && it.incomingShipment?.isFromReturnOrder }.collect {
+                it.source
+            }
+            command.toLocations.addAll(debitLocations)
+            command.toLocations.addAll(creditLocations)
         }
 
         // Keep track of all the transaction types (we may want to select a subset of these)
@@ -158,6 +165,10 @@ class ConsumptionController {
                         command.rows[product].issuedQuantity += transactionEntry.quantity
                     }
 
+                    if(transaction?.outgoingShipment?.isFromReturnOrder) {
+                        command.rows[product].issuedQuantity += transactionEntry.quantity
+                    }
+
                 } else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
                     command.rows[product].expiredQuantity += transactionEntry.quantity
                     command.rows[product].expiredTransactions << transaction
@@ -174,13 +185,12 @@ class ConsumptionController {
                         command.rows[product].transferInMap[transaction.source] = 0
                     }
 
+                    if(transaction?.incomingShipment?.isFromReturnOrder) {
+                        command.rows[product].returnedQuantity += transactionEntry.quantity
+                    }
+
                     // Add to the total transfer out per location
                     command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
-
-                    if(transaction?.order?.orderType?.code == Constants.RETURN_ORDER) {
-                        command.rows[product].returnedQuantity += transactionEntry.quantity
-                        command.rows[product].transferOutMap[transaction.destination] -= transactionEntry.quantity
-                    }
 
                 } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
                     command.rows[product].consumedQuantity += transactionEntry.quantity
@@ -189,9 +199,7 @@ class ConsumptionController {
                     }
                 }
 
-                command.rows[product].returnedQuantity *= -1
-
-                command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity + command.rows[product].consumedQuantity + command.rows[product].returnedQuantity
+                command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity + command.rows[product].consumedQuantity - command.rows[product].returnedQuantity
 
                 String dateKey = transaction.transactionDate.format("yyyy-MM")
                 command.selectedDates.add(dateKey)
