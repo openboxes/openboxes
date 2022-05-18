@@ -32,7 +32,7 @@
                     <hr/>
                     <div class="action-menu-item">
                         <g:if test="${stockMovement?.order}">
-                            <g:link class="button" controller="stockTransfer" action="deleteStockTransfer" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
+                            <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
                                     onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
                                 &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
