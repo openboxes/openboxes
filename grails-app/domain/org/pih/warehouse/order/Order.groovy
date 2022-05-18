@@ -96,6 +96,7 @@ class Order implements Serializable {
             "isPrepaymentInvoiceAllowed",
             "isPrepaymentRequired",
             "canGenerateInvoice",
+            "isPurchaseOrder",
             "isReturnOrder",
             // Statuses
             "pending",
@@ -436,6 +437,10 @@ class Order implements Serializable {
 
     def getActiveOrderAdjustments() {
         return orderAdjustments.findAll {!it.canceled }
+    }
+
+    Boolean getIsPurchaseOrder() {
+        return orderType?.isPurchaseOrder()
     }
 
     Boolean getIsReturnOrder() {

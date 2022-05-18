@@ -25,6 +25,7 @@ enum RequisitionStatus {
     CANCELED(9),
     DELETED(10),
     ERROR(11),
+    DISPATCHED(12), // for Outbound Stock Movement mapping
     // Removed
     OPEN(0),
     FULFILLED(0),
