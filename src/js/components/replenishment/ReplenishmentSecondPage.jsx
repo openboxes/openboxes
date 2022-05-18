@@ -245,7 +245,7 @@ class ReplenishmentSecondPage extends Component {
     if (this.state.values.replenishment.status === 'PENDING') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
-      const payload = { status: 'PLACED' };
+      const payload = { status: 'APPROVED' };
       apiClient.post(url, flattenRequest(payload))
         .then(() => {
           this.props.hideSpinner();
