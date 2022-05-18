@@ -84,7 +84,7 @@
                                             <div class="debit">${row.consumedQuantity}</div>
                                         </td>
                                         <td class="center">
-                                            <div class="debit">${row.returnedQuantity}</div>
+                                            ${row.returnedQuantity}
                                         </td>
                                         <td class="center">
                                             ${row.totalConsumptionQuantity}

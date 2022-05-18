@@ -2470,9 +2470,16 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate) {
+        getCreditsBetweenDates(fromLocations, toLocations, fromDate, toDate, null)
+    }
+
+    List<Transaction> getCreditsBetweenDates(List<Location> fromLocations, List<Location> toLocations, Date fromDate, Date toDate, List transactionTypes) {
         def transactions = Transaction.createCriteria().list() {
             transactionType {
                 eq("transactionCode", TransactionCode.CREDIT)
+            }
+            if (transactionTypes) {
+                'in'("transactionType", transactionTypes)
             }
             if (fromLocations) {
                 'in'("source", fromLocations)
