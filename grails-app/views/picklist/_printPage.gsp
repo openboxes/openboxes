@@ -116,7 +116,9 @@
                         <td class="middle center">
                             <g:if test="${picklistItems}">
                                 <span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
-                                <g:displayBarcode showData="${true}" data="${picklistItems[j]?.inventoryItem?.lotNumber}"/>
+                                <g:if test="${picklistItems[j]?.inventoryItem?.lotNumber}">
+                                    <g:displayBarcode showData="${true}" data="${picklistItems[j]?.inventoryItem?.lotNumber}"/>
+                                </g:if>
                             </g:if>
                         </td>
                         <td class="middle center">
@@ -135,25 +137,25 @@
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems[j]}">
+                            <g:if test="${picklistItems}">
                                 ${picklistItems[j]?.quantity ?: 0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems[j]}">
+                            <g:if test="${picklistItems}">
                                 ${picklistItems[j]?.quantityPicked ?: 0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems[j]}">
+                            <g:if test="${picklistItems}">
                                 ${picklistItems[j]?.quantityCanceled?:0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
                         </td>
                         <td class="middle center">
-                            <g:if test="${picklistItems[j]}">
+                            <g:if test="${picklistItems}">
                                 ${picklistItems[j]?.quantityRemaining?:0}
                                 ${requisitionItem?.product?.unitOfMeasure ?: "EA"}
                             </g:if>
@@ -163,15 +165,17 @@
                         </td>
                         <td class="middle">
                             <!-- Comments -->
-                            ${picklistItems[j].status}
-                            <g:if test="${picklistItems[j].shortage}">
-                                <small>Shortage of ${picklistItems[j]?.quantityCanceled}
-                                    ${requisitionItem?.product?.unitOfMeasure ?: "EA"} recorded by ${picklistItems[j]?.picker}
-                                (${picklistItems[j]?.reasonCode})</small>
+                            <g:if test="${picklistItems}">
+                                ${picklistItems[j].status}
+                                <g:if test="${picklistItems[j].shortage}">
+                                    <small>Shortage of ${picklistItems[j]?.quantityCanceled}
+                                        ${requisitionItem?.product?.unitOfMeasure ?: "EA"} recorded by ${picklistItems[j]?.picker}
+                                    (${picklistItems[j]?.reasonCode})</small>
+                                </g:if>
+                                <g:elseif test="${picklistItems[j].picker}">
+                                    Picked by ${picklistItems[j].picker}
+                                </g:elseif>
                             </g:if>
-                            <g:elseif test="${picklistItems[j].picker}">
-                                Picked by ${picklistItems[j].picker}
-                            </g:elseif>
                         </td>
                         <% j++ %>
                     </tr>
