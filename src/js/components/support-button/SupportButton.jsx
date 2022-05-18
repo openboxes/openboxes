@@ -5,21 +5,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useChat } from 'react-live-chat-loader';
+import { connect } from 'react-redux';
 
 import Translate from 'utils/Translate';
 
 import './SupportButton.scss';
 
-const SupportButton = ({ text, defaultText }) => {
+const SupportButton = ({ text, defaultText, locale }) => {
   const [, loadChat] = useChat();
 
   useEffect(() => {
     loadChat({ open: false }); // instantiate `window` object
+  }, []);
+
+  useEffect(() => {
     axios.get('/openboxes/api/helpscout/configuration/')
       .then((response) => {
         window.Beacon('config', response.data);
       });
-  }, []);
+  }, [locale]);
+
 
   const toggleOpenChat = () => window.Beacon('toggle');
 
@@ -36,9 +41,14 @@ const SupportButton = ({ text, defaultText }) => {
   );
 };
 
+const mapStateToProps = state => ({
+  locale: state.session.activeLanguage,
+});
+
 SupportButton.propTypes = {
   text: PropTypes.string,
   defaultText: PropTypes.string,
+  locale: PropTypes.string.isRequired,
 };
 
 SupportButton.defaultProps = {
@@ -46,4 +56,4 @@ SupportButton.defaultProps = {
   defaultText: 'Help',
 };
 
-export default SupportButton;
+export default connect(mapStateToProps)(SupportButton);
