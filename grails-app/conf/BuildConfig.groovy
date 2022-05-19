@@ -165,9 +165,6 @@ grails.project.dependency.resolution = {
         runtime(':quartz2:2.1.6.2')
         compile(":csv:0.3.1")  // FIXME continue migrating to commons-csv instead
 
-        // Unsure if used
-        runtime(':mail:1.0.6') { excludes 'mail', 'spring-test' }
-
         /*
          * abandonware https://web.archive.org/web/20170705122757/http://grails.org/plugin/jquery-validation
          * abandonware http://limcheekin.github.io/jquery-validation-ui/docs/guide/single.html
