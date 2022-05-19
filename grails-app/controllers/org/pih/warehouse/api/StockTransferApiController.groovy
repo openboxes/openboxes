@@ -182,9 +182,10 @@ class StockTransferApiController {
 
             // For inbound returns
             Date expirationDate = stockTransferItemMap.expirationDate && stockTransferItemMap.expirationDate != JSONObject.NULL ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+            String lotNumber = stockTransferItemMap.lotNumber && stockTransferItemMap.lotNumber != JSONObject.NULL ? stockTransferItemMap.lotNumber : null
             stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                     stockTransferItem.product,
-                    stockTransferItemMap.lotNumber ? stockTransferItemMap.lotNumber : null,
+                    lotNumber,
                     expirationDate
             )
 
