@@ -73,10 +73,6 @@ grails.project.dependency.resolution = {
 
         compile 'fr.w3blog:zebra-zpl:0.0.3'  // ZebraUtils.printZpl(), Labelary API, etc.
 
-        // Required by rendering plugin (NoClassDefFoundError: org/springframework/mock/web/MockHttpServletRequest)
-        // and also for the SendStockAlertsJob which needs to use the GSP template engine
-        runtime 'org.springframework:spring-test:3.0.5.RELEASE'
-
         // Required for functional tests
         test('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
         test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
