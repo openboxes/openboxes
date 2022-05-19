@@ -88,7 +88,7 @@
                     </g:link>
                 </g:elseif>
                 <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
-                    <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                    <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                         <warehouse:message code="default.button.delete.label" />

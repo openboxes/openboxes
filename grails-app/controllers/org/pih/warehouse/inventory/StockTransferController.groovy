@@ -98,7 +98,7 @@ class StockTransferController {
         redirect(action: "list")
     }
 
-    def deleteStockTransfer = {
+    def remove = {
         Location currentLocation = Location.get(session.warehouse.id)
         Order orderInstance = Order.get(params.orderId ?: params.id)
         StockMovementDirection direction = orderInstance?.getStockMovementDirection(currentLocation)
