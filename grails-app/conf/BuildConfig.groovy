@@ -43,17 +43,10 @@ grails.project.dependency.resolution = {
          * reload4j until we move to a more modern Grails release.
          * https://reload4j.qos.ch/news.html https://www.slf4j.org/legacy.html
          */
-        compile "org.slf4j:slf4j-reload4j:1.7.33"
-        compile "ch.qos.reload4j:reload4j:1.2.18.2"
-        /*
-         * This *should* be a `compile` dependency, but grails 1.3.9 logs
-         * warnings like these if we don't make it a `build` dependency:
-         * SLF4J: The requested version ... by your slf4j binding is not compatible with ...
-         */
-        build "org.slf4j:slf4j-api:1.7.33"
-        compile "org.slf4j:slf4j-api:1.7.33"
-        compile "org.slf4j:jcl-over-slf4j:1.7.33"
-        runtime "org.slf4j:jul-to-slf4j:1.7.33"
+        build 'org.slf4j:slf4j-api:1.7.36'  // use 'build' to override Grails' out-of-date version
+        compile 'org.slf4j:jcl-over-slf4j:1.7.36'  // use 'compile' to override jxls' out-of-date version
+        runtime 'org.slf4j:jul-to-slf4j:1.7.36'
+        runtime 'org.slf4j:slf4j-reload4j:1.7.36'
 
         // Required by database connection
         compile 'mysql:mysql-connector-java:5.1.47'
