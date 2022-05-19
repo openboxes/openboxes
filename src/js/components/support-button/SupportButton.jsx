@@ -5,21 +5,32 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useChat } from 'react-live-chat-loader';
+import { connect } from 'react-redux';
 
 import Translate from 'utils/Translate';
 
 import './SupportButton.scss';
 
-const SupportButton = ({ text, defaultText }) => {
+function configureBeacon() {
+  axios.get('/openboxes/api/helpscout/configuration/')
+    .then((response) => {
+      window.Beacon('config', response.data);
+    });
+}
+
+const SupportButton = ({ text, defaultText, locale }) => {
   const [, loadChat] = useChat();
 
+  // instantiate `window` object when page is first loaded
   useEffect(() => {
-    loadChat({ open: false }); // instantiate `window` object
-    axios.get('/openboxes/api/helpscout/configuration/')
-      .then((response) => {
-        window.Beacon('config', response.data);
-      });
+    loadChat({ open: false });
+    configureBeacon();
   }, []);
+
+  // reload beacon configuration whenever locale changes
+  useEffect(() => {
+    configureBeacon();
+  }, [locale]);
 
   const toggleOpenChat = () => window.Beacon('toggle');
 
@@ -36,14 +47,20 @@ const SupportButton = ({ text, defaultText }) => {
   );
 };
 
+const mapStateToProps = state => ({
+  locale: state.session.activeLanguage,
+});
+
 SupportButton.propTypes = {
   text: PropTypes.string,
   defaultText: PropTypes.string,
+  locale: PropTypes.string,
 };
 
 SupportButton.defaultProps = {
   text: 'Help',
   defaultText: 'Help',
+  locale: 'en',
 };
 
-export default SupportButton;
+export default connect(mapStateToProps)(SupportButton);
