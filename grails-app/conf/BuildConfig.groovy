@@ -55,10 +55,7 @@ grails.project.dependency.resolution = {
         compile 'com.mchange:c3p0:0.9.5.3'
 
         // Required by docx4j functionality
-        compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-codec', 'commons-io'  // not sure why these are excluded
-        }
-
+        compile 'org.docx4j:docx4j:2.8.1'
         // Required for barcode4j
         compile 'com.google.zxing:javase:2.0'
 
@@ -74,18 +71,16 @@ grails.project.dependency.resolution = {
         compile 'fr.w3blog:zebra-zpl:0.0.3'  // ZebraUtils.printZpl(), Labelary API, etc.
 
         // Required for functional tests
-        test('net.sourceforge.htmlunit:htmlunit:2.10') { excludes "xml-apis" }
+        test 'net.sourceforge.htmlunit:htmlunit:2.10'
         test 'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
-        test('org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0') { excludes "htmlunit" }
+        test 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.25.0'
         test 'org.seleniumhq.selenium:selenium-chrome-driver:2.25.0'
         test 'org.seleniumhq.selenium:selenium-ie-driver:2.25.0'
         test 'org.seleniumhq.selenium:selenium-support:2.25.0'
 
         // Required for Geb support in Grails 1.3.9
         test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
-        test("org.codehaus.geb:geb-spock:0.6.3") {
-            exclude 'spock'
-        }
+        test 'org.codehaus.geb:geb-spock:0.6.3'
 
         compile ("fr.opensagres.xdocreport:xdocreport:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:1.0.6")
@@ -106,7 +101,7 @@ grails.project.dependency.resolution = {
          * This test SMTP client is the latest release that works with Grails 1,
          * and Java 7, although it depends on a junit release we can't use (yet).
          */
-        test("com.icegreen:greenmail:1.5.10") { excludes "junit" }
+        test('com.icegreen:greenmail:1.5.10') { exclude 'junit' }
 
         // Required for GPars
         compile "org.codehaus.gpars:gpars:0.12"
@@ -114,11 +109,11 @@ grails.project.dependency.resolution = {
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
 
         // used only in scripts/VerifyClasspath.groovy
-        build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
+        build 'org.jboss.tattletale:tattletale-ant:1.2.0.Beta2'
 
         // used once in DocumentController.groovy -- refactor to use org.apache.*HttpClient
         compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
-            excludes "commons-codec", "commons-lang", "groovy", "xercesImpl"
+            exclude 'groovy'  // otherwise it pulls in a newer groovy than Grails 1.3.9 wants
         }
 
         // REST client
@@ -141,12 +136,12 @@ grails.project.dependency.resolution = {
 
         // Default plugins
         runtime(':tomcat:1.3.9')
-        runtime(':hibernate:1.3.9') { excludes 'antlr' }
+        runtime(':hibernate:1.3.9')
 
         // enables <jq:*> tags, which we don't use
         runtime(":jquery:1.7.2")
         // enables <jqui:*> tags, which we only use for imports
-        runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
+        runtime ':jquery-ui:1.8.7'
 
         // enables *RenderingService and renderPdf()
         compile ":rendering:0.4.4"
@@ -156,7 +151,7 @@ grails.project.dependency.resolution = {
          * but we may want to investigate using POI directly.
          * (see https://github.com/gpc/grails-excel-import)
          */
-        runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
+        runtime ':excel-import:0.3'
 
         runtime(':quartz2:2.1.6.2')
         compile(":csv:0.3.1")  // FIXME continue migrating to commons-csv instead
@@ -170,18 +165,14 @@ grails.project.dependency.resolution = {
          * https://grails.github.io/grails2-doc/1.3.9/guide/single.html#7.3%20Validation%20on%20the%20Client
          * https://docs.grails.org/3.1.1/guide/validation.html#validationOnTheClient
          */
-        runtime(':jquery-validation:1.9') { // 1.7.3  // enables <jqval:*>
-            excludes 'constraints'
-        }
-        runtime(':jquery-validation-ui:1.4.7') { // enables <jqvalui:*>
-            excludes 'constraints', 'spock'
-        }
+        runtime ':jquery-validation:1.9'  // enables <jqval:*>
+        runtime ':jquery-validation-ui:1.4.7'  // enables <jqvalui:*>
 
         // plugins that improve page rendering, may not be needed in Grails 3+
-        runtime(":zipped-resources:1.0") { excludes 'resources' }
-        runtime(":cached-resources:1.0") { excludes 'resources', 'cache-headers' }
         runtime ':cache-headers:1.1.5'  // not used directly (?)
         runtime ':resources:1.1.6'  // enables <r:*> tags: https://grails-plugins.github.io/grails-resources/guide/
+        runtime ':cached-resources:1.0'
+        runtime ':zipped-resources:1.0'
 
         // these plugins "just work" with no code changes
         compile ':console:1.1'  // enables `grails console` command
@@ -227,7 +218,7 @@ grails.project.dependency.resolution = {
         compile(":browser-detection:0.4.3")
 
         // this plugin has a straightforward migration to Grails 3
-        test(name: 'geb', version: '0.6.3') {}
+        test ':geb:0.6.3'
 
         /*
          * Pretty sure we don't use this, but it's well maintained through grails 5.
