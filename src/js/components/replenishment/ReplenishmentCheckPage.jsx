@@ -206,7 +206,7 @@ class ReplenishmentSecondPage extends Component {
   }
 
   completeReplenishment() {
-    if (this.state.values.replenishment.status === 'PLACED') {
+    if (this.state.values.replenishment.status === 'APPROVED') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'COMPLETED' };
