@@ -896,6 +896,8 @@ class ProductAvailabilityService {
             eq("inventoryItem", inventoryItem)
             if (binLocation) {
                 eq("binLocation", binLocation)
+            } else {
+                isNull("binLocation")
             }
         }
 
