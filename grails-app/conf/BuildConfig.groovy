@@ -20,6 +20,7 @@ grails.project.dependency.resolution = {
     inherits("global") {
         excludes(
                 "commons-logging",  // use jcl-over-slf4j instead
+                'core-renderer',  // we use a custom build for some reason
                 "log4j",  // use reload4j instead
                 "slf4j-log4j12",  // use slf4j-reload4j instead
                 "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
@@ -82,6 +83,7 @@ grails.project.dependency.resolution = {
         test "org.spockframework:spock-grails-support:0.6-groovy-1.7"
         test 'org.codehaus.geb:geb-spock:0.6.3'
 
+        compile ':core-renderer-R8:isomorphic'
         compile ("fr.opensagres.xdocreport:xdocreport:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:1.0.6")
         compile ("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:1.0.6")
