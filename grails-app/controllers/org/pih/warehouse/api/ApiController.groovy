@@ -153,7 +153,6 @@ class ApiController {
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
-        String helpScoutColor = grailsApplication.config.openboxes.helpscout.widget.color
         String helpScoutKey = grailsApplication.config.openboxes.helpscout.widget.key
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
         render([
@@ -183,7 +182,6 @@ class ApiController {
                 logoUrl              : logoUrl,
                 supportedLocales     : supportedLocales,
                 currencyCode         : currencyCode,
-                helpScoutColor       : helpScoutColor,
                 helpScoutKey         : helpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
             ],

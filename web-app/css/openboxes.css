@@ -2950,8 +2950,8 @@ span.canceled, div.canceled {
 
 /* HelpScout's default positioning wastes space and clobbers page content */
 .BeaconContainer {
-    right: 5px !important;
     bottom: 5px !important;
+    right: 5px !important;
 }
 
 /* Pill button
