@@ -6,7 +6,7 @@
     <title><g:layoutTitle default="OpenBoxes" /></title>
 
     <!-- YUI -->
-    <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2/build/reset-fonts-grids/reset-fonts-grids.css">
 
     <!-- Include Favicon -->
     <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}?v2" type="image/x-icon" />

@@ -200,12 +200,6 @@ grails.project.dependency.resolution = {
         compile ':webflow:1.3.8'  // supports Spring Web Flow, but not Grails 3 :-(
 
         /*
-         * abandonware, but we only use it in one place to fetch a stylesheet
-         * https://web.archive.org/web/20120304112327/http://grails.org/plugin/yui
-         */
-        compile(":yui:2.8.2.1")
-
-        /*
          * Enables publishEvent, but development stopped in Grails 2.
          * Replace with https://docs.grails.org/3.2.3/guide/async.html#events
          */
