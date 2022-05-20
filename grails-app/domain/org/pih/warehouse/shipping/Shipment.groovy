@@ -545,15 +545,6 @@ class Shipment implements Comparable, Serializable {
         return pallet
     }
 
-    Container findOrCreateContainer(String containerName, ContainerType containerType) {
-        Container container = findContainerByNameAndContainerType(containerName, containerType)
-        if (!container) {
-            container = addNewContainer(containerName, containerType)
-        }
-        return container
-    }
-
-
     ShipmentItem getNextShipmentItem(String currentShipmentItemId) {
         def nextIndex
         def shipmentItems = sortShipmentItems()
@@ -603,17 +594,8 @@ class Shipment implements Comparable, Serializable {
         return shipmentItem
     }
 
-
-    Collection findShipmentItemsByContainer(container) {
-        return ShipmentItem?.findAllByShipmentAndContainer(this, container)
-    }
-
     Integer countShipmentItemsByContainer(container) {
         return ShipmentItem?.countByShipmentAndContainer(this, container)
-    }
-
-    Integer countShipmentItems() {
-        return ShipmentItem.countByShipment(this)
     }
 
     TimeDuration timeToProcess() {
@@ -660,4 +642,3 @@ class Shipment implements Comparable, Serializable {
         return event?.eventDate
     }
 }
-

@@ -30,7 +30,6 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
@@ -47,7 +46,6 @@ class InventoryService implements ApplicationContextAware {
     def grailsApplication
 
     def dataService
-    def productService
     def identifierService
     def messageService
     def locationService
@@ -181,17 +179,6 @@ class InventoryService implements ApplicationContextAware {
             }
         }
         return results
-    }
-
-    List findInventoryItemsByProducts(List<Product> products) {
-        def inventoryItems = []
-        if (products) {
-            inventoryItems = InventoryItem.withCriteria {
-                'in'("product", products)
-                order("expirationDate", "asc")
-            }
-        }
-        return inventoryItems
     }
 
     /**
@@ -430,16 +417,6 @@ class InventoryService implements ApplicationContextAware {
         return products
     }
 
-    def countProductsByTags(List inputTags) {
-        log.debug "Get products by tags: " + inputTags
-        def results = Product.withCriteria {
-            projections { count('id') }
-            tags { 'in'('id', inputTags) }
-        }
-        //log.debug "Results " + results[0]
-        return results[0]
-    }
-
     /**
      * Get all products in the given catalog
      *
@@ -457,17 +434,6 @@ class InventoryService implements ApplicationContextAware {
         return products
     }
 
-    def countProductsByCatalogs(List inputCatalogs) {
-        log.debug "Get products by catalogs: " + inputCatalogs
-        def result = 0
-        for (inputCatalog in inputCatalogs) {
-            def productInstance = ProductCatalog.get(inputCatalog)
-            result += productInstance.productCatalogItems.size()
-        }
-        return result
-    }
-
-
     /**
      * Get all products that have the given tag.
      *
@@ -479,10 +445,6 @@ class InventoryService implements ApplicationContextAware {
             tags { eq('tag', tag) }
         }
         return products
-    }
-
-    def countProductsByShipment(shipment) {
-        return getProductsByShipment(shipment, 0, 0)?.size() ?: 0
     }
 
     def getProductsByShipment(shipment, max, offset) {
@@ -2857,50 +2819,6 @@ class InventoryService implements ApplicationContextAware {
         println "Transaction ${transaction?.transactionNumber} saved successfully! "
         println "Added ${transaction?.transactionEntries?.size()} transaction entries"
         return data
-    }
-
-
-    /**
-     * Calculate pending quantity for a given product and location.
-     *
-     * @param product
-     * @param location
-     * @return
-     */
-    def calculatePendingQuantity(product, location) {
-        def inboundQuantity = 0
-        def outboundQuantity = 0
-        try {
-            def shipmentItems = ShipmentItem.withCriteria {
-                shipment {
-                    eq("destination", location)
-                }
-                or {
-                    inventoryItem {
-                        eq("product", product)
-                    }
-                    eq("product", product)
-                }
-            }
-            inboundQuantity = shipmentItems.sum { it.quantity }
-            shipmentItems = ShipmentItem.withCriteria {
-                shipment {
-                    eq("origin", location)
-                }
-                or {
-                    inventoryItem {
-                        eq("product", product)
-                    }
-                    eq("product", product)
-                }
-            }
-            outboundQuantity = shipmentItems.sum { it.quantity }
-
-        } catch (Exception e) {
-            log.info("Error " + e.message)
-        }
-
-        [inboundQuantity, outboundQuantity]
     }
 
     def getProductsWithTransactions(Location location) {

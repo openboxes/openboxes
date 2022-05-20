@@ -225,10 +225,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
         return requisitionItems?.findAll { it.parentRequisitionItem }
     }
 
-    Boolean isWardRequisition() {
-        return (type in [RequisitionType.NON_STOCK, RequisitionType.STOCK, RequisitionType.ADHOC])
-    }
-
     Boolean isOpen() {
         return (status in [RequisitionStatus.CREATED, RequisitionStatus.EDITING])
     }
@@ -277,10 +273,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
         }
 
         return requisition
-    }
-
-    Boolean isRelatedToMe(Integer userId) {
-        return (createdBy?.id == userId || updatedBy?.id == userId)
     }
 
     /**

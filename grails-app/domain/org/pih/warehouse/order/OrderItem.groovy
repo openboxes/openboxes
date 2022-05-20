@@ -18,7 +18,6 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.invoice.InvoiceItem
-import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
@@ -28,8 +27,6 @@ import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
-
-import java.text.DecimalFormat
 
 class OrderItem implements Serializable, Comparable<OrderItem> {
 
@@ -164,10 +161,6 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     def getShippedShipmentItems() {
         return shipmentItems.findAll { it.shipment?.currentStatus >= ShipmentStatusCode.SHIPPED }
-    }
-
-    def hasShippedItems() {
-        return shippedShipmentItems?shippedShipmentItems.size()>0:false
     }
 
     void refreshPendingShipmentItemRecipients() {

@@ -30,7 +30,6 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustmentType
@@ -50,7 +49,6 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class SelectTagLib {
 
-    def userService
     def locationService
     def shipmentService
     def requisitionService
@@ -63,22 +61,6 @@ class SelectTagLib {
         attrs.optionValue = {
             it.getHierarchyAsString(" > ")
         }
-        out << g.select(attrs)
-    }
-
-    def selectInventoryItem = { attrs, body ->
-
-        println "attrs.product = " + attrs.product
-        attrs.from = InventoryItem.findAllByProduct(attrs.product)
-        attrs.optionKey = "id"
-        attrs.optionValue = { it.lotNumber }
-        out << g.select(attrs)
-    }
-
-
-    def selectReasonCode = { attrs, body ->
-        attrs.from = ReasonCode.list()
-        attrs.optionValue = { format.metadata(obj: it) }
         out << g.select(attrs)
     }
 

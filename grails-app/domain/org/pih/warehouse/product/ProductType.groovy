@@ -54,13 +54,6 @@ class ProductType {
         return fields?.any{ displayedFields.contains(it) }
     }
 
-    static List listAllBySupportedActivity(List<ProductActivityCode> supportedActivities) {
-        return ProductType.findAll(
-            "from ProductType pt where (:supportedActivities in elements(pt.supportedActivities))",
-            [supportedActivities: supportedActivities*.toString()]
-        )
-    }
-
     Integer getNextSequenceNumber() {
         if (!sequenceNumber) {
             return 1

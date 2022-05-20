@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-import grails.validation.ValidationException
-
 class OrganizationService {
 
     def identifierService
@@ -59,10 +57,6 @@ class OrganizationService {
             organization.save()
         }
         return organization
-    }
-
-    Organization findOrCreateBuyerOrganization(String name, String code) {
-        return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
     }
 
     Organization findOrCreateSupplierOrganization(String name, String code) {

@@ -23,16 +23,6 @@ class CategoryTagLib {
         }
     }
 
-    def selectCategoryWithChosen = { attrs ->
-        out << """
-			<select multiple="true" data-placeholder="${attrs.noSelection.value}" name="${
-            attrs.name
-        }" style="${attrs.style}" value="${attrs.value}" class='${attrs.class}'>
-		"""
-        displayCategoryOptions(attrs['rootNode'], attrs.value, 0)
-        out << "</select>"
-    }
-
     def displayCategoryOptions = { node, value, depth ->
         if (node) {
             if (node.id) {

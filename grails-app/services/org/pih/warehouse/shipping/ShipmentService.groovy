@@ -28,7 +28,6 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.ListCommand
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -38,8 +37,6 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.ShipOrderCommand
-import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
@@ -55,9 +52,6 @@ class ShipmentService {
 
     boolean transactional = true
 
-    MailService mailService
-    def sessionFactory
-    def productService
     def inventoryService
     def identifierService
     def documentService
@@ -2183,43 +2177,6 @@ class ShipmentService {
             }
         }
         return count
-    }
-
-
-    void updateOrCreateOrderBasedShipmentItems(ShipOrderCommand command) {
-        Order order = command.order
-        Shipment shipment = command.shipment
-        shipment.name = order.name
-        shipment.description = order.orderNumber
-        shipment.origin = order.origin
-        shipment.destination = order.destination
-
-        command.shipOrderItems.each { ShipOrderItemCommand shipOrderItem ->
-
-            // Remove shipment item if quantity to ship is 0
-            if (!shipOrderItem.quantityToShip) {
-                if (shipOrderItem.shipmentItem) {
-                    deleteShipmentItem(shipOrderItem.shipmentItem)
-                }
-            // Otherwise create or update the shipment item
-            } else {
-                if (!shipOrderItem.shipmentItem) {
-                    ShipmentItem shipmentItem = new ShipmentItem(
-                            product: shipOrderItem.orderItem.product,
-                            recipient: shipOrderItem.orderItem.recipient,
-                            quantity: shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
-                    )
-                    shipmentItem.addToOrderItems(shipOrderItem.orderItem)
-                    shipment.addToShipmentItems(shipmentItem)
-                } else {
-                    shipOrderItem.shipmentItem.quantity = shipOrderItem.quantityToShip * shipOrderItem.orderItem.quantityPerUom
-                }
-            }
-        }
-
-        if (shipment.hasErrors() || !shipment.save()) {
-            throw new ValidationException("Invalid shipment", shipment.errors)
-        }
     }
 
     Shipment createOrUpdateShipment(StockTransfer stockTransfer) {

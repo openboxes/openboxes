@@ -462,11 +462,6 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return isSubstituted || (quantityCanceled > 0 && substitutionItem)
     }
 
-    def isCanceledOrSubstituted() {
-        return isCanceled() || isSubstituted()
-    }
-
-
     /**
      * @return true if the requisition is no longer in the reviewing stage and there are no changes
      */

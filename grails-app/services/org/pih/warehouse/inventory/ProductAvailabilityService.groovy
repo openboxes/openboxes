@@ -24,7 +24,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
@@ -41,7 +40,6 @@ class ProductAvailabilityService {
     def persistenceInterceptor
     def locationService
     def inventoryService
-    def dataService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         log.info "Triggering refresh product availability"
@@ -293,35 +291,6 @@ class ProductAvailabilityService {
 
         def results = ProductAvailability.executeUpdate(deleteStmt, params)
         log.info "Deleted ${results} records for location ${location}, product ${product}"
-    }
-
-    def refreshInventorySnapshot(Location location, Product product, Boolean forceRefresh) {
-        String productId = product ? "'${product?.id}'" : null
-        if (forceRefresh) {
-            String forceRefreshStatement = """
-                DELETE FROM inventory_snapshot 
-                WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
-                AND location_id = '${location.id}' 
-                AND product_id = IFNULL(${productId}, product_id);
-            """
-            dataService.executeStatement(forceRefreshStatement)
-        }
-        String updateStatement = """
-            REPLACE INTO inventory_snapshot 
-            (
-                id, version, date, location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name, 
-                quantity_on_hand, date_created, last_updated
-            ) 
-            SELECT 
-                id, version, DATE_ADD(CURDATE(),INTERVAL 1 DAY), location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name,
-                quantity_on_hand, date_created, last_updated 
-            FROM product_availability 
-            WHERE location_id = '${location.id}' 
-            AND product_id = IFNULL(${productId}, product_id);
-        """
-        dataService.executeStatement(updateStatement)
     }
 
     def getQuantityOnHand(Location location) {

@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -21,17 +20,14 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellRangeAddress
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.hibernate.criterion.CriteriaSpecification
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
 import org.docx4j.convert.out.pdf.viaXSLFO.Conversion
 import org.docx4j.jaxb.Context
-import org.docx4j.openpackaging.io.SaveToZipFile
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart
 import org.docx4j.openpackaging.parts.relationships.Namespaces
-import org.docx4j.wml.Body
 import org.docx4j.wml.BooleanDefaultTrue
 import org.docx4j.wml.Document
 import org.docx4j.wml.P
@@ -41,26 +37,22 @@ import org.docx4j.wml.Tbl
 import org.docx4j.wml.TblGrid
 import org.docx4j.wml.TblGridCol
 import org.docx4j.wml.TblPr
-import org.docx4j.wml.TblWidth
 import org.docx4j.wml.Tc
-import org.docx4j.wml.TcPr
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
 import org.groovydev.SimpleImageBuilder
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
-import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
 import javax.xml.bind.JAXBException
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-
 
 class DocumentService {
 
@@ -183,77 +175,6 @@ class DocumentService {
 
         //change  JaxbElement
         documentPart.setJaxbElement((Document) obj)
-
-        return wordMLPackage
-    }
-
-    /**
-     * Generate the 'Certificate of Donation' letter from a template.
-     *
-     * @param shipmentInstance
-     * @return
-     */
-    WordprocessingMLPackage generateLetter(Shipment shipmentInstance) {
-
-        File template = findFile("templates/cod-pl-template.docx")
-        if (!template) {
-            throw new FileNotFoundException("templates/cod-pl-template.docx")
-        }
-
-        WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(template)
-
-        // 2. Fetch the document part
-        MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart()
-
-        Document wmlDocumentEl = (Document) documentPart.getJaxbElement()
-
-        //xml --> string
-        def xml = XmlUtils.marshaltoString(wmlDocumentEl, true)
-        def mappings = new HashMap<String, String>()
-
-        def formatter = new SimpleDateFormat("MMM dd, yyyy")
-        def date = formatter.format(shipmentInstance.getExpectedShippingDate())
-        mappings.put("date", date)
-
-        String subtitle = ""
-        if ("Sea".equals(shipmentInstance?.shipmentType?.name)) {
-            ReferenceNumber containerNumber = shipmentInstance.getReferenceNumber("Container Number")
-            if (containerNumber) {
-                subtitle = "Container #${containerNumber.identifier} "
-            }
-            ReferenceNumber sealNumber = shipmentInstance.getReferenceNumber("Seal Number")
-            if (sealNumber) {
-                subtitle += "Seal #${sealNumber.identifier}"
-            }
-            log.info("sea shipment " + subtitle)
-        } else if ("Air".equals(shipmentInstance?.shipmentType?.name)) {
-            subtitle = "Freight Forwarder ${shipmentInstance?.shipmentMethod?.shipper?.name}"
-            log.info("air shipment " + subtitle)
-        }
-        mappings.put("subtitle", subtitle)
-
-        def value = ""
-        if (shipmentInstance?.statedValue) {
-            def decimalFormatter = new DecimalFormat("\$###,###.00")
-            value = decimalFormatter.format(shipmentInstance?.statedValue)
-        }
-        mappings.put("value", value)
-
-        log.debug("mappings: " + mappings)
-        log.debug("xml before: " + xml)
-        //valorize template
-        Object obj = XmlUtils.unmarshallFromTemplate(xml, mappings)
-        log.debug("xml after: " + xml)
-        log.debug("mappings: " + mappings)
-
-        //change  JaxbElement
-        documentPart.setJaxbElement((Document) obj)
-
-        // Create a new table for the Packing List
-        Tbl table = createTable(wordMLPackage, shipmentInstance, 3, 1200)
-
-        // Add table to document
-        wordMLPackage.getMainDocumentPart().addObject(table)
 
         return wordMLPackage
     }

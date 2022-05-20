@@ -48,19 +48,6 @@ class ProductCatalog implements Comparable, Serializable {
     }
 
     /**
-     * Remove all catalog items for the given product.
-     *
-     * @param product
-     */
-    void removeProduct(Product product) {
-        def list = productCatalogItems.findAll { it.product = product }
-        list.toArray().each {
-            removeFromProductCatalogItems(it)
-            it.delete()
-        }
-    }
-
-    /**
      * Returns a string representation of the catalog.
      *
      * @return
