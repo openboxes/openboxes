@@ -11,7 +11,6 @@ package org.pih.warehouse.core
 
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.text.StrSubstitutor
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
@@ -426,7 +425,7 @@ class FileService {
      */
     void insertTable(WordprocessingMLPackage pkg, String afterText, Tbl table) throws Exception {
         Body b = pkg.getMainDocumentPart().getJaxbElement().getBody()
-        int addPoint = -1, index = 0
+        int index = 0
         for (Object o : b.getContent()) {
             if (o instanceof P && getElementText(o).startsWith(afterText)) {
                 b.getContent().set(index, table)

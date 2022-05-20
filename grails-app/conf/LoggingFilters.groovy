@@ -17,11 +17,8 @@ class LoggingFilters {
         all(controller: '*', action: '*') {
             before = {
                 try {
-                    def sessionId = session?.id
-                    def userId = session?.user?.username
-                    def serverUrl = CH.config.grails.serverURL
                     MDC.put('sessionId', session?.id ?: "No session ID")
-                    MDC.put('username', userId ?: "No user")
+                    MDC.put('username', session?.user?.username ?: "No user")
                     MDC.put('location', session?.warehouse?.name ?: "No location")
                     MDC.put('locale', session?.user?.locale?.toString() ?: "No locale")
                     MDC.put('ipAddress', request?.remoteAddr ?: "No IP address")
@@ -31,7 +28,6 @@ class LoggingFilters {
                     MDC.put('serverUrl', CH?.config?.grails?.serverURL ?: "No server URL")
                 } catch (Exception e) {
                     log.warn("Error occurred while adding attributes to Mapped Diagnostic Context: ${e.message}", e)
-
                 }
             }
             after = {

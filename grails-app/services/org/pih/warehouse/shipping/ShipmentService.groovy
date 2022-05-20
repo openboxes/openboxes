@@ -2080,8 +2080,6 @@ class ShipmentService {
     }
 
     boolean importPackingList(String shipmentId, InputStream inputStream) {
-        int lineNumber = 0
-
         Shipment shipment = Shipment.get(shipmentId)
         List packingListItems = parsePackingList(inputStream)
 
@@ -2149,11 +2147,10 @@ class ShipmentService {
 
 
     List getShipmentsWithInvalidStatus() {
-        long startTime = System.currentTimeMillis()
         def shipments = Shipment.withCriteria {
             fetchMode 'events', FetchMode.JOIN
         }
-        startTime = System.currentTimeMillis()
+
         shipments = shipments.collect {
             [
                     id              : it.id,
@@ -2168,7 +2165,7 @@ class ShipmentService {
         shipments = shipments.findAll {
             it.calculatedStatus != it.currentStatus || it.calculatedEvent != it.currentEvent
         }
-        startTime = System.currentTimeMillis()
+
         return shipments
     }
 

@@ -10,7 +10,6 @@
 package org.pih.warehouse.data
 
 import grails.validation.ValidationException
-import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
@@ -19,8 +18,6 @@ import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.BeanPropertyBindingResult
 
 class ProductPackageDataService {
-
-    def uomService
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -31,7 +28,6 @@ class ProductPackageDataService {
             def productSupplierCode = params.productSupplierCode
             def uomCode = params.uomCode
             def quantity = new BigDecimal(params.quantity)
-            def price = new BigDecimal(params.price)
 
             Product product = Product.findByProductCode(productCode)
             if (!product) {

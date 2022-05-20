@@ -39,7 +39,6 @@ class RequisitionController {
 
     def list = {
         def user = User.get(session?.user?.id)
-        def location = Location.get(session?.warehouse?.id)
 
         params.origin = Location.get(session?.warehouse?.id)
         def requisition = new Requisition(params)
@@ -188,7 +187,6 @@ class RequisitionController {
         } else {
 
             def location = Location.get(session.warehouse.id)
-            def quantityAvailableToPromiseMap = [:]
             def quantityOnHandMap = [:]
 
             def products = requisition.requisitionItems.collect { it.product }
@@ -631,7 +629,6 @@ class RequisitionController {
         def requisitionItems = requisition?.originalRequisitionItems
         def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
         def quantityOnHandMap = [:]
-        def quantityAvailableToPromiseMap = [:]
 
         requisitionItems?.each { requisitionItem ->
             quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product] ?: 0

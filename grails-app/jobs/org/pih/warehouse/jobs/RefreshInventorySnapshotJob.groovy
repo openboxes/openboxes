@@ -14,7 +14,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
-import org.quartz.JobExecutionException
 
 @DisallowConcurrentExecution
 class RefreshInventorySnapshotJob {
@@ -36,7 +35,6 @@ class RefreshInventorySnapshotJob {
             def date = context.mergedJobDataMap.get('date')
             def locationId = context.mergedJobDataMap.get('locationId')
             def productId = context.mergedJobDataMap.get('productId')
-            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
             try {
                 Product product = Product.load(productId)
                 Location location = Location.load(locationId)

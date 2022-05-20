@@ -79,8 +79,4 @@ class ReplenishmentPickPageItem {
             return "NOT_PICKED"
         }
     }
-
-    static PickPageItem createFromOrderItem(OrderItem orderItem) {
-        return new PickPageItem(orderItem: orderItem)
-    }
 }

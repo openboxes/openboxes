@@ -1923,7 +1923,6 @@ class StockMovementService {
         log.info "Substitute stock movement item ${stockMovementItem}"
 
         RequisitionItem requisitionItem = stockMovementItem.requisitionItem
-        Requisition requisition = requisitionItem.requisition
 
         if (stockMovementItem.substitutionItems) {
             stockMovementItem.substitutionItems?.each { subItem ->

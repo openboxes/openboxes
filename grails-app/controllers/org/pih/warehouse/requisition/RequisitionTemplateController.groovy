@@ -420,7 +420,6 @@ class RequisitionTemplateController {
 
 
     def importAsString = {
-        def lines = []
         def data = []
 
         def requisition = Requisition.get(params.id)

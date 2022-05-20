@@ -1,6 +1,5 @@
 package org.pih.warehouse.putaway
 
-import grails.plugin.rendering.pdf.PdfRenderingService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
@@ -9,7 +8,6 @@ import org.pih.warehouse.order.Order
 
 class PutAwayController {
 
-    PdfRenderingService pdfRenderingService
     def productAvailabilityService
 
     def index = {

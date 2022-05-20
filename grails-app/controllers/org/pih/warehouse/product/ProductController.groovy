@@ -199,7 +199,6 @@ class ProductController {
         if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             log.info("saved product " + productInstance.errors)
             def warehouseInstance = Location.get(session.warehouse.id)
-            def inventoryInstance = warehouseInstance?.inventory
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
             sendProductCreatedNotification(productInstance)
         }
@@ -789,7 +788,6 @@ class ProductController {
         def localFile
         def uploadFile = command?.importFile
 
-        def existingProductsMap = [:]
         def tag = ""
 
         if (request.method == "POST") {

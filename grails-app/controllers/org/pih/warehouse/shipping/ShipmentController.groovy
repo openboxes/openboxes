@@ -15,7 +15,6 @@ import groovy.sql.Sql
 import org.krysalis.barcode4j.impl.code128.Code128Bean
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
@@ -60,12 +59,8 @@ class ShipmentController {
         params.max = Math.min(params.max ? params.int('max') : 100, 10000)
 
         Calendar calendar = Calendar.instance
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
         int firstDayOfMonth = calendar.getActualMinimum(Calendar.DAY_OF_MONTH)
-        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), firstDayOfMonth)
-        def lastUpdatedFromDefault = calendar.getTime()
-        def lastUpdatedToDefault = calendar.getTime()
 
         boolean incoming = params?.type?.toUpperCase() == "INCOMING"
         def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)

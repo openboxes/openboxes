@@ -10,10 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.validation.ValidationException
-import groovy.xml.Namespace
-import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
@@ -23,6 +20,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
 
 import java.text.SimpleDateFormat
+
 /**
  * @author jmiranda*
  */
@@ -33,153 +31,6 @@ class ProductService {
     def identifierService
     def userService
     def dataService
-
-    def getNdcResults(operation, q) {
-        def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
-        if (!hipaaspaceApiKey) {
-            throw new ApiException(message: "Your administrator must specify Hipaaspace.com API key (hipaaspace.api.key) in configuration file (openboxes-config.properties).  Sign up at <a href='http://www.hipaaspace.com/myaccount/login.aspx?ReturnUrl=%2fmyaccount%2fdefault.aspx' target='_blank'>hipaaspace.com</a>.")
-        }
-        try {
-            def url = new URL("http://www.HIPAASpace.com/api/ndc/search?q=${q?.encodeAsURL()}&rt=xml&key=${hipaaspaceApiKey}")
-            def connection = url.openConnection()
-            if (connection.responseCode == 200) {
-                def xml = connection.content.text
-                //println xml
-
-                return processNdcProducts(xml)
-
-                //search.results << product
-            }
-        } catch (Exception e) {
-            log.error("Error trying to get products from NDC API ", e)
-            throw new ApiException(message: "Unable to query NDC database: " + e.message)
-        }
-    }
-
-    def processNdcProducts(xml) {
-        def results = []
-        def ndcList = new XmlParser(false, true).parseText(xml)
-        ndcList.NDC.each {
-            ndc ->
-
-                if (ndc.NDCCode) {
-                    println "NDC: " + ndc
-                    def product = new ProductDetailsCommand()
-                    product.title = ndc.PackageDescription.text()
-                    product.ndcCode = ndc.NDCCode
-                    product.productType = ndc.ProductTypeName.text()
-                    product.packageDescription = ndc.PackageDescription.text()
-                    product.ndcCode = ndc.NDCCode.text()
-                    product.productNdcCode = ndc.ProductNDC.text()
-                    product.labelerName = ndc.LabelerName.text()
-                    product.strengthNumber = ndc.StrengthNumber.text()
-                    product.strengthUnit = ndc.StrengthUnit.text()
-                    product.pharmClasses = ndc.PharmClasses.text()
-                    product.dosageForm = ndc.DosageFormName.text()
-                    product.route = ndc.RouteName.text()
-                    product.proprietaryName = ndc.ProprietaryName.text()
-                    product.nonProprietaryName = ndc.NonProprietaryName.text()
-                    results << product
-                }
-        }
-        return results
-    }
-
-    def processXml(urlString, itemName) {
-        try {
-            def results = []
-            println "URL " + urlString
-            def url = new URL(urlString)
-            def connection = url.openConnection()
-            if (connection.responseCode == 200) {
-                def xml = connection.content.text
-
-                def list = new XmlParser(false, true).parseText(xml)
-                for (item in list.displayTermsList.term) {
-                    println "item: " + item.class.name
-                    results << item.text()
-                }
-                return results
-            }
-        } catch (Exception e) {
-            log.error("Error trying to get products from NDC API ", e)
-            throw e
-        }
-    }
-
-    /**
-     * @param q
-     * @return
-     */
-    def findGoogleProducts(search) {
-
-        def googleProductSearchKey = grailsApplication.config.google.api.key
-        if (!googleProductSearchKey) {
-            throw new ApiException(message: "Your administrator must specify Google API key (google.api.key) in configuration file (openboxes-config.properties).  For more information, see Google's <a href='https://developers.google.com/shopping-search/v1/getting_started#getting-started' target='_blank'>Getting Started</a> guide")
-        }
-        def products = new ArrayList()
-        int startIndex = search.startIndex
-        String q = search.searchTerms
-        boolean spellingEnabled = search.spellingEnabled
-
-        def urlString = "https://www.googleapis.com/shopping/search/v1/public/products?" +
-                "key=${googleProductSearchKey}&country=US&q=${q.encodeAsURL()}&alt=atom&crowdBy=brand:1"
-        if (startIndex > 0) {
-            urlString += "&startIndex=" + startIndex
-        }
-        if (spellingEnabled) {
-            urlString += "&spelling.enabled=true"
-        }
-        def url = new URL(urlString)
-        def connection = url.openConnection()
-        if (connection.responseCode == 200) {
-            def xml = connection.content.text
-            def feed = new XmlParser(false, true).parseText(xml)
-
-            def ns = new Namespace("http://www.google.com/shopping/api/schemas/2010", "s")
-            def openSearch = new Namespace("http://a9.com/-/spec/opensearchrss/1.0/", "openSearch")
-
-            search.totalResults = Integer.valueOf(feed[openSearch.totalResults].text())
-            search.startIndex = Integer.valueOf(feed[openSearch.startIndex].text())
-            search.itemsPerPage = Integer.valueOf(feed[openSearch.itemsPerPage].text())
-
-            feed.entry.each {
-                entry ->
-
-                    def product = new ProductDetailsCommand()
-
-                    product.link = entry[ns.product][ns.link].text()
-                    product.author = entry.author.name.text()
-
-
-                    entry.link.each {
-                        link ->
-                            product.links[link.'@rel'] = link.'@href'
-                    }
-
-                    product.id = entry.id.text()
-                    product.googleId = entry[ns.product][ns.googleId].text()
-                    product.title = entry[ns.product][ns.title].text()
-                    product.description = entry[ns.product][ns.description].text()
-                    product.brand = entry[ns.product][ns.brand].text()
-                    product.gtin = entry[ns.product][ns.gtin].text()
-                    entry[ns.product][ns.gtins][ns.gtin].each { gtin ->
-                        product.gtins << gtin.text()
-                    }
-                    entry[ns.product][ns.images][ns.image].each { image ->
-                        product.images << image.'@link'
-                    }
-                    search.results << product
-            }
-        } else {
-            log.info("URL: " + url)
-            log.info("Response Code: " + connection.responseCode)
-            log.info("Response Message: " + connection.responseMessage)
-            throw new ApiException("Unable to connect to Google Product Search API using connection URL [" + urlString + "]: " + connection.responseMessage)
-        }
-
-    }
-
 
     /**
      * @param searchTerms
@@ -877,34 +728,6 @@ class ProductService {
      */
     def getAllTagLabels() {
         return Tag.findAllByIsActive(true).collect { it.tag }.unique()
-    }
-
-    /**
-     * Get all active tags in the database.
-     *
-     * @return all tags
-     */
-    def getAllTags() {
-        def tags = Tag.findAllByIsActive(true)
-        return tags
-    }
-
-    /**
-     * Get all active catalogs in the database.
-     *
-     * @return all tags
-     */
-    def getAllCatalogs() {
-        return ProductCatalog.createCriteria().list {
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            createAlias('productCatalogItems','productCatalogItems')
-            projections {
-                groupProperty("id", "id")
-                groupProperty("name", "name")
-                count("productCatalogItems.id", "count")
-            }
-            eq("active", Boolean.TRUE)
-        }
     }
 
     /**

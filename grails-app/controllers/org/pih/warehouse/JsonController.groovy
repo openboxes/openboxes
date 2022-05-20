@@ -847,7 +847,6 @@ class JsonController {
     def searchProductPackages = {
 
         log.info "Search product packages " + params
-        def location = Location.get(session.warehouse.id)
         def results = productService.searchProductAndProductGroup(params.term)
         if (!results) {
             results = productService.searchProductAndProductGroup(params.term, true)
@@ -873,7 +872,6 @@ class JsonController {
 
 
     def searchProduct = {
-        def location = Location.get(session.warehouse.id)
         def results = productService.searchProductAndProductGroup(params.term)
         if (!results) {
             results = productService.searchProductAndProductGroup(params.term, true)
@@ -998,7 +996,6 @@ class JsonController {
         quantityMap.each { Product product, value ->
             def inventoryLevel = inventoryStatusMap[product]?.inventoryLevel
             def status = inventoryStatusMap[product]?.inventoryStatus
-            def quantity = inventoryStatusMap[product]?.quantity ?: 0
 
             items << [
                     id             : product.id,
@@ -1467,7 +1464,6 @@ class JsonController {
     def getDashboardActivity = {
 
         List activityList = []
-        def currentUser = User.get(session?.user?.id)
         def location = Location.get(session.warehouse.id)
         def daysToInclude = params.daysToInclude ? Integer.parseInt(params.daysToInclude) : 7
 

@@ -2328,9 +2328,6 @@ class InventoryService implements ApplicationContextAware {
 
 
         try {
-            def dateFormat = new SimpleDateFormat("yyyy-MM-dd")
-
-
             Date today = new Date()
 
             def transactionInstance = new Transaction(transactionDate: today,
@@ -3371,4 +3368,3 @@ class InventoryService implements ApplicationContextAware {
     }
 
 }
-

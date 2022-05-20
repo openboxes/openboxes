@@ -30,7 +30,6 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
@@ -190,12 +189,6 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
-    def selectProduct = { attrs, body ->
-        attrs.from = Product.findAllByActive(true)
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name }
-        out << g.select(attrs)
-    }
 
     def selectProductSupplier = { attrs, body ->
         Product product = Product.get(attrs?.product?.id)
@@ -380,14 +373,6 @@ class SelectTagLib {
         attrs.optionKey = 'email'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
-    }
-
-    def selectInventory = { attrs, body ->
-        attrs.from = Inventory.list().sort { it.warehouse.name }
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.warehouse.name }
-        out << g.select(attrs)
-
     }
 
     def selectBinLocation = { attrs, body ->
@@ -797,13 +782,4 @@ class SelectTagLib {
         }
         out << '>' << noSelectionValue.encodeAsHTML() << '</option>'
     }
-
-    private String optionValueToString(def el, def optionValue) {
-        if (optionValue instanceof Closure) {
-            return optionValue(el).toString().encodeAsHTML()
-        }
-
-        el[optionValue].toString().encodeAsHTML()
-    }
-
 }
