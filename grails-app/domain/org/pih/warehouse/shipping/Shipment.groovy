@@ -112,6 +112,8 @@ class Shipment implements Comparable, Serializable {
             "purchaseOrder",
             "orders",
             "isFromReturnOrder",
+            "isFromPutawayOrder",
+            "isFromTransferOrder",
             "returnOrder"
     ]
 
@@ -336,6 +338,15 @@ class Shipment implements Comparable, Serializable {
 
     Boolean getIsFromReturnOrder() {
         return !orders?.isEmpty() && orders?.every { it.isReturnOrder }
+    }
+
+    Boolean getIsFromPutawayOrder() {
+        return !orders?.isEmpty() && orders?.every { it.isPutawayOrder }
+    }
+
+    Boolean getIsFromTransferOrder() {
+        // Check if is transfer order, but exclude Putaways and Returns
+        return !orders?.isEmpty() && orders?.every { it.isTransferOrder } && !orders?.any { it.isPutawayOrder } && !orders?.any { it.isReturnOrder }
     }
 
     Boolean isStockMovement() {

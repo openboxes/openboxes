@@ -25,7 +25,6 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -151,7 +150,7 @@ class ConsumptionController {
                     command.rows[product].transferOutTransactions << transaction
 
                     // Initialize transfer out by location map
-                    if(transaction.destination) {
+                    if(transaction.destination && transaction.destination != transaction.source) {
                         def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
 
                         if (!transferOutQuantity) {
@@ -161,14 +160,14 @@ class ConsumptionController {
                         command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
                     }
 
-                    if (transaction?.order?.orderType?.code != Constants.PUTAWAY_ORDER && transaction?.order?.orderType?.code != OrderTypeCode.TRANSFER_ORDER.name()) {
+                    def isFromPutawayOrder = transaction?.outgoingShipment?.isFromPutawayOrder
+                    def isFromTransferOrder = transaction?.outgoingShipment?.isFromTransferOrder
+                    def isInternalTransfer = isFromPutawayOrder || isFromTransferOrder
+                    def isFromReturnOrder = transaction?.outgoingShipment?.isFromReturnOrder
+
+                    if (isFromReturnOrder || !isInternalTransfer) {
                         command.rows[product].issuedQuantity += transactionEntry.quantity
                     }
-
-                    if(transaction?.outgoingShipment?.isFromReturnOrder) {
-                        command.rows[product].issuedQuantity += transactionEntry.quantity
-                    }
-
                 } else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
                     command.rows[product].expiredQuantity += transactionEntry.quantity
                     command.rows[product].expiredTransactions << transaction
@@ -194,9 +193,6 @@ class ConsumptionController {
 
                 } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
                     command.rows[product].consumedQuantity += transactionEntry.quantity
-                    if(transaction.destination) {
-                        command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
-                    }
                 }
 
                 command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity + command.rows[product].consumedQuantity - command.rows[product].returnedQuantity
