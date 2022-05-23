@@ -119,6 +119,29 @@ const FIELDS = {
           loadOptions: debouncedProductsFetch,
         }),
       },
+      lotNumber: {
+        type: TextField,
+        label: 'react.stockMovement.lot.label',
+        defaultMessage: 'Lot',
+        flexWidth: '1',
+        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      expirationDate: {
+        type: DateField,
+        label: 'react.stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
+        flexWidth: '1.5',
+        attributes: {
+          dateFormat: 'MM/DD/YYYY',
+          autoComplete: 'off',
+          placeholderText: 'MM/DD/YYYY',
+        },
+        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
       recipient: {
         type: SelectField,
         label: 'react.stockMovement.recipient.label',
@@ -166,29 +189,6 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      lotNumber: {
-        type: TextField,
-        label: 'react.stockMovement.lot.label',
-        defaultMessage: 'Lot',
-        flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      expirationDate: {
-        type: DateField,
-        label: 'react.stockMovement.expiry.label',
-        defaultMessage: 'Expiry',
-        flexWidth: '1.5',
-        attributes: {
-          dateFormat: 'MM/DD/YYYY',
-          autoComplete: 'off',
-          placeholderText: 'MM/DD/YYYY',
-        },
         getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
           onBlur: () => updateRow(values, rowIndex),
         }),
