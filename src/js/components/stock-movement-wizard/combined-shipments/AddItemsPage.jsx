@@ -142,22 +142,6 @@ const FIELDS = {
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
-      recipient: {
-        type: SelectField,
-        label: 'react.stockMovement.recipient.label',
-        defaultMessage: 'Recipient',
-        flexWidth: '1.5',
-        getDynamicAttr: ({
-          recipients, rowIndex, values, updateRow,
-        }) => ({
-          options: recipients,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-        attributes: {
-          labelKey: 'name',
-          openOnClick: false,
-        },
-      },
       quantityRequested: {
         type: TextField,
         label: 'react.stockMovement.quantity.label',
@@ -192,6 +176,22 @@ const FIELDS = {
         getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
           onBlur: () => updateRow(values, rowIndex),
         }),
+      },
+      recipient: {
+        type: SelectField,
+        label: 'react.stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
+        flexWidth: '1.5',
+        getDynamicAttr: ({
+          recipients, rowIndex, values, updateRow,
+        }) => ({
+          options: recipients,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+        attributes: {
+          labelKey: 'name',
+          openOnClick: false,
+        },
       },
       split: {
         type: ButtonField,
