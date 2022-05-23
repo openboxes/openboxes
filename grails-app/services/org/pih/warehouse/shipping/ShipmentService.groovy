@@ -26,7 +26,6 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
-import org.pih.warehouse.core.ListCommand
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -102,117 +101,11 @@ class ShipmentService {
         }
     }
 
-
-    /**
-     * @param sort
-     * @param order
-     * @return all shipments sorted by the given sort column and ordering
-     */
-    List<Shipment> getAllShipments(String sort, String order) {
-        return Shipment.list(['sort': sort, 'order': order])
-    }
-
-
     /**
      * @return all shipments
      */
     List<Shipment> getAllShipments() {
         return Shipment.list()
-    }
-
-
-    /**
-     *
-     * @return
-     */
-    Object getProductMap() {
-
-        def criteria = ShipmentItem.createCriteria()
-        def quantityMap = criteria.list {
-            projections {
-                sum('quantity')
-            }
-            groupProperty "product"
-        }
-        return quantityMap
-
-    }
-
-
-    /**
-     *
-     * @param locationId
-     * @return
-     */
-    List<Shipment> getRecentOutgoingShipments(String locationId, int daysBefore, int daysAfter) {
-        Location location = Location.get(locationId)
-
-        def criteria = Shipment.createCriteria()
-        def now = new Date()
-        def upcomingShipments = criteria.list {
-            and {
-                eq("origin", location)
-                or {
-                    //between("expectedShippingDate",null,null)
-                    between("expectedShippingDate", now - daysBefore, now + daysAfter)
-                    isNull("expectedShippingDate")
-                }
-            }
-        }
-
-        def shipments = new ArrayList<Shipment>()
-        for (shipment in upcomingShipments) {
-            shipments.add(shipment)
-        }
-
-        return shipments
-    }
-
-    /**
-     *
-     * @param locationId
-     * @return
-     */
-    List<Shipment> getRecentIncomingShipments(String locationId, int daysBefore, int daysAfter) {
-        def startTime = System.currentTimeMillis()
-        Location location = Location.get(locationId)
-        Date fromDate = new Date() - daysBefore
-        Date toDate = new Date() + daysAfter
-        //return Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, new Date()-30, new Date()+30,
-        def shipments = Shipment.findAllByDestinationAndExpectedShippingDateBetween(location, fromDate, toDate,
-                [max: 10, offset: 2, sort: "expectedShippingDate", order: "desc"])
-
-        log.debug "Get recent incoming shipments " + (System.currentTimeMillis() - startTime) + " ms"
-        return shipments
-    }
-
-
-    /**
-     *
-     * @param shipments
-     * @return
-     */
-    Map<EventType, ListCommand> getShipmentsByStatus(List shipments) {
-        def startTime = System.currentTimeMillis()
-        def shipmentMap = new TreeMap<ShipmentStatusCode, ListCommand>()
-
-        ShipmentStatusCode.list().each {
-            shipmentMap[it] = []
-        }
-        shipments.each {
-
-            def key = it.getStatus().code
-            def shipmentList = shipmentMap[key]
-            if (!shipmentList) {
-                shipmentList = new ListCommand(category: key, objectList: new ArrayList())
-            }
-            shipmentList.objectList.add(it)
-            shipmentMap.put(key, shipmentList)
-        }
-
-        log.debug "Get shipments by status " + (System.currentTimeMillis() - startTime) + " ms"
-
-        return shipmentMap
     }
 
     /**
@@ -221,11 +114,6 @@ class ShipmentService {
      */
     List<Shipment> getShipments() {
         return getAllShipments()
-    }
-
-
-    List<Shipment> getShipmentsByLocation(Location location) {
-        return getShipmentsByLocation(location, location, null)
     }
 
     /**
@@ -252,38 +140,8 @@ class ShipmentService {
     }
 
 
-    /**
-     *
-     * @param name
-     * @return
-     */
-    List<Shipment> getShipmentsByName(String name) {
-        return Shipment.withCriteria {
-            ilike("name", "%" + name + "%")
-        }
-    }
-
-    /**
-     *
-     * @param name
-     * @param location
-     * @return
-     */
-    List<Shipment> getShipmentsByNameAndDestination(String name, Location location) {
-        return Shipment.withCriteria {
-            and {
-                ilike("name", "%" + name + "%")
-                eq("destination", location)
-            }
-        }
-    }
-
     List<Shipment> getPendingShipments(Location origin) {
         return getPendingShipments(origin, null)
-    }
-
-    List<Shipment> getPendingInboundShipments(Location location) {
-        return getPendingShipments(null, location)
     }
 
     /**
@@ -313,26 +171,6 @@ class ShipmentService {
         }
 
         return shipments
-    }
-
-    /**
-     *
-     * @param location
-     * @param product
-     * @return
-     */
-    List<ShipmentItem> getPendingShipmentItemsWithProduct(Location location, Product product) {
-        def shipmentItems = []
-        def shipments = getPendingInboundShipments(location)
-
-        shipments.each {
-            def shipmentItemList = it.shipmentItems.findAll { it.product == product }
-            shipmentItemList.each {
-                shipmentItems << it
-            }
-        }
-
-        return shipmentItems
     }
 
     List<ShipmentItem> getPendingInboundShipmentItems(Location destination) {
@@ -795,29 +633,6 @@ class ShipmentService {
         return true
     }
 
-	Integer getQuantityAllocated(Location location, Location binLocation, InventoryItem inventoryItem) {
-
-		def results = ShipmentItem.createCriteria().list {
-			projections {
-				sum("quantity")
-			}
-            shipment {
-                eq("origin", location)
-				eq("currentStatus", ShipmentStatusCode.PENDING)
-            }
-			if (binLocation) {
-				eq("binLocation", binLocation)
-			}
-			else {
-				isNull("binLocation")
-			}
-			eq("inventoryItem", inventoryItem)
-		}
-
-        return results[0] ?: 0
-
-    }
-
     Integer getDuplicatedShipmentItemsQuantity(Shipment shipment, Location binLocation, InventoryItem inventoryItem) {
 
         def results = ShipmentItem.createCriteria().list {
@@ -1046,17 +861,6 @@ class ShipmentService {
     ShipmentItem findShipmentItem(Shipment shipment, Container container, InventoryItem inventoryItem) {
         return shipment.shipmentItems.find {
             it.container == container && it.inventoryItem == inventoryItem
-        }
-    }
-
-    ShipmentItem findShipmentItem(Shipment shipment,
-                                  Container container,
-                                  Product product,
-                                  String lotNumber) {
-        return shipment.shipmentItems.find {
-            it.container == container &&
-                    it.product == product &&
-                    it.lotNumber == lotNumber
         }
     }
 
