@@ -10,6 +10,8 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.util.Holders
+import org.apache.commons.io.FilenameUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
@@ -20,8 +22,6 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellRangeAddress
-import grails.util.Holders
-import org.hibernate.criterion.CriteriaSpecification
 import org.docx4j.TextUtils
 import org.docx4j.XmlUtils
 import org.docx4j.convert.out.pdf.PdfConversion
@@ -55,7 +55,10 @@ import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 
+import javax.imageio.ImageIO
 import javax.xml.bind.JAXBException
+import java.awt.Image
+import java.awt.image.BufferedImage
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 
@@ -72,49 +75,41 @@ class DocumentService {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
     }
 
-
-    File writeImage(Document document) {
-        File file
+    /**
+     * Render `document` to `outputStream` so it fits in a box of `width` x `height`.
+     *
+     * If the supplied image already fits within the box, don't change it.
+     *
+     * For best results on a hiDPI display, set `width` and `height` to 2x or 3x
+     * the desired size, then use the nailthumb jquery plugin to place the image.
+     */
+    void scaleImage(org.pih.warehouse.core.Document document, OutputStream outputStream, int width, int height) {
+        log.info "Scale image ${document.filename} width=${width} height=${height} contentType=${document.contentType}"
         try {
-            file = new File(document.filename)
-            println "Attempt to write to " + file?.absolutePath
-            FileOutputStream fos = new FileOutputStream(file)
-            fos << document?.fileContents
-            fos.close()
-        } catch (Exception e) {
-            log.error("Error occurred while writing file " + document.filename, e)
-        }
-        return file
-    }
+            final formatName = (document.extension ?: FilenameUtils.getExtension(document.filename))?.toLowerCase()
+            final original = ImageIO.read(new ByteArrayInputStream(document?.fileContents))
+            final scalingFactor = Math.min(width / (original.width as float), height / (original.height as float))
 
-
-    void scaleImage(Document document, OutputStream outputStream, String width, String height) {
-
-        log.info("Scale image " + document.filename + " width=" + width + " height=" + height + " contentType=" + document.contentType)
-        File file
-        FileInputStream fileInputStream
-        try {
-            file = writeImage(document)
-            def extension = document.extension ?: document.filename.substring(document.filename.lastIndexOf(".") + 1)
-            log.info "Scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension
-            fileInputStream = new FileInputStream(file)
-            // Fixme: fix the image scaling
-//            def builder = new SimpleImageBuilder()
-//            if (builder) {
-//                def result = builder.image(stream: fileInputStream) {
-//                    fit(width: width, height: height) {
-//                        save(stream: outputStream, format: extension?.toLowerCase())
+            if (scalingFactor >= 1) {
+                log.debug "Existing dimensions suffice: width=${original.width} height=${original.height}"
+                ImageIO.write(original, formatName, outputStream)
+            } else {
+                final thumbnail = original.getScaledInstance(
+                    Math.floor(scalingFactor * original.width) as int,
+                    Math.floor(scalingFactor * original.height) as int,
+                    Image.SCALE_SMOOTH)
+                final result = new BufferedImage(
+                    thumbnail.getWidth(null),
+                    thumbnail.getHeight(null),
+                    original.type)
+                result.graphics.drawImage(thumbnail, 0, 0, null)
 //                    }
-//                }
+                log.debug "Scaled contentType=${document.contentType} to width=${result.width} height=${result.height}"
 //            } else {
-//                log.warn("Unable to scale image " + document.filename + " (" + width + ", " + height + "), format=" + extension)
-//            }
-
+                ImageIO.write(result, formatName, outputStream)
+            }
         } catch (Exception e) {
-            log.warn("Error scaling image " + document?.filename + ": " + e.message, e)
-        } finally {
-            if (fileInputStream) fileInputStream?.close()
-            if (file) file?.delete()
+            log.warn("Error scaling image ${document?.filename}: ${e.message}", e)
         }
     }
 

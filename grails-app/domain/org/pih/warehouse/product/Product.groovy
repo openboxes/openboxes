@@ -350,7 +350,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
-    Collection getImages() {
+    Collection<Document> getImages() {
         return documents?.findAll { it.contentType.startsWith("image") }
     }
 
@@ -360,7 +360,7 @@ class Product implements Comparable, Serializable {
      * @return
      */
     Document getThumbnail() {
-        return this?.images ? this.images?.sort()?.first() : null
+        return this.images?.sort({ it?.dateCreated })?.first()
     }
 
     /**

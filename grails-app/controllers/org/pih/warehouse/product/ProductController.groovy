@@ -13,8 +13,8 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.apache.commons.io.FilenameUtils
 import grails.web.context.ServletContextHolder
+import org.apache.commons.io.FilenameUtils
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
@@ -606,7 +606,7 @@ class ProductController {
     }
 
     def downloadDocument() {
-        log.info "viewImage: " + params
+        log.info 'downloadDocument: {}', params
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
             response.setHeader "Content-disposition", "attachment;filename=\"${documentInstance.filename}\""
@@ -616,41 +616,12 @@ class ProductController {
         }
     }
 
-    /**
-     * View document
-     */
-    def viewImage() {
-        log.info "viewImage: " + params
-        def documentInstance = Document.get(params.id)
-        if (documentInstance) {
-            if (documentInstance.isImage()) {
-                documentService.scaleImage(documentInstance, response.outputStream, '300px', '300px')
-            } else {
-                // Strip out the most common mime type tree names
-                def documentType = documentInstance.contentType.minus("application/").minus("image/").minus("text/")
-                def servletContext = ServletContextHolder.servletContext
-                def imageContent = servletContext.getResource("/images/icons/${documentType}.png")
-                if (!imageContent) {
-                    imageContent = servletContext.getResource('/images/icons/silk/page.png')
-                }
-                response.contentType = 'image/png'
-                response.outputStream << imageContent.bytes
-                response.outputStream.flush()
-
-
-            }
-        } else {
-            response.sendError(404)
-        }
-    }
-
-
     def viewThumbnail() {
-        log.info "viewThumbnail: " + params
+        log.info 'viewThumbnail: {}', params
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
             if (documentInstance.isImage()) {
-                documentService.scaleImage(documentInstance, response.outputStream, '100px', '100px')
+                documentService.scaleImage(documentInstance, response.outputStream, 200, 200)
             } else if (documentInstance.fileUri) {
                 def imageContent = servletContext.getResource("/images/icons/silk/link.png")
                 response.contentType = 'image/png'
@@ -1164,6 +1135,3 @@ class ProductController {
         redirect(controller: 'product', action: 'edit', id: params['product.id'])
     }
 }
-
-
-

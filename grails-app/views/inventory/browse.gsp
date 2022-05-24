@@ -96,8 +96,8 @@
 														<td>
 															<g:if test="${searchResult?.product?.images }">
 															   <div class="nailthumb-container">
-																   <g:set var="image" value="${searchResult?.product?.images?.sort()?.first()}"/>
-																   <img src="${resource(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+																   <g:set var="image" value="${searchResult?.product?.thumbnail}" />
+																   <img src="${createLink(controller: 'product', action: 'viewThumbnail', id: image.id)}" style="display:none" />
 															   </div>
 														   </g:if>
 														   <g:else>
