@@ -24,7 +24,7 @@
 
             <picture>
                 <g:if test="${product.images}">
-                    <g:set var="image" value="${product?.images?.sort()?.first()}"/>
+                    <g:set var="image" value="${product?.thumbnail}" />
                     <img src="${createLink(controller:'product', action:'renderImage', id:image?.id)}" class="img-fluid"/>
                 </g:if>
                 <g:else>

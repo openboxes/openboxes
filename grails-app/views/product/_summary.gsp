@@ -6,8 +6,8 @@
 				<td class="middle" style="width: 1%;">
                     <g:if test="${productInstance?.images }">
                         <div class="nailthumb-product">
-                            <g:set var="image" value="${productInstance?.images?.sort()?.first()}"/>
-                            <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+                            <g:set var="image" value="${productInstance?.thumbnail}" />
+                            <img src="${createLink(controller:'product', action:'viewThumbnail', id:image.id)}" style="display:none" />
                         </div>
                     </g:if>
                     <g:else>
@@ -139,8 +139,8 @@
     </table>
 </div>
 <script>
-    $(function() {
-        $('.nailthumb-product img').hide();
-        $('.nailthumb-product img').nailthumb({width : 40, height : 40});
-    });
+	$(function () {
+		$('.nailthumb-product img').hide();
+		$('.nailthumb-product img').nailthumb({ width: 40, height: 40, replaceAnimation: null });
+	});
 </script>

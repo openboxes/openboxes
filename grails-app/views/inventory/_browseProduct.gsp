@@ -4,8 +4,8 @@
 	<td>
 		<g:if test="${inventoryItem?.product?.images }">
 			<div class="nailthumb-container">
-				<g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-				<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+				<g:set var="image" value="${inventoryItem?.product?.thumbnail}" />
+				<img src="${createLink(controller: 'product', action: 'viewThumbnail', id: image.id)}" style="display:none" />
 			</div>
 		</g:if>
 		<g:else>
@@ -17,8 +17,7 @@
 	<td>
 		<div class="action-menu hover">
 			<button class="action-btn">
-				<img
-					src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
+				<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}"
 					style="vertical-align: middle" />
 			</button>
 			<div class="actions left">
@@ -28,8 +27,8 @@
 							<td style="width: 100px;" class="center middle">
 								<g:if test="${inventoryItem?.product?.images }">
 									<div class="nailthumb-container-100">
-										<g:set var="image" value="${inventoryItem?.product?.images?.sort()?.first()}"/>
-										<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+										<g:set var="image" value="${inventoryItem?.product?.thumbnail}" />
+										<img src="${createLink(controller: 'product', action: 'viewThumbnail', id: image.id)}" style="display:none" />
 									</div>
 								</g:if>
 								<g:else>
