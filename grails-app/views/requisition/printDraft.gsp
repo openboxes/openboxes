@@ -99,8 +99,8 @@
                         <td>
 							<g:if test="${requisitionItem?.product?.images }">
 								<div class="nailthumb-container">
-									<g:set var="image" value="${requisitionItem?.product?.images?.sort()?.first()}"/>
-									<img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" />
+									<g:set var="image" value="${requisitionItem?.product?.thumbnail}" />
+									<img src="${createLink(controller: 'product', action: 'viewThumbnail', id: image.id)}" />
 								</div>
 							</g:if>
 							<g:else>

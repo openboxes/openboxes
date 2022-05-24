@@ -13,7 +13,6 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.grails.plugins.web.taglib.ApplicationTagLib
-import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -345,7 +344,7 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
-    Collection getImages() {
+    Collection<Document> getImages() {
         return documents?.findAll { it.contentType.startsWith("image") }
     }
 
@@ -355,7 +354,7 @@ class Product implements Comparable, Serializable {
      * @return
      */
     Document getThumbnail() {
-        return this?.images ? this.images?.sort()?.first() : null
+        return this.images?.sort({ it?.dateCreated })?.first()
     }
 
     /**
@@ -684,4 +683,3 @@ class Product implements Comparable, Serializable {
         ]
     }
 }
-
