@@ -102,7 +102,7 @@ function validate(values) {
   );
 
   _.forEach(values.availableItems, (item, key) => {
-    if (item.quantityPicked && pickedSum !== values.quantityRequired) {
+    if (!Number.isNaN(item.quantityPicked) && pickedSum !== values.quantityRequired && item.status !== 'NOT_AVAILABLE') {
       errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.differentTotalQty.label' };
     }
     if (item.quantityPicked > item.quantityAvailable) {
@@ -210,7 +210,7 @@ class EditPickModal extends Component {
           // check if this picklist item already exists
           const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
 
-          if (picklistItem) {
+          if (picklistItem && avItem.status !== 'NOT_AVAILABLE') {
             return {
               ...avItem,
               id: picklistItem.id,
