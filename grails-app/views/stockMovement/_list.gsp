@@ -87,12 +87,20 @@
                     </td>
                 </g:if>
                 <td>
-                    <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
+                    <g:link
+                        controller="${stockMovement?.order ? "stockTransfer" : "stockMovement" }"
+                        action="show"
+                        id="${stockMovement?.order?.id ?: stockMovement?.id}"
+                    >
                         <strong>${stockMovement.identifier }</strong>
                     </g:link>
                 </td>
                 <td>
-                    <g:link controller="stockMovement" action="show" id="${stockMovement.id}">
+                    <g:link
+                        controller="${stockMovement?.order ? "stockTransfer" : "stockMovement" }"
+                        action="show"
+                        id="${stockMovement?.order?.id ?: stockMovement?.id}"
+                    >
                         <g:if test="${stockMovement?.hasProperty('stockMovementType')}">
                             <format:metadata obj="${stockMovement?.stockMovementType}"/> &rsaquo;
                         </g:if>

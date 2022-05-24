@@ -384,6 +384,11 @@ class UrlMappings {
             action = [POST: "sendShipment"]
         }
 
+        "/api/stockTransfers/$id/rollback" {
+            controller = { "stockTransferApi" }
+            action = [POST: "rollback"]
+        }
+
         "/api/stockTransfers/$id/removeAllItems"(parseRequest: true) {
             controller = { "stockTransferApi" }
             action = [DELETE: "removeAllItems"]
