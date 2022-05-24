@@ -27,7 +27,7 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
-import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.InternalLocation
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -132,6 +132,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(Location) { Location location ->
             return location.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InternalLocation) { InternalLocation internalLocation ->
+            return internalLocation.toJson()
         }
 
         JSON.registerObjectMarshaller(Order) { Order order ->
