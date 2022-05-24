@@ -805,7 +805,7 @@ class InventoryService implements ApplicationContextAware {
      */
     List getQuantityByBinLocation(Location location, Location internalLocation) {
         List binLocationEntries = getQuantityByBinLocation(location)
-        return binLocationEntries.findAll { it.binLocation == internalLocation }
+        return binLocationEntries.findAll { it.binLocation?.id == internalLocation?.id }
     }
 
     List getProductQuantityByBinLocation(Location location, Product product) {

@@ -321,18 +321,6 @@ class LocationController {
 
     def showBinLocations = {
 
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-        } else {
-            def binLocations
-            if (locationInstance.isZoneLocation()) {
-                binLocations = Location.findAllByZone(locationInstance)
-            } else {
-                binLocations = locationService.getBinLocations(locationInstance)
-            }
-            [locationInstance: locationInstance, binLocations: binLocations]
-        }
     }
 
     def showZoneLocations = {
