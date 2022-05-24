@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -194,6 +195,7 @@ class SendMovementPage extends Component {
 
     this.fetchOutboundReturn = this.fetchOutboundReturn.bind(this);
     this.validate = this.validate.bind(this);
+    this.rollbackReturnOrder = this.rollbackReturnOrder.bind(this);
   }
 
   componentDidMount() {
@@ -248,6 +250,27 @@ class SendMovementPage extends Component {
         }, () => this.fetchShipmentTypes());
       })
       .catch(() => this.props.hideSpinner());
+  }
+
+  rollbackReturnOrder(values) {
+    this.props.showSpinner();
+    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}/rollback`;
+
+    const isOrigin = this.props.currentLocationId === values.origin.id;
+
+    if (isOrigin) {
+      apiClient.post(url)
+        .then(() => {
+          this.props.hideSpinner();
+          window.location.reload();
+        });
+    } else {
+      this.props.hideSpinner();
+      Alert.error(this.props.translate(
+        'react.stockMovement.alert.rollbackShipment.label',
+        'You are not able to rollback shipment from your location.',
+      ));
+    }
   }
 
   sendOutboundReturn(values, invalid) {
@@ -431,22 +454,33 @@ class SendMovementPage extends Component {
                 }))}
             </div>
             <div>
-              <div className="submit-buttons">
+              <div className="d-flex justify-content-between">
                 <button
                   type="submit"
-                  className="btn btn-outline-primary btn-form btn-xs"
+                  className="btn btn-outline-primary btn-form btn-xs mx-0"
                   disabled={values && values.status === 'COMPLETED'}
                   onClick={() => this.previousPage(values, invalid)}
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button
-                  type="submit"
-                  onClick={() => this.sendOutboundReturn(values, invalid)}
-                  className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={values && values.status === 'COMPLETED'}
-                ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
-                </button>
+                <div className="d-flex">
+                  {values.status === 'COMPLETED' && this.props.isUserAdmin &&
+                  <button
+                    type="button"
+                    onClick={() => this.rollbackReturnOrder(values)}
+                    className="btn btn-outline-success float-right btn-form btn-xs"
+                  >
+                    <i className="fa fa-undo pr-2" />
+                    <Translate id="react.default.button.rollback.label" defaultMessage="Rollback" />
+                  </button>}
+                  <button
+                    type="submit"
+                    onClick={() => this.sendOutboundReturn(values, invalid)}
+                    className="btn btn-outline-success float-right btn-form btn-xs mx-0"
+                    disabled={values && values.status === 'COMPLETED'}
+                  ><Translate id="react.stockMovement.sendShipment.label" defaultMessage="Send shipment" />
+                  </button>
+                </div>
               </div>
               <div className="my-2 table-form">
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
@@ -467,6 +501,8 @@ const mapStateToProps = state => ({
   outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
   minimumExpirationDate: state.session.minimumExpirationDate,
   locale: state.session.activeLanguage,
+  isUserAdmin: state.session.isUserAdmin,
+  currentLocationId: state.session.currentLocation.id,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
@@ -485,4 +521,6 @@ SendMovementPage.propTypes = {
   }).isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   locale: PropTypes.string.isRequired,
+  isUserAdmin: PropTypes.bool.isRequired,
+  currentLocationId: PropTypes.string.isRequired,
 };

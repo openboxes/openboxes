@@ -18,9 +18,11 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
 import java.text.SimpleDateFormat
@@ -238,6 +240,27 @@ class StockTransferApiController {
         }
 
         shipmentService.sendShipment(order)
+        render status: 200
+    }
+
+    def rollback = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+
+        Shipment returnOrderShipment = order.shipments.first() as Shipment;
+        if(!returnOrderShipment) {
+            throw new IllegalArgumentException("Order with id: ${params.id} has no shipments")
+        }
+
+        try {
+            // For returns there should be only one shipment for the given order
+            shipmentService.rollbackLastEvent(returnOrderShipment)
+            order.status = OrderStatus.PLACED;
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        }
         render status: 200
     }
 }
