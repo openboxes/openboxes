@@ -393,7 +393,7 @@ class SendMovementPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() => {
-                      window.location = `/openboxes/stockTransfer/show/${this.props.match.params.inboundReturnId}`;
+                      window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`;
                     }}
                     className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                   >
