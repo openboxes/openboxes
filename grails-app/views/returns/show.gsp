@@ -80,9 +80,8 @@
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
-                        stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
-                    <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
+                <g:elseif test="${stockMovement?.hasBeenShipped()}">
+                    <g:link controller="stockTransfer" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>

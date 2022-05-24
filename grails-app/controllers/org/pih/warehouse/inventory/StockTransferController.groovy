@@ -13,12 +13,15 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.shipping.Shipment
 
 class StockTransferController {
 
     def stockTransferService
+    def shipmentService
 
     def index = {
         redirect(action: "list", params: params)
@@ -121,5 +124,27 @@ class StockTransferController {
             redirect(action: "list")
         }
 
+    }
+
+    def rollback = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+
+        Shipment returnOrderShipment = order.shipments.first() as Shipment;
+        if(!returnOrderShipment) {
+            throw new IllegalArgumentException("Order with id: ${params.id} has no shipments")
+        }
+
+        try {
+            // For returns there should be only one shipment for the given order
+            shipmentService.rollbackLastEvent(returnOrderShipment)
+            order.status = OrderStatus.PLACED;
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        }
+
+        redirect( controller: "stockMovement", action: "show", id: params.id)
     }
 }
