@@ -135,12 +135,7 @@
             </td>
             <td class="center" width="1%">
                 <div class="tag tag-alert">
-                    <g:if test="${!stockMovement.shipment && !stockMovement.requisition}">
-                        <format:metadata obj="${stockMovement?.statusCode}"/>
-                    </g:if>
-                    <g:else>
-                        <format:metadata obj="${stockMovement?.shipment?.status?.code?.displayStatus?:stockMovement?.requisition?.status?.displayStatus }"/>
-                    </g:else>
+                    <format:metadata obj="${stockMovement?.shipment?.status?.code?.displayStatus?:stockMovement?.statusCode}"/>
                 </div>
             </td>
         </tr>

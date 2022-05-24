@@ -112,8 +112,9 @@ class StockMovementController {
     }
 
     def show = {
+        // Pull Outbound Stock movement (Requisition based) or Outbound or Inbound Return (Order based)
         def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        // For inbound stockMovement
+        // For inbound stockMovement only
         if (!stockMovement) {
             stockMovement =  stockMovementService.getStockMovement(params.id)
         }
