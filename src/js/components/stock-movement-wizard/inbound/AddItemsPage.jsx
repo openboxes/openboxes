@@ -743,7 +743,7 @@ class AddItemsPage extends Component {
    */
   saveAndExit(formValues) {
     const errors = this.validate(formValues).lineItems;
-    if (!errors.length) {
+    if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
           window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
