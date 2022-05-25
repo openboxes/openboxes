@@ -120,7 +120,7 @@ class StockMovementController {
         }
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
 
-        if (stockMovement.hasProperty("stockMovementType") && stockMovement.stockMovementType == StockMovementType.RETURN_ORDER) {
+        if (stockMovement?.order) {
             render(view: "/returns/show", model: [stockMovement: stockMovement])
         } else {
             render(view: "show", model: [stockMovement: stockMovement])
