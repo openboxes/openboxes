@@ -116,14 +116,16 @@ class LocationController {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 
                 } catch (ValidationException e) {
-                    flash.message = e.message
-                    log.error("error: " + e.message, e)
+                    log.error("validation error: " + e.message, e)
+                    locationInstance = Location.read(params.id)
+                    locationInstance.errors = e.errors
                     render(view: "edit", model: [locationInstance: locationInstance])
                     return
 
                 } catch (Exception e) {
-                    flash.message = e.message
                     log.error("error: " + e.message, e)
+                    locationInstance = Location.read(params.id)
+                    locationInstance.errors << e.message
                     render(view: "edit", model: [locationInstance: locationInstance])
                     return
                 }
