@@ -131,7 +131,10 @@ class PutawayService {
             if (zone) {
                 eq("zone", zone)
             }
-            order("sortOrder","asc")
+            locationType {
+                order("sortOrder", "desc")
+            }
+            order("sortOrder","desc")
             order("name","asc")
         }
 

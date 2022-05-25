@@ -126,14 +126,20 @@ class LocationService {
 
             eq("active", Boolean.TRUE)
             isNull("parentLocation")
+
+            locationType {
+                order("sortOrder", "desc")
+            }
+            order("sortOrder", "desc")
+            order("name", "asc")
+
         }
         return locations
     }
 
     def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
 
-        def locations = new HashSet()
-        locations += getLocations(fields, params)
+        def locations = getLocations(fields, params)
 
         if (params.applyUserFilter) {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
@@ -288,7 +294,7 @@ class LocationService {
 
         if (parentLocation.hasBinLocationSupport()) {
             log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes} and location type codes ${locationTypeCodes}"
-            List<Location> internalLocations = Location.createCriteria().list() {
+            List<Location> internalLocations = Location.createCriteria().listDistinct() {
                 eq("active", Boolean.TRUE)
                 eq("parentLocation", parentLocation)
                 or {
@@ -299,6 +305,12 @@ class LocationService {
                         'in'("name", locationNames)
                     }
                 }
+
+                locationType {
+                    order("sortOrder", "desc")
+                }
+                order("sortOrder", "desc")
+                order("name", "asc")
             }
 
             // Filter by activity code
@@ -317,7 +329,6 @@ class LocationService {
             internalLocationsSupportingActivityCodes =
                     internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
 
-            internalLocationsSupportingActivityCodes = internalLocationsSupportingActivityCodes.unique()
         }
 
         return internalLocationsSupportingActivityCodes
@@ -597,7 +608,10 @@ class LocationService {
                 }
             }
 
-            order("sortOrder", "asc")
+            locationType {
+                order("sortOrder", "desc")
+            }
+            order("sortOrder", "desc")
             order("name", "asc")
         }
     }
