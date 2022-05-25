@@ -19,6 +19,7 @@ import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -199,13 +200,12 @@ class SendMovementPage extends Component {
 
   fetchShipmentTypes() {
     const url = '/openboxes/api/generic/shipmentType';
-
     return apiClient.get(url)
       .then((response) => {
         const shipmentTypes = _.map(response.data.data, (type) => {
           const [en, fr] = _.split(type.name, '|fr:');
           return {
-            value: type.id,
+            ...type,
             label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
@@ -226,7 +226,13 @@ class SendMovementPage extends Component {
         const inboundReturn = parseResponse(resp.data.data);
         this.setState({
           values: {
-            inboundReturn,
+            inboundReturn: {
+              ...inboundReturn,
+              shipmentType: {
+                ...inboundReturn.shipmentType,
+                label: splitTranslation(inboundReturn.shipmentType.name, this.props.locale),
+              },
+            },
           },
         }, () => this.fetchShipmentTypes());
       })
@@ -261,7 +267,6 @@ class SendMovementPage extends Component {
         ...values,
       };
       const url = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}/sendShipment`;
-
       this.saveValues(payload)
         .then(() => {
           apiClient.post(url, flattenRequest(payload))

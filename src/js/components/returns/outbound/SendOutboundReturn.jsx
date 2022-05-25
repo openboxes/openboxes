@@ -19,6 +19,7 @@ import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -220,8 +221,8 @@ class SendMovementPage extends Component {
         const shipmentTypes = _.map(response.data.data, (type) => {
           const [en, fr] = _.split(type.name, '|fr:');
           return {
-            id: type.id,
-            name: this.props.locale === 'fr' && fr ? fr : en,
+            ...type,
+            label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
 
@@ -245,6 +246,10 @@ class SendMovementPage extends Component {
             outboundReturn: {
               ...outboundReturn,
               picklistItems,
+              shipmentType: {
+                ...outboundReturn.shipmentType,
+                label: splitTranslation(outboundReturn.shipmentType.name, this.props.locale),
+              },
             },
           },
         }, () => this.fetchShipmentTypes());
