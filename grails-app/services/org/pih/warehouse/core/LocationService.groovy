@@ -126,14 +126,20 @@ class LocationService {
 
             eq("active", Boolean.TRUE)
             isNull("parentLocation")
+
+            locationType {
+                order("sortOrder", "desc")
+            }
+            order("sortOrder", "desc")
+            order("name", "asc")
+
         }
         return locations
     }
 
     def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
 
-        def locations = new HashSet()
-        locations += getLocations(fields, params)
+        def locations = getLocations(fields, params)
 
         if (params.applyUserFilter) {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
@@ -271,25 +277,27 @@ class LocationService {
     }
 
     List getInternalLocations(Location parentLocation, List<ActivityCode> activityCodes) {
-        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes as ActivityCode[])
+        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION] as LocationTypeCode[], activityCodes as ActivityCode[])
     }
 
     List getInternalLocations(Location parentLocation, ActivityCode[] activityCodes) {
-        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes)
+        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION] as LocationTypeCode[], activityCodes)
     }
 
-    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes) {
-        return getInternalLocations(parentLocation, locationTypeCodes, activityCodes, null)
+    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, Boolean includeActive) {
+        return getInternalLocations(parentLocation, locationTypeCodes, activityCodes, null, includeActive)
     }
 
-    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, String[] locationNames) {
+    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, String[] locationNames, Boolean includeInactive = Boolean.FALSE) {
 
         List<Location> internalLocationsSupportingActivityCodes = []
 
         if (parentLocation.hasBinLocationSupport()) {
             log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes} and location type codes ${locationTypeCodes}"
-            List<Location> internalLocations = Location.createCriteria().list() {
-                eq("active", Boolean.TRUE)
+            List<Location> internalLocations = Location.createCriteria().listDistinct() {
+                if (!includeInactive) {
+                    eq("active", Boolean.TRUE)
+                }
                 eq("parentLocation", parentLocation)
                 or {
                     locationType {
@@ -299,6 +307,12 @@ class LocationService {
                         'in'("name", locationNames)
                     }
                 }
+
+                locationType {
+                    order("sortOrder", "desc")
+                }
+                order("sortOrder", "desc")
+                order("name", "asc")
             }
 
             // Filter by activity code
@@ -317,7 +331,6 @@ class LocationService {
             internalLocationsSupportingActivityCodes =
                     internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
 
-            internalLocationsSupportingActivityCodes = internalLocationsSupportingActivityCodes.unique()
         }
 
         return internalLocationsSupportingActivityCodes
@@ -576,7 +589,7 @@ class LocationService {
         return "${receivingLocationPrefix}-${identifier}"
     }
 
-    List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
+    List<Location> searchInternalLocations(String searchTerm, LocationTypeCode[] locationTypeCodes, Map params = [:]) {
         return Location.createCriteria().list(params) {
             eq("active", Boolean.TRUE)
 
@@ -590,14 +603,17 @@ class LocationService {
                 }
             }
 
-            if (params.searchTerm) {
+            if (searchTerm) {
                 or {
-                    ilike("name", "%${params.searchTerm}%")
-                    ilike("locationNumber", "%${params.searchTerm}%")
+                    ilike("name", "${searchTerm}%")
+                    ilike("locationNumber", "${searchTerm}%")
                 }
             }
 
-            order("sortOrder", "asc")
+            locationType {
+                order("sortOrder", "desc")
+            }
+            order("sortOrder", "desc")
             order("name", "asc")
         }
     }

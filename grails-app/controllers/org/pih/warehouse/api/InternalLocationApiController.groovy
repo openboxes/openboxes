@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Document
@@ -22,6 +23,7 @@ class InternalLocationApiController {
     def documentService
     def locationService
     def inventoryService
+    def putawayService
     def productAvailabilityService
 
     def list = {
@@ -31,15 +33,28 @@ class InternalLocationApiController {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
 
+        Boolean includeInactive = params.includeInactive ? params.boolean("includeInactive") : Boolean.FALSE
         ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes)
+        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, includeInactive)
         render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
     }
 
     def search = {
-        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-        List<Location> locations = locationService.searchInternalLocations(params, locationTypeCodes)
+        log.info "search " + params
+        Location currentLocation = Location.get(session.warehouse.id)
+        Boolean excludeUnavailable = params.boolean("excludeUnavailable")?:true
+        ActivityCode [] activityCodes = params.activityCode ? params.list("activityCode") :
+                [ActivityCode.RECEIVE_STOCK, ActivityCode.PUTAWAY_STOCK]
+        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") :
+                [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
+        List<Location> locations = locationService.searchInternalLocations(params.searchTerm, locationTypeCodes, params)
+
+        // FIXME Exclude unavailable by default but we should make this more generic since search is used in other places besides putaway
+        if (currentLocation.supports(ActivityCode.PUTAWAY_STRATEGY_EMPTY_LOCATIONS) && excludeUnavailable) {
+            List<Location> availableLocations = putawayService.getAvailableLocations(currentLocation, null, activityCodes.toList())
+            locations = availableLocations.intersect(locations)
+        }
         render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
     }
 

@@ -368,7 +368,8 @@ class Location implements Comparable<Location>, java.io.Serializable {
                         locationType: locationType?.name,
                         locationTypeCode: locationType?.locationTypeCode?.name(),
                         zoneId: zone?.id,
-                        zoneName: zone?.name
+                        zoneName: zone?.name,
+                        active: active
                 ]
 
             default:

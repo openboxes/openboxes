@@ -53,6 +53,9 @@ enum ActivityCode {
     // Dynamic slotting
     DYNAMIC_SLOTTING('DYNAMIC_SLOTTING'),
 
+    // Directed putaway
+    DIRECTED_PUTAWAY('DIRECTED_PUTAWAY'),
+
     // Creates a dynamic receiving location during receipt
     DYNAMIC_RECEIVING('DYNAMIC_RECEIVING'),
 
@@ -77,6 +80,10 @@ enum ActivityCode {
     ORDER_ALLOCATION_STRATEGY_LIFO('ORDER_ALLOCATION_STRATEGY_LIFO'),
     ORDER_ALLOCATION_STRATEGY_CUSTOM('ORDER_ALLOCATION_STRATEGY_CUSTOM'),
 
+    // Putaway strategies
+    PUTAWAY_STRATEGY_EMPTY_LOCATIONS('PUTAWAY_STRATEGY_EMPTY_LOCATIONS'),
+    PUTAWAY_STRATEGY_SINGLE_SKU('PUTAWAY_STRATEGY_SINGLE_SKU'),
+    PUTAWAY_STRATEGY_SINGLE_LPN('PUTAWAY_STRATEGY_SINGLE_LPN'),
 
     final String id
 
@@ -107,16 +114,25 @@ enum ActivityCode {
                 PARTIAL_RECEIVING,
                 DYNAMIC_SLOTTING,
                 STATIC_SLOTTING,
+                DIRECTED_PUTAWAY,
                 REQUIRE_ACCOUNTING,
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,
+
+                // Integration
                 REQUIRE_MOBILE_PICKING,
                 ENABLE_ETRUCKNOW_INTEGRATION,
+
+                // Order allocation strategies
                 ORDER_ALLOCATION_STRATEGY_FEFO,
                 ORDER_ALLOCATION_STRATEGY_FIFO,
                 ORDER_ALLOCATION_STRATEGY_LIFO,
-                ORDER_ALLOCATION_STRATEGY_CUSTOM
+                ORDER_ALLOCATION_STRATEGY_CUSTOM,
 
+                // Putaway strategies
+                PUTAWAY_STRATEGY_EMPTY_LOCATIONS,
+                PUTAWAY_STRATEGY_SINGLE_SKU,
+                PUTAWAY_STRATEGY_SINGLE_LPN,
         ]
     }
 }

@@ -277,6 +277,18 @@
                                     </td>
                                 </tr>
                             </g:if>
+                                <tr class="prop">
+                                    <td valign="top" class="name">
+                                        <label for="sortOrder"><warehouse:message
+                                                code="default.sortOrder.label"/></label>
+                                    </td>
+                                    <td valign="top"
+                                        class="value ${hasErrors(bean: locationInstance, field: 'sortOrder', 'errors')}">
+                                        <g:textField name="sortOrder"
+                                                     value="${locationInstance?.sortOrder}"
+                                                     class="text" size="10"/>
+                                    </td>
+                                </tr>
                             <tr class="prop">
                                 <td valign="top" class="name" rowspan="2">
                                     <label for="name"><warehouse:message
@@ -701,7 +713,7 @@
     );
 
     // Define all dialog windows
-    $("#dlgShowContents").dialog({autoOpen: false, modal: true, width: 800});
+    $("#dlgShowContents").dialog({autoOpen: false, modal: true, width: 800, height: 500});
     $("#dlgAddBinLocation").dialog({autoOpen: false, modal: true, width: 800});
     $("#dlgShowZoneContents").dialog({autoOpen: false, modal: true, width: 800});
     $("#dlgAddZoneLocation").dialog({autoOpen: false, modal: true, width: 800});
@@ -758,9 +770,7 @@
         $("#supported-activities").prop("disabled", true).trigger("chosen:updated");
       }
     });
-
   });
-
 </script>
 </body>
 </html>

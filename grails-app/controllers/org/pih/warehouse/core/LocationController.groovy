@@ -116,14 +116,16 @@ class LocationController {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 
                 } catch (ValidationException e) {
-                    flash.message = e.message
-                    log.error("error: " + e.message, e)
+                    log.error("validation error: " + e.message, e)
+                    locationInstance = Location.read(params.id)
+                    locationInstance.errors = e.errors
                     render(view: "edit", model: [locationInstance: locationInstance])
                     return
 
                 } catch (Exception e) {
-                    flash.message = e.message
                     log.error("error: " + e.message, e)
+                    locationInstance = Location.read(params.id)
+                    locationInstance.errors << e.message
                     render(view: "edit", model: [locationInstance: locationInstance])
                     return
                 }
@@ -321,18 +323,6 @@ class LocationController {
 
     def showBinLocations = {
 
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-        } else {
-            def binLocations
-            if (locationInstance.isZoneLocation()) {
-                binLocations = Location.findAllByZone(locationInstance)
-            } else {
-                binLocations = locationService.getBinLocations(locationInstance)
-            }
-            [locationInstance: locationInstance, binLocations: binLocations]
-        }
     }
 
     def showZoneLocations = {
