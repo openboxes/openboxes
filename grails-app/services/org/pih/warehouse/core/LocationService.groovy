@@ -277,25 +277,27 @@ class LocationService {
     }
 
     List getInternalLocations(Location parentLocation, List<ActivityCode> activityCodes) {
-        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes as ActivityCode[])
+        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION] as LocationTypeCode[], activityCodes as ActivityCode[])
     }
 
     List getInternalLocations(Location parentLocation, ActivityCode[] activityCodes) {
-        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL] as LocationTypeCode[], activityCodes)
+        return getInternalLocations(parentLocation, [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION] as LocationTypeCode[], activityCodes)
     }
 
-    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes) {
-        return getInternalLocations(parentLocation, locationTypeCodes, activityCodes, null)
+    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, Boolean includeActive) {
+        return getInternalLocations(parentLocation, locationTypeCodes, activityCodes, null, includeActive)
     }
 
-    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, String[] locationNames) {
+    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, ActivityCode[] activityCodes, String[] locationNames, Boolean includeInactive = Boolean.FALSE) {
 
         List<Location> internalLocationsSupportingActivityCodes = []
 
         if (parentLocation.hasBinLocationSupport()) {
             log.info "Get internal locations for parent ${parentLocation} with activity codes ${activityCodes} and location type codes ${locationTypeCodes}"
             List<Location> internalLocations = Location.createCriteria().listDistinct() {
-                eq("active", Boolean.TRUE)
+                if (!includeInactive) {
+                    eq("active", Boolean.TRUE)
+                }
                 eq("parentLocation", parentLocation)
                 or {
                     locationType {
@@ -601,10 +603,10 @@ class LocationService {
                 }
             }
 
-            if (params.searchTerm) {
+            if (searchTerm) {
                 or {
-                    ilike("name", "%${params.searchTerm}%")
-                    ilike("locationNumber", "%${params.searchTerm}%")
+                    ilike("name", "${searchTerm}%")
+                    ilike("locationNumber", "${searchTerm}%")
                 }
             }
 

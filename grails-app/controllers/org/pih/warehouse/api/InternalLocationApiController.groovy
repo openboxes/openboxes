@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Document
@@ -31,9 +32,10 @@ class InternalLocationApiController {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
 
+        Boolean includeInactive = params.includeInactive ? params.boolean("includeInactive") : Boolean.FALSE
         ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes)
+        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, includeInactive)
         render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
     }
 

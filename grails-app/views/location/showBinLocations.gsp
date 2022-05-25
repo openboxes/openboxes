@@ -36,7 +36,11 @@
 <script id="rowTemplate" type="text/x-jquery-tmpl">
     <tr>
         <td>
+            {{if active }}
             <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />
+            {{else}}
+            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />
+            {{/if}}
         </td>
         <td>
             <a href="${request.contextPath}/location/edit/{{= id }}" fragment="location-details-tab">
@@ -82,12 +86,14 @@
         "bSearch": false,
         "bScrollInfinite": true,
         "bScrollCollapse": true,
-        "sScrollY": 400,
+        "sScrollY": 300,
         "bJQueryUI": true,
         "bAutoWidth": true,
         "sAjaxSource": "${request.contextPath}/api/internalLocations",
         "sAjaxDataProp": "data",
-        "fnServerParams": function (params) {},
+        "fnServerParams": function (data) {
+          data.push({ name: "includeInactive", value: "true"})
+        },
         "fnServerData": function (url, params, callback) {
           $.ajax({
             "dataType": 'json',
@@ -123,10 +129,6 @@
       });
     });
 
-
-    function renderRow() {
-
-    }
 
     function handleAjaxError( xhr, status, error ) {
         if ( status === 'timeout' ) {
