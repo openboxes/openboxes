@@ -326,11 +326,6 @@ class LocationService {
             } else {
                 internalLocationsSupportingActivityCodes.addAll(internalLocations)
             }
-
-            // Sort locations by sort order, then name
-            internalLocationsSupportingActivityCodes =
-                    internalLocationsSupportingActivityCodes.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
-
         }
 
         return internalLocationsSupportingActivityCodes
