@@ -23,6 +23,7 @@ class InternalLocationApiController {
     def documentService
     def locationService
     def inventoryService
+    def putawayService
     def productAvailabilityService
 
     def list = {
@@ -40,8 +41,20 @@ class InternalLocationApiController {
     }
 
     def search = {
-        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-        List<Location> locations = locationService.searchInternalLocations(params, locationTypeCodes)
+        log.info "search " + params
+        Location currentLocation = Location.get(session.warehouse.id)
+        Boolean excludeUnavailable = params.boolean("excludeUnavailable")?:true
+        ActivityCode [] activityCodes = params.activityCode ? params.list("activityCode") :
+                [ActivityCode.RECEIVE_STOCK, ActivityCode.PUTAWAY_STOCK]
+        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") :
+                [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
+        List<Location> locations = locationService.searchInternalLocations(params.searchTerm, locationTypeCodes, params)
+
+        // FIXME Exclude unavailable by default but we should make this more generic since search is used in other places besides putaway
+        if (currentLocation.supports(ActivityCode.PUTAWAY_STRATEGY_EMPTY_LOCATIONS) && excludeUnavailable) {
+            List<Location> availableLocations = putawayService.getAvailableLocations(currentLocation, null, activityCodes.toList())
+            locations = availableLocations.intersect(locations)
+        }
         render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
     }
 

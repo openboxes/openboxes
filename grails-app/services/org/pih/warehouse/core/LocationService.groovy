@@ -589,7 +589,7 @@ class LocationService {
         return "${receivingLocationPrefix}-${identifier}"
     }
 
-    List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
+    List<Location> searchInternalLocations(String searchTerm, LocationTypeCode[] locationTypeCodes, Map params = [:]) {
         return Location.createCriteria().list(params) {
             eq("active", Boolean.TRUE)
 

@@ -109,10 +109,18 @@ class PutawayService {
                availableLocations = [inventoryLevel?.preferredBinLocation]
             }
         }
+        else {
+            availableLocations = getAvailablePutawayLocations(location, null)
+        }
         return availableLocations ? availableLocations[0] : null
     }
 
     def getAvailablePutawayLocations(Location location, Location zone = null) {
+        return getAvailableLocations(location, zone, [ActivityCode.PUTAWAY_STOCK])
+    }
+
+    def getAvailableLocations(Location location, Location zone = null, List activityCodes) {
+
         def unavailableLocations = ProductAvailability.createCriteria().list {
             projections {
                 property("binLocation")
@@ -121,10 +129,13 @@ class PutawayService {
             gt("quantityOnHand", 0)
         }
 
+        // Unfortunately, we cannot do filter by supported activity in the query because of a bug with Hibernate
+        unavailableLocations = unavailableLocations.findAll {it && it.supports(ActivityCode.PUTAWAY_STRATEGY_SINGLE_LPN) }
+
         // Get all active internal locations within the given facility and zone (if provided)
-        def allInternalLocations = Location.createCriteria().list {
-            eq("parentLocation", location)
+        def internalLocations = Location.createCriteria().list {
             eq("active", Boolean.TRUE)
+            eq("parentLocation", location)
             locationType {
                 'in'("locationTypeCode", [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION])
             }
@@ -138,18 +149,18 @@ class PutawayService {
             order("name","asc")
         }
 
-        // Get all available putaway locations that do not have a hold on them
-        def putawayLocations = allInternalLocations.findAll {
-            it.supports(ActivityCode.PUTAWAY_STOCK) && !it.supports(ActivityCode.HOLD_STOCK)
+        // Get all available locations (with any of the given activity codes) that do not have a hold on them
+        def supportedLocations = internalLocations.findAll { Location it ->
+            it.supportsAny((ActivityCode[]) activityCodes.toArray()) && !it.supports(ActivityCode.HOLD_STOCK)
         }
 
         // Get all putaway locations that have already been assigned in other putaway orders
         def pendingPutawayLocations = getPendingItems(location).collect { it.putawayLocation }
 
         // Return all putaway locations that are not already in use
-        def availablePutawayLocations = putawayLocations - unavailableLocations - pendingPutawayLocations
+        def availableLocations = supportedLocations - unavailableLocations - pendingPutawayLocations
 
-        return availablePutawayLocations
+        return availableLocations
     }
 
 
