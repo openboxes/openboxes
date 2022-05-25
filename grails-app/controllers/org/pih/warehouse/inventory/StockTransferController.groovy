@@ -35,6 +35,14 @@ class StockTransferController {
         Location currentLocation = Location.get(session.warehouse.id)
         def orderInstance = Order.get(params.id)
 
+        boolean isSameOrigin = orderInstance?.origin?.id == currentLocation?.id
+        boolean isSameDestination = orderInstance?.destination?.id == currentLocation?.id
+        if (!(isSameOrigin || isSameDestination)) {
+            flash.error = g.message(code: "retrunOrder.isDifferentLocation.message")
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
+        }
+
         if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
             redirect(action: "createInboundReturn", params: params)
         } else if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.OUTBOUND) {
