@@ -27,16 +27,12 @@
     </script>
     <!-- end magical HelpScout incantations -->
 
-    <!-- now, configure the widget the above code created for us -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"
-            integrity="sha512-lTLt+W7MrmDfKam+r3D2LURu0F47a3QaW5nF0c6Hl0JDZ57ruei+ovbg7BrZ+0bjVJ5YgzsAWE+RreERbpPE1g=="
-            referrerpolicy="no-referrer">
-    </script>
-    <script>
-      axios.get('/openboxes/api/helpscout/configuration/')
-        .then((response) => {
-          window.Beacon('config', response.data);
-        });
+    <!-- now, configure the widget the preceding code created for us -->
+    <script type="text/javascript">
+      let configUrl = new URL('/openboxes/api/helpscout/configuration/', window.location.href)
+      fetch(configUrl.toString(), { credentials: 'same-origin' })
+        .then(response => response.json())
+        .then(configJson => window.Beacon('config', configJson))
     </script>
 </g:if>
 
