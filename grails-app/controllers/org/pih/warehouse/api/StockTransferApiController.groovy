@@ -244,23 +244,9 @@ class StockTransferApiController {
     }
 
     def rollback = {
-        Order order = Order.get(params.id)
-        if (!order) {
-            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
-        }
+        Location currentLocation = Location.get(session.warehouse.id)
 
-        Shipment returnOrderShipment = order.shipments.first() as Shipment;
-        if(!returnOrderShipment) {
-            throw new IllegalArgumentException("Order with id: ${params.id} has no shipments")
-        }
-
-        try {
-            // For returns there should be only one shipment for the given order
-            shipmentService.rollbackLastEvent(returnOrderShipment)
-            order.status = OrderStatus.PLACED;
-        } catch (IllegalArgumentException e) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
-        }
+        stockTransferService.rollbackReturnOrder(params.id as String, currentLocation)
         render status: 200
     }
 }
