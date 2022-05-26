@@ -810,7 +810,7 @@ class ProductAvailabilityService {
             (a?.pickClassification) <=> (b?.pickClassification) ?:
                 (b?.binLocation?.locationType?.sortOrder?:0) <=> (a?.binLocation?.locationType?.sortOrder?:0) ?:
                     (a?.binLocation?.sortOrder?:"") <=> (b?.binLocation?.sortOrder?:"") ?:
-                            (a?.quantityAvailable) <=> (b?.quantityAvailable) ?:
+                            (b?.quantityAvailable) <=> (a?.quantityAvailable) ?:
                                 (a?.binLocation?.name?:"") <=> (b?.binLocation?.name?:"")
         }
 
