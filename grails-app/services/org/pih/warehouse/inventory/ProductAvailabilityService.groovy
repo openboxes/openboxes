@@ -807,11 +807,10 @@ class ProductAvailabilityService {
             log.info "b:${b.binLocation?.locationNumber}:${b.binLocation?.locationType?.sortOrder}:${b.quantityRequired}:${b.quantityAvailable}:${b.quantityPicked}"
             log.info "\tcompare: ${(a?.binLocation?.name <=> b?.binLocation?.name)}"
 
-            (a?.pickClassification) <=> (b?.pickClassification) ?:
-                (b?.binLocation?.locationType?.sortOrder?:0) <=> (a?.binLocation?.locationType?.sortOrder?:0) ?:
-                    (a?.binLocation?.sortOrder?:"") <=> (b?.binLocation?.sortOrder?:"") ?:
-                            (b?.quantityAvailable) <=> (a?.quantityAvailable) ?:
-                                (a?.binLocation?.name?:"") <=> (b?.binLocation?.name?:"")
+            return (b?.binLocation?.locationType?.sortOrder?:0) <=> (a?.binLocation?.locationType?.sortOrder?:0) ?:
+                (a?.binLocation?.sortOrder?:"") <=> (b?.binLocation?.sortOrder?:"") ?:
+                    (b?.quantityAvailable) <=> (a?.quantityAvailable) ?:
+                        (a?.binLocation?.name?:"") <=> (b?.binLocation?.name?:"")
         }
 
         log.info "${availableItems*.binLocation?.name}"
