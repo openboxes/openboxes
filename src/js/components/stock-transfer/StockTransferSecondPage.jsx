@@ -215,7 +215,7 @@ class StockTransferSecondPage extends Component {
           this.props.debounceTime,
           this.props.minSearchLength,
           this.props.location.id,
-          ['BIN_LOCATION'],
+          ['BIN_LOCATION', 'INTERNAL'],
           mapBins,
           this.state.bins,
         )}
@@ -286,7 +286,7 @@ class StockTransferSecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = `/openboxes/api/internalLocations/search?parentLocation.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION&max=10`;
+    const url = `/openboxes/api/internalLocations/search?parentLocation.id=${this.props.location.id}&max=100`;
 
     return apiClient.get(url)
       .then((response) => {

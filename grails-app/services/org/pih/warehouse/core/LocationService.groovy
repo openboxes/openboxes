@@ -317,15 +317,11 @@ class LocationService {
 
             // Filter by activity code
             if (activityCodes) {
-                activityCodes.each { activityCode ->
-                    internalLocations = internalLocations.findAll { internalLocation ->
-                        internalLocation.supports(activityCode) || (locationNames && internalLocation.name in locationNames)
-                    }
-                    internalLocationsSupportingActivityCodes.addAll(internalLocations)
+                internalLocations = internalLocations.findAll { internalLocation ->
+                    internalLocation.supportsAny(activityCodes)
                 }
-            } else {
-                internalLocationsSupportingActivityCodes.addAll(internalLocations)
             }
+            internalLocationsSupportingActivityCodes.addAll(internalLocations)
         }
 
         return internalLocationsSupportingActivityCodes
