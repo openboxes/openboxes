@@ -63,10 +63,10 @@ const FIELDS = {
       showValueTooltip: true,
       className: 'text-left',
       optionRenderer: option => (
-        <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+        <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
           {option.label}
           &nbsp;
-          {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+          {renderHandlingIcons(option.handlingIcons)}
         </strong>
       ),
       valueRenderer: option => (
