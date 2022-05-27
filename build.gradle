@@ -264,7 +264,7 @@ node {
 repositories {
     mavenCentral()
     maven { url 'https://repo.grails.org/grails/core' }
-    // deprecated: only needed for two dependencies (barcode4j, google-analytics)
+    // deprecated: only needed for one dependency (google-analytics)
     maven { url 'https://repo.grails.org/grails/plugins' }
 }
 
@@ -453,9 +453,6 @@ dependencies {
 
     // prevent java.lang.ClassNotFoundException for a few classes we don't directly consume
     implementation 'org.grails.plugins:async'
-
-    // FIXME replace with com.google.zxing
-    implementation 'org.grails.plugins:barcode4j:0.3'
 
     /*
      * Enable userAgentIdentService.isMobile() and <browser:is*> tags.
