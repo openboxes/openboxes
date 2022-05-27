@@ -10,13 +10,10 @@
 package org.pih.warehouse.shipping
 
 import au.com.bytecode.opencsv.CSVWriter
+import com.google.zxing.BarcodeFormat
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import org.krysalis.barcode4j.impl.code128.Code128Bean
-import org.pih.warehouse.core.*
-import org.pih.warehouse.inventory.TransactionException
-import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Event
@@ -38,14 +35,12 @@ class ShipmentController {
     static scaffold = Shipment
     def shipmentService
     def userService
-    def reportService
     def identifierService
     def inventoryService
     MailService mailService
 
-    def barcode4jService
+    def barcodeService
 
-    def dataSource
     def sessionFactory
 
 
@@ -435,29 +430,27 @@ class ShipmentController {
 
         Shipment shipmentInstance = Shipment.get(params.id)
         response.contentType = 'application/pdf'
-        response.setHeader("Content-disposition", "attachment; filename=\"barcodes.pdf\"")
-        def generator = new Code128Bean()
-        generator.height = 10
-        generator.fontSize = 3
+        response.setHeader('Content-disposition', 'attachment; filename="barcodes.pdf";')
 
         def shipmentItems = []
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        barcode4jService.render(generator, shipmentInstance?.shipmentNumber?.toString(), baos, "image/png")
+        final shipmentNumberBarcode = new ByteArrayOutputStream()
+        barcodeService.renderImage(shipmentNumberBarcode, shipmentInstance?.shipmentNumber, 180, 50, BarcodeFormat.CODE_128)
 
-        shipmentInstance?.shipmentItems.each { shipmentItem ->
-            ByteArrayOutputStream baos1 = new ByteArrayOutputStream()
-            ByteArrayOutputStream baos2 = new ByteArrayOutputStream()
-            barcode4jService.render(generator, shipmentItem?.inventoryItem?.lotNumber.toString(), baos1, "image/png")
-            barcode4jService.render(generator, shipmentItem?.inventoryItem?.product?.productCode.toString(), baos2, "image/png")
+        shipmentInstance?.shipmentItems?.each { shipmentItem ->
+            final lotNumberBarcode = new ByteArrayOutputStream()
+            barcodeService.renderImage(lotNumberBarcode, shipmentItem?.inventoryItem?.lotNumber, 180, 50, BarcodeFormat.CODE_128)
+            final productCodeBarcode = new ByteArrayOutputStream()
+            barcodeService.renderImage(productCodeBarcode, shipmentItem?.inventoryItem?.product?.productCode, 180, 50, BarcodeFormat.CODE_128)
             shipmentItems << [
-                    productCode     : shipmentItem?.inventoryItem?.product?.productCode,
-                    productName     : shipmentItem?.inventoryItem?.product?.name,
-                    lotNumber       : shipmentItem?.inventoryItem?.lotNumber,
-                    lotNumberBytes  : baos1.toByteArray(),
-                    productCodeBytes: baos2.toByteArray()]
+                productCode: shipmentItem?.inventoryItem?.product?.productCode,
+                productName: shipmentItem?.inventoryItem?.product?.name,
+                lotNumber: shipmentItem?.inventoryItem?.lotNumber,
+                lotNumberBytes: lotNumberBarcode.toByteArray(),
+                productCodeBytes: productCodeBarcode.toByteArray(),
+            ]
         }
-        renderPdf(template: 'barcodeLabel', model: [shipmentInstance: shipmentInstance, shipmentItems: shipmentItems, shipmentNumberBytes: baos.toByteArray()])
+        renderPdf(template: 'barcodeLabel', model: [shipmentInstance: shipmentInstance, shipmentItems: shipmentItems, shipmentNumberBytes: shipmentNumberBarcode.toByteArray()])
     }
 
     def showPutawayLocations() {
@@ -1220,6 +1213,3 @@ class ReceiveShipmentCommand implements Serializable {
     }
 
 }
-
-
-

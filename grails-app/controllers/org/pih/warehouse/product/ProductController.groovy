@@ -448,11 +448,7 @@ class ProductController {
 
     def barcode() {
         BarcodeFormat format = BarcodeFormat.valueOf(params.format)
-        File file = File.createTempFile("barcode-", ".png")
-        barcodeService.renderImageToFile(file, params.data, (params.width ?: 125) as int, (params.height ?: 50) as int, format)
-        response.contentType = "image/png"
-        response.outputStream << file.bytes
-        file.delete()
+        barcodeService.renderImage(response, params.data, (params.width ?: 125) as int, (params.height ?: 50) as int, format)
     }
 
 
@@ -1127,6 +1123,3 @@ class ProductController {
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
 }
-
-
-
