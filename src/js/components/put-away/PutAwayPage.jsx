@@ -434,10 +434,12 @@ class PutAwayPage extends Component {
             <div className="mr-1"><Translate id="react.putAway.lines.label" defaultMessage="Lines in pending putaways" />:</div>
             <div style={{ width: '150px' }}>
               <Select
-                options={[{ value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> },
-                  { value: true, label: <Translate id="react.putAway.include.label" defaultMessage="Include" /> }]}
-                onChange={val => this.filterPutAways(val)}
-                initialValue={false}
+                options={[
+                  { value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> },
+                  { value: true, label: <Translate id="react.putAway.include.label" defaultMessage="Include" /> },
+                ]}
+                onChange={val => this.filterPutAways(val.value)}
+                initialValue={{ value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> }}
                 clearable={false}
                 className="select-xs"
               />
