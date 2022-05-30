@@ -167,7 +167,7 @@ class StockTransferApiController {
             stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
             stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
             stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
-            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient"]) ? Person.load(stockTransferItemMap["recipient"]) : null
+            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient.id"]) ? Person.load(stockTransferItemMap["recipient.id"]) : null
 
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
