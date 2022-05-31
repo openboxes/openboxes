@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "plugins": [
     "react",
     "simple-import-sort"
@@ -17,7 +17,8 @@
     "node":    true
   },
   "extends": [
-    "airbnb"
+    "airbnb",
+    "airbnb/hooks"
   ],
   "rules": {
     "import/named": 2,

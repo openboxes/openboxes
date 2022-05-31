@@ -378,7 +378,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   };
 }
 
-export function fetchConfigAndData(locationId, config = 'personal', userId, filterSelected) {
+export function fetchConfigAndData(locationId, config, userId, filterSelected) {
   return (dispatch) => {
     apiClient.get('/openboxes/api/dashboard/config').then((res) => {
       dispatch({
