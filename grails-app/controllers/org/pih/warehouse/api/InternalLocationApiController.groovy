@@ -32,18 +32,28 @@ class InternalLocationApiController {
         if (!parentLocation) {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
-
+        Location currentLocation = Location.get(session.warehouse.id)
+        Boolean excludeUnavailable = params.excludeUnavailable ? params.boolean("excludeUnavailable") : Boolean.FALSE
         Boolean includeInactive = params.includeInactive ? params.boolean("includeInactive") : Boolean.FALSE
-        ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
-        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
+        ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") as ActivityCode [] : null
+        LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") :
+                [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
+
         List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, includeInactive)
+
+        // FIXME Exclude unavailable by default but we should make this more generic since search is used in other places besides putaway
+        if (currentLocation.supports(ActivityCode.PUTAWAY_STRATEGY_EMPTY_LOCATIONS) && excludeUnavailable) {
+            List<Location> availableLocations = putawayService.getAvailableLocations(currentLocation, null, activityCodes.toList())
+            locations = availableLocations.intersect(locations)
+        }
+
         render([data: locations?.collect { it.toJson(it?.locationType?.locationTypeCode) }] as JSON)
     }
 
     def search = {
         log.info "search " + params
         Location currentLocation = Location.get(session.warehouse.id)
-        Boolean excludeUnavailable = params.boolean("excludeUnavailable")?:true
+        Boolean excludeUnavailable = params.excludeUnavailable ? params.boolean("excludeUnavailable") : Boolean.TRUE
         ActivityCode [] activityCodes = params.activityCode ? params.list("activityCode") :
                 [ActivityCode.RECEIVE_STOCK, ActivityCode.PUTAWAY_STOCK]
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") :
