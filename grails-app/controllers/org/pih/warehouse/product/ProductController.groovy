@@ -266,6 +266,14 @@ class ProductController {
                     return
                 }
             }
+
+            if (!productInstance?.allowUpdates()) {
+                productInstance.discard()
+                flash.message = "Updates not allowed on externally managed products"
+                redirect(controller: "product", action: "edit", id: productInstance?.id)
+                return
+            }
+
             productInstance.properties = params
 
             try {
@@ -297,13 +305,7 @@ class ProductController {
                 productInstance.validateRequiredFields()
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
-                    if (productInstance?.allowUpdates()) {
-                        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
-                    }
-                    else {
-                        flash.message = "Updates not allowed on externally managed products"
-                    }
-                    //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
                     redirect(controller: "product", action: "edit", id: productInstance?.id)
                 } else {
                     render(view: "edit", model: [productInstance: productInstance])
@@ -321,8 +323,6 @@ class ProductController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventoryItem", action: "browse")
-
-
         }
     }
 
@@ -368,7 +368,7 @@ class ProductController {
                 value = params["productAttributes." + it.id + ".otherValue"]
             }
 
-            log.info("Process attribute " + it.name + " = " + value + ", required = ${it.required}, active = ${it.active}")
+            log.info("Attribute " + it.name + "=" + value + ", required=${it.required}, active=${it.active}")
 
             if (it.active && it.required && !value) {
                 productInstance.errors.rejectValue("attributes", "product.attribute.required",
