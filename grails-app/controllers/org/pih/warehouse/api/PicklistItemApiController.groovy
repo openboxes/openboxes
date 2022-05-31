@@ -38,10 +38,14 @@ class PicklistItemApiController extends BaseDomainApiController {
         render ([data: data] as JSON)
     }
 
-
     def update = {
         JSONObject jsonObject = request.JSON
         log.info "save " + jsonObject
+
+        PicklistItem picklistItem = PicklistItem.get(params.id)
+        if (!picklistItem) {
+            throw new IllegalArgumentException("Unable to locate picklist item with ID ${params.id}")
+        }
 
         String picklistItemId = params.id
         String productId = jsonObject["product.id"]
