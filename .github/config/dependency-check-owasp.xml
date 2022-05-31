@@ -25,23 +25,15 @@
    <vulnerabilityName>1005029</vulnerabilityName>
 </suppress>
 <suppress>
-   <!-- we cannot fix this until we update npm -->
-   <notes><![CDATA[
-   file name: json-schema:0.2.3
-   ]]></notes>
-   <packageUrl regex="true">^pkg:npm/json\-schema@.*$</packageUrl>
-   <cve>CVE-2021-3918</cve>
-</suppress>
    <!-- merge is a dev-only dependency -->
-   <suppress>
    <notes><![CDATA[
    file name: merge:1.2.1
    ]]></notes>
    <packageUrl regex="true">^pkg:npm/merge@.*$</packageUrl>
    <cve>CVE-2020-28499</cve>
 </suppress>
+<suppress>
    <!-- serialize-javascript is a dev-only dependency -->
-   <suppress>
    <notes><![CDATA[
    file name: serialize-javascript:1.5.0
    ]]></notes>
