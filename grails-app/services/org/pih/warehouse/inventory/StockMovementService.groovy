@@ -1298,6 +1298,8 @@ class StockMovementService {
                         null,
                         suggestedItem.inventoryItem,
                         suggestedItem.binLocation,
+                        // if requires mobile picking, then quantity picked is 0, otherwise quantity picked is quantity to pick
+                        (requisitionItem.requisition.origin.requiresMobilePicking() ? 0 : suggestedItem.quantityToPick.intValueExact()),
                         suggestedItem.quantityToPick.intValueExact(),
                         null,
                         null)
@@ -1315,15 +1317,15 @@ class StockMovementService {
 
     void createOrUpdatePicklistItem(StockMovementItem stockMovementItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantityPicked, String reasonCode, String comment) {
+                                    Integer quantityPicked, Integer quantityToPick, String reasonCode, String comment) {
 
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantityPicked, reasonCode, comment)
+        createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation, quantityPicked, quantityToPick, reasonCode, comment)
     }
 
     void createOrUpdatePicklistItem(RequisitionItem requisitionItem, PicklistItem picklistItem,
                                     InventoryItem inventoryItem, Location binLocation,
-                                    Integer quantityToPick, String reasonCode, String comment) {
+                                    Integer quantityPicked, Integer quantityToPick, String reasonCode, String comment) {
 
         Requisition requisition = requisitionItem.requisition
 
@@ -1358,8 +1360,8 @@ class StockMovementService {
             requisitionItem.addToPicklistItems(picklistItem)
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
-            picklistItem.quantity = quantityToPick // quantity = quantity to pick
-            picklistItem.quantityPicked = requisition.origin.requiresMobilePicking() ? 0 : quantityToPick
+            picklistItem.quantity = quantityToPick // quantity on the picklist item is the quantity to pick
+            picklistItem.quantityPicked = quantityPicked
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
@@ -1433,10 +1435,13 @@ class StockMovementService {
             BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
                     new BigDecimal(picklistItemMap.quantityPicked) : null
 
+            BigDecimal quantityToPick = (picklistItemMap.quantity != null && picklistItemMap.quantity != "") ?
+                    new BigDecimal(picklistItemMap.quantity) : null
+
             String comment = picklistItemMap.comment
 
             createOrUpdatePicklistItem(requisitionItem, picklistItem, inventoryItem, binLocation,
-                    quantityPicked?.intValueExact(), reasonCode, comment)
+                    quantityPicked?.intValueExact(), quantityToPick?.intValueExact(), reasonCode, comment)
         }
     }
 

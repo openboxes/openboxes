@@ -119,6 +119,20 @@ const FIELDS = {
               && !fieldValue.quantityPicked,
         }),
       },
+      // quantity = quantity to pick on the pick list item
+      quantity: {
+        type: TextField,
+        fieldKey: '',
+        label: 'react.stockMovement.quantityToPick.label',
+        defaultMessage: 'Qty to Pick',
+        fixedWidth: '120px',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({ fieldValue }) => ({
+          disabled: fieldValue && !fieldValue.quantityAvailable,
+        }),
+      },
     },
   },
 };
@@ -127,8 +141,17 @@ function validate(values) {
   const errors = {};
   errors.availableItems = [];
   _.forEach(values.availableItems, (item, key) => {
+    if (item.quantity > item.quantityAvailable) {
+      errors.availableItems[key] = { quantity: 'react.stockMovement.errors.higherTyPicked.label' };
+    }
     if (item.quantityPicked > item.quantityAvailable) {
       errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.higherTyPicked.label' };
+    }
+    if (item.quantityPicked > item.quantity) {
+      errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.higherThanToPick.label' };
+    }
+    if (item.quantity < 0) {
+      errors.availableItems[key] = { quantity: 'react.stockMovement.errors.negativeQtyPicked.label' };
     }
     if (item.quantityPicked < 0) {
       errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.negativeQtyPicked.label' };
@@ -140,11 +163,19 @@ function validate(values) {
       (sum + (val.quantityPicked ? _.toInteger(val.quantityPicked) : 0)),
     0,
   );
-
-
   if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
-    !values.reasonCode && pickedSum !== values.quantityRequired) {
+    !values.reasonCode && pickedSum > values.quantityRequired) {
     errors.reasonCode = 'react.stockMovement.errors.differentTotalQty.label';
+  }
+
+  const qtyToPickSum = _.reduce(
+    values.availableItems, (sum, val) =>
+      (sum + (val.quantity ? _.toInteger(val.quantity) : 0)),
+    0,
+  );
+  if (_.some(values.availableItems, val => !_.isNil(val.quantityPicked)) &&
+    !values.reasonCode && qtyToPickSum !== values.quantityRequired) {
+    errors.reasonCode = 'react.stockMovement.errors.differentToPickTotalQty.label';
   }
 
   return errors;
@@ -205,6 +236,7 @@ class EditPickModal extends Component {
         'inventoryItem.id': avItem['inventoryItem.id'],
         'binLocation.id': avItem['binLocation.id'] || '',
         quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
+        quantity: _.isNil(avItem.quantity) ? '' : avItem.quantity,
       })),
       reasonCode: values.reasonCode || '',
     };
@@ -257,6 +289,7 @@ class EditPickModal extends Component {
               ...avItem,
               id: picklistItem.id,
               quantityPicked: picklistItem.quantityPicked,
+              quantity: picklistItem.quantity,
               binLocation: {
                 id: picklistItem['binLocation.id'],
                 name: picklistItem['binLocation.name'],
