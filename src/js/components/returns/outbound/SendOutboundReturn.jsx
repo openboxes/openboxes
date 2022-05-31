@@ -18,6 +18,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -133,7 +134,16 @@ const FIELDS = {
         flexWidth: '0.5',
       },
       'product.name': {
-        type: LabelField,
+        type: (params) => {
+          const { rowIndex, values } = params;
+          const handlingIcons = _.get(values, `stockTransferItems[${rowIndex}].product.handlingIcons`, []);
+          const productNameWithIcons = (
+            <div className="d-flex">
+              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+              {renderHandlingIcons(handlingIcons)}
+            </div>);
+          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
+        },
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         flexWidth: '2',
@@ -491,6 +501,7 @@ class SendMovementPage extends Component {
                 {_.map(FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     translate: this.props.translate,
+                    values,
                   }))}
               </div>
             </div>

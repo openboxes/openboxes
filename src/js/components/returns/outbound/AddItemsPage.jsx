@@ -70,7 +70,16 @@ const FIELDS = {
         flexWidth: '1',
       },
       'product.name': {
-        type: LabelField,
+        type: (params) => {
+          const { rowIndex, values } = params;
+          const handlingIcons = _.get(values, `returnItems[${rowIndex}].product.handlingIcons`, []);
+          const productNameWithIcons = (
+            <div className="d-flex">
+              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+              {renderHandlingIcons(handlingIcons)}
+            </div>);
+          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
+        },
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
         flexWidth: '4.5',

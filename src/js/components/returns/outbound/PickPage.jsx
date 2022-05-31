@@ -12,6 +12,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -43,7 +44,16 @@ const FIELDS = {
         flexWidth: '0.5',
       },
       'product.name': {
-        type: LabelField,
+        type: (params) => {
+          const { rowIndex, values } = params;
+          const handlingIcons = values.picklistItems[rowIndex]['product.handlingIcons'];
+          const productNameWithIcons = (
+            <div className="d-flex">
+              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+              {renderHandlingIcons(handlingIcons)}
+            </div>);
+          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
+        },
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         flexWidth: '2',
@@ -173,7 +183,7 @@ class PickPage extends Component {
         onSubmit={() => this.nextPage()}
         mutators={{ ...arrayMutators }}
         initialValues={{ picklistItems }}
-        render={({ handleSubmit }) => (
+        render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
               <a
@@ -195,6 +205,7 @@ class PickPage extends Component {
                   refetchOutboundReturn: this.fetchOutboundReturn,
                   locationId: this.props.locationId,
                   translate: this.props.translate,
+                  values,
                 }))}
               </div>
               <div className="submit-buttons d-flex justify-content-between">
