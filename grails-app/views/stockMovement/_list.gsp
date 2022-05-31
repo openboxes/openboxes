@@ -43,8 +43,8 @@
             <g:sortableColumn property="dateRequested" params="${pageParams}"
                               title="${warehouse.message(code: 'stockMovement.dateRequested.label', default: 'Date requested')}" />
 
-            <th><g:message code="default.dateCreated.label"/></th>
-
+            <g:sortableColumn property="dateCreated" params="${pageParams}"
+                              title="${warehouse.message(code: 'default.dateCreated.label', default: 'Date created')}" />
         </tr>
         </thead>
         <tbody>

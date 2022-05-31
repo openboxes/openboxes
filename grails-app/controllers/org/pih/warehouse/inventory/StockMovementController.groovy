@@ -183,7 +183,8 @@ class StockMovementController {
         def stockMovements
 
         try {
-            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, createdAfter: createdAfter, createdBefore: createdBefore])
+            stockMovements = stockMovementService.getStockMovements(stockMovement,
+                    [max: max, offset: offset, createdAfter: createdAfter, createdBefore: createdBefore, sort: params.sort, order: params.order])
         } catch(Exception e) {
             flash.message = "${e.message}"
         }
