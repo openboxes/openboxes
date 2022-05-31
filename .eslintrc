@@ -1,7 +1,10 @@
 {
   "parser": "babel-eslint",
   "plugins": [
+    "import",
+    "jsx-a11y",
     "react",
+    "react-hooks",
     "simple-import-sort"
   ],
   "parserOptions": {
@@ -17,20 +20,71 @@
     "node":    true
   },
   "extends": [
-    "airbnb"
+    "airbnb",
+    "airbnb/hooks",
+    "eslint:recommended",
+    "plugin:react/recommended"
   ],
   "rules": {
-    "import/named": 2,
+    "arrow-parens": "warn",
+    "class-methods-use-this": "warn",
+    "comma-style": "warn",
+    "default-param-last": "warn",
+    "func-names": "warn",
+    "function-call-argument-newline": "warn",
+    "function-paren-newline": "warn",
+    "implicit-arrow-linebreak": "warn",
+    "import/first": "error",
+    "import/named": "error",
+    "import/newline-after-import": "error",
+    // FIXME `no-cycle` should be an error
+    "import/no-cycle": "warn",
+    "import/no-duplicates": "error",
+    "indent": "warn",
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
       "specialLink": [ "to", "hrefLeft", "hrefRight" ],
       "aspects": [ "noHref" ]
     }],
-    "jsx-a11y/label-has-for": [ 2, {
+    "jsx-a11y/control-has-associated-label": "warn",
+    "jsx-a11y/label-has-associated-control": "warn",
+    "jsx-a11y/label-has-for": [ "error", {
       "components": [ "Label" ],
       "required": "id",
       "allowChildren": false
     }],
+    "jsx-a11y/role-supports-aria-props": "warn",
+    "lines-between-class-members": "warn",
+    "object-curly-newline": "warn",
+    "operator-linebreak": "warn",
+    "no-else-return": "warn",
+    "no-multiple-empty-lines": "warn",
+    "no-unused-vars": "warn",
+    "react/button-has-type": "warn",
+    "react/default-props-match-prop-types": "warn",
+    "react/destructuring-assignment": "off",
+    "react/function-component-definition": "warn",
+    "react/jsx-curly-brace-presence": "warn",
+    "react/jsx-curly-newline": "warn",
+    "react/jsx-fragments": "warn",
+    "react/jsx-indent": "warn",
+    "react/jsx-key": "warn",
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-pascal-case": "warn",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-tag-spacing": "warn",
+    "react/jsx-wrap-multilines": "warn",
+    // FIXME `no-access-state-in-setstate` should be an error
+    "react/no-access-state-in-setstate": "warn",
+    // FIXME `no-unstable-nested-components` should be an error
+    "react/no-unstable-nested-components": "warn",
+    "react/no-unused-class-component-methods": "warn",
+    "react/prop-types": "warn",
+    "react/require-default-props": "warn",
+    "react/sort-comp": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "semi": "warn",
+    "simple-import-sort/exports": "error",
     "simple-import-sort/imports": [
       "error",
       {
@@ -57,11 +111,7 @@
           ["^.+\\.s?css$"]
         ]
       }
-    ],
-    "simple-import-sort/exports": "error",
-    "import/first": "error",
-    "import/newline-after-import": "error",
-    "import/no-duplicates": "error"
+    ]
   },
   "settings": {
     "import/resolver": {

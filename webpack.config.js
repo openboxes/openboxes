@@ -10,10 +10,11 @@ const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -29,12 +30,22 @@ module.exports = {
     colors: true,
   },
   plugins: [
+    new ESLintPlugin({
+      extensions: ['.js', '.jsx'],
+      fix: false,
+      threads: false,
+    }),
     new MiniCssExtractPlugin({
       filename: 'css/bundle.[hash].css',
       chunkFilename: 'css/bundle.[hash].[name].css',
     }),
     new OptimizeCSSAssetsPlugin({}),
-    new CleanWebpackPlugin([`${JS_DEST}/bundle.**`, `${CSS_DEST}/bundle.**`]),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [
+        `${CSS_DEST}/bundle.**`,
+        `${JS_DEST}/bundle.**`,
+      ],
+    }),
     new HtmlWebpackPlugin({
       filename: `${COMMON_VIEW}/_react.gsp`,
       template: `${ASSETS}/grails-template.html`,
@@ -63,16 +74,16 @@ module.exports = {
   module: {
     rules: [
       {
-        enforce: 'pre',
         test: /\.jsx$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader',
-      },
-      {
-        test: /\.jsx$/,
-        loader: 'babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1',
         include: SRC,
         exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+            presets: ['es2015', 'react', 'stage-1'],
+          },
+        },
       },
       {
         test: /\.(sa|sc|c)ss$/,
