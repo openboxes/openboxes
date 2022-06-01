@@ -50,7 +50,8 @@
     <ga:trackPageview/>
     <r:layoutResources/>
 
-    <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" data-auto-replace-svg="nest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js"
+            data-auto-replace-svg="nest"></script>
 </head>
 
 <body class="yui-skin-sam">
