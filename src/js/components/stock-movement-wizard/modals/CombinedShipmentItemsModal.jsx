@@ -27,8 +27,20 @@ const FIELDS = {
     fields: {
       checked: {
         fieldKey: '',
-        label: '',
+        label: 'react.stockMovement.selectAll.label',
+        defaultMessage: 'Select All',
         flexWidth: '0.4',
+        headerAlign: 'right',
+        getDynamicAttr: ({ selectAllItems, allItemsSelected }) => ({
+          headerHtml: () => (
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={allItemsSelected}
+              onClick={selectAllItems}
+            />
+          ),
+        }),
         type: ({
           // eslint-disable-next-line react/prop-types
           rowIndex, fieldValue, selectRow,
@@ -36,7 +48,7 @@ const FIELDS = {
           <Checkbox
             id={rowIndex.toString()}
             disabled={false}
-            className="ml-4"
+            style={{ marginLeft: '1.1rem' }}
             value={fieldValue.checked}
             onChange={value => selectRow(value, rowIndex)}
           />
@@ -161,6 +173,8 @@ class CombinedShipmentItemsModal extends Component {
     this.onSave = this.onSave.bind(this);
     this.selectRow = this.selectRow.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.selectAllItems = this.selectAllItems.bind(this);
+    this.allItemsSelected = this.allItemsSelected.bind(this);
 
     this.debounceProductsInOrders = debounceProductsInOrders(
       this.props.debounceTime,
@@ -183,7 +197,6 @@ class CombinedShipmentItemsModal extends Component {
     this.props.showSpinner();
     const { shipment } = this.props;
     const { selectedOrderItems } = this.state;
-
     const payload = {
       itemsToAdd: _.map(selectedOrderItems, (item, key) => ({
         orderItemId: key,
@@ -299,6 +312,42 @@ class CombinedShipmentItemsModal extends Component {
     });
   }
 
+  allItemsSelected() {
+    return this.state.formValues.orderItems.every(item => item.checked);
+  }
+
+  selectAllItems() {
+    const allItemsSelected = this.allItemsSelected();
+    this.setState({
+      formValues: {
+        orderItems: this.state.formValues.orderItems.map(item => ({
+          ...item,
+          checked: !allItemsSelected,
+          quantityToShip: !allItemsSelected ? item.quantityAvailable : '',
+          sortOrder: !allItemsSelected ? item.sortOrder : '',
+        })),
+      },
+    }, () => this.updateAllSelectedItems());
+  }
+
+  updateAllSelectedItems() {
+    const allItemsSelected = this.allItemsSelected();
+    const updatedSelectedOrderItems = this.state.formValues.orderItems.reduce((acc, curr) => {
+      if (allItemsSelected) {
+        return {
+          ...acc,
+          [curr.orderItemId]: {
+            quantityToShip: curr.quantityAvailable,
+            sortOrder: curr.sortOrder,
+          },
+        };
+      }
+      return acc;
+    }, {});
+
+    this.setState({ selectedOrderItems: updatedSelectedOrderItems });
+  }
+
   render() {
     const {
       orderNumberOptions, selectedOrders, formValues,
@@ -319,6 +368,8 @@ class CombinedShipmentItemsModal extends Component {
         formProps={{
           selectRow: this.selectRow,
           updateRow: this.updateRow,
+          selectAllItems: this.selectAllItems,
+          allItemsSelected: this.allItemsSelected(),
         }}
         btnSaveText="react.combinedShipments.addItemsToShipment.label"
         btnSaveDefaultText="Add items to shipment"
