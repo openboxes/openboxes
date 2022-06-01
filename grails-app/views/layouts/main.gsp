@@ -2,7 +2,8 @@
 <html>
 <head>
     <title><g:layoutTitle default="OpenBoxes" /></title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css">
 </head>
 <body class="d-flex flex-column">
     <div style="flex: 1">

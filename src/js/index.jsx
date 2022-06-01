@@ -14,7 +14,7 @@ import store from 'store';
 import 'bootstrap/dist/js/bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.css';
-import 'font-awesome/css/font-awesome.min.css';
+import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
 // eslint-disable-next-line import/no-unresolved
 import 'css/main.scss';
 
@@ -31,4 +31,3 @@ ReactDOM.render(
   </Provider>
   , document.getElementById('root'),
 );
-
