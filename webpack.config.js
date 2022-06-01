@@ -31,6 +31,7 @@ module.exports = {
   },
   plugins: [
     new ESLintPlugin({
+      extensions: ['.js', '.jsx'],
       fix: false,
       threads: true,
     }),
@@ -81,8 +82,8 @@ module.exports = {
           options: {
             cacheDirectory: true,
             presets: [
-              ['@babel/preset-env', { targets: "defaults" }],
-              ['@babel/preset-react', { targets: "defaults" }]
+              ['@babel/preset-env', { targets: 'defaults' }],
+              ['@babel/preset-react', { targets: 'defaults' }],
             ]
           }
         }
