@@ -32,7 +32,9 @@
     "moduleNameMapper": {
       "\\.(css|scss)$": "<rootDir>/src/js/tests/__mocks__/styleMock.js"
     },
-    "testURL": "http://localhost/"
+    "testEnvironmentOptions": {
+      "url": "http://localhost/"
+    }
   },
   "repository": {
     "type": "git",
