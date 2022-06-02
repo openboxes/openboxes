@@ -32,9 +32,7 @@
     "moduleNameMapper": {
       "\\.(css|scss)$": "<rootDir>/src/js/tests/__mocks__/styleMock.js"
     },
-    "testEnvironmentOptions": {
-      "url": "http://localhost/"
-    }
+    "testURL": "http://localhost/"
   },
   "repository": {
     "type": "git",
@@ -100,14 +98,13 @@
     "redux-thunk": "2.4.1"
   },
   "devDependencies": {
-    "@babel/cli": "7.17.10",
-    "@babel/core": "7.18.2",
-    "@babel/eslint-parser": "7.18.2",
-    "@babel/preset-env": "7.18.2",
-    "@babel/preset-react": "7.17.12",
     "acorn": "6.4.2",
-    "babel-jest": "28.1.0",
-    "babel-loader": "8.2.5",
+    "babel-core": "6.26.3",
+    "babel-eslint": "8.0.1",
+    "babel-jest": "23.6.0",
+    "babel-loader": "7.1.5",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-react": "6.24.1",
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "5.2.7",
     "eslint": "8.16.0",
@@ -120,7 +117,7 @@
     "eslint-webpack-plugin": "2.6.0",
     "file-loader": "6.2.0",
     "html-webpack-plugin": "4.5.1",
-    "jest": "28.1.0",
+    "jest": "23.6.0",
     "jquery": "3.6.0",
     "jss": "10.9.0",
     "mini-css-extract-plugin": "1.6.2",
