@@ -59,7 +59,8 @@ class FileTransferService {
                 return fileInfo
             }
 
-            messages = messages.findAll { !it.isDirectory }.sort { it.mtime }
+            // Sort message by modified date in ascending order
+            messages = messages.findAll { !it.isDirectory }.sort { a, b -> a.mtime <=> b.mtime }
 
             return messages
         } catch (Exception e) {
