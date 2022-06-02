@@ -33,7 +33,7 @@ module.exports = {
     new ESLintPlugin({
       extensions: ['.js', '.jsx'],
       fix: false,
-      threads: true,
+      threads: false,
     }),
     new MiniCssExtractPlugin({
       filename: 'css/bundle.[hash].css',
@@ -43,8 +43,8 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
         `${CSS_DEST}/bundle.**`,
-        `${JS_DEST}/bundle.**`
-      ]
+        `${JS_DEST}/bundle.**`,
+      ],
     }),
     new HtmlWebpackPlugin({
       filename: `${COMMON_VIEW}/_react.gsp`,
@@ -81,9 +81,9 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             cacheDirectory: true,
-            presets: ['env', 'react']
-          }
-        }
+            presets: ['es2015', 'react', 'stage-1'],
+          },
+        },
       },
       {
         test: /\.(sa|sc|c)ss$/,

@@ -1,7 +1,10 @@
 {
-  "parser": "@babel/eslint-parser",
+  "parser": "babel-eslint",
   "plugins": [
+    "import",
+    "jsx-a11y",
     "react",
+    "react-hooks",
     "simple-import-sort"
   ],
   "parserOptions": {
@@ -18,7 +21,9 @@
   },
   "extends": [
     "airbnb",
-    "airbnb/hooks"
+    "airbnb/hooks",
+    "eslint:recommended",
+    "plugin:react/recommended"
   ],
   "rules": {
     "arrow-parens": "warn",
@@ -32,6 +37,7 @@
     "import/first": "error",
     "import/named": "error",
     "import/newline-after-import": "error",
+    // FIXME `no-cycle` should be an error
     "import/no-cycle": "warn",
     "import/no-duplicates": "error",
     "indent": "warn",
@@ -62,12 +68,15 @@
     "react/jsx-curly-newline": "warn",
     "react/jsx-fragments": "warn",
     "react/jsx-indent": "warn",
+    "react/jsx-key": "warn",
     "react/jsx-one-expression-per-line": "off",
     "react/jsx-pascal-case": "warn",
     "react/jsx-props-no-spreading": "off",
     "react/jsx-tag-spacing": "warn",
     "react/jsx-wrap-multilines": "warn",
+    // FIXME `no-access-state-in-setstate` should be an error
     "react/no-access-state-in-setstate": "warn",
+    // FIXME `no-unstable-nested-components` should be an error
     "react/no-unstable-nested-components": "warn",
     "react/no-unused-class-component-methods": "warn",
     "react/prop-types": "warn",
@@ -102,7 +111,7 @@
           ["^.+\\.s?css$"]
         ]
       }
-    ],
+    ]
   },
   "settings": {
     "import/resolver": {
