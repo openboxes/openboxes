@@ -88,7 +88,6 @@
                     <td>
                         <g:expirationDate date="${entry?.inventoryItem?.expirationDate}"/>
                     </td>
-
                     <td>
                         ${g.formatNumber(number: entry?.quantityOnHand, format: '###,###,###') }
                         ${entry?.inventoryItem?.product?.unitOfMeasure}
@@ -114,7 +113,7 @@ Status: ${stockMovement?.stockMovementStatusCode?.name}
 Packing: ${stockMovement?.packingLocation?:'Unassigned'}
 Loading: ${stockMovement?.loadingLocation?:'Unassigned'}
 </g:set>
-                                <g:link controller="stockMovement" action="show" id="${requisitionNumber}" title="${tooltipMessage}">
+                                <g:link controller="stockMovement" action="show" id="${stockMovement?.identifier}" title="${tooltipMessage}">
                                     ${stockMovement?.identifier}
                                 </g:link>
                                 <br/>
