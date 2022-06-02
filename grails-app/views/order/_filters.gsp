@@ -133,10 +133,27 @@
                 <button type="submit" class="button icon search" name="search" value="true">
                     <warehouse:message code="default.search.label"/>
                 </button>
-                <button name="format" value="csv" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
-                    <warehouse:message code="order.downloadOrderLineDetails.label" default="Download order line details"/>
-                </button>
+                <span class="action-menu" style="margin-left: 15px">
+                    <button class="action-btn button">
+                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
+                    ${warehouse.message(code: 'default.button.download.label')}
+                        <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                    </button>
+                    <div class="actions">
+                        <div class="action-menu-item download-subbuttons">
+                            <button name="format" value="csv">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                <warehouse:message code="order.downloadOrderLineDetails.label" default="Download order line details"/>
+                            </button>
+                        </div>
+                        <div class="action-menu-item download-subbuttons">
+                            <button name="downloadOrders" value="csv">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                <warehouse:message code="order.downloadOrders" default="Download orders"/>
+                            </button>
+                        </div>
+                    </div>
+                </span>
                 <g:link controller="order" action="list" class="button icon reload">
                     <warehouse:message code="default.button.cancel.label"/>
                 </g:link>
