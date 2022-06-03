@@ -113,7 +113,7 @@
                         <li>
                             <button class="action-hover-btn button helpscout top" onclick="Beacon('toggle');">
                                 <i class="far fa-life-ring"></i>
-                                <g:message code="default.support.label" default="Support" />
+                                <warehouse:message code="default.support.label" default="Support" />
                             </button>
                         </li>
                     </g:if>
