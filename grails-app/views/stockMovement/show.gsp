@@ -490,6 +490,11 @@
                             </a>
                         </li>
                         <li>
+                            <a href="${request.contextPath}/stockMovement/picklist/${stockMovement?.id}">
+                                <g:message code="picklist.label"/>
+                            </a>
+                        </li>
+                        <li>
                             <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
                                 <warehouse:message code="shipping.packingList.label" />
                             </a>

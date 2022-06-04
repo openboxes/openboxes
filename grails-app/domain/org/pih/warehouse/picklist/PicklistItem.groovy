@@ -9,10 +9,10 @@
  **/
 package org.pih.warehouse.picklist
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.RefreshPicklistStatusEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.RequisitionItem
@@ -82,6 +82,10 @@ class PicklistItem implements Serializable {
             "quantityCanceled",
             "pickable",
             "shortage",
+            "totalCount",
+            "indexString",
+            "index",
+            "reasonCodeMessage",
     ]
 
     String getAssociatedLocation() {
@@ -120,51 +124,74 @@ class PicklistItem implements Serializable {
         }
     }
 
+    Integer getIndex() {
+        def index = picklist?.picklistItems?.findIndexOf {PicklistItem picklistItem -> picklistItem?.id == id }
+        return index?:1
+    }
 
+    Integer getTotalCount() {
+        return picklist?.picklistItems?.size() ?: 0
+    }
+
+    String getIndexString() {
+        return "${index} / ${totalCount}"
+    }
+
+    String getReasonCodeMessage() {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return g.message(code: 'enum.ReasonCode.' + reasonCode)?:reasonCode
+    }
 
     Map toJson() {
         [
-                id                    : id,
-                version               : version,
-                status                : status,
-                requisitionItemId     : requisitionItem?.id,
-                orderItemId           : orderItem?.id,
-                binLocationId         : binLocation?.id,
-                inventoryItemId       : inventoryItem?.id,
-                quantity              : quantity ?: 0,
-                reasonCode            : reasonCode,
-                comment               : comment,
+                id               : id,
+                version          : version,
+                status           : status,
+                requisitionItemId: requisitionItem?.id,
+                orderItemId      : orderItem?.id,
+                binLocationId    : binLocation?.id,
+                inventoryItemId  : inventoryItem?.id,
+                quantity         : quantity ?: 0,
+                reasonCode       : reasonCode,
+                reasonCodeMessage: reasonCodeMessage,
+                comment          : comment,
 
                 // Used in Bin Replenishment feature
-                binLocation           : binLocation,
-                zone                  : binLocation?.zone,
-                product               : inventoryItem?.product,
-                inventoryItem         : inventoryItem,
-                lotNumber             : inventoryItem?.lotNumber,
-                expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocation      : binLocation,
+                zone             : binLocation?.zone,
+                product          : inventoryItem?.product,
+                inventoryItem    : inventoryItem,
+                lotNumber        : inventoryItem?.lotNumber,
+                expirationDate   : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
 
                 // Used in React Native app
-                "picklist.id"         : picklist?.id,
-                "requisitionItem.id"  : requisitionItem?.id,
-                "product.id"          : inventoryItem?.product?.id,
-                "product.name"        : inventoryItem?.product?.name,
-                "productCode"         : inventoryItem?.product?.productCode,
-                "inventoryItem.id"    : inventoryItem?.id,
-                lotNumber             : inventoryItem?.lotNumber,
-                expirationDate        : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                "binLocation.id"      : binLocation?.id,
-                "binLocation.name"    : binLocation?.name,
-                "binLocation.zoneId"  : binLocation?.zone?.id,
-                "binLocation.zoneName": binLocation?.zone?.name,
-                quantityRequested     : requisitionItem?.quantity ?: 0,
-                quantityRemaining     : quantityRemaining ?: 0,
-                quantityToPick        : quantity ?: 0,
-                quantityPicked        : quantityPicked ?: 0,
-                quantityCanceled      : quantityCanceled ?: 0,
-                unitOfMeasure         : requisitionItem?.product?.unitOfMeasure ?: "EA",
-                shortage              : shortage,
-                picker                : picker,
-                datePicked            : datePicked
+                "picklist.id"               : picklist?.id,
+                "requisitionItem.id"        : requisitionItem?.id,
+                "product.id"                : inventoryItem?.product?.id,
+                "product.name"              : inventoryItem?.product?.name,
+                "productCode"               : inventoryItem?.product?.productCode,
+                "inventoryItem.id"          : inventoryItem?.id,
+                lotNumber                   : inventoryItem?.lotNumber,
+                expirationDate              : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "binLocation.id"            : binLocation?.id,
+                "binLocation.name"          : binLocation?.name,
+                "binLocation.locationNumber": binLocation?.locationNumber,
+                "binLocation.locationType"  : binLocation?.locationType?.name,
+                "binLocation.zoneId"        : binLocation?.zone?.id,
+                "binLocation.zoneName"      : binLocation?.zone?.name,
+                quantityRequested           : requisitionItem?.quantity ?: 0,
+                quantityRemaining           : quantityRemaining ?: 0,
+                quantityToPick              : quantity ?: 0,
+                quantityPicked              : quantityPicked ?: 0,
+                quantityCanceled            : quantityCanceled ?: 0,
+                unitOfMeasure               : requisitionItem?.product?.unitOfMeasure ?: "EA",
+                shortage                    : shortage,
+                picker                      : picker,
+                datePicked                  : datePicked,
+                index                       : index,
+                totalCount                  : totalCount,
+                indexString                 : indexString,
+                pickerName                  : picker?.name,
         ]
     }
 }

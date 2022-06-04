@@ -18,7 +18,6 @@ class PicklistItemController {
     def delete = {
         def picklistItem = PicklistItem.get(params.id)
         if (picklistItem) {
-
             try {
                 picklistItem.delete()
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
@@ -29,6 +28,25 @@ class PicklistItemController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
         }
-        redirect(controller: "requisition", action: "pick", id: picklistItem?.picklist?.requisition?.id, params: ['requisitionItem.id': picklistItem?.requisitionItem?.id])
+        redirect(controller: "stockMovement", action: "show", id: picklistItem?.picklist?.requisition?.id)
     }
+
+    def undo = {
+        def picklistItem = PicklistItem.get(params.id)
+        if (picklistItem) {
+            try {
+                picklistItem.picker = null
+                picklistItem.reasonCode = null
+                picklistItem.quantityPicked = 0
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
+            }
+            catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
+            }
+        } else {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'picklistItem.label', default: 'Picklist item'), params.id])}"
+        }
+        redirect(controller: "stockMovement", action: "show", id: picklistItem?.picklist?.requisition?.id)
+    }
+
 }

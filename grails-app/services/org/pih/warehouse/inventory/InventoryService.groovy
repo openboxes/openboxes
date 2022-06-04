@@ -1241,7 +1241,8 @@ class InventoryService implements ApplicationContextAware {
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantityOnHand != 0) {
 
-                        def picklists = stockMovementService.getPicklistByLocationAndProduct(binLocation, inventoryItem)
+                        def picklistItems = stockMovementService.getPicklistItemsByLocationAndProduct(binLocation, inventoryItem)
+                        def picklists = picklistItems*.picklist
                         List<String> pickedRequisitionNumbers = picklists?.collect { it.requisition.requestNumber }?.unique()
 
                         List<StockMovement> stockMovements = pickedRequisitionNumbers.collect { stockMovementService.getStockMovement(it, false)}
@@ -1251,8 +1252,8 @@ class InventoryService implements ApplicationContextAware {
                                 binLocation: binLocation,
                                 quantityOnHand: quantityOnHand,
                                 quantityAvailable: quantityAvailable,
-                                quantityPicked: picklists*.picklistItems?.flatten()?.sum { it.quantityPicked },
-                                quantityAllocated: picklists*.picklistItems?.flatten()?.sum { it.quantity },
+                                quantityPicked: picklistItems?.sum { it.quantityPicked },
+                                quantityAllocated: picklistItems?.sum { it.quantity },
                                 pickedRequisitionNumbers: pickedRequisitionNumbers,
                                 stockMovements: stockMovements
                         )

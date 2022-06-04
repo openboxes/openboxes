@@ -152,46 +152,11 @@ class BootStrap {
 
 
         JSON.registerObjectMarshaller(Picklist) { Picklist picklist ->
-            [
-                    id              : picklist.id,
-                    name            : picklist.name,
-                    description     : picklist.description,
-                    picker          : picklist.picker,
-                    datePicked      : picklist.datePicked?.format("MM/dd/yyyy"),
-                    picklistItems   : picklist.picklistItems,
-                    "requisition.id": picklist?.requisition?.id
-            ]
+            return picklist.toJson()
         }
 
         JSON.registerObjectMarshaller(PicklistItem) { PicklistItem picklistItem ->
-            [
-                    id                          : picklistItem.id,
-                    status                      : picklistItem.status,
-                    "picklist.id"               : picklistItem?.picklist?.id,
-                    "requisitionItem.id"        : picklistItem?.requisitionItem?.id,
-                    "inventoryItem.id"          : picklistItem.inventoryItem?.id,
-                    "product.id"                : picklistItem?.inventoryItem?.product?.id,
-                    "product.name"              : picklistItem?.inventoryItem?.product?.name,
-                    "productCode"               : picklistItem?.inventoryItem?.product?.productCode,
-                    lotNumber                   : picklistItem?.inventoryItem?.lotNumber,
-                    expirationDate              : picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                    "binLocation.id"            : picklistItem?.binLocation?.id,
-                    "binLocation.name"          : picklistItem?.binLocation?.name,
-                    "binLocation.locationNumber": picklistItem?.binLocation?.locationNumber,
-                    "binLocation.locationType"  : picklistItem?.binLocation?.locationType?.name,
-                    "binLocation.zoneId"        : picklistItem?.binLocation?.zone?.id,
-                    "binLocation.zoneName"      : picklistItem?.binLocation?.zone?.name,
-                    quantity                    : picklistItem?.quantity ?: 0,
-                    quantityPicked              : picklistItem?.quantityPicked ?: 0,
-                    quantityRequested           : picklistItem?.requisitionItem?.quantity ?: 0,
-                    quantityRemaining           : picklistItem?.quantityRemaining ?: 0,
-                    quantityToPick              : picklistItem?.quantity ?: 0,
-                    unitOfMeasure               : picklistItem?.requisitionItem?.product?.unitOfMeasure ?: "EA",
-                    picker                      : picklistItem?.picklist?.picker,
-                    datePicked                  : picklistItem?.picklist?.datePicked?.format("MM/dd/yyyy"),
-                    reasonCode                  : picklistItem.reasonCode,
-                    comment                     : picklistItem.comment
-            ]
+            return picklistItem.toJson()
         }
 
 

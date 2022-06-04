@@ -395,6 +395,11 @@ class StockMovementController {
         render(template: "documents", model: [stockMovement: stockMovement])
     }
 
+    def picklist = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "picklist", model: [stockMovement: stockMovement])
+    }
+
     def packingList = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render(template: "packingList", model: [stockMovement: stockMovement])
