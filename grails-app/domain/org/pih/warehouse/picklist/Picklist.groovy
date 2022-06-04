@@ -118,10 +118,14 @@ class Picklist implements Serializable {
 
     Map toJson() {
         [
-                id           : id,
-                version      : version,
-                picklistItems: picklistItems?.collect { it.toJson() }
+                id              : id,
+                version         : version,
+                name            : name,
+                description     : description,
+                picker          : picker,
+                datePicked      : datePicked?.format("MM/dd/yyyy"),
+                "requisition.id": requisition?.id,
+                picklistItems   : picklistItems
         ]
     }
-
 }
