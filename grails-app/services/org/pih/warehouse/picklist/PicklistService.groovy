@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import grails.validation.ValidationException
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -26,6 +27,7 @@ import org.pih.warehouse.requisition.RequisitionStatus
 class PicklistService {
 
     def grailsApplication
+    def stockMovementService
     def productAvailabilityService
 
     Picklist save(Map data) {
@@ -83,11 +85,22 @@ class PicklistService {
         picklistItem.picker = User.load(pickerId)
 
         // Used to mark a pick item as shorted
-        if(reasonCode) {
+        if (reasonCode) {
             picklistItem.reasonCode = reasonCode
         }
+
+        // Save picklist item
         if (picklistItem.hasErrors() || !picklistItem.save(flush:true)) {
             throw new ValidationException("Unable to save picklist item", picklistItem.errors)
+        }
+
+        // Checking whether we need to perform automatic reallocation after shortage
+        if (picklistItem.shortage) {
+            Location currentLocation = picklistItem?.requisitionItem?.requisition?.origin
+            if (currentLocation?.supports(ActivityCode.PICKING_STRATEGY_AUTOMATIC_REALLOCATION)) {
+                log.info "Automatically generate new picklist item for shortage: ${picklistItem?.toJson()}"
+                stockMovementService.createPicklist(picklistItem, Boolean.TRUE)
+            }
         }
 
         // Check if the picklist has been completed

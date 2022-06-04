@@ -85,6 +85,9 @@ enum ActivityCode {
     PUTAWAY_STRATEGY_SINGLE_SKU('PUTAWAY_STRATEGY_SINGLE_SKU'),
     PUTAWAY_STRATEGY_SINGLE_LPN('PUTAWAY_STRATEGY_SINGLE_LPN'),
 
+    // Picking strategies
+    PICKING_STRATEGY_AUTOMATIC_REALLOCATION('PICKING_STRATEGY_AUTOMATIC_REALLOCATION'),
+
     final String id
 
     ActivityCode(String id) { this.id = id }
@@ -133,6 +136,9 @@ enum ActivityCode {
                 PUTAWAY_STRATEGY_EMPTY_LOCATIONS,
                 PUTAWAY_STRATEGY_SINGLE_SKU,
                 PUTAWAY_STRATEGY_SINGLE_LPN,
+
+                // Picking strategies
+                PICKING_STRATEGY_AUTOMATIC_REALLOCATION,
         ]
     }
 }

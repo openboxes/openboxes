@@ -1267,11 +1267,14 @@ class StockMovementService {
         }
     }
 
-    void createPicklist(StockMovementItem stockMovementItem, Boolean validateQtyAvailable) {
+    void createPicklist(StockMovementItem stockMovementItem, Boolean validateQuantityAvailable) {
         log.info "Create picklist for stock movement item ${stockMovementItem.toJson()}"
-
         RequisitionItem requisitionItem = RequisitionItem.get(stockMovementItem.id)
-        createPicklist(requisitionItem, validateQtyAvailable)
+        createPicklist(requisitionItem, requisitionItem.calculateQuantityRequired(), Boolean.TRUE, validateQuantityAvailable)
+    }
+
+    void createPicklist(PicklistItem picklistItem, Boolean validateQuantityAvailable) {
+        createPicklist(picklistItem.requisitionItem, picklistItem?.quantityCanceled, Boolean.FALSE, validateQuantityAvailable, picklistItem)
     }
 
     /**
@@ -1279,19 +1282,30 @@ class StockMovementService {
      *
      * @param id
      */
-    void createPicklist(RequisitionItem requisitionItem, validateQtyAvailable) {
+    void createPicklist(RequisitionItem requisitionItem, Integer quantityRequired, Boolean shouldClearPicklist = Boolean.TRUE, Boolean validateQuantityAvailable = Boolean.FALSE, PicklistItem excludedPicklistItem = null) {
         Location location = requisitionItem?.requisition?.origin
-        Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
 
         log.info "QUANTITY REQUIRED: ${quantityRequired}"
 
         if (quantityRequired) {
             // Retrieve all available items and then calculate suggested
             List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
+
+            // If a picklist item was passed as an argument, remove the picklist item for which we're trying to create an alternative pick
+            if (excludedPicklistItem) {
+                availableItems.removeAll { AvailableItem availableItem->
+                    availableItem.binLocation?.id == excludedPicklistItem?.binLocation?.id &&
+                            availableItem?.inventoryItem?.id == excludedPicklistItem?.inventoryItem?.id
+                }
+            }
             log.info "Available items: ${availableItems}"
             List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
             log.info "Suggested items " + suggestedItems
-            clearPicklist(requisitionItem)
+
+            // The only time we don't want to clear the picklist is if we're generating new picklist items due to a shortage
+            if (shouldClearPicklist) {
+                clearPicklist(requisitionItem)
+            }
             if (suggestedItems) {
                 for (SuggestedItem suggestedItem : suggestedItems) {
                     createOrUpdatePicklistItem(requisitionItem,
@@ -1305,7 +1319,7 @@ class StockMovementService {
                         null)
                 }
             }
-            if (validateQtyAvailable && !suggestedItems) {
+            if (validateQuantityAvailable && !suggestedItems) {
                 String errorMessage = "Product " + requisitionItem.product.productCode + " has no available inventory. Please go back to edit page and revise quantity"
                 requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
                         requisitionItem?.product?.productCode,
@@ -1466,7 +1480,7 @@ class StockMovementService {
     List<AvailableItem> calculateQuantityAvailableToPromise(List<AvailableItem> availableItems, def picklistItems) {
         for (PicklistItem picklistItem : picklistItems) {
             AvailableItem availableItem = availableItems.find {
-                it.inventoryItem == picklistItem.inventoryItem && it.binLocation == picklistItem.binLocation
+                it.inventoryItem?.id == picklistItem.inventoryItem?.id && it.binLocation?.id == picklistItem.binLocation?.id
             }
 
             if (!availableItem) {
@@ -1507,7 +1521,30 @@ class StockMovementService {
             }
             picklistItems {
                 eq("inventoryItem", inventoryItem)
+                if (binLocation) {
+                    eq("binLocation", binLocation)
+                }
+                else {
+                    isNull("binLocation")
+                }
+            }
+        }
+    }
+
+
+    def getPicklistItemsByLocationAndProduct(Location binLocation, InventoryItem inventoryItem) {
+        return PicklistItem.createCriteria().list {
+            picklist {
+                requisition {
+                    'in'("status", RequisitionStatus.listPending())
+                }
+            }
+            eq("inventoryItem", inventoryItem)
+            if (binLocation) {
                 eq("binLocation", binLocation)
+            }
+            else {
+                isNull("binLocation")
             }
         }
     }
@@ -1627,7 +1664,7 @@ class StockMovementService {
 
         if (!requisitionItem.picklistItems || (requisitionItem.picklistItems && requisitionItem.totalQuantityPicked() != requisitionItem.quantity &&
                 !requisitionItem.picklistItems.reasonCode)) {
-            createPicklist(requisitionItem, false)
+            createPicklist(requisitionItem, requisitionItem?.calculateQuantityRequired(), false)
         }
         PickPageItem pickPageItem = new PickPageItem(requisitionItem: requisitionItem,
                 picklistItems: requisitionItem.picklistItems)
