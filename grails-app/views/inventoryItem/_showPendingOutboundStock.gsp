@@ -29,7 +29,7 @@
                     ${warehouse.message(code: 'requisition.quantityRequired.label')}
                 </th>
                 <th>
-                    ${warehouse.message(code: 'requisition.quantityPicked.label')}
+                    ${warehouse.message(code: 'picklistItem.quantityAllocated.label', default: 'Allocated')}
                 </th>
                 <th>
                     ${warehouse.message(code: 'default.lotSerialNo.label')}
