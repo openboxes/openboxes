@@ -17,7 +17,6 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
-import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -48,7 +47,9 @@ const FIELDS = {
       rowValues, subfield, showOnlyErroredItems, itemFilter,
     }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
-      if (!subfield) { className += 'font-weight-bold'; }
+      if (rowValues.quantityAvailable < rowValues.quantityRequested) {
+        className += 'font-weight-bold';
+      }
       const filterOutItems = itemFilter && !(
         rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
         rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
@@ -73,7 +74,7 @@ const FIELDS = {
       product: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '2.5',
+        flexWidth: '3.5',
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
@@ -95,7 +96,9 @@ const FIELDS = {
         label: 'react.stockMovement.requested.label',
         defaultMessage: 'Requested',
         flexWidth: '1.1',
+        headerAlign: 'right',
         attributes: {
+          className: 'text-right',
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
@@ -106,15 +109,16 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
+          let className = 'text-right';
           if (fieldValue && (!fieldValue.quantityOnHand ||
             fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className = `${className} text-danger`;
           }
           return {
             className,
           };
         },
+        headerAlign: 'right',
         attributes: {
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
         },
@@ -126,15 +130,16 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
+          let className = 'text-right';
           if (fieldValue && (!fieldValue.quantityAvailable ||
             fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className = `${className} text-danger`;
           }
           return {
             className,
           };
         },
+        headerAlign: 'right',
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
@@ -154,34 +159,10 @@ const FIELDS = {
           },
           showValueTooltip: true,
         }),
-      },
-      detailsButton: {
-        label: 'react.stockMovement.details.label',
-        defaultMessage: 'Details',
-        type: DetailsModal,
-        fieldKey: '',
-        flexWidth: '1',
+        headerAlign: 'right',
         attributes: {
-          title: 'react.stockMovement.pendingRequisitionDetails.label',
-          defaultTitleMessage: 'Pending Requisition Details',
+          className: 'text-right',
         },
-        getDynamicAttr: ({ fieldValue, stockMovementId, values }) => ({
-          productId: fieldValue && fieldValue.product && fieldValue.product.id,
-          productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
-          productName: fieldValue && fieldValue.product && fieldValue.product.name,
-          originId: values && values.origin && values.origin.id,
-          stockMovementId,
-          quantityRequested: fieldValue && fieldValue.quantityRequested,
-          quantityOnHand: fieldValue && fieldValue.quantityOnHand,
-          quantityAvailable: fieldValue && fieldValue.quantityAvailable,
-          btnOpenText: 'react.stockMovement.details.label',
-          btnOpenDefaultText: 'Details',
-          btnCancelText: 'Close',
-          btnSaveStyle: { display: 'none' },
-          btnContainerClassName: 'float-right',
-          btnOpenAsIcon: true,
-          btnOpenStyle: { border: 'none', cursor: 'pointer' },
-        }),
       },
       substituteButton: {
         label: 'react.stockMovement.substitution.label',
