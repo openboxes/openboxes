@@ -29,6 +29,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
 
+import java.math.RoundingMode
+
 class OrderController {
     def orderService
     def stockMovementService
@@ -63,8 +65,8 @@ class OrderController {
         params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
 
         // Pagination parameters
-        params.max = params.format ? null : params.max?:10
-        params.offset = params.format ? null : params.offset?:0
+        params.max = (params.format || params.downloadOrders) ? null : params.max?:10
+        params.offset = (params.format || params.downloadOrders) ? null : params.offset?:0
 
         def orderTemplate = new Order(params)
         orderTemplate.orderType = orderType
@@ -131,6 +133,57 @@ class OrderController {
                         orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
                         orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
                         orderItem?.budgetCode?.code,
+                )
+            }
+
+            response.setHeader("Content-disposition", "attachment; filename=\"OrdersLineItems-${new Date().format("MM/dd/yyyy")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+        }
+
+        if (params.downloadOrders && orders) {
+            def csv = CSVUtils.getCSVPrinter()
+            csv.printRecord(
+                    "Status",
+                    "PO Number",
+                    "Name",
+                    "Supplier",
+                    "Destination name",
+                    "Ordered by",
+                    "Ordered on",
+                    "Payment method",
+                    "Payment terms",
+                    "Line items",
+                    "Ordered",
+                    "Shipped",
+                    "Received",
+                    "Invoiced",
+                    "Currency code",
+                    "Total Amount (Local Currency)",
+                    "Total Amount (Default Currency)"
+            )
+
+            orders.each { order ->
+                Integer lineItemsSize = order?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }.size() ?: 0
+                BigDecimal totalPrice = new BigDecimal(order?.total).setScale(2, RoundingMode.HALF_UP)
+                BigDecimal totalPriceNormalized = order?.totalNormalized.setScale(2, RoundingMode.HALF_UP)
+                csv.printRecord(
+                        order?.displayStatus,
+                        order?.orderNumber,
+                        order?.name,
+                        "${order?.origin?.name} (${order?.origin?.organization?.code})",
+                        "${order?.destination?.name} (${order?.destination?.organization?.code})",
+                        order?.orderedBy?.name,
+                        order?.dateOrdered?.format("MM/dd/yyyy"),
+                        order?.paymentMethodType?.name,
+                        order?.paymentTerm?.name,
+                        lineItemsSize,
+                        order?.orderedOrderItems?.size() ?: 0,
+                        order?.shippedOrderItems?.size() ?: 0,
+                        order?.receivedOrderItems?.size() ?: 0,
+                        order?.invoiceItems?.size() ?: 0,
+                        order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
+                        "${totalPrice} ${order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
+                        "${totalPriceNormalized} ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
                 )
             }
 
