@@ -17,6 +17,7 @@ import org.pih.warehouse.requisition.RequisitionItem
 
 class StockMovementItemApiController {
 
+    def allocationService
     def stockMovementService
     def productAvailabilityService
 
@@ -172,7 +173,7 @@ class StockMovementItemApiController {
             log.info new JSONObject(getAvailableItemDetails(it, quantityRequired)).toString(4)
         }
         log.info "suggested items: "
-        List suggestedItems = stockMovementService.getSuggestedItems(availableItems, quantityRequired)
+        List suggestedItems = allocationService.getAllocatedItems(location, stockMovementItem.product, quantityRequired)
         suggestedItems.each {
             log.info new JSONObject(it.toJson()).toString(4)
         }
