@@ -16,6 +16,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
 
+import java.math.RoundingMode
 import java.sql.Timestamp
 import java.text.DateFormatSymbols
 import java.text.NumberFormat
@@ -43,12 +44,11 @@ class ForecastingService {
             def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))
             def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, origin)
             def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
-
             return [
                 totalDemand  : totalDemand,
                 totalDays    : demandPeriod,
                 dailyDemand  : dailyDemand,
-                monthlyDemand: "${NumberFormat.getIntegerInstance().format(monthlyDemand)}",
+                monthlyDemand: new BigDecimal(totalDemand / Math.floor((demandPeriod / 30))).setScale(0, RoundingMode.HALF_UP),
                 onHandMonths : onHandMonths
             ]
         }
