@@ -37,7 +37,7 @@ class OrderAdjustment implements Serializable {
 
     static transients = [
         'totalAdjustments',
-        'submittedInvoiceItems',
+        'postedPurchaseInvoiceItems',
         'invoiceItems',
         'isInvoiced',
         "invoices",
@@ -79,19 +79,21 @@ class OrderAdjustment implements Serializable {
           """, [id: id])
     }
 
-    def getSubmittedInvoiceItems() {
+    def getPostedPurchaseInvoiceItems() {
         return InvoiceItem.executeQuery("""
           SELECT ii
             FROM InvoiceItem ii
             JOIN ii.invoice i
+            JOIN i.invoiceType it
             JOIN ii.orderAdjustments oa
             WHERE oa.id = :id 
             AND i.datePosted IS NOT NULL
-          """, [id: id])
+            AND it.code = :purchaseInvoiceCode
+          """, [id: id, purchaseInvoiceCode: InvoiceTypeCode.INVOICE])
     }
 
     Boolean getIsInvoiced() {
-        return !submittedInvoiceItems.empty
+        return !postedPurchaseInvoiceItems.empty
     }
 
     def getInvoices() {
