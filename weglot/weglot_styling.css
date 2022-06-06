@@ -1,0 +1,38 @@
+/*
+ * This file restyles WeGlot's translation button to match other fields
+ * in HelpScout Docs' navigation bar, and aligns text consistently.
+ *
+ * To apply, click the "Choose File" button next to "Upload Stylesheet" at
+ * https://secure.helpscout.net/settings/docs/custom-code
+ */
+
+.country-selector,
+.country-selector .wg-li {
+    font-size: 12px !important;
+}
+
+.navbar .brand {
+    line-height: 38px !important;
+}
+
+.wg-drop {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.wg-drop.country-selector {
+    background-color: #ff9800 !important;
+}
+
+.wg-drop.country-selector a {
+    height: 32px !important;
+    padding: 11px 15px !important;
+}
+
+.wg-drop.country-selector .wgcurrent {
+    border: none !important;
+}
+
+.wg-drop.country-selector .wgcurrent:after {
+    right: 0 !important;
+    top: 0.6em !important;
+}
