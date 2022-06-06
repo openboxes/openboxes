@@ -14,13 +14,11 @@ class RoleFilters {
     def dependsOn = [SecurityFilters]
     def static changeActions = ['delete', 'create', 'add', 'process', 'save',
                                 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
-    def static changeControllers = ['createProductFromTemplate']
-
     def static managerActions = [
             'stockMovementItemApi': ['eraseItem']
     ]
 
-    def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
+    def static adminControllers = ['createProduct', 'admin']
     def static adminActions = [
             'product'      : ['create'],
             'person'       : ['list'],
@@ -121,10 +119,8 @@ class RoleFilters {
         def isChangeAction = changeActions.any {
             actionName?.startsWith(it)
         }
-        def isWorkflow = controllerName?.contains("Workflow")
-        def isChangeController = changeControllers?.contains(controllerName)
         def isManagerAction = managerActions[controllerName]?.contains(actionName)
-        return isChangeAction || isWorkflow || isChangeController || isManagerAction
+        return isChangeAction || isManagerAction
     }
 
     static Boolean needInvoice(controllerName, actionName) {

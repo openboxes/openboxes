@@ -13,17 +13,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 class Constants {
-
-
-    static final String DEFAULT = "DEFAULT"
-
-    static final controllersWithAuthUserNotRequired = ['api', 'test']
     static final actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
-    static final actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
-    static final changeActions = ['edit', 'delete', 'create', 'add', 'process', 'save', 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle']
-    static final changeControllers = ['createProductFromTemplate']
-    static final adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
-    static final adminActions = ['product': ['create'], 'person': ['list'], 'user': ['list'], 'location': ['edit'], 'shipper': ['create'], 'locationGroup': ['create'], 'locationType': ['create'], '*': ['delete']]
 
     static final String DEFAULT_YEAR_FORMAT = "yyyy"
     static final String DEFAULT_DATE_FORMAT = "dd/MMM/yyyy"
@@ -35,8 +25,6 @@ class Constants {
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
 
-
-    static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT)
     static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
     static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
@@ -44,11 +32,7 @@ class Constants {
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")
     static DateFormat dayFormat = new SimpleDateFormat("dd")
-    static DateFormat weekdayAbbrFormat = new SimpleDateFormat("EEE")
     static DateFormat weekdayNameFormat = new SimpleDateFormat("EEEEE")
-    static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd")
-    static DateFormat monthFormat = new SimpleDateFormat("MM")
-    static DateFormat monthAbbrFormat = new SimpleDateFormat("MMM")
     static DateFormat monthNameFormat = new SimpleDateFormat("MMMMM")
     static DateFormat yearFormat = new SimpleDateFormat("yyyy")
     static DateFormat yearMonthFormat = new SimpleDateFormat("yyyy-MM")
@@ -61,8 +45,6 @@ class Constants {
 
     static final Float POUNDS_PER_KILOGRAM = 0.45359237
     static final Float KILOGRAMS_PER_POUND = 2.20462262
-
-    static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 
     static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
 
