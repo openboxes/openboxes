@@ -240,6 +240,7 @@ const AD_HOCK_FIELDS = {
           btnContainerClassName: 'float-right',
           btnOpenAsIcon: true,
           btnOpenStyle: { border: 'none', cursor: 'pointer' },
+          btnOpenIcon: 'fa-search',
         }),
       },
       substituteButton: {
