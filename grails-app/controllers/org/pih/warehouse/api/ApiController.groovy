@@ -32,6 +32,11 @@ class ApiController {
     def grailsApplication
     def messageSource
 
+    def rbacRules = {
+
+        render ([data: session.rbacRules] as JSON)
+    }
+
     def login = {
         def username = request.JSON.username
         def password = request.JSON.password

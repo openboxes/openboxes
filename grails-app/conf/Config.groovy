@@ -1110,6 +1110,23 @@ openboxes.purchaseOrder.editableProperties = [
         ]
 ]
 
+
+openboxes.security.rbac.rules = [
+        [controller: 'auth', actions: ['*'], access: [RoleType.ROLE_ANONYMOUS]],
+        [controller: 'dashboard', actions: ['getExpirationSummary'], access: [RoleType.ROLE_AUTHENTICATED]],
+        [controller: 'dashboard', actions: ['*'], access: [RoleType.ROLE_AUTHENTICATED]],
+        [controller: 'product', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'person', actions: ['list'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'user', actions: ['list'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'location', actions: ['edit'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'shipper', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'locationGroup', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'locationType', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
+        [controller: 'shipper', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
+        [controller: '*', actions: ['delete'], access: [RoleType.ROLE_SUPERUSER]],
+        [controller: '*', actions: ['remove'], access: [RoleType.ROLE_SUPERUSER]]
+]
+
 // OpenBoxes default uploads directory location
 openboxes.uploads.location = "uploads"
 
