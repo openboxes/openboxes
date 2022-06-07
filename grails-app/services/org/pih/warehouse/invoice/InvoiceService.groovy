@@ -260,14 +260,19 @@ class InvoiceService {
         Invoice invoice = createFromOrder(order)
         createOrUpdateVendorInvoiceNumber(invoice, order.orderNumber)
 
-        order.activeOrderItems.each { OrderItem orderItem ->
-            orderItem?.shipmentItems?.each { ShipmentItem shipmentItem ->
-                InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
+        order.orderItems.each { OrderItem orderItem ->
+            if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
+                InvoiceItem invoiceItem = createFromOrderItem(orderItem)
                 invoice.addToInvoiceItems(invoiceItem)
+            } else {
+                orderItem?.shipmentItems?.each { ShipmentItem shipmentItem ->
+                    InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
+                    invoice.addToInvoiceItems(invoiceItem)
+                }
             }
         }
 
-        order.activeOrderAdjustments.each { OrderAdjustment orderAdjustment ->
+        order.orderAdjustments.each { OrderAdjustment orderAdjustment ->
             InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
             invoice.addToInvoiceItems(invoiceItem)
         }
@@ -343,6 +348,20 @@ class InvoiceService {
     }
 
     InvoiceItem createFromOrderItem(OrderItem orderItem) {
+        if (orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED) {
+            InvoiceItem invoiceItem = new InvoiceItem(
+                    quantity: 0,
+                    product: orderItem.product,
+                    glAccount: orderItem.glAccount ?: orderItem.product.glAccount,
+                    budgetCode: orderItem?.budgetCode,
+                    quantityUom: orderItem?.quantityUom,
+                    quantityPerUom: orderItem.quantityPerUom ?: 1,
+                    unitPrice: orderItem.unitPrice
+            )
+            invoiceItem.addToOrderItems(orderItem)
+            return invoiceItem
+        }
+
         InvoiceItem invoiceItem = new InvoiceItem(
             quantity: orderItem.quantity,
             product: orderItem.product,
