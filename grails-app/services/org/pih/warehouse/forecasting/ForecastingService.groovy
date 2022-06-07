@@ -48,7 +48,7 @@ class ForecastingService {
                 totalDemand  : totalDemand,
                 totalDays    : demandPeriod,
                 dailyDemand  : dailyDemand,
-                monthlyDemand: new BigDecimal(totalDemand / Math.floor((demandPeriod / 30))).setScale(0, RoundingMode.HALF_UP),
+                monthlyDemand: new BigDecimal(monthlyDemand).setScale(0, RoundingMode.HALF_UP),
                 onHandMonths : onHandMonths
             ]
         }
