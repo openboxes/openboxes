@@ -321,12 +321,12 @@
                             <td class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
-                                            <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
-                                        </g:link>
-                                        /
                                         <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.destinationTransaction?.id }">
                                             <format:metadata obj="${stockHistoryEntry?.destinationTransaction?.transactionType}"/>
+                                        </g:link>
+                                        /
+                                        <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
+                                            <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
                                         </g:link>
                                     </g:if>
                                     <g:else>

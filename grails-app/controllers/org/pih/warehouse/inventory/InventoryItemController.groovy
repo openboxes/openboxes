@@ -190,6 +190,9 @@ class InventoryItemController {
             transactionEntries.eachWithIndex { TransactionEntry transactionEntry, i ->
 
                 boolean isBaseline = false
+                boolean isCredit = false
+                boolean isDebit = false
+
                 String index = (transactionEntry.binLocation?.name ?: "DefaultBin") + "-" + (transactionEntry?.inventoryItem?.lotNumber ?: "DefaultLot")
 
                 if (!balance[index]) {
@@ -200,10 +203,14 @@ class InventoryItemController {
                     case TransactionCode.DEBIT:
                         balance[index] -= transactionEntry?.quantity
                         totalDebit += transactionEntry?.quantity
+                        isDebit = transactionEntry?.quantity > 0
+                        isCredit = transactionEntry.quantity < 0
                         break
                     case TransactionCode.CREDIT:
                         balance[index] += transactionEntry?.quantity
                         totalCredit += transactionEntry?.quantity
+                        isDebit = transactionEntry.quantity < 0
+                        isCredit = transactionEntry?.quantity >= 0
                         break
                     case TransactionCode.INVENTORY:
                         balance[index] = transactionEntry?.quantity
@@ -219,11 +226,6 @@ class InventoryItemController {
                     isBaseline = true
                 }
 
-                boolean isCredit = (currentTransactionCode == TransactionCode.CREDIT && transactionEntry?.quantity >= 0) ||
-                        (currentTransactionCode == TransactionCode.DEBIT && transactionEntry.quantity < 0)
-
-                boolean isDebit = (currentTransactionCode == TransactionCode.DEBIT && transactionEntry?.quantity > 0) ||
-                        (currentTransactionCode == TransactionCode.CREDIT && transactionEntry.quantity < 0)
 
                 // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
                 def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity
@@ -231,7 +233,7 @@ class InventoryItemController {
                 String transactionYear = (transaction.transactionDate.year + 1900).toString()
                 String transactionMonth = (transaction.transactionDate.month).toString()
 
-                Boolean isInternal = (previousTransaction?.destination && transaction?.source) && previousTransaction?.destination == transaction?.source
+                Boolean isInternal = previousTransaction?.destination && transaction?.source && previousTransaction?.destination == transaction?.source
 
                 if (isInternal) {
                     def previousStockHistoryEntry = stockHistoryList.last()
