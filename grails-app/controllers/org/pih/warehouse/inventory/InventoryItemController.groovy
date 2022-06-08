@@ -219,13 +219,9 @@ class InventoryItemController {
                     case TransactionCode.PRODUCT_INVENTORY:
                         balance[index] += transactionEntry?.quantity
                         count[index] += transactionEntry?.quantity
+                        isBaseline = i == 0
                         break
                 }
-
-                if (currentTransactionCode == TransactionCode.PRODUCT_INVENTORY && i == 0) {
-                    isBaseline = true
-                }
-
 
                 // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
                 def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity

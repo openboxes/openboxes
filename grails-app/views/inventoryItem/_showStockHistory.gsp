@@ -285,7 +285,7 @@
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="Internal"/>
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="${format.metadata(obj:TransactionCode.INTERNAL)}"/>
                                     </g:if>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.DEBIT}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
@@ -425,7 +425,7 @@
                             </td>
 
 
-                            <td class="border-right center middle">
+                            <td class="border-right middle">
                                 <div class="line">
                                     <span>
                                         <g:if test="${stockHistoryEntry?.binLocation}">
@@ -443,13 +443,14 @@
                                         </g:else>
                                     </span>
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        &rsaquo;
-
+                                        <span>&nbsp;&rsaquo;&nbsp;</span>
                                         <g:if test="${stockHistoryEntry?.destinationBinLocation}">
-                                            <g:if test="${stockHistoryEntry?.destinationBinLocation?.zone}">
-                                                ${stockHistoryEntry?.destinationBinLocation?.zone?.name}
-                                            </g:if>
-                                            ${stockHistoryEntry?.destinationBinLocation?.name}
+                                            <span>
+                                                <g:if test="${stockHistoryEntry?.destinationBinLocation?.zone}">
+                                                    ${stockHistoryEntry?.destinationBinLocation?.zone?.name}
+                                                </g:if>
+                                                ${stockHistoryEntry?.destinationBinLocation?.name}
+                                            </span>
                                         </g:if>
                                         <g:else>
                                             <div class="fade">${g.message(code: 'default.label')}</div>
