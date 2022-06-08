@@ -732,10 +732,12 @@ class ReportService implements ApplicationContextAware {
             where destination_id = :locationId and oos.product_id in (${productIds.collect { "'$it'" }.join(',')})
             """
         def results = dataService.executeQuery(query, [locationId: locationId])
-        def data = results.collect {
+        def data = results.collect { it ->
+            Integer qtyOrderedNotShipped = onOrder[it.productId] ? onOrder[it.productId].qtyOrderedNotShipped.toInteger() : 0
+            Integer qtyShippedNotReceived = onOrder[it.productId] ? onOrder[it.productId].qtyShippedNotReceived.toInteger() : 0
             [
                     productId            : it.productId,
-                    totalOnOrder         : onOrder[it.productId].qtyOrderedNotShipped.toInteger() + onOrder[it.productId].qtyShippedNotReceived.toInteger() ?: 0,
+                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
                     totalOnHand          : it.qtyOnHand ? it.qtyOnHand.toInteger() : 0,
             ]
         }
