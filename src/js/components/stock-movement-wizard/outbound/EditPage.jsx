@@ -340,6 +340,7 @@ class EditItemsPage extends Component {
         reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
         substitutionItems: _.map(val.substitutionItems, sub => ({
           ...sub,
+          reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
           requisitionItemId: val.requisitionItemId,
           product: {
             ...sub.product,
@@ -462,6 +463,7 @@ class EditItemsPage extends Component {
               reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
+                reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
                 requisitionItemId: item.requisitionItemId,
               })),
             })),
