@@ -22,6 +22,7 @@ enum RoleType {
     // Complementary roles that provide additional functionality
     ROLE_FINANCE('Financial User', 100),
     ROLE_INVOICE('Invoice user', 100),
+    ROLE_PRODUCT_MANAGER('Product Manager', 100),
 
     // Notification roles for general system events
     ROLE_ERROR_NOTIFICATION('Error Notification', 100),
@@ -116,6 +117,7 @@ enum RoleType {
                 ROLE_SUPERUSER,
                 ROLE_FINANCE,
                 ROLE_INVOICE,
+                ROLE_PRODUCT_MANAGER,
                 ROLE_USER_NOTIFICATION,
                 ROLE_PRODUCT_NOTIFICATION,
                 ROLE_ORDER_NOTIFICATION,
