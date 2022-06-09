@@ -155,7 +155,7 @@ class PutawayService {
         }
 
         // Get all putaway locations that have already been assigned in other putaway orders
-        def pendingPutawayLocations = getPendingItems(location).collect { it.putawayLocation }
+        def pendingPutawayLocations = getPendingItems(location)?.collect { it.putawayLocation }?.findAll { it && it.supports(ActivityCode.PUTAWAY_STRATEGY_SINGLE_LPN) }
 
         // Return all putaway locations that are not already in use
         def availableLocations = supportedLocations - unavailableLocations - pendingPutawayLocations
