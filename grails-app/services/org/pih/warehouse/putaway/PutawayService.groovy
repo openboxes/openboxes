@@ -151,7 +151,7 @@ class PutawayService {
 
         // Get all available locations (with any of the given activity codes) that do not have a hold on them
         def supportedLocations = internalLocations.findAll { Location it ->
-            it.supportsAny((ActivityCode[]) activityCodes.toArray()) && !it.supports(ActivityCode.HOLD_STOCK)
+            it.supportsAny((ActivityCode[]) activityCodes.toArray())
         }
 
         // Get all putaway locations that have already been assigned in other putaway orders
