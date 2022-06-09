@@ -675,10 +675,13 @@ class AddItemsPage extends Component {
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
+    // First find items that are new and should be added (don't have status code)
     const lineItemsToBeAdded = _.filter(lineItems, item =>
       !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+    // Then get a list of items that already exist in this request (have status code)
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
+    // For each already existing items - find the ones that have changed
     _.forEach(lineItemsWithStatus, (item) => {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem.quantityRequested, 10);
@@ -706,6 +709,7 @@ class AddItemsPage extends Component {
       }
     });
 
+    // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
@@ -948,10 +952,16 @@ class AddItemsPage extends Component {
   confirmSave(onConfirm) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      ),
+      message: this.state.isRequestFromWard ?
+        this.props.translate(
+          'react.stockMovement.QOHWillNotBeSaved.message',
+          'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Also if there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+        )
+        :
+        this.props.translate(
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        ),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -1045,14 +1055,12 @@ class AddItemsPage extends Component {
    */
   fetchAddItemsPageData() {
     this.props.showSpinner();
-
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
         const { statusCode } = resp.data.data;
         const { totalCount } = resp.data;
-
         this.setState({
           values: {
             ...this.state.values,
@@ -1061,8 +1069,10 @@ class AddItemsPage extends Component {
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
           isRequestFromWard: this.props.currentLocationId === this.state.values.destination.id && this.state.values.destination.type === 'WARD',
-        }, () => this.props.hideSpinner());
-      });
+        });
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   loadMoreRows({ startIndex }) {
@@ -1168,6 +1178,7 @@ class AddItemsPage extends Component {
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
+        .then(() => this.fetchAddItemsPageData())
         .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
     }
 
@@ -1178,29 +1189,12 @@ class AddItemsPage extends Component {
     lineItems,
     callback = () => {},
   }) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.QOHWillNotBeSaved.message',
-        'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Are you sure you want to proceed?',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => {
-            this.props.showSpinner();
-            return this.saveRequisitionItemsInCurrentStep(lineItems)
-              .then(res => callback(res))
-              .catch(() => {
-                this.props.hideSpinner();
-              });
-          },
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
+    this.props.showSpinner();
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(res => callback(res))
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   submitRequest(lineItems) {
@@ -1223,7 +1217,6 @@ class AddItemsPage extends Component {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
     };
-
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
@@ -1248,6 +1241,10 @@ class AddItemsPage extends Component {
                 this.state.values.lineItems,
                 lineItem => lineItem.sortOrder === val.sortOrder,
               ).demandPerReplenishmentPeriod,
+              quantityAvailable: _.find(
+                this.state.values.lineItems,
+                lineItem => lineItem.sortOrder === val.sortOrder,
+              ).quantityAvailable,
             }),
           );
 
@@ -1258,9 +1255,10 @@ class AddItemsPage extends Component {
             currentLineItems: lineItemsBackendData,
           });
         })
+        .then(() => this.fetchAddItemsPageData())
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
-
+    this.fetchAddItemsPageData();
     return Promise.resolve();
   }
 
@@ -1271,8 +1269,8 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+    const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+    if (zeroedLines || this.state.isRequestFromWard) {
       this.confirmSave(() => this.saveItems(lineItems));
     } else {
       this.saveItems(lineItems);
@@ -1287,16 +1285,31 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
-      this.saveRequisitionItemsInCurrentStepWithAlert({
-        lineItems: formValues.lineItems,
-        callback: () => {
-          let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
-          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            redirectTo = '/openboxes/dashboard';
-          }
-          window.location = redirectTo;
-        },
-      });
+      const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      if (zeroedLines || this.state.isRequestFromWard) {
+        this.confirmSave(() => this.saveRequisitionItemsInCurrentStepWithAlert({
+          lineItems: formValues.lineItems,
+          callback: () => {
+            let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+            if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+              redirectTo = '/openboxes/dashboard';
+            }
+            window.location = redirectTo;
+          },
+        }));
+      } else {
+        this.saveRequisitionItemsInCurrentStepWithAlert({
+          lineItems: formValues.lineItems,
+          callback: () => {
+            let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+            if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+              redirectTo = '/openboxes/dashboard';
+            }
+            window.location = redirectTo;
+          },
+        });
+      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
@@ -1435,10 +1448,19 @@ class AddItemsPage extends Component {
    */
   previousPage(values, invalid) {
     if (!invalid) {
-      this.saveRequisitionItemsInCurrentStepWithAlert({
-        lineItems: values.lineItems,
-        callback: () => this.props.previousPage(values),
-      });
+      const lineItems = _.filter(values.lineItems, item => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      if (zeroedLines || this.state.isRequestFromWard) {
+        this.confirmSave(() => this.saveRequisitionItemsInCurrentStepWithAlert({
+          lineItems: values.lineItems,
+          callback: () => this.props.previousPage(values),
+        }));
+      } else {
+        this.saveRequisitionItemsInCurrentStepWithAlert({
+          lineItems: values.lineItems,
+          callback: () => this.props.previousPage(values),
+        })
+      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
