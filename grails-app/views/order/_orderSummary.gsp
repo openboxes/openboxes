@@ -64,6 +64,7 @@
                             <g:link controller="inventoryItem" action="showStockCard"
                                     style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
                                 <format:product product="${orderItem?.product}"/>
+                                <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>
                         <g:if test="${!isItemCanceled}">

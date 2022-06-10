@@ -950,6 +950,7 @@
 	<td class="left middle" style="color: {{= product.color }}">
         {{= product.productCode }}
         {{= product.name }}
+        <g:renderHandlingIcons product="{{= product}}"/>
 	</td>
 	<td class="center middle">
     	{{if productSupplier }}
