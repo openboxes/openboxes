@@ -15,6 +15,7 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -201,6 +202,9 @@ class ShipmentItem implements Comparable, Serializable {
         return quantityPicked?:quantity
     }
 
+    BigDecimal getNumericValue(Attribute attribute) {
+        return attribute ? product?.getNumericValue(attribute) * quantity : 0.0
+    }
 
     String[] getComments() {
         def comments = []

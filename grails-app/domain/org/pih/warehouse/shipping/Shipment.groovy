@@ -25,6 +25,7 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
@@ -120,7 +121,10 @@ class Shipment implements Comparable, Serializable {
             "orders",
             "packingScheduled",
             "loadingScheduled",
-            "receivingScheduled"
+            "receivingScheduled",
+            "totalValue",
+            "totalVolume",
+            "totalWeight",
     ]
 
     static mappedBy = [
@@ -272,6 +276,23 @@ class Shipment implements Comparable, Serializable {
     String getPackingStatus() {
         return "${packedItemCount} / ${totalItemCount}"
     }
+
+    Map getTotalVolume() {
+        Attribute attribute = Attribute.findByCode("VOLUME")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    Map getTotalWeight() {
+        Attribute attribute = Attribute.findByCode("WEIGHT")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    BigDecimal getAggregateNumericValue(Attribute attribute) {
+        return shipmentItems.sum { ShipmentItem shipmentItem ->
+            shipmentItem.getNumericValue(attribute)
+        }
+    }
+
 
     /**
      * Invoking the default sort() method from a GSP on the shipment items association does not seem to work reliably,

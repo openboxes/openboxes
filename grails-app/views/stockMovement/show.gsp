@@ -495,6 +495,11 @@
                             </a>
                         </li>
                         <li>
+                            <a href="${request.contextPath}/stockMovement/statusNotification/${stockMovement?.id}">
+                                <warehouse:message code="shipping.statusNotification.label" default="Status notification"/>
+                            </a>
+                        </li>
+                        <li>
                             <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
                                 <warehouse:message code="shipping.packingList.label" />
                             </a>
