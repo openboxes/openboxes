@@ -616,8 +616,6 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
-    this.saveRequisitionItemsInCurrentStepWithAlert =
-      this.saveRequisitionItemsInCurrentStepWithAlert.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
@@ -896,17 +894,16 @@ class AddItemsPage extends Component {
   saveItemsAndExportTemplate(formValues, lineItems) {
     const { movementNumber, stockMovementId } = formValues;
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStepWithAlert({
-      lineItems,
-      callback: () => {
+    this.props.showSpinner();
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
             fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
             this.props.hideSpinner();
-          })
-          .catch(() => this.props.hideSpinner());
-      },
-    });
+          });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -1185,18 +1182,6 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
-  saveRequisitionItemsInCurrentStepWithAlert({
-    lineItems,
-    callback = () => {},
-  }) {
-    this.props.showSpinner();
-    return this.saveRequisitionItemsInCurrentStep(lineItems)
-      .then(res => callback(res))
-      .catch(() => {
-        this.props.hideSpinner();
-      });
-  }
-
   submitRequest(lineItems) {
     this.confirmSubmit(() => {
       const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
@@ -1282,33 +1267,32 @@ class AddItemsPage extends Component {
    * @param {object} formValues
    * @public
    */
+  // eslint-disable-next-line consistent-return
   saveAndExit(formValues) {
+    const saveAndRedirect = (lineItems) => {
+      this.props.showSpinner();
+      return this.saveRequisitionItemsInCurrentStep(lineItems)
+        .then(() => {
+          let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+            redirectTo = '/openboxes/dashboard';
+          }
+          window.location = redirectTo;
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+        });
+    };
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
       const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
       const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
       if (zeroedLines || this.state.isRequestFromWard) {
-        this.confirmSave(() => this.saveRequisitionItemsInCurrentStepWithAlert({
-          lineItems: formValues.lineItems,
-          callback: () => {
-            let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
-            if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-              redirectTo = '/openboxes/dashboard';
-            }
-            window.location = redirectTo;
-          },
-        }));
-      } else {
-        this.saveRequisitionItemsInCurrentStepWithAlert({
-          lineItems: formValues.lineItems,
-          callback: () => {
-            let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
-            if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-              redirectTo = '/openboxes/dashboard';
-            }
-            window.location = redirectTo;
-          },
+        this.confirmSave(() => {
+          saveAndRedirect(lineItems);
         });
+      } else {
+        saveAndRedirect(lineItems);
       }
     } else {
       confirmAlert({
@@ -1342,13 +1326,15 @@ class AddItemsPage extends Component {
    * @public
    */
   saveItems(lineItems) {
-    this.saveRequisitionItemsInCurrentStepWithAlert({
-      lineItems,
-      callback: () => {
+    this.props.showSpinner();
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
-      },
-    });
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   /**
@@ -1446,20 +1432,25 @@ class AddItemsPage extends Component {
    * @param {boolean} invalid
    * @public
    */
+  // eslint-disable-next-line consistent-return
   previousPage(values, invalid) {
+    const saveAndRedirect = (lineItems) => {
+      this.props.showSpinner();
+      return this.saveRequisitionItemsInCurrentStep(lineItems)
+        .then(() => this.props.previousPage(values))
+        .catch(() => {
+          this.props.hideSpinner();
+        });
+    };
     if (!invalid) {
       const lineItems = _.filter(values.lineItems, item => !_.isEmpty(item));
       const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
       if (zeroedLines || this.state.isRequestFromWard) {
-        this.confirmSave(() => this.saveRequisitionItemsInCurrentStepWithAlert({
-          lineItems: values.lineItems,
-          callback: () => this.props.previousPage(values),
-        }));
+        this.confirmSave(() => {
+          saveAndRedirect(lineItems);
+        });
       } else {
-        this.saveRequisitionItemsInCurrentStepWithAlert({
-          lineItems: values.lineItems,
-          callback: () => this.props.previousPage(values),
-        })
+        saveAndRedirect(lineItems);
       }
     } else {
       confirmAlert({
