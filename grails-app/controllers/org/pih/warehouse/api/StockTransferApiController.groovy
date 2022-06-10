@@ -143,7 +143,7 @@ class StockTransferApiController {
         }
 
         if (jsonObject.shipmentType) {
-            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType)
+            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType?.id)
         }
 
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
