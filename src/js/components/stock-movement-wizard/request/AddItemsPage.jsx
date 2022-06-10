@@ -584,6 +584,7 @@ const REQUEST_FROM_WARD_FIELDS = {
 };
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
+const REPLENISHMENT_TYPE_PUSH = 'PUSH';
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -839,28 +840,34 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+    const isPush = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PUSH;
+    const isPull = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
 
     _.forEach(values.lineItems, (item, key) => {
+      const rowErrors = {};
       if (!_.isNil(item.product)) {
         if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
-          errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
+          rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
         }
-        if (_.isNil(item.quantityOnHand)) {
-          errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.enterQuantity.label' };
+        if (_.isNil(item.quantityOnHand) && !isPush && !isPull) {
+          rowErrors.quantityOnHand = 'react.stockMovement.error.enterQuantity.label';
         }
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
-        errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
+        rowErrors.boxName = 'react.stockMovement.error.boxWithoutPallet.label';
       }
       const dateRequested = moment(item.expirationDate, 'MM/DD/YYYY');
       if (date.diff(dateRequested) > 0) {
-        errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
+        rowErrors.expirationDate = 'react.stockMovement.error.invalidDate.label';
       }
 
       if (this.state.isRequestFromWard) {
         if (!item.quantityOnHand || item.quantityOnHand < 0) {
-          errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.quantityOnHand.label' };
+          rowErrors.quantityOnHand = 'react.stockMovement.error.quantityOnHand.label';
         }
+      }
+      if (!_.isEmpty(rowErrors)) {
+        errors.lineItems[key] = rowErrors;
       }
     });
     return errors;
