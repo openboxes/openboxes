@@ -1504,16 +1504,16 @@ class AddItemsPage extends Component {
 
         apiClient.get(url)
           .then((response) => {
-            const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
-            const quantityRequested = monthlyDemand - response.data.quantityAvailable > 0 ?
-              monthlyDemand - response.data.quantityAvailable : 0;
+            const { monthlyDemand, quantityAvailable, quantityOnHand } = response.data;
+            const quantityRequested = monthlyDemand - quantityAvailable > 0 ?
+              monthlyDemand - quantityAvailable : 0;
             this.setState({
               values: update(values, {
                 lineItems: {
                   [index]: {
                     product: { $set: product },
-                    quantityOnHand: { $set: response.data.quantityOnHand },
-                    quantityAvailable: { $set: response.data.quantityAvailable },
+                    quantityOnHand: { $set: quantityOnHand },
+                    quantityAvailable: { $set: quantityAvailable },
                     monthlyDemand: { $set: monthlyDemand },
                     quantityRequested: { $set: quantityRequested },
                   },
