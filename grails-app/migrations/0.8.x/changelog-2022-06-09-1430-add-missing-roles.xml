@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="DariuszRodzewicz" id="0906202214000-0">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">select count(*) from role where role_type = "ROLE_PRODUCT_MANAGER"</sqlCheck>
+    </preConditions>
+    <insert tableName="role">
+      <column name="id" value="ROLE_PRODUCT_MANAGER"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="description" value="Role that represents users who have the permission to manage products"/>
+      <column name="role_type" value="ROLE_PRODUCT_MANAGER"/>
+      <column name="name" value="Product Manager"/>
+    </insert>
+  </changeSet>
+  <changeSet author="DariuszRodzewicz" id="0906202214000-1">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">select count(*) from role where role_type = "ROLE_APPROVER"</sqlCheck>
+    </preConditions>
+    <insert tableName="role">
+      <column name="id" value="ROLE_APPROVER"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="role_type" value="ROLE_APPROVER"/>
+      <column name="name" value="Approver"/>
+    </insert>
+  </changeSet>
+</databaseChangeLog>
