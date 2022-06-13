@@ -17,6 +17,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
+import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -163,6 +164,35 @@ const FIELDS = {
         attributes: {
           className: 'text-right',
         },
+      },
+      detailsButton: {
+        label: 'react.stockMovement.details.label',
+        defaultMessage: 'Details',
+        type: DetailsModal,
+        flexWidth: '1',
+        fieldKey: '',
+        attributes: {
+          title: 'react.stockMovement.pendingRequisitionDetails.label',
+          defaultTitleMessage: 'Pending Requisition Details',
+        },
+        getDynamicAttr: ({ fieldValue, stockMovementId, values }) => ({
+          productId: fieldValue && fieldValue.product && fieldValue.product.id,
+          productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
+          productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          originId: values && values.origin && values.origin.id,
+          stockMovementId,
+          quantityRequested: fieldValue && fieldValue.quantityRequested,
+          quantityOnHand: fieldValue && fieldValue.quantityOnHand,
+          quantityAvailable: fieldValue && fieldValue.quantityAvailable,
+          btnOpenText: 'react.stockMovement.details.label',
+          btnOpenDefaultText: 'Details',
+          btnCancelText: 'Close',
+          btnSaveStyle: { display: 'none' },
+          btnContainerClassName: 'float-right',
+          btnOpenAsIcon: true,
+          btnOpenStyle: { border: 'none', cursor: 'pointer' },
+          btnOpenIcon: 'fa-search',
+        }),
       },
       substituteButton: {
         label: 'react.stockMovement.substitution.label',
