@@ -1483,7 +1483,7 @@ class AddItemsPage extends Component {
 
         apiClient.get(url)
           .then((response) => {
-            const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
+            const monthlyDemand = parseFloat(response.data.monthlyDemand);
             const quantityRequested = monthlyDemand - (response.data.quantityOnHand || 0);
             this.setState({
               values: update(values, {
