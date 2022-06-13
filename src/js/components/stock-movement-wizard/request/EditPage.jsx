@@ -540,6 +540,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           btnContainerClassName: 'float-right',
           btnOpenAsIcon: true,
           btnOpenStyle: { border: 'none', cursor: 'pointer' },
+          btnOpenIcon: 'fa-search',
         }),
       },
       substituteButton: {
@@ -839,6 +840,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           btnContainerClassName: 'float-right',
           btnOpenAsIcon: true,
           btnOpenStyle: { border: 'none', cursor: 'pointer' },
+          btnOpenIcon: 'fa-search',
         }),
       },
       substituteButton: {
