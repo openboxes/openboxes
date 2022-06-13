@@ -1029,6 +1029,10 @@ class AddItemsPage extends Component {
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
+    } else if (this.state.isFirstPageLoaded) {
+      // Workaround for refetching items from scratch
+      // when the first page was already loaded and table is paginated
+      this.loadMoreRows({ startIndex: 0 });
     }
   }
 
@@ -1062,9 +1066,8 @@ class AddItemsPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
-        const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
-        const { totalCount } = resp.data;
+        const { data: { hasManageInventory, statusCode }, totalCount } = resp.data;
+
         this.setState({
           values: {
             ...this.state.values,
@@ -1211,46 +1214,15 @@ class AddItemsPage extends Component {
     };
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
-        .then((resp) => {
-          const { lineItems } = resp.data.data;
-          const lineItemsBackendData = _.map(
-            lineItems,
-            val => ({
-              ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
-              quantityOnHand: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).quantityOnHand,
-              monthlyDemand: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).monthlyDemand,
-              demandPerReplenishmentPeriod: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).demandPerReplenishmentPeriod,
-              quantityAvailable: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).quantityAvailable,
-            }),
-          );
-
-          this.setState({
-            values:
-              { ...this.state.values, lineItems: lineItemsBackendData },
-            totalCount: lineItems.length,
-            currentLineItems: lineItemsBackendData,
-          });
-        })
-        .then(() => this.fetchAddItemsPageData())
+        .then(() => this.setState({
+          currentLineItems: [],
+          values: { ...this.state.values, lineItems: [] },
+          sortOrder: 0,
+          newItem: false,
+          totalCount: 0,
+        }, () => this.fetchAllData()))
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
-    this.fetchAddItemsPageData();
     return Promise.resolve();
   }
 
