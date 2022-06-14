@@ -367,10 +367,12 @@ class EditItemsPage extends Component {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
         },
-        reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
+        // eslint-disable-next-line max-len
+        reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
         substitutionItems: _.map(val.substitutionItems, sub => ({
           ...sub,
-          reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
+          // eslint-disable-next-line max-len
+          reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
           requisitionItemId: val.requisitionItemId,
           product: {
             ...sub.product,
@@ -490,10 +492,12 @@ class EditItemsPage extends Component {
             editPageItems: _.map(data, item => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
-              reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
+              // eslint-disable-next-line max-len
+              reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
-                reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
+                // eslint-disable-next-line max-len
+                reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
                 requisitionItemId: item.requisitionItemId,
               })),
             })),
