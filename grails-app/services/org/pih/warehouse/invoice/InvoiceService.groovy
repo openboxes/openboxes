@@ -395,7 +395,7 @@ class InvoiceService {
             budgetCode: orderAdjustment.budgetCode,
             product: orderAdjustment.orderItem?.product,
             glAccount: orderAdjustment.glAccount ?: orderAdjustment.orderItem?.glAccount ?: orderAdjustment.orderAdjustmentType?.glAccount,
-            quantity: 1,
+            quantity: orderAdjustment?.canceled ? 0 : 1,
             quantityUom: orderAdjustment.orderItem?.quantityUom,
             quantityPerUom: orderAdjustment.orderItem?.quantityPerUom ?: 1,
             unitPrice: orderAdjustment.totalAdjustments
