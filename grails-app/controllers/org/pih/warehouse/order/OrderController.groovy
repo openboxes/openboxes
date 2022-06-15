@@ -1094,4 +1094,20 @@ class OrderController {
         def orderSummaryList = orderService.getOrderSummaryList(params)
         render(view: "orderSummaryList", model: [orderSummaryList: orderSummaryList ?: []], params: params)
     }
+
+    // For testing order item derived status feature. orderItemSummary action gets the data from extended SQL view
+    def orderItemSummary = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def orderItemSummaryList = orderService.getOrderItemSummaryList(params)
+        render(view: "orderItemSummaryList", model: [orderItemSummaryList: orderItemSummaryList ?: [], actionName: "orderItemSummary"], params: params)
+    }
+
+    // For testing order item derived status feature. orderItemDetails action gets the data from simplified SQL view
+    def orderItemDetails = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def orderItemDetailsList = orderService.getOrderItemDetailsList(params)
+        render(view: "orderItemSummaryList", model: [orderItemSummaryList: orderItemDetailsList ?: []], actionName: "orderItemDetails", params: params)
+    }
 }
