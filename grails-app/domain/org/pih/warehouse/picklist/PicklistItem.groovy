@@ -10,11 +10,13 @@
 package org.pih.warehouse.picklist
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.RequisitionItem
 
 class PicklistItem implements Serializable {
@@ -80,6 +82,8 @@ class PicklistItem implements Serializable {
             'disableRefresh',
             "quantityRemaining",
             "quantityCanceled",
+            "pickUnitOfMeasure",
+            "pickType",
             "pickable",
             "shortage",
             "totalCount",
@@ -139,30 +143,47 @@ class PicklistItem implements Serializable {
 
     String getReasonCodeMessage() {
         def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        return g.message(code: 'enum.ReasonCode.' + reasonCode)?:reasonCode
+        return reasonCode ? (g.message(code: 'enum.ReasonCode.' + reasonCode)?:reasonCode) : null
+    }
+
+    ProductPackage getPickUnitOfMeasure() {
+        return requisitionItem?.product?.getProductPackage(quantity)
+    }
+
+    // FIXME Consider moving this mapping to configuration so we don't have to hard-code the UOM code here
+    static PickTypeClassification getPickTypeClassification(String uomCode) {
+        switch(uomCode) {
+            case Constants.UOM_CODE_PALLET:
+                return PickTypeClassification.FULL_PALLET
+            case Constants.UOM_CODE_CASE:
+                return PickTypeClassification.CASE_PICK
+            case Constants.UOM_CODE_EACH:
+            default:
+                return PickTypeClassification.PIECE_PICK
+        }
     }
 
     Map toJson() {
         [
-                id               : id,
-                version          : version,
-                status           : status,
-                requisitionItemId: requisitionItem?.id,
-                orderItemId      : orderItem?.id,
-                binLocationId    : binLocation?.id,
-                inventoryItemId  : inventoryItem?.id,
-                quantity         : quantity ?: 0,
-                reasonCode       : reasonCode,
-                reasonCodeMessage: reasonCodeMessage,
-                comment          : comment,
+                id                          : id,
+                version                     : version,
+                status                      : status,
+                requisitionItemId           : requisitionItem?.id,
+                orderItemId                 : orderItem?.id,
+                binLocationId               : binLocation?.id,
+                inventoryItemId             : inventoryItem?.id,
+                quantity                    : quantity ?: 0,
+                reasonCode                  : reasonCode,
+                reasonCodeMessage           : reasonCodeMessage,
+                comment                     : comment,
 
                 // Used in Bin Replenishment feature
-                binLocation      : binLocation,
-                zone             : binLocation?.zone,
-                product          : inventoryItem?.product,
-                inventoryItem    : inventoryItem,
-                lotNumber        : inventoryItem?.lotNumber,
-                expirationDate   : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                binLocation                 : binLocation,
+                zone                        : binLocation?.zone,
+                product                     : inventoryItem?.product,
+                inventoryItem               : inventoryItem,
+                lotNumber                   : inventoryItem?.lotNumber,
+                expirationDate              : inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
 
                 // Used in React Native app
                 "picklist.id"               : picklist?.id,
@@ -176,22 +197,46 @@ class PicklistItem implements Serializable {
                 "binLocation.id"            : binLocation?.id,
                 "binLocation.name"          : binLocation?.name,
                 "binLocation.locationNumber": binLocation?.locationNumber,
-                "binLocation.locationType"  : binLocation?.locationType?.name,
-                "binLocation.zoneId"        : binLocation?.zone?.id,
-                "binLocation.zoneName"      : binLocation?.zone?.name,
-                quantityRequested           : requisitionItem?.quantity ?: 0,
-                quantityRemaining           : quantityRemaining ?: 0,
-                quantityToPick              : quantity ?: 0,
-                quantityPicked              : quantityPicked ?: 0,
-                quantityCanceled            : quantityCanceled ?: 0,
-                unitOfMeasure               : requisitionItem?.product?.unitOfMeasure ?: "EA",
-                shortage                    : shortage,
-                picker                      : picker,
-                datePicked                  : datePicked,
-                index                       : index,
-                totalCount                  : totalCount,
-                indexString                 : indexString,
-                pickerName                  : picker?.name,
+                "binLocation.locationType": binLocation?.locationType?.name,
+                "binLocation.zoneId"      : binLocation?.zone?.id,
+                "binLocation.zoneName"    : binLocation?.zone?.name,
+                quantityRequested         : requisitionItem?.quantity ?: 0,
+                quantityRemaining         : quantityRemaining ?: 0,
+                quantityToPick            : quantity ?: 0,
+                quantityPicked            : quantityPicked ?: 0,
+                quantityCanceled          : quantityCanceled ?: 0,
+                unitOfMeasure             : requisitionItem?.product?.unitOfMeasure ?: "EA",
+                pickUnitOfMeasure         : pickUnitOfMeasure,
+                pickTypeClassification    : PicklistItem.getPickTypeClassification(pickUnitOfMeasure?.uom?.code)?.name(),
+                shortage                  : shortage,
+                picker                    : picker,
+                datePicked                : datePicked,
+                index                     : index,
+                totalCount                : totalCount,
+                indexString               : indexString,
+                pickerName                : picker?.name,
         ]
     }
+}
+
+public enum PickTypeClassification {
+    FULL_PALLET(0),
+    CASE_PICK(1),
+    PIECE_PICK(2)
+
+    int sortOrder
+
+    PickTypeClassification(int sortOrder) { [this.sortOrder = sortOrder] }
+
+    static int compare(PickTypeClassification a, PickTypeClassification b) {
+        return a.sortOrder <=> b.sortOrder
+    }
+
+    static list() {
+        [FULL_PALLET, CASE_PICK, PIECE_PICK]
+    }
+
+    String getName() { return name() }
+
+    String toString() { return name() }
 }

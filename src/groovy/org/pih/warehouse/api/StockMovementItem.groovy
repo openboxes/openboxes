@@ -8,9 +8,11 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.picklist.PickTypeClassification
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.shipping.ShipmentItem
 
@@ -348,6 +350,11 @@ class AvailableItem {
         return AvailableItemStatus.NOT_AVAILABLE
     }
 
+    Integer getLocationTypeSortOrder() {
+        List sortOrder = ConfigurationHolder.config.openboxes.order.allocation.locationType.sortOrderMap[pickTypeClassification]
+        return sortOrder?.contains(binLocation?.locationType?.name) ? sortOrder?.indexOf(binLocation?.locationType?.name) : 0
+    }
+
     Boolean isPickable() {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
@@ -364,13 +371,25 @@ class AvailableItem {
         return inventoryItem.unavailable
     }
 
-    PickClassification getPickClassification() {
-        quantityRequired && quantityAvailable ?
-                (quantityRequired == quantityAvailable) ? PickClassification.EXACT :
-                        (quantityRequired.intValue() % quantityAvailable.intValue() == 0) ? PickClassification.MULTIPLE :
-                                PickClassification.PIECE : PickClassification.NONE
+    ProductPackage getOptimalUnitOfMeasure() {
+        return inventoryItem?.product?.getProductPackage(quantityAvailable?.toInteger())
     }
 
+    PickTypeClassification getPickTypeClassification() {
+        return PicklistItem.getPickTypeClassification(optimalUnitOfMeasure?.uom?.code)
+    }
+
+    boolean equals(AvailableItem other) {
+        return inventoryItem?.id == other.inventoryItem?.id && binLocation?.id == other?.binLocation?.id
+    }
+
+    int hashCode() {
+        return Objects.hash(inventoryItem?.id, binLocation?.id)
+    }
+
+    String toString() {
+        return "${inventoryItem?.lotNumber}:${binLocation?.locationNumber?:binLocation?.name}:${hashCode()}"
+    }
 
     Map toJson() {
         return [
@@ -385,7 +404,8 @@ class AvailableItem {
                 quantityAvailable         : quantityAvailable > 0 ? quantityAvailable : 0,
                 quantityOnHand            : quantityOnHand,
                 quantityRequired          : quantityRequired ?: null,
-                pickClassification        : pickClassification,
+                optimalUnitOfMeasure      : optimalUnitOfMeasure,
+                pickTypeClassification    : pickTypeClassification,
                 status                    : status?.name(),
                 pickedRequisitionNumbers  : pickedRequisitionNumbers ? pickedRequisitionNumbers?.join(",") : "",
                 inventoryItem             : inventoryItem,
@@ -395,26 +415,6 @@ class AvailableItem {
                 quantityAvailableToPromise: quantityAvailable > 0 ? quantityAvailable : 0,
         ]
     }
-}
-
-enum PickClassification {
-
-    EXACT(0),
-    MULTIPLE(1),
-    PIECE(2),
-    RANDOM(3),
-    NONE(4)
-
-    final Integer sortOrder
-
-    PickClassification(Integer sortOrder) {
-        this.sortOrder = sortOrder
-    }
-
-    static list() {
-        [EXACT, MULTIPLE, PIECE, RANDOM, NONE]
-    }
-
 }
 
 enum AvailableItemStatus {
@@ -436,6 +436,15 @@ class SuggestedItem extends AvailableItem {
         json << [quantityRequested: quantityRequested, quantityToPick: quantityToPick]
         return json
     }
+
+    boolean equals(SuggestedItem other) {
+        return super.equals(other)
+    }
+
+    int hashCode() {
+        return super.hashCode()
+    }
+
 }
 
 class SubstitutionItem {

@@ -659,6 +659,14 @@ class Product implements Comparable, Serializable {
        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
+    ProductPackage getProductPackage(Integer quantity) {
+        ProductPackage productPackage = packages.find { it.quantity == quantity }
+        if (!productPackage) {
+            productPackage = packages.find { quantity % it.quantity == 0 }
+        }
+        return productPackage
+    }
+
     Map toJson() {
         [
                 id                  : id,

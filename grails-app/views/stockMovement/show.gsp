@@ -113,15 +113,23 @@
         <g:isSuperuser>
             <div class="button-group">
                 <g:set var="isOutboundFromCurrentLocation" value="${stockMovement?.origin?.id == session?.warehouse?.id}"/>
-                <g:if test="${isOutboundFromCurrentLocation && stockMovement?.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
-                    <g:link controller="picklist" action="print" class="button" id="${stockMovement?.id}" target="_blank">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-                        <warehouse:message code="default.print.label" args="[g.message(code: 'picklist.label', default: 'Picklist')]" default="Print picklist" />
-                    </g:link>
-                    <g:link controller="stockMovement" action="validatePicklist" class="button" id="${stockMovement?.id}">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
-                        <warehouse:message code="stockMovement.validatePicklist.label" default="Validate picklist" />
-                    </g:link>
+                <g:if test="${isOutboundFromCurrentLocation}">
+                    <g:if test="${stockMovement?.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+                        <g:link controller="picklist" action="print" class="button" id="${stockMovement?.id}" target="_blank">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+                            <warehouse:message code="default.print.label" args="[g.message(code: 'picklist.label', default: 'Picklist')]" default="Print picklist" />
+                        </g:link>
+                        <g:link controller="stockMovement" action="validatePicklist" class="button" id="${stockMovement?.id}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
+                            <warehouse:message code="stockMovement.validatePicklist.label" default="Validate picklist" />
+                        </g:link>
+                    </g:if>
+                    <g:elseif test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING, StockMovementStatusCode.REQUESTED]}">
+                        <g:link controller="stockMovement" action="createPicklist" class="button" id="${stockMovement?.id}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'map_clipboard.png')}" />&nbsp;
+                            <warehouse:message code="stockMovement.createPicklist.label" default="Create picklist" />
+                        </g:link>
+                    </g:elseif>
                 </g:if>
             </div>
         </g:isSuperuser>

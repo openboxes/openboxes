@@ -328,8 +328,26 @@ class Location implements Comparable<Location>, java.io.Serializable {
         else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_LIFO)) {
             return OrderAllocationStrategy.LIFO
         }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_QUANTITY_ASCENDING)) {
+            return OrderAllocationStrategy.QUANTITY_ASCENDING
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_QUANTITY_DESCENDING)) {
+            return OrderAllocationStrategy.QUANTITY_DESCENDING
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_LOCATION_ASCENDING)) {
+            return OrderAllocationStrategy.LOCATION_ASCENDING
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_LOCATION_DESCENDING)) {
+            return OrderAllocationStrategy.LOCATION_DESCENDING
+        }
+        else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_BEST_AVAILABLE)) {
+            return OrderAllocationStrategy.BEST_AVAILABLE
+        }
         else if (supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_CUSTOM)) {
             return OrderAllocationStrategy.CUSTOM
+        }
+        else {
+            return OrderAllocationStrategy.DEFAULT
         }
     }
 
