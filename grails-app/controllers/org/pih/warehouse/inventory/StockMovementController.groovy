@@ -345,27 +345,21 @@ class StockMovementController {
     }
 
     def documents = {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(params.id)
-        }
+        // Pull stock movement in "old fashion" way to bump up performance a bit (instead of getting OutboundStockMovement)
+        def stockMovement = stockMovementService.getStockMovement(params.id)
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
         render(template: "documents", model: [stockMovement: stockMovement])
     }
 
     def packingList = {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(params.id)
-        }
+        // Pull stock movement in "old fashion" way to bump up performance a bit (instead of getting OutboundStockMovement)
+        def stockMovement = stockMovementService.getStockMovement(params.id)
         render(template: "packingList", model: [stockMovement: stockMovement])
     }
 
     def receipts = {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(params.id)
-        }
+        // Pull stock movement in "old fashion" way to bump up performance a bit (instead of getting OutboundStockMovement)
+        def stockMovement = stockMovementService.getStockMovement(params.id)
         def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
