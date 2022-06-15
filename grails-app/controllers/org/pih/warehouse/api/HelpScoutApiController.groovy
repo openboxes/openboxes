@@ -11,35 +11,25 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 
-import java.util.regex.Pattern
-
 class HelpScoutApiController {
 
     def grailsApplication
-    def localizationService
+    def helpScoutService
 
     /**
      * Return localized configuration, as JSON, for a HelpScout Beacon object.
      */
     def configuration = {
-        Locale locale = session?.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-        String prefix = "helpscout.beacon"
-        Pattern prefixPattern = Pattern.compile("^${prefix}\\.(\\w+)\\.label\$")
-
         def json = [
-            "color"             : grailsApplication.config.openboxes.helpscout.widget.color,
-            "enableFabAnimation": false,
-            "labels"            : [
+            'color'                : grailsApplication.config.openboxes.helpscout.widget.color,
+            'enableFabAnimation'   : false,
+            'labels'               : [
                 /* do not promise response times while we adapt to HelpScout */
-                "noTimeToWaitAround": null,
-                "responseTime"      : null,
-            ]
+                'noTimeToWaitAround': null,
+                'responseTime'      : null,
+            ],
+            'localizedHelpScoutKey': helpScoutService.localizedHelpScoutKey,
         ]
-
-        localizationService.getMessagesPropertiesWithPrefix(prefix, locale)
-            .each {
-                json["labels"][prefixPattern.matcher(it.key).replaceFirst(/$1/)] = it.value
-            }
 
         render json as JSON
     }

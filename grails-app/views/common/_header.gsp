@@ -23,7 +23,6 @@
         e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
       }(window, document, window.Beacon || function () {
       });
-      window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.key}")
     </script>
     <!-- end magical HelpScout incantations -->
 
@@ -32,7 +31,10 @@
       let configUrl = new URL('/openboxes/api/helpscout/configuration/', window.location.href)
       fetch(configUrl.toString(), { credentials: 'same-origin' })
         .then(response => response.json())
-        .then(configJson => window.Beacon('config', configJson))
+        .then(configJson => {
+          window.Beacon('init', configJson.localizedHelpScoutKey);
+          window.Beacon('config', configJson)
+        })
     </script>
 </g:if>
 
