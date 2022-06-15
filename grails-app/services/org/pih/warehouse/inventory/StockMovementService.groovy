@@ -3039,11 +3039,54 @@ class StockMovementService {
     }
 
     Boolean validatePicklist(StockMovement stockMovement) {
-        if (stockMovement?.requisition?.picklist) {
+        Picklist picklist = stockMovement?.requisition?.picklist
+        if (picklist) {
+            validatePicklist(picklist)
+            if (picklist.hasErrors()) {
+                throw new ValidationException("Picklist has validation errors", picklist.errors)
+            }
+
             Shipment shipment = Shipment.findByRequisition(stockMovement?.requisition)
             shipmentService.validateShipment(shipment)
             validateQuantityRequested(stockMovement)
         }
         return true
+    }
+
+    Boolean validatePicklist(Picklist picklist) {
+
+        picklist.picklistItems.each { PicklistItem picklistItem ->
+            validatePicklistItem(picklistItem)
+        }
+        if (picklist.hasErrors()) {
+            throw new ValidationException("validation errors" , picklist.errors)
+        }
+
+    }
+
+    Boolean validatePicklistItem(PicklistItem picklistItem) {
+        log.info "picklistItem " + picklistItem
+        Location location = picklistItem?.picklist?.requisition?.origin
+        Integer quantityAvailable = picklistItem?.binLocation ? productAvailabilityService.getQuantityAvailableToPromise(location, picklistItem?.binLocation, picklistItem?.inventoryItem) :
+                productAvailabilityService.getAvailableItems(location, picklistItem?.inventoryItem)
+
+        Integer quantityToPick = picklistItem.quantity
+        quantityAvailable += (quantityToPick ?: 0)
+
+        log.info "quantityToPick ${quantityToPick} > quantityAvailable ${quantityAvailable}? ${quantityToPick > quantityAvailable}"
+        if (quantityToPick > quantityAvailable) {
+            String errorMessage = "Insufficient quantity available ({0} {1}) to fulfill {2} {3} of item {4} ({5}) at location {6}"
+            Object [] arguments = [
+                    quantityAvailable,
+                    picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA",
+                    picklistItem?.quantity,
+                    picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA",
+                    picklistItem?.inventoryItem?.product?.productCode,
+                    picklistItem?.inventoryItem?.lotNumber,
+                    picklistItem?.binLocation?.name,
+
+            ] as Object[]
+            picklistItem.picklist.errors.reject("picklist.insufficientQuantityAvailable.message", arguments, errorMessage)
+        }
     }
 }

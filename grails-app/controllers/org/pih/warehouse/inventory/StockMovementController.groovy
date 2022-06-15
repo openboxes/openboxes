@@ -120,6 +120,12 @@ class StockMovementController {
         [stockMovement: stockMovement]
     }
 
+    def createPicklist = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.PICKING, false, false, true, true)
+        redirect(action: "show", id: params.id)
+    }
+
     def validatePicklist = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
