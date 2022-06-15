@@ -1,48 +1,87 @@
 <%@ page import="org.pih.warehouse.core.Constants;" %>
 <%@ page import="org.pih.warehouse.order.OrderType;" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
-<div id="tab-content" class="box">
-    <h2>
-        <warehouse:message code="order.itemStatus.label" default="Item Status"/>
-    </h2>
-    <g:if test="${orderInstance?.orderItems }">
-        <table class="table table-bordered">
-            <thead>
-            <tr class="odd">
-                <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                    <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
-                </g:if>
-                <th><warehouse:message code="product.productCode.label" /></th>
-                <th><warehouse:message code="product.label" /></th>
-                <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
-                <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
-                <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                    <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
-                    <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
-                    <th class="right">${warehouse.message(code: 'order.received.label')}</th>
-                    <th class="right">${warehouse.message(code: 'invoice.invoiced.label')}</th>
-                    <th><warehouse:message code="order.unitPrice.label" /></th>
-                    <th><warehouse:message code="order.totalPrice.label" /></th>
-                </g:if>
-                <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                    <th><warehouse:message code="inventoryItem.lotNumber.label" /></th>
-                    <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
-                    <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
-                    <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
-                </g:elseif>
-            </tr>
-            </thead>
-            <tbody>
-            <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
-                <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}">
+
+<script>
+  $(document).ready(function() {
+    $("#orderItemsStatusFilter").keyup(function(event){
+      const filterCell = 1; // product name
+      const filterValue = $("#orderItemsStatusFilter")
+        .val()
+        .toUpperCase();
+      filterTableItemStatus(filterCell, filterValue)
+    });
+
+  });
+  function filterTableItemStatus(cellIndex, filterValue) {
+    const tableRows = $("#order-items-status tr.dataRowItemStatus");
+    // Loop through all table rows, and hide those who don't match the search query
+    $.each(tableRows, function(index, currentRow) {
+      // If filter matches text value then we display, otherwise hide
+      const txtValue = $(currentRow)
+        .find("td")
+        .eq(cellIndex)
+        .text();
+      if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+        $(currentRow).show();
+      } else {
+        $(currentRow).hide();
+      }
+    });
+  }
+</script>
+
+<div class="item-status-table">
+    <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+        <div class="filters-container">
+            <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
+            <div>
+                <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="Filter by product name"/>
+            </div>
+        </div>
+    </g:if>
+    <div id="tab-content" class="box">
+        <h2>
+            <warehouse:message code="order.itemStatus.label" default="Item Status"/>
+        </h2>
+        <g:if test="${orderInstance?.orderItems }">
+            <table class="table table-bordered" id="order-items-status">
+                <thead>
+                <tr class="odd">
                     <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                        <td>
-                            ${orderItem?.orderItemStatusCode}
-                        </td>
+                        <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
                     </g:if>
-                    <td>
-                        ${orderItem?.product?.productCode?:""}
-                    </td>
+                    <th><warehouse:message code="product.productCode.label" /></th>
+                    <th><warehouse:message code="product.label" /></th>
+                    <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
+                    <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
+                    <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                        <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
+                        <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
+                        <th class="right">${warehouse.message(code: 'order.received.label')}</th>
+                        <th class="right">${warehouse.message(code: 'invoice.invoiced.label')}</th>
+                        <th><warehouse:message code="order.unitPrice.label" /></th>
+                        <th><warehouse:message code="order.totalPrice.label" /></th>
+                    </g:if>
+                    <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                        <th><warehouse:message code="inventoryItem.lotNumber.label" /></th>
+                        <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
+                        <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
+                        <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
+                    </g:elseif>
+                </tr>
+                </thead>
+                <tbody>
+                <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
+                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
+                        <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                            <td>
+                                ${orderItem?.orderItemStatusCode}
+                            </td>
+                        </g:if>
+                        <td>
+                            ${orderItem?.product?.productCode?:""}
+                        </td>
 
                     <td class="order-item-product">
                         <g:if test="${orderItem?.product }">
@@ -113,9 +152,10 @@
                 </tfoot>
             </g:if>
 
-        </table>
-    </g:if>
-    <g:else>
-        <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
-    </g:else>
+            </table>
+        </g:if>
+        <g:else>
+            <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
+        </g:else>
+    </div>
 </div>
