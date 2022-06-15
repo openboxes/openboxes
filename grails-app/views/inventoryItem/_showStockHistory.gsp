@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.inventory.TransactionTypeScope" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
@@ -285,7 +285,7 @@
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="${format.metadata(obj:TransactionCode.INTERNAL)}"/>
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="${format.metadata(obj:TransactionTypeScope.INTERNAL)}"/>
                                     </g:if>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.DEBIT}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
@@ -321,12 +321,13 @@
                             <td class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.destinationTransaction?.id }">
-                                            <format:metadata obj="${stockHistoryEntry?.destinationTransaction?.transactionType}"/>
+                                        <g:set var="localTransfer" value="${stockHistoryEntry?.transaction?.localTransfer}"/>
+                                        <g:link controller="inventory" action="showTransaction" id="${localTransfer.destinationTransaction?.id }">
+                                            <format:metadata obj="${localTransfer?.destinationTransaction?.transactionType}"/>
                                         </g:link>
                                         /
-                                        <g:link controller="inventory" action="showTransaction" id="${stockHistoryEntry?.transaction?.id }">
-                                            <format:metadata obj="${stockHistoryEntry?.transaction?.transactionType}"/>
+                                        <g:link controller="inventory" action="showTransaction" id="${localTransfer.sourceTransaction?.id }">
+                                            <format:metadata obj="${localTransfer?.sourceTransaction?.transactionType}"/>
                                         </g:link>
                                     </g:if>
                                     <g:else>
@@ -473,7 +474,7 @@
                             </td>
 
                             <td class="border-right center middle">
-                                <g:if test="${stockHistoryEntry.isCredit}">
+                                <g:if test="${stockHistoryEntry.isCredit || stockHistoryEntry.isInternal }">
                                     <span class="credit">
                                         <g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
                                     </span>
@@ -481,7 +482,7 @@
                                 </g:if>
                             </td>
                             <td class="border-right center middle">
-                                <g:if test="${stockHistoryEntry.isDebit}">
+                                <g:if test="${stockHistoryEntry.isDebit || stockHistoryEntry.isInternal}">
                                     <span class="debit"><g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/></span>
                                 </g:if>
                             </td>

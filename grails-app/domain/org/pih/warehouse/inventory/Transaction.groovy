@@ -109,8 +109,8 @@ class Transaction implements Comparable, Serializable {
     static belongsTo = [LocalTransfer, Requisition, Shipment]
 
     static mappedBy = [
-            outboundTransfer: 'destinationTransaction',
-            inboundTransfer : 'sourceTransaction'
+        outboundTransfer: 'destinationTransaction',
+        inboundTransfer : 'sourceTransaction'
     ]
 
     static mapping = {
@@ -119,7 +119,14 @@ class Transaction implements Comparable, Serializable {
     }
 
     // Transient attributs
-    static transients = ['localTransfer', 'forceRefresh', 'disableRefresh', 'associatedLocation', 'associatedProducts']
+    static transients = [
+        'localTransfer',
+        'forceRefresh',
+        'disableRefresh',
+        'associatedLocation',
+        'associatedProducts',
+        'transactionTypeScope'
+    ]
 
 
     static namedQueries = {
@@ -208,6 +215,14 @@ class Transaction implements Comparable, Serializable {
 
     List getAssociatedProducts() {
         return transactionEntries?.collect { it?.inventoryItem?.product?.id }?.unique()
+    }
+
+    TransactionTypeScope getTransactionTypeScope() {
+
+        if (localTransfer && localTransfer.sourceTransaction.destination == localTransfer.destinationTransaction.source) {
+            return TransactionTypeScope.INTERNAL
+        }
+        return TransactionTypeScope.EXTERNAL
     }
 
     /**

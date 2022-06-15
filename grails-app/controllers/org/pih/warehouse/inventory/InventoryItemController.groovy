@@ -192,6 +192,7 @@ class InventoryItemController {
                 boolean isBaseline = false
                 boolean isCredit = false
                 boolean isDebit = false
+                boolean isInternal = transactionEntry.transaction.transactionTypeScope == TransactionTypeScope.INTERNAL
 
                 String index = (transactionEntry.binLocation?.name ?: "DefaultBin") + "-" + (transactionEntry?.inventoryItem?.lotNumber ?: "DefaultLot")
 
@@ -199,28 +200,30 @@ class InventoryItemController {
                     balance[index] = 0
                     count[index] = 0
                 }
-                switch (currentTransactionCode) {
-                    case TransactionCode.DEBIT:
-                        balance[index] -= transactionEntry?.quantity
-                        totalDebit += transactionEntry?.quantity
-                        isDebit = transactionEntry?.quantity > 0
-                        isCredit = transactionEntry.quantity < 0
-                        break
-                    case TransactionCode.CREDIT:
-                        balance[index] += transactionEntry?.quantity
-                        totalCredit += transactionEntry?.quantity
-                        isDebit = transactionEntry.quantity < 0
-                        isCredit = transactionEntry?.quantity >= 0
-                        break
-                    case TransactionCode.INVENTORY:
-                        balance[index] = transactionEntry?.quantity
-                        count[index] = transactionEntry?.quantity
-                        break
-                    case TransactionCode.PRODUCT_INVENTORY:
-                        balance[index] += transactionEntry?.quantity
-                        count[index] += transactionEntry?.quantity
-                        isBaseline = i == 0
-                        break
+                if (!isInternal) {
+                    switch (currentTransactionCode) {
+                        case TransactionCode.DEBIT:
+                            balance[index] -= transactionEntry?.quantity
+                            totalDebit += transactionEntry?.quantity
+                            isDebit = transactionEntry?.quantity > 0
+                            isCredit = transactionEntry.quantity < 0
+                            break
+                        case TransactionCode.CREDIT:
+                            balance[index] += transactionEntry?.quantity
+                            totalCredit += transactionEntry?.quantity
+                            isDebit = transactionEntry.quantity < 0
+                            isCredit = transactionEntry?.quantity >= 0
+                            break
+                        case TransactionCode.INVENTORY:
+                            balance[index] = transactionEntry?.quantity
+                            count[index] = transactionEntry?.quantity
+                            break
+                        case TransactionCode.PRODUCT_INVENTORY:
+                            balance[index] += transactionEntry?.quantity
+                            count[index] += transactionEntry?.quantity
+                            isBaseline = i == 0
+                            break
+                    }
                 }
 
                 // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
@@ -229,15 +232,14 @@ class InventoryItemController {
                 String transactionYear = (transaction.transactionDate.year + 1900).toString()
                 String transactionMonth = (transaction.transactionDate.month).toString()
 
-                Boolean isInternal = previousTransaction?.destination && transaction?.source && previousTransaction?.destination == transaction?.source
-
-                if (isInternal) {
+                // if transaction is internal and is the same localTransfer as the previous transaction
+                // then skip current transactionEntry and update previous entry with necessary data
+                if (isInternal && previousTransaction.localTransfer == transactionEntry.transaction.localTransfer) {
                     def previousStockHistoryEntry = stockHistoryList.last()
-                    previousStockHistoryEntry.isCredit = isCredit
-                    previousStockHistoryEntry.balance = balance.values().sum()
                     previousStockHistoryEntry.destinationBinLocation = transactionEntry.binLocation
-                    previousStockHistoryEntry.destinationTransaction = transaction
-                    previousStockHistoryEntry.isInternal = true
+
+                    totalDebit += transactionEntry?.quantity
+                    totalCredit += transactionEntry?.quantity
                 } else {
                     stockHistoryList << [
                             transactionYear         : transactionYear,
@@ -245,7 +247,6 @@ class InventoryItemController {
                             transactionDate         : transaction.transactionDate,
                             transactionCode         : currentTransactionCode,
                             transaction             : transaction,
-                            destinationTransaction  : null,
                             shipment                : null,
                             requisition             : null,
                             destinationBinLocation  : null,
@@ -259,7 +260,7 @@ class InventoryItemController {
                             showDetails             : (i == 0),
                             isBaseline              : isBaseline,
                             isSameTransaction       : (previousTransaction?.id == transaction?.id),
-                            isInternal              : false,
+                            isInternal              : isInternal,
                     ]
                 }
 
