@@ -1375,7 +1375,7 @@ class StockMovementService {
             picklistItem.inventoryItem = inventoryItem
             picklistItem.binLocation = binLocation
             picklistItem.quantity = quantityToPick // quantity on the picklist item is the quantity to pick
-            picklistItem.quantityPicked = quantityPicked
+            picklistItem.quantityPicked = quantityPicked ?: 0
             picklistItem.reasonCode = reasonCode
             picklistItem.comment = comment
             picklistItem.sortOrder = requisitionItem.orderIndex
