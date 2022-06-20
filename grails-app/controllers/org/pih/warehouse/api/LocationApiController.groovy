@@ -60,13 +60,7 @@ class LocationApiController extends BaseDomainApiController {
         def inRoleAdmin = userService.isUserInRole(currentUser, RoleType.ROLE_ADMIN)
         def inRoleSuperuser = userService.isUserInRole(currentUser, RoleType.ROLE_SUPERUSER)
 
-        def requiredRoles = [
-                RoleType.ROLE_ASSISTANT,
-                RoleType.ROLE_MANAGER,
-                RoleType.ROLE_ADMIN,
-                RoleType.ROLE_SUPERUSER,
-                RoleType.ROLE_BROWSER
-        ]
+        def requiredRoles = RoleType.listRoleTypesForLocationChooser()
 
 
         if (params.locationChooser && isRequestor && !currentUser.locationRoles && !inRoleBrowser) {

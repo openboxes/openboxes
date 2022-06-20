@@ -257,13 +257,7 @@ class LocationService {
         def inRoleAdmin = userService.isUserInRole(user, RoleType.ROLE_ADMIN)
         def inRoleSuperuser = userService.isUserInRole(user, RoleType.ROLE_SUPERUSER)
 
-        def requiredRoles = [
-                RoleType.ROLE_ASSISTANT,
-                RoleType.ROLE_MANAGER,
-                RoleType.ROLE_ADMIN,
-                RoleType.ROLE_SUPERUSER,
-                RoleType.ROLE_BROWSER
-        ]
+        def requiredRoles = RoleType.listRoleTypesForLocationChooser()
 
         if (isRequestor && !user.locationRoles && !inRoleBrowser) {
             locations = getLocations(null, null)
