@@ -402,9 +402,16 @@ class OrderController {
                     if (orderAdjustment.hasRegularInvoice) {
                         throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
                     }
-                    orderInstance.removeFromOrderAdjustments(orderAdjustment)
-                    orderAdjustment.delete()
-                    if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
+
+                    try {
+                        orderInstance.removeFromOrderAdjustments(orderAdjustment)
+                        orderAdjustment.delete()
+                        orderInstance.save(flush: true)
+                    } catch(Exception e) {
+                        throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+                    }
+
+                    if (!orderInstance.hasErrors()) {
                         flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
                         redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
                     } else {
@@ -702,9 +709,14 @@ class OrderController {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             Order order = orderItem.order
-            order.removeFromOrderItems(orderItem)
-            orderItem.delete()
-            order.save(flush:true)
+            try {
+                order.removeFromOrderItems(orderItem)
+                orderItem.delete()
+                order.save(flush:true)
+            } catch(Exception e) {
+                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
+            }
+
             render (status: 200, text: "Successfully deleted order item")
         }
         else {
