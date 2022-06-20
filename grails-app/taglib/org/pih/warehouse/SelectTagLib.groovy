@@ -408,7 +408,7 @@ class SelectTagLib {
     def selectBinLocationWithOptGroup = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
         if (currentLocation.hasBinLocationSupport()) {
-            attrs.from = Location.findAllByParentLocationAndActive(currentLocation, true).sort {
+            attrs.from = locationService.getBinLocations(currentLocation).sort {
                 it?.name?.toLowerCase()
             }
             attrs.optionKey = 'id'
