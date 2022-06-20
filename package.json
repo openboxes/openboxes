@@ -127,6 +127,7 @@
     "babel-preset-stage-1": "6.24.1",
     "cache-loader": "4.1.0",
     "browserslist": "4.21.2",
+    "cache-loader": "4.1.0",
     "clean-webpack-plugin": "0.1.19",
     "css-loader": "3.6.0",
     "eslint": "6.1.0",
