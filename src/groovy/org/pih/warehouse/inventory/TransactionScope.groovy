@@ -16,7 +16,7 @@ package org.pih.warehouse.inventory
  * EXTERNAL - transaction is one where the origin != destination
  *
  */
-enum TransactionTypeScope {
+enum TransactionScope {
     INTERNAL,
     EXTERNAL,
 

@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.inventory.TransactionTypeScope" %>
+<%@ page import="org.pih.warehouse.inventory.TransactionScope" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
@@ -285,7 +285,7 @@
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="${format.metadata(obj:TransactionTypeScope.INTERNAL)}"/>
+                                        <img src="${createLinkTo(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="${format.metadata(obj:TransactionScope.INTERNAL)}"/>
                                     </g:if>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.DEBIT}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>

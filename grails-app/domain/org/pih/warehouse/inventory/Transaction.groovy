@@ -125,7 +125,8 @@ class Transaction implements Comparable, Serializable {
         'disableRefresh',
         'associatedLocation',
         'associatedProducts',
-        'transactionTypeScope'
+        'otherTransaction',
+        'isInternal'
     ]
 
 
@@ -217,12 +218,21 @@ class Transaction implements Comparable, Serializable {
         return transactionEntries?.collect { it?.inventoryItem?.product?.id }?.unique()
     }
 
-    TransactionTypeScope getTransactionTypeScope() {
+    Boolean getIsInternal() {
+        Transaction otherTransaction = getOtherTransaction()
 
-        if (localTransfer && localTransfer.sourceTransaction.destination == localTransfer.destinationTransaction.source) {
-            return TransactionTypeScope.INTERNAL
+        if (!otherTransaction) {
+            return false
         }
-        return TransactionTypeScope.EXTERNAL
+
+        return (source && source == otherTransaction.destination) || (destination && destination == otherTransaction.source)
+    }
+
+    Transaction getOtherTransaction() {
+        if (!localTransfer) {
+            return null;
+        }
+        return this.equals(localTransfer.sourceTransaction) ? localTransfer.destinationTransaction : localTransfer.sourceTransaction
     }
 
     /**

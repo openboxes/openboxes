@@ -177,6 +177,12 @@ class InventoryItemController {
 
 
         transactionMap.each { Transaction transaction, List transactionEntries ->
+
+            // skip current transaction if it is internal and is connected to previous transaction
+            if (transaction.isInternal && previousTransaction == transaction.otherTransaction)  {
+                return
+            }
+
             TransactionCode currentTransactionCode = transaction?.transactionType?.transactionCode
 
             // For PRODUCT INVENTORY transactions we just need to clear the balance completely and start over
@@ -192,7 +198,6 @@ class InventoryItemController {
                 boolean isBaseline = false
                 boolean isCredit = false
                 boolean isDebit = false
-                boolean isInternal = transactionEntry.transaction.transactionTypeScope == TransactionTypeScope.INTERNAL
 
                 String index = (transactionEntry.binLocation?.name ?: "DefaultBin") + "-" + (transactionEntry?.inventoryItem?.lotNumber ?: "DefaultLot")
 
@@ -200,7 +205,11 @@ class InventoryItemController {
                     balance[index] = 0
                     count[index] = 0
                 }
-                if (!isInternal) {
+
+                if (transaction.isInternal) {
+                    totalDebit += transactionEntry?.quantity
+                    totalCredit += transactionEntry?.quantity
+                } else {
                     switch (currentTransactionCode) {
                         case TransactionCode.DEBIT:
                             balance[index] -= transactionEntry?.quantity
@@ -232,37 +241,31 @@ class InventoryItemController {
                 String transactionYear = (transaction.transactionDate.year + 1900).toString()
                 String transactionMonth = (transaction.transactionDate.month).toString()
 
-                // if transaction is internal and is the same localTransfer as the previous transaction
-                // then skip current transactionEntry and update previous entry with necessary data
-                if (isInternal && previousTransaction.localTransfer == transactionEntry.transaction.localTransfer) {
-                    def previousStockHistoryEntry = stockHistoryList.last()
-                    previousStockHistoryEntry.destinationBinLocation = transactionEntry.binLocation
+                // FIXME Find a better way to get binLocation of the "otherTransaction" for internal transaction
+                def otherTransactionEntries = transaction.otherTransaction?.transactionEntries;
+                def destinationBinLocation = transaction.isInternal && otherTransactionEntries.size() > 0 ? otherTransactionEntries[0].binLocation : null
 
-                    totalDebit += transactionEntry?.quantity
-                    totalCredit += transactionEntry?.quantity
-                } else {
-                    stockHistoryList << [
-                            transactionYear         : transactionYear,
-                            transactionMonth        : transactionMonth,
-                            transactionDate         : transaction.transactionDate,
-                            transactionCode         : currentTransactionCode,
-                            transaction             : transaction,
-                            shipment                : null,
-                            requisition             : null,
-                            destinationBinLocation  : null,
-                            binLocation             : transactionEntry.binLocation,
-                            inventoryItem           : transactionEntry.inventoryItem,
-                            comments                : transactionEntry.comments,
-                            quantity                : quantity,
-                            isDebit                 : isDebit,
-                            isCredit                : isCredit,
-                            balance                 : balance.values().sum(),
-                            showDetails             : (i == 0),
-                            isBaseline              : isBaseline,
-                            isSameTransaction       : (previousTransaction?.id == transaction?.id),
-                            isInternal              : isInternal,
-                    ]
-                }
+                stockHistoryList << [
+                        transactionYear         : transactionYear,
+                        transactionMonth        : transactionMonth,
+                        transactionDate         : transaction.transactionDate,
+                        transactionCode         : currentTransactionCode,
+                        transaction             : transaction,
+                        shipment                : null,
+                        requisition             : null,
+                        destinationBinLocation  : destinationBinLocation,
+                        binLocation             : transactionEntry.binLocation,
+                        inventoryItem           : transactionEntry.inventoryItem,
+                        comments                : transactionEntry.comments,
+                        quantity                : quantity,
+                        isDebit                 : isDebit,
+                        isCredit                : isCredit,
+                        balance                 : balance.values().sum(),
+                        showDetails             : (i == 0),
+                        isBaseline              : isBaseline,
+                        isSameTransaction       : (previousTransaction?.id == transaction?.id),
+                        isInternal              : transaction.isInternal,
+                ]
 
                 previousTransaction = transaction
             }
