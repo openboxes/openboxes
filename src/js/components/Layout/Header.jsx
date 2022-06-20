@@ -73,7 +73,7 @@ class Header extends Component {
             <LocationChooser />
             {
               this.props.isHelpScoutEnabled &&
-              <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.helpScoutKey}>
+              <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.localizedHelpScoutKey}>
                 <SupportButton text="react.default.button.help.label" />
               </LiveChatLoaderProvider>
             }
@@ -90,7 +90,7 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
   logoUrl: state.session.logoUrl,
   logoLabel: state.session.logoLabel,
-  helpScoutKey: state.session.helpScoutKey,
+  localizedHelpScoutKey: state.session.localizedHelpScoutKey,
   isHelpScoutEnabled: state.session.isHelpScoutEnabled,
 });
 
@@ -106,11 +106,11 @@ Header.propTypes = {
   /** Id of the current location */
   logoLabel: PropTypes.string.isRequired,
   highestRole: PropTypes.string.isRequired,
-  helpScoutKey: PropTypes.string,
+  localizedHelpScoutKey: PropTypes.string,
   isHelpScoutEnabled: PropTypes.bool,
 };
 
 Header.defaultProps = {
-  helpScoutKey: '',
+  localizedHelpScoutKey: '',
   isHelpScoutEnabled: false,
 };
