@@ -149,6 +149,46 @@ class UserService {
         return false
     }
 
+    Boolean hasRoleAssistantGlobally(User u) {
+        if (u) {
+            def assistantRole = RoleType.ROLE_ASSISTANT
+            return u.roles.any { role -> role.roleType == assistantRole}
+        }
+        return false
+    }
+
+    Boolean hasRoleBrowserGlobally(User u) {
+        if (u) {
+            def browserRole = RoleType.ROLE_BROWSER
+            return u.roles.any { role -> role.roleType == browserRole}
+        }
+        return false
+    }
+
+    Boolean isManagerGlobally(User u) {
+        if (u) {
+            def managerRole = RoleType.ROLE_MANAGER
+            return u.roles.any { role -> role.roleType == managerRole}
+        }
+        return false
+    }
+
+    Boolean isUserAdminGlobally(User u) {
+        if (u) {
+            def adminRole = RoleType.ROLE_ADMIN
+            return u.roles.any { role -> role.roleType == adminRole}
+        }
+        return false
+    }
+
+    Boolean isSuperuserGlobally(User u) {
+        if (u) {
+            def superuserRole = RoleType.ROLE_SUPERUSER
+            return u.roles.any { role -> role.roleType == superuserRole}
+        }
+        return false
+    }
+
     Boolean hasHighestRole(User u, String locationId, RoleType roleType) {
         if (u) {
             def user = User.get(u.id)
