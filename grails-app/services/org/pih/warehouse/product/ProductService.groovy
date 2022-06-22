@@ -763,6 +763,7 @@ class ProductService {
 
         def rows = []
         products.each { product ->
+            // FIXME make relation to Constants.EXPORT_PRODUCT_COLUMNS explicit
             def row = [
                 Id                  : product?.id,
                 ProductCode         : product.productCode ?: '',

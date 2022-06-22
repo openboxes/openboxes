@@ -14,18 +14,13 @@ import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.hibernate.Criteria
-import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
-import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.util.LocalizationUtil
 
@@ -414,6 +409,9 @@ class InventorySnapshotService {
     }
 
     void updateInventorySnapshots(Product product) {
+        if (!product || !product.id || !product.productCode) {
+            return
+        }
         def results = InventorySnapshot.executeUpdate(
                 "update InventorySnapshot a " +
                         "set a.productCode = :productCode " +

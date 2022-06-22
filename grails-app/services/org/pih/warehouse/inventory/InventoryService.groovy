@@ -731,9 +731,9 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    Map getQuantityByInventoryItemMap(List<TransactionEntry> entries) {
+    Map<InventoryItem, Integer> getQuantityByInventoryItemMap(List<TransactionEntry> entries) {
         def startTime = System.currentTimeMillis()
-        def quantityMap = [:]
+        Map<InventoryItem, Integer> quantityMap = [:]
 
         // first get the quantity and inventory item map
         def quantityByProductAndInventoryItemMap =
@@ -3371,4 +3371,3 @@ class InventoryService implements ApplicationContextAware {
     }
 
 }
-
