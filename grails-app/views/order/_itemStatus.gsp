@@ -2,6 +2,7 @@
 <%@ page import="org.pih.warehouse.order.OrderType;" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
 
+
 <script>
   $(document).ready(function() {
     $("#orderItemsStatusFilter").keyup(function(event){
@@ -9,153 +10,133 @@
       const filterValue = $("#orderItemsStatusFilter")
         .val()
         .toUpperCase();
-      filterTableItemStatus(filterCell, filterValue)
+      const tableRows = $("#order-items-status tr.dataRowItemStatus");
+      filterTableItems(filterCell, filterValue, tableRows)
     });
 
   });
-  function filterTableItemStatus(cellIndex, filterValue) {
-    const tableRows = $("#order-items-status tr.dataRowItemStatus");
-    // Loop through all table rows, and hide those who don't match the search query
-    $.each(tableRows, function(index, currentRow) {
-      // If filter matches text value then we display, otherwise hide
-      const txtValue = $(currentRow)
-        .find("td")
-        .eq(cellIndex)
-        .text();
-      if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
-        $(currentRow).show();
-      } else {
-        $(currentRow).hide();
-      }
-    });
-  }
 </script>
 
-<div class="item-status-table">
+
+<div id="tab-content" class="box">
+    <h2>
+        <warehouse:message code="order.itemStatus.label" default="Item Status"/>
+    </h2>
     <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-        <div class="filters-container">
-            <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
-            <div>
-                <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="Filter by product name"/>
-            </div>
-        </div>
+        <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="Filter by product name"/>
     </g:if>
-    <div id="tab-content" class="box">
-        <h2>
-            <warehouse:message code="order.itemStatus.label" default="Item Status"/>
-        </h2>
-        <g:if test="${orderInstance?.orderItems }">
-            <table class="table table-bordered" id="order-items-status">
-                <thead>
-                <tr class="odd">
+    <g:if test="${orderInstance?.orderItems }">
+        <table class="table table-bordered" id="order-items-status">
+            <thead>
+            <tr class="odd">
+                <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                    <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
+                </g:if>
+                <th><warehouse:message code="product.productCode.label" /></th>
+                <th><warehouse:message code="product.label" /></th>
+                <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
+                <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
+                <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                    <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
+                    <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
+                    <th class="right">${warehouse.message(code: 'order.received.label')}</th>
+                    <th class="right">${warehouse.message(code: 'invoice.invoiced.label')}</th>
+                    <th><warehouse:message code="order.unitPrice.label" /></th>
+                    <th><warehouse:message code="order.totalPrice.label" /></th>
+                </g:if>
+                <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                    <th><warehouse:message code="inventoryItem.lotNumber.label" /></th>
+                    <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
+                    <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
+                    <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
+                </g:elseif>
+            </tr>
+            </thead>
+            <tbody>
+            <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
+                <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
                     <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                        <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
-                    </g:if>
-                    <th><warehouse:message code="product.productCode.label" /></th>
-                    <th><warehouse:message code="product.label" /></th>
-                    <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
-                    <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
-                    <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                        <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
-                        <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
-                        <th class="right">${warehouse.message(code: 'order.received.label')}</th>
-                        <th class="right">${warehouse.message(code: 'invoice.invoiced.label')}</th>
-                        <th><warehouse:message code="order.unitPrice.label" /></th>
-                        <th><warehouse:message code="order.totalPrice.label" /></th>
-                    </g:if>
-                    <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                        <th><warehouse:message code="inventoryItem.lotNumber.label" /></th>
-                        <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
-                        <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
-                        <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
-                    </g:elseif>
-                </tr>
-                </thead>
-                <tbody>
-                <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
-                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
-                        <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                            <td>
-                                ${orderItem?.orderItemStatusCode}
-                            </td>
-                        </g:if>
                         <td>
-                            ${orderItem?.product?.productCode?:""}
+                            ${orderItem?.orderItemStatusCode}
                         </td>
+                    </g:if>
+                    <td>
+                        ${orderItem?.product?.productCode?:""}
+                    </td>
 
-                    <td class="order-item-product">
-                        <g:if test="${orderItem?.product }">
-                            <g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
-                                <format:product product="${orderItem?.product}"/>
-                                <g:renderHandlingIcons product="${orderItem?.product}" />
-                            </g:link>
-                        </g:if>
-                        <g:else>
-                            ${orderItem?.description }
-                        </g:else>
-                    </td>
-                    <td class="center">
-                        ${orderItem?.unitOfMeasure}
-                    </td>
-                    <td class="order-item-quantity right">
-                        ${orderItem?.quantity}
-                    </td>
-                    <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                        <td class="order-item-ordered right">
-                            ${orderInstance.isPlaced()?orderItem?.quantity:0}
-                        </td>
-                        <td class="order-item-fullfilled right">
-                            ${orderItem?.quantityShipped}
-                        </td>
-                        <td class="order-item-received right">
-                            ${orderItem?.quantityReceived}
-                        </td>
-                        <td class="right">
-                            ${orderItem?.quantityInvoicedInStandardUom}
-                        </td>
-                        <td class="">
-                            <g:formatNumber number="${orderItem?.unitPrice?:0}" />
-                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                        </td>
-                        <td class="">
-                            <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
-                            ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                        </td>
+                <td class="order-item-product">
+                    <g:if test="${orderItem?.product }">
+                        <g:link controller="inventoryItem" action="showStockCard" params="['product.id':orderItem?.product?.id]">
+                            <format:product product="${orderItem?.product}"/>
+                            <g:renderHandlingIcons product="${orderItem?.product}" />
+                        </g:link>
                     </g:if>
-                    <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                        <td>
-                            ${orderItem?.inventoryItem?.lotNumber}
-                        </td>
-                        <td>
-                            <g:formatDate date="${orderItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
-                        </td>
-                        <td>
-                            ${orderItem?.originBinLocation}
-                        </td>
-                        <td>
-                            ${orderItem?.destinationBinLocation}
-                        </td>
-                    </g:elseif>
-                </tr>
-            </g:each>
-            </tbody>
-            <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                <tfoot>
-                <tr class="">
-                    <th colspan="9" class="right">
-                    </th>
-                    <th colspan="1" class="left">
-                        <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
+                    <g:else>
+                        ${orderItem?.description }
+                    </g:else>
+                </td>
+                <td class="center">
+                    ${orderItem?.unitOfMeasure}
+                </td>
+                <td class="order-item-quantity right">
+                    ${orderItem?.quantity}
+                </td>
+                <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                    <td class="order-item-ordered right">
+                        ${orderInstance.isPlaced()?orderItem?.quantity:0}
+                    </td>
+                    <td class="order-item-fullfilled right">
+                        ${orderItem?.quantityShipped}
+                    </td>
+                    <td class="order-item-received right">
+                        ${orderItem?.quantityReceived}
+                    </td>
+                    <td class="right">
+                        ${orderItem?.quantityInvoicedInStandardUom}
+                    </td>
+                    <td class="">
+                        <g:formatNumber number="${orderItem?.unitPrice?:0}" />
                         ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
-                    </th>
-                </tr>
-                </tfoot>
-            </g:if>
-
-            </table>
+                    </td>
+                    <td class="">
+                        <g:formatNumber number="${orderItem?.totalPrice()?:0}" />
+                        ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                    </td>
+                </g:if>
+                <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+                    <td>
+                        ${orderItem?.inventoryItem?.lotNumber}
+                    </td>
+                    <td>
+                        <g:formatDate date="${orderItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
+                    </td>
+                    <td>
+                        ${orderItem?.originBinLocation}
+                    </td>
+                    <td>
+                        ${orderItem?.destinationBinLocation}
+                    </td>
+                </g:elseif>
+            </tr>
+        </g:each>
+        </tbody>
+        <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+            <tfoot>
+            <tr class="">
+                <th colspan="9" class="right">
+                </th>
+                <th colspan="1" class="left">
+                    <g:formatNumber number="${orderInstance?.totalPrice()?:0.0 }"/>
+                    ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                </th>
+            </tr>
+            </tfoot>
         </g:if>
-        <g:else>
-            <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
-        </g:else>
-    </div>
+
+        </table>
+    </g:if>
+    <g:else>
+        <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
+    </g:else>
 </div>
+

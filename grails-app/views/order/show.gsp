@@ -280,6 +280,22 @@
                     selected: ${params.tab ? params.tab : 0}
                 });
             });
+
+            function filterTableItems(cellIndex, filterValue, tableRows) {
+              // Loop through all table rows, and hide those who don't match the search query
+              $.each(tableRows, function(index, currentRow) {
+                // If filter matches text value then we display, otherwise hide
+                const txtValue = $(currentRow)
+                  .find("td")
+                  .eq(cellIndex)
+                  .text();
+                if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+                  $(currentRow).show();
+                } else {
+                  $(currentRow).hide();
+                }
+              });
+            }
         </script>
     </body>
 </html>
