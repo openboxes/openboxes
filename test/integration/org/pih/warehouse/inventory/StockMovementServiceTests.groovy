@@ -11,16 +11,18 @@ package org.pih.warehouse.inventory
 
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
+import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.api.StockMovement
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.product.Product
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.requisition.CommodityClass
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentType
+import testutils.DbHelper
 
 class StockMovementServiceTests extends GroovyTestCase {
 
@@ -28,29 +30,28 @@ class StockMovementServiceTests extends GroovyTestCase {
 	Requisition requisition
 	RequisitionItem requisitionItem1
 	RequisitionItem requisitionItem2
+	Shipment shipment
 	StockMovement stockMovement
 	StockMovement stockMovementEmpty
 
 	protected void setUp() {
 		super.setUp()
 
-		def origin = Location.findByName("Boston Headquarters")
+		def origin = DbHelper.getOrCreateLocation('Boston Headquarters')
 		assertNotNull(origin)
-		def destination = Location.findByName("Miami Warehouse")
+		def destination = DbHelper.getOrCreateLocation('Miami Warehouse')
 		assertNotNull(destination)
-		def product1 = Product.findByName("Advil 200mg")
+		def product1 = DbHelper.getOrCreateProduct('Advil 200mg')
 		assertNotNull(product1)
-		def product2 = Product.findByName("Tylenol 325mg")
+		def product2 = DbHelper.getOrCreateProduct('Tylenol 325mg')
 		assertNotNull(product2)
 		requisitionItem1 = new RequisitionItem(id: "item1", description: "item1", product: product1, quantity: 10)
 		assertNotNull(requisitionItem1)
 		requisitionItem2 = new RequisitionItem(id: "item2", description: "item2", product: product2, quantity: 20)
 		assertNotNull(requisitionItem2)
-		def person = Person.findById("1")
-		assertNotNull(person)
+		def person = DbHelper.getOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
 
 		requisition = new Requisition(
-				id: "requisitionID",
 				requestNumber: "SM1",
 				name: "testRequisition" + UUID.randomUUID().toString()[0..5],
 				commodityClass: CommodityClass.MEDICATION,
@@ -60,21 +61,30 @@ class StockMovementServiceTests extends GroovyTestCase {
 				requestedBy: person,
 				dateRequested: new Date(),
 				requestedDeliveryDate: new Date().plus(1),
-				status: RequisitionStatus.CREATED)
+				status: RequisitionStatus.CREATED).save(failOnError: true, flush: true)
+
+		shipment = new Shipment(
+			destination: destination,
+			expectedShippingDate: new Date().plus(1),
+			name: 'Speedy Delivery',
+			origin: origin,
+			shipmentType: new ShipmentType([name: 'hand-deliver']).save()
+		).save(failOnError: true, flush: true)
+
+		requisition.addToShipments(shipment)
 		requisition.addToRequisitionItems(requisitionItem1)
 		requisition.addToRequisitionItems(requisitionItem2)
-		requisition.save(failOnError: true)
-
-		println "Requisition: " + requisition.toJson()
-		assertNotNull(requisition)
-
+		requisition.save(failOnError: true, flush: true)
 
 		stockMovement = new StockMovement(
-				id: requisition.id,
-				origin: origin,
-				destination: destination,
-				requestedBy: person,
-				dateRequested: new Date(),
+			dateRequested: new Date(),
+			destination: destination,
+			id: requisition.id,
+			origin: origin,
+			requestedBy: person,
+			requisition: requisition,
+			shipment: shipment,
+			stockMovementDirection: StockMovementDirection.OUTBOUND
 		)
 		stockMovementEmpty = new StockMovement(id: "1")
 	}
@@ -92,14 +102,16 @@ class StockMovementServiceTests extends GroovyTestCase {
 		assertNotNull sm
 	}
 
-	@Test
+	// FIXME stockMovementService.updateStatus() no longer exists
+	@Ignore
 	void test_updateStatus_shouldThrowExceptionIfStatusNotInList() {
 		shouldFail (IllegalStateException) {
 			stockMovementService.updateStatus(requisition.id, RequisitionStatus.ERROR)
 		}
 	}
 
-	@Test
+	// FIXME stockMovementService.updateStatus() no longer exists
+	@Ignore
 	void test_updateStatus_shouldUpdateStatus() {
 
 		stockMovementService.updateStatus(requisition.id, RequisitionStatus.CANCELED)
@@ -109,7 +121,7 @@ class StockMovementServiceTests extends GroovyTestCase {
 	@Test
 	void test_updateRequisition_shouldThrowExceptionIfNoRequisition() {
 		shouldFail (ObjectNotFoundException) {
-			stockMovementService.updateOutboundStockMovement(stockMovementEmpty)
+			stockMovementService.updateRequisitionBasedStockMovement(stockMovementEmpty)
 		}
 	}
 
@@ -131,7 +143,7 @@ class StockMovementServiceTests extends GroovyTestCase {
 	void test_getStockMovements_shouldReturnStockMovements() {
 		def maxResults = 2
 		def offset = 0
-		def stockMovements = stockMovementService.getStockMovements(maxResults, offset)
+		def stockMovements = stockMovementService.getOutboundStockMovements(maxResults, offset)
 		assertNotNull stockMovements
 		assert stockMovements.size() == 1
 	}
@@ -158,4 +170,3 @@ class StockMovementServiceTests extends GroovyTestCase {
 		stockMovementService.clearPicklist(item)
 	}
 }
-

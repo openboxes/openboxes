@@ -7,7 +7,7 @@ import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
-import org.pih.warehouse.product.Product
+import testutils.DbHelper
 
 class RequisitionControllerIntegrationTests extends GroovyTestCase {
 
@@ -31,9 +31,10 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
 
     @Test
     void list_shouldListRequisitions() {
-        def location = Location.findByName("Boston Headquarters")
-        def product1 = Product.findByName("Advil 200mg")
-        def product2 = Product.findByName("Tylenol 325mg")
+        Location location = DbHelper.getOrCreateLocation('Boston Headquarters')
+
+        def product1 = DbHelper.getOrCreateProduct('Advil 200mg')
+        def product2 = DbHelper.getOrCreateProduct('Tylenol 325mg')
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()

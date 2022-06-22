@@ -17,21 +17,12 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.product.Product
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
+import testutils.DbHelper
 
 class DataServiceTests extends GroovyTestCase {
 
 
     def dataService
-
-    protected void setUp() {
-        super.setUp()
-    }
-
-    protected void tearDown() {
-        super.tearDown()
-    }
-
-
 
     @Test
     void findOrCreateCategory() {
@@ -69,19 +60,12 @@ class DataServiceTests extends GroovyTestCase {
         assertEquals "EA/1", productPackage.description
         assertEquals 1.50, productPackage.productPrice.price
         assertEquals "EA", productPackage.uom.code
-        assertEquals "EA", productPackage.uom.name
-        assertEquals "EA", productPackage.uom.description
+        assertEquals "Each", productPackage.uom.name
     }
 
     @Test
     void findOrCreateInventoryLevel() {
-        def location = Location.findByName("Boston Headquarters");
-        assertNotNull location
-        if (!location.inventory) {
-            location.inventory = new Inventory();
-            location.save(flush: true, failOnError: true)
-        }
-
+        def location = DbHelper.getOrCreateLocationWithInventory("Boston Headquarters");
         def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         def row = [minQuantity: 0, reorderQuantity: 10, maxQuantity: 100, expectedLeadTimeDays: 120, replenishmentPeriodDays: 7, preferredForReorder: true]
         def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, row)

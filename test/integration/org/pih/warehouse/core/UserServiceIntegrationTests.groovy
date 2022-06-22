@@ -1,24 +1,19 @@
 package org.pih.warehouse.core
 
-import grails.test.*
-// import org.pih.warehouse.auth.AuthService
-
-import testutils.DbHelper;
+import testutils.DbHelper
 
 
 class UserServiceIntegrationTests extends GroovyTestCase{
 
-	def userService 
-	
+	def userService
+
 	void setUp() {
 		super.setUp()
 	}
-	
-	
-	
-	void test_getAllAdminUsers() { 		
+
+	void test_getAllAdminUsers() {
 		// Create a new inactive user who has role ROLE_ADMIN
-		User adminUser = DbHelper.createAdmin("Firstson", "Miranda III", "fmiranda@pih.org", "fmiranda", "password", false)
+		User adminUser = DbHelper.getOrCreateAdminUser('Firstson', 'Miranda III', 'fmiranda@pih.org', 'fmiranda', 'password', false)
 		assertNotNull adminUser
 		assertFalse adminUser.active
 		
@@ -37,9 +32,5 @@ class UserServiceIntegrationTests extends GroovyTestCase{
 			assertTrue "Should have ROLE_ADMIN", admin.roles.contains(roleAdmin)
 			assertTrue "Should be active", admin.active
 		}
-		
-		
-		
-		
 	}
 }

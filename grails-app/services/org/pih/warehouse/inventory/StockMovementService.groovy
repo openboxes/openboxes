@@ -2240,7 +2240,7 @@ class StockMovementService {
         Shipment shipment = Shipment.findByRequisition(stockMovement.requisition)
 
         if (!shipment) {
-            throw new IllegalArgumentException("Could not find shipment for stock movement with ID ${stockMovement.id}")
+            throw new IllegalArgumentException("Could not find shipment (${stockMovement?.requisition?.id}) for stock movement with ID ${stockMovement.id}")
         }
 
         shipment.origin = stockMovement.origin

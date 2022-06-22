@@ -9,22 +9,23 @@
  * */
 package org.pih.warehouse.inventory
 
+import org.hibernate.SessionFactory
 import org.junit.Ignore
-import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.product.Product
+import org.junit.Test
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
-import org.pih.warehouse.core.Tag;
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
-import org.springframework.core.io.ClassPathResource;
+import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.product.Product
+import org.springframework.core.io.ClassPathResource
 import testutils.DbHelper
-
-import org.junit.Test
 
 class InventoryServiceTests extends GroovyTestCase {
 
-	def inventoryService
+    def inventoryService
+    SessionFactory sessionFactory
 
     protected def transactionType_consumptionDebit
     protected def  transactionType_inventory
@@ -63,11 +64,11 @@ class InventoryServiceTests extends GroovyTestCase {
         supplierLocationType = LocationType.get(Constants.SUPPLIER_LOCATION_TYPE_ID)
 
         // get or create a default location
-        acmeLocation = DbHelper.creatLocationIfNotExist("Acme Supply Company", supplierLocationType)
+        acmeLocation = DbHelper.getOrCreateLocation('Acme Supply Company', supplierLocationType)
 
         // create some default warehouses and inventories
-        bostonLocation = DbHelper.creatLocationIfNotExist("Boston Location", warehouseLocationType)
-        haitiLocation = DbHelper.creatLocationIfNotExist("Haiti Location", warehouseLocationType)
+        bostonLocation = DbHelper.getOrCreateLocation('Boston Location', warehouseLocationType)
+        haitiLocation = DbHelper.getOrCreateLocation('Haiti Location', warehouseLocationType)
 
         bostonInventory = DbHelper.createInventory(bostonLocation)
         haitiInventory = DbHelper.createInventory(haitiLocation)
@@ -80,27 +81,27 @@ class InventoryServiceTests extends GroovyTestCase {
         transactionType_transferOut =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) //id:9
 
         // create some products
-        aspirinProduct = DbHelper.createProductIfNotExists("Aspirin" + UUID.randomUUID().toString()[0..5])
-        tylenolProduct = DbHelper.createProductIfNotExists("Tylenol" + UUID.randomUUID().toString()[0..5])
-		ibuprofenProduct = DbHelper.createProductIfNotExists("Ibuprofen" + UUID.randomUUID().toString()[0..5])
-		advilProduct = DbHelper.createProductIfNotExists("Advil" + UUID.randomUUID().toString()[0..5])
-		ibuprofenProduct.description = "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)"
-		ibuprofenProduct.save(flush:true);
+        aspirinProduct = DbHelper.getOrCreateProduct('Aspirin' + UUID.randomUUID().toString()[0..5])
+        tylenolProduct = DbHelper.getOrCreateProduct('Tylenol' + UUID.randomUUID().toString()[0..5])
+        ibuprofenProduct = DbHelper.getOrCreateProduct('Ibuprofen' + UUID.randomUUID().toString()[0..5])
+        advilProduct = DbHelper.getOrCreateProduct('Advil' + UUID.randomUUID().toString()[0..5])
+        ibuprofenProduct.description = 'Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)'
+        ibuprofenProduct.save(flush: true)
 
-		tylenolProduct.brandName = "TYLENOL®"
-		tylenolProduct.manufacturer = "McNeil Consumer Healthcare"
-		tylenolProduct.manufacturerName = "Tylenol Extra Strength Acetaminophen 500 Mg 325 Caplets"
-		tylenolProduct.manufacturerCode = "TYL325"
-		tylenolProduct.vendor = "IDA"
-		tylenolProduct.vendorCode = "025200"
-		tylenolProduct.vendorName = "Acetaminophen 325 mg, film coated"
-		tylenolProduct.save(flush:true);
+        tylenolProduct.brandName = 'TYLENOL®'
+        tylenolProduct.manufacturer = 'McNeil Consumer Healthcare'
+        tylenolProduct.manufacturerName = 'Tylenol Extra Strength Acetaminophen 500 Mg 325 Caplets'
+        tylenolProduct.manufacturerCode = 'TYL325'
+        tylenolProduct.vendor = 'IDA'
+        tylenolProduct.vendorCode = '025200'
+        tylenolProduct.vendorName = 'Acetaminophen 325 mg, film coated'
+        tylenolProduct.save(flush: true)
 
 
         // create some inventory items
-        aspirinItem1 = DbHelper.createInventoryItem(aspirinProduct, "1", new Date().plus(100))
-        aspirinItem2 = DbHelper.createInventoryItem(aspirinProduct, "2", new Date().plus(10))
-        tylenolItem = DbHelper.createInventoryItem(tylenolProduct, "lot9383")
+        aspirinItem1 = DbHelper.getOrCreateInventoryItem(aspirinProduct, '1', new Date().plus(100))
+        aspirinItem2 = DbHelper.getOrCreateInventoryItem(aspirinProduct, '2', new Date().plus(10))
+        tylenolItem = DbHelper.getOrCreateInventoryItem(tylenolProduct, 'lot9383')
     }
 
     private void transactionEntryTestFixture() {
@@ -332,17 +333,43 @@ class InventoryServiceTests extends GroovyTestCase {
 		assertEquals 1, tylenolProduct.tags.size()
 		assertEquals 2, Tag.list().size()
 
-	}
+    }
 
+    /**
+     * Fetch all objects of a given domain in chunks so as to not exceed Hibernate limits.
+     *
+     * @param domain a Grails domain class (User, Product, etc.)
+     * @param chunkIdx the desired chunk to retrieve, starting with 0
+     * @param chunkLen how many objects to fetch at a time
+     * @return collated results should be identical to domain.list()
+     */
+    private <D> List<D> listInChunks(Class<D> domain, int chunkIdx, int chunkLen = 512, int clearInterval = 10) {
+        if (chunkIdx % clearInterval == 0) {
+            sessionFactory?.currentSession?.clear()
+        }
+        List<D> results = domain.list(max: chunkLen, offset: (chunkIdx * chunkLen))
+        return results
+    }
+
+    @Test
     void test_getQuantityByProductMap() {
-
         transactionEntryTestFixture()
-        def map = inventoryService.getQuantityByProductMap(TransactionEntry.list())
+        int chunk = 0
+        Map<Product, Integer> map = [:]
+
+        while (true) {
+            def batch = listInChunks(TransactionEntry, chunk++)
+            if (batch.empty) {
+                break
+            }
+            inventoryService.getQuantityByProductMap(batch).each { k, v ->
+                map[k] = map.get(k, 0) + v
+            }
+        }
 
         assert map[aspirinProduct] == 97
         assert map[tylenolProduct] == 25
     }
-
 
     @Test
     //todo: getQuantity is broken now, need to know why
@@ -368,7 +395,6 @@ class InventoryServiceTests extends GroovyTestCase {
     @Test
     void test_getProductsQuantityForInventory(){
         transactionEntryTestFixture()
-        //def inventoryService = new InventoryService()
         def results = inventoryService.getQuantityForProducts(bostonInventory, [tylenolProduct.id])
         assert results[tylenolProduct.id] == 25
         assert results.keySet().size() == 1
@@ -377,26 +403,30 @@ class InventoryServiceTests extends GroovyTestCase {
     @Test
 	void test_getProductsQuantityForInventoryWithEmptyProductArray(){
 		transactionEntryTestFixture()
-		//def inventoryService = new InventoryService()
 		def results = inventoryService.getQuantityForProducts(bostonInventory, [])
 		assert results == [:]
 	}
 
 
-
+    @Test
     void test_getQuantityByInventoryItemMap() {
-
         transactionEntryTestFixture()
+        int chunk = 0
+        Map<Product, Integer> map = [:]
 
-        //def inventoryService = new InventoryService()
-
-        // fetch the map
-        def map = inventoryService.getQuantityByInventoryItemMap(TransactionEntry.list())
+        while (true) {
+            def batch = listInChunks(TransactionEntry, chunk++)
+            if (batch.empty) {
+                break
+            }
+            inventoryService.getQuantityByInventoryItemMap(batch).each { k, v ->
+                map[k] = map.get(k, 0) + v
+            }
+        }
 
         assert map[aspirinItem1] == 94
         assert map[aspirinItem2] == 3
         assert map[tylenolItem] == 25
-
     }
 
     void test_getInventoryItemsWithQuantity() {
@@ -404,8 +434,6 @@ class InventoryServiceTests extends GroovyTestCase {
         transactionEntryTestFixture()
 
         def products = [aspirinProduct, tylenolProduct]
-
-        //def inventoryService = new InventoryService()
         def inventoryItems = inventoryService.getInventoryItemsWithQuantity(products, bostonInventory)
         assert inventoryItems.size() == 2
         assert inventoryItems[aspirinProduct]
@@ -424,8 +452,6 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_isValidForLocalTransfer_shouldCheckIfTransactionSupportsLocalTransfer() {
         localTransferTestFixture()
 
-        //def inventoryService = new InventoryService()
-
         // a transaction that isn't of transfer in or transfer out type shouldn't be marked as valid
         inventoryService.validateForLocalTransfer(transaction1)
         assert transaction1.errors.hasFieldErrors("transactionType")
@@ -443,9 +469,6 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_saveLocalTransfer_shouldCreateNewLocalTransfer() {
         localTransferTestFixture()
-
-        //def inventoryService = new InventoryService()
-
         def warehouse = bostonLocation
 
         assert warehouse.inventory != null
@@ -485,9 +508,6 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_saveLocalTransfer_shouldEditExistingLocalTransfer() {
         localTransferTestFixture()
-
-        //def inventoryService = new InventoryService()
-
         def baseTransaction = transaction4
 
         // first create a local transfer
@@ -514,7 +534,6 @@ class InventoryServiceTests extends GroovyTestCase {
 
     void test_getProductsByTags() {
         productTagTestFixture()
-        //def inventoryService = new InventoryService()
         def tags = ["thistag", "thattag"].collect { Tag.findByTag(it).id }
 
         def results = inventoryService.getProductsByTags(tags, 10, 0)
@@ -526,8 +545,6 @@ class InventoryServiceTests extends GroovyTestCase {
         productTagTestFixture()
         def tags = Tag.list()
         assertEquals 2, tags.size()
-
-        //def inventoryService = new InventoryService()
         def results = inventoryService.getProductsByTag("thistag")
         assertEquals 1, results.size()
     }
@@ -542,9 +559,8 @@ class InventoryServiceTests extends GroovyTestCase {
 
 
     void test_getProductsByTermsAndCategoriesAndLotNumberWithProductSearchTerm() {
-        basicTestFixture()
+        transactionEntryTestFixture()
         def terms = ["Asp", "rin"]
-        //def inventoryService = new InventoryService()
         def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory,  25, 0)
         assert results.contains(aspirinProduct)
     }
@@ -553,7 +569,6 @@ class InventoryServiceTests extends GroovyTestCase {
     void test_getProductsByTermsAndCategoriesAndLotNumberWithLotNumberSearchTerm() {
         basicTestFixture()
         def terms = ["lot9383"]
-        //def inventoryService = new InventoryService()
         def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 1000, 0)
         assert results.contains(tylenolProduct)
     }
@@ -561,7 +576,6 @@ class InventoryServiceTests extends GroovyTestCase {
 	void test_getProductsByTermsAndCategoriesWithProductName() {
 		basicTestFixture()
 		def terms = ["Ibuprofen"]
-		//def inventoryService = new InventoryService()
 		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
@@ -569,7 +583,6 @@ class InventoryServiceTests extends GroovyTestCase {
 	void test_getProductsByTermsAndCategoriesWithDescription() {
 		basicTestFixture()
 		def terms = ["NSAID"]
-		//def inventoryService = new InventoryService()
 		def results = inventoryService.getProductsByTermsAndCategories(terms, null, true, bostonInventory, 25, 0)
 		assert results.contains(ibuprofenProduct)
 	}
@@ -597,6 +610,5 @@ class InventoryServiceTests extends GroovyTestCase {
                 println "Product ${product.productCode} ${product.name}: ${quantityOnHand}"
             }
         }
-
     }
 }
