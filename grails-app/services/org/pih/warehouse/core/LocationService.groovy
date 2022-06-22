@@ -250,12 +250,12 @@ class LocationService {
         def locations = new HashSet()
         def nullHigh = new NullComparator(true)
         def isRequestor = userService.isUserRequestor(user)
-        def inRoleBrowser = userService.hasRoleBrowserGlobally(user)
         def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(user)
-        def inRoleAssistant = userService.hasRoleAssistantGlobally(user)
-        def inRoleManager = userService.isManagerGlobally(user)
-        def inRoleAdmin = userService.isUserAdminGlobally(user)
-        def inRoleSuperuser = userService.isSuperuserGlobally(user)
+        def inRoleBrowser = user.hasDefaultRole(RoleType.ROLE_BROWSER)
+        def inRoleAssistant = user.hasDefaultRole(RoleType.ROLE_ASSISTANT)
+        def inRoleManager = user.hasDefaultRole(RoleType.ROLE_MANAGER)
+        def inRoleAdmin = user.hasDefaultRole(RoleType.ROLE_ADMIN)
+        def inRoleSuperuser = user.hasDefaultRole(RoleType.ROLE_SUPERUSER)
 
         def requiredRoles = RoleType.listRoleTypesForLocationChooser()
 
