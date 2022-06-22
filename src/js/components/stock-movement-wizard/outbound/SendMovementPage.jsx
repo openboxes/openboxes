@@ -186,12 +186,14 @@ const FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         flexWidth: '3',
+        getDynamicAttr: ({ isPalletNameEmpty }) => ({ hide: isPalletNameEmpty }),
       },
       boxName: {
         type: LabelField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '3',
+        getDynamicAttr: ({ isBoxNameEmpty }) => ({ hide: isBoxNameEmpty }),
       },
       productCode: {
         type: LabelField,
@@ -203,7 +205,9 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        flexWidth: '7',
+        getDynamicAttr: ({ isBoxNameEmpty, isPalletNameEmpty }) => ({
+          flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
+        }),
         attributes: {
           className: 'text-left',
           formatValue: value => (
@@ -929,6 +933,10 @@ class SendMovementPage extends Component {
                         isPaginated: this.props.isPaginated,
                         isFirstPageLoaded: this.state.isFirstPageLoaded,
                         translate: this.props.translate,
+                        // eslint-disable-next-line max-len
+                        isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
+                        // eslint-disable-next-line max-len
+                        isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
                       }))}
                 </div>
               </div>

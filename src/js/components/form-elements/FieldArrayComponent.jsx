@@ -100,13 +100,16 @@ class FieldArrayComponent extends Component {
             {_.map(fieldsConfig.fields, (config, name) => {
               const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
               const { hide, headerHtml } = dynamicAttr;
+              const flexWidth = dynamicAttr.flexWidth || config.flexWidth;
+              const fixedWidth = dynamicAttr.fixedWidth || config.fixedWidth;
+
               if (!hide) {
                 return (
                   <div
                     key={name}
                     className={`${config.headerClassName ? config.headerClassName : ''}`}
                     style={{
-                      flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+                      flex: fixedWidth ? `0 1 ${fixedWidth}` : `${flexWidth || '12'} 1 0`,
                       minWidth: 0,
                       textAlign: config.headerAlign ? config.headerAlign : 'center',
                     }}
