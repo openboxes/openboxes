@@ -53,12 +53,13 @@ class LocationApiController extends BaseDomainApiController {
         def fields = params.fields ? params.fields.split(",") : null
         def locations = new HashSet()
         def isRequestor = userService.isUserRequestor(currentUser)
-        def inRoleBrowser = userService.isUserInRole(currentUser, RoleType.ROLE_BROWSER)
         def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(currentUser)
-        def inRoleAssistant = userService.isUserInRole(currentUser, RoleType.ROLE_ASSISTANT)
-        def inRoleManager = userService.isUserInRole(currentUser, RoleType.ROLE_MANAGER)
-        def inRoleAdmin = userService.isUserInRole(currentUser, RoleType.ROLE_ADMIN)
-        def inRoleSuperuser = userService.isUserInRole(currentUser, RoleType.ROLE_SUPERUSER)
+        def inRoleBrowser = currentUser.hasDefaultRole(RoleType.ROLE_BROWSER)
+        def inRoleAssistant = currentUser.hasDefaultRole(RoleType.ROLE_ASSISTANT)
+        def inRoleManager = currentUser.hasDefaultRole(RoleType.ROLE_MANAGER)
+        def inRoleAdmin = currentUser.hasDefaultRole(RoleType.ROLE_ADMIN)
+        def inRoleSuperuser = currentUser.hasDefaultRole(RoleType.ROLE_SUPERUSER)
+
 
         def requiredRoles = RoleType.listRoleTypesForLocationChooser()
 

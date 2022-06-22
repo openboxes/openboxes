@@ -128,6 +128,10 @@ class User extends Person {
         return json.parse(dashboardConfig)
     }
 
+    Boolean hasDefaultRole(RoleType roleType) {
+        return roles?.any { Role role -> role.roleType == roleType} ?: false
+    }
+
 
     Map toJson() {
         boolean anonymize = CH.config.openboxes.anonymize.enabled
