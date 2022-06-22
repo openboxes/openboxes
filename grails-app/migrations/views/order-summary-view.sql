@@ -1,10 +1,12 @@
 CREATE OR REPLACE VIEW order_item_status AS
-    SELECT order_id,
+    SELECT
+        order_id,
         order_number,
         product_code,
         quantity_ordered,
         quantity_shipped,
         order_status,
+        order_item_id,
         (quantity_ordered > 0)                 AS shipment_ordered,
         (quantity_shipped >= quantity_ordered) AS shipped, 				    -- indicates if item was shipped
         (quantity_shipped > 0)  			         AS partially_shipped 	-- indicates if item was partially shipped
@@ -34,6 +36,7 @@ AS order_item_status;
 CREATE OR REPLACE VIEW order_receipt_status AS
     SELECT
         order_id,
+        order_item_id,
         order_number,
         quantity_ordered,
         quantity_received,
@@ -42,14 +45,15 @@ CREATE OR REPLACE VIEW order_receipt_status AS
         (quantity_ordered > 0)                  AS receipt_ordered,
         (quantity_received >= quantity_ordered) AS received
     FROM (
-        SELECT order.id                                             AS order_id,
+        SELECT
+            `order`.id                                              AS order_id,
             `order`.order_number                                    AS order_number,
             order.status                                            AS order_status,
             order_item.id                                           AS order_item_id,
             product.product_code                                    AS product_code,
             SUM(order_item.quantity * order_item.quantity_per_uom)  AS quantity_ordered,
             SUM(shipment_item.quantity)                             AS quantity_received,
-            shipment.current_status		                              AS shipment_status
+            shipment.current_status		                            AS shipment_status
         FROM `order`
             LEFT OUTER JOIN order_item ON order.id = order_item.order_id
             LEFT OUTER JOIN product ON order_item.product_id = product.id
@@ -67,6 +71,7 @@ CREATE OR REPLACE VIEW order_payment_status_from_shipments AS
     SELECT
         order_id,
         order_number,
+        order_item_id,
         quantity_ordered,
         shipment_item_quantity_invoiced,
         order_status,
@@ -74,7 +79,8 @@ CREATE OR REPLACE VIEW order_payment_status_from_shipments AS
         (shipment_item_quantity_invoiced >= quantity_ordered) AS shipment_item_invoiced,
         invoice_submitted
     FROM (
-        SELECT order.id                                               AS order_id,
+        SELECT
+            `order`.id                                               AS order_id,
             `order`.order_number                                      AS order_number,
             order.status                                              AS order_status,
             order_item.id                                             AS order_item_id,
@@ -163,13 +169,75 @@ CREATE OR REPLACE VIEW order_summary AS (
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) = IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced), 0)) THEN 'INVOICED'
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) + IFNULL(SUM(adjustment_quantity_invoiced), 0) > 0 AND IFNULL(SUM(shipment_item_invoiced), 0) + IFNULL(SUM(adjustment_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
-                WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 and IFNULL(sum(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
+                WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 AND IFNULL(SUM(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
                 ELSE NULL
             END AS payment_status
         FROM `order`
-            LEFT OUTER JOIN order_item_status on order_item_status.order_id = `order`.id
-            LEFT OUTER JOIN order_receipt_status on order_receipt_status.order_id = `order`.id
-            LEFT OUTER JOIN order_payment_status_from_shipments on order_payment_status_from_shipments.order_id = `order`.id
-            LEFT OUTER JOIN order_payment_status_from_adjustments on order_payment_status_from_adjustments.order_id = `order`.id
+            LEFT OUTER JOIN order_item_status ON order_item_status.order_id = `order`.id
+            LEFT OUTER JOIN order_receipt_status ON order_receipt_status.order_id = `order`.id
+            LEFT OUTER JOIN order_payment_status_from_shipments ON order_payment_status_from_shipments.order_id = `order`.id
+            LEFT OUTER JOIN order_payment_status_from_adjustments ON order_payment_status_from_adjustments.order_id = `order`.id
+        WHERE `order`.order_type_id = 'PURCHASE_ORDER'
         GROUP BY `order`.id, `order`.order_number, `order`.status
     ) AS order_summary);
+
+CREATE OR REPLACE VIEW order_item_summary AS (
+    SELECT
+        order_item_id AS id,
+        order_id,
+        order_number,
+        product_id,
+        quantity,
+        order_item_status,
+        quantity_uom_id,
+        quantity_per_uom,
+        unit_price,
+        IFNULL(quantity_ordered, 0) AS quantity_ordered,
+        IFNULL(quantity_shipped, 0) AS quantity_shipped,
+        IFNULL(quantity_received, 0) AS quantity_received,
+        IFNULL(quantity_invoiced, 0) AS quantity_invoiced,
+        COALESCE(payment_status, receipt_status, shipment_status, order_status) AS derived_status
+    FROM (
+        SELECT
+            order_item.id AS order_item_id,
+            `order`.id AS order_id,
+            `order`.order_number,
+            `order`.status AS order_status,
+            order_item.product_id AS product_id,
+            quantity,
+            order_item.order_item_status_code AS order_item_status,
+            quantity_uom_id,
+            quantity_per_uom,
+            unit_price,
+            quantity * quantity_per_uom AS quantity_ordered,
+            order_item_status.quantity_shipped AS quantity_shipped,
+            order_receipt_status.quantity_received        AS quantity_received,
+            order_payment_status_from_shipments.shipment_item_quantity_invoiced        AS quantity_invoiced,
+            CASE
+                WHEN (IFNULL(SUM(shipment_ordered), 0) + IFNULL(SUM(shipped), 0) = 0) THEN NULL
+                WHEN (IFNULL(SUM(shipment_ordered), 0) + IFNULL(SUM(partially_shipped), 0) = 0) THEN NULL
+                WHEN (IFNULL(SUM(shipment_ordered), 0) = IFNULL(SUM(shipped), 0)) THEN 'SHIPPED'
+                WHEN (IFNULL(SUM(shipment_ordered), 0) > 0 AND IFNULL(SUM(partially_shipped), 0) > 0) THEN 'PARTIALLY_SHIPPED'
+                ELSE NULL
+            END AS shipment_status,
+            CASE
+                WHEN (IFNULL(SUM(receipt_ordered), 0) + IFNULL(SUM(received), 0) = 0) THEN NULL
+                WHEN (IFNULL(SUM(receipt_ordered), 0) = IFNULL(SUM(received), 0)) THEN 'RECEIVED'
+                WHEN (IFNULL(SUM(receipt_ordered), 0) > 0 AND IFNULL(SUM(received), 0) > 0) THEN 'PARTIALLY_RECEIVED'
+                ELSE NULL
+            END AS receipt_status,
+            CASE
+                WHEN (IFNULL(SUM(shipment_payment_ordered), 0) = 0) THEN NULL
+                WHEN (IFNULL(SUM(shipment_payment_ordered), 0) = IFNULL(SUM(shipment_item_invoiced), 0)) THEN 'INVOICED'
+                WHEN (IFNULL(SUM(shipment_payment_ordered), 0)  > 0 AND IFNULL(SUM(shipment_item_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
+                WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 and IFNULL(sum(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
+                ELSE NULL
+            END AS payment_status
+        FROM order_item
+        	JOIN `order` ON order_item.order_id = `order`.id
+            LEFT OUTER JOIN order_item_status ON order_item_status.order_item_id = order_item.id
+            LEFT OUTER JOIN order_receipt_status ON order_receipt_status.order_item_id = order_item.id
+            LEFT OUTER JOIN order_payment_status_from_shipments ON order_payment_status_from_shipments.order_item_id = order_item.id
+        WHERE `order`.order_type_id = 'PURCHASE_ORDER' AND order_item.order_item_status_code != 'CANCELED'
+        GROUP BY order_item.id, order_item_status.quantity_shipped, order_receipt_status.quantity_received, order_payment_status_from_shipments.shipment_item_quantity_invoiced
+    ) AS order_item_summary);

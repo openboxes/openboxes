@@ -963,6 +963,25 @@ class OrderService {
         }
     }
 
+    def getOrderItemSummaryList(Map params) {
+        return OrderItemSummary.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+            if (params.derivedStatus) {
+                'in'("derivedStatus", params.derivedStatus)
+            }
+        }
+    }
+
+    def getOrderItemDetailsList(Map params) {
+        return OrderItemDetails.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+        }
+    }
+
     List<OrderItem> getOrderItemsForPriceHistory(Organization supplierOrganization, Product productInstance, String query) {
         def terms = "%" + query + "%"
         def orderItems = OrderItem.createCriteria().list() {
