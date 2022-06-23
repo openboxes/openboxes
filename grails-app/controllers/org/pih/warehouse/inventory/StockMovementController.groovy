@@ -24,6 +24,7 @@ import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.Requisition
@@ -345,31 +346,35 @@ class StockMovementController {
     }
 
     def documents = {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(params.id)
-        }
+        def stockMovement = getStockMovement(params.id)
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
         render(template: "documents", model: [stockMovement: stockMovement])
     }
 
     def packingList = {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(params.id)
-        }
+        def stockMovement = getStockMovement(params.id)
         render(template: "packingList", model: [stockMovement: stockMovement])
     }
 
     def receipts = {
-        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
-        if (!stockMovement) {
-            stockMovement =  stockMovementService.getStockMovement(params.id)
-        }
+        def stockMovement = getStockMovement(params.id)
         def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
         render(template: "receipts", model: [receiptItems: receiptItems])
     }
 
+    // Used by SM show page 'tabs' actions - packing list, documents and receipts
+    def getStockMovement(String stockMovementId) {
+        def stockMovement
+        // Pull stock movement in "old fashion" way to bump up performance a bit (instead of getting OutboundStockMovement) for Non-Returns
+        def order = Order.get(stockMovementId)
+        if (order) {
+            stockMovement = outboundStockMovementService.getStockMovement(stockMovementId)
+        } else {
+            stockMovement = stockMovementService.getStockMovement(stockMovementId)
+        }
+
+        return stockMovement
+    }
 
     def uploadDocument = { DocumentCommand command ->
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)

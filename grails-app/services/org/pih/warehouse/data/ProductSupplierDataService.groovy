@@ -135,9 +135,9 @@ class ProductSupplierDataService {
     void process(ImportDataCommand command) {
         log.info "Process data " + command.filename
 
-        command.data.eachWithIndex { params, index ->
-            ProductSupplier productSupplier = createOrUpdate(params)
-            if (productSupplier.validate()) {
+        command.data.each { params ->
+            ProductSupplier.withNewSession {
+                ProductSupplier productSupplier = createOrUpdate(params)
                 productSupplier.save(failOnError: true)
             }
         }

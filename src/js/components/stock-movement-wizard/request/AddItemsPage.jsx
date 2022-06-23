@@ -63,10 +63,10 @@ const FIELDS = {
       showValueTooltip: true,
       className: 'text-left',
       optionRenderer: option => (
-        <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+        <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
           {option.label}
           &nbsp;
-          {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+          {renderHandlingIcons(option.handlingIcons)}
         </strong>
       ),
       valueRenderer: option => (
@@ -584,6 +584,7 @@ const REQUEST_FROM_WARD_FIELDS = {
 };
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
+const REPLENISHMENT_TYPE_PUSH = 'PUSH';
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -616,8 +617,6 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
-    this.saveRequisitionItemsInCurrentStepWithAlert =
-      this.saveRequisitionItemsInCurrentStepWithAlert.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
@@ -675,10 +674,13 @@ class AddItemsPage extends Component {
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
+    // First find items that are new and should be added (don't have status code)
     const lineItemsToBeAdded = _.filter(lineItems, item =>
       !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+    // Then get a list of items that already exist in this request (have status code)
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
+    // For each already existing items - find the ones that have changed
     _.forEach(lineItemsWithStatus, (item) => {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem.quantityRequested, 10);
@@ -706,6 +708,7 @@ class AddItemsPage extends Component {
       }
     });
 
+    // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
@@ -839,28 +842,34 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+    const isPush = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PUSH;
+    const isPull = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
 
     _.forEach(values.lineItems, (item, key) => {
+      const rowErrors = {};
       if (!_.isNil(item.product)) {
         if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
-          errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
+          rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
         }
-        if (_.isNil(item.quantityOnHand)) {
-          errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.enterQuantity.label' };
+        if (_.isNil(item.quantityOnHand) && !isPush && !isPull) {
+          rowErrors.quantityOnHand = 'react.stockMovement.error.enterQuantity.label';
         }
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
-        errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
+        rowErrors.boxName = 'react.stockMovement.error.boxWithoutPallet.label';
       }
       const dateRequested = moment(item.expirationDate, 'MM/DD/YYYY');
       if (date.diff(dateRequested) > 0) {
-        errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
+        rowErrors.expirationDate = 'react.stockMovement.error.invalidDate.label';
       }
 
       if (this.state.isRequestFromWard) {
         if (!item.quantityOnHand || item.quantityOnHand < 0) {
-          errors.lineItems[key] = { quantityOnHand: 'react.stockMovement.error.quantityOnHand.label' };
+          rowErrors.quantityOnHand = 'react.stockMovement.error.quantityOnHand.label';
         }
+      }
+      if (!_.isEmpty(rowErrors)) {
+        errors.lineItems[key] = rowErrors;
       }
     });
     return errors;
@@ -892,17 +901,16 @@ class AddItemsPage extends Component {
   saveItemsAndExportTemplate(formValues, lineItems) {
     const { movementNumber, stockMovementId } = formValues;
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStepWithAlert({
-      lineItems,
-      callback: () => {
+    this.props.showSpinner();
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
             fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
             this.props.hideSpinner();
-          })
-          .catch(() => this.props.hideSpinner());
-      },
-    });
+          });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -948,10 +956,16 @@ class AddItemsPage extends Component {
   confirmSave(onConfirm) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      ),
+      message: this.state.isRequestFromWard ?
+        this.props.translate(
+          'react.stockMovement.QOHWillNotBeSaved.message',
+          'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Also if there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+        )
+        :
+        this.props.translate(
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        ),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -1015,6 +1029,10 @@ class AddItemsPage extends Component {
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
+    } else if (this.state.isFirstPageLoaded) {
+      // Workaround for refetching items from scratch
+      // when the first page was already loaded and table is paginated
+      this.loadMoreRows({ startIndex: 0 });
     }
   }
 
@@ -1045,13 +1063,10 @@ class AddItemsPage extends Component {
    */
   fetchAddItemsPageData() {
     this.props.showSpinner();
-
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
-        const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
-        const { totalCount } = resp.data;
+        const { data: { hasManageInventory, statusCode }, totalCount } = resp.data;
 
         this.setState({
           values: {
@@ -1061,8 +1076,10 @@ class AddItemsPage extends Component {
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
           isRequestFromWard: this.props.currentLocationId === this.state.values.destination.id && this.state.values.destination.type === 'WARD',
-        }, () => this.props.hideSpinner());
-      });
+        });
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   loadMoreRows({ startIndex }) {
@@ -1168,39 +1185,11 @@ class AddItemsPage extends Component {
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
+        .then(() => this.fetchAddItemsPageData())
         .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
     }
 
     return Promise.resolve();
-  }
-
-  saveRequisitionItemsInCurrentStepWithAlert({
-    lineItems,
-    callback = () => {},
-  }) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.QOHWillNotBeSaved.message',
-        'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Are you sure you want to proceed?',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => {
-            this.props.showSpinner();
-            return this.saveRequisitionItemsInCurrentStep(lineItems)
-              .then(res => callback(res))
-              .catch(() => {
-                this.props.hideSpinner();
-              });
-          },
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
   }
 
   submitRequest(lineItems) {
@@ -1223,44 +1212,17 @@ class AddItemsPage extends Component {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
     };
-
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
-        .then((resp) => {
-          const { lineItems } = resp.data.data;
-          const lineItemsBackendData = _.map(
-            lineItems,
-            val => ({
-              ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
-              quantityOnHand: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).quantityOnHand,
-              monthlyDemand: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).monthlyDemand,
-              demandPerReplenishmentPeriod: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).demandPerReplenishmentPeriod,
-            }),
-          );
-
-          this.setState({
-            values:
-              { ...this.state.values, lineItems: lineItemsBackendData },
-            totalCount: lineItems.length,
-            currentLineItems: lineItemsBackendData,
-          });
-        })
+        .then(() => this.setState({
+          currentLineItems: [],
+          values: { ...this.state.values, lineItems: [] },
+          sortOrder: 0,
+          newItem: false,
+          totalCount: 0,
+        }, () => this.fetchAllData()))
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
-
     return Promise.resolve();
   }
 
@@ -1271,8 +1233,8 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+    const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+    if (zeroedLines || this.state.isRequestFromWard) {
       this.confirmSave(() => this.saveItems(lineItems));
     } else {
       this.saveItems(lineItems);
@@ -1284,19 +1246,33 @@ class AddItemsPage extends Component {
    * @param {object} formValues
    * @public
    */
+  // eslint-disable-next-line consistent-return
   saveAndExit(formValues) {
-    const errors = this.validate(formValues).lineItems;
-    if (!errors.length) {
-      this.saveRequisitionItemsInCurrentStepWithAlert({
-        lineItems: formValues.lineItems,
-        callback: () => {
+    const saveAndRedirect = (lineItems) => {
+      this.props.showSpinner();
+      return this.saveRequisitionItemsInCurrentStep(lineItems)
+        .then(() => {
           let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
             redirectTo = '/openboxes/dashboard';
           }
           window.location = redirectTo;
-        },
-      });
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+        });
+    };
+    const errors = this.validate(formValues).lineItems;
+    if (!errors.length) {
+      const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      if (zeroedLines || this.state.isRequestFromWard) {
+        this.confirmSave(() => {
+          saveAndRedirect(lineItems);
+        });
+      } else {
+        saveAndRedirect(lineItems);
+      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
@@ -1329,13 +1305,15 @@ class AddItemsPage extends Component {
    * @public
    */
   saveItems(lineItems) {
-    this.saveRequisitionItemsInCurrentStepWithAlert({
-      lineItems,
-      callback: () => {
+    this.props.showSpinner();
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
+      .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
-      },
-    });
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   /**
@@ -1433,12 +1411,26 @@ class AddItemsPage extends Component {
    * @param {boolean} invalid
    * @public
    */
+  // eslint-disable-next-line consistent-return
   previousPage(values, invalid) {
+    const saveAndRedirect = (lineItems) => {
+      this.props.showSpinner();
+      return this.saveRequisitionItemsInCurrentStep(lineItems)
+        .then(() => this.props.previousPage(values))
+        .catch(() => {
+          this.props.hideSpinner();
+        });
+    };
     if (!invalid) {
-      this.saveRequisitionItemsInCurrentStepWithAlert({
-        lineItems: values.lineItems,
-        callback: () => this.props.previousPage(values),
-      });
+      const lineItems = _.filter(values.lineItems, item => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      if (zeroedLines || this.state.isRequestFromWard) {
+        this.confirmSave(() => {
+          saveAndRedirect(lineItems);
+        });
+      } else {
+        saveAndRedirect(lineItems);
+      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
@@ -1463,7 +1455,7 @@ class AddItemsPage extends Component {
 
         apiClient.get(url)
           .then((response) => {
-            const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
+            const monthlyDemand = parseFloat(response.data.monthlyDemand);
             const quantityRequested = monthlyDemand - (response.data.quantityOnHand || 0);
             this.setState({
               values: update(values, {
@@ -1484,16 +1476,16 @@ class AddItemsPage extends Component {
 
         apiClient.get(url)
           .then((response) => {
-            const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
-            const quantityRequested = monthlyDemand - response.data.quantityAvailable > 0 ?
-              monthlyDemand - response.data.quantityAvailable : 0;
+            const { monthlyDemand, quantityAvailable, quantityOnHand } = response.data;
+            const quantityRequested = monthlyDemand - quantityAvailable > 0 ?
+              monthlyDemand - quantityAvailable : 0;
             this.setState({
               values: update(values, {
                 lineItems: {
                   [index]: {
                     product: { $set: product },
-                    quantityOnHand: { $set: response.data.quantityOnHand },
-                    quantityAvailable: { $set: response.data.quantityAvailable },
+                    quantityOnHand: { $set: quantityOnHand },
+                    quantityAvailable: { $set: quantityAvailable },
                     monthlyDemand: { $set: monthlyDemand },
                     quantityRequested: { $set: quantityRequested },
                   },

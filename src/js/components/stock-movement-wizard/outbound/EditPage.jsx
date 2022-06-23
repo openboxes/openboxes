@@ -48,7 +48,9 @@ const FIELDS = {
       rowValues, subfield, showOnlyErroredItems, itemFilter,
     }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
-      if (!subfield) { className += 'font-weight-bold'; }
+      if (rowValues.quantityAvailable < rowValues.quantityRequested) {
+        className += 'font-weight-bold';
+      }
       const filterOutItems = itemFilter && !(
         rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
         rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
@@ -73,7 +75,7 @@ const FIELDS = {
       product: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '2.5',
+        flexWidth: '3.5',
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
@@ -95,7 +97,9 @@ const FIELDS = {
         label: 'react.stockMovement.requested.label',
         defaultMessage: 'Requested',
         flexWidth: '1.1',
+        headerAlign: 'right',
         attributes: {
+          className: 'text-right',
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
@@ -106,15 +110,16 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
+          let className = 'text-right';
           if (fieldValue && (!fieldValue.quantityOnHand ||
             fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className = `${className} text-danger`;
           }
           return {
             className,
           };
         },
+        headerAlign: 'right',
         attributes: {
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
         },
@@ -126,15 +131,16 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
+          let className = 'text-right';
           if (fieldValue && (!fieldValue.quantityAvailable ||
             fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className = `${className} text-danger`;
           }
           return {
             className,
           };
         },
+        headerAlign: 'right',
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
@@ -154,13 +160,17 @@ const FIELDS = {
           },
           showValueTooltip: true,
         }),
+        headerAlign: 'right',
+        attributes: {
+          className: 'text-right',
+        },
       },
       detailsButton: {
         label: 'react.stockMovement.details.label',
         defaultMessage: 'Details',
         type: DetailsModal,
-        fieldKey: '',
         flexWidth: '1',
+        fieldKey: '',
         attributes: {
           title: 'react.stockMovement.pendingRequisitionDetails.label',
           defaultTitleMessage: 'Pending Requisition Details',
@@ -181,6 +191,7 @@ const FIELDS = {
           btnContainerClassName: 'float-right',
           btnOpenAsIcon: true,
           btnOpenStyle: { border: 'none', cursor: 'pointer' },
+          btnOpenIcon: 'fa-search',
         }),
       },
       substituteButton: {
@@ -356,9 +367,12 @@ class EditItemsPage extends Component {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
         },
-        reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
+        // eslint-disable-next-line max-len
+        reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
         substitutionItems: _.map(val.substitutionItems, sub => ({
           ...sub,
+          // eslint-disable-next-line max-len
+          reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
           requisitionItemId: val.requisitionItemId,
           product: {
             ...sub.product,
@@ -478,9 +492,12 @@ class EditItemsPage extends Component {
             editPageItems: _.map(data, item => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
-              reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
+              // eslint-disable-next-line max-len
+              reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
+                // eslint-disable-next-line max-len
+                reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
                 requisitionItemId: item.requisitionItemId,
               })),
             })),

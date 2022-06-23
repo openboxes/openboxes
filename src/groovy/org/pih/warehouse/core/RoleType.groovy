@@ -180,4 +180,14 @@ enum RoleType {
                 ROLE_REQUESTOR,
         ]
     }
+
+    static listRoleTypesForLocationChooser() {
+        return [
+                ROLE_ASSISTANT,
+                ROLE_MANAGER,
+                ROLE_ADMIN,
+                ROLE_SUPERUSER,
+                ROLE_BROWSER
+        ]
+    }
 }
