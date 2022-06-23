@@ -405,6 +405,12 @@ class StockMovementController {
         render(template: "packingList", model: [stockMovement: stockMovement])
     }
 
+    // FIXME remove before merging
+    def statusNotification = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        render(template: "../email/requisitionStatusChanged", model: [requisition: stockMovement.requisition])
+    }
+
     def receipts = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)

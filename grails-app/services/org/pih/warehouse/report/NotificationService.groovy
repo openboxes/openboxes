@@ -140,7 +140,6 @@ class NotificationService {
         sendNotifications(model, users, template, subject)
     }
 
-
     def sendRequisitionUpdatedNotification(Requisition requisition, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)
         String subject = "Order ${requisition?.requestNumber} has been updated"

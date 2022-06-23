@@ -17,6 +17,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
@@ -646,6 +647,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     BigDecimal getTotalCost() {
         return product.pricePerUnit ? quantity * product?.pricePerUnit : null
+    }
+
+    BigDecimal getNumericValue(Attribute attribute) {
+        return attribute ? product?.getNumericValue(attribute) * quantity : 0.0
     }
 
     Integer getQuantityIssued() {

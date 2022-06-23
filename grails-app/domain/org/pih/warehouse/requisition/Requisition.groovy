@@ -16,6 +16,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.fulfillment.Fulfillment
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
@@ -118,7 +119,16 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Integer statusSortOrder
 
     // Removed comments, documents, events for the time being.
-    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
+    static transients = [
+            "sortedStocklistItems",
+            "requisitionItemsByDateCreated",
+            "requisitionItemsByOrderIndex",
+            "requisitionItemsByCategory",
+            "shipment",
+            "totalCost",
+            "totalWeight",
+            "totalVolume",
+    ]
     static hasOne = [picklist: Picklist]
     static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
     static mapping = {
@@ -351,6 +361,22 @@ class Requisition implements Comparable<Requisition>, Serializable {
     BigDecimal getTotalCost() {
         def itemsWithPrice = requisitionItems?.findAll { it.product.pricePerUnit }
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
+    }
+
+    Map getTotalVolume() {
+        Attribute attribute = Attribute.findByCode("VOLUME")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    Map getTotalWeight() {
+        Attribute attribute = Attribute.findByCode("WEIGHT")
+        return [value: getAggregateNumericValue(attribute), unitOfMeasure: attribute?.unitOfMeasureClass?.baseUom]
+    }
+
+    BigDecimal getAggregateNumericValue(Attribute attribute) {
+        return requisitionItems.sum { RequisitionItem requisitionItem ->
+            requisitionItem.getNumericValue(attribute)
+        }
     }
 
     BigDecimal getQuantityByProduct(Product product) {
