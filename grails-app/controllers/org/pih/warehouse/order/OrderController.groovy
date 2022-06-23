@@ -386,42 +386,19 @@ class OrderController {
     }
 
     def deleteAdjustment = {
-        def orderInstance = Order.get(params.order.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
-            redirect(action: "list")
-        } else {
-            User user = User.get(session?.user?.id)
-            def canEdit = orderService.canManageAdjustments(orderInstance, user)
-            if(canEdit) {
-                def orderAdjustment = OrderAdjustment.get(params?.id)
-                if (!orderAdjustment) {
-                    flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
-                    redirect(action: "show", id: orderInstance?.id)
-                } else {
-                    if (orderAdjustment.hasRegularInvoice) {
-                        throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-                    }
+        User user = User.get(session?.user?.id)
 
-                    try {
-                        orderInstance.removeFromOrderAdjustments(orderAdjustment)
-                        orderAdjustment.delete()
-                        orderInstance.save(flush: true)
-                    } catch(Exception e) {
-                        throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-                    }
-
-                    if (!orderInstance.hasErrors()) {
-                        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                        redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
-                    } else {
-                        render(view: "show", model: [orderInstance: orderInstance])
-                    }
-                }
-            } else {
-                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-            }
+        OrderAdjustment orderAdjustment = OrderAdjustment.get(params?.id)
+        if (!orderAdjustment) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
+            redirect(action: "show", id: params.order.id)
         }
+
+        orderService.deleteAdjustment(orderAdjustment, user)
+
+        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
+        redirect(controller:"purchaseOrder", action: "addItems", id: params.order.id, params:['skipTo': 'adjustments'])
+
     }
 
 
@@ -703,25 +680,16 @@ class OrderController {
     }
 
     def removeOrderItem = {
-        OrderItem orderItem = OrderItem.get(params.id)
-        if (orderItem) {
-            if (orderItem.hasShipmentAssociated() || !orderService.canOrderItemBeEdited(orderItem, session.user)) {
-                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-            }
-            Order order = orderItem.order
-            try {
-                order.removeFromOrderItems(orderItem)
-                orderItem.delete()
-                order.save(flush:true)
-            } catch(Exception e) {
-                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-            }
+        User user = User.get(session?.user?.id)
 
-            render (status: 200, text: "Successfully deleted order item")
-        }
-        else {
+        OrderItem orderItem = OrderItem.get(params.id)
+        if (!orderItem) {
             render (status: 404, text: "Unable to locate order item")
         }
+
+        orderService.removeOrderItem(orderItem, user)
+
+        render (status: 200, text: "Successfully deleted order item")
     }
 
     def saveOrderItem = {
