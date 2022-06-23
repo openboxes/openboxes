@@ -37,7 +37,7 @@ ${warehouse.message(code: 'email.requisitionStatusChanged.message', args: [requi
                 Containers
             </td>
             <td class="center">
-                ${requisition?.requisitionItems?.size()?:0}
+                Not available
             </td>
             <td class="center">
                 ${requisition?.shipment?.containers?.size()?:0}
@@ -49,12 +49,12 @@ ${warehouse.message(code: 'email.requisitionStatusChanged.message', args: [requi
             </td>
             <td class="center">
                 <g:set var="estimatedVolume" value="${requisition?.totalVolume}"/>
-                <g:formatNumber number="${estimatedVolume?.value}"/>
+                <g:formatNumber number="${estimatedVolume?.value?:0}"/>
                 ${estimatedVolume?.unitOfMeasure}
             </td>
             <td class="center">
                 <g:set var="actualVolume" value="${requisition?.shipment?.totalVolume}"/>
-                <g:formatNumber number="${actualVolume?.value}"/>
+                <g:formatNumber number="${actualVolume?.value?:0}"/>
                 ${actualVolume?.unitOfMeasure}
             </td>
         </tr>
@@ -64,12 +64,12 @@ ${warehouse.message(code: 'email.requisitionStatusChanged.message', args: [requi
             </td>
             <td class="center">
                 <g:set var="estimatedWeight" value="${requisition?.totalWeight}"/>
-                <g:formatNumber number="${estimatedWeight?.value}"/>
+                <g:formatNumber number="${estimatedWeight?.value?:0}"/>
                 ${estimatedWeight?.unitOfMeasure}
             </td>
             <td class="center">
                 <g:set var="actualWeight" value="${requisition?.shipment?.totalWeight}"/>
-                <g:formatNumber number="${actualWeight?.value}"/>
+                <g:formatNumber number="${actualWeight?.value?:0}"/>
                 ${actualWeight?.unitOfMeasure}
             </td>
         </tr>
