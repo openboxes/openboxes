@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import ModalWrapper from '../../form-elements/ModalWrapper';
-import LabelField from '../../form-elements/LabelField';
-import TextField from '../../form-elements/TextField';
-import ArrayField from '../../form-elements/ArrayField';
-import SelectField from '../../form-elements/SelectField';
-import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+
 
 const FIELDS = {
   reasonCode: {
@@ -206,7 +208,7 @@ class EditPickModal extends Component {
         'binLocation.id': avItem['binLocation.id'] || '',
         quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
       })),
-      reasonCode: values.reasonCode || '',
+      reasonCode: values.reasonCode.value || '',
     };
 
     apiClient.post(picklistUrl, payload)

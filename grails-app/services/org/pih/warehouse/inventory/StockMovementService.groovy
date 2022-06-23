@@ -19,8 +19,8 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.PackPageItem
 import org.pih.warehouse.api.PickPageItem
 import org.pih.warehouse.api.StockMovement
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
-import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.auth.AuthService
@@ -31,6 +31,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -49,6 +50,7 @@ import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
@@ -67,6 +69,7 @@ class StockMovementService {
     def locationService
     def dataService
     def forecastingService
+    def outboundStockMovementService
 
     boolean transactional = true
 
@@ -356,10 +359,10 @@ class StockMovementService {
 
     def getStockMovements(StockMovement criteria, Map params) {
         params.includeStockMovementItems = false
-        switch(criteria.stockMovementType) {
-            case StockMovementType.OUTBOUND:
-                return getOutboundStockMovements(criteria, params)
-            case StockMovementType.INBOUND:
+        switch(criteria.stockMovementDirection) {
+            case StockMovementDirection.OUTBOUND:
+                return outboundStockMovementService.getStockMovements(criteria, params)
+            case StockMovementDirection.INBOUND:
                 return getInboundStockMovements(criteria, params)
             default:
                 throw new IllegalArgumentException("Origin and destination cannot be the same")
@@ -367,8 +370,8 @@ class StockMovementService {
     }
 
 
-    def getInboundStockMovements(Integer maxResults, Integer offset) {
-        return getInboundStockMovements(new StockMovement(), [:], maxResults, offset)
+    def getInboundStockMovements(Map params = [:]) {
+        return getInboundStockMovements(new StockMovement(), params)
     }
 
     def getInboundStockMovements(StockMovement criteria, Map params) {
@@ -407,8 +410,13 @@ class StockMovementService {
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
-
-            order("dateCreated", "desc")
+            if (params.orderBy == "requisition.dateRequested") {
+                requisition {
+                    order("dateRequested", "desc")
+                }
+            } else {
+                order("dateCreated", "desc")
+            }
         }
         def stockMovements = shipments.collect { Shipment shipment ->
             if (shipment.requisition) {
@@ -426,7 +434,7 @@ class StockMovementService {
     }
 
     def getOutboundStockMovements(StockMovement stockMovement, Map params) {
-        log.info "Stock movement: ${stockMovement?.shipmentStatusCode}"
+        log.info "Stock movement: ${stockMovement?.currentStatus}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
             eq("isTemplate", Boolean.FALSE)
@@ -579,6 +587,44 @@ class StockMovementService {
         return requisitionItems
     }
 
+    def getPendingRequisitionDetails(Location origin, Product product, def currentRequisitionId) {
+        def results = []
+        def pendingRequisitionDetails = requisitionService.getPendingRequisitionItems(origin, product)
+        pendingRequisitionDetails = pendingRequisitionDetails.findAll { it.requisition.id != currentRequisitionId }
+
+        pendingRequisitionDetails.groupBy { it.requisition.destination }.collect { Location destination, List<RequisitionItem> requisitionItems ->
+            def demandDetails = forecastingService.getDemand(origin, destination, product)
+            if (destination.isDepot()) {
+                def quantityOnHandAtDestination = productAvailabilityService.getQuantityOnHand(product, destination)
+                demandDetails << [quantityOnHandAtDestination: quantityOnHandAtDestination]
+            }
+
+            def requisitionDetails = requisitionItems.groupBy { it.requisition }.collect { Requisition requisition, List<RequisitionItem> items ->
+                [
+                        'requisition.id'            : requisition.id,
+                        'requisition.requestNumber' : requisition.requestNumber,
+                        quantityRequested           : items.quantity.sum(),
+                        quantityPicked              : items.sum() { RequisitionItem requisitionItem -> requisitionItem.calculateQuantityPicked() },
+                ]
+            }
+
+            def details = requisitionDetails.pop()
+
+            results << [
+                    'destination.name'          : destination.name,
+                    quantityOnHandAtDestination : demandDetails.quantityOnHandAtDestination,
+                    averageMonthlyDemand        : demandDetails.monthlyDemand as Integer,
+                    requisitions                : requisitionDetails,
+                    'requisition.id'            : details['requisition.id'],
+                    'requisition.requestNumber' : details['requisition.requestNumber'],
+                    quantityRequested           : details.quantityRequested,
+                    quantityPicked              : details.quantityPicked,
+            ]
+        }
+
+        return results
+    }
+
     def getStockMovementItem(String id, String stepNumber) {
         return getStockMovementItem(id, stepNumber, false)
     }
@@ -703,8 +749,22 @@ class StockMovementService {
             def quantityOnHand = productAvailabilityService.getQuantityOnHand(stockMovementItem.product, requisition.destination)
             def quantityAvailable = inventoryService.getQuantityAvailableToPromise(stockMovementItem.product, requisition.destination)
             def template = requisition.requisitionTemplate
-            if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-                def demand = forecastingService.getDemand(requisition.destination, stockMovementItem.product)
+            if (requisition.requisitionTemplateId && requisition.type == RequisitionType.STOCK && requisition.destination.locationType.locationTypeCode == LocationTypeCode.WARD) {
+                def demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
+                return [
+                        id                              : stockMovementItem.id,
+                        product                         : stockMovementItem.product,
+                        productCode                     : stockMovementItem.productCode,
+                        quantityOnHand                  : quantityOnHand ?: 0,
+                        quantityAllowed                 : stockMovementItem.quantityAllowed,
+                        comments                        : stockMovementItem.comments,
+                        statusCode                      : stockMovementItem.statusCode,
+                        sortOrder                       : stockMovementItem.sortOrder,
+                        monthlyDemand                   : demand?.monthlyDemand ?: 0,
+                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
+                ]
+            } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
+                def demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
                 return [
                         id                              : stockMovementItem.id,
                         product                         : stockMovementItem.product,
@@ -716,8 +776,8 @@ class StockMovementService {
                         quantityRequested               : stockMovementItem.quantityRequested,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
-                        monthlyDemand                   : demand?.monthlyDemand?:0,
-                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
+                        monthlyDemand                   : demand?.monthlyDemand ?: 0,
+                        demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
                 ]
             } else {
                 return [
@@ -797,9 +857,9 @@ class StockMovementService {
 
         def template = requisition.requisitionTemplate
         if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-            def quantityDemand = forecastingService.getDemand(requisition.destination, editPageItem.product)
+            def quantityDemand = forecastingService.getDemand(requisition.destination, null, editPageItem.product)
             editPageItem << [
-                    quantityDemand                  : quantityDemand?.monthlyDemand?:0,
+                    quantityDemandRequesting        : quantityDemand?.monthlyDemand?:0,
                     demandPerReplenishmentPeriod    : Math.ceil((quantityDemand?.dailyDemand?:0) * (template?.replenishmentPeriod?:30))
             ]
         } else {
@@ -839,12 +899,19 @@ class StockMovementService {
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
 
-            List<AvailableItem> availableItems = availableItemsMap[it.product_id]
+            // Collect to make a deep clone of Available Items, to avoid overriding Available Items from availableItemsMap[it.product_id]
+            List<AvailableItem> availableItems = availableItemsMap[it.product_id].collect { AvailableItem availableItem -> new AvailableItem(
+                inventoryItem: availableItem.inventoryItem,
+                binLocation: availableItem.binLocation,
+                quantityAvailable: availableItem.quantityAvailable,
+                quantityOnHand: availableItem.quantityOnHand
+            )}
             def picklist = (picklistItemsMap && picklistItemsMap[it.product_id]) ? picklistItemsMap[it.product_id] : []
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklist)
 
             def quantityAvailable = availableItems?.findAll { it.quantityAvailable > 0 }?.sum { it.quantityAvailable }
             def quantityOnHand = availableItems?.sum { it.quantityOnHand }
+            def quantityDemandFulfilling = forecastingService.getDemand(requisition.origin, null, productsMap[it.product_id])
 
             [
                 product                     : productsMap[it.product_id],
@@ -855,7 +922,7 @@ class StockMovementService {
                 quantityRequested           : it.quantity,
                 quantityRevised             : it.quantity_revised,
                 quantityCanceled            : it.quantity_canceled,
-                quantityConsumed            : it.quantity_demand,
+                quantityDemandFulfilling    : quantityDemandFulfilling ? quantityDemandFulfilling.monthlyDemand : 0,
                 quantityOnHand              : (quantityOnHand && quantityOnHand > 0 ? quantityOnHand : 0),
                 quantityAvailable           : (quantityAvailable && quantityAvailable > 0 ? quantityAvailable : 0),
                 substitutionStatus          : it.substitution_status,
@@ -879,7 +946,6 @@ class StockMovementService {
                         productName         : it.name,
                         quantityAvailable   : (qtyAvailable && qtyAvailable > 0 ? qtyAvailable : 0),
                         quantityOnHand      : (qtyOnHand && qtyOnHand > 0 ? qtyOnHand : 0),
-                        quantityConsumed    : it.quantity_demand,
                         quantitySelected    : it.quantity,
                         quantityRequested   : it.quantity
                     ]
@@ -927,13 +993,13 @@ class StockMovementService {
         return packPageItems
     }
 
-    List<ReceiptItem> getStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getStockMovementReceiptItems(def stockMovement) {
         return (stockMovement.requisition) ?
                 getRequisitionBasedStockMovementReceiptItems(stockMovement) :
                 getShipmentBasedStockMovementReceiptItems(stockMovement)
     }
 
-    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
         List<ReceiptItem> receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
@@ -943,7 +1009,7 @@ class StockMovementService {
         return receiptItems
     }
 
-    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(StockMovement stockMovement) {
+    List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
         Shipment shipment = stockMovement.shipment
         List<ReceiptItem> receiptItems = shipment.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
@@ -2477,7 +2543,7 @@ class StockMovementService {
     }
 
 
-    List<Map> getDocuments(StockMovement stockMovement) {
+    List<Map> getDocuments(def stockMovement) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         def documentList = []
 
@@ -2559,21 +2625,23 @@ class StockMovementService {
             log.info "Shipment workflow " + shipmentWorkflow
             if (shipmentWorkflow) {
                 shipmentWorkflow.documentTemplates.each { Document documentTemplate ->
+                    def action = getActionByDocumentCode(documentTemplate.documentType?.documentCode)
+                    def isInvoiceTemplate = documentTemplate.documentType?.documentCode == DocumentCode.INVOICE_TEMPLATE
                     documentList << [
                             name        : documentTemplate?.name,
                             documentType: documentTemplate?.documentType?.name,
                             contentType : documentTemplate?.contentType,
-                            stepNumber  : null,
-                            uri         : documentTemplate?.fileUri ?: g.createLink(controller: 'document', action: "render",
+                            stepNumber  : isInvoiceTemplate ? 5 : null,
+                            uri         : documentTemplate?.fileUri ?: g.createLink(controller: 'document', action: action,
                                     id: documentTemplate?.id, params: [shipmentId: stockMovement?.shipment?.id],
                                     absolute: true, title: documentTemplate?.filename),
-                            fileUri    : documentTemplate?.fileUri
+                            fileUri     : documentTemplate?.fileUri
                     ]
                 }
             }
 
             stockMovement?.shipment?.documents.each { Document document ->
-                def action = document.documentType?.documentCode == DocumentCode.SHIPPING_TEMPLATE ? "render" : "download"
+                def action = getActionByDocumentCode(document.documentType?.documentCode)
                 documentList << [
                         id          : document?.id,
                         name        : document?.name,
@@ -2590,6 +2658,21 @@ class StockMovementService {
         }
 
         return documentList
+    }
+
+    String getActionByDocumentCode(DocumentCode documentCode) {
+        String action = ""
+        switch (documentCode) {
+            case DocumentCode.INVOICE_TEMPLATE:
+                action = "renderInvoiceTemplate"
+                break
+            case DocumentCode.SHIPPING_TEMPLATE:
+                action = "render"
+                break
+            default:
+                action = "download"
+        }
+        return action
     }
 
     List buildStockMovementItemList(StockMovement stockMovement) {
@@ -2630,10 +2713,10 @@ class StockMovementService {
             return g.message(code: "stockMovement.hasAlreadyBeenReceived.message", args: [stockMovement?.identifier])
         } else if (!(stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())) {
             return g.message(code: "stockMovement.hasNotBeenShipped.message", args: [stockMovement?.identifier])
-        } else if (!stockMovement?.hasBeenIssued() && !stockMovement?.isFromOrder) {
-            return g.message(code: "stockMovement.hasNotBeenIssued.message", args: [stockMovement?.identifier])
         } else if (!isSameDestination) {
             return g.message(code: "stockMovement.isDifferentLocation.message")
+        } else if (!stockMovement?.hasBeenIssued() && !stockMovement?.isFromOrder) {
+            return g.message(code: "stockMovement.hasNotBeenIssued.message", args: [stockMovement?.identifier])
         }
     }
 

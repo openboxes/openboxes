@@ -12,6 +12,7 @@
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
             </g:if>
+            <g:hiddenField id="productAssociationId" name="productAssociationInstance" value="${productAssociationInstance?.id}"/>
             <div class="box">
                 <h2><warehouse:message code="default.show.label" args="[entityName]" /></h2>
                 <table>
@@ -51,6 +52,20 @@
                             <td valign="top" class="value">${fieldValue(bean: productAssociationInstance, field: "comments")}</td>
                             
                         </tr>
+
+                        <tr class="prop">
+                            <td class="name">
+                                <warehouse:message code="productAssociation.mutualAssociation.label" default="Two-way Association"/>
+                            </td>
+                            <td class="value">
+                                <g:if test="${productAssociationInstance?.mutualAssociation}">
+                                    ${warehouse.message(code:'default.yes.label')}
+                                </g:if>
+                                <g:else>
+                                    ${warehouse.message(code:'default.no.label')}
+                                </g:else>
+                            </td>
+                        </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productAssociation.dateCreated.label" default="Date Created" /></td>
@@ -80,8 +95,19 @@
 					            <div class="buttons left">
 					                <g:form>
 					                    <g:hiddenField name="id" value="${productAssociationInstance?.id}" />
-					                    <g:actionSubmit class="edit" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
-					                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+					                    <g:actionSubmit class="button" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
+                                        <g:if test="${productAssociationInstance?.mutualAssociation}">
+                                            <button type="button"
+                                                    class="button"
+                                                    onclick="$('#product-association-delete-dialog')
+                                                      .data('productAssociationId', `${productAssociationInstance?.id}`)
+                                                      .dialog('open')">
+                                                ${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+                                            </button>
+                                        </g:if>
+                                        <g:else>
+                                            <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+                                        </g:else>
 					                </g:form>
 					            </div>
 							</td>
@@ -89,6 +115,7 @@
                     </tbody>
                 </table>
             </div>
+            <g:render template="/productAssociation/productAssociationDeleteDialog" />
         </div>
     </body>
 </html>

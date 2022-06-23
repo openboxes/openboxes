@@ -1,23 +1,25 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
-import { withRouter } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { hideSpinner, showSpinner } from 'actions';
+import DateField from 'components/form-elements/DateField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import moment from 'moment';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import DateField from '../../form-elements/DateField';
-import { renderFormField } from '../../../utils/form-utils';
-import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -109,7 +111,8 @@ const FIELDS = {
       disabled: !(origin && destination && origin.id && destination.id),
       options: stocklists,
       showValueTooltip: true,
-      objectValue: true,
+      valueKey: 'id',
+      labelKey: 'name',
     }),
   },
   requestedBy: {
@@ -217,7 +220,9 @@ class CreateStockMovement extends Component {
     return apiClient.get(url)
       .then((response) => {
         const stocklists = _.map(response.data.data, stocklist => (
-          { value: { id: stocklist.id, name: stocklist.name }, label: stocklist.name }
+          {
+            id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
+          }
         ));
 
         const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));

@@ -1,10 +1,12 @@
 /* eslint-disable react/no-array-index-key */
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
+
 import PropTypes from 'prop-types';
-import { showLocationChooser } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { showLocationChooser } from 'actions';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 class Breadcrumbs extends Component {
   constructor(props) {

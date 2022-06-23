@@ -1,29 +1,32 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
-import Alert from 'react-s-alert';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import { getTranslate } from 'react-localize-redux';
-import { confirmAlert } from 'react-confirm-alert';
+import _ from 'lodash';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import Dropzone from 'react-dropzone';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { hideSpinner, showSpinner } from 'actions';
+import DocumentButton from 'components/DocumentButton';
+import ArrayField from 'components/form-elements/ArrayField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceLocationsFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import { renderFormField } from '../../../utils/form-utils';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
-import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-import DateField from '../../form-elements/DateField';
-import DocumentButton from '../../DocumentButton';
-import SelectField from '../../form-elements/SelectField';
-import TextField from '../../form-elements/TextField';
-import LabelField from '../../form-elements/LabelField';
-import { debounceLocationsFetch } from '../../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import ArrayField from '../../form-elements/ArrayField';
 
 const SHIPMENT_FIELDS = {
   'origin.name': {
@@ -95,6 +98,8 @@ const SHIPMENT_FIELDS = {
     attributes: {
       required: true,
       showValueTooltip: true,
+      valueKey: 'id',
+      labelKey: 'name',
     },
     getDynamicAttr: ({ shipmentTypes, received, showOnly }) => ({
       options: shipmentTypes,
@@ -288,7 +293,7 @@ class SendMovementPage extends Component {
     const payload = {
       'destination.id': values.destination.id,
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
+      'shipmentType.id': values.shipmentType.id,
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
@@ -334,7 +339,7 @@ class SendMovementPage extends Component {
         const shipmentTypes = _.map(response.data.data, (type) => {
           const [en, fr] = _.split(type.name, '|fr:');
           return {
-            value: type.id,
+            ...type,
             label: this.props.locale === 'fr' && fr ? fr : en,
           };
         });
@@ -416,7 +421,10 @@ class SendMovementPage extends Component {
           values: {
             ...this.state.values,
             dateShipped: stockMovementData.dateShipped,
-            shipmentType: _.get(stockMovementData, 'shipmentType.id'),
+            shipmentType: {
+              ...stockMovementData.shipmentType,
+              label: splitTranslation(stockMovementData.shipmentType.name, this.props.locale),
+            },
             trackingNumber: stockMovementData.trackingNumber,
             driverName: stockMovementData.driverName,
             comments: stockMovementData.comments,
@@ -532,7 +540,7 @@ class SendMovementPage extends Component {
     const payload = {
       'destination.id': values.destination.id,
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType,
+      'shipmentType.id': values.shipmentType.id,
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
@@ -545,7 +553,7 @@ class SendMovementPage extends Component {
         'You are not able to send shipment from a location other than origin. Change your current location.',
       ));
       this.props.hideSpinner();
-    } else if (values.shipmentType === _.find(this.state.shipmentTypes, shipmentType => shipmentType.label === 'Default').value) {
+    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, shipmentType => shipmentType.label === 'Default').id) {
       Alert.error(this.props.translate(
         'react.stockMovement.alert.populateShipmentType.label',
         'Please populate shipment type before continuing',

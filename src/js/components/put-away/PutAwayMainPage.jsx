@@ -1,19 +1,22 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
-import PutAwayPage from './PutAwayPage';
-import PutAwaySecondPage from './PutAwaySecondPage';
-import PutAwayCheckPage from './PutAwayCheckPage';
-import Wizard from '../wizard/Wizard';
-import apiClient, { parseResponse } from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import PutAwayCheckPage from 'components/put-away/PutAwayCheckPage';
+import PutAwayPage from 'components/put-away/PutAwayPage';
+import PutAwaySecondPage from 'components/put-away/PutAwaySecondPage';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import './PutAway.scss';
+import 'components/put-away/PutAway.scss';
+
+
 /** Main put-away form's component. */
 class PutAwayMainPage extends Component {
   constructor(props) {

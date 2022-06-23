@@ -1,8 +1,11 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
-import { renderFormField } from '../../utils/form-utils';
+
+import { renderFormField } from 'utils/form-utils';
+
 
 class TableRow extends Component {
   shouldComponentUpdate(nextProps) {
@@ -72,6 +75,10 @@ class TableRow extends Component {
     const rowIndex = !_.isNil(properties.parentIndex) ? properties.parentIndex : index;
     const className = `table-row ${rowIndex % 2 === 0 ? 'even-row' : ''} ${dynamicRowAttr.className ? dynamicRowAttr.className : ''}`;
     const tooltip = dynamicRowAttr.tooltip ? dynamicRowAttr.tooltip : null;
+
+    if (dynamicRowAttr.hideRow) {
+      return null;
+    }
 
     return (
       <div {...dynamicRowAttr} className={className}>

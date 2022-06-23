@@ -36,16 +36,15 @@
                                 <tr>
                                     <th><warehouse:message code="product.productCode.label"/></th>
                                     <th><warehouse:message code="product.label"/></th>
+                                    <th class="center"><warehouse:message code="consumption.unitPrice.label" default="Unit Price"/></th>
                                     <th class="center"><warehouse:message code="consumption.issued.label" default="Issued"/></th>
-                                    <th class="center"><warehouse:message code="consumption.expired.label" default="Expired"/></th>
-                                    <th class="center"><warehouse:message code="consumption.damaged.label" default="Damaged"/></th>
-                                    <th class="center"><warehouse:message code="consumption.other.label" default="Other"/></th>
-                                    <th class="center"><warehouse:message code="consumption.total.label" default="Total"/></th>
+                                    <th class="center"><warehouse:message code="consumption.consumed.label" default="Consumed"/></th>
+                                    <th class="center"><warehouse:message code="consumption.returned.label" default="Returned"/></th>
+                                    <th class="center"><warehouse:message code="consumption.total.label" default="Total Consumption"/></th>
+                                    <th class="center"><warehouse:message code="consumption.totalConsumptionValue.label" default="Total Consumption Value"/></th>
                                     <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
-                                    <th class="center"><warehouse:message code="consumption.weekly.label" default="Weekly"/></th>
-                                    <th class="center"><warehouse:message code="consumption.daily.label" default="Daily"/></th>
                                     <th class="center"><warehouse:message code="consumption.qoh.label" default="QoH"/></th>
-                                    <th class="center"><warehouse:message code="consumption.months.label" default="Months"/></th>
+                                    <th class="center"><warehouse:message code="consumption.months.label" default="Months remaining"/></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -53,12 +52,10 @@
                                 <g:each var="entry" in="${command.rows}" status="i">
                                     <g:set var="row" value="${entry.value}"/>
                                     <g:set var="product" value="${entry.key}"/>
-                                    <g:set var="totalQuantity" value="${row.transferOutQuantity}"/>
                                     <g:set var="monthlyQuantity" value="${row.monthlyQuantity}"/>
-                                    <g:set var="weeklyQuantity" value="${row.weeklyQuantity}"/>
-                                    <g:set var="dailyQuantity" value="${row.dailyQuantity}"/>
                                     <g:set var="onHandQuantity" value="${row.onHandQuantity}"/>
                                     <g:set var="numberOfMonthsLeft" value="${onHandQuantity / monthlyQuantity}"/>
+                                    <g:set var="totalConsumptionValue" value="${(product?.pricePerUnit ?: 0) * row.totalConsumptionQuantity}"/>
 
                                     <tr>
                                         <td>
@@ -78,33 +75,30 @@
                                             </a>
                                         </td>
                                         <td class="center">
-                                            <div class="debit">${row.transferOutQuantity}</div>
+                                            <g:formatNumber number="${product.pricePerUnit}" maxFractionDigits="2"/>
                                         </td>
                                         <td class="center">
-                                            <div class="debit">${row.expiredQuantity}</div>
+                                            <div class="debit">${row.issuedQuantity}</div>
                                         </td>
                                         <td class="center">
-                                            <div class="debit">${row.damagedQuantity}</div>
+                                            <div class="debit">${row.consumedQuantity}</div>
                                         </td>
                                         <td class="center">
-                                            <div class="debit">${row.otherQuantity}</div>
+                                            ${row.returnedQuantity}
                                         </td>
                                         <td class="center">
-                                            ${row.transferBalance}
+                                            ${row.totalConsumptionQuantity}
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${row.monthlyQuantity}" maxFractionDigits="0"/>
+                                            <g:formatNumber number="${totalConsumptionValue}" maxFractionDigits="2"/>
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${row.weeklyQuantity}" maxFractionDigits="0"/>
+                                            <g:formatNumber number="${monthlyQuantity}" maxFractionDigits="4"/>
                                         </td>
-                                        <td class="center">
-                                            <g:formatNumber number="${row.dailyQuantity}" maxFractionDigits="0"/>
-                                        </td>
-
                                         <td class="center">
                                             <g:formatNumber number="${row.onHandQuantity}" maxFractionDigits="0"/>
                                         </td>
+
                                         <td class="center">
                                             <g:formatNumber number="${row.numberOfMonthsRemaining}" maxFractionDigits="0"/>
                                         </td>

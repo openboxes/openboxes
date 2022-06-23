@@ -1,24 +1,26 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import ReactTable from 'react-table';
-import PropTypes from 'prop-types';
+
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
-import { getTranslate } from 'react-localize-redux';
-import { Tooltip } from 'react-tippy';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import ReactTable from 'react-table';
+import { Tooltip } from 'react-tippy';
+
+import { fetchBreadcrumbsConfig, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import SplitLineModal from 'components/put-away/SplitLineModal';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import customTreeTableHOC from 'utils/CustomTreeTable';
+import Filter from 'utils/Filter';
+import showLocationChangedAlert from 'utils/location-change-alert';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
-import customTreeTableHOC from '../../utils/CustomTreeTable';
-import Select from '../../utils/Select';
-import SplitLineModal from './SplitLineModal';
-import apiClient, { parseResponse, flattenRequest } from '../../utils/apiClient';
-import { showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import Filter from '../../utils/Filter';
-import showLocationChangedAlert from '../../utils/location-change-alert';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -238,7 +240,8 @@ class PutAwaySecondPage extends Component {
 
         return (<Select
           options={this.state.bins}
-          objectValue
+          valueKey="id"
+          labelKey="name"
           value={_.get(this.state.putAway.putawayItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
           onChange={value => this.changePutAway(update(this.state.putAway, {
             putawayItems: { [cellInfo.index]: { putawayLocation: { $set: value } } },
@@ -362,20 +365,14 @@ class PutAwaySecondPage extends Component {
     const url = `/openboxes/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
 
     const mapBins = bins => (_.chain(bins)
-      .map(bin => ({
-        value: {
-          id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName,
-        },
-        label: bin.name,
-      }))
-      .orderBy(['label'], ['asc']).value()
+      .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url)
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
-          .map((value, key) => ({ label: key, options: mapBins(value) }))
+          .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['label'], ['asc'])
           .value();
         const binsWithoutZone = mapBins(binGroups[1]);

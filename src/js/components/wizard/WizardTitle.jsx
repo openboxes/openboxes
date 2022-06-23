@@ -1,28 +1,36 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
 
-const WizardTitle = props => (
-  <div className="panel-heading movement-number">
-    {props.title ?
-      (
-        <div>
-          {
-            _.map(props.title, element => (
-              <span style={{ color: element.color }}>
-                {element.text}
-                <span style={{ color: 'black' }}>
-                  {element.delimeter}
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+
+
+const WizardTitle = (props) => {
+  if (!props.title && !props.additionalTitle) {
+    return null;
+  }
+
+  return (
+    <div className="panel-heading movement-number">
+      {props.title ?
+        (
+          <div>
+            {
+              _.map(props.title, element => (
+                <span style={{ color: element.color }}>
+                  {element.text}
+                  <span style={{ color: 'black' }}>
+                    {element.delimeter}
+                  </span>
                 </span>
-              </span>
-            ))
-          }
-        </div>
-      )
+              ))
+            }
+          </div>
+        )
       : null}
-    {props.additionalTitle}
-  </div>
-);
+      {props.additionalTitle}
+    </div>
+  );
+};
 
 export default WizardTitle;
 

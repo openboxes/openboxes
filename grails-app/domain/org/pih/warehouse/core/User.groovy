@@ -87,6 +87,12 @@ class User extends Person {
         return defaultRoles
     }
 
+    def getAllRoles() {
+        def defaultRoles = roles?.collect { it } ?: []
+        defaultRoles.addAll(locationRoles?.collect { it.role } ?: [])
+        return defaultRoles
+    }
+
     boolean hasPrimaryRole(Location currentLocation) {
         def roles = getEffectiveRoles(currentLocation)
         return roles.roleType.find { RoleType.listPrimaryRoleTypes().contains(it) }
@@ -117,9 +123,13 @@ class User extends Person {
 
     def deserializeDashboardConfig() {
         if (dashboardConfig == null) return null
-        
+
         def json = new JSON();
         return json.parse(dashboardConfig)
+    }
+
+    Boolean hasDefaultRole(RoleType roleType) {
+        return roles?.any { Role role -> role.roleType == roleType} ?: false
     }
 
 

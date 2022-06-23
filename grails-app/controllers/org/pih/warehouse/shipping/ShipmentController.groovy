@@ -1188,7 +1188,6 @@ class ShipmentController {
         }
         redirect(controller: "shipment", action: "showDetails", id: params.id)
     }
-
 }
 
 class ReceiveShipmentCommand implements Serializable {

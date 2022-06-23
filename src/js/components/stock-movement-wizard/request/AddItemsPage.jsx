@@ -1,35 +1,188 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
-import moment from 'moment';
-import fileDownload from 'js-file-download';
 import update from 'immutability-helper';
+import fileDownload from 'js-file-download';
+import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import Alert from 'react-s-alert';
+
+import { fetchUsers, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceProductsFetch } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import ArrayField from '../../form-elements/ArrayField';
-import ButtonField from '../../form-elements/ButtonField';
-import LabelField from '../../form-elements/LabelField';
-import { renderFormField } from '../../../utils/form-utils';
-import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import { debounceProductsFetch } from '../../../utils/option-utils';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
+function addButton({
+  // eslint-disable-next-line react/prop-types
+  addRow, getSortOrder, newItemAdded, updateTotalCount,
+}) {
+  return (
+    <button
+      type="button"
+      className="btn btn-outline-success btn-xs"
+      onClick={() => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+        newItemAdded();
+      }}
+    ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+    </button>
+  );
+}
+
+
+const FIELDS = {
+  product: {
+    type: SelectField,
+    label: 'react.stockMovement.requestedProduct.label',
+    defaultMessage: 'Requested product',
+    headerAlign: 'left',
+    flexWidth: '9',
+    attributes: {
+      async: true,
+      openOnClick: false,
+      autoload: false,
+      filterOptions: options => options,
+      cache: false,
+      options: [],
+      showValueTooltip: true,
+      className: 'text-left',
+      optionRenderer: option => (
+        <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
+          {option.label}
+          &nbsp;
+          {renderHandlingIcons(option.handlingIcons)}
+        </strong>
+      ),
+      valueRenderer: option => (
+        <span className="d-flex align-items-center">
+          <span className="text-truncate">
+            {option.label}
+          </span>
+          &nbsp;
+          {renderHandlingIcons(option ? option.handlingIcons : [])}
+        </span>
+      ),
+    },
+  },
+  quantityOnHand: {
+    type: LabelField,
+    label: 'react.stockMovement.quantityOnHand.label',
+    defaultMessage: 'QoH',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityOnHandAtRequestSite: {
+    type: TextField,
+    flexWidth: '1.7',
+    label: 'react.stockMovement.quantityOnHandAtRequestSite.label',
+    defaultMessage: 'QOH at Request Site',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityAvailable: {
+    type: LabelField,
+    label: 'react.stockMovement.available.label',
+    defaultMessage: 'Available',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityAllowed: {
+    type: LabelField,
+    label: 'react.stockMovement.maxQuantity.label',
+    defaultMessage: 'Max Qty',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  monthlyDemand: {
+    type: LabelField,
+    label: 'react.stockMovement.demandPerMonth.label',
+    defaultMessage: 'Demand per Month',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  quantityRequested: {
+    type: TextField,
+    label: 'react.stockMovement.neededQuantity.label',
+    defaultMessage: 'Needed Qty',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  comments: {
+    type: TextField,
+    label: 'react.stockMovement.comments.label',
+    defaultMessage: 'Comments',
+    flexWidth: '1.7',
+    getDynamicAttr: ({
+      addRow, rowCount, rowIndex, getSortOrder,
+      updateTotalCount, updateRow, values,
+    }) => ({
+      onTabPress: rowCount === rowIndex + 1 ? () => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+      } : null,
+      arrowRight: rowCount === rowIndex + 1 ? () => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+      } : null,
+      arrowDown: rowCount === rowIndex + 1 ? () => () => {
+        updateTotalCount(1);
+        addRow({ sortOrder: getSortOrder() });
+      } : null,
+      onBlur: () => updateRow(values, rowIndex),
+    }),
+  },
+  demandPerReplenishmentPeriod: {
+    type: LabelField,
+    label: 'react.stockMovement.demandPerReplenishmentPeriod.label',
+    defaultMessage: 'Demand per Replenishment Period',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+  demandPerRequestPeriod: {
+    type: LabelField,
+    label: 'react.stockMovement.demandPerRequestPeriod.label',
+    defaultMessage: 'Demand per Request Period',
+    flexWidth: '1.7',
+    attributes: {
+      type: 'number',
+    },
+  },
+};
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
-  flexWidth: '1',
+  flexWidth: '0.5',
   fieldKey: '',
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
@@ -48,65 +201,26 @@ const DELETE_BUTTON_FIELD = {
   },
 };
 
+const LINE_ITEMS_ATTR = {
+  type: ArrayField,
+  arrowsNavigation: true,
+  virtualized: true,
+  totalCount: ({ totalCount }) => totalCount,
+  isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
+  loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
+  isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+  addButton,
+};
+
+
 const NO_STOCKLIST_FIELDS = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    // eslint-disable-next-line react/prop-types
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: '',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
         flexWidth: '9.5',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
           debouncedProductsFetch, rowIndex, rowCount, updateProductData, values,
         }) => ({
@@ -115,41 +229,12 @@ const NO_STOCKLIST_FIELDS = {
           autoFocus: rowIndex === rowCount - 1,
         }),
       },
-      quantityOnHand: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QoH',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      quantityAvailable: {
-        type: LabelField,
-        label: 'react.stockMovement.available.label',
-        defaultMessage: 'Available',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
-      monthlyDemand: {
-        type: LabelField,
-        label: 'react.stockMovement.demandPerMonth',
-        defaultMessage: 'Demand per Month',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
-      },
+      quantityOnHand: FIELDS.quantityOnHand,
+      quantityAvailable: FIELDS.quantityAvailable,
+      monthlyDemand: FIELDS.monthlyDemand,
       quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
+        ...FIELDS.quantityRequested,
         flexWidth: '2.5',
-        attributes: {
-          type: 'number',
-        },
         fieldKey: '',
         getDynamicAttr: ({
           updateRow, values, rowIndex,
@@ -157,30 +242,7 @@ const NO_STOCKLIST_FIELDS = {
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
-      comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
+      comments: FIELDS.comments,
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
@@ -188,62 +250,68 @@ const NO_STOCKLIST_FIELDS = {
 
 const STOCKLIST_FIELDS_PUSH_TYPE = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
+        getDynamicAttr: ({
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: debouncedProductsFetch,
+          autoFocus: newItem && rowIndex === rowCount - 1,
+        }),
+      },
+      quantityAllowed: FIELDS.quantityAllowed,
+      quantityOnHand: FIELDS.quantityOnHand,
+      quantityAvailable: FIELDS.quantityAvailable,
+      quantityRequested: {
+        ...FIELDS.quantityRequested,
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      comments: FIELDS.comments,
+      deleteButton: DELETE_BUTTON_FIELD,
+    },
+  },
+};
+
+const STOCKLIST_FIELDS_PULL_TYPE = {
+  lineItems: {
+    ...LINE_ITEMS_ATTR,
+    fields: {
+      product: {
+        ...FIELDS.product,
+        fieldKey: 'disabled',
+        getDynamicAttr: ({
+          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+        }) => ({
+          disabled: !!fieldValue,
+          loadOptions: debouncedProductsFetch,
+          autoFocus: newItem && rowIndex === rowCount - 1,
+        }),
+      },
+      demandPerReplenishmentPeriod: FIELDS.demandPerReplenishmentPeriod,
+      quantityOnHand: FIELDS.quantityOnHand,
+      quantityAvailable: FIELDS.quantityAvailable,
+      quantityRequested: FIELDS.quantityRequested,
+      comments: FIELDS.comments,
+      deleteButton: DELETE_BUTTON_FIELD,
+    },
+  },
+};
+
+const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
+  lineItems: {
+    ...LINE_ITEMS_ATTR,
+    fields: {
+      product: {
+        ...FIELDS.product,
+        fieldKey: 'disabled',
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
         }) => ({
@@ -253,39 +321,43 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         }),
       },
       quantityAllowed: {
-        type: LabelField,
-        label: 'react.stockMovement.maxQuantity.label',
-        defaultMessage: 'Max Qty',
-        flexWidth: '1.7',
+        ...FIELDS.quantityAllowed,
+        headerTooltip: 'react.stockMovement.tooltip.maxQuantity.label',
+        headerAlign: 'right',
         attributes: {
-          type: 'number',
+          ...FIELDS.quantityAllowed.attributes,
+          cellClassName: 'text-right',
         },
       },
       quantityOnHand: {
-        type: LabelField,
-        label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QoH',
-        flexWidth: '1.7',
+        ...FIELDS.quantityOnHand,
+        type: TextField,
+        headerTooltip: 'react.stockMovement.tooltip.quantityOnHand.label',
+        headerAlign: 'right',
         attributes: {
-          type: 'number',
+          ...FIELDS.quantityAllowed.attributes,
+          required: true,
+          cellClassName: 'text-right',
         },
-      },
-      quantityAvailable: {
-        type: LabelField,
-        label: 'react.stockMovement.available.label',
-        defaultMessage: 'Available',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
+        getDynamicAttr: ({
+          fieldValue, rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => {
+            const valuesWithUpdatedQtyRequested = values;
+            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
+                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            updateRow(valuesWithUpdatedQtyRequested, rowIndex);
+          },
+        }),
       },
       quantityRequested: {
-        type: TextField,
-        label: 'react.stockMovement.neededQuantity.label',
-        defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
+        ...FIELDS.quantityRequested,
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.tooltip.quantityRequested.label',
         attributes: {
-          type: 'number',
+          ...FIELDS.quantityRequested.attributes,
+          cellClassName: 'text-right',
         },
         getDynamicAttr: ({
           rowIndex, values, updateRow,
@@ -294,92 +366,27 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         }),
       },
       comments: {
-        type: TextField,
-        label: 'react.stockMovement.comments.label',
-        defaultMessage: 'Comments',
-        flexWidth: '1.7',
-        getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
-        }) => ({
-          onTabPress: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowRight: rowCount === rowIndex + 1 ? () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          arrowDown: rowCount === rowIndex + 1 ? () => () => {
-            updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
-          } : null,
-          onBlur: () => updateRow(values, rowIndex),
-        }),
+        ...FIELDS.comments,
+        headerTooltip: 'react.stockMovement.tooltip.comments.label',
+        headerAlign: 'left',
+        attributes: {
+          ...FIELDS.comments.attributes,
+          cellClassName: 'text-left',
+        },
       },
       deleteButton: DELETE_BUTTON_FIELD,
     },
   },
 };
 
-const STOCKLIST_FIELDS_PULL_TYPE = {
+const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
   lineItems: {
-    type: ArrayField,
-    arrowsNavigation: true,
-    virtualized: true,
-    totalCount: ({ totalCount }) => totalCount,
-    isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
-    loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
-    isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
-    }) => (
-      <button
-        type="button"
-        className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+    ...LINE_ITEMS_ATTR,
     fields: {
       product: {
+        ...FIELDS.product,
         fieldKey: 'disabled',
-        type: SelectField,
-        label: 'react.stockMovement.requestedProduct.label',
-        defaultMessage: 'Requested product',
-        headerAlign: 'left',
-        flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-                &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
+        flexWidth: '2',
         getDynamicAttr: ({
           fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
         }) => ({
@@ -390,36 +397,49 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
       },
       demandPerReplenishmentPeriod: {
         type: LabelField,
-        label: 'react.stockMovement.demandPerReplenishmentPeriod.label',
-        defaultMessage: 'Demand per Replenishment Period',
-        flexWidth: '1.7',
+        label: 'react.stockMovement.demandPerRequestPeriod.label',
+        defaultMessage: 'Demand per Request Period',
+        flexWidth: '1',
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.demandPerRequestPeriod.headerTooltip.label',
+        headerDefaultTooltip: 'The average of your previous requests for this product.',
         attributes: {
           type: 'number',
+          className: 'text-right',
         },
       },
       quantityOnHand: {
-        type: LabelField,
+        ...FIELDS.quantityOnHandAtRequestSite,
         label: 'react.stockMovement.quantityOnHand.label',
-        defaultMessage: 'QoH',
-        flexWidth: '1.7',
+        defaultMessage: 'QOH',
+        flexWidth: '0.6',
+        required: true,
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
+        headerDefaultTooltip: 'Enter your current quantity on hand for this product',
         attributes: {
           type: 'number',
         },
-      },
-      quantityAvailable: {
-        type: LabelField,
-        label: 'react.stockMovement.available.label',
-        defaultMessage: 'Available',
-        flexWidth: '1.7',
-        attributes: {
-          type: 'number',
-        },
+        getDynamicAttr: ({
+          fieldValue, rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => {
+            const valuesWithUpdatedQtyRequested = values;
+            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+              values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue >= 0 ?
+                values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue : 0;
+            updateRow(valuesWithUpdatedQtyRequested, rowIndex);
+          },
+        }),
       },
       quantityRequested: {
         type: TextField,
         label: 'react.stockMovement.neededQuantity.label',
         defaultMessage: 'Needed Qty',
-        flexWidth: '1.7',
+        flexWidth: '0.6',
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
+        headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
         attributes: {
           type: 'number',
         },
@@ -433,7 +453,112 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         type: TextField,
         label: 'react.stockMovement.comments.label',
         defaultMessage: 'Comments',
-        flexWidth: '1.7',
+        flexWidth: '1.6',
+        headerAlign: 'left',
+        headerTooltip: 'react.stockMovement.comments.headerTooltip.label',
+        headerDefaultTooltip: 'Leave a comment for the person who will review this request.',
+        getDynamicAttr: ({
+          addRow, rowCount, rowIndex, getSortOrder,
+          updateTotalCount, updateRow, values,
+        }) => ({
+          onTabPress: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowRight: rowCount === rowIndex + 1 ? () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          arrowDown: rowCount === rowIndex + 1 ? () => () => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder() });
+          } : null,
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      deleteButton: DELETE_BUTTON_FIELD,
+    },
+  },
+};
+
+const REQUEST_FROM_WARD_FIELDS = {
+  lineItems: {
+    ...LINE_ITEMS_ATTR,
+    fields: {
+      product: {
+        ...FIELDS.product,
+        fieldKey: 'disabled',
+        flexWidth: '2.4',
+        getDynamicAttr: ({
+          debouncedProductsFetch, rowIndex, rowCount, updateProductData, values, newItem,
+        }) => ({
+          onChange: value => updateProductData(value, values, rowIndex),
+          loadOptions: debouncedProductsFetch,
+          autoFocus: newItem && rowIndex === rowCount - 1,
+        }),
+      },
+      monthlyDemand: {
+        type: LabelField,
+        label: 'react.stockMovement.demandPerMonth.label',
+        defaultMessage: 'Demand per Month',
+        headerAlign: 'right',
+        flexWidth: '0.8',
+        headerTooltip: 'react.stockMovement.demandPerRequestPeriod.headerTooltip.label',
+        headerDefaultTooltip: 'The average of your previous requests for this product.',
+        attributes: {
+          type: 'number',
+          className: 'text-right',
+        },
+      },
+      quantityOnHand: {
+        type: TextField,
+        label: 'react.stockMovement.quantityOnHand.label',
+        defaultMessage: 'QOH',
+        flexWidth: '0.6',
+        required: true,
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
+        headerDefaultTooltip: 'Enter your current quantity on hand for this product',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({
+          fieldValue, rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => {
+            const valuesWithUpdatedQtyRequested = values;
+            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+              values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
+                values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            updateRow(valuesWithUpdatedQtyRequested, rowIndex);
+          },
+        }),
+      },
+      quantityRequested: {
+        type: TextField,
+        label: 'react.stockMovement.neededQuantity.label',
+        defaultMessage: 'Needed Qty',
+        flexWidth: '0.6',
+        headerAlign: 'right',
+        headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
+        headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
+        attributes: {
+          type: 'number',
+        },
+        getDynamicAttr: ({
+          rowIndex, values, updateRow,
+        }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
+      },
+      comments: {
+        type: TextField,
+        label: 'react.stockMovement.comments.label',
+        defaultMessage: 'Comments',
+        flexWidth: '2.4',
+        headerAlign: 'left',
+        headerTooltip: 'react.stockMovement.comments.headerTooltip.label',
+        headerDefaultTooltip: 'Leave a comment for the person who will review this request.',
         getDynamicAttr: ({
           addRow, rowCount, rowIndex, getSortOrder,
           updateTotalCount, updateRow, values,
@@ -459,6 +584,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
 };
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
+const REPLENISHMENT_TYPE_PUSH = 'PUSH';
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -475,6 +601,7 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      isRequestFromWard: false,
     };
 
     this.props.showSpinner();
@@ -490,6 +617,7 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
+    this.submitRequest = this.submitRequest.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -519,6 +647,16 @@ class AddItemsPage extends Component {
    * @public
    */
   getFields() {
+    if (this.state.isRequestFromWard) {
+      if (_.get(this.state.values.stocklist, 'id')) {
+        if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
+          return REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE;
+        }
+        return REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE;
+      }
+      return REQUEST_FROM_WARD_FIELDS;
+    }
+
     if (_.get(this.state.values.stocklist, 'id')) {
       if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
         return STOCKLIST_FIELDS_PULL_TYPE;
@@ -536,10 +674,13 @@ class AddItemsPage extends Component {
    * @public
    */
   getLineItemsToBeSaved(lineItems) {
+    // First find items that are new and should be added (don't have status code)
     const lineItemsToBeAdded = _.filter(lineItems, item =>
       !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+    // Then get a list of items that already exist in this request (have status code)
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
+    // For each already existing items - find the ones that have changed
     _.forEach(lineItemsWithStatus, (item) => {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem.quantityRequested, 10);
@@ -567,6 +708,7 @@ class AddItemsPage extends Component {
       }
     });
 
+    // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
@@ -596,9 +738,39 @@ class AddItemsPage extends Component {
     const { data } = response.data;
     let lineItemsData;
 
+    const isPullType = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
+
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100 });
-    } else if (_.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL) {
+    } else if (this.state.isRequestFromWard && _.get(this.state.values.stocklist, 'id')) {
+      lineItemsData = _.map(
+        data,
+        (val) => {
+          const {
+            quantityRequested,
+            demandPerReplenishmentPeriod,
+            quantityOnHand,
+            quantityAllowed,
+          } = val;
+
+          let qtyRequested = 0;
+          if (quantityRequested) qtyRequested = quantityRequested;
+          else if (isPullType) qtyRequested = demandPerReplenishmentPeriod - quantityOnHand;
+          else qtyRequested = quantityAllowed;
+
+          return {
+            ...val,
+            quantityOnHand: '',
+            disabled: true,
+            quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
+            product: {
+              ...val.product,
+              label: `${val.productCode} ${val.product.name}`,
+            },
+          };
+        },
+      );
+    } else if (isPullType) {
       lineItemsData = _.map(
         data,
         (val) => {
@@ -670,18 +842,34 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
+    const isPush = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PUSH;
+    const isPull = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (_.isNil(item.quantityRequested)
-        || item.quantityRequested < 0)) {
-        errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
+      const rowErrors = {};
+      if (!_.isNil(item.product)) {
+        if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
+          rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
+        }
+        if (_.isNil(item.quantityOnHand) && !isPush && !isPull) {
+          rowErrors.quantityOnHand = 'react.stockMovement.error.enterQuantity.label';
+        }
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
-        errors.lineItems[key] = { boxName: 'react.stockMovement.error.boxWithoutPallet.label' };
+        rowErrors.boxName = 'react.stockMovement.error.boxWithoutPallet.label';
       }
       const dateRequested = moment(item.expirationDate, 'MM/DD/YYYY');
       if (date.diff(dateRequested) > 0) {
-        errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
+        rowErrors.expirationDate = 'react.stockMovement.error.invalidDate.label';
+      }
+
+      if (this.state.isRequestFromWard) {
+        if (!item.quantityOnHand || item.quantityOnHand < 0) {
+          rowErrors.quantityOnHand = 'react.stockMovement.error.quantityOnHand.label';
+        }
+      }
+      if (!_.isEmpty(rowErrors)) {
+        errors.lineItems[key] = rowErrors;
       }
     });
     return errors;
@@ -711,19 +899,18 @@ class AddItemsPage extends Component {
    * @public
    */
   saveItemsAndExportTemplate(formValues, lineItems) {
-    this.props.showSpinner();
-
     const { movementNumber, stockMovementId } = formValues;
     const url = `/openboxes/stockMovement/exportCsv/${stockMovementId}`;
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.props.showSpinner();
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         apiClient.get(url, { responseType: 'blob' })
           .then((response) => {
             fileDownload(response.data, `ItemList${movementNumber ? `-${movementNumber}` : ''}.csv`, 'text/csv');
             this.props.hideSpinner();
-          })
-          .catch(() => this.props.hideSpinner());
-      });
+          });
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -769,10 +956,16 @@ class AddItemsPage extends Component {
   confirmSave(onConfirm) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.stockMovement.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      ),
+      message: this.state.isRequestFromWard ?
+        this.props.translate(
+          'react.stockMovement.QOHWillNotBeSaved.message',
+          'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Also if there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+        )
+        :
+        this.props.translate(
+          'react.stockMovement.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        ),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -836,6 +1029,10 @@ class AddItemsPage extends Component {
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
+    } else if (this.state.isFirstPageLoaded) {
+      // Workaround for refetching items from scratch
+      // when the first page was already loaded and table is paginated
+      this.loadMoreRows({ startIndex: 0 });
     }
   }
 
@@ -866,13 +1063,10 @@ class AddItemsPage extends Component {
    */
   fetchAddItemsPageData() {
     this.props.showSpinner();
-
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
-        const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
-        const { totalCount } = resp.data;
+        const { data: { hasManageInventory, statusCode }, totalCount } = resp.data;
 
         this.setState({
           values: {
@@ -881,8 +1075,11 @@ class AddItemsPage extends Component {
             statusCode,
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
-        }, () => this.props.hideSpinner());
-      });
+          isRequestFromWard: this.props.currentLocationId === this.state.values.destination.id && this.state.values.destination.type === 'WARD',
+        });
+        this.props.hideSpinner();
+      })
+      .catch(() => this.props.hideSpinner());
   }
 
   loadMoreRows({ startIndex }) {
@@ -988,10 +1185,19 @@ class AddItemsPage extends Component {
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
+        .then(() => this.fetchAddItemsPageData())
         .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
     }
 
     return Promise.resolve();
+  }
+
+  submitRequest(lineItems) {
+    this.confirmSubmit(() => {
+      const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
+      this.saveRequisitionItems(nonEmptyLineItems)
+        .then(() => this.transitionToNextStep('REQUESTED'));
+    });
   }
 
   /**
@@ -1006,44 +1212,17 @@ class AddItemsPage extends Component {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
     };
-
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
-        .then((resp) => {
-          const { lineItems } = resp.data.data;
-          const lineItemsBackendData = _.map(
-            lineItems,
-            val => ({
-              ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
-              quantityOnHand: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).quantityOnHand,
-              monthlyDemand: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).monthlyDemand,
-              demandPerReplenishmentPeriod: _.find(
-                this.state.values.lineItems,
-                lineItem => lineItem.sortOrder === val.sortOrder,
-              ).demandPerReplenishmentPeriod,
-            }),
-          );
-
-          this.setState({
-            values:
-              { ...this.state.values, lineItems: lineItemsBackendData },
-            totalCount: lineItems.length,
-            currentLineItems: lineItemsBackendData,
-          });
-        })
+        .then(() => this.setState({
+          currentLineItems: [],
+          values: { ...this.state.values, lineItems: [] },
+          sortOrder: 0,
+          newItem: false,
+          totalCount: 0,
+        }, () => this.fetchAllData()))
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
-
     return Promise.resolve();
   }
 
@@ -1054,8 +1233,8 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+    const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+    if (zeroedLines || this.state.isRequestFromWard) {
       this.confirmSave(() => this.saveItems(lineItems));
     } else {
       this.saveItems(lineItems);
@@ -1067,13 +1246,33 @@ class AddItemsPage extends Component {
    * @param {object} formValues
    * @public
    */
+  // eslint-disable-next-line consistent-return
   saveAndExit(formValues) {
+    const saveAndRedirect = (lineItems) => {
+      this.props.showSpinner();
+      return this.saveRequisitionItemsInCurrentStep(lineItems)
+        .then(() => {
+          let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+            redirectTo = '/openboxes/dashboard';
+          }
+          window.location = redirectTo;
+        })
+        .catch(() => {
+          this.props.hideSpinner();
+        });
+    };
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
-        .then(() => {
-          window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+      const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      if (zeroedLines || this.state.isRequestFromWard) {
+        this.confirmSave(() => {
+          saveAndRedirect(lineItems);
         });
+      } else {
+        saveAndRedirect(lineItems);
+      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
@@ -1084,7 +1283,13 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = '/openboxes/stockMovement/list?direction=INBOUND'; },
+            onClick: () => {
+              let redirectTo = '/openboxes/stockMovement/list?direction=INBOUND';
+              if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+                redirectTo = '/openboxes/dashboard';
+              }
+              window.location = redirectTo;
+            },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1101,13 +1306,14 @@ class AddItemsPage extends Component {
    */
   saveItems(lineItems) {
     this.props.showSpinner();
-
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    return this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
-      .catch(() => this.props.hideSpinner());
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   /**
@@ -1187,7 +1393,13 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
-          window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+            Alert.success(`${this.props.translate('react.stockMovement.request.submitMessage.label', 'Thank you for submitting your request. You can check the status of your request using stock movement number')} ${movementNumber}`);
+            this.props.history.push('/openboxes/');
+            this.props.updateBreadcrumbs([]);
+          } else {
+            window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+          }
         });
     }
     return Promise.resolve();
@@ -1199,10 +1411,26 @@ class AddItemsPage extends Component {
    * @param {boolean} invalid
    * @public
    */
+  // eslint-disable-next-line consistent-return
   previousPage(values, invalid) {
+    const saveAndRedirect = (lineItems) => {
+      this.props.showSpinner();
+      return this.saveRequisitionItemsInCurrentStep(lineItems)
+        .then(() => this.props.previousPage(values))
+        .catch(() => {
+          this.props.hideSpinner();
+        });
+    };
     if (!invalid) {
-      this.saveRequisitionItemsInCurrentStep(values.lineItems)
-        .then(() => this.props.previousPage(values));
+      const lineItems = _.filter(values.lineItems, item => !_.isEmpty(item));
+      const zeroedLines = _.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0');
+      if (zeroedLines || this.state.isRequestFromWard) {
+        this.confirmSave(() => {
+          saveAndRedirect(lineItems);
+        });
+      } else {
+        saveAndRedirect(lineItems);
+      }
     } else {
       confirmAlert({
         title: this.props.translate('react.stockMovement.confirmPreviousPage.label', 'Validation error'),
@@ -1222,28 +1450,51 @@ class AddItemsPage extends Component {
 
   updateProductData(product, values, index) {
     if (product) {
-      const url = `/openboxes/api/products/${product.id}/productAvailabilityAndDemand?locationId=${this.state.values.destination.id}`;
+      if (this.state.isRequestFromWard) {
+        const url = `/openboxes/api/products/${product.id}/productDemand?originId=${this.state.values.origin.id}&destinationId=${this.state.values.destination.id}`;
 
-      apiClient.get(url)
-        .then((response) => {
-          const monthlyDemand = parseFloat(response.data.monthlyDemand.replace(',', ''));
-          const quantityRequested = monthlyDemand - response.data.quantityAvailable > 0 ?
-            monthlyDemand - response.data.quantityAvailable : 0;
-          this.setState({
-            values: update(values, {
-              lineItems: {
-                [index]: {
-                  product: { $set: product },
-                  quantityOnHand: { $set: response.data.quantityOnHand },
-                  quantityAvailable: { $set: response.data.quantityAvailable },
-                  monthlyDemand: { $set: monthlyDemand },
-                  quantityRequested: { $set: quantityRequested },
+        apiClient.get(url)
+          .then((response) => {
+            const monthlyDemand = parseFloat(response.data.monthlyDemand);
+            const quantityRequested = monthlyDemand - (response.data.quantityOnHand || 0);
+            this.setState({
+              values: update(values, {
+                lineItems: {
+                  [index]: {
+                    product: { $set: product },
+                    quantityOnHand: { $set: '' },
+                    monthlyDemand: { $set: monthlyDemand },
+                    quantityRequested: { $set: quantityRequested >= 0 ? quantityRequested : 0 },
+                  },
                 },
-              },
-            }),
-          });
-        })
-        .catch(this.props.hideSpinner());
+              }),
+            });
+          })
+          .catch(this.props.hideSpinner());
+      } else {
+        const url = `/openboxes/api/products/${product.id}/productAvailabilityAndDemand?locationId=${this.state.values.destination.id}`;
+
+        apiClient.get(url)
+          .then((response) => {
+            const { monthlyDemand, quantityAvailable, quantityOnHand } = response.data;
+            const quantityRequested = monthlyDemand - quantityAvailable > 0 ?
+              monthlyDemand - quantityAvailable : 0;
+            this.setState({
+              values: update(values, {
+                lineItems: {
+                  [index]: {
+                    product: { $set: product },
+                    quantityOnHand: { $set: quantityOnHand },
+                    quantityAvailable: { $set: quantityAvailable },
+                    monthlyDemand: { $set: monthlyDemand },
+                    quantityRequested: { $set: quantityRequested },
+                  },
+                },
+              }),
+            });
+          })
+          .catch(this.props.hideSpinner());
+      }
     } else {
       this.setState({
         values: update(values, {
@@ -1360,14 +1611,10 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => {
-                    if (!invalid) {
-                      this.confirmSubmit(() => this.saveRequisitionItems(_.filter(values.lineItems, val => !_.isEmpty(val) && val.product)).then(() => this.transitionToNextStep('REQUESTED')));
-                    }
-                  }}
+                  onClick={() => this.submitRequest(values.lineItems)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={invalid}
-                ><Translate id="react.default.button.next.label" defaultMessage="Next" />
+                ><Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
                 </button>
               </div>
             </form>
@@ -1386,11 +1633,18 @@ const mapStateToProps = state => ({
   minimumExpirationDate: state.session.minimumExpirationDate,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  currentLocationId: state.session.currentLocation.id,
+  supportedActivities: state.session.supportedActivities,
 });
 
-export default (connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchUsers,
-})(AddItemsPage));
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  fetchUsers,
+  updateBreadcrumbs,
+};
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
 
 AddItemsPage.propTypes = {
   /** Initial component's data */
@@ -1419,4 +1673,10 @@ AddItemsPage.propTypes = {
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
+  currentLocationId: PropTypes.string.isRequired,
+  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+  updateBreadcrumbs: PropTypes.func.isRequired,
 };

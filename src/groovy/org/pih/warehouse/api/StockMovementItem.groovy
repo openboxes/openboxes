@@ -393,7 +393,6 @@ class SubstitutionItem {
     String productCode
     String productName
     Integer quantitySelected
-    Integer quantityConsumed
     Integer sortOrder
 
     Product product
@@ -425,7 +424,6 @@ class SubstitutionItem {
                 minExpirationDate: minExpirationDate?.format("MM/dd/yyyy"),
                 quantityAvailable: quantityAvailable,
                 quantityOnHand   : quantityOnHand,
-                quantityConsumed : quantityConsumed,
                 quantitySelected : quantitySelected,
                 quantityRequested: quantitySelected,
                 availableItems   : availableItems
@@ -467,7 +465,6 @@ class EditPageItem {
     RequisitionItem requisitionItem
 
     Integer quantityRequested
-    Integer quantityConsumed
     Integer totalMonthlyQuantity
     Integer sortOrder
 
@@ -537,7 +534,6 @@ class EditPageItem {
             minExpirationDate           : minExpirationDate?.format("MM/dd/yyyy"),
             quantityRequested           : quantityRequested,
             quantityRevised             : quantityRevised,
-            quantityConsumed            : quantityConsumed,
             quantityAvailable           : quantityAvailable,
             quantityOnHand              : quantityOnHand,
             totalMonthlyQuantity        : totalMonthlyQuantity,

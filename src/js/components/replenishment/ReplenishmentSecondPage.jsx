@@ -1,23 +1,25 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import EditPickModal from 'components/replenishment/EditPickModal';
+import apiClient, { flattenRequest } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import ButtonField from '../form-elements/ButtonField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
-
-import EditPickModal from './EditPickModal';
-import { showSpinner, hideSpinner } from '../../actions';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const FIELDS = {
   replenishmentItems: {
@@ -35,6 +37,10 @@ const FIELDS = {
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+        },
       },
       'product.name': {
         type: LabelField,
@@ -43,40 +49,9 @@ const FIELDS = {
         flexWidth: '2',
         headerAlign: 'left',
         attributes: {
+          cellClassName: 'text-left',
           showValueTooltip: true,
         },
-      },
-      'currentZone.name': {
-        type: LabelField,
-        label: 'react.replenishment.currentZone.label',
-        defaultMessage: 'Current Zone',
-        flexWidth: '0.5',
-        attributes: {
-          showValueTooltip: true,
-        },
-      },
-      'currentBinLocation.name': {
-        type: LabelField,
-        label: 'react.replenishment.currentBinLocation.label',
-        defaultMessage: 'Current Bin Location',
-        flexWidth: '1',
-        attributes: {
-          showValueTooltip: true,
-        },
-        getDynamicAttr: ({ subfield }) => ({
-          formatValue: (value) => {
-            if (subfield || value) {
-              return value;
-            }
-            return 'DEFAULT';
-          },
-        }),
-      },
-      quantityNeeded: {
-        type: LabelField,
-        label: 'react.replenishment.quantityInBin.label',
-        defaultMessage: 'Qty Needed',
-        flexWidth: '1',
       },
       'zone.name': {
         type: LabelField,
@@ -113,12 +88,33 @@ const FIELDS = {
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
+      },
+      'currentBinLocation.name': {
+        type: LabelField,
+        label: 'react.replenishment.transferTo.label',
+        defaultMessage: 'Transfer to',
+        flexWidth: '1',
+        attributes: {
+          showValueTooltip: true,
+        },
+        getDynamicAttr: ({ subfield }) => ({
+          formatValue: (value) => {
+            if (subfield || value) {
+              return value;
+            }
+            return 'DEFAULT';
+          },
+        }),
       },
       buttonEditPick: {
         label: 'react.stockMovement.editPick.label',
         defaultMessage: 'Edit pick',
-        flexWidth: '0.5',
         type: EditPickModal,
+        fixedWidth: '90px',
         fieldKey: '',
         attributes: {
           title: 'react.stockMovement.editPick.label',
@@ -137,7 +133,7 @@ const FIELDS = {
         type: ButtonField,
         label: 'react.default.button.undoEdit.label',
         defaultMessage: 'Undo edit',
-        flexWidth: '1',
+        fixedWidth: '100px',
         fieldKey: '',
         buttonLabel: 'react.default.button.undoEdit.label',
         buttonDefaultMessage: 'Undo edit',
@@ -161,11 +157,13 @@ class ReplenishmentSecondPage extends Component {
     super(props);
     this.state = {
       values: { replenishment: { ...this.props.initialValues } },
+      sorted: false,
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
     this.fetchReplenishment = this.fetchReplenishment.bind(this);
     this.nextPage = this.nextPage.bind(this);
+    this.printTransferOrder = this.printTransferOrder.bind(this);
   }
 
   componentDidMount() {
@@ -206,6 +204,17 @@ class ReplenishmentSecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  recreatePickList() {
+    this.props.showSpinner();
+    const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}/picklists`;
+
+    apiClient.post(url)
+      .then(() => {
+        this.fetchReplenishment();
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
   checkForInitialPicksChanges(pickPageItem) {
     if (pickPageItem.picklistItems.length) {
       const initialPicks = [];
@@ -236,8 +245,8 @@ class ReplenishmentSecondPage extends Component {
     if (this.state.values.replenishment.status === 'PENDING') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
-      const payload = { status: 'PLACED' };
-      apiClient.post(url, payload)
+      const payload = { status: 'APPROVED' };
+      apiClient.post(url, flattenRequest(payload))
         .then(() => {
           this.props.hideSpinner();
           this.props.nextPage(this.state.values);
@@ -248,10 +257,15 @@ class ReplenishmentSecondPage extends Component {
     }
   }
 
+  printTransferOrder() {
+    const url = `/openboxes/replenishment/print/${this.props.match.params.replenishmentId}`;
+    window.open(url, '_blank');
+  }
+
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const revertPicklistUrl = `/openboxes/api/replenishments/${itemId}/picklists`;
+    const revertPicklistUrl = `/openboxes/api/replenishments/${itemId}/picklistItem`;
 
     apiClient.post(revertPicklistUrl, {})
       .then(() => {
@@ -259,6 +273,58 @@ class ReplenishmentSecondPage extends Component {
         this.fetchReplenishment();
       })
       .catch(() => { this.props.hideSpinner(); });
+  }
+
+  refresh() {
+    confirmAlert({
+      title: this.props.translate('react.replenishment.confirmRefresh.label', 'Confirm refresh'),
+      message: this.props.translate(
+        'react.replenishment.confirmRefresh.content.label',
+        'This button will redo the autopick on all items. Are you sure you want to continue?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.recreatePickList();
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
+
+  saveAndExit() {
+    window.location = `/openboxes/stockTransfer/show/${this.props.match.params.replenishmentId}`;
+  }
+
+  sortByBins() {
+    if (this.state.sorted) {
+      const sortedPickItemsByDefault = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['binLocation.name', 'quantity']) }));
+      this.setState({
+        values: {
+          replenishment: {
+            ...this.state.values.replenishment,
+            replenishmentItems: _.sortBy(sortedPickItemsByDefault, ['product.productCode']),
+          },
+        },
+        sorted: false,
+      });
+      return;
+    }
+
+    const sortedPickItemsByBinName = this.state.values.replenishment.replenishmentItems.map(item => ({ ...item, picklistItems: _.sortBy(item.picklistItems, ['zone.name', 'binLocation.name']) }));
+    this.setState({
+      values: {
+        replenishment: {
+          ...this.state.values.replenishment,
+          replenishmentItems: _.sortBy(sortedPickItemsByBinName, ['picklistItems[0].zone.name', 'picklistItems[0].binLocation.name']),
+        },
+      },
+      sorted: true,
+    });
   }
 
   render() {
@@ -269,11 +335,53 @@ class ReplenishmentSecondPage extends Component {
         initialValues={this.state.values.replenishment}
         render={({ handleSubmit }) => (
           <div className="d-flex flex-column">
-            <div className="submit-buttons">
+            <div className="submit-buttons d-flex justify-content-end buttons-container">
               <button
-                type="submit"
-                className="btn btn-outline-primary btn-form float-right btn-xs mt-0 mb-3"
-              ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
+                type="button"
+                onClick={() => this.printTransferOrder()}
+                className="mb-1 btn btn-outline-secondary btn-xs ml-1"
+              >
+                <span>
+                  <i className="fa fa-print pr-2" />
+                  <Translate id="react.stockTransfer.printTransferOrder.label" defaultMessage="Print Transfer Order" />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.refresh()}
+                className="mb-1 btn btn-outline-secondary btn-xs ml-1"
+              >
+                <span>
+                  <i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.saveAndExit()}
+                className="mb-1 btn btn-outline-secondary btn-xs ml-1 bg-white border-0"
+              >
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => this.sortByBins()}
+                className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
+              >
+                {this.state.sorted ?
+                  <span>
+                    <i className="fa fa-sort pr-2" />
+                    <Translate id="react.replenishment.originalOrder.label" defaultMessage="Original order" />
+                  </span>
+                  :
+                  <span>
+                    <i className="fa fa-sort pr-2" />
+                    <Translate id="react.replenishment.sortByBins.label" defaultMessage="Sort by bins" />
+                  </span>
+                }
               </button>
             </div>
             <form onSubmit={handleSubmit} className="print-mt">

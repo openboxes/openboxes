@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.User
 
 class OrderType implements Serializable {
@@ -40,6 +41,22 @@ class OrderType implements Serializable {
     Date lastUpdated
     User createdBy
     User updatedBy
+
+    Boolean isReturnOrder() {
+        return code == Constants.RETURN_ORDER
+    }
+
+    Boolean isPurchaseOrder() {
+        return orderTypeCode == OrderTypeCode.PURCHASE_ORDER
+    }
+
+    Boolean isPutawayOrder() {
+        return code == Constants.PUTAWAY_ORDER
+    }
+
+    Boolean isTransferOrder() {
+        return orderTypeCode == OrderTypeCode.TRANSFER_ORDER
+    }
 
     static mapping = {
         id generator: 'uuid'

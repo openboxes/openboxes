@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryLevelStatus
@@ -26,6 +27,7 @@ class ReplenishmentApiController {
     def identifierService
     def replenishmentService
     def picklistService
+    def inventoryService
 
     def list = {
         List<Order> replenishments = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
@@ -44,10 +46,9 @@ class ReplenishmentApiController {
     }
 
     def create = {
-        JSONObject jsonObject = request.JSON
-
-        User currentUser = User.get(session.user.id)
         Location currentLocation = Location.get(session.warehouse.id)
+        JSONObject jsonObject = request.JSON
+        User currentUser = User.get(session.user.id)
         if (!currentLocation || !currentUser) {
             throw new IllegalArgumentException("User must be logged into a location to update replenishment")
         }
@@ -55,7 +56,6 @@ class ReplenishmentApiController {
         Replenishment replenishment = new Replenishment()
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
         if (order.hasErrors() || !order.save(flush: true)) {
             throw new ValidationException("Invalid order", order.errors)
@@ -75,15 +75,18 @@ class ReplenishmentApiController {
             throw new IllegalArgumentException("User must be logged into a location to update replenishment")
         }
 
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No replenishment found for order ID ${params.id}")
+        }
+
         Replenishment replenishment = new Replenishment()
         replenishment.id = params.id
-
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
-
         if (replenishment?.status == ReplenishmentStatus.COMPLETED) {
             replenishmentService.completeReplenishment(replenishment)
         } else {
-            Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
+            order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
             if (order.hasErrors() || !order.save(flush: true)) {
                 throw new ValidationException("Invalid order", order.errors)
             }
@@ -108,7 +111,7 @@ class ReplenishmentApiController {
         }
 
         if (!replenishment.replenishmentNumber) {
-            replenishment.replenishmentNumber = identifierService.generateOrderIdentifier()
+            replenishment.replenishmentNumber = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix + identifierService.generateOrderIdentifier()
         }
 
         if (jsonObject.status) {
@@ -122,7 +125,7 @@ class ReplenishmentApiController {
                 replenishmentItem.location = replenishment.destination
             }
 
-            replenishmentItemMap.pickItems.each { pickItemMap ->
+            replenishmentItemMap.picklistItems.each { pickItemMap ->
                 ReplenishmentItem pickItem = new ReplenishmentItem()
                 bindData(pickItem, pickItemMap)
                 if (!pickItem.location) {
@@ -132,6 +135,7 @@ class ReplenishmentApiController {
             }
 
             replenishment.replenishmentItems.add(replenishmentItem)
+
         }
 
         return replenishment
@@ -173,16 +177,28 @@ class ReplenishmentApiController {
     }
 
     def createPicklist = {
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
+        }
+
+        picklistService.clearPicklist(order)
+
+        picklistService.createPicklist(order)
+
+        render status: 201
+    }
+
+    def createPicklistItem = {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
         }
 
-        picklistService.clearPicklist(orderItem)
-
         picklistService.createPicklist(orderItem)
 
-        render status: 201
+        render status: 200
+
     }
 
     def updatePicklist = {

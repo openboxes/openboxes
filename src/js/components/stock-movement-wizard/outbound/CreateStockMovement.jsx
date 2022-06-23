@@ -1,24 +1,27 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
-import { withRouter } from 'react-router-dom';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
+
 import update from 'immutability-helper';
+import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+
+import { hideSpinner, showSpinner } from 'actions';
+import DateField from 'components/form-elements/DateField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import AddDestinationModal from 'components/stock-movement-wizard/modals/AddDestinationModal';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import moment from 'moment';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import DateField from '../../form-elements/DateField';
-import { renderFormField } from '../../../utils/form-utils';
-import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceUsersFetch, debounceLocationsFetch } from '../../../utils/option-utils';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
 
 function validate(values) {
   const errors = {};
@@ -87,6 +90,8 @@ const FIELDS = {
     label: 'react.stockMovement.destination.label',
     defaultMessage: 'Destination',
     attributes: {
+      createNewFromModal: true,
+      createNewFromModalLabel: 'Add Destination',
       required: true,
       async: true,
       showValueTooltip: true,
@@ -96,11 +101,17 @@ const FIELDS = {
       options: [],
       filterOptions: options => options,
     },
-    getDynamicAttr: props => ({
-      loadOptions: props.debouncedLocationsFetch,
+    getDynamicAttr: ({
+      debouncedLocationsFetch,
+      origin,
+      fetchStockLists,
+      openNewLocationModal,
+    }) => ({
+      loadOptions: debouncedLocationsFetch,
+      newOptionModalOpen: openNewLocationModal,
       onChange: (value) => {
-        if (value && props.origin && props.origin.id) {
-          props.fetchStockLists(props.origin, value);
+        if (value && origin && origin.id) {
+          fetchStockLists(origin, value);
         }
       },
     }),
@@ -156,7 +167,8 @@ const FIELDS = {
       disabled: !(origin && destination && origin.id && destination.id),
       options: stocklists,
       showValueTooltip: true,
-      objectValue: true,
+      valueKey: 'id',
+      labelKey: 'name',
       onChange: (value) => {
         if (value) {
           setRequestType(values, value);
@@ -175,6 +187,7 @@ class CreateStockMovement extends Component {
       setInitialValues: true,
       values: this.props.initialValues,
       requestTypes: [],
+      showDestinationModal: false,
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
@@ -184,6 +197,8 @@ class CreateStockMovement extends Component {
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+
+    this.openAddDestinationModal = this.openAddDestinationModal.bind(this);
   }
 
   componentDidMount() {
@@ -201,9 +216,11 @@ class CreateStockMovement extends Component {
   }
 
   setRequestType(values, stocklist) {
+    const requestType = _.find(this.state.requestTypes, type => type.value === 'STOCK');
+
     this.setState({
       values: update(values, {
-        requestType: { $set: 'STOCK' },
+        requestType: { $set: requestType },
         stocklist: { $set: stocklist },
       }),
     });
@@ -221,6 +238,10 @@ class CreateStockMovement extends Component {
       },
     };
     this.setState({ values, setInitialValues: false });
+  }
+
+  openAddDestinationModal() {
+    this.setState({ showDestinationModal: true });
   }
 
   /**
@@ -272,7 +293,9 @@ class CreateStockMovement extends Component {
     return apiClient.get(url)
       .then((response) => {
         const stocklists = _.map(response.data.data, stocklist => (
-          { value: { id: stocklist.id, name: stocklist.name }, label: stocklist.name }
+          {
+            id: stocklist.id, name: stocklist.name, value: stocklist.id, label: stocklist.name,
+          }
         ));
 
         const stocklistChanged = !_.find(stocklists, item => item.value.id === _.get(this.state.values, 'stocklist.id'));
@@ -312,7 +335,7 @@ class CreateStockMovement extends Component {
         'destination.id': values.destination.id,
         'requestedBy.id': values.requestedBy.id,
         'stocklist.id': _.get(values.stocklist, 'id') || '',
-        requestType: values.requestType,
+        requestType: values.requestType.value,
       };
 
       apiClient.post(stockMovementUrl, payload)
@@ -389,33 +412,49 @@ class CreateStockMovement extends Component {
           clearStocklist: (args, state, utils) => {
             utils.changeValue(state, 'stocklist', () => null);
           },
+          setDestinationValues: ([{ id, name, locationType }], state, utils) => {
+            const data = {
+              id,
+              value: id,
+              label: `${name} [${locationType ? locationType.description : null}]`,
+            };
+            utils.changeValue(state, 'destination', () => data);
+          },
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
-          <form onSubmit={handleSubmit}>
-            <div className="classic-form with-description">
-              {_.map(
-                FIELDS,
-                (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
-                  stocklists: this.state.stocklists,
-                  fetchStockLists: (origin, destination) =>
-                    this.fetchStockLists(origin, destination, mutators.clearStocklist),
-                  origin: values.origin,
-                  destination: values.destination,
-                  isSuperuser: this.props.isSuperuser,
-                  debouncedUsersFetch: this.debouncedUsersFetch,
-                  debouncedLocationsFetch: this.debouncedLocationsFetch,
-                  requestTypes: this.state.requestTypes,
-                  setRequestType: this.setRequestType,
-                  values,
-                }),
-              )}
-            </div>
-            <div className="submit-buttons">
-              <button type="submit" className="btn btn-outline-primary float-right btn-xs">
-                <Translate id="react.default.button.next.label" defaultMessage="Next" />
-              </button>
-            </div>
-          </form>
+          <React.Fragment>
+            <AddDestinationModal
+              isOpen={this.state.showDestinationModal}
+              onClose={() => this.setState({ showDestinationModal: false })}
+              onResponse={mutators.setDestinationValues}
+            />
+            <form onSubmit={handleSubmit}>
+              <div className="classic-form with-description">
+                {_.map(
+                  FIELDS,
+                  (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
+                    stocklists: this.state.stocklists,
+                    fetchStockLists: (origin, destination) =>
+                      this.fetchStockLists(origin, destination, mutators.clearStocklist),
+                    origin: values.origin,
+                    destination: values.destination,
+                    isSuperuser: this.props.isSuperuser,
+                    debouncedUsersFetch: this.debouncedUsersFetch,
+                    debouncedLocationsFetch: this.debouncedLocationsFetch,
+                    requestTypes: this.state.requestTypes,
+                    setRequestType: this.setRequestType,
+                    openNewLocationModal: this.openAddDestinationModal,
+                    values,
+                  }),
+                )}
+              </div>
+              <div className="submit-buttons">
+                <button type="submit" className="btn btn-outline-primary float-right btn-xs">
+                  <Translate id="react.default.button.next.label" defaultMessage="Next" />
+                </button>
+              </div>
+            </form>
+          </React.Fragment>
         )}
       />
     );

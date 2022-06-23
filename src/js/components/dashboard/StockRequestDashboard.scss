@@ -1,0 +1,21 @@
+.stock-request-table {
+  .pagination-bottom > div {
+    justify-content: flex-end;
+    .-previous {
+      flex: none;
+    }
+    .-center {
+      flex: none;
+      .-pageJump {
+        height: 80%;
+      }
+    }
+    .-next {
+      flex: none;
+    }
+    .-btn {
+      height: 100% !important;
+      background-color: #ffffff;
+    }
+  }
+}

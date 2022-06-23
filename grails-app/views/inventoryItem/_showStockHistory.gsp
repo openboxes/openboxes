@@ -1,6 +1,9 @@
-<%@ page import="org.pih.warehouse.product.Product"%>
+<%@ page import="org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 <%@ page import="org.pih.warehouse.inventory.InventoryStatus" %>
 <%@ page import="org.pih.warehouse.inventory.LotStatusCode" %>
+<%@ page import="org.pih.warehouse.inventory.TransactionCode" %>
+
 <html>
 <head>
     <style>
@@ -281,16 +284,16 @@
                             title="${stockHistoryEntry?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? warehouse.message(code: 'inventoryItem.recalledLot.label') : ''}">
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
-                                    <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.DEBIT}">
+                                    <g:if test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.DEBIT}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
                                     </g:if>
-                                    <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.CREDIT}">
+                                    <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.CREDIT}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'add.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}" />
                                     </g:elseif>
-                                    <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.INVENTORY}">
+                                    <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.INVENTORY}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'calculator_edit.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}" />
                                     </g:elseif>
-                                    <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY}">
+                                    <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.PRODUCT_INVENTORY}">
                                         <img src="${createLinkTo(dir: 'images/icons/silk', file: 'calculator.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
                                     </g:elseif>
                                 </g:if>
@@ -339,67 +342,61 @@
                             <td class="border-right middle">
 
                                 <g:if test="${stockHistoryEntry?.showDetails}">
-                                    <div >
-                                        <g:if test="${stockHistoryEntry?.transaction?.incomingShipment }">
-                                            <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.incomingShipment?.id }">
-                                                <div class="ellipsis" title="${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.incomingShipment?.name }">
-                                                    <g:message code="shipment.label"/> &rsaquo;
-                                                    ${stockHistoryEntry?.transaction.incomingShipment?.shipmentNumber } &rsaquo;
-                                                    ${stockHistoryEntry?.transaction.incomingShipment?.name }
+                                    <g:set var="shipment" value="${stockHistoryEntry?.transaction?.incomingShipment ?: stockHistoryEntry?.transaction?.outgoingShipment}"/>
+                                    <div>
+                                        %{-- CHECK IF IT IS PURCHASE ORDER RELATED --}%
+                                        <g:if test="${shipment?.isFromPurchaseOrder}">
+                                            <g:link controller="stockMovement" action="show" id="${shipment?.id }">
+                                                <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
+                                                    <format:metadata obj="${shipment?.purchaseOrder?.orderType?.orderTypeCode }"/>
+                                                    &rsaquo;
+                                                    ${shipment?.shipmentNumber}
                                                 </div>
                                             </g:link>
                                         </g:if>
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.outgoingShipment }">
-                                            <g:link controller="shipment" action="showDetails" id="${stockHistoryEntry?.transaction?.outgoingShipment?.id }">
-                                                <div class="ellipsis" title="${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber } &rsaquo; ${stockHistoryEntry?.transaction.outgoingShipment?.name }">
-                                                    <g:message code="shipment.label"/> &rsaquo;
-                                                    ${stockHistoryEntry?.transaction.outgoingShipment?.shipmentNumber } &rsaquo;
-                                                    ${stockHistoryEntry?.transaction.outgoingShipment?.name }
+                                        %{-- CHECK IF IT IS RETURN ORDER RELATED --}%
+                                        <g:elseif test="${shipment?.isFromReturnOrder}">
+                                            <g:link controller="stockMovement" action="show" id="${shipment?.id}">
+                                                <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
+                                                    ${shipment?.returnOrder?.orderType?.name}
+                                                    &rsaquo;
+                                                    ${shipment?.shipmentNumber}
                                                 </div>
                                             </g:link>
                                         </g:elseif>
+                                        %{-- CHECK IF IT IS INBOUND OR OUTBOUND STOCK MOVEMENT --}%
                                         <g:elseif test="${stockHistoryEntry?.transaction?.requisition }">
-                                            <g:link controller="requisition" action="show" id="${stockHistoryEntry?.transaction?.requisition?.id }">
+                                            <g:link controller="stockMovement" action="show" id="${stockHistoryEntry?.transaction?.requisition?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.requisition?.requestNumber } &rsaquo; ${stockHistoryEntry?.transaction?.requisition?.name }">
-                                                    <g:message code="requisition.label"/> &rsaquo;
-                                                    ${stockHistoryEntry?.transaction?.requisition?.requestNumber } &rsaquo;
-                                                    ${stockHistoryEntry?.transaction?.requisition?.name }
+                                                    <g:message code="requisition.label"/>
+                                                    &rsaquo;
+                                                    ${stockHistoryEntry?.transaction?.requisition?.requestNumber }
                                                 </div>
                                             </g:link>
                                         </g:elseif>
+                                        %{-- CHECK IF IT IS SHIPMENT WITHOUT BACKING OBJECT (NON REQUISITION, NON ORDER) --}%
+                                        <g:elseif test="${shipment}">
+                                            <g:link controller="shipment" action="showDetails" id="${shipment?.id }">
+                                                <div class="ellipsis" title="${shipment?.shipmentNumber } &rsaquo; ${shipment?.name }">
+                                                    <g:message code="shipment.label"/>
+                                                    &rsaquo;
+                                                    ${shipment?.shipmentNumber }
+                                                </div>
+                                            </g:link>
+                                        </g:elseif>
+                                        %{-- CHECK IF IT IS TRANSFER OR PUTAWAY ORDER --}%
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order }">
                                             <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
-                                                    <format:metadata obj="${stockHistoryEntry?.transaction?.order?.orderType?.code }"/>
-                                                &rsaquo;
+                                                    ${stockHistoryEntry?.transaction?.order?.orderType?.name}
+                                                    &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
                                                 </div>
                                             </g:link>
                                         </g:elseif>
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}">
-                                            <g:set var="requisition" value="${stockHistoryEntry?.transaction?.localTransfer?.sourceTransaction?.requisition}"/>
-                                            <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
-                                                <div title="${stockHistoryEntry?.requisition?.requestNumber }&rsaquo; ${stockHistoryEntry?.requisition?.name }">
-                                                    <g:message code="requisition.label"/> &rsaquo;
-                                                ${stockHistoryEntry?.requisition?.requestNumber }&rsaquo;
-                                                    ${stockHistoryEntry?.requisition?.name }
-                                                </div>
-                                            </g:link>
-                                        </g:elseif>
-                                        <g:elseif test="${stockHistoryEntry?.transaction?.localTransfer?.destinationTransaction?.requisition}">
-                                            <g:set var="requisition" value="${transaction?.localTransfer?.destinationTransaction?.requisition}"/>
-                                            <g:link controller="requisition" action="show" id="${stockHistoryEntry?.requisition?.id }">
-                                                <div title="${stockHistoryEntry?.requisition?.requestNumber } &rsaquo; ${stockHistoryEntry?.requisition?.name }">
-                                                    <g:message code="requisition.label"/> &rsaquo;
-                                                    ${stockHistoryEntry?.requisition?.requestNumber } &rsaquo;
-                                                    ${stockHistoryEntry?.requisition?.name }
-                                                </div>
-                                            </g:link>
-                                        </g:elseif>
-
-                                        <g:else>
-                                        </g:else>
                                     </div>
+                                    %{-- reset shipment value --}%
+                                    <g:set var="shipment" value="${null}"/>
                                 </g:if>
                             </td>
                             <td class="border-right middle center">
@@ -438,7 +435,7 @@
                                 </span>
                             </td>
                             <td class="border-right center middle">
-                                <g:if test="${stockHistoryEntry?.transactionCode in [org.pih.warehouse.inventory.TransactionCode.INVENTORY, org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY] }">
+                                <g:if test="${stockHistoryEntry?.transactionCode in [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY] }">
                                     <span class="balance">
                                         <g:formatNumber number="${stockHistoryEntry?.quantity?:0 }" format="###,###.#" maxFractionDigits="1"/>
                                     </span>

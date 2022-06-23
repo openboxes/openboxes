@@ -15,21 +15,17 @@ import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.core.UnitOfMeasureClass
-import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.jobs.RefreshInventorySnapshotJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 
 import java.text.SimpleDateFormat
@@ -80,7 +76,7 @@ class DashboardController {
 
         def shipment = Shipment.findByShipmentNumber(params.searchTerms)
         if (shipment) {
-            redirect(controller: "stockMovement", action: "show", id: shipment.id)
+            redirect(controller: "stockMovement", action: "show", id: shipment.returnOrder?.id ?: shipment.id)
             return
         }
 
@@ -91,6 +87,10 @@ class DashboardController {
         }
         def order = Order.findByOrderNumber(params.searchTerms)
         if (order) {
+            if (order.isReturnOrder) {
+                redirect(controller: "stockMovement", action: "show", id: order.id)
+                return
+            }
             redirect(controller: "order", action: "show", id: order.id)
             return
         }
@@ -104,7 +104,14 @@ class DashboardController {
             redirect(controller: "mobile")
             return
         }
+        if (userService.hasHighestRole(session?.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+            redirect(controller: "stockMovement", action: "list", params: [direction: 'INBOUND'] )
+            return
+        }
+        render(template: "/common/react")
+    }
 
+    def supplier = {
         render(template: "/common/react")
     }
 
@@ -184,9 +191,13 @@ class DashboardController {
             if (user) {
                 //userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
                 user.lastLoginDate = new Date()
-                user.warehouse = warehouse
                 user.save(flush: true)
                 session.user = user
+            }
+
+            if (userService.hasHighestRole(session?.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+                redirect(controller: 'stockMovement', action: 'list' , params: [direction: 'INBOUND'])
+                return
             }
 
             // Successfully logged in and selected a warehouse
@@ -202,15 +213,16 @@ class DashboardController {
             return
         }
 
+        def loginLocationsMap = locationService.getLoginLocationsMap(user, warehouse)
+        def savedLocations = user.warehouse && loginLocationsMap.containsValue(user.warehouse) ? [user.warehouse] : null
+
         if (userAgentIdentService.isMobile()) {
             render (view: "/mobile/chooseLocation",
-                    model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)])
+                    model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
             return
         }
 
-
-
-        [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)]
+        [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap]
     }
 
 

@@ -1,35 +1,36 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
-import arrayMutators from 'final-form-arrays';
-import PropTypes from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
-import fileDownload from 'js-file-download';
-import update from 'immutability-helper';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
+
 import axios from 'axios';
+import arrayMutators from 'final-form-arrays';
+import update from 'immutability-helper';
+import fileDownload from 'js-file-download';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import LabelField from 'components/form-elements/LabelField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
+import AlertMessage from 'utils/AlertMessage';
+import {
+  flattenRequest,
+  handleError,
+  handleSuccess,
+  parseResponse,
+} from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../../form-elements/ArrayField';
-import LabelField from '../../form-elements/LabelField';
-import { renderFormField } from '../../../utils/form-utils';
-
-import EditPickModal from '../modals/EditPickModal';
-import { showSpinner, hideSpinner, fetchReasonCodes } from '../../../actions';
-import TableRowWithSubfields from '../../form-elements/TableRowWithSubfields';
-import {
-  parseResponse,
-  flattenRequest,
-  handleSuccess,
-  handleError,
-} from '../../../utils/apiClient';
-import ButtonField from '../../form-elements/ButtonField';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
-import AlertMessage from '../../../utils/AlertMessage';
 
 const FIELDS = {
   pickPageItems: {
@@ -41,10 +42,19 @@ const FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     rowComponent: TableRowWithSubfields,
     subfieldKey: 'picklistItems',
-    getDynamicRowAttr: ({ rowValues, subfield }) => {
+    getDynamicRowAttr: ({
+      rowValues, subfield, showOnlyErroredItems, itemFilter,
+    }) => {
       let className = rowValues.initial ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      return { className };
+      const filterOutItems = itemFilter && !(
+        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
+        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
+      );
+      const hideRow = (
+        (showOnlyErroredItems && !rowValues.hasError) || filterOutItems
+      ) && !subfield;
+      return { className, hideRow };
     },
     fields: {
       productCode: {
@@ -206,6 +216,7 @@ class PickPage extends Component {
       isFirstPageLoaded: false,
       showAlert: false,
       alertMessage: '',
+      itemFilter: '',
     };
 
     this.revertUserPick = this.revertUserPick.bind(this);
@@ -618,6 +629,7 @@ class PickPage extends Component {
   }
 
   render() {
+    const { itemFilter } = this.state;
     const { showOnly } = this.props;
     return (
       <Form
@@ -629,6 +641,24 @@ class PickPage extends Component {
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
+                <div className="d-flex mr-auto justify-content-center align-items-center">
+                  <input
+                    value={itemFilter}
+                    onChange={event => this.setState({ itemFilter: event.target.value })}
+                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
+                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
+                  />
+                  {itemFilter &&
+                    <i
+                      role="button"
+                      className="fa fa-times-circle"
+                      style={{ color: 'grey', cursor: 'pointer' }}
+                      onClick={() => this.setState({ itemFilter: '' })}
+                      onKeyPress={() => this.setState({ itemFilter: '' })}
+                      tabIndex={0}
+                    />
+                  }
+                </div>
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -709,6 +739,7 @@ class PickPage extends Component {
                   isPaginated: this.props.isPaginated,
                   showOnly,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  itemFilter,
                 }))}
               </div>
               <div className="d-print-none submit-buttons">

@@ -29,14 +29,30 @@
 
         <g:set var="disabledMessage" value="${g.message(code:'inventory.stockTransfers.editCompleted')}"/>
 
-        <g:if test="${orderInstance.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)}">
-            <g:link controller="stockTransfer" action="createReturns" id="${orderInstance?.id}" class="button"
+        <g:if test="${orderInstance.isOutbound(session?.warehouse)}">
+            <g:link controller="stockTransfer" action="createOutboundReturn" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
                     disabledMessage="${disabledMessage}">
                 <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
                 <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
             </g:link>
         </g:if>
+        <g:elseif test="${orderInstance.isInbound(session?.warehouse)}">
+            <g:link controller="stockTransfer" action="createInboundReturn" id="${orderInstance?.id}" class="button"
+                    disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                    disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
+            </g:link>
+        </g:elseif>
+        <g:elseif test="${orderInstance.orderNumber.startsWith(grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix)}">
+            <g:link controller="replenishment" action="create" id="${orderInstance?.id}" class="button"
+                    disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
+                    disabledMessage="${disabledMessage}">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cart_edit.png')}" />&nbsp;
+                <warehouse:message code="inventory.editStockTransfer.label" default="Edit Stock Transfer"/>
+            </g:link>
+        </g:elseif>
         <g:else>
             <g:link controller="stockTransfer" action="create" id="${orderInstance?.id}" class="button"
                     disabled="${orderInstance?.status >= OrderStatus.COMPLETED}"
@@ -46,7 +62,7 @@
             </g:link>
         </g:else>
         <g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_SUPERUSER, org.pih.warehouse.core.RoleType.ROLE_ADMIN, org.pih.warehouse.core.RoleType.ROLE_MANAGER]">
-            <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
+            <g:if test="${orderInstance?.status == OrderStatus.PENDING || orderInstance?.status == OrderStatus.APPROVED}">
                 <g:link class="button" controller="stockTransfer" action="eraseStockTransfer" id="${orderInstance?.id}"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />

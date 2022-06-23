@@ -1,0 +1,16 @@
+.category-list {
+  margin-left: 150px;
+  margin-top: 1.5em;
+  margin-bottom: 3em;
+
+  ul {
+    list-style-type: none;
+
+    li:before {
+      font-family: 'FontAwesome';
+      content: '\f0da';
+      margin: 0 5px 0 -15px;
+      color: #0c60e5;
+    }
+  }
+}

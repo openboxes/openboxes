@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import ModalWrapper from '../form-elements/ModalWrapper';
-import LabelField from '../form-elements/LabelField';
-import TextField from '../form-elements/TextField';
-import ArrayField from '../form-elements/ArrayField';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+
 
 const FIELDS = {
   availableItems: {
@@ -26,7 +28,7 @@ const FIELDS = {
       status: {
         type: LabelField,
         fieldKey: '',
-        flexWidth: '2',
+        flexWidth: 6,
         getDynamicAttr: ({ translate }) => ({
           showValueTooltip: true,
           formatValue: (fieldValue) => {
@@ -64,7 +66,9 @@ const FIELDS = {
         label: 'react.stockMovement.quantityAvailable.label',
         defaultMessage: 'Qty Available',
         fixedWidth: '150px',
+        headerAlign: 'right',
         attributes: {
+          cellClassName: 'text-right',
           formatValue: value => (value || value === 0 ? value.toLocaleString('en-US') : null),
         },
       },
@@ -74,7 +78,9 @@ const FIELDS = {
         label: 'react.stockMovement.quantityPicked.label',
         defaultMessage: 'Qty Picked',
         fixedWidth: '120px',
+        headerAlign: 'right',
         attributes: {
+          cellClassName: 'text-right',
           type: 'number',
         },
         getDynamicAttr: ({ fieldValue }) => ({
@@ -96,7 +102,7 @@ function validate(values) {
   );
 
   _.forEach(values.availableItems, (item, key) => {
-    if (item.quantityPicked && pickedSum !== values.quantityRequired) {
+    if (!Number.isNaN(item.quantityPicked) && pickedSum !== values.quantityRequired && item.status !== 'NOT_AVAILABLE') {
       errors.availableItems[key] = { quantityPicked: 'react.stockMovement.errors.differentTotalQty.label' };
     }
     if (item.quantityPicked > item.quantityAvailable) {
@@ -204,7 +210,7 @@ class EditPickModal extends Component {
           // check if this picklist item already exists
           const picklistItem = _.find(pickPageItem.picklistItems, item => item['inventoryItem.id'] === avItem['inventoryItem.id'] && item['binLocation.id'] === avItem['binLocation.id']);
 
-          if (picklistItem) {
+          if (picklistItem && avItem.status !== 'NOT_AVAILABLE') {
             return {
               ...avItem,
               id: picklistItem.id,

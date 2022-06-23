@@ -10,6 +10,7 @@
 package org.pih.warehouse.order
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.*
 import org.pih.warehouse.invoice.InvoiceItem
@@ -95,6 +96,11 @@ class Order implements Serializable {
             "isPrepaymentInvoiceAllowed",
             "isPrepaymentRequired",
             "canGenerateInvoice",
+            "isPurchaseOrder",
+            "isReturnOrder",
+            "isPutawayOrder",
+            "isReturnOrder",
+            "isTransferOrder",
             // Statuses
             "pending",
             "placed",
@@ -133,11 +139,11 @@ class Order implements Serializable {
         currencyCode(nullable:true)
         exchangeRate(nullable:true)
         origin(nullable: false, validator: { Location origin, Order obj ->
-            return !origin?.organization ? ['validator.organization.required'] : true
+            return !origin.isWard() && !origin?.organization ? ['validator.organization.required'] : true
         })
         originParty(nullable:true)
         destination(nullable: false, validator: { Location destination, Order obj ->
-            return !destination?.organization ? ['validator.organization.required'] : true
+            return !destination.isWard() && !destination?.organization ? ['validator.organization.required'] : true
         })
         destinationParty(nullable:true)
         recipient(nullable: true)
@@ -202,6 +208,18 @@ class Order implements Serializable {
         BigDecimal minimumAmount = ConfigurationHolder.config.openboxes.purchasing.approval.minimumAmount
         return (origin?.supports([ActivityCode.APPROVE_ORDER]) ||
                 destination?.supports(ActivityCode.APPROVE_ORDER)) && total > minimumAmount
+    }
+
+    StockMovementDirection getStockMovementDirection(Location currentLocation) {
+        if (origin == destination) {
+            return StockMovementDirection.INTERNAL
+        } else if (currentLocation == origin) {
+            return StockMovementDirection.OUTBOUND
+        } else if (currentLocation == destination || origin?.isSupplier()) {
+            return StockMovementDirection.INBOUND
+        } else {
+            return null
+        }
     }
 
 
@@ -422,6 +440,32 @@ class Order implements Serializable {
 
     def getActiveOrderAdjustments() {
         return orderAdjustments.findAll {!it.canceled }
+    }
+
+    Boolean getIsPurchaseOrder() {
+        return orderType?.isPurchaseOrder()
+    }
+
+    Boolean getIsReturnOrder() {
+        return orderType?.isReturnOrder()
+    }
+
+    Boolean getIsPutawayOrder() {
+        return orderType?.isPutawayOrder()
+    }
+
+    Boolean getIsTransferOrder() {
+        return orderType?.isTransferOrder()
+    }
+
+    // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
+    Boolean isInbound(Location currentLocation) {
+        return isReturnOrder && destination == currentLocation && origin != currentLocation
+    }
+
+    // isOutbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
+    Boolean isOutbound(Location currentLocation) {
+        return isReturnOrder && origin == currentLocation && destination != currentLocation
     }
 
     Map toJson() {

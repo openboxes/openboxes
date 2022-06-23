@@ -132,12 +132,13 @@ class InventoryItemController {
         }
     }
 
-    def showAlternativeProducts = { StockCardCommand cmd ->
+    def showAssociatedProducts = { StockCardCommand cmd ->
         def startTime = System.currentTimeMillis()
         def product = Product.get(params.id)
         def location = Location.get(session?.warehouse?.id)
 
-        def products = product.alternativeProducts() as List
+        def associations = product?.associations
+        def products = product?.associatedProducts() as List
         log.info "Products " + products
         def quantityAvailableMap = [:]
         if (!products.isEmpty()) {
@@ -148,7 +149,12 @@ class InventoryItemController {
 
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
-        render(template: "showProductGroups", model: [product: product, totalQuantity: totalQuantity, quantityAvailableMap: quantityAvailableMap])
+        render(template: "showProductAssociations", model: [
+            product: product,
+            associations: associations?.sort { it.code },
+            quantityAvailableMap: quantityAvailableMap,
+            totalQuantity: totalQuantity,
+        ])
     }
 
 
@@ -354,7 +360,7 @@ class InventoryItemController {
         DateFormat monthFormat = new SimpleDateFormat("MMM yyyy")
         monthFormat.timeZone = TimeZone.default
 
-        def requisitionItemsDemandDetails = forecastingService.getDemandDetailsForDemandTab(
+        def requisitionItemsDemandDetails = forecastingService.getDemandDetails(
             cmd.warehouse,
             destination,
             commandInstance?.product,
@@ -788,6 +794,12 @@ class InventoryItemController {
 
             // FIXME Temporary hack to handle a changed values for these two fields
             itemInstance.lotNumber = params?.lotNumber
+
+            if (!itemInstance.product.lotAndExpiryControl && !itemInstance.lotNumber) {
+                flash.error = "${warehouse.message(code: 'inventoryItem.blankLot.message')}"
+                redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
+                return
+            }
 
             if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"

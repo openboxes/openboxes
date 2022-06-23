@@ -489,6 +489,9 @@ class OrderService {
 
 
     void deleteOrder(Order orderInstance) {
+        orderInstance.shipments?.each { Shipment it ->
+            shipmentService.deleteShipment(it)
+        }
         deleteTransactions(orderInstance)
         orderInstance.delete(flush: true)
     }
@@ -509,8 +512,10 @@ class OrderService {
             if (method == UpdateUnitPriceMethodCode.LAST_PURCHASE_PRICE) {
                 BigDecimal pricePerPackage = orderItem.unitPrice * orderItem?.order?.lookupCurrentExchangeRate()
                 BigDecimal pricePerUnit = pricePerPackage / orderItem?.quantityPerUom
-                orderItem.product.pricePerUnit = pricePerUnit
-                orderItem.product.save()
+                if (pricePerUnit != 0) {
+                    orderItem.product.pricePerUnit = pricePerUnit
+                    orderItem.product.save()
+                }
             }
             else {
                 log.warn("Cannot update unit price because method ${method} is not currently supported")
@@ -556,7 +561,7 @@ class OrderService {
                 productPackage.save()
             }
             // Otherwise update the price
-            else {
+            else if (packagePrice > 0) {
                 if (productPackage.productPrice) {
                     productPackage.productPrice.price = packagePrice
                 } else {
@@ -573,7 +578,7 @@ class OrderService {
             }
         }
         // Otherwise we update the existing price
-        else {
+        else if (packagePrice > 0) {
             if (orderItem.productPackage.productPrice) {
                 orderItem.productPackage.productPrice.price = packagePrice
             } else {
@@ -857,6 +862,24 @@ class OrderService {
                 }
             }
             eq("product", product)
+        }
+
+        return orderItems.findAll { !it.isCompletelyFulfilled() }
+    }
+
+    List<OrderItem> getPendingInboundOrderItems(Location destination, List<Product> products) {
+        def orderItems = OrderItem.createCriteria().list() {
+            order {
+                eq("destination", destination)
+                eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
+                not {
+                    'in'("status", OrderStatus.PENDING)
+                }
+            }
+            'in'("product", products)
+            not {
+                'in'("orderItemStatusCode", OrderItemStatusCode.CANCELED)
+            }
         }
 
         return orderItems.findAll { !it.isCompletelyFulfilled() }

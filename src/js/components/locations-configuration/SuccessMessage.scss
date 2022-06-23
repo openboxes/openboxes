@@ -1,0 +1,46 @@
+.success-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  background-color: #ffffff;
+  .cancel-icon {
+    display: grid;
+    grid-row: 1;
+    grid-column: 1 / 4;
+    font-size: 1.5rem;
+
+    & > i {
+      justify-self: flex-end !important;
+      cursor: pointer;
+    }
+  }
+  .success-content {
+    grid-row: 2;
+    grid-column: 2;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+    .success-icon {
+      color: green;
+      font-size: 6rem;
+    }
+    .error-icon {
+      color: red;
+      font-size: 6rem;
+    }
+    .no-border-btn {
+      border: none !important;
+    }
+    .success-buttons-section {
+      gap: 15px;
+      width: 100%;
+    }
+    .knowledge-base-link {
+      font-weight: bold;
+      text-decoration: none;
+      color: dodgerblue;
+    }
+  }
+}
+
+

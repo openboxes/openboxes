@@ -1,31 +1,33 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
+import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
+
 import {
-  SHOW_SPINNER,
-  HIDE_SPINNER,
-  TOGGLE_LOCATION_CHOOSER,
-  TOGGLE_USER_ACTION_MENU,
-  FETCH_USERS,
+  CHANGE_CURRENT_LOCALE,
+  CHANGE_CURRENT_LOCATION,
+  FETCH_BREADCRUMBS_CONFIG,
+  FETCH_CONFIG,
+  FETCH_CONFIG_AND_SET_ACTIVE,
+  FETCH_CURRENCIES,
+  FETCH_GRAPHS,
+  FETCH_MENU_CONFIG,
+  FETCH_NUMBERS,
+  FETCH_ORGANIZATIONS,
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
-  FETCH_MENU_CONFIG,
-  CHANGE_CURRENT_LOCATION,
-  TRANSLATIONS_FETCHED,
-  CHANGE_CURRENT_LOCALE,
-  FETCH_GRAPHS,
-  FETCH_NUMBERS,
-  RESET_INDICATORS,
-  ADD_TO_INDICATORS,
+  FETCH_USERS,
+  HIDE_SPINNER,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
-  FETCH_CONFIG,
+  RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
+  SHOW_SPINNER,
+  TOGGLE_LOCATION_CHOOSER,
+  TOGGLE_USER_ACTION_MENU,
+  TRANSLATIONS_FETCHED,
   UPDATE_BREADCRUMBS_PARAMS,
-  FETCH_BREADCRUMBS_CONFIG,
-  FETCH_CURRENCIES,
-  FETCH_ORGANIZATIONS,
-} from './types';
-import apiClient, { parseResponse } from '../utils/apiClient';
+} from 'actions/types';
+import apiClient, { parseResponse } from 'utils/apiClient';
 
 export function showSpinner() {
   return {
@@ -133,7 +135,7 @@ export function changeCurrentLocation(location) {
   return (dispatch) => {
     const url = `/openboxes/api/chooseLocation/${location.id}`;
 
-    apiClient.put(url).then(() => {
+    return apiClient.put(url).then(() => {
       dispatch({
         type: CHANGE_CURRENT_LOCATION,
         payload: location,
@@ -217,148 +219,123 @@ function fetchGraphIndicator(
   const listParams = getParameterList(params, locationId);
   const url = `${indicatorConfig.endpoint}?${listParams}`;
 
-  if (!indicatorConfig.enabled) {
-    dispatch({
-      type: FETCH_GRAPHS,
-      payload: {
-        id,
-        archived: indicatorConfig.archived,
-        enabled: indicatorConfig.enabled,
-      },
-    });
-  } else {
-    dispatch({
-      type: FETCH_GRAPHS,
-      payload: {
-        id,
-        title: 'Loading...',
-        info: 'Loading...',
-        type: 'loading',
-        data: [],
-        archived: indicatorConfig.archived,
-        enabled: indicatorConfig.enabled,
-      },
-    });
+  dispatch({
+    type: FETCH_GRAPHS,
+    payload: {
+      id,
+      widgetId: indicatorConfig.widgetId,
+      title: 'Loading...',
+      info: 'Loading...',
+      type: 'loading',
+      data: [],
+    },
+  });
 
-    apiClient.get(url).then((res) => {
-      const indicatorData = res.data;
-      dispatch({
-        type: FETCH_GRAPHS,
-        payload: {
-          id,
-          title: indicatorData.title,
-          info: indicatorData.info,
-          type: indicatorData.type,
-          data: indicatorData.data,
-          archived: indicatorConfig.archived,
-          timeFilter: indicatorConfig.timeFilter,
-          locationFilter: indicatorConfig.locationFilter,
-          timeLimit: indicatorConfig.timeLimit,
-          link: indicatorData.link,
-          legend: indicatorConfig.legend,
-          doubleAxeY: indicatorConfig.doubleAxeY,
-          config: {
-            stacked: indicatorConfig.stacked,
-            datalabel: indicatorConfig.datalabel,
-            colors: indicatorConfig.colors,
-          },
-          enabled: indicatorConfig.enabled,
-          size: indicatorConfig.size,
+  apiClient.get(url).then((res) => {
+    const indicatorData = res.data;
+    dispatch({
+      type: FETCH_GRAPHS,
+      payload: {
+        id,
+        widgetId: indicatorConfig.widgetId,
+        title: indicatorConfig.title,
+        info: indicatorConfig.info,
+        type: indicatorConfig.graphType,
+        data: indicatorData.data,
+        timeFilter: indicatorConfig.timeFilter,
+        yearTypeFilter: indicatorConfig.yearTypeFilter,
+        locationFilter: indicatorConfig.locationFilter,
+        timeLimit: indicatorConfig.timeLimit,
+        link: indicatorData.link,
+        legend: indicatorConfig.legend,
+        doubleAxeY: indicatorConfig.doubleAxeY,
+        config: {
+          stacked: indicatorConfig.stacked,
+          datalabel: indicatorConfig.datalabel,
+          colors: indicatorConfig.colors,
         },
-      });
-    }, () => {
-      dispatch({
-        type: FETCH_GRAPHS,
-        payload: {
-          id,
-          title: 'Indicator could not be loaded',
-          type: 'error',
-          data: [],
-          archived: indicatorConfig.archived,
-          enabled: indicatorConfig.enabled,
-        },
-      });
+        size: indicatorConfig.size,
+      },
     });
-  }
+  }, () => {
+    dispatch({
+      type: FETCH_GRAPHS,
+      payload: {
+        id,
+        widgetId: indicatorConfig.widgetId,
+        title: 'Indicator could not be loaded',
+        type: 'error',
+        data: [],
+      },
+    });
+  });
 }
 
 function fetchNumberIndicator(
   dispatch,
   indicatorConfig,
   locationId,
-  userId
+  userId,
 ) {
   const id = indicatorConfig.order;
 
   const listParams = getParameterList('', locationId, userId);
 
   const url = `${indicatorConfig.endpoint}?${listParams}`;
-  if (!indicatorConfig.enabled) {
+
+  apiClient.get(url).then((res) => {
+    const indicatorData = res.data;
     dispatch({
       type: FETCH_NUMBERS,
       payload: {
+        ...indicatorData,
         id,
-        enabled: indicatorConfig.enabled,
+        widgetId: indicatorConfig.widgetId,
+        title: indicatorConfig.title,
+        info: indicatorConfig.info,
+        subtitle: indicatorConfig.subtitle,
+        numberType: indicatorConfig.numberType,
       },
     });
-  } else {
-    apiClient.get(url).then((res) => {
-      const indicatorData = res.data;
-      dispatch({
-        type: FETCH_NUMBERS,
-        payload: {
-          ...indicatorData,
-          id,
-          archived: indicatorConfig.archived,
-          enabled: indicatorConfig.enabled,
-        },
-      });
-    });
-  }
+  });
 }
 
 export function reloadIndicator(indicatorConfig, params, locationId) {
   return (dispatch) => {
     // new reference so that the original config is not modified
     const indicatorConfigData = JSON.parse(JSON.stringify(indicatorConfig));
-    indicatorConfigData.archived = false;
     fetchGraphIndicator(dispatch, indicatorConfigData, locationId, params);
   };
 }
 
-function getData(dispatch, configData, locationId, config = 'personal', userId = '') {
+function getData(dispatch, dashboardConfig, locationId, config = 'personal', userId = '') {
   // new reference so that the original config is not modified
 
-  const dataEndpoints = JSON.parse(JSON.stringify(configData.endpoints));
-  if (configData.enabled) {
-    Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
-      indicatorConfig.archived = indicatorConfig.archived.includes(config);
+  const dashboard = dashboardConfig.dashboards[config] || {};
+  const widgets = _.map(dashboard.widgets, widget => ({
+    ...dashboardConfig.dashboardWidgets[widget.widgetId],
+    order: widget.order,
+    widgetId: widget.widgetId,
+  }));
 
-      fetchGraphIndicator(dispatch, indicatorConfig, locationId, '');
-    });
-    Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
-      indicatorConfig.archived = indicatorConfig.archived.includes(config);
-      fetchNumberIndicator(dispatch, indicatorConfig, locationId, userId);
-    });
-  } else {
-    Object.values(dataEndpoints.graph).forEach((indicatorConfig) => {
-      indicatorConfig.archived = false;
-      indicatorConfig.colors = undefined;
+  const visibleWidgets = _.chain(widgets)
+    .filter(widget => widget.enabled)
+    .sortBy(['order']).value();
 
-      fetchGraphIndicator(dispatch, indicatorConfig, locationId, '');
-    });
-    Object.values(dataEndpoints.number).forEach((indicatorConfig) => {
-      indicatorConfig.archived = false;
-      fetchNumberIndicator(dispatch, indicatorConfig, locationId, userId);
-    });
-  }
+  _.forEach(visibleWidgets, (widgetConfig) => {
+    if (widgetConfig.type === 'graph') {
+      fetchGraphIndicator(dispatch, widgetConfig, locationId, '');
+    } else if (widgetConfig.type === 'number') {
+      fetchNumberIndicator(dispatch, widgetConfig, locationId, userId);
+    }
+  });
 }
 
 export function fetchIndicators(
   configData,
   config,
   locationId,
-  userId
+  userId,
 ) {
   return (dispatch) => {
     dispatch({
@@ -378,10 +355,13 @@ export function resetIndicators() {
   };
 }
 
-export function addToIndicators(index, type) {
-  return {
-    type: ADD_TO_INDICATORS,
-    payload: { index, type },
+export function addToIndicators(widgetConfig, locationId, userId = '') {
+  return (dispatch) => {
+    if (widgetConfig.type === 'graph') {
+      fetchGraphIndicator(dispatch, widgetConfig, locationId, '');
+    } else if (widgetConfig.type === 'number') {
+      fetchNumberIndicator(dispatch, widgetConfig, locationId, userId);
+    }
   };
 }
 
@@ -400,11 +380,12 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 
 export function fetchConfigAndData(locationId, config = 'personal', userId, filterSelected) {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/config').then((res) => {
+    apiClient.get('/openboxes/api/dashboard/config').then((res) => {
       dispatch({
-        type: FETCH_CONFIG,
+        type: FETCH_CONFIG_AND_SET_ACTIVE,
         payload: {
           data: res.data,
+          activeConfig: config,
         },
       });
       getData(dispatch, res.data, locationId, config, userId, filterSelected);
@@ -414,7 +395,7 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, filt
 
 export function fetchConfig() {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/config').then((res) => {
+    apiClient.get('/openboxes/api/dashboard/config').then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
@@ -452,7 +433,7 @@ export function updateBreadcrumbs(listBreadcrumbsStep = [
 
 export function fetchBreadcrumbsConfig() {
   return (dispatch) => {
-    apiClient.get('/openboxes/apitablero/breadcrumbsConfig').then((res) => {
+    apiClient.get('/openboxes/api/dashboard/breadcrumbsConfig').then((res) => {
       dispatch({
         type: FETCH_BREADCRUMBS_CONFIG,
         payload: res.data,

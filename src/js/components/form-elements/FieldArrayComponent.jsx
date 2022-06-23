@@ -1,15 +1,16 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Tooltip } from 'react-tippy';
-import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
+
+import TableBody from 'components/form-elements/TableBody';
+import TableBodyVirtualized from 'components/form-elements/TableBodyVirtualized';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
-
-import TableBody from './TableBody';
-import TableBodyVirtualized from './TableBodyVirtualized';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 class FieldArrayComponent extends Component {
   constructor(props) {
@@ -98,7 +99,7 @@ class FieldArrayComponent extends Component {
           <div className="d-flex flex-row border-bottom font-weight-bold">
             {_.map(fieldsConfig.fields, (config, name) => {
               const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
-              const { hide } = dynamicAttr;
+              const { hide, headerHtml } = dynamicAttr;
               if (!hide) {
                 return (
                   <div
@@ -127,12 +128,14 @@ class FieldArrayComponent extends Component {
                       hideDelay="50"
                     >
                       <div
-                        className={`mx-2 text-truncate ${config.required ? 'required' : ''}`}
+                        className={`mx-2 text-truncate ${config.required ? 'arrayfield-header-required' : ''}`}
                         style={{
                           fontSize: fieldsConfig.headerFontSize ? fieldsConfig.headerFontSize : '0.875rem',
                         }}
-                      >{config.label &&
-                      <Translate id={config.label} defaultMessage={config.defaultMessage} />}
+                      >
+                        { headerHtml && headerHtml() }
+                        { config.label && !headerHtml &&
+                          <Translate id={config.label} defaultMessage={config.defaultMessage} />}
                       </div>
                     </Tooltip>
                   </div>);

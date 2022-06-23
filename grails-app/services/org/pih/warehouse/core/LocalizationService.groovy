@@ -76,7 +76,7 @@ class LocalizationService {
      */
     Properties getMessagesProperties(Locale locale) {
         Properties messagesProperties
-        def messagesPropertiesFilename = (locale && locale.language != "en") ? "messages_${locale.language}.properties" : "messages.properties"
+        def messagesPropertiesFilename = (locale && locale.language != "en" && locale.language != 'null') ? "messages_${locale.language}.properties" : "messages.properties"
 
         // Get properties from classpath
         if (!Metadata.getCurrent().isWarDeployed()) {
@@ -89,6 +89,12 @@ class LocalizationService {
             messagesProperties = getMessagesPropertiesFromResource(messagesPropertiesUrl)
         }
         return messagesProperties.sort()
+    }
+
+    Properties getMessagesPropertiesWithPrefix(String prefix, Locale locale) {
+        return getMessagesProperties(locale).findAll {
+            it.key.startsWith(prefix)
+        }
     }
 
 

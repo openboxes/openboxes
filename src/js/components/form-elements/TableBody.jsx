@@ -1,7 +1,9 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 
-import TableRow from './TableRow';
+import TableRow from 'components/form-elements/TableRow';
+
 
 const TableBody = (props) => {
   const {

@@ -1,6 +1,7 @@
 import React from 'react';
-import _ from 'lodash';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import _ from 'lodash';
 
 const getIcon = iconName => _.trimStart(iconName, ['fa', '-']);
 

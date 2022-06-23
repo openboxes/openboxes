@@ -1,3 +1,5 @@
+import org.pih.warehouse.core.RoleType
+
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -32,18 +34,45 @@ class RoleFilters {
 
     def static superuserControllers = []
     def static superuserActions = [
-            '*'               : ['delete'],
-            'console'         : ['index', 'execute'],
-            'inventory'       : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
-            'inventoryItem'   : ['adjustStock', 'transferStock'],
-            'productCatalog'  : ['create', 'importProductCatalog'],
-            'productType'     : ['edit', 'delete', 'save', 'update'],
-            'transactionEntry': ['edit', 'delete', 'save', 'update'],
-            'user'            : ['impersonate']
+            '*'                         : ['delete'],
+            'console'                   : ['index', 'execute'],
+            'inventory'                 : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
+            'inventoryItem'             : ['adjustStock', 'transferStock'],
+            'productCatalog'            : ['create', 'importProductCatalog'],
+            'productType'               : ['edit', 'delete', 'save', 'update'],
+            'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
+            'user'                      : ['impersonate'],
+            'productsConfigurationApi'  : ['downloadCategories', 'importCategories']
     ]
 
     def static invoiceActions = [
             'invoice': ['*']
+    ]
+
+    def static requestorOrManagerActions = [
+            'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
+            'dashboard'           : ['megamenu'],
+            'dashboardApi'        : ['breadcrumbsConfig'],
+            'grails'              : ['errors'],
+            'localizationApi'     : ['list'],
+            'locationApi'         : ['list'],
+            'productApi'          : ['list', 'productDemand', 'productAvailabilityAndDemand'],
+            'stocklistApi'        : ['list'],
+            'stockMovement'       : ['list', 'createRequest'],
+            'stockMovementApi'    : ['updateItems', 'create', 'updateStatus', 'read'],
+            'stockMovementItemApi': ['getStockMovementItems']
+    ]
+
+    def static authenticatedActions = [
+            'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
+            'dashboard'           : ['megamenu'],
+            'dashboardApi'        : ['breadcrumbsConfig'],
+            'grails'              : ['errors'],
+            'localizationApi'     : ['list'],
+            'locationApi'         : ['list'],
+            'productApi'          : ['list', 'productDemand', 'productAvailabilityAndDemand'],
+            'stocklistApi'        : ['list'],
+            'stockMovement'       : ['list'],
     ]
 
     def filters = {
@@ -57,13 +86,16 @@ class RoleFilters {
                 }
 
                 // Authorized users
-                def missBrowser = !userService.canUserBrowse(session.user)
-                def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
-                def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
-                def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
-                def invoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
+                def isNotAuthenticated = !userService.isUserInRole(session.user, RoleType.ROLE_AUTHENTICATED)
+                def isNotBrowser = !userService.canUserBrowse(session.user) && !needRequestorOrManager(controllerName, actionName)
+                def isNotManager = needManager(controllerName, actionName) && (needRequestorOrManager(controllerName, actionName) ? !userService.isUserManager(session.user) && !userService.isUserRequestor(session.user) : !userService.isUserManager(session.user))
+                def isNotAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
+                def isNotSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
+                def hasNoRoleInvoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
+                def isNotRequestor = needRequestorOrManager(controllerName, actionName) && !userService.isUserRequestor(session.user)
+                def isNotRequestorOrManager = needRequestorOrManager(controllerName, actionName) ? !userService.isUserManager(session.user) && !userService.isUserRequestor(session.user) : false
 
-                if (missBrowser || missManager || missAdmin || missSuperuser || invoice) {
+                if (isNotAuthenticated || isNotBrowser || isNotManager || isNotAdmin || isNotSuperuser || hasNoRoleInvoice || (isNotRequestorOrManager && !userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName)) || (isNotRequestor && userService.hasHighestRole(session.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED) && !needAuthenticatedActions(controllerName, actionName))) {
                     log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
                     redirect(controller: "errors", action: "handleForbidden")
                     return false
@@ -86,13 +118,24 @@ class RoleFilters {
     }
 
     static Boolean needManager(controllerName, actionName) {
-        changeActions.any {
+        def isChangeAction = changeActions.any {
             actionName?.startsWith(it)
-        } || controllerName?.contains("Workflow") || changeControllers?.contains(controllerName) || managerActions[controllerName]?.contains(actionName)
+        }
+        def isWorkflow = controllerName?.contains("Workflow")
+        def isChangeController = changeControllers?.contains(controllerName)
+        def isManagerAction = managerActions[controllerName]?.contains(actionName)
+        return isChangeAction || isWorkflow || isChangeController || isManagerAction
     }
 
     static Boolean needInvoice(controllerName, actionName) {
         invoiceActions[controllerName]?.contains("*") || invoiceActions[controllerName]?.contains(actionName)
     }
 
+    static Boolean needRequestorOrManager(controllerName, actionName) {
+        requestorOrManagerActions[controllerName]?.contains(actionName)
+    }
+
+    static Boolean needAuthenticatedActions(controllerName, actionName) {
+        authenticatedActions[controllerName]?.contains(actionName)
+    }
 }

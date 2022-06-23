@@ -1,7 +1,7 @@
 import { confirmAlert } from 'react-confirm-alert';
+import { dispatch } from 'store';
 
-import { dispatch } from '../store';
-import { changeCurrentLocation } from '../actions';
+import { changeCurrentLocation } from 'actions';
 
 const showLocationChangedAlert = (translate, oldLocation, newLocation, onLocationChanged) => {
   if (oldLocation.id && oldLocation.id !== newLocation.id) {

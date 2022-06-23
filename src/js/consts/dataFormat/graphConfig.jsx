@@ -1,7 +1,8 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 // eslint-disable-next-line no-unused-vars
 import datalabels from 'chartjs-plugin-datalabels';
-import { getColor, getArrayOfColors } from './colorMapping';
+
+import { getArrayOfColors, getColor } from 'consts/dataFormat/colorMapping';
 
 // === COLOR OPTIONS ===
 
@@ -114,8 +115,9 @@ function loadDatalabel(context) {
   return '';
 }
 
-function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = false, legend = false, doubleAxeY = false, sizeGraph = null) {
+function getOptions(isStacked = false, hasDataLabel = false, alignLabel = '', maxValue = null, minValue = null, isDoughnut = false, legend = false, doubleAxeY = false, sizeGraph = null, maintainAspectRatio = false) {
   const options = {
+    maintainAspectRatio,
     legend: {
       display: (isDoughnut || legend)
       && (window.innerWidth > 1000 || (window.innerWidth < 865 && window.innerWidth > 590) || (sizeGraph === 'big' && window.innerWidth > 500)),

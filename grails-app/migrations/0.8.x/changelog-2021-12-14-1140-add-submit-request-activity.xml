@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="MagdaToczek" id="1412202111400-0">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM location_type_supported_activities
+        JOIN location_type ON location_type_supported_activities.location_type_id = location_type.id
+        WHERE location_type_code = 'DEPOT'
+        AND supported_activities_string = 'SUBMIT_REQUEST';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'SUBMIT_REQUEST' supported activity where location type is 'DEPOT'</comment>
+    <sql>
+      INSERT INTO location_type_supported_activities (location_type_id, supported_activities_string)
+      SELECT location_type_id, 'SUBMIT_REQUEST'
+      FROM location_type_supported_activities
+      JOIN location_type ON location_type_supported_activities.location_type_id = location_type.id
+      WHERE location_type_code = 'DEPOT';
+    </sql>
+  </changeSet>
+</databaseChangeLog>

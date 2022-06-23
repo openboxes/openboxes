@@ -1,4 +1,4 @@
-import ColorPalette from '../../components/tablero/ColorPalette.scss';
+import ColorPalette from 'components/dashboard/ColorPalette.scss';
 
 /* global _ */
 
@@ -110,4 +110,4 @@ function getArrayOfColors(length, config, hover = false) {
   return colorsArray;
 }
 
-export { getColor, getArrayOfColors, getRandomColor, getColorByName };
+export { getArrayOfColors, getColor, getColorByName, getRandomColor };

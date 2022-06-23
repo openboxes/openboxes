@@ -1,12 +1,15 @@
 import React from 'react';
-import { Tooltip } from 'react-tippy';
+
 import PropTypes from 'prop-types';
+import ReactHtmlParser from 'react-html-parser';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
+
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
 
-import Translate, { translateWithDefaultMessage } from './Translate';
 
 export const renderFormField = (fieldConfig, fieldName, props = {}) => {
   const FieldType = fieldConfig.type;
@@ -24,7 +27,7 @@ export const renderFormField = (fieldConfig, fieldName, props = {}) => {
 export const renderFormFields = ({
   renderInput,
   attributes: {
-    required, hidden, showError, ...otherAttributes
+    required, hidden, showError, tooltip, injectionData, trigger = 'click', ...otherAttributes
   },
   label: FieldLabel,
   defaultMessage,
@@ -42,7 +45,6 @@ export const renderFormFields = ({
       <Tooltip
         title={translate(`${error}`)}
         disabled={!error || !(touched || fieldTouched)}
-        theme="transparent"
         arrow="true"
         delay="150"
         duration="250"
@@ -60,7 +62,25 @@ export const renderFormFields = ({
       <div className="row">
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">{FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}</label> :
+            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">
+              {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
+              {attr.withTooltip &&
+                <Tooltip
+                  interactive="true"
+                  arrow="true"
+                  trigger={trigger}
+                  hideOnClick="true"
+                  html={injectionData
+                    ? ReactHtmlParser(translate(tooltip, tooltip, injectionData))
+                    : translate(tooltip, tooltip)
+                  }
+                >
+                  &nbsp;
+                  <i className="fa fa-question-circle-o text-primary" aria-hidden="true" />
+                </Tooltip>
+              }
+            </label>
+            :
             <FieldLabel />
         }
         <div className="col-md-4 col-7 form-element-container">
@@ -70,7 +90,7 @@ export const renderFormFields = ({
       <div className="row">
         <div className="col-md-2 hidden" />
         <div className="help-block" style={{ float: 'left' }}>
-          { (error && (touched || fieldTouched || showError)) ? translate(`${error}`) : '' }
+          {(error && (touched || fieldTouched || showError)) ? translate(`${error}`) : ''}
         </div>
       </div>
     </div>

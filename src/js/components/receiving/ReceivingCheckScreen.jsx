@@ -1,22 +1,25 @@
+import React, { Component } from 'react';
+
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import moment from 'moment';
-import { hideSpinner, showSpinner } from '../../actions';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import { renderFormField } from '../../utils/form-utils';
-import Translate from '../../utils/Translate';
-import ArrayField from '../form-elements/ArrayField';
-import CheckboxField from '../form-elements/CheckboxField';
-import DateField from '../form-elements/DateField';
-import LabelField from '../form-elements/LabelField';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import TextField from '../form-elements/TextField';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import CheckboxField from 'components/form-elements/CheckboxField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import TextField from 'components/form-elements/TextField';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Translate from 'utils/Translate';
+
 
 const SHIPMENT_FIELDS = {
   'origin.name': {

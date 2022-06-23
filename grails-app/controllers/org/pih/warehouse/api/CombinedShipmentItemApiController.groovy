@@ -49,8 +49,8 @@ class CombinedShipmentItemApiController {
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         render([data: orders.findAll{ it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } }.collect {
             [
-                value: it.id,
-                label: it.orderNumber
+                id: it.id,
+                orderNumber: it.orderNumber
             ]
         }] as JSON)
     }
@@ -171,7 +171,7 @@ class CombinedShipmentItemApiController {
             def orderItems = OrderItem.findAllByOrderInList(orders)
             orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.each {orderItem ->
                 String quantityUom = "${orderItem?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
-                String quantityPerUom = "${g.formatNumber(number: orderItem?.quantityPerUom?:1, maxFractionDigits: 0)}"
+                String quantityPerUom = orderItem?.quantityPerUom?.toInteger()
                 String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
                 csv << [
                         orderNumber         : orderItem.order.orderNumber,

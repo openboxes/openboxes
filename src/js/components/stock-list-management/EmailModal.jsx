@@ -1,18 +1,19 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
-import { getTranslate } from 'react-localize-redux';
 
-import ModalWrapper from '../form-elements/ModalWrapper';
-import TextField from '../form-elements/TextField';
-import TextareaField from '../form-elements/TextareaField';
-import SelectField from '../form-elements/SelectField';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
-import CheckboxField from '../form-elements/CheckboxField';
+import { hideSpinner, showSpinner } from 'actions';
+import CheckboxField from 'components/form-elements/CheckboxField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import SelectField from 'components/form-elements/SelectField';
+import TextareaField from 'components/form-elements/TextareaField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 
 const FIELDS = {
@@ -24,8 +25,10 @@ const FIELDS = {
       required: true,
       showValueTooltip: true,
       multi: true,
-      objectValue: true,
+      className: 'multi-select',
       style: { paddingBottom: 5 },
+      valueKey: 'id',
+      labelKey: 'name',
     },
     getDynamicAttr: ({ users }) => ({
       options: users,

@@ -1,9 +1,10 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
 
-import { renderField } from '../../utils/form-utils';
+import { renderField } from 'utils/form-utils';
 
 class BaseField extends Component {
   constructor(props) {

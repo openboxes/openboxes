@@ -72,7 +72,7 @@ class ProductApiControllerTests extends ControllerUnitTestCase {
     void testDemand() {
         controller.params.id = "1"
         controller.forecastingService = [
-                getDemand: { Location l, Product p -> return ["demand"] }
+                getDemand: { Location origin, Location destination, Product p -> return ["demand"] }
         ]
         //WHEN
         controller.demand()

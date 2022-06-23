@@ -1,31 +1,35 @@
-import { arrayMove } from 'react-sortable-hoc';
 import update from 'immutability-helper';
-import { loadGraphColors, loadGraphOptions } from '../consts/dataFormat/graphConfig';
+import _ from 'lodash';
+import { arrayMove } from 'react-sortable-hoc';
+
 import {
-  ADD_TO_INDICATORS,
+  FETCH_CONFIG,
+  FETCH_CONFIG_AND_SET_ACTIVE,
   FETCH_GRAPHS,
   FETCH_NUMBERS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
-  RESET_INDICATORS,
-  FETCH_CONFIG,
-  SET_ACTIVE_CONFIG,
-} from '../actions/types';
-import { loadNumbersOptions } from '../consts/dataFormat/customGraphConfig';
+  RESET_INDICATORS, SET_ACTIVE_CONFIG,
+} from 'actions/types';
+import { loadNumbersOptions } from 'consts/dataFormat/customGraphConfig';
+import { loadGraphColors, loadGraphOptions } from 'consts/dataFormat/graphConfig';
+
 
 function arrayArchive(array = [], index) {
-  const newArray = update(array, { [index]: { archived: { $set: 1 } } });
+  let newArray = update(array, { $splice: [[index, 1]] });
+  newArray = _.map(newArray, (value, ind) => {
+    if (ind < index) {
+      return value;
+    }
+
+    return { ...value, id: value.id - 1 };
+  });
   return newArray;
 }
 
-function arrayUnarchive(array = [], index) {
-  const newArray = update(array, { [index]: { archived: { $set: 0 } } });
-  return newArray;
-}
-
-function findInArray(id, array = []) {
+function findInArray(widgetId, array = []) {
   for (let i = 0; i < array.length; i += 1) {
-    if (array[i] && array[i].id === id) {
+    if (array[i] && array[i].widgetId === widgetId) {
       return i;
     }
   }
@@ -53,7 +57,7 @@ export default function (state = initialState, action) {
       }
       // new reference to array so the component is re-rendered when value changes
       const newState = [].concat(state.data);
-      const index = findInArray(payload.id, state.data);
+      const index = findInArray(payload.widgetId, state.data);
       if (index === false) {
         newState[action.payload.id - 1] = action.payload;
       } else {
@@ -67,7 +71,7 @@ export default function (state = initialState, action) {
     case FETCH_NUMBERS: {
       // new reference to array so the component is re-rendered when value changes
       const newState = [].concat(state.numberData);
-      const index = findInArray(action.payload.id, state.numberData);
+      const index = findInArray(action.payload.widgetId, state.numberData);
       if (index === false) {
         newState[action.payload.id - 1] = action.payload;
       } else {
@@ -107,20 +111,6 @@ export default function (state = initialState, action) {
       }
       return state;
     }
-    case ADD_TO_INDICATORS:
-      if (action.payload.type === 'graph') {
-        return {
-          ...state,
-          data: arrayUnarchive(state.data, action.payload.index),
-        };
-      }
-      if (action.payload.type === 'number') {
-        return {
-          ...state,
-          numberData: arrayUnarchive(state.numberData, action.payload.index),
-        };
-      }
-      return state;
     case REMOVE_FROM_INDICATORS: {
       if (action.payload.type === 'graph') {
         return {
@@ -145,6 +135,12 @@ export default function (state = initialState, action) {
       return {
         ...state,
         activeConfig: action.payload.data,
+      };
+    case FETCH_CONFIG_AND_SET_ACTIVE:
+      return {
+        ...state,
+        config: action.payload.data,
+        activeConfig: action.payload.activeConfig,
       };
     default:
       return state;

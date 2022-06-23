@@ -1,0 +1,26 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+$pih_teal: #3AB4B1;
+
+.BeaconFabButtonFrame {
+  display: none;
+}
+
+/* HelpScout's default positioning wastes space and clobbers page content */
+.BeaconContainer {
+  bottom: 5px !important;
+  right: 5px !important;
+}
+
+.btn.btn-helpscout {
+  @include button-variant(
+      $pih_teal,
+      darken($pih_teal, 7.5%),
+      darken($pih_teal, 10%),
+      lighten($pih_teal, 5%),
+      lighten($pih_teal, 10%),
+      darken($pih_teal, 30%)
+  );
+}

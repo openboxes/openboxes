@@ -1,12 +1,12 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { withLocalize } from 'react-localize-redux';
 import connect from 'react-redux/es/connect/connect';
 
-import Router from './components/Router';
-
-import { fetchTranslations, fetchSessionInfo, fetchMenuConfig } from './actions';
+import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
+import Router from 'components/Router';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
@@ -25,6 +25,9 @@ class MainRouter extends React.Component {
       this.props.fetchTranslations('', 'default');
       this.props.fetchTranslations('', 'dashboard');
       this.props.fetchTranslations('', 'combinedShipments');
+      this.props.fetchTranslations('', 'productsConfiguration');
+      this.props.fetchTranslations('', 'locationsConfiguration');
+      this.props.fetchTranslations('', 'loadData');
     });
   }
 
@@ -36,7 +39,10 @@ class MainRouter extends React.Component {
         this.props.fetchMenuConfig();
         this.props.fetchTranslations(nextProps.locale, 'default');
         this.props.fetchTranslations(nextProps.locale, 'dashboard');
-        this.props.fetchTranslations('', 'combinedShipments');
+        this.props.fetchTranslations(nextProps.locale, 'combinedShipments');
+        this.props.fetchTranslations(nextProps.locale, 'productsConfiguration');
+        this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
+        this.props.fetchTranslations(nextProps.locale, 'loadData');
       }
     }
   }

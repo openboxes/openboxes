@@ -15,11 +15,15 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
+import org.grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
 
 class LocationService {
 
     def grailsApplication
+    def userService
+    def locationDataService
     boolean transactional = true
 
 
@@ -79,7 +83,7 @@ class LocationService {
 
     def getLocations(String[] fields, Map params) {
 
-        LocationTypeCode locationTypeCode = params.locationTypeCode ?: null
+        LocationTypeCode locationTypeCode = params?.locationTypeCode ?: null
 
         def locations = Location.createCriteria().list() {
             if (fields) {
@@ -90,11 +94,11 @@ class LocationService {
                 }
             }
 
-            if (params.name) {
+            if (params?.name) {
                 ilike("name", "%" + params.name + "%")
             }
 
-            if (params.locationTypeCode) {
+            if (params?.locationTypeCode) {
                 locationType {
                     eq("locationTypeCode", locationTypeCode)
                 }
@@ -107,7 +111,6 @@ class LocationService {
     }
 
     def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
-
         def locations = new HashSet()
         locations += getLocations(fields, params)
 
@@ -119,6 +122,18 @@ class LocationService {
             ActivityCode[] activityCodes = params.list("activityCodes") as ActivityCode[]
             return locations.findAll {
                 it.supportsAll(activityCodes)
+            }
+        }
+
+        if (params.isReturnOrder) {
+            if (isSuperuser) {
+                return locations.findAll { Location it ->
+                    !it.supports(ActivityCode.MANAGE_INVENTORY)
+                }
+            } else {
+                return locations.findAll { Location it ->
+                    !it.supports(ActivityCode.MANAGE_INVENTORY) && it.locationGroup == currentLocation.locationGroup
+                }
             }
         }
 
@@ -180,6 +195,18 @@ class LocationService {
 
     }
 
+    def getRequestorLocations(User user) {
+        def locations = new HashSet()
+        List locationRolesForRequestor = user?.locationRoles.findAll {it.role.roleType == RoleType.ROLE_REQUESTOR}
+
+        if (locationRolesForRequestor) {
+            locations = locationRolesForRequestor.collect {it.location}
+            locations = locations.findAll {it -> it.supports(ActivityCode.SUBMIT_REQUEST) && !it.supports(ActivityCode.MANAGE_INVENTORY)}
+        }
+
+        return locations
+    }
+
     def getSuppliers(String query, Integer max, Integer offset) {
         def terms = "%" + query + "%"
         def locations = Supplier.createCriteria().list(max: max, offset: offset) {
@@ -220,10 +247,41 @@ class LocationService {
     Map getLoginLocationsMap(User user, Location currentLocation) {
         log.info "Get login locations for user ${user} and location ${currentLocation})"
         def locationMap = [:]
+        def locations = new HashSet()
         def nullHigh = new NullComparator(true)
-        def locations = getLoginLocations(currentLocation)
+        def isRequestor = userService.isUserRequestor(user)
+        def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(user)
+        def inRoleBrowser = user.hasDefaultRole(RoleType.ROLE_BROWSER)
+        def inRoleAssistant = user.hasDefaultRole(RoleType.ROLE_ASSISTANT)
+        def inRoleManager = user.hasDefaultRole(RoleType.ROLE_MANAGER)
+        def inRoleAdmin = user.hasDefaultRole(RoleType.ROLE_ADMIN)
+        def inRoleSuperuser = user.hasDefaultRole(RoleType.ROLE_SUPERUSER)
+
+        def requiredRoles = RoleType.listRoleTypesForLocationChooser()
+
+        if (isRequestor && !user.locationRoles && !inRoleBrowser) {
+            locations = getLocations(null, null)
+            locations = locations.findAll {it -> it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
+        } else if (requestorInAnyLocation && inRoleBrowser) {
+            locations = getRequestorLocations(user)
+            locations += getLoginLocations(currentLocation)
+        } else {
+            if (requestorInAnyLocation) {
+                locations += getRequestorLocations(user)
+            }
+            // If a user doesn't have at least one of the requiredRoles by default, get locations where the user HAS any of those roles
+            if (!inRoleBrowser && !inRoleAssistant && !inRoleManager && !inRoleAdmin && !inRoleSuperuser) {
+                user.locationRoles.each { LocationRole locationRole ->
+                    if (requiredRoles.contains(locationRole.role.roleType)) {
+                        locations += locationRole.location
+                    }
+                }
+            } else {
+                locations += getLoginLocations(currentLocation)
+            }
+        }
+
         if (locations) {
-            locations = locations.findAll { Location location -> user.hasPrimaryRole(location) }
             locations = locations.collect { Location location ->
                 [
                         id              : location?.id,
@@ -528,4 +586,47 @@ class LocationService {
         return "${receivingLocationPrefix}-${identifier}"
     }
 
+    List<Location> searchInternalLocations(Map params, LocationTypeCode[] locationTypeCodes) {
+        return Location.createCriteria().list(params) {
+            if (!params.includeInactive) {
+                eq("active", Boolean.TRUE)
+            }
+
+            if (params.parentLocation?.id) {
+                eq("parentLocation", Location.get(params.parentLocation.id))
+            }
+
+            if (locationTypeCodes) {
+                locationType {
+                    'in'("locationTypeCode", locationTypeCodes)
+                }
+            }
+
+            if (params.searchTerm) {
+                or {
+                    ilike("name", "%${params.searchTerm}%")
+                    ilike("locationNumber", "%${params.searchTerm}%")
+                }
+            }
+
+            order("sortOrder", "asc")
+            order("name", "asc")
+        }
+    }
+
+    def importLocationCsv(ImportDataCommand command) {
+        String csv = new String(command.importFile.bytes)
+        def settings = [separatorChar: ',']
+        CSVMapReader csvReader = new CSVMapReader(new StringReader(csv), settings)
+        command.data = csvReader.readAll()
+
+        command.errors = null
+        locationDataService.validateData(command)
+
+        if (command.errors.allErrors) {
+            throw new ValidationException("Failed to import template due to validation errors", command.errors)
+        }
+
+        locationDataService.importData(command)
+    }
 }

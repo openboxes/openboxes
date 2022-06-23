@@ -1,14 +1,15 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 
 const AlertMessage = ({
-  show, message, danger, close,
+  show, message, danger, close, className,
 }) => {
   if (show) {
     return (
       <div
-        className={`alert ${danger ? 'alert-danger' : 'alert-warning'}`}
-        style={{ cursor: close ? 'pointer' : 'default' }}
+        className={`${className} alert ${danger ? 'alert-danger' : 'alert-warning'}`}
+        style={{ cursor: close ? 'pointer' : 'default', whiteSpace: 'pre-line' }}
         role="presentation"
         onClick={() => close()}
       >
@@ -23,15 +24,17 @@ const AlertMessage = ({
 export default AlertMessage;
 
 AlertMessage.propTypes = {
-  show: PropTypes.bool,
-  message: PropTypes.string,
-  danger: PropTypes.bool,
+  className: PropTypes.string,
   close: PropTypes.func,
+  danger: PropTypes.bool,
+  message: PropTypes.string,
+  show: PropTypes.bool,
 };
 
 AlertMessage.defaultProps = {
-  show: false,
-  message: '',
-  danger: false,
+  className: '',
   close: () => null,
+  danger: false,
+  message: '',
+  show: false,
 };

@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { FETCH_REASONCODES } from '../actions/types';
+
+import { FETCH_REASONCODES } from 'actions/types';
 
 const initialState = {
   data: [],
@@ -11,7 +12,7 @@ export default function (state = initialState, action) {
     case FETCH_REASONCODES:
       if (action.payload.data !== undefined) {
         const reasonCodes = _.map(action.payload.data.data, reasonCode => (
-          { value: reasonCode.id, label: reasonCode.name }
+          { value: reasonCode.id, id: reasonCode.id, label: reasonCode.name }
         ));
         return { ...state, data: reasonCodes, fetched: true };
       }

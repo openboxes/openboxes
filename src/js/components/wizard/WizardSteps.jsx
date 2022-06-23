@@ -1,30 +1,34 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 import _ from 'lodash';
-import './WizardSteps.scss';
+import PropTypes from 'prop-types';
+
+import 'components/wizard/WizardSteps.scss';
+
 
 const WizardSteps = props => (
-  <div className="steps-box d-print-none">
-    <div className="steps d-flex flex-wrap">
-      { _.map(props.steps, (step, index) => (
+  <div className="steps-main-box">
+    <div className="steps-inside-wrapper">
+      {_.map(props.steps, (step, index) => (
         <div
           key={index}
-          className="step-container"
+          className={`step-container ${props.currentStep === index + 1 ? 'active' : ''}`}
         >
-          <button className="step" onClick={() => props.onClick(index + 1)} disabled={!props.stepsClickable}>
-            <i
-              className={`fa 
-                ${index + 1 === props.currentStep ? 'fa-circle-o' : ''} 
-                ${index + 1 < props.currentStep ? 'fa-check-circle-o' : ''} 
-                ${index + 1 > props.currentStep || (index + 1 !== props.currentStep && !props.stepsClickable) ? 'fa-circle-o disabled' : ''}`}
-              aria-hidden="true"
-            />
-            <span className="step-text">
-              {step}
-            </span>
-          </button>
+          <div
+            className={props.showStepNumber ? 'circle filled' : 'circle'}
+            onClick={() => props.onClick(index + 1)}
+            onKeyPress={() => props.onClick(index + 1)}
+            role="button"
+            tabIndex="0"
+            disabled={!props.stepsClickable}
+          >
+            {props.showStepNumber && <span className="number">{index + 1}</span>}
+          </div>
+          <div className="step-name">
+            {step}
+          </div>
         </div>
-          ))
+      ))
         }
     </div>
   </div>
@@ -42,9 +46,11 @@ WizardSteps.propTypes = {
   onClick: PropTypes.func,
   /** Indicator if steps are clickable (default = false) */
   stepsClickable: PropTypes.bool,
+  showStepNumber: PropTypes.bool,
 };
 
 WizardSteps.defaultProps = {
   onClick: stepIdx => stepIdx,
   stepsClickable: false,
+  showStepNumber: false,
 };

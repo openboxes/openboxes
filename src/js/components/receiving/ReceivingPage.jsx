@@ -1,17 +1,21 @@
-import _ from 'lodash';
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import 'react-confirm-alert/src/react-confirm-alert.css';
+
+import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import moment from 'moment';
-import { fetchTranslations, hideSpinner, showSpinner } from '../../actions';
-import apiClient, { parseResponse } from '../../utils/apiClient';
-import { translateWithDefaultMessage } from '../../utils/Translate';
-import '../stock-movement-wizard/StockMovement.scss';
-import Wizard from '../wizard/Wizard';
-import PartialReceivingPage from './PartialReceivingPage';
-import ReceivingCheckScreen from './ReceivingCheckScreen';
+
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import PartialReceivingPage from 'components/receiving/PartialReceivingPage';
+import ReceivingCheckScreen from 'components/receiving/ReceivingCheckScreen';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
+
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'components/stock-movement-wizard/StockMovement.scss';
+
 
 /** Main partial receiving form's component. */
 class ReceivingPage extends Component {
@@ -139,20 +143,14 @@ class ReceivingPage extends Component {
   fetchBins() {
     const url = `/openboxes/api/internalLocations/receiving?location.id=${this.state.locationId}&shipmentNumber=${this.state.shipmentNumber}`;
     const mapBins = bins => (_.chain(bins)
-      .map(bin => ({
-        value: {
-          id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName,
-        },
-        label: bin.name,
-      }))
-      .orderBy(['label'], ['asc']).value()
+      .orderBy(['name'], ['asc']).value()
     );
 
     return apiClient.get(url)
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
-          .map((value, key) => ({ label: key, options: mapBins(value) }))
+          .map((value, key) => ({ name: key, options: mapBins(value) }))
           .orderBy(['label'], ['asc'])
           .value();
         const binsWithoutZone = mapBins(binGroups[1]);

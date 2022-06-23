@@ -1,3 +1,4 @@
+<%@ page defaultCodec="none" %>
 <%@ page import="org.pih.warehouse.inventory.Transaction" %>
 <html>
     <head>

@@ -24,7 +24,7 @@
 			</div>
 
 			<g:form method="post" >
-				<g:hiddenField name="id" value="${productAssociationInstance?.id}" />
+				<g:hiddenField id="productAssociationId" name="id" value="${productAssociationInstance?.id}" />
 				<g:hiddenField name="version" value="${productAssociationInstance?.version}" />
 				<div class="box">
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
@@ -79,6 +79,15 @@
 									<g:textArea class="text" name="comments" value="${productAssociationInstance?.comments}" />
 								</td>
 							</tr>
+
+							<tr class="prop">
+								<td class="name">
+									<label><warehouse:message code="productAssociation.mutualAssociation.label" default="Two-way Association"/></label>
+								</td>
+								<td class="value">
+									<g:checkBox name="hasMutualAssociation" value="${productAssociationInstance?.mutualAssociation}"/>
+								</td>
+							</tr>
 						
 							<tr class="prop">
 								<td valign="top" class="name">
@@ -106,7 +115,18 @@
                                 <td valign="top left">
                                     <div class="buttons left">
                                         <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
-                                        <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+										<g:if test="${productAssociationInstance?.mutualAssociation}">
+											<button type="button"
+													class="button"
+													onclick="$('#product-association-delete-dialog')
+															.data('productAssociationId', `${productAssociationInstance?.id}`)
+															.dialog('open')">
+												${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}
+											</button>
+										</g:if>
+										<g:else>
+											<g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
+										</g:else>
                                     </div>
                                 </td>
                             </tr>
@@ -114,6 +134,7 @@
 					</table>
 				</div>
             </g:form>
-        </div>
+			<g:render template="/productAssociation/productAssociationDeleteDialog" />
+		</div>
     </body>
 </html>

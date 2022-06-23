@@ -136,11 +136,17 @@
                                                                     <td class="${productProperties?.productCode!=existingProduct?.productCode?'modified':'' }">
                                                                         <span title="${existingProduct?.productCode }">${productProperties?.productCode }</span>
                                                                     </td>
+                                                                    <td class="${productProperties?.productType?.name!=existingProduct?.productType?.name?'modified':'' }">
+                                                                        <span title="${existingProduct?.productType?.name }">${productProperties?.productType?.name}</span>
+                                                                    </td>
                                                                     <td class="${productProperties?.name!=existingProduct?.name?'modified':'' }">
                                                                         <span title="${existingProduct?.name }">${productProperties?.name }</span>
                                                                     </td>
                                                                     <td class="${productProperties?.category!=existingProduct?.category?'modified':'' }">
                                                                         <span title="${existingProduct?.category }">${productProperties?.category }</span>
+                                                                    </td>
+                                                                    <td class="${productProperties?.glAccount?.code!=existingProduct?.glAccount?.code?'modified':'' }">
+                                                                        <span title="${existingProduct?.glAccount?.code }">${productProperties?.glAccount?.code }</span>
                                                                     </td>
                                                                     <td class="${productProperties?.description!=existingProduct?.description?'modified':'' }">
                                                                         <g:if test="${maxLength > 15 }">
@@ -159,6 +165,11 @@
                                                                         </ul>
                                                                     </td>
                                                                     <td class="${productProperties?.pricePerUnit!=existingProduct?.pricePerUnit?'modified':'' }">${productProperties?.pricePerUnit }</td>
+                                                                    <td class="${productProperties?.lotAndExpiryControl!=existingProduct?.lotAndExpiryControl?'modified':'' }">${productProperties?.lotAndExpiryControl }</td>
+                                                                    <td class="${productProperties?.coldChain!=existingProduct?.coldChain?'modified':'' }">${productProperties?.coldChain }</td>
+                                                                    <td class="${productProperties?.controlledSubstance!=existingProduct?.controlledSubstance?'modified':'' }">${productProperties?.controlledSubstance }</td>
+                                                                    <td class="${productProperties?.hazardousMaterial!=existingProduct?.hazardousMaterial?'modified':'' }">${productProperties?.hazardousMaterial }</td>
+                                                                    <td class="${productProperties?.reconditioned!=existingProduct?.reconditioned?'modified':'' }">${productProperties?.reconditioned }</td>
                                                                     <td class="${productProperties?.manufacturer!=existingProduct?.manufacturer?'modified':'' }">${productProperties?.manufacturer }</td>
                                                                     <td class="${productProperties?.brandName!=existingProduct?.brandName?'modified':'' }">${productProperties?.brandName }</td>
                                                                     <td class="${productProperties?.manufacturerCode!=existingProduct?.manufacturerCode?'modified':'' }">${productProperties?.manufacturerCode }</td>
@@ -166,7 +177,6 @@
                                                                     <td class="${productProperties?.vendor!=existingProduct?.vendor?'modified':'' }">${productProperties?.vendor }</td>
                                                                     <td class="${productProperties?.vendorCode!=existingProduct?.vendorCode?'modified':'' }">${productProperties?.vendorCode }</td>
                                                                     <td class="${productProperties?.vendorName!=existingProduct?.vendorName?'modified':'' }">${productProperties?.vendorName }</td>
-                                                                    <td class="${productProperties?.coldChain!=existingProduct?.coldChain?'modified':'' }">${productProperties?.coldChain }</td>
                                                                     <td class="${productProperties?.upc!=existingProduct?.upc?'modified':'' }">${productProperties?.upc }</td>
                                                                     <td class="${productProperties?.ndc!=existingProduct?.ndc?'modified':'' }">${productProperties?.ndc }</td>
                                                                     <td class="fade">${productProperties?.product?.dateCreated }</td>

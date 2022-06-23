@@ -1,0 +1,90 @@
+.zoneTable {
+  width: 100%;
+  border: none;
+  margin-top: 15px;
+  .header {
+    font-weight: bold;
+    border: none !important;
+    padding: 15px !important;
+  }
+  .text-align-left {
+    text-align: left;
+  }
+  .cell {
+    display: flex;
+    align-self: center;
+    border: none !important;
+    padding: 10px;
+  }
+  .action-cell {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    border: none !important;
+    padding: 10px;
+    .action-icons {
+      padding: 10px;
+      font-size: 1.5rem;
+      color: #0d95d3;
+      border: none;
+      background-color: transparent;
+      outline: none;
+    }
+  }
+  .active-circle {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    .green-circle {
+      color: green;
+    }
+    .grey-circle {
+      opacity: .5;
+    }
+  }
+  .pagination-bottom > div {
+    justify-content: flex-end;
+    .-previous {
+      flex: none;
+    }
+    .-center {
+      flex: none;
+      .-pageJump {
+        height: 80%;
+      }
+    }
+    .-next {
+      flex: none;
+    }
+    .-btn {
+      height: 100% !important;
+      background-color: #ffffff;
+    }
+  }
+}
+
+.zone-subtitle {
+  flex-direction: column;
+  align-items: flex-start !important;
+}
+
+.add-zonebin-btn {
+  background-color: #a2d3e8 !important;
+  color: #076fce !important;
+  font-weight: bold !important;
+  border: none !important;
+}
+
+.icon-pointer {
+  cursor: pointer;
+}
+
+.bin-buttons {
+  margin-top: 18px;
+  gap: 3px;
+}
+
+.ReactModal__Body--open {
+  overflow-y: hidden;
+}

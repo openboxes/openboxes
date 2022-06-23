@@ -34,21 +34,17 @@ class StockMovementApiController {
     def list = {
         int max = Math.min(params.max ? params.int('max') : 10, 1000)
         int offset = params.offset ? params.int("offset") : 0
-        def stockMovements = params.direction == "INBOUND" ?
-                stockMovementService.getInboundStockMovements(max, offset) :
-                stockMovementService.getOutboundStockMovements(max, offset)
+        String orderBy = params.orderBy ?: "requisition.dateRequested"
+        StockMovementDirection stockMovementDirection = params.direction ? params.direction as StockMovementDirection : null
+        Location destination = params.destination ? Location.get(params.destination) : null
 
-        stockMovements = stockMovements.collect { StockMovement stockMovement ->
-            Map json = stockMovement.toJson()
-            def excludes = params.list("exclude")
-            if (excludes) {
-                excludes.each { exclude ->
-                    json.remove(exclude)
-                }
-            }
-            return json
-        }
-        render([data: stockMovements] as JSON)
+        StockMovement stockMovement = new StockMovement()
+        stockMovement.stockMovementDirection = stockMovementDirection
+        stockMovement.destination = destination
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, orderBy: orderBy ])
+
+        render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }
 
     def read = {
@@ -77,11 +73,7 @@ class StockMovementApiController {
     def create = { StockMovement stockMovement ->
         // Detect whether inbound or outbound stock movement
         def currentLocation = Location.get(session.warehouse.id)
-        StockMovementType stockMovementType = stockMovement.origin.equals(currentLocation) ?
-                StockMovementType.OUTBOUND : stockMovement.destination.equals(currentLocation) ?
-                        StockMovementType.INBOUND : null
 
-        stockMovement.stockMovementType = stockMovementType
         stockMovement.requestType = params.requestType
         stockMovement.sourceType = params.sourceType as RequisitionSourceType
         StockMovement newStockMovement = stockMovementService.createStockMovement(stockMovement)
@@ -329,6 +321,19 @@ class StockMovementApiController {
         }
 
         render([data: "Data will be imported successfully"] as JSON)
+    }
+
+    def getPendingRequisitionDetails = {
+        Location origin = Location.get(params.origin.id)
+        Product product = Product.get(params.product.id)
+        def stockMovementId = params.stockMovementId
+
+        if (!origin || !product) {
+            throw new IllegalArgumentException("Both origin location and product are required!")
+        }
+
+        def pendingRequisitionDetails = stockMovementService.getPendingRequisitionDetails(origin, product, stockMovementId)
+        render([data: pendingRequisitionDetails] as JSON)
     }
 
     /**

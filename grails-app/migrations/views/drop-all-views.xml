@@ -37,6 +37,7 @@
       DROP VIEW IF EXISTS stocklist_item_list;
       DROP VIEW IF EXISTS substitution_item;
       DROP VIEW IF EXISTS supplier;
+      DROP VIEW IF EXISTS stock_movement;
     </sql>
   </changeSet>
 </databaseChangeLog>

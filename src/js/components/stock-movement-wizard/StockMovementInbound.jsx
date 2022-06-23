@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import CreateStockMovement from './inbound/CreateStockMovement';
-import AddItemsPage from './inbound/AddItemsPage';
-import SendMovementPage from './inbound/SendMovementPage';
-import Wizard from '../wizard/Wizard';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import AddItemsPage from 'components/stock-movement-wizard/inbound/AddItemsPage';
+import CreateStockMovement from 'components/stock-movement-wizard/inbound/CreateStockMovement';
+import SendMovementPage from 'components/stock-movement-wizard/inbound/SendMovementPage';
+import Wizard from 'components/wizard/Wizard';
+import apiClient from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import './StockMovement.scss';
+import 'components/stock-movement-wizard/StockMovement.scss';
 
 // TODO: Cleanup not required code
 // TODO: Revise docs

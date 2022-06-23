@@ -160,15 +160,16 @@
                                                     ${(productInstance.active) ? g.message(code:"default.active.label") : g.message(code:"default.inactive.label")}
                                                 </td>
                                                 <td align="center">
-                                                    <g:link action="edit" id="${productInstance.id}">
+                                                    <g:link controller="inventoryItem" action="showStockCard" id="${productInstance?.id}">
                                                         ${productInstance.productCode}
                                                     </g:link>
                                                 </td>
                                                 <td align="center">
-                                                    <g:link action="edit" id="${productInstance.id}">
+                                                    <g:link controller="inventoryItem" action="showStockCard" id="${productInstance?.id}">
                                                         <format:product product="${productInstance}"/>
                                                     </g:link>
                                                 </td>
+
                                                 <td align="center">
                                                     <format:category category="${productInstance?.category }"/>
                                                 </td>

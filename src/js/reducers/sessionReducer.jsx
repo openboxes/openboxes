@@ -1,16 +1,16 @@
 import _ from 'lodash';
 
 import {
-  FETCH_SESSION_INFO,
-  CHANGE_CURRENT_LOCATION,
-  TRANSLATIONS_FETCHED,
   CHANGE_CURRENT_LOCALE,
+  CHANGE_CURRENT_LOCATION,
+  FETCH_BREADCRUMBS_CONFIG,
   FETCH_MENU_CONFIG,
+  FETCH_SESSION_INFO,
   TOGGLE_LOCATION_CHOOSER,
   TOGGLE_USER_ACTION_MENU,
+  TRANSLATIONS_FETCHED,
   UPDATE_BREADCRUMBS_PARAMS,
-  FETCH_BREADCRUMBS_CONFIG,
-} from '../actions/types';
+} from 'actions/types';
 
 const initialState = {
   currentLocation: {
@@ -37,6 +37,9 @@ const initialState = {
     stockTransfer: false,
     replenishment: false,
     outboundReturns: false,
+    inboundReturns: false,
+    productsConfiguration: false,
+    locationsConfiguration: false,
   },
   searchConfig: {
     debounceTime: 500,
@@ -70,6 +73,8 @@ const initialState = {
   breadcrumbsParams: [],
   breadcrumbsConfig: [],
   currencyCode: '',
+  localizedHelpScoutKey: '',
+  isHelpScoutEnabled: false,
 };
 
 export default function (state = initialState, action) {
@@ -102,6 +107,8 @@ export default function (state = initialState, action) {
         logoUrl: _.get(action, 'payload.data.data.logoUrl'),
         supportedLocales: _.get(action, 'payload.data.data.supportedLocales'),
         currencyCode: _.get(action, 'payload.data.data.currencyCode'),
+        localizedHelpScoutKey: _.get(action, 'payload.data.data.localizedHelpScoutKey'),
+        isHelpScoutEnabled: _.get(action, 'payload.data.data.isHelpScoutEnabled'),
       };
     case FETCH_MENU_CONFIG:
       return {

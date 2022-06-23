@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import Modal from 'react-modal';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import Modal from 'react-modal';
 
-import { renderFormField } from '../../utils/form-utils';
-import Translate from '../../utils/Translate';
+import { renderFormField } from 'utils/form-utils';
+import Translate from 'utils/Translate';
+
 
 class ModalWrapper extends Component {
   constructor(props) {
@@ -49,7 +51,14 @@ class ModalWrapper extends Component {
           disabled={this.props.btnOpenDisabled}
           onClick={() => this.openModal()}
         >
-          <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
+          {
+            this.props.btnOpenIcon &&
+            <i className={`fa ${this.props.btnOpenIcon} mr-1`} aria-hidden="true" />
+          }
+          {
+            this.props.btnOpenText && !this.props.btnOpenAsIcon &&
+            <Translate id={this.props.btnOpenText} defaultMessage={this.props.btnOpenDefaultText} />
+          }
         </button>
         <Modal
           isOpen={this.props.showModal || this.state.showModal}
@@ -94,17 +103,6 @@ class ModalWrapper extends Component {
                       style={this.props.btnContainerStyle}
                     >
                       <button
-                        type="submit"
-                        className={this.props.btnSaveClassName}
-                        style={this.props.btnSaveStyle}
-                        disabled={this.props.btnSaveDisabled}
-                      >
-                        <Translate
-                          id={this.props.btnSaveText}
-                          defaultMessage={this.props.btnSaveDefaultText}
-                        />
-                      </button>
-                      <button
                         type="button"
                         className={this.props.btnCancelClassName}
                         style={this.props.btnCancelStyle}
@@ -113,6 +111,17 @@ class ModalWrapper extends Component {
                         <Translate
                           id={this.props.btnCancelText}
                           defaultMessage={this.props.btnCancelDefaultText}
+                        />
+                      </button>
+                      <button
+                        type="submit"
+                        className={this.props.btnSaveClassName}
+                        style={this.props.btnSaveStyle}
+                        disabled={this.props.btnSaveDisabled}
+                      >
+                        <Translate
+                          id={this.props.btnSaveText}
+                          defaultMessage={this.props.btnSaveDefaultText}
                         />
                       </button>
                     </div>
@@ -136,6 +145,8 @@ ModalWrapper.propTypes = {
   btnOpenClassName: PropTypes.string,
   btnOpenStyle: PropTypes.shape({}),
   btnOpenDisabled: PropTypes.bool,
+  btnOpenAsIcon: PropTypes.bool,
+  btnOpenIcon: PropTypes.string,
 
   /** Modal title property */
   title: PropTypes.oneOfType([
@@ -189,6 +200,8 @@ ModalWrapper.defaultProps = {
   btnOpenClassName: 'btn btn-outline-primary',
   btnOpenStyle: {},
   btnOpenDisabled: false,
+  btnOpenAsIcon: false,
+  btnOpenIcon: '',
 
   children: null,
   bodyContainerClassName: 'modal-body-container',

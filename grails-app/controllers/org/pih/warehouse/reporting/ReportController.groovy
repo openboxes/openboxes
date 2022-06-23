@@ -11,12 +11,12 @@ package org.pih.warehouse.reporting
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
@@ -27,6 +27,10 @@ import org.pih.warehouse.report.MultiLocationInventoryReportCommand
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
+
+import java.math.RoundingMode
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class ReportController {
 
@@ -479,16 +483,17 @@ class ReportController {
                     "Estimated Goods Ready Date" { it.estimatedGoodsReadyDate }
                     "Shipment Number" { it.shipmentNumber }
                     "Ship Date" { it.shipDate }
+                    "Expected Delivery Date" { it.expectedDeliveryDate }
                     "Shipment Type" { it.shipmentType }
                 })
 
                 items.sort { a,b ->
-                    a.product.productCode <=> b.product.productCode
+                    a.product?.productCode <=> b.product?.productCode
                 }.each {
                     def isOrderItem = it instanceof OrderItem
                     csv << [
-                            productCode  : it.product.productCode,
-                            productName  : it.product.name,
+                            productCode  : it.product?.productCode,
+                            productName  : it.product?.name,
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
@@ -499,6 +504,7 @@ class ReportController {
                             estimatedGoodsReadyDate  : isOrderItem ? it.actualReadyDate?.format("MM/dd/yyyy") : '',
                             shipmentNumber  : isOrderItem ? '' : it.shipment.shipmentNumber,
                             shipDate  : isOrderItem ? '' : it.shipment.expectedShippingDate?.format("MM/dd/yyyy"),
+                            expectedDeliveryDate  : isOrderItem ? '' : it.shipment.expectedDeliveryDate?.format("MM/dd/yyyy"),
                             shipmentType  : isOrderItem ? '' : it.shipment.shipmentType.name
                     ]
                 }
@@ -652,4 +658,77 @@ class ReportController {
         render(view: "showCycleCountReport", model: [rows: rows])
     }
 
+    def showForecastReport = {
+        def origin = Location.get(session.warehouse.id)
+        params.origin = origin.name
+
+        // Export as XLS
+        if (params.format == "text/csv" && params.print) {
+            params.originId = session.warehouse.id
+            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            if (params.startDate && params.endDate) {
+                params.startDate = dateFormat.parse(params.startDate)
+                params.endDate = dateFormat.parse(params.endDate)
+            } else {
+                Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
+                Date today = new Date()
+                params.startDate = today - demandPeriod
+                params.endDate = today
+            }
+            def data = reportService.getForecastReport(params)
+
+            def rows = []
+            data.collect { item ->
+                def product = Product.get(item.productId)
+                def inventoryLevel
+                if (!params.replenishmentPeriodDays || !params.leadTimeDays) {
+                    inventoryLevel = InventoryLevel.findByProduct(product)
+                }
+                Integer replenishmentPeriodDays = params.replenishmentPeriodDays ? params.replenishmentPeriodDays.toInteger() : inventoryLevel && inventoryLevel.replenishmentPeriodDays ? inventoryLevel.replenishmentPeriodDays : 365
+                Integer leadTimeDays = params.leadTimeDays ? params.leadTimeDays.toInteger() : inventoryLevel && inventoryLevel.expectedLeadTimeDays ? inventoryLevel.expectedLeadTimeDays : 365
+                def productExpiry = forecastingService.getProductExpiry(origin, replenishmentPeriodDays + leadTimeDays, item.productId)
+                def quantityOnOrder = item?.totalOnOrder ?: 0
+                def quantityOnHand = item?.totalOnHand ?: productAvailabilityService.getQuantityOnHand(product, origin)
+                def quantityExpiring = productExpiry.collect {it.quantity_on_hand}.sum() ?: 0
+                def quantityAvailable = quantityOnOrder + quantityOnHand - quantityExpiring ?: 0
+                def averageDemand = item.averageMonthlyDemand ? item.averageMonthlyDemand?.setScale(1, RoundingMode.HALF_UP) : 0
+                def monthsOfStock = ((replenishmentPeriodDays + leadTimeDays) / 30).setScale(1, RoundingMode.HALF_UP) ?: 0
+                def quantityNeeded = averageDemand * monthsOfStock ?: 0
+                def quantityToOrder = BigDecimal.ZERO.max(quantityNeeded - quantityAvailable)
+                def unitPrice = product?.pricePerUnit ?: 0
+
+                def printRow = [
+                        'Product code'                    : product.productCode ?: '',
+                        'Name'                            : product.name,
+                        'Order Period (Days)'             : replenishmentPeriodDays,
+                        'Lead Time (Days)'                : leadTimeDays,
+                        'Qty On Order'                    : quantityOnOrder,
+                        'Qty On Hand'                     : quantityOnHand,
+                        'Qty Expiring within time period' : quantityExpiring,
+                        'Qty Available'                   : quantityAvailable,
+                        'Average Demand/Month'            : averageDemand,
+                        'Months of Stock Needed (order period + lead time in months)'  : monthsOfStock,
+                        'Qty Needed'                      : quantityNeeded,
+                        'Qty to Order'                    : quantityToOrder,
+                        'Estimated Cost'                  : unitPrice * quantityToOrder,
+                ]
+
+                rows << printRow
+            }
+
+            rows.sort { it["Product code"] }
+            if (rows.size() > 0) {
+                def filename = "ForecastReport-${new Date().format("dd MMM yyyy hhmmss")}"
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
+                documentService.generateExcel(response.outputStream, rows)
+                response.outputStream.flush()
+            } else {
+                log.info("Unable to generate forecast report due to lack of data")
+                flash.message = "Unable to generate forecast report due to lack of data"
+            }
+        }
+
+        render(view: 'showForecastReport', params: params)
+    }
 }

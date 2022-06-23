@@ -1,11 +1,12 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
 import { Field } from 'react-final-form';
 import { Tooltip } from 'react-tippy';
 
-import 'react-tippy/dist/tippy.css';
+import Translate from 'utils/Translate';
 
-import Translate from '../../utils/Translate';
+import 'react-tippy/dist/tippy.css';
 
 const LabelField = (props) => {
   const {
@@ -17,9 +18,9 @@ const LabelField = (props) => {
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
   const {
-    formatValue, tooltipValue, showValueTooltip, url, ...otherAttr
+    formatValue, tooltipValue, showValueTooltip, url, numberField, ...otherAttr
   } = attr;
-  const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''}`;
+  const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''} ${numberField ? 'text-right mr-2' : ''}`;
 
   if (otherAttr.cellClassName) {
     delete otherAttr.cellClassName;
@@ -53,10 +54,11 @@ const LabelField = (props) => {
         <Tooltip
           html={tooltipValue || (<div className="text-truncate">{formattedValue}</div>)}
           disabled={!showValueTooltip}
-          theme="transparent"
+          theme="dark"
           delay="150"
           duration="250"
           hideDelay="50"
+          arrow
         >
           {url ?
             <div {...otherAttr} className={`font-size-xs ${className}`}>
@@ -96,9 +98,11 @@ LabelField.propTypes = {
   arrayField: PropTypes.bool,
   fieldValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
+  numberField: PropTypes.bool,
 };
 
 LabelField.defaultProps = {
   arrayField: false,
   fieldValue: null,
+  numberField: false,
 };

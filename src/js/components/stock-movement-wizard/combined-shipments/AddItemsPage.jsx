@@ -1,31 +1,33 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
-import Alert from 'react-s-alert';
-import { confirmAlert } from 'react-confirm-alert';
-import { getTranslate } from 'react-localize-redux';
-import moment from 'moment';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
+import _ from 'lodash';
+import moment from 'moment';
+import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import Alert from 'react-s-alert';
+
+import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import ButtonField from 'components/form-elements/ButtonField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
+import AlertMessage from 'utils/AlertMessage';
+import apiClient from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import { debounceProductsFetch } from 'utils/option-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../../form-elements/TextField';
-import SelectField from '../../form-elements/SelectField';
-import ArrayField from '../../form-elements/ArrayField';
-import ButtonField from '../../form-elements/ButtonField';
-import LabelField from '../../form-elements/LabelField';
-import DateField from '../../form-elements/DateField';
-import { renderFormField } from '../../../utils/form-utils';
-import { showSpinner, hideSpinner, fetchUsers } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-import AlertMessage from '../../../utils/AlertMessage';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import { debounceProductsFetch } from '../../../utils/option-utils';
-import CombinedShipmentItemsModal from '../modals/CombinedShipmentItemsModal';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -117,21 +119,28 @@ const FIELDS = {
           loadOptions: debouncedProductsFetch,
         }),
       },
-      recipient: {
-        type: SelectField,
-        label: 'react.stockMovement.recipient.label',
-        defaultMessage: 'Recipient',
-        flexWidth: '1.5',
-        getDynamicAttr: ({
-          recipients, rowIndex, values, updateRow,
-        }) => ({
-          options: recipients,
+      lotNumber: {
+        type: TextField,
+        label: 'react.stockMovement.lot.label',
+        defaultMessage: 'Lot',
+        flexWidth: '1',
+        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
           onBlur: () => updateRow(values, rowIndex),
         }),
+      },
+      expirationDate: {
+        type: DateField,
+        label: 'react.stockMovement.expiry.label',
+        defaultMessage: 'Expiry',
+        flexWidth: '1.5',
         attributes: {
-          labelKey: 'name',
-          openOnClick: false,
+          dateFormat: 'MM/DD/YYYY',
+          autoComplete: 'off',
+          placeholderText: 'MM/DD/YYYY',
         },
+        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
+          onBlur: () => updateRow(values, rowIndex),
+        }),
       },
       quantityRequested: {
         type: TextField,
@@ -168,28 +177,21 @@ const FIELDS = {
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
-      lotNumber: {
-        type: TextField,
-        label: 'react.stockMovement.lot.label',
-        defaultMessage: 'Lot',
-        flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
-        }),
-      },
-      expirationDate: {
-        type: DateField,
-        label: 'react.stockMovement.expiry.label',
-        defaultMessage: 'Expiry',
+      recipient: {
+        type: SelectField,
+        label: 'react.stockMovement.recipient.label',
+        defaultMessage: 'Recipient',
         flexWidth: '1.5',
-        attributes: {
-          dateFormat: 'MM/DD/YYYY',
-          autoComplete: 'off',
-          placeholderText: 'MM/DD/YYYY',
-        },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
+        getDynamicAttr: ({
+          recipients, rowIndex, values, updateRow,
+        }) => ({
+          options: recipients,
           onBlur: () => updateRow(values, rowIndex),
         }),
+        attributes: {
+          labelKey: 'name',
+          openOnClick: false,
+        },
       },
       split: {
         type: ButtonField,
@@ -692,11 +694,14 @@ class AddItemsPage extends Component {
    */
   save(formValues) {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-
-    if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveItems(lineItems));
+    if (lineItems.length > 0) {
+      if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
+        this.confirmSave(() => this.saveItems(lineItems));
+      } else {
+        this.saveItems(lineItems);
+      }
     } else {
-      this.saveItems(lineItems);
+      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
     }
   }
 
@@ -706,29 +711,35 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndExit(formValues) {
-    const errors = this.validate(formValues).lineItems;
-    if (!errors.length) {
-      this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
-        .then(() => {
-          window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+    if (formValues.lineItems.length > 0) {
+      const errors = this.validate(formValues).lineItems;
+      if (!errors.length) {
+        this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
+          .then(() => {
+            window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+          });
+      } else {
+        confirmAlert({
+          title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
+          message: this.props.translate(
+            'react.stockMovement.confirmExit.message',
+            'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+          ),
+          buttons: [
+            {
+              label: this.props.translate('react.default.yes.label', 'Yes'),
+              onClick: () => {
+                window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;
+              },
+            },
+            {
+              label: this.props.translate('react.default.no.label', 'No'),
+            },
+          ],
         });
+      }
     } else {
-      confirmAlert({
-        title: this.props.translate('react.stockMovement.confirmExit.label', 'Confirm save'),
-        message: this.props.translate(
-          'react.stockMovement.confirmExit.message',
-          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-        ),
-        buttons: [
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`; },
-          },
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-          },
-        ],
-      });
+      Alert.error(this.props.translate('react.stockMovement.error.noShipmentItems.label', 'Cannot save shipment from PO with no items.'), { timeout: 2000 });
     }
   }
 

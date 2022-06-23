@@ -108,16 +108,17 @@ class StockTransfer {
                 "destination.id"    : destination?.id,
                 "destination.name"  : destination?.name,
                 stockTransferItems  : stockTransferItems.sort { a, b ->
-                    a.product?.productCode <=> b.product?.productCode ?:
-                        a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber ?:
-                            a.originBinLocation?.zone?.name <=> b.originBinLocation?.zone?.name ?:
-                                a.originBinLocation?.name <=> b.originBinLocation?.name
+                    a.orderIndex <=> b.orderIndex ?:
+                        a.product?.productCode <=> b.product?.productCode ?:
+                            a.inventoryItem?.lotNumber <=> b.inventoryItem?.lotNumber ?:
+                                a.originBinLocation?.zone?.name <=> b.originBinLocation?.zone?.name ?:
+                                    a.originBinLocation?.name <=> b.originBinLocation?.name
                 }.collect { it?.toJson() },
                 orderedBy           : orderedBy?.name,
                 type                : type?.code,
                 dateShipped         : dateShipped?.format("MM/dd/yyyy") ?: "",
                 expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy") ?: "",
-                shipmentType        : shipmentType?.id ?: "",
+                shipmentType        : shipmentType ?: "",
                 trackingNumber      : trackingNumber ?: "",
                 driverName          : driverName ?: "",
                 comments            : comments ?: "",

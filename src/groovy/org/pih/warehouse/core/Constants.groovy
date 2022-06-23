@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat
 class Constants {
 
 
+    static final String DEFAULT = "DEFAULT"
+
     static final controllersWithAuthUserNotRequired = ['api', 'test']
     static final actionsWithAuthUserNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale']
     static final actionsWithLocationNotRequired = ['test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'chooseLocation', 'json', 'updateAuthUserLocale']
@@ -31,11 +33,13 @@ class Constants {
     static final String SHORT_MONTH_YEAR_DATE_FORMAT = "MM/yyyy"
     static final String EXPIRATION_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
+    static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
 
 
     static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT)
     static final DateFormat EXPIRATION_DATE_FORMATTER = new SimpleDateFormat(EXPIRATION_DATE_FORMAT)
     static final DateFormat DELIVERY_DATE_FORMATTER = new SimpleDateFormat(DELIVERY_DATE_FORMAT)
+    static final DateFormat EUROPEAN_DATE_FORMATTER = new SimpleDateFormat(EUROPEAN_DATE_FORMAT)
 
     // Dimension date formats
     static DateFormat weekFormat = new SimpleDateFormat("w")
@@ -60,7 +64,7 @@ class Constants {
 
     static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 
-    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "Name", "Category", "Description", "UnitOfMeasure", "Tags", "UnitCost", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "ColdChain", "UPC", "NDC", "Created", "Updated"]
+    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
@@ -120,6 +124,7 @@ class Constants {
     static final String DEFAULT_PO_SEQUENCE_NUMBER_FORMAT = "000000"
     static final String DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR = "0"
     static final String DEFAULT_INVOICE_NUMBER_FORMAT = "NNNLLL"
+    static final String DEFAULT_LOCATION_NUMBER_FORMAT = "NNNLLL"
 
     static final String TRACKING_NUMBER_TYPE_ID = "10"
     static final String VENDOR_INVOICE_NUMBER_TYPE_ID = "VENDOR_INVOICE_NUMBER"
@@ -133,5 +138,13 @@ class Constants {
     static final String DEFAULT_BIN_LOCATION_NAME = "DEFAULT" // default product availability bin location name
 
     static final String PUTAWAY_ORDER = "PUTAWAY_ORDER"
-    static final String OUTBOUND_RETURNS = "OUTBOUND_RETURNS"
+    static final String RETURN_ORDER = "RETURN_ORDER"
+
+    // Products and categories configuration wizard
+    static final String ROOT_CATEGORY_NAME = "ROOT"
+
+    static final String DEFAULT_ORGANIZATION_CODE = "ORG"
+
+    // Order number prefix for bin replenishment case
+    static final String REPLENISHMENT_PREFIX = "R-"
 }

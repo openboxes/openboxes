@@ -674,7 +674,6 @@ class ProductController {
         }
     }
 
-
     def upnDatabase = {
 
         def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
@@ -1107,19 +1106,6 @@ class ProductController {
 
         render template: "productCatalogs", model: [productInstance: product]
     }
-
-    def removeFromProductAssociations = {
-        String productId
-        def productAssociation = ProductAssociation.get(params.id)
-        if (productAssociation) {
-            productId = productAssociation.product.id
-            productAssociation.delete()
-            redirect(action: "productSubstitutions", id: productId)
-        } else {
-            response.status = 404
-        }
-    }
-
 
     def createProductSnapshot = {
 

@@ -79,7 +79,14 @@
   <changeSet id="1580848680306-26" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/requirement.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-27" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
+  <!-- should this fail, ReportService.refreshProductDemandData() rebuilds this migration's tables anyway -->
+  <changeSet id="1580848680306-27" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="false">
     <sqlFile path="views/product-expiry-summary.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-28" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/stock-movement.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-29" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/stock-movement-list-item.sql"/>
   </changeSet>
 </databaseChangeLog>

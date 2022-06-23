@@ -12,7 +12,8 @@ class Requirement implements Serializable {
     Integer minQuantity
     Integer maxQuantity
     Integer reorderQuantity
-    Integer totalQuantityOnHand // Total QoH for this product in Depot
+    Integer totalQuantityAvailableToPromise // Total QATP for this product in Depot
+    Integer quantityAvailable // quantityAvailable = quantity available to replenish = total qatp - qatp in bin
     InventoryLevelStatus status
 
     static mapping = {
@@ -30,24 +31,33 @@ class Requirement implements Serializable {
         minQuantity(nullable: true)
         maxQuantity(nullable: true)
         reorderQuantity(nullable: true)
-        totalQuantityOnHand(nullable: true)
+        totalQuantityAvailableToPromise(nullable: true)
+        quantityAvailable(nullable: true)
         status(nullable: true)
     }
 
+
+    def getQuantityNeeded() {
+        def qtyNeeded = getQuantityAvailable() > maxQuantity - quantityInBin ? maxQuantity - quantityInBin : getQuantityAvailable()
+        return qtyNeeded > 0 ? qtyNeeded : 0
+    }
+
+    static transients = ['quantityNeeded']
+
     Map toJson() {
         return [
-            id                      : id,
-            "product.id"            : product?.id,
-            "product.productCode"   : product?.productCode,
-            "product.name"          : product?.name,
-            "binLocation.id"        : binLocation?.id,
-            "binLocation.name"      : binLocation?.name,
-            "zone"                  : binLocation?.zone?.name,
-            quantityInBin           : quantityInBin,
-            minQuantity             : minQuantity,
-            maxQuantity             : maxQuantity,
-            totalQuantityOnHand     : totalQuantityOnHand,
-            quantityNeeded          : maxQuantity - quantityInBin > 0 ? maxQuantity - quantityInBin : 0,
+            id                                  : id,
+            "product.id"                        : product?.id,
+            "product.productCode"               : product?.productCode,
+            "product.name"                      : product?.name,
+            "binLocation.id"                    : binLocation?.id,
+            "binLocation.name"                  : binLocation?.name,
+            "zone"                              : binLocation?.zone?.name,
+            quantityInBin                       : quantityInBin,
+            minQuantity                         : minQuantity,
+            maxQuantity                         : maxQuantity,
+            quantityNeeded                      : quantityNeeded,
+            quantityAvailable                   : quantityAvailable
         ]
     }
 }

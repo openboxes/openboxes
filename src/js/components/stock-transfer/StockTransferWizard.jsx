@@ -1,25 +1,27 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
-import CreateStockTransfer from './CreateStockTransfer';
-import StockTransferSecondPage from './StockTransferSecondPage';
-import StockTransferCheckPage from './StockTransferCheckPage';
-import Wizard from '../wizard/Wizard';
-import apiClient, { parseResponse } from '../../utils/apiClient';
 import {
-  showSpinner,
-  hideSpinner,
-  fetchTranslations,
-  updateBreadcrumbs,
   fetchBreadcrumbsConfig,
-} from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+  fetchTranslations,
+  hideSpinner,
+  showSpinner,
+  updateBreadcrumbs,
+} from 'actions';
+import CreateStockTransfer from 'components/stock-transfer/CreateStockTransfer';
+import StockTransferCheckPage from 'components/stock-transfer/StockTransferCheckPage';
+import StockTransferSecondPage from 'components/stock-transfer/StockTransferSecondPage';
+import Wizard from 'components/wizard/Wizard';
+import apiClient, { parseResponse } from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import './StockTransfer.scss';
+import 'components/stock-transfer/StockTransfer.scss';
+
 
 /** Main stock transfer form's wizard component. */
 class StockTransferWizard extends Component {

@@ -1061,7 +1061,7 @@ class JsonController {
         items.addAll(products)
         items.unique { it.id }
         def json = items.collect { Product product ->
-            def quantity = quantityMap[product] ?: 0
+            def quantity = quantityMap[product.id] ?: 0
 
             if (product.productType) {
                 if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
@@ -1388,8 +1388,8 @@ class JsonController {
         def data = items.collect {
             def isOrderItem = it instanceof OrderItem
             [
-                    productCode  : it.product.productCode,
-                    productName  : it.product.name,
+                    productCode  : it.product?.productCode,
+                    productName  : it.product?.name,
                     qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                     qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                     orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
@@ -1739,7 +1739,7 @@ class JsonController {
     def getForecastingData = {
         Product product = Product.get(params.product.id)
         Location location = Location.get(params.location.id)
-        def demandData = forecastingService.getDemand(location, product)
+        def demandData = forecastingService.getDemand(location, null, product)
         render demandData as JSON
     }
 

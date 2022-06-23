@@ -12,12 +12,9 @@ package util
 import liquibase.DatabaseChangeLogLock
 import liquibase.database.DatabaseFactory
 import liquibase.lock.LockHandler
-import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 class LiquibaseUtil {
-
-    private static final log = LogFactory.getLog(this)
 
     static getDatabase() {
         def ctx = ApplicationHolder.getApplication().getMainContext()

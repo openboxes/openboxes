@@ -16,6 +16,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
 
+import java.math.RoundingMode
 import java.sql.Timestamp
 import java.text.DateFormatSymbols
 import java.text.NumberFormat
@@ -28,8 +29,7 @@ class ForecastingService {
     def grailsApplication
     def productAvailabilityService
 
-    def getDemand(Location origin, Product product) {
-
+    def getDemand(Location origin, Location destination, Product product) {
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
         if (forecastingEnabled) {
@@ -38,36 +38,38 @@ class ForecastingService {
                 defaultDateRange.startDate = defaultDateRange.endDate - demandPeriod.days
             }
 
-            def rows = getDemandDetails(origin, product, defaultDateRange.startDate, defaultDateRange.endDate)
+            def rows = getDemandDetails(origin, destination, product, defaultDateRange.startDate, defaultDateRange.endDate)
             def totalDemand = rows.sum { it.quantity_demand } ?: 0
             def dailyDemand = (totalDemand && demandPeriod) ? (totalDemand / demandPeriod) : 0
             def monthlyDemand = totalDemand / Math.floor((demandPeriod / 30))
             def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, origin)
             def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
-
             return [
-                    totalDemand  : totalDemand,
-                    totalDays    : demandPeriod,
-                    dailyDemand  : dailyDemand,
-                    monthlyDemand: "${NumberFormat.getIntegerInstance().format(monthlyDemand)}",
-                    onHandMonths : onHandMonths
+                totalDemand  : totalDemand,
+                totalDays    : demandPeriod,
+                dailyDemand  : dailyDemand,
+                monthlyDemand: new BigDecimal(monthlyDemand).setScale(0, RoundingMode.HALF_UP),
+                onHandMonths : onHandMonths
             ]
         }
+        return [:]
     }
 
     def getDemandDetails(Location origin, Product product) {
         Date today = new Date()
         Integer demandPeriod = grailsApplication.config.openboxes.forecasting.demandPeriod ?: 365
-        return getDemandDetails(origin, product, today - demandPeriod, today)
+        return getDemandDetails(origin, null, product, today - demandPeriod, today)
     }
 
-    def getDemandDetails(Location origin, Product product, Date startDate, Date endDate) {
+    def getDemandDetails(Location origin, Location destination, Product product, Date startDate, Date endDate) {
         List data = []
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             Map params = [startDate: startDate, endDate: endDate]
             String query = """
                 select 
+                    request_id,
+                    request_item_id,
                     request_status,
                     request_number,
                     DATE_FORMAT(date_issued, '%b %Y') as month_year,
@@ -97,6 +99,10 @@ class ForecastingService {
                 query += " AND origin_id = :originId"
                 params << [originId: origin.id]
             }
+            if (destination) {
+                query += " AND destination_id = :destinationId"
+                params << [destinationId: destination.id]
+            }
 
             Sql sql = new Sql(dataSource)
             try {
@@ -108,46 +114,6 @@ class ForecastingService {
         }
         return data
     }
-
-    def getDemandDetailsForDemandTab(Location origin, Location destination, Product product, Date startDate, Date endDate) {
-        List data = []
-        Map params = [startDate: startDate, endDate: endDate, productId: product.id, originId: origin.id]
-        String query = """
-            select 
-                request_id,
-                request_item_id,
-                request_status,
-                request_number,
-                date_requested,
-                date_issued,
-                origin_name,
-                destination_name,
-                product_code,
-                product_name,
-                quantity_requested,
-                quantity_picked,
-                quantity_demand,
-                reason_code_classification
-            FROM product_demand_details
-            WHERE date_issued BETWEEN :startDate AND :endDate
-            AND product_id = :productId
-            AND origin_id = :originId
-            """
-        if (destination) {
-            query += " AND destination_id = :destinationId"
-            params << [destinationId: destination.id]
-        }
-
-        Sql sql = new Sql(dataSource)
-        try {
-            data = sql.rows(query, params)
-
-        } catch (Exception e) {
-            log.error("Unable to execute query: " + e.message, e)
-        }
-        return data
-    }
-
 
     def getAvailableDestinationsForDemandDetails(Location origin, Product product, Date startDate, Date endDate) {
         List data = []
@@ -464,5 +430,28 @@ class ForecastingService {
         }
 
         return productExpirySummary
+    }
+
+    def getProductExpiry(Location location, def daysBeforeExpiration, def productId) {
+        List data = []
+        Map params = [locationId: location.id, daysBeforeExpiration: daysBeforeExpiration, productId: productId]
+        String query = """
+            SELECT 
+                product_id,
+                quantity_on_hand,
+                average_daily_demand
+            FROM product_expiry_summary
+            WHERE expiration_date < DATE_ADD(CURRENT_DATE, INTERVAL :daysBeforeExpiration DAY)
+            AND location_id = :locationId
+            AND product_id = :productId
+            """
+        Sql sql = new Sql(dataSource)
+        try {
+            data = sql.rows(query, params)
+        } catch (Exception e) {
+            log.error("Unable to execute query: " + e.message, e)
+        }
+
+        return data
     }
 }

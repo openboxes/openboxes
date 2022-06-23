@@ -28,6 +28,9 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Product
+
+import javax.xml.bind.ValidationException
 
 class ReplenishmentService {
 
@@ -41,15 +44,20 @@ class ReplenishmentService {
 
     def getRequirements(Location location, InventoryLevelStatus inventoryLevelStatus) {
         def requirements = Requirement.createCriteria().list() {
+            if (inventoryLevelStatus == InventoryLevelStatus.BELOW_MAXIMUM) {
+                'in'("status", inventoryLevelStatus.listReplenishmentOptions())
+            } else {
+                eq("status", inventoryLevelStatus)
+            }
             eq("location", location)
-            eq("status", inventoryLevelStatus)
+            isNotNull("binLocation")
+            gt("quantityAvailable", 0)
         }
 
         return requirements?.unique {[it.product, it.location, it.binLocation]}?.sort { a, b ->
-            a.product.productCode <=> b.product.productCode ?:
-                    a.binLocation.zone.name <=> b.binLocation.zone.name ?:
-                            a.binLocation.name <=> b.binLocation.name ?:
-                                    a.quantityInBin <=> b.quantityInBin
+            a.binLocation?.zone?.name?.toLowerCase() <=> b.binLocation?.zone?.name?.toLowerCase() ?:
+                a.binLocation?.name?.toLowerCase() <=> b.binLocation?.name?.toLowerCase() ?:
+                    a.product.name?.toLowerCase() <=> b.product.name?.toLowerCase()
         }
     }
 
@@ -95,6 +103,12 @@ class ReplenishmentService {
             updateOrderItem(replenishmentItem, orderItem)
         }
 
+        if (replenishment.status <= ReplenishmentStatus.PENDING) {
+            validateRequirement(replenishment)
+        } else {
+            validateReplenishment(order)
+        }
+
         order.save(failOnError: true)
         return order
     }
@@ -134,7 +148,6 @@ class ReplenishmentService {
     }
 
     Order completeReplenishment(Replenishment replenishment) {
-        validateReplenishment(replenishment)
 
         // Save the replenishment as an order
         Order order = createOrUpdateOrderFromReplenishment(replenishment)
@@ -155,37 +168,50 @@ class ReplenishmentService {
         return order
     }
 
-    void validateReplenishment(Replenishment replenishment) {
+    void validateRequirement(Replenishment replenishment) {
         replenishment.replenishmentItems.toArray().each { ReplenishmentItem replenishmentItem ->
-            validateReplenishmentItem(replenishmentItem)
+            validateRequirement(replenishment.origin, replenishmentItem)
         }
     }
 
-    void validateReplenishmentItem(ReplenishmentItem replenishmentItem) {
-        def quantity = replenishmentItem.quantity
-
-        if (replenishmentItem.picklistItems) {
-            quantity = replenishmentItem.picklistItems.sum { it.quantity }
+    void validateRequirement(Location replenishingLocation, ReplenishmentItem item) {
+        def qtyAvailable = productAvailabilityService.getQuantityAvailableToPromiseByProductNotInBin(replenishingLocation, item.binLocation, item.product)
+        if (item.quantity > qtyAvailable) {
+            throw new ValidationException("There is not available that quantity of the product with id: ${item.product.id}")
         }
-
-        validateQuantityAvailable(replenishmentItem.replenishmentLocation, replenishmentItem.inventoryItem, quantity)
     }
 
-    void validateQuantityAvailable(Location replenishmentLocation, InventoryItem inventoryItem, BigDecimal quantity) {
+    void validateReplenishment(Order order) {
+        order.orderItems.each { OrderItem orderItem ->
+            validateReplenishmentItem(order.origin, orderItem)
+        }
+    }
 
-        if (!replenishmentLocation) {
+    void validateReplenishmentItem(Location replenishingLocation, OrderItem orderItem) {
+        if (orderItem.picklistItems) {
+            orderItem.picklistItems.toArray().each { PicklistItem picklistItem ->
+                validateQuantityAvailable(replenishingLocation, picklistItem, picklistItem.quantity)
+            }
+        }
+    }
+
+    void validateQuantityAvailable(Location replenishingLocation, PicklistItem picklistItem, Integer quantityPicked) {
+        if (!replenishingLocation) {
             throw new IllegalArgumentException("Location is required")
         }
 
-        Integer quantityAvailable = productAvailabilityService.getQuantityOnHandInBinLocation(inventoryItem, replenishmentLocation)
-        log.info "Quantity: ${quantity} vs ${quantityAvailable}"
+        Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromise(
+            replenishingLocation,
+            picklistItem.binLocation,
+            picklistItem.inventoryItem,
+        )
 
-        if (quantityAvailable < 0) {
-            throw new IllegalStateException("The inventory item is no longer available at the specified location ${replenishmentLocation}")
-        }
+        Integer quantityAvailableWithPicked = quantityAvailable + quantityPicked >= 0 ? quantityAvailable + quantityPicked : 0
+        log.info "Quantity: ${quantityPicked} vs ${quantityAvailableWithPicked}"
 
-        if (quantity > quantityAvailable) {
-            throw new IllegalStateException("Quantity available ${quantityAvailable} is less than quantity to replenish ${quantity} for product ${inventoryItem.product.productCode} ${inventoryItem.product.name}")
+        def product = picklistItem.inventoryItem.product
+        if (quantityPicked > quantityAvailableWithPicked) {
+            throw new IllegalStateException("Quantity available ${quantityAvailableWithPicked} is less than quantity to replenish ${quantityPicked} for product ${product.productCode} ${product.name}")
         }
     }
 
@@ -203,7 +229,7 @@ class ReplenishmentService {
 
             // Get Picklist related data
             OrderItem orderItem = OrderItem.get(replenishmentItem.id)
-            replenishmentItem.picklistItems = picklistService.getPicklistItems(orderItem)
+            replenishmentItem.picklistItems = picklistService.getPicklistItems(orderItem).findAll{ it.quantity > 0 }
             replenishmentItem.availableItems = picklistService.getAvailableItems(replenishmentItem.location, orderItem)
             replenishmentItem.suggestedItems = picklistService.getSuggestedItems(replenishmentItem.availableItems, replenishmentItem.quantity, replenishment.origin)
         }}

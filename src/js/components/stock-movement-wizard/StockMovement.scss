@@ -26,6 +26,11 @@
     }
 }
 
+.classic-card {
+    background-color: #fff;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.15);
+}
+
 // Wizard page
 .panel-body {
     display: flex;
@@ -60,6 +65,15 @@
                 font-size: 15px;
                 margin: 0;
             }
+        }
+
+        .form-subtitle {
+            width: 100%;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px;
         }
 
         &.with-description {
@@ -100,18 +114,18 @@
                     height: 3em;
                 }
 
-                .Select {
+                .select-xs {
                     height: 3em;
 
-                    .Select-control {
+                    .react-select__control {
                         height: inherit;
 
-                        .Select-value,
-                        .Select-placeholder {
+                        .react-select__value-container,
+                        .react-select__indicators {
                             display: flex;
                             align-items: center;
 
-                            .Select-value-label {
+                            .react-select__single-value {
                                 height: fit-content;
                             }
                         }
@@ -268,7 +282,6 @@
             box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.09);
             color: grey;
             padding: 4px 8px;
-            margin-left: 1em !important;
         }
     }
 
@@ -331,3 +344,68 @@
 .footer>div:first-child {
     display: none !important;
 }
+
+.filter-input {
+    text-align: left !important;
+    width: 300px;
+    border: 1px solid #999 !important;
+}
+
+.configuration-wizard-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1.5rem 0;
+}
+
+.configuration-wizard-card {
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+    padding: 50px 0;
+    button, a {
+        width: 180px;
+    }
+}
+
+.vartical-tabs {
+    > div {
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #fff;
+        box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+        margin: 0 10px 5px 0;
+        color: #999;
+        &:hover {
+            background-color: #EEE;
+        }
+        &.active {
+            color: black;
+        }
+    }
+    i {
+        font-size: 20px;
+        color: #999;
+        &.active {
+           color: #4f87ce !important;
+        }
+    }
+
+    .tab-title-icon {
+        margin-left: 3rem;
+        margin-right: 1.5rem;
+
+        @media (max-width: 1440px) {
+            margin-left: 0.5rem !important;
+            margin-right: 0.25rem !important;
+        }
+    }
+}
+
+.vertical-tabs-content {
+    min-height: 300px;
+    background-color: #fff;
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .09);
+}
+

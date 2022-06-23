@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import ModalWrapper from '../../form-elements/ModalWrapper';
-import TextField from '../../form-elements/TextField';
-import ArrayField from '../../form-elements/ArrayField';
-import LabelField from '../../form-elements/LabelField';
-import SelectField from '../../form-elements/SelectField';
-import DateField from '../../form-elements/DateField';
-import { showSpinner, hideSpinner } from '../../../actions';
-import apiClient from '../../../utils/apiClient';
-import Translate from '../../../utils/Translate';
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import DateField from 'components/form-elements/DateField';
+import LabelField from 'components/form-elements/LabelField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import Translate from 'utils/Translate';
+
 
 const FIELDS = {
   adjustInventory: {

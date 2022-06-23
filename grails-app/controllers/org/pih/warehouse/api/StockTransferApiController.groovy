@@ -14,10 +14,15 @@ import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
 import java.text.SimpleDateFormat
@@ -25,6 +30,7 @@ import java.text.SimpleDateFormat
 class StockTransferApiController {
 
     def identifierService
+    def inventoryService
     def shipmentService
     def stockTransferService
 
@@ -80,12 +86,16 @@ class StockTransferApiController {
             throw new IllegalArgumentException("User must be logged into a location to update stock transfer")
         }
 
+        Order order = Order.get(params.id)
+        if (!order) {
+            throw new IllegalArgumentException("No stock transfer found for order ID ${params.id}")
+        }
+
         StockTransfer stockTransfer = new StockTransfer()
 
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
-        Order order
-        Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.OUTBOUND_RETURNS)
+        Boolean isReturnType = stockTransfer.type == OrderType.findByCode(Constants.RETURN_ORDER)
         if (isReturnType && (stockTransfer?.status == StockTransferStatus.PLACED)) {
             order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
             shipmentService.createOrUpdateShipment(stockTransfer)
@@ -103,6 +113,10 @@ class StockTransferApiController {
         stockTransfer = StockTransfer.createFromOrder(order)
         stockTransferService.setQuantityOnHand(stockTransfer)
         render([data: stockTransfer?.toJson()] as JSON)
+    }
+
+    Boolean isNull(Object objectValue) {
+        return objectValue == JSONObject.NULL || objectValue == null || objectValue?.equals("")
     }
 
     StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
@@ -129,7 +143,7 @@ class StockTransferApiController {
         }
 
         if (jsonObject.shipmentType) {
-            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType)
+            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType?.id)
         }
 
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
@@ -143,7 +157,18 @@ class StockTransferApiController {
 
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
             StockTransferItem stockTransferItem = new StockTransferItem()
-            bindData(stockTransferItem, stockTransferItemMap)
+            stockTransferItem.id = !isNull(stockTransferItemMap["id"]) ? stockTransferItemMap["id"] : null
+            stockTransferItem.productAvailabilityId = !isNull(stockTransferItemMap["productAvailabilityId"]) ? stockTransferItemMap["productAvailabilityId"] : null
+            stockTransferItem.product = !isNull(stockTransferItemMap["product.id"]) ? Product.load(stockTransferItemMap["product.id"]) : null
+            stockTransferItem.originBinLocation = !isNull(stockTransferItemMap["originBinLocation.id"]) ? Location.load(stockTransferItemMap["originBinLocation.id"]) : null
+            stockTransferItem.destinationBinLocation = !isNull(stockTransferItemMap["destinationBinLocation.id"]) ? Location.load(stockTransferItemMap["destinationBinLocation.id"]) : null
+            stockTransferItem.inventoryItem = !isNull(stockTransferItemMap["inventoryItem.id"]) ? InventoryItem.load(stockTransferItemMap["inventoryItem.id"]) : null
+            stockTransferItem.quantityOnHand = stockTransferItemMap["quantityOnHand"] ? stockTransferItemMap["quantityOnHand"] : 0
+            stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
+            stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
+            stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
+            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient.id"]) ? Person.load(stockTransferItemMap["recipient.id"]) : null
+
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
             }
@@ -155,6 +180,19 @@ class StockTransferApiController {
                     splitItem.location = stockTransfer.origin
                 }
                 stockTransferItem.splitItems.add(splitItem)
+            }
+
+            // For inbound returns
+            Date expirationDate = stockTransferItemMap.expirationDate && stockTransferItemMap.expirationDate != JSONObject.NULL ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+            String lotNumber = stockTransferItemMap.lotNumber && stockTransferItemMap.lotNumber != JSONObject.NULL ? stockTransferItemMap.lotNumber : null
+            stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
+                    stockTransferItem.product,
+                    lotNumber,
+                    expirationDate
+            )
+
+            if (stockTransferItemMap.sortOrder) {
+                stockTransferItem.orderIndex = stockTransferItemMap.sortOrder
             }
 
             stockTransfer.stockTransferItems.add(stockTransferItem)
@@ -174,9 +212,6 @@ class StockTransferApiController {
     }
 
     def returnCandidates = {
-        // OBPIH-4199: TEMPORARILY DISABLED
-        throw new UnsupportedOperationException("${warehouse.message(code: 'outboundReturns.temporaryDisabled.message')}")
-
         Location location = Location.get(params.locationId)
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${params.locationId}")
@@ -193,6 +228,11 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
+    def removeAllItems = {
+        Order order = stockTransferService.deleteAllStockTransferItems(params.id)
+        render([data: StockTransfer.createFromOrder(order)?.toJson()] as JSON)
+    }
+
     def sendShipment = {
         Order order = Order.get(params.id)
         if (!order) {
@@ -200,6 +240,13 @@ class StockTransferApiController {
         }
 
         shipmentService.sendShipment(order)
+        render status: 200
+    }
+
+    def rollback = {
+        Location currentLocation = Location.get(session.warehouse.id)
+
+        stockTransferService.rollbackReturnOrder(params.id as String, currentLocation)
         render status: 200
     }
 }

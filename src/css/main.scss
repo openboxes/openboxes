@@ -262,6 +262,14 @@ body {
   }
 }
 
+.btn-link {
+  color: #757575;
+
+  &:hover {
+    color: #007bff;
+  }
+}
+
 .btn-xs {
   padding: 0 .5rem;
   font-size: .875rem;
@@ -285,24 +293,70 @@ body {
 .select-xs {
   font-size: .875rem;
   border-radius: .2rem;
+  height: 26px;
 
-  .Select-control {
-    height: 26px;
+  .react-select__control {
+    height: inherit;
+    min-height: 26px !important;
 
-    .Select-value {
-      line-height: 26px !important;
+    &.react-select__control--is-focused {
+      border-color: #007eff;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 0 3px rgba(0,126,255,.1);
     }
 
-    .Select-placeholder {
-      line-height: 26px;
+    &.react-select__control--menu-is-open {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #b3b3b3 #cccccc #d9d9d9 !important;
+      box-shadow: none;
     }
 
-    .Select-input {
+    .react-select__value-container, .react-select__indicators {
+      display: flex;
+      align-items: center;
+      height: inherit;
+
+      div {
+        margin: 0;
+        padding: 0;
+      }
+
+      .react-select__indicator {
+        padding-right: 5px !important;
+        cursor: pointer;
+      }
+
+      .react-select__single-value {
+        height: fit-content;
+      }
+    }
+
+    .react-select__input {
+      display: flex !important;
+      align-items: center;
       height: 24px;
 
       input {
         padding: 0;
         line-height: 26px;
+      }
+    }
+  }
+
+  .react-select__menu {
+    background-color: white;
+    z-index: 9999;
+  }
+}
+
+.multi-select {
+  height: auto !important;
+
+  .react-select__control {
+    .react-select__value-container, .react-select__indicators {
+      div {
+        margin: 2px;
+        padding: 2px 0;
       }
     }
   }
@@ -312,18 +366,26 @@ body {
   font-size: .875rem;
   border-radius: .2rem;
 
-  .Select-control {
+  .react-select__control {
     height: 32px;
 
-    .Select-value {
+    .react-select__value-container {
       line-height: 32px !important;
     }
 
-    .Select-placeholder {
+    .react-select__indicators {
       line-height: 32px;
+
+      .react-select__indicator {
+        padding: 0 !important;
+        cursor: pointer;
+      }
+      .react-select__indicator:last-child {
+        padding-right: 5px !important;
+      }
     }
 
-    .Select-input {
+    .react-select__input {
       height: 30px;
 
       input {
@@ -332,6 +394,24 @@ body {
       }
     }
   }
+}
+
+.custom-option {
+  .react-select__menu-list {
+    padding: 0;
+
+    .react-select__menu-notice {
+      text-align: left;
+    }
+  }
+}
+
+.add-new-button {
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: right;
+  background-color: #DEEBFF;
+  color: #4f87ce;
 }
 
 .table-xs th,
@@ -383,7 +463,7 @@ body {
 }
 
 .has-error .form-control,
-.has-error .Select-control {
+.has-error .react-select__control {
   border: 2px solid $red-beta;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
@@ -697,7 +777,7 @@ div.crossed-out .table-inner-row:before {
   z-index: 9999 !important;
 }
 
-.Select-loading-zone {
+.react-select__loading-zone {
   display: none !important;
 }
 
@@ -880,6 +960,25 @@ div.crossed-out .table-inner-row:before {
   max-height: 60vh;
 }
 
+/* MODAL PAGE
+----------------------------*/
+.modal-page {
+  background-color: #888888;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__content {
+    background-color: #ffffff;
+    width: clamp(500px, 60vw, 850px);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 3rem;
+  }
+}
+
+
 /* LOGIN MODAL
 ----------------------------*/
 
@@ -939,4 +1038,20 @@ div.crossed-out .table-inner-row:before {
       }
     }
   }
+}
+
+.file-field {
+  height: 3em;
+  display: flex;
+  align-items: center;
+
+  input[type=file] {
+    width: 0;
+  }
+}
+
+.arrayfield-header-required::after {
+  margin-left: .25rem;
+  content: "*";
+  color: red;
 }

@@ -14,7 +14,7 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
-import org.pih.warehouse.core.Constants
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -90,12 +90,15 @@ class StockTransferService {
             stockTransferItems << StockTransferItem.createFromProductAvailability(productAvailability)
         }
 
-        List<StockTransferItem> pendingStockTransferItems = getPendingItems(location)
+        if (!params) {
+            List<StockTransferItem> pendingStockTransferItems = getPendingItems(location)
 
-        stockTransferItems.removeAll { StockTransferItem item ->
-            pendingStockTransferItems.find {
-                item.location?.id == it.location?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
-                        item.product?.id == it.product?.id
+            stockTransferItems.removeAll { StockTransferItem item ->
+                pendingStockTransferItems.find {
+                    item.location?.id == it.location?.id && item.inventoryItem?.id == it.inventoryItem?.id &&
+                            item.originBinLocation?.id == it.originBinLocation?.id &&
+                            item.product?.id == it.product?.id
+                }
             }
         }
 
@@ -192,7 +195,8 @@ class StockTransferService {
         }
         order.save(failOnError: true)
 
-        if (order.orderType == OrderType.get(Constants.OUTBOUND_RETURNS) && order?.orderItems) {
+        def currentLocation = AuthService?.currentLocation?.get()
+        if (order.orderType.isReturnOrder() && order.isOutbound(currentLocation) && order?.orderItems) {
             picklistService.createPicklistFromItem(order)
         }
 
@@ -206,6 +210,18 @@ class StockTransferService {
         }
 
         return deleteOrderItem(orderItem.order, orderItem)
+    }
+
+    Order deleteAllStockTransferItems(String id) {
+        Order order = Order.get(id)
+        if (!order) {
+            throw new IllegalArgumentException("No stockTransfer found with ID ${id}")
+        }
+
+        def itemsToRemove = order.orderItems?.findAll { it }
+        itemsToRemove?.each { it -> deleteOrderItem(order, it) }
+
+        return order
     }
 
     Order deleteOrderItem(Order order, OrderItem orderItem) {
@@ -223,8 +239,10 @@ class StockTransferService {
                 picklistItem.disableRefresh = Boolean.TRUE
                 picklistItem.picklist?.removeFromPicklistItems(picklistItem)
                 picklistItem.orderItem?.removeFromPicklistItems(picklistItem)
-                picklistItem.delete()
+                picklistItem.delete(flush: true)
             }
+            def productsToRefresh = picklistItems.collect {it.inventoryItem?.product?.id}.unique()
+            productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, productsToRefresh, false)
         }
 
         OrderItem parentItem = orderItem?.parentOrderItem
@@ -273,6 +291,8 @@ class StockTransferService {
         orderItem.quantity = stockTransferItem.quantity
         orderItem.originBinLocation = stockTransferItem.originBinLocation
         orderItem.destinationBinLocation = stockTransferItem.destinationBinLocation
+        orderItem.recipient = stockTransferItem.recipient
+        orderItem.orderIndex = stockTransferItem.orderIndex
         return orderItem
     }
 
@@ -345,12 +365,20 @@ class StockTransferService {
             throw new IllegalArgumentException("Location is required")
         }
 
+        // Get quantity available as not picked, we allow transferring from on hold bins or recalled in this workflow
         Integer quantityAvailable
         if (originBinLocation) {
-            quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, originBinLocation)
+            quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, location, originBinLocation)
         } else {
             quantityAvailable = productAvailabilityService.getQuantityNotPickedInLocation(inventoryItem.product, location)
         }
+
+//        Integer quantityAvailable
+//        if (originBinLocation) {
+//            quantityAvailable = productAvailabilityService.getQuantityNotPickedInBinLocation(inventoryItem, originBinLocation)
+//        } else {
+//            quantityAvailable = productAvailabilityService.getQuantityNotPickedInLocation(inventoryItem.product, location)
+//        }
 
         log.info "Quantity: ${quantity} vs ${quantityAvailable}"
 
@@ -388,5 +416,26 @@ class StockTransferService {
             contentType : "application/pdf",
             uri         : g.createLink(controller: 'picklist', action: "returnPrint", id: stockTransfer?.id, absolute: true),
         ]]
+    }
+
+    def rollbackReturnOrder(String orderId, Location currentLocation) {
+        Order order = Order.get(orderId)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${orderId}")
+        }
+
+        if(currentLocation != order?.origin && currentLocation != order?.destination) {
+            throw new IllegalArgumentException("Can't rollback shipment from current location")
+        }
+
+        Shipment returnOrderShipment = order.shipments.first() as Shipment;
+        if(!returnOrderShipment) {
+            throw new IllegalArgumentException("Order with id: ${orderId} has no shipments")
+        }
+
+        // For returns there should be only one shipment for the given order
+        shipmentService.rollbackLastEvent(returnOrderShipment)
+        order.status = OrderStatus.PLACED;
+
     }
 }

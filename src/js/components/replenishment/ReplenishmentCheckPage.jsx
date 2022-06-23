@@ -1,21 +1,22 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
+import apiClient, { flattenRequest } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import ArrayField from '../form-elements/ArrayField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
-
-import { showSpinner, hideSpinner } from '../../actions';
-import TableRowWithSubfields from '../form-elements/TableRowWithSubfields';
-import apiClient from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
 
 const FIELDS = {
   replenishmentItems: {
@@ -33,6 +34,10 @@ const FIELDS = {
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
         flexWidth: '0.5',
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+        },
       },
       'product.name': {
         type: LabelField,
@@ -42,6 +47,7 @@ const FIELDS = {
         headerAlign: 'left',
         attributes: {
           showValueTooltip: true,
+          cellClassName: 'text-left',
         },
       },
       'currentZone.name': {
@@ -75,6 +81,10 @@ const FIELDS = {
         label: 'react.replenishment.quantityInBin.label',
         defaultMessage: 'Qty Needed',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       'zone.name': {
         type: LabelField,
@@ -111,6 +121,10 @@ const FIELDS = {
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
         flexWidth: '1',
+        headerAlign: 'right',
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
     },
   },
@@ -192,14 +206,14 @@ class ReplenishmentSecondPage extends Component {
   }
 
   completeReplenishment() {
-    if (this.state.values.replenishment.status === 'PLACED') {
+    if (this.state.values.replenishment.status === 'APPROVED') {
       this.props.showSpinner();
       const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'COMPLETED' };
-      apiClient.post(url, payload)
+      apiClient.post(url, flattenRequest(payload))
         .then(() => {
+          window.location = `/openboxes/stockTransfer/show/${this.props.match.params.replenishmentId}`;
           this.props.hideSpinner();
-          window.location = `/openboxes/order/show/${this.props.match.params.replenishmentId}`;
         })
         .catch(() => this.props.hideSpinner());
     }

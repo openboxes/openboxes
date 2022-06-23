@@ -1,48 +1,86 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Form } from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
+import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import CheckboxField from 'components/form-elements/CheckboxField';
+import LabelField from 'components/form-elements/LabelField';
+import TextField from 'components/form-elements/TextField';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import { renderFormField } from 'utils/form-utils';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-import TextField from '../form-elements/TextField';
-import ArrayField from '../form-elements/ArrayField';
-import LabelField from '../form-elements/LabelField';
-import { renderFormField } from '../../utils/form-utils';
-import { showSpinner, hideSpinner } from '../../actions';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import Select from '../../utils/Select';
 
 const FIELD = {
   requirements: {
     type: ArrayField,
     arrowsNavigation: true,
     fields: {
+      checked: {
+        type: CheckboxField,
+        label: 'react.stockMovement.selectAll.label',
+        defaultMessage: 'Select All',
+        flexWidth: 4,
+        getDynamicAttr: ({
+          rowIndex, allRowsSelected, selectAllCode, updateSelectedItems,
+        }) => ({
+          headerHtml: () => (
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={allRowsSelected}
+              onClick={selectAllCode}
+            />
+          ),
+          onChange: checkState => updateSelectedItems(checkState, rowIndex),
+        }),
+      },
       'product.productCode': {
         type: LabelField,
         label: 'react.stockMovement.productCode.label',
         defaultMessage: 'Code',
+        flexWidth: 5,
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+        },
       },
       'product.name': {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
+        flexWidth: 30,
+        headerAlign: 'left',
+        attributes: {
+          cellClassName: 'text-left',
+          showValueTooltip: true,
+        },
       },
       zone: {
         type: LabelField,
-        label: 'react.replenishment.currentZone.label',
-        defaultMessage: 'Current Zone',
+        label: 'react.replenishment.zone.label',
+        defaultMessage: 'Zone',
+        headerAlign: 'left',
+        attributes: {
+          className: 'text-left',
+        },
       },
       'binLocation.name': {
         type: LabelField,
-        label: 'react.replenishment.currentBinLocation.label',
-        defaultMessage: 'Current Bin Location',
+        label: 'react.replenishment.bin.label',
+        defaultMessage: 'Bin',
+        headerAlign: 'left',
         attributes: {
           formatValue: (value) => {
             if (value) {
@@ -50,35 +88,49 @@ const FIELD = {
             }
             return 'DEFAULT';
           },
+          className: 'text-left',
         },
       },
       quantityInBin: {
         type: LabelField,
         label: 'react.replenishment.quantityInBin.label',
         defaultMessage: 'Qty in Bin',
-      },
-      minQuantity: {
-        type: LabelField,
-        label: 'react.replenishment.minQuantity.label',
-        defaultMessage: 'Min Qty',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       maxQuantity: {
         type: LabelField,
         label: 'react.replenishment.maxQuantity.label',
         defaultMessage: 'Max Qty',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
-      totalQuantityOnHand: {
+      quantityAvailable: {
         type: LabelField,
-        label: 'react.replenishment.totalQuantityOnHand.label',
-        defaultMessage: 'Total QoH',
+        label: 'react.replenishment.quantityAvailable.label',
+        defaultMessage: 'Qty available',
+        headerAlign: 'right',
+        flexWidth: 8,
+        attributes: {
+          cellClassName: 'text-right',
+        },
       },
       quantity: {
         type: TextField,
         label: 'react.stockMovement.quantityToTransfer.label',
         defaultMessage: 'Qty to Transfer',
+        headerAlign: 'center',
         attributes: {
           type: 'number',
+          cellClassName: 'text-center',
         },
+        flexWidth: 10,
         fieldKey: '',
         getDynamicAttr: ({
           updateRow, values, rowIndex,
@@ -95,10 +147,24 @@ function validate(values) {
   errors.requirements = [];
 
   _.forEach(values.requirements, (item, key) => {
-    if (item.quantity && item.quantity < 0) {
-      errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
+    if (item.quantity) {
+      if (item.quantity < 0) {
+        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
+      }
+      if (item.quantity > item.quantityAvailable) {
+        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
+      }
     }
   });
+  const anyRowSelected = _.find(values.requirements, row => row.checked);
+  if (!anyRowSelected) {
+    _.forEach(values.requirements, (item, key) => {
+      errors.requirements[key] = {
+        ...errors.requirements[key],
+        checked: 'react.replenishment.error.selected.label',
+      };
+    });
+  }
   return errors;
 }
 
@@ -114,6 +180,9 @@ class CreateReplenishment extends Component {
       isDirty: false,
     };
     this.updateRow = this.updateRow.bind(this);
+    this.updateSelectedItems = this.updateSelectedItems.bind(this);
+    this.selectAllRows = this.selectAllRows.bind(this);
+    this.allRowsSelected = this.allRowsSelected.bind(this);
   }
 
   componentDidMount() {
@@ -135,6 +204,31 @@ class CreateReplenishment extends Component {
         this.fetchRequirements(nextProps.locationId);
       }
     }
+  }
+
+  allRowsSelected() {
+    return !_.find(this.state.values.requirements, row => !row.checked);
+  }
+
+  selectAllRows() {
+    const isAllSelected = this.allRowsSelected();
+    this.setState({
+      values: update(this.state.values, {
+        requirements: {
+          $apply: req => req.map(it => ({
+            ...it, checked: !isAllSelected,
+          })),
+        },
+      }),
+    });
+  }
+
+  updateSelectedItems(checkedValue, index) {
+    this.setState({
+      values: update(this.state.values, {
+        requirements: { [index]: { checked: { $set: checkedValue } } },
+      }),
+    });
   }
 
   updateRow(values, index) {
@@ -165,8 +259,8 @@ class CreateReplenishment extends Component {
     this.props.showSpinner();
     const { inventoryLevelStatus } = this.state;
     let url = `/openboxes/api/requirements?location.id=${locationId}`;
-    if (inventoryLevelStatus) {
-      url += `&inventoryLevelStatus=${inventoryLevelStatus}`;
+    if (inventoryLevelStatus.id) {
+      url += `&inventoryLevelStatus=${inventoryLevelStatus.id}`;
     }
 
     return apiClient.get(url)
@@ -174,20 +268,18 @@ class CreateReplenishment extends Component {
         const requirements = _.map(parseResponse(resp.data.data), requirement => ({
           ...requirement,
           quantity: requirement.quantityNeeded,
+          checked: true,
         }));
         this.setState({ values: { requirements }, isDirty: false }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
 
-  createReplenishment() {
+  createReplenishment(values) {
     this.props.showSpinner();
     const url = '/openboxes/api/replenishments/';
     const payload = {
-      replenishmentItems: _.filter(
-        this.state.values.requirements,
-        item => _.toInteger(item.quantity) > 0,
-      ),
+      replenishmentItems: values.requirements.filter(item => item.checked && item.quantity > 0),
     };
 
     apiClient.post(url, flattenRequest(payload))
@@ -236,14 +328,22 @@ class CreateReplenishment extends Component {
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <div className="d-flex justify-content-between submit-buttons mt-0 mb-3">
-              <Select
-                value={this.state.inventoryLevelStatus}
-                onChange={value => this.inventoryLevelStatusChange(value)}
-                options={this.state.statusOptions}
-                className="select-sm stocklist-select"
-                clearable={false}
-                objectValue
-              />
+              <div className="d-flex flex-column">
+                <label htmlFor="stock-level-filter">
+                  <Translate
+                    id="react.replenishment.filter.label"
+                    defaultMessage="Replenish bins that have a stock level"
+                  />:
+                </label>
+                <Select
+                  name="stock-level-filter"
+                  value={this.state.inventoryLevelStatus}
+                  onChange={value => this.inventoryLevelStatusChange(value)}
+                  options={this.state.statusOptions}
+                  className="select-sm stocklist-select"
+                  clearable={false}
+                />
+              </div>
               <button
                 type="submit"
                 onClick={() => {
@@ -260,8 +360,11 @@ class CreateReplenishment extends Component {
               <div className="table-form">
                 {_.map(FIELD, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
-                    updateRow: this.updateRow,
                     values,
+                    updateRow: this.updateRow,
+                    updateSelectedItems: this.updateSelectedItems,
+                    allRowsSelected: this.allRowsSelected(),
+                    selectAllCode: this.selectAllRows,
                   }))}
               </div>
               <div className="submit-buttons">

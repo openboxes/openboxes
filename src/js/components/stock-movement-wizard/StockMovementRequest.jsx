@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import CreateStockMovement from './request/CreateStockMovement';
-import AddItemsPage from './request/AddItemsPage';
-import Wizard from '../wizard/Wizard';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import AddItemsPage from 'components/stock-movement-wizard/request/AddItemsPage';
+import CreateStockMovement from 'components/stock-movement-wizard/request/CreateStockMovement';
+import Wizard from 'components/wizard/Wizard';
+import apiClient from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import './StockMovement.scss';
+import 'components/stock-movement-wizard/StockMovement.scss';
 
 // TODO: check docs for SM wizard and Wizard related components
 

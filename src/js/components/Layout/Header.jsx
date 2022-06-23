@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
-import Translate from '../../utils/Translate';
-import GlobalSearch from '../GlobalSearch';
-import LocationChooser from '../location/LocationChooser';
-import UserActionMenu from '../user/UserActionMenu';
-import apiClient from '../../utils/apiClient';
+import { LiveChatLoaderProvider } from 'react-live-chat-loader';
+import { connect } from 'react-redux';
+
+import GlobalSearch from 'components/GlobalSearch';
+import LocationChooser from 'components/location/LocationChooser';
+import SupportButton from 'components/support-button/SupportButton';
+import UserActionMenu from 'components/user/UserActionMenu';
+import apiClient from 'utils/apiClient';
+import Translate from 'utils/Translate';
 
 
 class Header extends Component {
@@ -54,7 +58,7 @@ class Header extends Component {
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="logo-header">
             <a
-              href="/openboxes"
+              href={this.props.highestRole === 'Authenticated' ? '/openboxes/stockMovement/list?direction=INBOUND' : '/openboxes'}
               className="navbar-brand brand-name"
             >
               { this.state.logoUrl !== '' ?
@@ -67,6 +71,12 @@ class Header extends Component {
             <GlobalSearch />
             <UserActionMenu />
             <LocationChooser />
+            {
+              this.props.isHelpScoutEnabled &&
+              <LiveChatLoaderProvider provider="helpScout" providerKey={this.props.localizedHelpScoutKey}>
+                <SupportButton text="react.default.button.help.label" />
+              </LiveChatLoaderProvider>
+            }
           </div>
         </div>
       </div>
@@ -77,8 +87,11 @@ class Header extends Component {
 const mapStateToProps = state => ({
   username: state.session.user.username,
   isImpersonated: state.session.isImpersonated,
+  highestRole: state.session.highestRole,
   logoUrl: state.session.logoUrl,
   logoLabel: state.session.logoLabel,
+  localizedHelpScoutKey: state.session.localizedHelpScoutKey,
+  isHelpScoutEnabled: state.session.isHelpScoutEnabled,
 });
 
 export default connect(mapStateToProps)(Header);
@@ -92,4 +105,12 @@ Header.propTypes = {
   logoUrl: PropTypes.string.isRequired,
   /** Id of the current location */
   logoLabel: PropTypes.string.isRequired,
+  highestRole: PropTypes.string.isRequired,
+  localizedHelpScoutKey: PropTypes.string,
+  isHelpScoutEnabled: PropTypes.bool,
+};
+
+Header.defaultProps = {
+  localizedHelpScoutKey: '',
+  isHelpScoutEnabled: false,
 };

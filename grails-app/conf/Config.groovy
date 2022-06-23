@@ -98,7 +98,7 @@ grails.mime.types = [html         : ['text/html', 'application/xhtml+xml'],
                      multipartForm: 'multipart/form-data']
 
 // The default codec used to encode data with ${}
-grails.views.default.codec = "none" // none, html, base64
+grails.views.default.codec = "html" // none, html, base64
 grails.views.gsp.encoding = "UTF-8"
 //grails.views.gsp.keepgenerateddir="/home/jmiranda/git/openboxes/target/generated"
 grails.converters.encoding = "UTF-8"
@@ -386,25 +386,196 @@ openboxes.dashboard.newsSummary.newsItems = []
 openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
+
 openboxes {
-    tablero {
-        enabled = true
-        configurations {
+    dashboard {
+        yearTypes {
+            fiscalYear {
+                start = "07/01" // format: MM/DD, For PIH and the Govt of Dominica fiscal year start July 1
+                end = "06/30" // format: MM/DD
+                labelYearPrefix = "FY "
+                yearFormat = "yy"
+            }
+            calendarYear {
+                start = "01/01"
+                end = "12/31"
+                labelYearPrefix = ""
+                yearFormat = "yyyy"
+            }
+        }
+    }
+}
+
+openboxes {
+    dashboardConfig {
+        dashboards {
             personal {
                 name = "My Dashboard"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "inventoryByLotAndBin",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "receivingBin",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "inProgressShipments",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "inProgressPutaways",
+                            order: 4
+                        ],
+
+                        [
+                            widgetId: "inventorySummary",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "expirationSummary",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "incomingStock",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "outgoingStock",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "delayedShipments",
+                            order: 5
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order: 6
+                        ]
+                ]
             }
             warehouse {
                 name = "Warehouse Management"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "inventoryByLotAndBin",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "receivingBin",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "inProgressShipments",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "inProgressPutaways",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "itemsInventoried",
+                            order: 5
+                        ],
+
+                        [
+                            widgetId: "inventorySummary",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "expirationSummary",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "incomingStock",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "outgoingStock",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "delayedShipments",
+                            order: 5
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order: 6
+                        ]
+                ]
             }
             inventory {
                 name = "Inventory Management"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "receivingBin",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "defaultBin",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "negativeInventory",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "expiredStock",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "openStockRequests",
+                            order: 5
+                        ],
+
+                        [
+                            widgetId: "delayedShipments",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "productsInventoried",
+                            order: 2
+                        ]
+                ]
             }
             transaction {
                 name = "Transaction Management"
                 filters {}
+                widgets = [
+                        [
+                            widgetId: "fillRateSnapshot",
+                            order: 1
+                        ],
+
+                        [
+                            widgetId: "receivedStockMovements",
+                            order: 1
+                        ],
+                        [
+                            widgetId: "sentStockMovements",
+                            order: 2
+                        ],
+                        [
+                            widgetId: "lossCausedByExpiry",
+                            order: 3
+                        ],
+                        [
+                            widgetId: "percentageAdHoc",
+                            order: 4
+                        ],
+                        [
+                            widgetId: "fillRate",
+                            order: 5
+                        ],
+                        [
+                            widgetId: "stockOutLastMonth",
+                            order: 6
+                        ]
+                ]
             }
             fillRate {
                 name = "Fill Rate"
@@ -413,257 +584,364 @@ openboxes {
                         endpoint = "/${appName}/categoryApi/list"
                     }
                 }
+                widgets = [
+                        [
+                            widgetId: "fillRateSnapshot",
+                            order: 1
+                        ],
+
+                        [
+                            widgetId: "fillRate",
+                            order: 1
+                        ]
+                ]
             }
-        }
-        endpoints {
-            number {
-                inProgressPutaways {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInProgressPutaways"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 4
-                }
-                inventoryByLotAndBin {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInventoryByLotAndBin"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 1
-                }
-                inProgressShipments {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInProgressShipments"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 3
-                }
-                receivingBin {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getReceivingBin"
-                    archived = ['transaction', 'fillRate']
-                    order = 2
-                }
-                itemsInventoried {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getItemsInventoried"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 5
-                }
-                defaultBin {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getDefaultBin"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 6
-                }
-                negativeInventory {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getProductWithNegativeInventory"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 7
-                }
-                expiredStock {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getExpiredProductsInStock"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 8
-                }
-                fillRateSnapshot {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getFillRateSnapshot"
-                    archived = ['personal', 'warehouse', 'inventory']
-                    order = 9
-                }
-                openStockRequests {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getOpenStockRequests"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 10
-                }
-                inventoryValue {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInventoryValue"
-                    archived = ['personal', 'warehouse', 'inventory', 'transaction', 'fillRate']
-                    order = 11
-                }
-            }
-            graph {
-                inventorySummary {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getInventorySummary"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    datalabel = true
-                    order = 1
-                    colors {
-                        labels {
-                            success = ["In stock"]
-                            warning = ["Above maximum", "Below reorder", "Below minimum"]
-                            error = ["No longer in stock"]
-                        }
+            supplier {
+                name = "Supplier Dashboard"
+                filters {
+                    supplier {
+                        endpoint = "/${appName}/api/locations?direction=INBOUND"
                     }
                 }
-                expirationSummary {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getExpirationSummary"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    timeFilter = true
-                    order = 2
-                    colors {
-                        datasets {
-                            state6 = ["Expiration(s)"]
-                        }
-                        labels {
-                            state5 = [
+                widgets = [
+                    [
+                        widgetId: "numberOfOpenPurchaseOrders",
+                        order: 1
+                    ]
+                ]
+            }
+        }
+        // TODO: OBPIH-4384 Refactor indicator filters to be more generic (currently filters are hardcoded on the frontend, these should be defined here and rendered there basing on config)
+        dashboardWidgets {
+            inProgressPutaways {
+                enabled = true
+                title = "react.dashboard.inProgressPutaways.title.label"
+                info = "react.dashboard.inProgressPutaways.info.label"
+                subtitle = "react.dashboard.subtitle.putaways.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inProgressPutaways"
+            }
+            inventoryByLotAndBin {
+                enabled = true
+                title = "react.dashboard.inventoryByLotAndBin.title.label"
+                info = "react.dashboard.inventoryByLotAndBin.info.label"
+                subtitle = "react.dashboard.subtitle.inStock.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inventoryByLotAndBin"
+            }
+            inProgressShipments {
+                enabled = true
+                title = "react.dashboard.inProgressShipments.title.label"
+                info = "react.dashboard.inProgressShipments.info.label"
+                subtitle = "react.dashboard.subtitle.shipments.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inProgressShipments"
+            }
+            receivingBin {
+                enabled = true
+                title = "react.dashboard.receivingBin.title.label"
+                info = "react.dashboard.receivingBin.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/receivingBin"
+            }
+            itemsInventoried {
+                enabled = true
+                title = "react.dashboard.itemsInventoried.title.label"
+                info = "react.dashboard.itemsInventoried.info.label"
+                subtitle = "react.dashboard.subtitle.items.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/itemsInventoried"
+            }
+            defaultBin {
+                enabled = true
+                title = "react.dashboard.defaultBin.title.label"
+                info = "react.dashboard.defaultBin.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/defaultBin"
+            }
+            negativeInventory {
+                enabled = true
+                title = "react.dashboard.productWithNegativeInventory.title.label"
+                info = "react.dashboard.productWithNegativeInventory.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/productWithNegativeInventory"
+            }
+            expiredStock {
+                enabled = true
+                title = "react.dashboard.expiredProductsInStock.title.label"
+                info = "react.dashboard.expiredProductsInStock.info.label"
+                subtitle = "react.dashboard.subtitle.products.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/expiredProductsInStock"
+            }
+            openStockRequests {
+                enabled = true
+                title = "react.dashboard.openStockRequests.title.label"
+                info = "react.dashboard.openStockRequests.info.label"
+                subtitle = "react.dashboard.requests.subtitle.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/openStockRequests"
+            }
+            inventoryValue {
+                enabled = true
+                title = "react.dashboard.inventoryValue.title.label"
+                info = ''
+                subtitle = "react.dashboard.subtitle.inStock.label"
+                numberType = 'dollars'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/inventoryValue"
+            }
+
+            fillRateSnapshot {
+                enabled = true
+                title = "react.dashboard.fillRateSnapshot.title.label"
+                info = "react.dashboard.fillRateSnapshot.info.label"
+                graphType = 'sparkline'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/fillRateSnapshot"
+            }
+
+            requisitionCountByYear {
+                enabled = true
+                title = "react.dashboard.requisitionCountByYear.title.label"
+                info = "react.dashboard.requisitionCountByYear.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/requisitionsByYear"
+                yearTypeFilter {
+                    parameter = "yearType"
+                    defaultValue = "fiscalYear"
+                    options = [
+                        [label: "react.dashboard.fiscalYear.label", value: "fiscalYear"],
+                        [label: "react.dashboard.calendarYear.label", value: "calendarYear"]
+                    ]
+                }
+            }
+            inventorySummary {
+                enabled = true
+                title = "react.dashboard.inventorySummaryData.title.label"
+                info = "react.dashboard.inventorySummaryData.info.label"
+                graphType = "horizontalBar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/inventorySummary"
+                datalabel = true
+                colors {
+                    labels {
+                        success = ["In stock"]
+                        warning = ["Above maximum", "Below reorder", "Below minimum"]
+                        error = ["No longer in stock"]
+                    }
+                }
+            }
+            expirationSummary {
+                enabled = true
+                title = "react.dashboard.expirationSummaryData.title.label"
+                info = "react.dashboard.expirationSummaryData.info.label"
+                graphType = "line"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/expirationSummary"
+                timeFilter = true
+                colors {
+                    datasets {
+                        state6 = ["Expiration(s)"]
+                    }
+                    labels {
+                        state5 = [
                                 [code : "react.dashboard.timeline.today.label", message : "today"],
                                 [code : "react.dashboard.timeline.within30Days.label", message : "within 30 days"],
                                 [code : "react.dashboard.timeline.within90Days.label", message : "within 90 days"],
                                 [code : "react.dashboard.timeline.within180Days.label", message : "within 180 days"],
                                 [code : "react.dashboard.timeline.within360Days.label", message : "within 360 days"]
-                            ]
-                        }
+                        ]
                     }
                 }
-                incomingStock {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getIncomingStock"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 3
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
+            }
+            incomingStock {
+                enabled = true
+                title = "react.dashboard.incomingStock.title.label"
+                info = "react.dashboard.incomingStock.info.label"
+                graphType = "numbers"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/incomingStock"
+                colors {
+                    datasets {
+                        state6 = ["first"]
+                        state7 = ["second"]
+                        state8 = ["third"]
                     }
                 }
-                outgoingStock {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getOutgoingStock"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    order = 4
-                    colors {
-                        datasets {
-                            success = ["first"]
-                            warning = ["second"]
-                            error = ["third"]
-                        }
+            }
+            outgoingStock {
+                enabled = true
+                title = "react.dashboard.outgoingStock.title.label"
+                info = "react.dashboard.outgoingStock.info.label"
+                graphType = "numbers"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/outgoingStock"
+                colors {
+                    datasets {
+                        success = ["first"]
+                        warning = ["second"]
+                        error = ["third"]
                     }
                 }
-                receivedStockMovements {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getReceivedStockMovements"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    timeFilter = true
-                    stacked = true
-                    datalabel = true
-                    order = 7
-                }
-                discrepancy {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getDiscrepancy"
-                    archived = ['inventory', 'transaction', 'fillRate']
-                    timeFilter = true
-                    order = 6
-                }
-                delayedShipments {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getDelayedShipments"
-                    archived = ['transaction', 'fillRate']
-                    order = 5
-                    colors {
-                        datasets {
-                            state5 = ["first"]
-                            state4 = ["second"]
-                            state3 = ["third"]
-                        }
+            }
+            receivedStockMovements {
+                enabled = true
+                title = "react.dashboard.receivedStockData.title.label"
+                info = "react.dashboard.receivedStockData.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/receivedStockMovements"
+                timeFilter = true
+                stacked = true
+                datalabel = true
+            }
+            discrepancy {
+                enabled = true
+                title = "react.dashboard.discrepancy.title.label"
+                info = "react.dashboard.discrepancy.info.label"
+                graphType = "table"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/discrepancy"
+                timeFilter = true
+            }
+            delayedShipments {
+                enabled = true
+                title = "react.dashboard.delayedShipments.title.label"
+                info = "react.dashboard.delayedShipments.info.label"
+                graphType = "numberTable"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/delayedShipments"
+                colors {
+                    datasets {
+                        state5 = ["first"]
+                        state4 = ["second"]
+                        state3 = ["third"]
                     }
                 }
-                sentStockMovements {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getSentStockMovements"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    timeFilter = true
-                    stacked = true
-                    datalabel = true
-                    order = 8
-                }
-                lossCausedByExpiry {
-                    enabled = false
-                    endpoint = "/${appName}/apitablero/getLossCausedByExpiry"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    timeFilter = true
-                    stacked = true
-                    order = 9
-                    colors {
-                        datasets {
-                            success = ["Inventory value not expired last day of month"]
-                            warning = ["Inventory value expired last day of month"]
-                            error = ["Inventory value removed due to expiry"]
-                        }
+            }
+            sentStockMovements {
+                enabled = true
+                title = "react.dashboard.sentStockMovements.title.label"
+                info = "react.dashboard.sentStockMovements.info.label"
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/sentStockMovements"
+                timeFilter = true
+                stacked = true
+                datalabel = true
+            }
+            lossCausedByExpiry {
+                enabled = false
+                title = "react.dashboard.lossCausedByExpiry.title.label"
+                info = ""
+                graphType = "bar"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/lossCausedByExpiry"
+                timeFilter = true
+                stacked = true
+                colors {
+                    datasets {
+                        success = ["Inventory value not expired last day of month"]
+                        warning = ["Inventory value expired last day of month"]
+                        error = ["Inventory value removed due to expiry"]
                     }
                 }
-                productsInventoried {
-                    enabled = false
-                    endpoint = "/${appName}/apitablero/getProductsInventoried"
-                    archived = ['personal', 'warehouse', 'transaction', 'fillRate']
-                    order = 10
-                    colors {
-                        datasets {
-                            state6 = ["first"]
-                            state7 = ["second"]
-                            state8 = ["third"]
-                        }
+            }
+            productsInventoried {
+                enabled = false
+                title = "react.dashboard.productsInventoried.title.label"
+                info = ""
+                graphType = "numbersCustomColors"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/productsInventoried"
+                colors {
+                    datasets {
+                        state6 = ["first"]
+                        state7 = ["second"]
+                        state8 = ["third"]
                     }
                 }
-                percentageAdHoc {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getPercentageAdHoc"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    legend = true
-                    datalabel = true
-                    order = 11
-                    colors {
-                        labels {
-                            state5 = ["STOCK"]
-                            state4 = ["ADHOC"]
-                        }
+            }
+            percentageAdHoc {
+                enabled = true
+                title = "react.dashboard.percentageAdHoc.title.label"
+                info = "react.dashboard.percentageAdHoc.info.label"
+                graphType = "doughnut"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/percentageAdHoc"
+                legend = true
+                datalabel = true
+                colors {
+                    labels {
+                        state5 = ["STOCK"]
+                        state4 = ["ADHOC"]
                     }
                 }
-                fillRate {
-                    enabled = true
-                    legend = true
-                    endpoint = "/${appName}/apitablero/getFillRate"
-                    archived = ['personal', 'warehouse', 'inventory']
-                    timeFilter = true
-                    locationFilter = true
-                    timeLimit = 12
-                    doubleAxeY = true
-                    datalabel = false
-                    size = 'big'
-                    colors {
-                        datasets {
-                            state3 = ["Request lines submitted"]
-                            state6 = ["Lines cancelled stock out"]
-                            state2 = ["Average Fill Rate"]
-                            state8 = ["Average of target Fill Rate"]
-                        }
-                    }
-                    order = 12
-                }
-                stockOutLastMonth {
-                    enabled = true
-                    endpoint = "/${appName}/apitablero/getStockOutLastMonth"
-                    archived = ['personal', 'warehouse', 'inventory', 'fillRate']
-                    legend = true
-                    datalabel = true
-                    order = 13
-                    colors {
-                        labels {
-                            success = ["Never"]
-                            warning = ["Stocked out <1 week"]
-                            state2  = ["Stocked out 1-2 weeks"]
-                            state1  = ["Stocked out 2-3 weeks"]
-                            error   = ["Stocked out 3-4 weeks"]
-                        }
+            }
+            fillRate {
+                enabled = true
+                title = "react.dashboard.fillRate.title.label"
+                info = "react.dashboard.fillRate.info.label"
+                graphType = "bar"
+                type = 'graph'
+                legend = true
+                endpoint = "/${appName}/api/dashboard/fillRate"
+                timeFilter = true
+                locationFilter = true
+                timeLimit = 12
+                doubleAxeY = true
+                datalabel = false
+                size = 'big'
+                colors {
+                    datasets {
+                        state3 = ["Request lines submitted"]
+                        state6 = ["Lines cancelled stock out"]
+                        state2 = ["Average Fill Rate"]
+                        state8 = ["Average of target Fill Rate"]
                     }
                 }
+            }
+            stockOutLastMonth {
+                enabled = true
+                title = "react.dashboard.stockOutLastMonth.title.label"
+                info = "react.dashboard.stockOutLastMonth.info.label"
+                graphType = "doughnut"
+                type = 'graph'
+                endpoint = "/${appName}/api/dashboard/stockOutLastMonth"
+                legend = true
+                datalabel = true
+                colors {
+                    labels {
+                        success = ["Never"]
+                        warning = ["Stocked out <1 week"]
+                        state2  = ["Stocked out 1-2 weeks"]
+                        state1  = ["Stocked out 2-3 weeks"]
+                        error   = ["Stocked out 3-4 weeks"]
+                    }
+                }
+            }
+            numberOfOpenPurchaseOrders {
+                enabled = true
+                title = "react.dashboard.numberOfOpenPurchaseOrders.title.label"
+                info = "react.dashboard.numberOfOpenPurchaseOrders.info.label"
+                subtitle = "react.dashboard.subtitle.purchaseOrders.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/${appName}/api/dashboard/openPurchaseOrdersCount"
             }
         }
     }
@@ -743,13 +1021,31 @@ breadcrumbsConfig {
             actionUrl = "/${appName}/replenishment/create/"
             listUrl = "/"
         }
-        returns {
+        outboundReturns {
             actionLabel = "react.outboundReturns.createReturn.label"
-            defaultActionLabel = "Create Return"
+            defaultActionLabel = "Create Outbound Return"
             listLabel = "react.outboundReturns.label"
             defaultListLabel = "Outbound Returns"
-            actionUrl = "/${appName}/stockTransfer/createReturns/"
+            actionUrl = "/${appName}/stockTransfer/createOutboundReturn/"
             listUrl = "/"
+        }
+        inboundReturns {
+            actionLabel = "react.inboundReturns.createReturn.label"
+            defaultActionLabel = "Create Inbound Return"
+            listLabel = "react.inboundReturns.label"
+            defaultListLabel = "Inbound Returns"
+            actionUrl = "/${appName}/stockTransfer/createInboundReturn/"
+            listUrl = "/"
+        }
+        productsConfiguration {
+            actionLabel = "productsConfiguration.label"
+            defaultActionLabel = "Categories and Products Configuration"
+            actionUrl = "/${appName}/productsConfiguration/index"
+        }
+        locationsConfiguration {
+            actionLabel = "locationsConfiguration.label"
+            defaultActionLabel = "Locations Configuration"
+            actionUrl = "/${appName}/locationsConfiguration/create"
         }
 }
 
@@ -768,6 +1064,7 @@ openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_F
 openboxes.identifier.shipment.format = Constants.DEFAULT_SHIPMENT_NUMBER_FORMAT
 openboxes.identifier.sequenceNumber.format = Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT
 openboxes.identifier.invoice.format = Constants.DEFAULT_INVOICE_NUMBER_FORMAT
+openboxes.identifier.location.format = Constants.DEFAULT_LOCATION_NUMBER_FORMAT
 
 openboxes.identifier.organization.format = Constants.DEFAULT_ORGANIZATION_NUMBER_FORMAT
 openboxes.identifier.organization.minSize = 2
@@ -911,12 +1208,17 @@ openboxes {
 
 
 // UserVoice widget
-openboxes.uservoice.widget.enabled = true
+openboxes.uservoice.widget.enabled = false
 openboxes.uservoice.widget.position = "right"
 
-// UserVoice widget
+// Zopim widget
 openboxes.zopim.widget.enabled = false
 openboxes.zopim.widget.url = "//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA"
+
+// HelpScout beacon
+openboxes.helpscout.widget.color = "#3AB4B1"
+openboxes.helpscout.widget.enabled = true
+openboxes.helpscout.widget.key = "44ee4f01-5334-4b93-ad25-03037903eb80"
 
 // JIRA Issue Collector
 openboxes.jira.issue.collector.enabled = false
@@ -1087,7 +1389,7 @@ openboxes {
             enabled = true
             label = "inventory.label"
             defaultLabel = "Inventory"
-            requiredActivities = [ActivityCode.MANAGE_INVENTORY]
+            requiredActivitiesAny = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
                     label: "inventory.browse.label",
@@ -1103,10 +1405,9 @@ openboxes {
                     menuItems: [
                         [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/${appName}/inventory/manage"],
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
-                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", href: "/${appName}/stockTransfer/create"],
-                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", href: "/${appName}/stockTransfer/list"],
-//                        OBPIH-4079: TEMPORARY DISABLED
-//                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", href: "/${appName}/replenishment/index"]
+                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/create"],
+                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/list"],
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/index"]
                     ]
                 ]
             ]
@@ -1120,10 +1421,11 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivities: [ActivityCode.PLACE_ORDER]],
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderType=PURCHASE_ORDER"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
-                            [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"]
+                            [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
+                            [label: "dashboard.supplierDashboard.label", defaultLabel: "Supplier Dashboard", href: "/${appName}/dashboard/supplier"]
                     ]
                 ]
             ]
@@ -1148,6 +1450,7 @@ openboxes {
             enabled = true
             label = "default.inbound.label"
             defaultLabel = "Inbound"
+            requiredActivitiesAny = [ActivityCode.RECEIVE_STOCK]
             subsections = [
                     [
                             label: "stockMovements.label",
@@ -1155,12 +1458,14 @@ openboxes {
                             menuItems: [
                                     [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
                                     [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
-                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"]
+                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
+                                    [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/${appName}/stockTransfer/createInboundReturn"]
                             ]
                     ],
                     [
                             label: "putAways.label",
                             defaultLabel: "Putaways",
+                            requiredActivitiesAll: ActivityCode.binTrackingList(),
                             menuItems: [
                                     [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
                                     [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
@@ -1172,6 +1477,7 @@ openboxes {
             enabled = true
             label = "outbound.label"
             defaultLabel = "Outbound"
+            requiredActivitiesAny = [ActivityCode.SEND_STOCK]
             subsections = [
                 [
                     label: "",
@@ -1179,8 +1485,7 @@ openboxes {
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
-//                        OBPIH-4199: TEMPORARILY DISABLED
-//                        [label: "outboundReturns.create.label", defaultLabel: "Create Return", href: "/${appName}/stockTransfer/createReturns"]
+                        [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/${appName}/stockTransfer/createOutboundReturn"]
                     ]
                 ]
             ]
@@ -1200,10 +1505,17 @@ openboxes {
                         [label: "report.expiringStockReport.label", defaultLabel: "Expiring Stock Report", href: "/${appName}/inventory/listExpiringStock"],
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/report/showCycleCountReport"],
-//                        OPBIH-4213: TEMPORARILY DISABLED
-//                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
+                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
                         [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
                     ]
+                ],
+                [
+                        label: "report.orderReports.label",
+                        defaultLabel: "Order Reports",
+                        menuItems: [
+                                [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
+                                [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
+                        ]
                 ],
                 [
                     label: "report.transactionReports.label",
@@ -1211,7 +1523,7 @@ openboxes {
                     menuItems: [
                         [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/${appName}/report/showTransactionReport"],
                         [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/show"],
-                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/${appName}/report/showRequestDetailReport"]
+                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/${appName}/report/showRequestDetailReport"],
                     ]
                 ],
                 [
@@ -1234,17 +1546,17 @@ openboxes {
             enabled = true
             label = "products.label"
             defaultLabel = "Products"
+            requiredActivitiesAny = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
-                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
-                        [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
-                        [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
-                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
-                        [label: "inventoryLevels.label", defaultLabel: "Inventory Levels", href: "/${appName}/inventoryLevel/list"],
+                        [label: "product.create.label", defaultLabel: "Create product", href: "/${appName}/product/create"],
+                        [label: "products.list.label", defaultLabel: "List Products", href: "/${appName}/product/list"],
+                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
+                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
+                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
                         [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
                     ]
                 ],
@@ -1252,26 +1564,23 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "products.label", defaultLabel: "Products", href: "/${appName}/product/list"],
-                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
-                        [label: "product.associations.label", defaultLabel: "Products Associations", href: "/${appName}/productAssociation/list"],
+                        [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
+                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
                         [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
-                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
-                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
-                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/${appName}/unitOfMeasureConversion/list"]
+                        [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
+                        [label: "product.associations.label", defaultLabel: "Associations", href: "/${appName}/productAssociation/list"],
                     ]
                 ],
                 [
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "product.create.label", defaultLabel: "Create new product", href: "/${appName}/product/create"],
-                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
-                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
-                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
-                        [label: "productSupplier.productSourcePreferencesExport.label", defaultLabel: "Export Product Source Preferences", href: "/${appName}/batch/downloadExcel?type=ProductSupplierPreference"],
-                        [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
-                        [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
+                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
+                        [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
+                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
+                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
+                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
+                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/${appName}/unitOfMeasureConversion/list"]
                     ]
                 ]
             ]
@@ -1346,7 +1655,11 @@ openboxes {
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],
                         [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
-                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"]
+                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
+                        [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
+                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
+                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"],
+                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/${appName}/resettingInstanceInfo/index"]
                     ]
                 ]
             ]
@@ -1398,6 +1711,24 @@ openboxes {
             defaultLabel = "Receiving"
         }
     }
+    requestorMegamenu {
+        request {
+            enabled = true
+            requiredRole = [RoleType.ROLE_REQUESTOR]
+            label = "default.inbound.label"
+            defaultLabel = "Inbound"
+            subsections = [
+                    [
+                            label       : "stockMovements.label",
+                            defaultLabel: "Stock Movements",
+                            menuItems   : [
+                                    [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
+                                    [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
+                            ]
+                    ]
+            ]
+        }
+    }
 }
 
 openboxes.generateName.separator = " - "
@@ -1412,6 +1743,202 @@ openboxes.shipping.search.maxResults = 1000
 // Automatically create temporary receiving locations for shipments
 openboxes.receiving.createReceivingLocation.enabled = true
 openboxes.receiving.receivingLocation.prefix = Constants.DEFAULT_RECEIVING_LOCATION_PREFIX
+
+
+openboxes.supportLinks = [
+    configureOrganizationsAndLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations',
+    manageBinLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1311572061/Manage+Bin+Locations',
+    discussionForum: 'https://discuss.openboxes.com/',
+    knowledgeBase: 'https://openboxes.helpscoutdocs.com/',
+]
+
+// Reset an instance
+
+openboxes.resettingInstance.command = "wget https://raw.githubusercontent.com/openboxes/openboxes/develop/reset-database.sh | sh"
+
+// Product configuration wizard
+openboxes.configurationWizard.enabled = true
+openboxes.configurationWizard.categoryOptions = [
+    defaultCategories: [
+        enabled: true,
+        fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/default_OB_categories.csv",
+        rootCategoryName: "ROOT",
+        categoryNameColumnIndex: 0,
+        parentCategoryNameColumnIndex: 1,
+        title: "OpenBoxes Default Category List",
+        description: "<div>A simple and flexible category tree with 25 categories organized into Equipment, Medicine, Supplies, Perishables, and Other. A good place to start for users  who aren’t sure exactly what they want. Can be edited after import. See a sample of the category tree below.</div>" +
+                "<div class='category-list'>" +
+                "  <ul>" +
+                "    <li>Supplies" +
+                "      <ul>" +
+                "        <li>Office Supplies</li>" +
+                "        <li>Medical Supplies" +
+                "          <ul>" +
+                "            <li>Dental</li>" +
+                "            <li>Lab</li>" +
+                "            <li>Surgical</li>" +
+                "          </ul>" +
+                "        </li>" +
+                "      </ul>" +
+                "    </li>" +
+                "    <li>Equipment</li>" +
+                "  </ul>" +
+                "</div>",
+    ],
+    unspscCategories: [
+        enabled: true,
+        // TODO: add option to support 'classpath:'
+        fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/UNSPSC_categories.csv",
+        rootCategoryName: "ROOT", // needs to match the category from file
+        categoryNameColumnIndex: 0,
+        parentCategoryNameColumnIndex: 1,
+        title: "UNSPSC Category List",
+        description: "<div>A tree of 201 categories based on the <a target='_blank' rel='noopener noreferrer' href='https://www.unspsc.org'>United Nations Standard Products and Services Code</a>. This list takes some of the most commonly used sections and classes from the UNSPSC list, using the sections as parent categories for the classes. This is a good option for organizations who already use UNSPSC classifications or who want a very detailed tree. See a sample section of the tree below.</div>" +
+                "<div class='category-list'>" +
+                "  <ul>" +
+                "    <li>Paper Materials and Products" +
+                "      <ul>" +
+                "        <li>Paper materials</li>" +
+                "        <li>Paper Products</li>" +
+                "        <li>Industrial use papers</li>" +
+                "      </ul>" +
+                "    </li>" +
+                "    <li>Office Equipment and Accessories and Supplies" +
+                "      <ul>" +
+                "        <li>Office machines and their supplies and accessories</li>" +
+                "      </ul>" +
+                "    </li>" +
+                "  </ul>" +
+                "</div>",
+    ],
+    whoCategories: [
+            enabled: true,
+            // TODO: add option to support 'classpath:'
+            fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_categories.csv",
+            rootCategoryName: "ROOT", // needs to match the category from file
+            categoryNameColumnIndex: 0,
+            parentCategoryNameColumnIndex: 1,
+            title: "WHO Category List",
+            description: "<div>A system of medical categorization used by the <a target='_blank' rel='noopener noreferrer' href='https://www.who.int/groups/expert-committee-on-selection-and-use-of-essential-medicines/essential-medicines-lists'>WHO in their Essential Medicines List</a>. This categorization system is focused entirely on medication, and is best suited to healthcare organizations. Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to which medical items and other categories can be added. Users that want to import the WHO Essential Medicines List as their product list must select this category tree. See a sample of the tree below.</div>" +
+                    "<div class='category-list'>" +
+                    "  <ul>" +
+                    "    <li>Antileprosy Medicines</li>" +
+                    "    <li>Antimalarial Medicines" +
+                    "      <ul>" +
+                    "        <li>For Chemoprevention</li>" +
+                    "        <li>For Curative Treatment</li>" +
+                    "        <li>For Treatment of Acute Attack</li>" +
+                    "      </ul>" +
+                    "    </li>" +
+                    "    <li>Antimigraine Medicines</li>" +
+                    "  </ul>" +
+                    "</div>",
+    ]
+]
+
+openboxes.configurationWizard.productOptions = [
+        whoProducts: [
+                enabled: true,
+                // TODO: add option to support 'classpath:'
+                fileUrl: "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_products.csv",
+                title: "WHO product list",
+                description: "<div>This selection will import the WHO Essential Medicines List (Sept 2021 version) into your instance as products.  Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to building out their products in OpenBoxes.</div>" +
+                        "<div class='my-3'>In order to import this product list, you must have selected the corresponding WHO category tree in the previous step. This product list will not work with any other category tree. Go to <a target='_blank' rel='noopener noreferrer' href='https://list.essentialmeds.org/'>list.essentialmeds.org</a> to view the full WHO list that will be imported.</div>",
+        ]
+]
+
+openboxes.configurationWizard.listOfDemoData = [
+    title: "Summary of data to be loaded",
+    description: "<ul>" +
+                 "  <li>57 products across 21 categories</li>" +
+                 "  <li>18 locations including 3 depots, 5 suppliers, and 10 dispensaries</li>" +
+                 "  <li>Inventory for 3 depots</li>" +
+                 "  <li>12 sample people and users</li>" +
+                 "  <li>2 sample stock lists</li>" +
+                 "<ul>",
+]
+
+openboxes {
+    configurationWizard {
+        dataInit {
+            locations {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locations.csv"
+            }
+            locationGroups {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/locationGroups.csv"
+            }
+            organizations {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/organizations.csv"
+            }
+            binLocations {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/binLocations.csv"
+            }
+            categories {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/default_OB_categories.csv"
+            }
+            products {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/products.csv"
+            }
+            productCatalog {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalog.csv"
+            }
+            productCatalogItems {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productCatalogItems.csv"
+            }
+            productSuppliers {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/productSuppliers.csv"
+            }
+            mainWarehouseInventory {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/mainWarehouseInventory.csv"
+                warehouseName = "Main Warehouse"
+            }
+            bostonWarehouseInventory {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonWarehouseInventory.csv"
+                warehouseName = "Boston Warehouse"
+            }
+            chicagoWarehouseInventory {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoWarehouseInventory.csv"
+                warehouseName = "Chicago Warehouse"
+            }
+            inventoryLevels {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/inventoryLevels.csv"
+                warehouseName = "Main Warehouse"
+            }
+            users {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/users.csv"
+            }
+            persons {
+                enabled = true
+                url = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/persons.csv"
+            }
+            chicagoStocklist {
+                enabled = true
+                templateUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoStocklistTemplate.csv"
+                itemsUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/chicagoStocklistItems.csv"
+            }
+            bostonStocklist {
+                enabled = true
+                templateUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonStocklistTemplate.csv"
+                itemsUrl = "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/bostonStocklistItems.csv"
+            }
+        }
+    }
+}
+
 
 // Pagination
 openboxes.api.pagination.enabled = true
@@ -1449,3 +1976,6 @@ grails.gorm.default.mapping = {
 grails.gorm.default.constraints = {
     expirationDateConstraint(nullable: true, min: openboxes.expirationDate.minValue)
 }
+
+// Order number prefix for bin replenishment case
+openboxes.stockTransfer.binReplenishment.prefix = Constants.REPLENISHMENT_PREFIX

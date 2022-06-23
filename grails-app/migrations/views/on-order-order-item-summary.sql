@@ -2,7 +2,10 @@ CREATE OR REPLACE VIEW on_order_order_item_summary AS
 (
 SELECT a.product_id,
        a.destination_id,
-       ifnull(sum(a.quantity_ordered) - sum(a.quantity_shipped), 0) as quantity_ordered_not_shipped,
+       ifnull(sum(case
+                    when a.quantity_ordered - a.quantity_shipped > 0
+                        then a.quantity_ordered - a.quantity_shipped
+                    else 0 end), 0) as quantity_ordered_not_shipped,
        null                                                         as quantity_shipped_not_received
 FROM (
          SELECT product.id                   as product_id,
@@ -13,7 +16,7 @@ FROM (
                                      then order_item.quantity * order_item.quantity_per_uom
                                  else 0 end) as quantity_ordered,
                 sum(case
-                        when shipment_item.quantity then shipment_item.quantity
+                        when shipment_item.quantity and shipment.current_status in ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') then shipment_item.quantity
                         else 0 end)          as quantity_shipped,
                 null                         as quantity_shipped_not_received
          FROM order_item

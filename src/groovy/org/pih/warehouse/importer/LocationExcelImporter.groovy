@@ -19,20 +19,40 @@ class LocationExcelImporter extends AbstractExcelImporter {
             sheet    : 'Sheet1',
             startRow : 1,
             columnMap: [
-                    'A': 'name',
-                    'B': 'locationNumber',
-                    'C': 'locationType',
-                    'D': 'locationGroup',
-                    'E': 'parentLocation'
+                    'A': 'id',
+                    'B': 'name',
+                    'C': 'active',
+                    'D': 'locationNumber',
+                    'E': 'locationType',
+                    'F': 'locationGroup',
+                    'G': 'parentLocation',
+                    'H': 'organization',
+                    'I': 'streetAddress',
+                    'J': 'streetAddress2',
+                    'K': 'city',
+                    'L': 'stateOrProvince',
+                    'M': 'postalCode',
+                    'N': 'country',
+                    'O': 'description',
             ]
     ]
 
     static Map propertyMap = [
-            name          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            locationNumber: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            locationType  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            locationGroup : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            parentLocation: ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            id              : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            name            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            active          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            locationNumber  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            locationType    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            locationGroup   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            parentLocation  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            organization    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            streetAddress   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            streetAddress2  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            city            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            stateOrProvince : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            postalCode      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            country         : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            description     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
     LocationExcelImporter(String fileName) {

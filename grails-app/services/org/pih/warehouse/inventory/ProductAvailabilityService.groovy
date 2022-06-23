@@ -21,9 +21,10 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
@@ -151,29 +152,32 @@ class ProductAvailabilityService {
     }
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
-        Picklist.createCriteria().list {
-            projections {
-                picklistItems {
-                    groupProperty("binLocation.id", "binLocation")
-                    groupProperty("inventoryItem.id", "inventoryItem")
-                    sum("quantity", "quantity")
-                    groupProperty("sortOrder", "sortOrder")
-                }
-            }
-            requisition {
-                'in'("status", RequisitionStatus.listPending())
-                eq("origin", location)
-            }
-            picklistItems {
-                if (product) {
-                    requisitionItem {
-                        eq("product", product)
-                    }
-                }
-                order("binLocation")
-                order("inventoryItem")
-            }
-        }.collect { [binLocation: it[0], inventoryItem: it[1], quantityAllocated: it[2]] }
+        def results = Picklist.executeQuery("""
+            SELECT
+                pli.binLocation,
+                pli.inventoryItem,
+                sum(pli.quantity)*((count(distinct pli.requisitionItem) + count(distinct pli.orderItem) )/ count(*))
+            FROM Picklist pl
+            INNER JOIN pl.picklistItems pli
+            LEFT JOIN pl.requisition r
+            LEFT JOIN pl.order o
+            LEFT JOIN pli.requisitionItem ri
+            LEFT JOIN pli.orderItem oi
+            LEFT JOIN pli.inventoryItem ii
+            LEFT JOIN pli.binLocation l
+            LEFT JOIN l.supportedActivities s
+            WHERE ((r.origin = :location AND r.status IN (:pendingRequisitionStatus)) OR (o.origin = :location AND o.status IN (:pendingOrderStatus)))
+              AND (oi IS NOT NULL OR (ri IS NOT NULL AND (ii.lotStatus IS NULL OR ii.lotStatus != 'RECALLED') AND NOT ('HOLD_STOCK' IN ELEMENTS(l.supportedActivities))))
+              AND (:product = '' OR ri.product.id = :product OR oi.product.id = :product)
+            GROUP BY pli.binLocation, pli.inventoryItem
+        """, [
+                location                    : location,
+                pendingRequisitionStatus    : RequisitionStatus.listPending(),
+                pendingOrderStatus          : OrderStatus.listPending(),
+                product                     : product?.id ?: ''
+        ])
+
+        return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
     }
 
     def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
@@ -385,16 +389,29 @@ class ProductAvailabilityService {
         return quantityOnHand
     }
 
-    def getQuantityNotPickedInBinLocation(InventoryItem inventoryItem, Location binLocation) {
-        def quantityOnHand = ProductAvailability.createCriteria().get {
+    def getQuantityNotPickedInBinLocation(InventoryItem inventoryItem, Location location, Location binLocation) {
+        return ProductAvailability.createCriteria().get {
             projections {
                 sum("quantityNotPicked")
             }
+            eq("location", location)
             eq("inventoryItem", inventoryItem)
-            eq("binLocation", binLocation)
+            if (binLocation) {
+                eq("binLocation", binLocation)
+            } else {
+                isNull("binLocation")
+            }
         }
+    }
 
-        return quantityOnHand
+    def getQuantityNotPickedInLocation(Product product, Location location) {
+        return  ProductAvailability.createCriteria().get {
+            projections {
+                sum("quantityNotPicked")
+            }
+            eq("product", product)
+            eq("location", location)
+        }
     }
 
     Map<Product, Integer> getCurrentInventory(Location location) {
@@ -461,7 +478,7 @@ class ProductAvailabilityService {
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
-						select pa.product, sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
+						select pa.product.id, sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa
 						where pa.location = :location
 						and pa.product in (:products)
@@ -474,10 +491,10 @@ class ProductAvailabilityService {
         }
 
         if (products.size() != quantityMap.size()) {
-            def missingProducts = products - quantityMap.keySet()
-            missingProducts.each { Product product ->
-                if (!quantityMap[product]) {
-                    quantityMap[product] = 0
+            def missingProducts = products*.id - quantityMap.keySet()
+            missingProducts.each { productId ->
+                if (!quantityMap[productId]) {
+                    quantityMap[productId] = 0
                 }
             }
         }
@@ -833,9 +850,6 @@ class ProductAvailabilityService {
     List<ProductAvailability> getStockTransferCandidates(Location location) {
         return ProductAvailability.createCriteria().list {
             eq("location", location)
-            binLocation {
-                ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
-            }
             gt("quantityOnHand", 0)
         }
     }
@@ -851,9 +865,6 @@ class ProductAvailabilityService {
         Date expirationDate = params.expirationDate ? dateFormat.parse(params.expirationDate) : null
         return ProductAvailability.createCriteria().list {
             eq("location", location)
-            binLocation {
-                ne("locationType", LocationType.get(Constants.RECEIVING_LOCATION_TYPE_ID))
-            }
             or {
                 if (product) {
                     eq("product", product)
@@ -885,9 +896,32 @@ class ProductAvailabilityService {
             eq("inventoryItem", inventoryItem)
             if (binLocation) {
                 eq("binLocation", binLocation)
+            } else {
+                isNull("binLocation")
             }
         }
 
         return quantityAvailableToPromise ?: 0
+    }
+
+    def getQuantityAvailableToPromiseByProductNotInBin(Location location, Location binLocation, Product product) {
+        def quantityAvailableToPromiseByProductNotInBin = ProductAvailability.createCriteria().get {
+            projections {
+                sum("quantityAvailableToPromise")
+            }
+
+            eq("location", location)
+            eq("product", product)
+            if (binLocation) {
+                or {
+                    ne("binLocation", binLocation)
+                    isNull("binLocation")
+                }
+            } else {
+                isNotNull("binLocation")
+            }
+        }
+
+        return quantityAvailableToPromiseByProductNotInBin ?: 0
     }
 }

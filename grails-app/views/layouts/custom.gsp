@@ -47,11 +47,12 @@
     <g:render template="/common/fullstory"/>
     <g:render template="/common/hotjar"/>
 
-    <ga:trackPageview />
+    <ga:trackPageview/>
     <r:layoutResources/>
 
     <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" data-auto-replace-svg="nest"></script>
 </head>
+
 <body class="yui-skin-sam">
 
 <g:render template="/common/customVariables"/>
@@ -628,7 +629,6 @@
         }]);
     </script>
 </g:if>
-<!-- Live Chat -->
 <g:if test="${grailsApplication.config.openboxes.zopim.widget.enabled}">
     <!--Start of Zopim Live Chat Script-->
     <script type="text/javascript">

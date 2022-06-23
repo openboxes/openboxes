@@ -58,7 +58,5 @@ class LocalizationApiController {
         Locale locale = localizationService.getLocale(languageCode)
         String message = messageSource.getMessage(params.id, params.list("args").toArray(), locale)
         render([code: params.id, message: message, currentLocale: locale] as JSON)
-
     }
-
 }

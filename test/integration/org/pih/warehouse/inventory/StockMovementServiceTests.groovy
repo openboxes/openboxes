@@ -22,8 +22,6 @@ import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 
-import static org.junit.Assert.assertNotNull
-
 class StockMovementServiceTests extends GroovyTestCase {
 
 	def stockMovementService

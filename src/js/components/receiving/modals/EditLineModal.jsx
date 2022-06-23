@@ -1,19 +1,21 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+
 import _ from 'lodash';
-import { connect } from 'react-redux';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import ModalWrapper from '../../form-elements/ModalWrapper';
-import ArrayField from '../../form-elements/ArrayField';
-import TextField from '../../form-elements/TextField';
-import DateField from '../../form-elements/DateField';
-import SelectField from '../../form-elements/SelectField';
-import { showSpinner, hideSpinner } from '../../../actions';
-import Translate, { translateWithDefaultMessage } from '../../../utils/Translate';
-import { debounceProductsFetch } from '../../../utils/option-utils';
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import DateField from 'components/form-elements/DateField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import SelectField from 'components/form-elements/SelectField';
+import TextField from 'components/form-elements/TextField';
+import { debounceProductsFetch } from 'utils/option-utils';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+
 
 const FIELDS = {
   lines: {

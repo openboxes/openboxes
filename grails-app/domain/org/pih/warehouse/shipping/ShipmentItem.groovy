@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.shipping
 
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.donation.Donor
@@ -51,7 +52,8 @@ class ShipmentItem implements Comparable, Serializable {
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
 
     static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
-                         "orderNumber", "orderId", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked"]
+                         "orderNumber", "orderId", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders",
+                         "unavailableQuantityPicked"]
 
     static mapping = {
         id generator: 'uuid'
@@ -197,6 +199,33 @@ class ShipmentItem implements Comparable, Serializable {
             quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity }
         } else {
             quantityPicked = requisitionItem?.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity }
+        }
+        return quantityPicked?:quantity
+    }
+
+    // For requisition based shipments, to avoid qualifying recalled or on hold items into quantity picked validation
+    Integer getUnavailableQuantityPicked() {
+        Integer unavailableQuantityPicked
+        if (binLocation) {
+            unavailableQuantityPicked = requisitionItem?.picklistItems?.findAll {
+                it.inventoryItem == inventoryItem && it.binLocation == binLocation && (
+                    it.inventoryItem?.recalled || it.binLocation?.supports(ActivityCode.HOLD_STOCK)
+                )
+            }?.sum { it.quantity }
+        } else {
+            unavailableQuantityPicked = requisitionItem?.picklistItems?.findAll {
+                it.inventoryItem == inventoryItem && it.inventoryItem?.recalled
+            }?.sum { it.quantity }
+        }
+        return unavailableQuantityPicked?:0
+    }
+
+    Integer getQuantityPickedFromOrders() {
+        Integer quantityPicked
+        if (binLocation) {
+            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem && it.binLocation == binLocation }?.sum { it.quantity } }.sum()
+        } else {
+            quantityPicked = orderItems.collect { it.picklistItems?.findAll { it.inventoryItem == inventoryItem }?.sum { it.quantity } }.sum()
         }
         return quantityPicked?:quantity
     }

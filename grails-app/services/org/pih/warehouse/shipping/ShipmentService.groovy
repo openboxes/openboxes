@@ -38,7 +38,6 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.PicklistItem
@@ -367,6 +366,20 @@ class ShipmentService {
         return shipmentItems.findAll { !it.isFullyReceived() }
     }
 
+    List<ShipmentItem> getPendingInboundShipmentItems(Location destination, List<Product> products) {
+        def shipmentItems = ShipmentItem.createCriteria().list() {
+            shipment {
+                eq("destination", destination)
+                not {
+                    'in'("currentStatus", [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PENDING])
+                }
+            }
+            'in'("product", products)
+        }
+
+        return shipmentItems.findAll { !it.isFullyReceived() }
+    }
+
     /**
      * Get all shipments that are shipping to the given location.
      *
@@ -671,14 +684,13 @@ class ShipmentService {
             shipmentItem.binLocation = null
         }
         return shipment.save()
-
     }
 
 
     boolean validateShipment(Shipment shipment) {
-        if (shipment?.orders && shipment?.orders?.first()?.orderType == OrderType.findByCode(Constants.OUTBOUND_RETURNS)) {
+        if (shipment?.orders && shipment?.orders?.first()?.orderType?.isReturnOrder()) {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
-                validateReturnShipmentItem(shipmentItem)
+                validateReturnShipmentItem(shipmentItem, shipmentItem.binLocation ? true : false)
             }
         } else {
             shipment?.shipmentItems?.each { ShipmentItem shipmentItem ->
@@ -716,7 +728,7 @@ class ShipmentService {
             }
 
             def quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked
+            def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked - shipmentItem.unavailableQuantityPicked
 
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
@@ -749,32 +761,42 @@ class ShipmentService {
      * @param shipmentItem shipment item to validate
      * @return boolean
      */
-    boolean validateReturnShipmentItem(ShipmentItem shipmentItem) {
-        if (!shipmentItem.validate()) {
-            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
-        }
-
+    boolean validateReturnShipmentItem(ShipmentItem shipmentItem, Boolean withBinLocation) {
         def origin = Location.get(shipmentItem?.shipment?.origin?.id)
-        def quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, shipmentItem.binLocation)
 
-        if (shipmentItem.quantity > quantityAvailableToReturn) {
-            String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
-                    "product code ''${shipmentItem.product.productCode}'' " +
-                    "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
-                    "at origin ''${origin.name}'' " +
-                    "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
-                    "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
-                    "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
-            shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
-                    [
-                            shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                            quantityAvailableToReturn + " " + shipmentItem?.product?.unitOfMeasure,
-                            shipmentItem?.product?.productCode,
-                            shipmentItem?.inventoryItem?.lotNumber,
-                            origin.name,
-                            shipmentItem?.binLocation?.name ?: 'Default'
-                    ].toArray(), errorMessage)
-            throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+        if (origin.requiresOutboundQuantityValidation()) {
+            if (!shipmentItem.validate()) {
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
+
+            def quantityAvailableToReturn
+            if (withBinLocation) {
+                // Picked value added to compensate value already subtracted
+                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInBinLocation(shipmentItem.inventoryItem, origin, shipmentItem.binLocation) + shipmentItem.getQuantityPickedFromOrders()
+            } else {
+                // Picked value added to compensate value already subtracted
+                quantityAvailableToReturn = productAvailabilityService.getQuantityNotPickedInLocation(shipmentItem.product, origin) + shipmentItem.getQuantityPickedFromOrders()
+            }
+
+            if (shipmentItem.quantity > quantityAvailableToReturn) {
+                String errorMessage = "Shipping quantity (${shipmentItem.quantity}) can not exceed quantity on hand (${quantityAvailableToReturn}) for " +
+                        "product code ''${shipmentItem.product.productCode}'' " +
+                        "and lot number ''${shipmentItem?.inventoryItem?.lotNumber}'' " +
+                        "at origin ''${origin.name}'' " +
+                        "bin ''${shipmentItem?.binLocation?.name ?: 'Default'}''. " +
+                        "This can occur if changes were made to inventory after this shipment was picked but before it shipped. " +
+                        "To move forward, please remove the lines above from the shipment or reduce to reflect current QOH."
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
+                        [
+                                shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
+                                quantityAvailableToReturn + " " + shipmentItem?.product?.unitOfMeasure,
+                                shipmentItem?.product?.productCode,
+                                shipmentItem?.inventoryItem?.lotNumber,
+                                origin.name,
+                                shipmentItem?.binLocation?.name ?: 'Default'
+                        ].toArray(), errorMessage)
+                throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
+            }
         }
         return true
     }
@@ -2248,33 +2270,59 @@ class ShipmentService {
     }
 
     def createShipmentItems(OrderItem orderItem) {
-        def shipmentItems = orderItem.shipmentItems
+        def shipmentItems = orderItem.shipmentItems ?: []
+        def currentLocation = AuthService?.currentLocation?.get()
         if (shipmentItems) {
             shipmentItems.each { ShipmentItem shipmentItem ->
-                PicklistItem picklistItem = orderItem.picklistItems?.find {
-                    shipmentItem.inventoryItem == it.inventoryItem && shipmentItem.binLocation == it.binLocation
+                if (orderItem?.order?.isOutbound(currentLocation)) {
+                    PicklistItem picklistItem = orderItem.picklistItems?.find {
+                        shipmentItem.inventoryItem == it.inventoryItem && shipmentItem.binLocation == it.binLocation
+                    }
+                    shipmentItem.quantity = picklistItem?.quantity ?: shipmentItem.quantity
+                } else {
+                    shipmentItem.quantity = orderItem.quantity
+                    shipmentItem.lotNumber = orderItem?.inventoryItem?.lotNumber
+                    shipmentItem.expirationDate = orderItem?.inventoryItem?.expirationDate
+                    shipmentItem.product = orderItem?.product
+                    shipmentItem.quantity = orderItem?.quantity
+                    shipmentItem.recipient = orderItem?.recipient
+                    shipmentItem.inventoryItem = orderItem?.inventoryItem
+                    shipmentItem.sortOrder = shipmentItems?.size()
                 }
-                shipmentItem.quantity = picklistItem?.quantity ?: shipmentItem.quantity
             }
             return shipmentItems
         }
 
-        orderItem?.picklistItems?.each { PicklistItem picklistItem ->
-            if (picklistItem.quantity > 0) {
-                ShipmentItem shipmentItem = new ShipmentItem()
-                shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
-                shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
-                shipmentItem.product = picklistItem?.inventoryItem?.product
-                shipmentItem.quantity = picklistItem?.quantity
-                shipmentItem.recipient = picklistItem?.orderItem?.recipient ?:
-                        picklistItem?.orderItem?.parentOrderItem?.recipient
-                shipmentItem.inventoryItem = picklistItem?.inventoryItem
-                shipmentItem.binLocation = picklistItem?.binLocation
-                shipmentItem.sortOrder = shipmentItems.size()
+        if (orderItem?.order?.isOutbound(currentLocation)) {
+            orderItem?.picklistItems?.each { PicklistItem picklistItem ->
+                if (picklistItem.quantity > 0) {
+                    ShipmentItem shipmentItem = new ShipmentItem()
+                    shipmentItem.lotNumber = picklistItem?.inventoryItem?.lotNumber
+                    shipmentItem.expirationDate = picklistItem?.inventoryItem?.expirationDate
+                    shipmentItem.product = picklistItem?.inventoryItem?.product
+                    shipmentItem.quantity = picklistItem?.quantity
+                    shipmentItem.recipient = picklistItem?.orderItem?.recipient ?:
+                            picklistItem?.orderItem?.parentOrderItem?.recipient
+                    shipmentItem.inventoryItem = picklistItem?.inventoryItem
+                    shipmentItem.binLocation = picklistItem?.binLocation
+                    shipmentItem.sortOrder = shipmentItems?.size()
 
-                shipmentItem.addToOrderItems(picklistItem.orderItem)
-                shipmentItems.add(shipmentItem)
+                    shipmentItem.addToOrderItems(picklistItem.orderItem)
+                    shipmentItems.add(shipmentItem)
+                }
             }
+        } else {
+            ShipmentItem shipmentItem = new ShipmentItem()
+            shipmentItem.lotNumber = orderItem?.inventoryItem?.lotNumber
+            shipmentItem.expirationDate = orderItem?.inventoryItem?.expirationDate
+            shipmentItem.product = orderItem?.product
+            shipmentItem.quantity = orderItem?.quantity
+            shipmentItem.recipient = orderItem?.recipient
+            shipmentItem.inventoryItem = orderItem?.inventoryItem
+            shipmentItem.sortOrder = shipmentItems?.size()
+
+            shipmentItem.addToOrderItems(orderItem)
+            shipmentItems.add(shipmentItem)
         }
 
         return shipmentItems

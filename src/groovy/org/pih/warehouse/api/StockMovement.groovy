@@ -22,19 +22,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
-enum StockMovementType {
-
-    INBOUND('Inbound'),
-    OUTBOUND('Outbound')
-
-    String name
-
-    StockMovementType(String name) { this.name = name }
-
-    static list() {
-        [INBOUND, OUTBOUND]
-    }
-}
 
 @Validateable
 class StockMovement {
@@ -67,7 +54,7 @@ class StockMovement {
     String currentStatus
     Float totalValue
 
-    StockMovementType stockMovementType
+    StockMovementDirection stockMovementDirection
     StockMovementStatusCode stockMovementStatusCode
 
 
@@ -79,6 +66,7 @@ class StockMovement {
     Boolean isFromOrder = Boolean.FALSE
     Boolean isShipped = Boolean.FALSE
     Boolean isReceived = Boolean.FALSE
+    Boolean isReturn = Boolean.FALSE
 
     Requisition stocklist
     Requisition requisition
@@ -99,7 +87,7 @@ class StockMovement {
         requestedBy(nullable: false)
         dateRequested(nullable: false)
 
-        stockMovementType(nullable: true)
+        stockMovementDirection(nullable: true)
         stockMovementStatusCode(nullable: true)
         receiptStatusCode(nullable: true)
         dateShipped(nullable: true)
@@ -156,6 +144,7 @@ class StockMovement {
                 documents  : documents
             ],
             isFromOrder         : isFromOrder,
+            isReturn            : isReturn,
             isShipped           : isShipped,
             isReceived          : isReceived,
             shipped             : isShipped,
@@ -175,16 +164,6 @@ class StockMovement {
     }
 
     /**
-     * Return the receipt status of the associated stock movement.
-     *
-     * @return
-     */
-    ShipmentStatusCode getShipmentStatusCode() {
-        return shipment?.status?.code ?: ShipmentStatusCode.PENDING
-
-    }
-
-    /**
      * Return total value of the issued shipment
      *
      * @return
@@ -192,6 +171,20 @@ class StockMovement {
     Float getTotalValue() {
         def itemsWithPrice = shipment?.shipmentItems?.findAll { it.product.pricePerUnit }
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
+    }
+
+    /**
+     * Return the stock movement directions based on a given location
+     *
+     * @return
+     */
+    StockMovementDirection getStockMovementDirection (Location currentLocation) {
+        if(currentLocation == origin)
+            return StockMovementDirection.OUTBOUND
+        else if(currentLocation == destination || origin?.isSupplier())
+            return StockMovementDirection.INBOUND
+        else
+            return null
     }
 
     Boolean isPending() {
@@ -295,6 +288,8 @@ class StockMovement {
                 createdBy: shipment.createdBy,
                 updatedBy: shipment.updatedBy,
                 shipment: shipment,
+                order: shipment?.returnOrder,
+                isReturn: shipment?.isFromReturnOrder,
                 isFromOrder: shipment?.isFromPurchaseOrder,
                 isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
                 isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
@@ -352,6 +347,7 @@ class StockMovement {
             currentStatus: shipment?.currentStatus,
             stocklist: requisition?.requisitionTemplate,
             isFromOrder: Boolean.FALSE,
+            isReturn: Boolean.FALSE,
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
@@ -391,28 +387,6 @@ class StockMovement {
         }
 
         return stockMovement
-    }
-
-}
-
-enum DocumentGroupCode {
-
-    EXPORT('Export'),
-    INVOICE('Invoice'),
-    PICKLIST('Pick list'),
-    PACKING_LIST('Packing List'),
-    CERTIFICATE_OF_DONATION('Certificate of Donation'),
-    DELIVERY_NOTE('Delivery Note'),
-    GOODS_RECEIPT_NOTE('Goods Receipt Note'),
-
-    final String description
-
-    DocumentGroupCode(String description) {
-        this.description = description
-    }
-
-    static list() {
-        return [EXPORT, INVOICE, PICKLIST, PACKING_LIST, CERTIFICATE_OF_DONATION, DELIVERY_NOTE, GOODS_RECEIPT_NOTE]
     }
 
 }

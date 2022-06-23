@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import _ from 'lodash';
-import update from 'immutability-helper';
-import { getTranslate } from 'react-localize-redux';
 
-import ModalWrapper from '../../form-elements/ModalWrapper';
-import LabelField from '../../form-elements/LabelField';
-import Select from '../../../utils/Select';
-import ArrayField from '../../form-elements/ArrayField';
-import TextField from '../../form-elements/TextField';
-import Checkbox from '../../../utils/Checkbox';
-import apiClient from '../../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../../actions';
-import { debounceProductsInOrders } from '../../../utils/option-utils';
-import renderHandlingIcons from '../../../utils/product-handling-icons';
-import { translateWithDefaultMessage } from '../../../utils/Translate';
+import update from 'immutability-helper';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
+
+import { hideSpinner, showSpinner } from 'actions';
+import ArrayField from 'components/form-elements/ArrayField';
+import LabelField from 'components/form-elements/LabelField';
+import ModalWrapper from 'components/form-elements/ModalWrapper';
+import TextField from 'components/form-elements/TextField';
+import apiClient from 'utils/apiClient';
+import Checkbox from 'utils/Checkbox';
+import { debounceProductsInOrders } from 'utils/option-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
+import Select from 'utils/Select';
+import { translateWithDefaultMessage } from 'utils/Translate';
+
 
 const FIELDS = {
   orderItems: {
@@ -230,7 +232,7 @@ class CombinedShipmentItemsModal extends Component {
     const { vendor, destination } = this.props;
     const url = '/openboxes/api/combinedShipmentItems/findOrderItems';
     const payload = {
-      orderIds: selectedOrders, productId: selectedProductId, vendor, destination,
+      orderIds: _.map(selectedOrders, o => o.id), productId: selectedProductId, vendor, destination,
     };
     return apiClient.post(url, payload).then(resp => this.setState({
       formValues: {
@@ -334,6 +336,8 @@ class CombinedShipmentItemsModal extends Component {
             options={orderNumberOptions}
             showValueTooltip
             onChange={value => this.setSelectedOrders(value)}
+            valueKey="id"
+            labelKey="orderNumber"
             classes=""
             cache={false}
           />
@@ -351,10 +355,10 @@ class CombinedShipmentItemsModal extends Component {
             filterOption={options => options}
             cache={false}
             optionRenderer={option => (
-              <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+              <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
                 {option.label}
                 &nbsp;
-                {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+                {renderHandlingIcons(option.handlingIcons)}
               </strong>
             )}
             valueRenderer={option => (

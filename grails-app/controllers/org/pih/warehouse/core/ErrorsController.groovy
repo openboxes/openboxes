@@ -97,7 +97,7 @@ class ErrorsController {
             response.status = 400
             BeanPropertyBindingResult errors = request?.exception?.cause?.errors
             def errorMessages = errors.allErrors.collect {
-                return messageService.getMessage(it.codes[0], it.arguments, it.defaultMessage, null)
+                return messageService.getMessage(it.codes[0], it.arguments, (it.defaultMessage ?: it.codes[0]), null)
             }
             render([errorCode: 400,
                     errorMessage: "Validation error. " + request?.exception?.cause?.fullMessage,
@@ -114,26 +114,20 @@ class ErrorsController {
 
         if (enabled) {
             def recipients = grailsApplication.config.openboxes.mail.feedback.recipients
-
             def jsonObject = JSON.parse(params.data)
             byte[] attachment = jsonObject[1].replace("data:image/png;base64,", "").decodeBase64()
-
-            def emailMessage = [
-                    from          : session?.user?.email,
-                    to            : recipients,
-                    cc            : [],
-                    bcc           : [],
-                    subject       : jsonObject[0]["summary"],
-                    body          : jsonObject[0]["description"],
-                    attachment    : attachment,
-                    attachmentName: "screenshot.png",
-                    mimeType      : "image/png"
-
-            ]
-            mailService.sendHtmlMailWithAttachment(emailMessage)
+            mailService.sendHtmlMailWithAttachment(
+                    session?.user,
+                    recipients,
+                    null,
+                    jsonObject[0]["summary"],
+                    jsonObject[0]["description"],
+                    attachment,
+                    "screenshot.png",
+                    "image/png"
+            )
         }
         render "OK"
-
     }
 
 

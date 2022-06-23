@@ -52,7 +52,14 @@ enum ActivityCode {
     REQUIRE_ACCOUNTING('REQUIRE_ACCOUNTING'),
 
     // Central purchasing
-    ENABLE_CENTRAL_PURCHASING('ENABLE_CENTRAL_PURCHASING')
+    ENABLE_CENTRAL_PURCHASING('ENABLE_CENTRAL_PURCHASING'),
+
+    // Submitting requests
+    SUBMIT_REQUEST('SUBMIT_REQUEST'),
+
+    // Dynamic creation
+    DYNAMIC_CREATION('DYNAMIC_CREATION')
+
 
     final String id
 
@@ -80,7 +87,16 @@ enum ActivityCode {
                 PARTIAL_RECEIVING,
                 REQUIRE_ACCOUNTING,
                 ENABLE_CENTRAL_PURCHASING,
-                HOLD_STOCK
+                HOLD_STOCK,
+                SUBMIT_REQUEST,
+                DYNAMIC_CREATION
+        ]
+    }
+
+    static binTrackingList() {
+        [
+                PICK_STOCK,
+                PUTAWAY_STOCK
         ]
     }
 }

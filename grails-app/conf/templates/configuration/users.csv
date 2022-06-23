@@ -1,0 +1,5 @@
+username,firstName,lastName,email,roleType
+browser,Mr,Browser,,"ROLE_BROWSER,ROLE_FINANCE"
+purchaser,Ms,Purchaser,,"ROLE_ADMIN,ROLE_FINANCE"
+accountant,Mr,Accountant,,"ROLE_ADMIN,ROLE_FINANCE,ROLE_INVOICE"
+superuser,Ms,Superuser,,"ROLE_SUPERUSER,ROLE_FINANCE,ROLE_INVOICE"

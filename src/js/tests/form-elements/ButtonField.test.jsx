@@ -1,7 +1,9 @@
 import React from 'react';
+
 import renderer from 'react-test-renderer';
-import ButtonField from '../../components/form-elements/ButtonField';
-import { renderFormField } from '../../utils/form-utils';
+
+import ButtonField from 'components/form-elements/ButtonField';
+import { renderFormField } from 'utils/form-utils';
 
 jest.mock('react-localize-redux', () => ({
   Translate: (props) => {

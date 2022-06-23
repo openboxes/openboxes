@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
-import CreateInvoicePage from './CreateInvoicePage';
-import AddItemsPage from './AddItemsPage';
-import ConfirmInvoicePage from './ConfirmInvoicePage';
-import Wizard from '../wizard/Wizard';
-import apiClient from '../../utils/apiClient';
-import { showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig } from '../../actions';
-import { translateWithDefaultMessage } from '../../utils/Translate';
+import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import AddItemsPage from 'components/invoice/AddItemsPage';
+import ConfirmInvoicePage from 'components/invoice/ConfirmInvoicePage';
+import CreateInvoicePage from 'components/invoice/CreateInvoicePage';
+import Wizard from 'components/wizard/Wizard';
+import apiClient from 'utils/apiClient';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
-import './Invoice.scss';
+import 'components/invoice/Invoice.scss';
+
 
 class InvoiceWizard extends Component {
   constructor(props) {

@@ -1,21 +1,23 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import update from 'immutability-helper';
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
-import PropTypes from 'prop-types';
-import update from 'immutability-helper';
-import { getTranslate } from 'react-localize-redux';
 import { Tooltip } from 'react-tippy';
+
+import { hideSpinner, showSpinner } from 'actions';
+import { extractStockTransferItems, prepareRequest } from 'components/stock-transfer/utils';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import customTreeTableHOC from 'utils/CustomTreeTable';
+import Filter from 'utils/Filter';
+import Select from 'utils/Select';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
-import customTreeTableHOC from '../../utils/CustomTreeTable';
-import Select from '../../utils/Select';
-import apiClient, { flattenRequest, parseResponse } from '../../utils/apiClient';
-import { showSpinner, hideSpinner } from '../../actions';
-import Filter from '../../utils/Filter';
-import Translate, { translateWithDefaultMessage } from '../../utils/Translate';
-import { extractStockTransferItems, prepareRequest } from './utils';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -193,11 +195,12 @@ class StockTransferSecondPage extends Component {
       accessor: 'destinationBinLocation',
       Cell: cellInfo => (<Select
         options={this.state.bins}
-        objectValue
         value={_.get(this.state.stockTransfer.stockTransferItems, `[${cellInfo.index}].${cellInfo.column.id}`) || null}
         onChange={value => this.changeStockTransfer(update(this.state.stockTransfer, {
           stockTransferItems: { [cellInfo.index]: { destinationBinLocation: { $set: value } } },
         }))}
+        valueKey="id"
+        labelKey="name"
         className="select-xs"
         disabled={cellInfo.original.status === CANCELED}
       />),
@@ -267,12 +270,6 @@ class StockTransferSecondPage extends Component {
     const url = `/openboxes/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
 
     const mapBins = bins => (_.chain(bins)
-      .map(bin => ({
-        value: {
-          id: bin.id, name: bin.name, zoneId: bin.zoneId, zoneName: bin.zoneName,
-        },
-        label: bin.name,
-      }))
       .orderBy(['label'], ['asc']).value()
     );
 
@@ -280,8 +277,8 @@ class StockTransferSecondPage extends Component {
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
-          .map((value, key) => ({ label: key, options: mapBins(value) }))
-          .orderBy(['label'], ['asc'])
+          .map((value, key) => ({ name: key, options: mapBins(value) }))
+          .orderBy(['name'], ['asc'])
           .value();
         const binsWithoutZone = mapBins(binGroups[1]);
         this.setState(

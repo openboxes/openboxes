@@ -11,10 +11,11 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import grails.util.GrailsUtil
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
@@ -24,8 +25,8 @@ import java.text.SimpleDateFormat
 
 class ApiController {
 
-    def dataSource
     def userService
+    def helpScoutService
     def localizationService
     def megamenuService
     def grailsApplication
@@ -65,9 +66,19 @@ class ApiController {
     }
 
     def getMenuConfig = {
-        Map menuConfig = grailsApplication.config.openboxes.megamenu
-        User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
+
+        if (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST)) {
+            render([data: [menuConfig: []]] as JSON)
+            return
+        }
+
+        Map menuConfig = grailsApplication.config.openboxes.megamenu;
+        User user = User.get(session?.user?.id)
+
+        if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+            menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
+        }
         List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
         render([data: [menuConfig: translatedMenu]] as JSON)
     }
@@ -131,7 +142,6 @@ class ApiController {
         def hostname = session.hostname ?: "Unknown"
         def timezone = session?.timezone?.ID
         def isPaginated = grailsApplication.config.openboxes.api.pagination.enabled
-        def tablero = grailsApplication.config.openboxes.tablero
         DateFormat dateFormat = new SimpleDateFormat("MM/DD/YYYY");
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
         def logoLabel = grailsApplication.config.openboxes.logo.label
@@ -143,35 +153,38 @@ class ApiController {
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+        String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
+        boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
         render([
-                data: [
-                        user                 : user,
-                        location             : location,
-                        isSuperuser          : isSuperuser,
-                        isUserAdmin          : isUserAdmin,
-                        supportedActivities  : supportedActivities,
-                        isImpersonated       : isImpersonated,
-                        grailsVersion        : grailsVersion,
-                        appVersion           : appVersion,
-                        branchName           : branchName,
-                        buildNumber          : buildNumber,
-                        environment          : environment,
-                        buildDate            : buildDate,
-                        ipAddress            : ipAddress,
-                        hostname             : hostname,
-                        timezone             : timezone,
-                        tablero              : tablero,
-                        minimumExpirationDate: minimumExpirationDate,
-                        activeLanguage       : locale.language,
-                        isPaginated          : isPaginated,
-                        logoLabel            : logoLabel,
-                        menuItems            : menuItems,
-                        highestRole          : highestRole,
-                        pageSize             : pageSize,
-                        logoUrl              : logoUrl,
-                        supportedLocales     : supportedLocales,
-                        currencyCode         : currencyCode,
-                ],
+            data: [
+                user                 : user,
+                location             : location,
+                isSuperuser          : isSuperuser,
+                isUserAdmin          : isUserAdmin,
+                supportedActivities  : supportedActivities,
+                isImpersonated       : isImpersonated,
+                grailsVersion        : grailsVersion,
+                appVersion           : appVersion,
+                branchName           : branchName,
+                buildNumber          : buildNumber,
+                environment          : environment,
+                buildDate            : buildDate,
+                ipAddress            : ipAddress,
+                hostname             : hostname,
+                timezone             : timezone,
+                minimumExpirationDate: minimumExpirationDate,
+                activeLanguage       : locale.language,
+                isPaginated          : isPaginated,
+                logoLabel            : logoLabel,
+                menuItems            : menuItems,
+                highestRole          : highestRole,
+                pageSize             : pageSize,
+                logoUrl              : logoUrl,
+                supportedLocales     : supportedLocales,
+                currencyCode         : currencyCode,
+                localizedHelpScoutKey: localizedHelpScoutKey,
+                isHelpScoutEnabled   : isHelpScoutEnabled,
+            ],
         ] as JSON)
     }
 
@@ -211,5 +224,17 @@ class ApiController {
             requestTypes << [id: id, name: name]
         }
         render([data: requestTypes] as JSON)
+    }
+
+    def getSupportLinks = {
+        def supportLinks = grailsApplication.config.openboxes.supportLinks
+
+        render([data: supportLinks] as JSON)
+    }
+
+    def getResettingInstanceCommand = {
+        def resettingInstanceCommand = grailsApplication.config.openboxes.resettingInstance.command
+
+        render([data: resettingInstanceCommand] as JSON)
     }
 }

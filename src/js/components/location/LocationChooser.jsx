@@ -1,17 +1,20 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import Modal from 'react-modal';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
+import Modal from 'react-modal';
+import { connect } from 'react-redux';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import {
   changeCurrentLocation,
-  showLocationChooser,
-  hideLocationChooser,
+  fetchMenuConfig,
   fetchSessionInfo,
-} from '../../actions';
-import apiClient from '../../utils/apiClient';
+  hideLocationChooser,
+  showLocationChooser,
+} from 'actions';
+import apiClient from 'utils/apiClient';
+
 
 class LocationChooser extends Component {
   constructor(props) {
@@ -49,14 +52,16 @@ class LocationChooser extends Component {
 
   closeModal(location) {
     if (location) {
-      this.props.changeCurrentLocation(location);
+      this.props.changeCurrentLocation(location).then(() => {
+        this.props.fetchMenuConfig();
+      });
       this.props.fetchSessionInfo();
     }
     this.props.hideLocationChooser();
   }
 
   fetchLocations() {
-    const url = '/openboxes/api/locations?locationTypeCode=DEPOT&activityCodes=MANAGE_INVENTORY&applyUserFilter=true';
+    const url = '/openboxes/api/locations?locationTypeCode=DEPOT&activityCodes=MANAGE_INVENTORY&applyUserFilter=true&locationChooser=true';
 
     return apiClient.get(url)
       .then((response) => {
@@ -165,6 +170,7 @@ export default connect(mapStateToProps, {
   showLocationChooser,
   hideLocationChooser,
   fetchSessionInfo,
+  fetchMenuConfig,
 })(LocationChooser);
 
 LocationChooser.propTypes = {
@@ -180,4 +186,5 @@ LocationChooser.propTypes = {
   currentLocationName: PropTypes.string.isRequired,
   defaultTranslationsFetched: PropTypes.bool.isRequired,
   fetchSessionInfo: PropTypes.func.isRequired,
+  fetchMenuConfig: PropTypes.func.isRequired,
 };

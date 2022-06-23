@@ -56,6 +56,7 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.core.Address
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
@@ -138,6 +139,18 @@ class BootStrap {
             ]
         }
 
+        JSON.registerObjectMarshaller(Address) { Address address ->
+            [
+                    address             : address.address,
+                    address2            : address.address2,
+                    city                : address.city,
+                    country             : address.country,
+                    description         : address.description,
+                    postalCode          : address.postalCode,
+                    stateOrProvince     : address.stateOrProvince,
+            ]
+        }
+
         JSON.registerObjectMarshaller(Location) { Location location ->
             [
                     id                   : location.id,
@@ -156,7 +169,12 @@ class BootStrap {
                     organizationCode     : location?.organization?.code,
                     backgroundColor : location?.bgColor,
                     zoneName : location?.zone?.name,
-                    zoneId : location?.zone?.id
+                    zoneId : location?.zone?.id,
+                    active : location?.active,
+                    organization : location?.organization,
+                    manager: location?.manager,
+                    address: location?.address,
+                    supportedActivities: location.supportedActivities ?: location.locationType?.supportedActivities,
             ]
         }
 

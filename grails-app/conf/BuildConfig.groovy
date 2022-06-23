@@ -24,27 +24,39 @@ grails.plugin.location.liquibase = 'liquibase/'
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
-        // uncomment to disable ehcache
-        // excludes 'ehcache'
-        excludes "xml-apis", "xmlbeans"
+        // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
+        excludes(
+                "commons-logging",  // use jcl-over-slf4j instead
+                "log4j",  // use reload4j instead
+                "slf4j-log4j12",  // use slf4j-reload4j instead
+                "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
+                "xmlbeans"  // conflicts with Grails: see https://stackoverflow.com/a/6410955
+        )
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
-        //grailsRepo "http://grails.org/plugins"
-        grailsPlugins()
-        grailsHome()
-        grailsCentral()
-
-        mavenLocal()
-        mavenCentral()
-
+        inherit false  // some old plugins refer to repos that no longer exist
+        mavenRepo "https://repo1.maven.org/maven2/"
         mavenRepo "https://repo.grails.org/grails/plugins-releases/"
-        mavenRepo "https://repo.grails.org/grails/plugins/"
-        mavenRepo "https://repo.grails.org/grails/core/"
-        mavenRepo "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 
     dependencies {
+        /*
+         * Unfortunately, grails 1.3.9 doesn't play nicely with log4j 2's bridge
+         * library (https://logging.apache.org/log4j/2.x/manual/migration.html);
+         * it instantiates org.apache.log4j.PatternLayout in a non-compliant way.
+         *
+         * For the time being, we can get critical log4j security patches from
+         * reload4j until we move to a more modern Grails release.
+         * https://reload4j.qos.ch/news.html https://www.slf4j.org/legacy.html
+         */
+        compile "org.slf4j:slf4j-reload4j:1.7.33"
+        compile "ch.qos.reload4j:reload4j:1.2.18.2"
+        // override hidden grails dependencies to work with reload4j
+        build "org.slf4j:slf4j-api:1.7.33"
+        compile "org.slf4j:slf4j-api:1.7.33"
+        compile "org.slf4j:jcl-over-slf4j:1.7.33"
+        runtime "org.slf4j:jul-to-slf4j:1.7.33"
 
         // Required by database connection
         compile 'mysql:mysql-connector-java:5.1.47'
@@ -54,18 +66,17 @@ grails.project.dependency.resolution = {
 
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
-            excludes 'commons-logging:commons-logging:1.0.4', 'commons-codec', 'commons-io'
+            excludes 'commons-codec', 'commons-io'
         }
 
         // Required for barcode4j
         compile 'com.google.zxing:javase:2.0'
 
-        // Required by MailService (should replace with grails mail plugin)
-        compile 'org.apache.commons:commons-email:1.3'
-        compile 'org.apache.commons:commons-text:1.3'
+        compile "org.apache.commons:commons-email:1.5"
+        compile "org.apache.commons:commons-text:1.3"  // last Java 7-compatible release
         compile 'commons-lang:commons-lang:2.6'
         compile "org.jadira.usertype:usertype.jodatime:1.9"
-        compile 'org.apache.commons:commons-csv:1.6'
+        compile "org.apache.commons:commons-csv:1.6"  // last Java 7-compatible release
 
         // Required by LDAP
         compile "com.unboundid:unboundid-ldapsdk:2.3.6"
@@ -106,8 +117,11 @@ grails.project.dependency.resolution = {
         compile ("fr.opensagres.xdocreport:org.odftoolkit.odfdom.converter.pdf:1.0.6")
         compile "org.apache.xmlgraphics:batik-util:1.7"
 
-        // Fake SMTP server
-        test 'dumbster:dumbster:1.6'
+        /*
+         * This test SMTP client is the latest release that works with Grails 1,
+         * and Java 7, although it depends on a junit release we can't use (yet).
+         */
+        test("com.icegreen:greenmail:1.5.10") { excludes "junit" }
 
         // Required for GPars
         compile "org.codehaus.gpars:gpars:0.12"
@@ -117,7 +131,7 @@ grails.project.dependency.resolution = {
         // Unknown
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
         compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
-            excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
+            excludes "commons-codec", "commons-lang", "groovy", "xercesImpl"
         }
 
         // REST client
@@ -125,6 +139,16 @@ grails.project.dependency.resolution = {
 
         // for com.google.common
         compile 'com.google.guava:guava:12.0'
+
+        // TODO: This is the last version for java 7. After migration to Java 8 upgrade this to 2.9+
+        compile 'org.jxls:jxls:2.8.1'
+        /*
+         * This jxls-poi release is the last that supports Apache POI v3 (anything
+         * above needs v4, which requires Java 8). What's more, if left to its
+         * own devices, it will introduce a dependency on a jxls that requires
+         * java 8, too. We exclude its jxls requirement to force the one above.
+         */
+        compile('org.jxls:jxls-poi:1.0.9') { exclude "jxls" }
     }
     plugins {
 

@@ -17,6 +17,7 @@ enum RoleType {
     ROLE_MANAGER('Manager', 2),
     ROLE_ASSISTANT('Assistant', 3),
     ROLE_BROWSER('Browser', 4),
+    ROLE_AUTHENTICATED('Authenticated', 5),
 
     // Complementary roles that provide additional functionality
     ROLE_FINANCE('Financial User', 100),
@@ -79,7 +80,10 @@ enum RoleType {
     ROLE_PURCHASER('Purchaser', 100),
 
     // Customer role types
-    ROLE_CUSTOMER('Customer', 102)
+    ROLE_CUSTOMER('Customer', 102),
+
+    // Requestor role type
+    ROLE_REQUESTOR('Requestor', 100)
 
     String name
     Integer sortOrder
@@ -104,6 +108,7 @@ enum RoleType {
 
     static list() {
         [
+                ROLE_AUTHENTICATED,
                 ROLE_BROWSER,
                 ROLE_ASSISTANT,
                 ROLE_MANAGER,
@@ -148,6 +153,7 @@ enum RoleType {
 
     static listPrimaryRoleTypes() {
         [
+                ROLE_AUTHENTICATED,
                 ROLE_BROWSER,
                 ROLE_ASSISTANT,
                 ROLE_MANAGER,
@@ -169,6 +175,17 @@ enum RoleType {
                 ROLE_CLEARING_AGENT,
                 ROLE_CUSTOMER,
                 ROLE_PURCHASER,
+                ROLE_REQUESTOR,
+        ]
+    }
+
+    static listRoleTypesForLocationChooser() {
+        return [
+                ROLE_ASSISTANT,
+                ROLE_MANAGER,
+                ROLE_ADMIN,
+                ROLE_SUPERUSER,
+                ROLE_BROWSER
         ]
     }
 }

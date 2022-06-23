@@ -554,6 +554,56 @@ class DashboardService {
         return reorderStock
     }
 
+    def getReorderReport(Location location) {
+        long startTime = System.currentTimeMillis()
+        ArrayList<Map> inventoryItems = getInventoryItems(location)
+
+        ArrayList<Map> reorderStock = inventoryItems.findAll { Map inventoryItem ->
+            def inventoryLevel = inventoryItem?.inventoryLevel as InventoryLevel
+
+            if (inventoryLevel?.binLocation != null) {
+                return false;
+            }
+
+            def minQuantity = inventoryLevel?.minQuantity
+
+            if(minQuantity == null) {
+                return false
+            }
+
+            def reorderQuantity = inventoryLevel?.reorderQuantity
+
+            if(reorderQuantity == null) {
+                return false
+            }
+
+            def quantityATP = inventoryItem.quantityAvailableToPromise as Number
+
+            if (quantityATP >= minQuantity || quantityATP >= reorderQuantity) {
+                return false
+            }
+
+            def quantityToOrder = null
+            def expectedReorderCost = null
+            def unitCost =  inventoryLevel?.product?.costPerUnit
+
+            if (inventoryLevel?.maxQuantity != null) {
+                quantityToOrder = inventoryLevel.maxQuantity - quantityATP
+
+                if(unitCost != null) {
+                    expectedReorderCost = quantityToOrder * unitCost
+                }
+            }
+            inventoryItem.put("quantityToOrder", quantityToOrder);
+            inventoryItem.put("unitCost", unitCost);
+            inventoryItem.put("expectedReorderCost", expectedReorderCost);
+
+            true
+        }
+        log.info "Get simple reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
+        return reorderStock
+    }
+
     def getOverStock(Location location) {
         long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location)

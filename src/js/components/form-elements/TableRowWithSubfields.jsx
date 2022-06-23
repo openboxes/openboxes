@@ -1,10 +1,12 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
+
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { FieldArray } from 'react-final-form-arrays';
 
-import TableBody from './TableBody';
-import TableRow from './TableRow';
+import TableBody from 'components/form-elements/TableBody';
+import TableRow from 'components/form-elements/TableRow';
+
 
 class TableRowWithSubfields extends Component {
   constructor(props) {

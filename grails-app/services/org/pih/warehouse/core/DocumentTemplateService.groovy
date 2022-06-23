@@ -19,17 +19,19 @@ import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
 import groovy.text.Template
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.jxls.common.Context
+import org.jxls.util.JxlsHelper
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 class DocumentTemplateService {
 
     boolean transactional = true
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
+    def requisitionService
 
     def renderGroovyServerPageDocumentTemplate(Document documentTemplate, Map model) {
         StringWriter output = new StringWriter()
@@ -37,6 +39,19 @@ class DocumentTemplateService {
         Template template = groovyPagesTemplateEngine.createTemplate(templateContents, documentTemplate.name)
         template.make(model).writeTo(output)
         return output.toString()
+    }
+
+    def renderInvoiceTemplate(Document documentTemplate, Shipment shipmentInstance, ByteArrayOutputStream outputStream) {
+        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+        Context context = new Context()
+        context.putVar("invoiceItems", shipmentInstance?.shipmentItems)
+        context.putVar("datePrinted", Constants.EUROPEAN_DATE_FORMATTER.format(new Date()))
+        context.putVar("requisition", shipmentInstance?.requisition)
+        context.putVar("origin", shipmentInstance?.origin)
+        context.putVar("destination", shipmentInstance?.destination)
+        context.putVar("originRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.origin))
+        context.putVar("destinationRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.destination))
+        JxlsHelper.getInstance().processTemplateAtCell(inputStream, outputStream, context, "Sheet1!A1")
     }
 
     def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
