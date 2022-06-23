@@ -12,10 +12,12 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementRevisedEvent
@@ -29,6 +31,7 @@ import org.pih.warehouse.shipping.Shipment
 class StockMovementApiController {
 
     def dataService
+    def locationService
     def stockMovementService
 
     def list = {
@@ -339,6 +342,34 @@ class StockMovementApiController {
         }
 
         render([data: "Data will be imported successfully"] as JSON)
+    }
+
+    def packingLocation = {
+        JSONObject jsonObject = request.JSON
+        String packingLocationId = jsonObject["packingLocation.id"]
+        Location packingLocation = packingLocationId ? locationService.getLocation(packingLocationId) : null
+        if (!packingLocation) {
+            throw new ObjectNotFoundException(packingLocationId, Location.class)
+        }
+
+        if (!packingLocation.supports(ActivityCode.PACK_STOCK)) {
+            throw new IllegalArgumentException("Location ${packingLocation?.name} should be an internal location with supported activities that include ${ActivityCode.PACK_STOCK}")
+        }
+
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            throw new ObjectNotFoundException(params.id, StockMovement.class)
+        }
+
+        // If the packing location is already set and doesn't match the given packing location
+        if (stockMovement?.packingLocation && stockMovement?.packingLocation != packingLocation) {
+            throw new IllegalArgumentException("Stock movement ${stockMovement.identifier} is already assigned to packing location ${stockMovement?.packingLocation?.name}")
+        }
+
+        // Setting packing location
+        stockMovement.shipment.setPackingScheduled(packingLocation, new Date(), User.load(session.user.id))
+
+        render status: 200
     }
 
     /**

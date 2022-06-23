@@ -202,6 +202,11 @@ class UrlMappings {
             action = [POST: "createCombinedShipments"]
         }
 
+        "/api/stockMovements/$id/packingLocation"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [POST: "packingLocation"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {
