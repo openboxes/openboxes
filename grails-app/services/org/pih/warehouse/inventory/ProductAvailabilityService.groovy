@@ -27,6 +27,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderAllocationStrategy
+import org.pih.warehouse.picklist.PickTypeClassification
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -649,6 +650,35 @@ class ProductAvailabilityService {
         return data
     }
 
+    List<AvailableItem> getAvailableItems(Location location, Location internalLocation, InventoryItem inventoryItem) {
+        def data = []
+        if (location) {
+            def results = ProductAvailability.executeQuery("""
+						select 
+						    pa.product, 
+						    ii,
+						    pa.binLocation,
+						    pa.quantityOnHand,
+						    pa.quantityAvailableToPromise
+						from ProductAvailability pa
+						left outer join pa.inventoryItem ii
+						left outer join pa.binLocation bl
+						where pa.location = :location
+						and pa.binLocation = :internalLocation
+						and pa.inventoryItem = :inventoryItem
+						""", [location: location, internalLocation: internalLocation, inventoryItem: inventoryItem])
+
+            data = results.collect {
+                return new AvailableItem(
+                        inventoryItem: it[1],
+                        binLocation: it[2],
+                        quantityOnHand: it[3]?:0,
+                        quantityAvailable: it[4]?:0
+                )
+            }
+        }
+        return data
+    }
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
         def quantityMap = [:]
@@ -714,7 +744,6 @@ class ProductAvailabilityService {
         OrderAllocationStrategy defaultOrderAllocationStrategy =
                 grailsApplication.config.openboxes.order.allocation.strategy?:OrderAllocationStrategy.FEFO
         Location currentLocation = AuthService.currentLocation.get()
-        log.info "current location " + currentLocation.supports(ActivityCode.ORDER_ALLOCATION_STRATEGY_CUSTOM)
         if (currentLocation && currentLocation.orderAllocationStrategy) {
             return currentLocation.orderAllocationStrategy
         }
@@ -724,16 +753,28 @@ class ProductAvailabilityService {
     /**
      * Sort based on order allocation strategy
      */
-    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
-        switch (orderAllocationStrategy) {
+    List<AvailableItem> sortAvailableItems(List<AvailableItem> availableItems, Integer quantityRequired = 0, Boolean optimizeFullPallet = Boolean.TRUE, OrderAllocationStrategy overrideOrderAllocationStrategy = null) {
+        switch (overrideOrderAllocationStrategy?:orderAllocationStrategy) {
             case OrderAllocationStrategy.FEFO:
                 return sortAvailableItemsByFefo(availableItems, quantityRequired)
             case OrderAllocationStrategy.FIFO:
                 return sortAvailableItemsByFifo(availableItems, quantityRequired)
             case OrderAllocationStrategy.LIFO:
                 return sortAvailableItemsByFifo(availableItems, quantityRequired).reverse()
+            case OrderAllocationStrategy.QUANTITY_ASCENDING:
+                return sortAvailableItemsByQuantityAscending(availableItems, quantityRequired)
+            case OrderAllocationStrategy.QUANTITY_DESCENDING:
+                return sortAvailableItemsByQuantityDescending(availableItems, quantityRequired)
+            case OrderAllocationStrategy.LOCATION_ASCENDING:
+                return sortAvailableItemsByLocationAscending(availableItems, quantityRequired)
+            case OrderAllocationStrategy.LOCATION_DESCENDING:
+                return sortAvailableItemsByLocationDescending(availableItems, quantityRequired)
+            case OrderAllocationStrategy.BEST_AVAILABLE:
+                return sortAvailableItemsByBestAvailable(availableItems, quantityRequired, optimizeFullPallet).reverse()
             case OrderAllocationStrategy.CUSTOM:
                 return sortAvailableItemsByCustom(availableItems, quantityRequired)
+            case OrderAllocationStrategy.DEFAULT:
+                return sortAvailableItemsByFefo(availableItems, quantityRequired)
         }
     }
 
@@ -780,6 +821,62 @@ class ProductAvailabilityService {
     }
 
     /**
+     * Sorting by quantity available (descending). Usually leads to less items to pick.
+     */
+    List<AvailableItem> sortAvailableItemsByQuantityDescending(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        log.info "Sorting available items by quantity descending ... "
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            return (b?.quantityAvailable?:0) <=> (a?.quantityAvailable?:0)
+        }
+        return availableItems
+    }
+
+
+    /**
+     * Sorting by quantity available (ascending). Usually leads to locations becoming available.
+     */
+    List<AvailableItem> sortAvailableItemsByQuantityAscending(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        log.info "Sorting available items by quantity ascending ... "
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            return (a?.quantityAvailable ?: 0) <=> (b?.quantityAvailable ?: 0)
+        }
+        return availableItems
+    }
+
+    /**
+     * Sorting by quantity available (descending). Usually leads to less items to pick.
+     */
+    List<AvailableItem> sortAvailableItemsByLocationDescending(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        log.info "Sorting available items by location descending ... "
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            return (b?.binLocation?.name ?: "") <=> (a?.binLocation?.name ?: "")
+        }
+        return availableItems
+    }
+
+
+    /**
+     * Sorting by quantity available (ascending). Usually leads to locations becoming available.
+     */
+    List<AvailableItem> sortAvailableItemsByLocationAscending(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
+        log.info "Sorting available items by location ascending ... "
+
+        // Sort empty expiration dates last
+        availableItems = availableItems.sort { a, b ->
+            return (a?.binLocation?.name ?: "") <=> (b?.binLocation?.name ?: "")
+
+        }
+        return availableItems
+    }
+
+
+    /**
      * Sorting used by custom algorithm based on quantity
      *
      * @param availableItems
@@ -789,24 +886,7 @@ class ProductAvailabilityService {
     List sortAvailableItemsByCustom(List<AvailableItem> availableItems, Integer quantityRequired = 0) {
 
         log.info "Sorting available items by custom ... "
-
-        // In order to sort the available items properly we need to know the quantity required
-        if (quantityRequired) {
-            availableItems.each {
-                it.quantityRequired = quantityRequired
-            }
-        }
-
-        // if quantity required has any exact matches then we sort by matching (floor, racking, bulk)
-        // check exact match OR quantityAvailable % quantityRequired == 0
-
-        // if quantity required is less than
-
         availableItems = availableItems.sort {a, b ->
-            log.info "a:${a.binLocation?.locationNumber}:${a.binLocation?.locationType?.sortOrder}:${a.quantityRequired}:${a.quantityAvailable}:${a.quantityPicked}"
-            log.info "b:${b.binLocation?.locationNumber}:${b.binLocation?.locationType?.sortOrder}:${b.quantityRequired}:${b.quantityAvailable}:${b.quantityPicked}"
-            log.info "\tcompare: ${(a?.binLocation?.name <=> b?.binLocation?.name)}"
-
             return (b?.binLocation?.locationType?.sortOrder?:0) <=> (a?.binLocation?.locationType?.sortOrder?:0) ?:
                 (a?.binLocation?.sortOrder?:"") <=> (b?.binLocation?.sortOrder?:"") ?:
                     (b?.quantityAvailable) <=> (a?.quantityAvailable) ?:
@@ -818,6 +898,48 @@ class ProductAvailabilityService {
         return availableItems
     }
 
+
+    List sortAvailableItemsByBestAvailable(List<AvailableItem> availableItems, Integer quantityRequired = 0, Boolean prioritizeFullPallet) {
+        log.info "Sorting available items by best available ... prioritizeFullPallet = ${prioritizeFullPallet}"
+        availableItems.each { it.quantityRequired = quantityRequired }
+
+        if (prioritizeFullPallet) {
+            availableItems = availableItems.sort { AvailableItem a, AvailableItem b ->
+                return calculatePickTypeClassificationSortOrder(b) <=> calculatePickTypeClassificationSortOrder(a) ?:
+                        calculateLocationTypeSortOrder(b) <=> calculateLocationTypeSortOrder(a) ?:
+                                (a?.binLocation?.sortOrder ?: 0) <=> (b?.binLocation?.sortOrder ?: 0) ?:
+                                        (b?.quantityAvailable ?: 0) <=> (a?.quantityAvailable ?: 0) ?:
+                                                (b?.binLocation?.name ?: "") <=> (a?.binLocation?.name ?: "")
+            }
+        }
+        else {
+            availableItems = availableItems.sort { AvailableItem a, AvailableItem b ->
+                return calculatePickTypeClassificationSortOrder(a) <=> calculatePickTypeClassificationSortOrder(b) ?:
+                        calculateLocationTypeSortOrder(b) <=> calculateLocationTypeSortOrder(a) ?:
+                                (a?.binLocation?.sortOrder ?: 0) <=> (b?.binLocation?.sortOrder ?: 0) ?:
+                                        (b?.quantityAvailable ?: 0) <=> (a?.quantityAvailable ?: 0) ?:
+                                                (b?.binLocation?.name ?: "") <=> (a?.binLocation?.name ?: "")
+            }
+        }
+        log.info "sort by best available (fullPallet=${prioritizeFullPallet}): ${availableItems*.binLocation?.name}"
+        return availableItems
+    }
+
+    Integer calculatePickTypeClassificationSortOrder(AvailableItem availableItem) {
+        return calculatePickTypeClassification(availableItem)?.sortOrder
+    }
+
+    PickTypeClassification calculatePickTypeClassification(AvailableItem availableItem) {
+        return (availableItem?.quantityRequired < availableItem.quantityAvailable) ? PickTypeClassification.PIECE_PICK : availableItem?.pickTypeClassification
+    }
+
+    Integer calculateLocationTypeSortOrder(AvailableItem availableItem) {
+        PickTypeClassification pickTypeClassification = calculatePickTypeClassification(availableItem)
+        List sortOrder = ConfigurationHolder.config.openboxes.order.allocation.locationType.sortOrderMap[pickTypeClassification]
+        String locationTypeName = availableItem?.binLocation?.locationType?.name
+        Integer sortOrderIndex = sortOrder.contains(locationTypeName) ? sortOrder?.indexOf(locationTypeName) : Integer.MAX_VALUE
+        return sortOrderIndex
+    }
 
     private static List collectQuantityOnHandByBinLocation(List<ProductAvailability> productAvailabilities) {
 

@@ -37,13 +37,16 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderAllocationStrategy
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
+import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
+import org.pih.warehouse.product.ProductAttribute
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
@@ -1179,7 +1182,7 @@ class StockMovementService {
         }
 
         Picklist picklist = requisitionItem?.requisition?.picklist
-        log.info "Clear picklist"
+        log.info "Clear picklist for ${requisitionItem}"
         if (picklist) {
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
@@ -1286,20 +1289,9 @@ class StockMovementService {
         Location location = requisitionItem?.requisition?.origin
 
         log.info "QUANTITY REQUIRED: ${quantityRequired}"
-
         if (quantityRequired) {
-            // Retrieve all available items and then calculate suggested
-            List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
 
-            // If a picklist item was passed as an argument, remove the picklist item for which we're trying to create an alternative pick
-            if (excludedPicklistItem) {
-                availableItems.removeAll { AvailableItem availableItem->
-                    availableItem.binLocation?.id == excludedPicklistItem?.binLocation?.id &&
-                            availableItem?.inventoryItem?.id == excludedPicklistItem?.inventoryItem?.id
-                }
-            }
-            log.info "Available items: ${availableItems}"
-            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+            List<SuggestedItem> suggestedItems = getBestAvailableItems(location, requisitionItem, quantityRequired, excludedPicklistItem)
             log.info "Suggested items " + suggestedItems
 
             // The only time we don't want to clear the picklist is if we're generating new picklist items due to a shortage
@@ -1459,11 +1451,7 @@ class StockMovementService {
         }
     }
 
-    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem) {
-        return getAvailableItems(location, requisitionItem, false)
-    }
-
-    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
+    List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus = Boolean.FALSE) {
         List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
         def picklistItems = getPicklistItems(requisitionItem)
 
@@ -1549,6 +1537,61 @@ class StockMovementService {
         }
     }
 
+    List<SuggestedItem> getBestAvailableItems(Location location, RequisitionItem requisitionItem, Integer quantityRequired, PicklistItem excludedPicklistItem = null) {
+        List<SuggestedItem> allocatedItems = []
+
+        // Product configuration used to optimize allocation algorithm
+        Integer quantityPerPallet = requisitionItem?.product?.getProductPackage(Constants.UOM_CODE_PALLET)?.quantity?:1
+
+        Attribute attribute = Attribute.findByCode("ALLOCATION_STRATEGY")
+        ProductAttribute productAttribute = requisitionItem?.product?.getProductAttribute(attribute)
+        OrderAllocationStrategy overrideOrderAllocationStrategy = productAttribute?.value ? productAttribute.value as OrderAllocationStrategy : null
+
+        List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
+
+        // If a picklist item was passed as an argument, remove the picklist item for which we're trying to create an alternative pick
+        if (excludedPicklistItem) {
+            availableItems.removeAll { AvailableItem availableItem ->
+                availableItem.binLocation?.id == excludedPicklistItem?.binLocation?.id &&
+                        availableItem?.inventoryItem?.id == excludedPicklistItem?.inventoryItem?.id
+            }
+        }
+
+        while (quantityRequired > 0) {
+            log.info "=".multiply(50)
+            log.info "quantityRequired " + quantityRequired
+            log.info "availableItems " + availableItems
+            log.info "allocatedItems " + allocatedItems
+
+
+            // Need to remove the items that have already been hypothetically allocated
+            availableItems = availableItems - allocatedItems
+
+            if (overrideOrderAllocationStrategy) {
+                log.info "Using order allocation stategy ${overrideOrderAllocationStrategy}"
+            }
+
+            // Sort available items
+            Boolean optimizeFullPallet = quantityRequired >= quantityPerPallet
+            availableItems = productAvailabilityService.sortAvailableItems(availableItems, quantityRequired, optimizeFullPallet, overrideOrderAllocationStrategy)
+            log.info "availableItems " + availableItems
+
+            // Generate a list of suggestions
+            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+            log.info "suggestedItems " + suggestedItems
+            // Should move the following code into a service method call getNextSuggestedItem()
+            if (suggestedItems.empty) {
+                break;
+            }
+
+            SuggestedItem suggestedItem = suggestedItems?.first()
+            allocatedItems << suggestedItem
+            quantityRequired -= suggestedItem.quantityToPick
+            log.info "quantityRemaining " + quantityRequired
+        }
+        return allocatedItems
+    }
+
     /**
      * Get a list of suggested items for the given stock movement item.
      *
@@ -1578,11 +1621,12 @@ class StockMovementService {
                         availableItem.quantityAvailable : quantityRequested
 
                 log.info "Suggested quantity ${quantityToPick}"
-                suggestedItems << new SuggestedItem(inventoryItem: availableItem?.inventoryItem,
-                    binLocation: availableItem?.binLocation,
-                    quantityAvailable: availableItem?.quantityAvailable,
-                    quantityRequested: quantityRequested,
-                    quantityToPick: quantityToPick)
+                suggestedItems << new SuggestedItem(
+                        inventoryItem: availableItem?.inventoryItem,
+                        binLocation: availableItem?.binLocation,
+                        quantityAvailable: availableItem?.quantityAvailable,
+                        quantityRequested: quantityRequested,
+                        quantityToPick: quantityToPick)
                 quantityRequested -= quantityToPick
             }
         }
@@ -1672,7 +1716,7 @@ class StockMovementService {
 
         List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem, showDetails)
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
-        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+        List<SuggestedItem> suggestedItems = getBestAvailableItems(location, requisitionItem, quantityRequired)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
         pickPageItem.sortOrder = requisitionItem.orderIndex ?: sortOrder
@@ -2995,11 +3039,54 @@ class StockMovementService {
     }
 
     Boolean validatePicklist(StockMovement stockMovement) {
-        if (stockMovement?.requisition?.picklist) {
+        Picklist picklist = stockMovement?.requisition?.picklist
+        if (picklist) {
+            validatePicklist(picklist)
+            if (picklist.hasErrors()) {
+                throw new ValidationException("Picklist has validation errors", picklist.errors)
+            }
+
             Shipment shipment = Shipment.findByRequisition(stockMovement?.requisition)
             shipmentService.validateShipment(shipment)
             validateQuantityRequested(stockMovement)
         }
         return true
+    }
+
+    Boolean validatePicklist(Picklist picklist) {
+
+        picklist.picklistItems.each { PicklistItem picklistItem ->
+            validatePicklistItem(picklistItem)
+        }
+        if (picklist.hasErrors()) {
+            throw new ValidationException("validation errors" , picklist.errors)
+        }
+
+    }
+
+    Boolean validatePicklistItem(PicklistItem picklistItem) {
+        log.info "picklistItem " + picklistItem
+        Location location = picklistItem?.picklist?.requisition?.origin
+        Integer quantityAvailable = picklistItem?.binLocation ? productAvailabilityService.getQuantityAvailableToPromise(location, picklistItem?.binLocation, picklistItem?.inventoryItem) :
+                productAvailabilityService.getAvailableItems(location, picklistItem?.inventoryItem)
+
+        Integer quantityToPick = picklistItem.quantity
+        quantityAvailable += (quantityToPick ?: 0)
+
+        log.info "quantityToPick ${quantityToPick} > quantityAvailable ${quantityAvailable}? ${quantityToPick > quantityAvailable}"
+        if (quantityToPick > quantityAvailable) {
+            String errorMessage = "Insufficient quantity available ({0} {1}) to fulfill {2} {3} of item {4} ({5}) at location {6}"
+            Object [] arguments = [
+                    quantityAvailable,
+                    picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA",
+                    picklistItem?.quantity,
+                    picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA",
+                    picklistItem?.inventoryItem?.product?.productCode,
+                    picklistItem?.inventoryItem?.lotNumber,
+                    picklistItem?.binLocation?.name,
+
+            ] as Object[]
+            picklistItem.picklist.errors.reject("picklist.insufficientQuantityAvailable.message", arguments, errorMessage)
+        }
     }
 }

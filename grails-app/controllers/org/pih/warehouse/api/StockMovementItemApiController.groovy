@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.requisition.RequisitionItem
 
 class StockMovementItemApiController {
@@ -165,17 +166,10 @@ class StockMovementItemApiController {
         Location location = Location.get(session.warehouse.id)
         StockMovementItem stockMovementItem = stockMovementService.getStockMovementItem(params.id)
 
-        Integer quantityRequired = stockMovementItem?.requisitionItem?.calculateQuantityRequired()
         List<AvailableItem> availableItems = stockMovementService.getAvailableItems(location, stockMovementItem.requisitionItem)
-        log.info "available items: "
-        availableItems.each {
-            log.info new JSONObject(getAvailableItemDetails(it, quantityRequired)).toString(4)
-        }
-        log.info "suggested items: "
-        List suggestedItems = stockMovementService.getSuggestedItems(availableItems, quantityRequired)
-        suggestedItems.each {
-            log.info new JSONObject(it.toJson()).toString(4)
-        }
+
+        Integer quantityRequired = stockMovementItem?.requisitionItem?.calculateQuantityRequired()
+        List suggestedItems = stockMovementService.getBestAvailableItems(location, stockMovementItem.requisitionItem, quantityRequired)
 
         def data = availableItems.collect { AvailableItem availableItem ->
             return getSuggestedItemDetails(suggestedItems, availableItem, quantityRequired)
@@ -192,14 +186,16 @@ class StockMovementItemApiController {
                 expirationDate: availableItem.inventoryItem?.expirationDate,
                 quantityAvailable: availableItem.quantityAvailable,
                 quantityOnHand: availableItem.quantityOnHand,
-                pickClassification: availableItem?.pickClassification
+                pickType: availableItem?.pickTypeClassification,
+                uom: availableItem?.optimalUnitOfMeasure?.uom?.code
             ]
     }
 
     def getSuggestedItemDetails = { List suggestedItems, AvailableItem availableItem, Integer quantityRequired ->
 
-        boolean isSuggested = suggestedItems.find { it.binLocation == availableItem.binLocation &&
-                            it.inventoryItem == availableItem.inventoryItem }
+        SuggestedItem suggestedItem = suggestedItems.find { it.equals(availableItem) }
+        Integer suggestedIndex = suggestedItems.indexOf(suggestedItem)
+        ProductPackage optimalUnitOfMeasure = availableItem?.optimalUnitOfMeasure
         return [
                 locationNumber: availableItem.binLocation?.locationNumber,
                 locationName: availableItem.binLocation?.name,
@@ -208,8 +204,11 @@ class StockMovementItemApiController {
                 expirationDate: availableItem.inventoryItem?.expirationDate,
                 quantityAvailable: availableItem.quantityAvailable,
                 quantityOnHand: availableItem.quantityOnHand,
-                pickClassification: availableItem?.pickClassification,
-                isSuggested: isSuggested
+                quantityToPick: suggestedItem?.quantityToPick,
+                pickType: availableItem?.pickTypeClassification,
+                uom: optimalUnitOfMeasure ? "${optimalUnitOfMeasure?.uom?.code}/${optimalUnitOfMeasure?.quantity}" : null,
+                suggested: (suggestedItem != null),
+                suggestedIndex: (suggestedIndex >= 0) ? suggestedIndex : null
             ]
     }
 

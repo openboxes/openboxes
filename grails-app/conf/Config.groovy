@@ -17,6 +17,7 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.order.OrderAllocationStrategy
 import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.picklist.PickTypeClassification
 
 // Locations to search for config files that get merged into the main config
 // config files can either be Java properties files or ConfigSlurper scripts
@@ -813,6 +814,13 @@ openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEF
 // Default order allocation strategy
 openboxes.order.allocation.strategy = OrderAllocationStrategy.FEFO
 
+// Location sequence to use when allocating items to an order
+// FIMXE: relies on location type name, but we should have a unique code for each location type i.e. ACTIVE, RESERVE, BULK
+openboxes.order.allocation.locationType.sortOrderMap = [
+        (PickTypeClassification.PIECE_PICK): ["Active", "Bulk", "Reserve"],
+        (PickTypeClassification.CASE_PICK): ["Active", "Bulk", "Reserve"],
+        (PickTypeClassification.FULL_PALLET): ["Bulk", "Reserve", "Active"]
+]
 // Order status property map
 openboxes.order.orderStatusPropertyMap = [
         (OrderStatus.PLACED) : ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"],

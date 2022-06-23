@@ -184,8 +184,7 @@
 
         <a href="javascript:void(0);" class="btn-show-dialog"
            data-title="${g.message(code:'product.availableItems.label', default: 'Available Items')}"
-            data-width="1000"
-           data-url="${request.contextPath}/stockMovementItemApi/suggestPickableItems/${requisitionItem?.id}">
+            data-width="1200" data-url="${request.contextPath}/stockMovementItemApi/suggestPickableItems/${requisitionItem?.id}">
             <img src="${resource(dir: 'images/icons/silk', file: 'page_white_magnify.png')}"/>
         </a>
     </td>

@@ -18,18 +18,16 @@
             <th><warehouse:message code="location.label"/></th>
             <th><warehouse:message code="inventoryItem.lotNumber.label"/></th>
             <th><warehouse:message code="inventoryItem.expirationDate.label"/></th>
-            <th><warehouse:message code="picklistItem.picker.label" default="Picker"/></th>
-            <th class="center"><warehouse:message code="picklistItem.quantity.label" default="Required"/></th>
+            <th class="center"><warehouse:message code="picklistItem.quantity.label" default="Quantity to Pick"/></th>
             <th class="center"><warehouse:message code="picklistItem.quantityPicked.label" default="Picked"/></th>
             <th class="center"><warehouse:message code="picklistItem.quantityCanceled.label" default="Canceled"/></th>
             <th class="center"><warehouse:message code="picklistItem.quantityRemaining.label" default="Remaining"/></th>
+            <th><warehouse:message code="picklistItem.picker.label" default="Picker"/></th>
             <th class="center"><warehouse:message code="picklistItem.shortage.label" default="Shortage"/></th>
             <th><warehouse:message code="picklistItem.reasonCode.label" default="Shortage Reason"/></th>
         </tr>
 
         <g:set var="picklistItems" value="${stockMovement?.requisition?.picklist?.picklistItems?.groupBy {it.requisitionItem }}"/>
-
-
         <g:each var="requisitionItem" in="${picklistItems?.keySet()}" status="i">
             <g:each var="picklistItem" in="${picklistItems[requisitionItem]}" status="j">
                 <tr class="${(i % 2)?'odd':'even'}">
@@ -64,12 +62,12 @@
                     </td>
                     <td>
                         <g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id}">
-                            ${picklistItem?.inventoryItem?.product?.productCode}
+                            <g:if test="${j==0}">${picklistItem?.inventoryItem?.product?.productCode}</g:if>
                         </g:link>
                     </td>
                     <td>
                         <g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id}">
-                            ${picklistItem?.inventoryItem?.product?.name}
+                            <g:if test="${j==0}">${picklistItem?.inventoryItem?.product?.name}</g:if>
                         </g:link>
                     </td>
                     <td>
@@ -81,16 +79,12 @@
                         <g:else>
                             ${g.message(code:'default.label')}
                         </g:else>
-
                     </td>
                     <td>
                         ${picklistItem?.inventoryItem?.lotNumber?:g.message(code:'default.label')}
                     </td>
                     <td>
                         ${picklistItem?.inventoryItem?.expirationDate}
-                    </td>
-                    <td>
-                        ${picklistItem?.picker?.name}
                     </td>
                     <td width="5%" class="center">
                         ${picklistItem?.quantity}
@@ -103,6 +97,9 @@
                     </td>
                     <td width="5%" class="center">
                         ${picklistItem?.quantityRemaining}
+                    </td>
+                    <td>
+                        ${picklistItem?.picker?.name}
                     </td>
                     <td width="5%" class="center">
                         ${picklistItem?.shortage}
