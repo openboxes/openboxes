@@ -1189,7 +1189,7 @@ class StockMovementService {
                 requisitionItem.removeFromPicklistItems(it)
                 it.delete()
             }
-            picklist.save()
+            picklist.save(flush:true, failOnError: true)
         }
 
         productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
