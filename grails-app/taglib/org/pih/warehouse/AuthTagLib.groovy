@@ -9,12 +9,18 @@
  **/
 package org.pih.warehouse
 
+import org.hibernate.LazyInitializationException
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.util.ExceptionUtil
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class AuthTagLib {
+
+    private static final transient Logger log = LoggerFactory.getLogger(AuthTagLib.class)
 
     def userService
 
@@ -110,12 +116,22 @@ class AuthTagLib {
     }
 
     def hasHighestRoleAuthenticated = { attrs, body ->
-        if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType == RoleType.ROLE_AUTHENTICATED)
-            out << body()
+        try {
+            if (User.get(session?.user?.id)?.getHighestRole(session?.warehouse)?.roleType == RoleType.ROLE_AUTHENTICATED) {
+                out << body()
+            }
+        } catch (LazyInitializationException e) {
+            log.error("couldn't check user roles: ${ExceptionUtil.summarize(e)}")
+        }
     }
 
     def hasHigherRoleThanAuthenticated = { attrs, body ->
-        if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType != RoleType.ROLE_AUTHENTICATED)
-            out << body()
+        try {
+            if (User.get(session?.user?.id)?.getHighestRole(session?.warehouse)?.roleType != RoleType.ROLE_AUTHENTICATED) {
+                out << body()
+            }
+        } catch (LazyInitializationException e) {
+            log.error("couldn't check user roles: ${ExceptionUtil.summarize(e)}")
+        }
     }
 }
