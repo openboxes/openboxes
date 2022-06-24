@@ -21,6 +21,14 @@
     .import-template + label {
         display: inline-block;
     }
+    .filters-container {
+        justify-self: flex-end;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: center;
+        margin: 10px 5px;
+    }
 </style>
 
 </head>
@@ -59,14 +67,23 @@
                 <div id="edit-items" class="box">
                     <h2 style="display: flex; align-items: center; justify-content: space-between;">
                         <warehouse:message code="order.wizard.addItems.label"/>
-                        <div class="button-group" style="margin-right: 5px;">
-                            <input type="file" name="importTemplate" id="importTemplate" class="import-template" />
-                            <label for="importTemplate" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'disk_upload.png')}" />&nbsp;
-                                <warehouse:message code="default.importTemplate.label" default="Import template"/>
-                            </label>
+                        <div style="display: flex; align-items: center;">
+                            <div class="filters-container">
+                                <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
+                                <div>
+                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="Filter by name or code"/>
+                                </div>
+                            </div>
+                            <div class="button-group" style="margin-right: 5px;">
+                                <input type="file" name="importTemplate" id="importTemplate" class="import-template" />
+                                <label for="importTemplate" class="button">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'disk_upload.png')}" />&nbsp;
+                                    <warehouse:message code="default.importTemplate.label" default="Import template"/>
+                                </label>
+                            </div>
                         </div>
                     </h2>
+
                     <g:form name="orderItemForm" action="create" method="post">
                         <g:hiddenField id="orderId" name="order.id" value="${order?.id }"></g:hiddenField>
                         <g:hiddenField id="orderItemId" name="orderItem.id" value="${orderItem?.id }"></g:hiddenField>
@@ -942,8 +959,38 @@
 
     </script>
 
+
+<script>
+  $(document).ready(function() {
+    $("#orderItemsFilter").keyup(function(event){
+      const filterCell = 1; // product name
+      const filterValue = $("#orderItemsFilter")
+        .val()
+        .toUpperCase();
+      filterTable(filterCell, filterValue)
+    });
+  });
+  function filterTable(cellIndex, filterValue) {
+    const tableRows = $("#orderItemsTable tr.dataRow");
+    // Loop through all table rows, and hide those who don't match the search query
+    $.each(tableRows, function(index, currentRow) {
+      // If filter matches text value then we display, otherwise hide
+      const txtValue = $(currentRow)
+        .find("td")
+        .eq(cellIndex)
+        .text();
+      if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+        $(currentRow).show();
+      } else {
+        $(currentRow).hide();
+      }
+    });
+  }
+</script>
+
+
 <script id="itemsRowTemplate" type="x-jquery-tmpl">
-<tr id="{{= id}}" tabindex="{{= index}}" class="{{if orderItemStatusCode == "CANCELED" }} canceled-item {{else !canEdit }} non-editable {{/if}}">
+<tr id="{{= id}}" tabindex="{{= index}}" class="{{if orderItemStatusCode == "CANCELED" }} canceled-item {{else !canEdit }} non-editable {{/if}} dataRow">
 	<td class="center middle">
     	{{= index }}
 	</td>
