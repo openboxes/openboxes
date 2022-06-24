@@ -1044,4 +1044,35 @@ class OrderService {
 
         return orderItems
     }
+
+    def deleteAdjustment(OrderAdjustment orderAdjustment, User user) {
+        Order order = orderAdjustment.order;
+        if (!canManageAdjustments(order, user) || orderAdjustment.hasInvoices){
+            throw new UnsupportedOperationException("You do not have permissions to edit")
+        }
+
+        order.removeFromOrderAdjustments(orderAdjustment)
+        orderAdjustment.delete()
+
+        if (order.hasErrors()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+        order.save(flush: true)
+    }
+
+    def removeOrderItem(OrderItem orderItem, User user) {
+        if (orderItem.hasShipmentAssociated() || !canOrderItemBeEdited(orderItem, user) || orderItem.hasInvoices) {
+            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+        }
+
+        Order order = orderItem.order
+        order.removeFromOrderItems(orderItem)
+        orderItem.delete()
+
+        if (order.hasErrors()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+        order.save(flush:true)
+    }
+
 }
