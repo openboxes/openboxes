@@ -27,13 +27,15 @@ class TableRow extends Component {
       const dynamicAttr = config.getDynamicAttr ? config.getDynamicAttr(properties) : {};
       const { attributes } = config;
       const { hide } = dynamicAttr;
+      const flexWidth = dynamicAttr.flexWidth || config.flexWidth;
+      const fixedWidth = dynamicAttr.fixedWidth || config.fixedWidth;
       if (!hide) {
         return (
           <div
             key={`${field}.${name}`}
             className={`align-self-center ${attributes && attributes.cellClassName ? attributes.cellClassName : ''}`}
             style={{
-              flex: config.fixedWidth ? `0 1 ${config.fixedWidth}` : `${config.flexWidth || '12'} 1 0`,
+              flex: fixedWidth ? `0 1 ${fixedWidth}` : `${flexWidth || '12'} 1 0`,
               minWidth: 0,
             }}
           >
