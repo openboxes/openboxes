@@ -25,8 +25,8 @@ import java.text.SimpleDateFormat
 
 class ApiController {
 
-    def dataSource
     def userService
+    def helpScoutService
     def localizationService
     def megamenuService
     def grailsApplication
@@ -153,7 +153,7 @@ class ApiController {
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
-        String helpScoutKey = grailsApplication.config.openboxes.helpscout.widget.key
+        String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
         render([
             data: [
@@ -182,7 +182,7 @@ class ApiController {
                 logoUrl              : logoUrl,
                 supportedLocales     : supportedLocales,
                 currencyCode         : currencyCode,
-                helpScoutKey         : helpScoutKey,
+                localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
             ],
         ] as JSON)

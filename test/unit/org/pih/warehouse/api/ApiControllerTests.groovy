@@ -112,6 +112,9 @@ class ApiControllerTests extends ControllerUnitTestCase {
         controller.messageSource = [
                 getMessage: { String code, Object[] args, String defaultMessage, Locale locale -> return "localized string" }
         ]
+        controller.helpScoutService = [
+            getLocalizedHelpScoutKey: { -> return 'helpscout-key-123' }
+        ]
         controller.session.user = user
         controller.session.warehouse = location
         controller.session.impersonateUserId = null

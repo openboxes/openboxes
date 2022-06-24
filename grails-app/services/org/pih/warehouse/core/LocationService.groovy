@@ -247,11 +247,17 @@ class LocationService {
     Map getLoginLocationsMap(User user, Location currentLocation) {
         log.info "Get login locations for user ${user} and location ${currentLocation})"
         def locationMap = [:]
-        def locations
+        def locations = new HashSet()
         def nullHigh = new NullComparator(true)
         def isRequestor = userService.isUserRequestor(user)
-        def inRoleBrowser = userService.isUserInRole(user, RoleType.ROLE_BROWSER)
         def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(user)
+        def inRoleBrowser = user.hasDefaultRole(RoleType.ROLE_BROWSER)
+        def inRoleAssistant = user.hasDefaultRole(RoleType.ROLE_ASSISTANT)
+        def inRoleManager = user.hasDefaultRole(RoleType.ROLE_MANAGER)
+        def inRoleAdmin = user.hasDefaultRole(RoleType.ROLE_ADMIN)
+        def inRoleSuperuser = user.hasDefaultRole(RoleType.ROLE_SUPERUSER)
+
+        def requiredRoles = RoleType.listRoleTypesForLocationChooser()
 
         if (isRequestor && !user.locationRoles && !inRoleBrowser) {
             locations = getLocations(null, null)
@@ -259,11 +265,22 @@ class LocationService {
         } else if (requestorInAnyLocation && inRoleBrowser) {
             locations = getRequestorLocations(user)
             locations += getLoginLocations(currentLocation)
-        } else if (requestorInAnyLocation) {
-            locations = getRequestorLocations(user)
         } else {
-            locations = getLoginLocations(currentLocation)
+            if (requestorInAnyLocation) {
+                locations += getRequestorLocations(user)
+            }
+            // If a user doesn't have at least one of the requiredRoles by default, get locations where the user HAS any of those roles
+            if (!inRoleBrowser && !inRoleAssistant && !inRoleManager && !inRoleAdmin && !inRoleSuperuser) {
+                user.locationRoles.each { LocationRole locationRole ->
+                    if (requiredRoles.contains(locationRole.role.roleType)) {
+                        locations += locationRole.location
+                    }
+                }
+            } else {
+                locations += getLoginLocations(currentLocation)
+            }
         }
+
         if (locations) {
             locations = locations.collect { Location location ->
                 [

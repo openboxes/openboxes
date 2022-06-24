@@ -899,7 +899,13 @@ class StockMovementService {
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
 
-            List<AvailableItem> availableItems = availableItemsMap[it.product_id]
+            // Collect to make a deep clone of Available Items, to avoid overriding Available Items from availableItemsMap[it.product_id]
+            List<AvailableItem> availableItems = availableItemsMap[it.product_id].collect { AvailableItem availableItem -> new AvailableItem(
+                inventoryItem: availableItem.inventoryItem,
+                binLocation: availableItem.binLocation,
+                quantityAvailable: availableItem.quantityAvailable,
+                quantityOnHand: availableItem.quantityOnHand
+            )}
             def picklist = (picklistItemsMap && picklistItemsMap[it.product_id]) ? picklistItemsMap[it.product_id] : []
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklist)
 

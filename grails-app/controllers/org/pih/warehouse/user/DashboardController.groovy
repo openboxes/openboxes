@@ -87,6 +87,10 @@ class DashboardController {
         }
         def order = Order.findByOrderNumber(params.searchTerms)
         if (order) {
+            if (order.isReturnOrder) {
+                redirect(controller: "stockMovement", action: "show", id: order.id)
+                return
+            }
             redirect(controller: "order", action: "show", id: order.id)
             return
         }

@@ -15,6 +15,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
@@ -50,10 +51,18 @@ class LocationApiController extends BaseDomainApiController {
         boolean isSuperuser = userService.isSuperuser(session?.user)
         String direction = params?.direction
         def fields = params.fields ? params.fields.split(",") : null
-        def locations
+        def locations = new HashSet()
         def isRequestor = userService.isUserRequestor(currentUser)
-        def inRoleBrowser = userService.isUserInRole(currentUser, RoleType.ROLE_BROWSER)
         def requestorInAnyLocation = userService.hasRoleRequestorInAnyLocations(currentUser)
+        def inRoleBrowser = currentUser.hasDefaultRole(RoleType.ROLE_BROWSER)
+        def inRoleAssistant = currentUser.hasDefaultRole(RoleType.ROLE_ASSISTANT)
+        def inRoleManager = currentUser.hasDefaultRole(RoleType.ROLE_MANAGER)
+        def inRoleAdmin = currentUser.hasDefaultRole(RoleType.ROLE_ADMIN)
+        def inRoleSuperuser = currentUser.hasDefaultRole(RoleType.ROLE_SUPERUSER)
+
+
+        def requiredRoles = RoleType.listRoleTypesForLocationChooser()
+
 
         if (params.locationChooser && isRequestor && !currentUser.locationRoles && !inRoleBrowser) {
             locations = locationService.getLocations(null, null)
@@ -61,13 +70,23 @@ class LocationApiController extends BaseDomainApiController {
         } else if (params.locationChooser && requestorInAnyLocation && inRoleBrowser) {
             locations = locationService.getRequestorLocations(currentUser)
             locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
-        } else if (params.locationChooser && requestorInAnyLocation) {
-            locations = locationService.getRequestorLocations(currentUser)
         } else {
-            locations = locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+            if (params.locationChooser && requestorInAnyLocation) {
+                locations += locationService.getRequestorLocations(currentUser)
+            }
+            // If a user doesn't have at least one of the requiredRoles by default, get locations where the user HAS any of those roles
+            if (params.locationChooser && !inRoleBrowser && !inRoleAssistant && !inRoleManager && !inRoleAdmin && !inRoleSuperuser) {
+                currentUser.locationRoles.each { LocationRole locationRole ->
+                    if (requiredRoles.contains(locationRole.role.roleType)) {
+                        locations += locationRole.location
+                    }
+                }
+            } else {
+                locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+            }
         }
         render ([data:locations] as JSON)
-     }
+    }
 
 
     def productSummary = {

@@ -728,7 +728,7 @@ class ShipmentService {
             }
 
             def quantityAvailableToPromise = productAvailabilityService.getQuantityAvailableToPromise(origin, shipmentItem.binLocation, shipmentItem.inventoryItem)
-            def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked
+            def quantityAvailableWithPicked = quantityAvailableToPromise + shipmentItem.quantityPicked - shipmentItem.unavailableQuantityPicked
 
             def duplicatedShipmentItemsQuantity = getDuplicatedShipmentItemsQuantity(shipmentItem.shipment, shipmentItem.binLocation, shipmentItem.inventoryItem)
 
