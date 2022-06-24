@@ -13,6 +13,12 @@ import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.apache.http.HttpResponse
+import org.apache.http.client.HttpClient
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClientBuilder
+import org.apache.http.util.EntityUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
@@ -79,6 +85,7 @@ class TmsIntegrationService {
     boolean transactional = true
 
     def grailsApplication
+    def apiClientService
     def shipmentService
     def fileTransferService
     def xsdValidatorService
@@ -291,6 +298,7 @@ class TmsIntegrationService {
         // Locate stock movement by tracking number
         StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
         if (!stockMovement) {
+            invokeTripNotificationRetryRequest(trackingNumber)
             throw new IllegalArgumentException("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
 
@@ -354,6 +362,7 @@ class TmsIntegrationService {
     void acceptDeliveryOrder(String trackingNumber, Date eventDate) {
         StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
         if (!stockMovement) {
+            invokeTripNotificationRetryRequest(trackingNumber)
             throw new Exception("Unable to locate stock movement by tracking number ${trackingNumber}")
         }
         createEvent(stockMovement, EventTypeCode.ACCEPTED, eventDate)
@@ -363,7 +372,10 @@ class TmsIntegrationService {
         if (trackingNumber) {
             log.info "Looking up stock movement by tracking number ${trackingNumber}"
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
-            if (stockMovement) {
+            if (!stockMovement) {
+                invokeTripNotificationRetryRequest(trackingNumber)
+            }
+            else {
                 log.info "Attaching document ${fileName} to ${stockMovement.identifier}"
                 Document document = new Document()
                 if (documentType) {
@@ -380,7 +392,30 @@ class TmsIntegrationService {
 
                 stockMovement.shipment.addToDocuments(document)
                 stockMovement.shipment.save(flush:true)
+            }
+        }
+    }
 
+    def invokeTripNotificationRetryRequest(String trackingNumber) {
+        String url
+        Boolean enabled = ConfigurationHolder.config.openboxes.integration.webhook.tripNotificationRetry.enabled?:false
+        if (enabled) {
+            try {
+                String uriTemplate = ConfigurationHolder.config.openboxes.integration.webhook.tripNotificationRetry.uri
+                String apiKey = ConfigurationHolder.config.openboxes.integration.webhook.tripNotificationRetry.apiKey
+                url = String.format(uriTemplate, trackingNumber, apiKey);
+
+                // Simplest way to invoke a GET request
+                if (url) {
+                    HttpClient httpClient = HttpClientBuilder.create().build();
+                    HttpGet request = new HttpGet(url)
+                    HttpResponse response = httpClient.execute(request)
+                    if (response?.entity) {
+                        log.info "response " + EntityUtils.toString(response?.entity)
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Unable to invoke webhook ${url}: " + e.message, e)
             }
         }
     }

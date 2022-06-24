@@ -1474,6 +1474,11 @@ openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTr
 openboxes.integration.createOutboundTransactionOnStatusUpdate = ["PICKUP"]
 openboxes.integration.createInboundTransactionOnStatusUpdate = ["DELIVERY"]
 
+// Webhook integration
+openboxes.integration.webhook.tripNotificationRetry.enabled = false
+openboxes.integration.webhook.tripNotificationRetry.uri = null
+openboxes.integration.webhook.tripNotificationRetry.apiKey = null
+
 // Default order header
 openboxes.integration.order.filename = "Order-%s.xml"
 openboxes.integration.order.header.version = "V1"
