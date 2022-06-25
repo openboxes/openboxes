@@ -42,7 +42,8 @@ function validate(values) {
   } else {
     const dateRequested = moment(values.dateRequested, 'MM/DD/YYYY');
     if (moment().diff(dateRequested) < 0) {
-      errors.dateRequested = 'react.stockMovement.error.futureDate.label';
+      // FIXME Temporarily commented out for Kuehne-Nagel
+      // errors.dateRequested = 'react.stockMovement.error.futureDate.label';
     }
   }
   return errors;
