@@ -42,10 +42,11 @@
             "sPaginationType": "two_button",
             "sAjaxSource": "${url}",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
+              const sSourceParsed = sSource.replaceAll("&amp;", "&");
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
-                    "url": sSource,
+                    "url": sSourceParsed,
                     "data": aoData,
                     "success": fnCallback,
                     "timeout": 30000,
