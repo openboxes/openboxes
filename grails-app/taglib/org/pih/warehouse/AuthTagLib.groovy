@@ -110,12 +110,14 @@ class AuthTagLib {
     }
 
     def hasHighestRoleAuthenticated = { attrs, body ->
-        if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType == RoleType.ROLE_AUTHENTICATED)
+        if (User.get(session?.user?.id)?.hasHighestRoleAuthenticated()) {
             out << body()
+        }
     }
 
     def hasHigherRoleThanAuthenticated = { attrs, body ->
-        if (User.get(session?.user?.id)?.getHighestRole(session.warehouse).roleType != RoleType.ROLE_AUTHENTICATED)
+        if (User.get(session?.user?.id)?.hasHigherRoleThanAuthenticated()) {
             out << body()
+        }
     }
 }
