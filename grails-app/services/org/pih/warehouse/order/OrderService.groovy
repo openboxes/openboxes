@@ -1048,7 +1048,7 @@ class OrderService {
     def deleteAdjustment(OrderAdjustment orderAdjustment, User user) {
         Order order = orderAdjustment.order;
         if (!canManageAdjustments(order, user) || orderAdjustment.hasInvoices){
-            throw new UnsupportedOperationException("You do not have permissions to edit")
+            throw new UnsupportedOperationException("You do not have permissions to perform this action")
         }
 
         order.removeFromOrderAdjustments(orderAdjustment)
