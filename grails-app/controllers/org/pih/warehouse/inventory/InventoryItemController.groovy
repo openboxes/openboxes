@@ -173,13 +173,20 @@ class InventoryItemController {
         def balance = [:]
         def count = [:]
         def transactionMap = commandInstance?.getTransactionLogMap(false)
-        def previousTransaction = null
+        Transaction previousTransaction = null
 
 
         transactionMap.each { Transaction transaction, List transactionEntries ->
 
+            // skip current transaction if it is internal and is connected to previous transaction
+            if (transaction.isInternal && previousTransaction == transaction.otherTransaction)  {
+                return
+            }
+
+            TransactionCode currentTransactionCode = transaction?.transactionType?.transactionCode
+
             // For PRODUCT INVENTORY transactions we just need to clear the balance completely and start over
-            if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
+            if (currentTransactionCode == TransactionCode.PRODUCT_INVENTORY) {
                 balance = [:]
                 count = [:]
                 totalCredit = 0
@@ -189,6 +196,9 @@ class InventoryItemController {
             transactionEntries.eachWithIndex { TransactionEntry transactionEntry, i ->
 
                 boolean isBaseline = false
+                boolean isCredit = false
+                boolean isDebit = false
+
                 String index = (transactionEntry.binLocation?.name ?: "DefaultBin") + "-" + (transactionEntry?.inventoryItem?.lotNumber ?: "DefaultLot")
 
                 if (!balance[index]) {
@@ -196,29 +206,34 @@ class InventoryItemController {
                     count[index] = 0
                 }
 
-                if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.DEBIT) {
-                    balance[index] -= transactionEntry?.quantity
+                if (transaction.isInternal) {
                     totalDebit += transactionEntry?.quantity
-                } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.CREDIT) {
-                    balance[index] += transactionEntry?.quantity
                     totalCredit += transactionEntry?.quantity
-                } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.INVENTORY) {
-                    balance[index] = transactionEntry?.quantity
-                    count[index] = transactionEntry?.quantity
-                } else if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY) {
-                    balance[index] += transactionEntry?.quantity
-                    count[index] += transactionEntry?.quantity
+                } else {
+                    switch (currentTransactionCode) {
+                        case TransactionCode.DEBIT:
+                            balance[index] -= transactionEntry?.quantity
+                            totalDebit += transactionEntry?.quantity
+                            isDebit = transactionEntry?.quantity > 0
+                            isCredit = transactionEntry.quantity < 0
+                            break
+                        case TransactionCode.CREDIT:
+                            balance[index] += transactionEntry?.quantity
+                            totalCredit += transactionEntry?.quantity
+                            isDebit = transactionEntry.quantity < 0
+                            isCredit = transactionEntry?.quantity >= 0
+                            break
+                        case TransactionCode.INVENTORY:
+                            balance[index] = transactionEntry?.quantity
+                            count[index] = transactionEntry?.quantity
+                            break
+                        case TransactionCode.PRODUCT_INVENTORY:
+                            balance[index] += transactionEntry?.quantity
+                            count[index] += transactionEntry?.quantity
+                            isBaseline = i == 0
+                            break
+                    }
                 }
-
-                if (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.PRODUCT_INVENTORY && i == 0) {
-                    isBaseline = true
-                }
-
-                boolean isCredit = (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.CREDIT && transactionEntry?.quantity >= 0) ||
-                        (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.DEBIT && transactionEntry.quantity < 0)
-
-                boolean isDebit = (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.DEBIT && transactionEntry?.quantity > 0) ||
-                        (transaction?.transactionType?.transactionCode == org.pih.warehouse.inventory.TransactionCode.CREDIT && transactionEntry.quantity < 0)
 
                 // Normalize quantity (inventory transactions were all converted to CREDIT so some may have negative quantity)
                 def quantity = (transactionEntry.quantity > 0) ? transactionEntry.quantity : -transactionEntry.quantity
@@ -226,25 +241,32 @@ class InventoryItemController {
                 String transactionYear = (transaction.transactionDate.year + 1900).toString()
                 String transactionMonth = (transaction.transactionDate.month).toString()
 
+                // FIXME Find a better way to get binLocation of the "otherTransaction" for internal transaction
+                def otherTransactionEntries = transaction.otherTransaction?.transactionEntries;
+                def destinationBinLocation = transaction.isInternal && otherTransactionEntries.size() > 0 ? otherTransactionEntries[0].binLocation : null
+
                 stockHistoryList << [
-                        transactionYear  : transactionYear,
-                        transactionMonth : transactionMonth,
-                        transactionDate  : transaction.transactionDate,
-                        transactionCode  : transaction?.transactionType?.transactionCode,
-                        transaction      : transaction,
-                        shipment         : null,
-                        requisition      : null,
-                        binLocation      : transactionEntry.binLocation,
-                        inventoryItem    : transactionEntry.inventoryItem,
-                        comments         : transactionEntry.comments,
-                        quantity         : quantity,
-                        isDebit          : isDebit,
-                        isCredit         : isCredit,
-                        balance          : balance.values().sum(),
-                        showDetails      : (i == 0),
-                        isBaseline       : isBaseline,
-                        isSameTransaction: (previousTransaction?.id == transaction?.id),
+                        transactionYear         : transactionYear,
+                        transactionMonth        : transactionMonth,
+                        transactionDate         : transaction.transactionDate,
+                        transactionCode         : currentTransactionCode,
+                        transaction             : transaction,
+                        shipment                : null,
+                        requisition             : null,
+                        destinationBinLocation  : destinationBinLocation,
+                        binLocation             : transactionEntry.binLocation,
+                        inventoryItem           : transactionEntry.inventoryItem,
+                        comments                : transactionEntry.comments,
+                        quantity                : quantity,
+                        isDebit                 : isDebit,
+                        isCredit                : isCredit,
+                        balance                 : balance.values().sum(),
+                        showDetails             : (i == 0),
+                        isBaseline              : isBaseline,
+                        isSameTransaction       : (previousTransaction?.id == transaction?.id),
+                        isInternal              : transaction.isInternal,
                 ]
+
                 previousTransaction = transaction
             }
 
@@ -256,8 +278,14 @@ class InventoryItemController {
         log.info "${controllerName}.${actionName}: " + (System.currentTimeMillis() - startTime) + " ms"
 
         if (params.print) {
-            render(template: "printStockHistory", model: [commandInstance: commandInstance, stockHistoryList: stockHistoryList,
-                                                          totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
+            render(template: "printStockHistory", model: [
+                    commandInstance     : commandInstance,
+                    stockHistoryList    : stockHistoryList,
+                    totalBalance        : totalBalance,
+                    totalCount          : totalCount,
+                    totalCredit         : totalCredit,
+                    totalDebit          : totalDebit
+            ])
         } else {
             stockHistoryList = stockHistoryList.groupBy({ it.transactionYear })
             def groupedStockHistoryList = [:]
@@ -265,8 +293,14 @@ class InventoryItemController {
                 history = history.groupBy { it.transactionMonth }
                 groupedStockHistoryList.get(year, [:]) << history
             }
-            render(template: "showStockHistory", model: [commandInstance: commandInstance, stockHistoryList: groupedStockHistoryList,
-                                                          totalBalance   : totalBalance, totalCount: totalCount, totalCredit: totalCredit, totalDebit: totalDebit])
+            render(template: "showStockHistory", model: [
+                    commandInstance     : commandInstance,
+                    stockHistoryList    : groupedStockHistoryList,
+                    totalBalance        : totalBalance,
+                    totalCount          : totalCount,
+                    totalCredit         : totalCredit,
+                    totalDebit          : totalDebit
+            ])
         }
     }
 
