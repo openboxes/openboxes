@@ -243,8 +243,19 @@ class InventoryItemController {
 
                 // FIXME Find a better way to get binLocation of the "otherTransaction" for internal transaction
                 def otherTransactionEntries = transaction.otherTransaction?.transactionEntries;
-                def destinationBinLocation = transaction.isInternal && otherTransactionEntries.size() > 0 ? otherTransactionEntries[0].binLocation : null
+                def otherBinLocation = transaction.isInternal && otherTransactionEntries.size() > 0 ? otherTransactionEntries[0].binLocation : null
 
+                def sourceBinLocation = transactionEntry.binLocation;
+                def destinationBinLocation = null;
+
+                if (transaction.isInternal) {
+                    if (currentTransactionCode == TransactionCode.DEBIT) {
+                        destinationBinLocation = otherBinLocation
+                    } else {
+                        sourceBinLocation = otherBinLocation
+                        destinationBinLocation = transactionEntry.binLocation
+                    }
+                }
                 stockHistoryList << [
                         transactionYear         : transactionYear,
                         transactionMonth        : transactionMonth,
@@ -254,7 +265,7 @@ class InventoryItemController {
                         shipment                : null,
                         requisition             : null,
                         destinationBinLocation  : destinationBinLocation,
-                        binLocation             : transactionEntry.binLocation,
+                        binLocation             : sourceBinLocation,
                         inventoryItem           : transactionEntry.inventoryItem,
                         comments                : transactionEntry.comments,
                         quantity                : quantity,
