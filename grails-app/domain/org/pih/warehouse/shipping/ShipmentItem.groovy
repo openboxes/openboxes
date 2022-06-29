@@ -254,9 +254,11 @@ class ShipmentItem implements Comparable, Serializable {
 
     Map toJson() {
         def container = container ? [
-                id  : container?.id,
-                name: container?.name,
-                type: container?.containerType?.name] : null
+                id      : container?.id,
+                name    : container?.name,
+                type    : container?.containerType?.name,
+                status  : container?.containerStatus
+        ] : null
 
         return [
                 id               : id,
