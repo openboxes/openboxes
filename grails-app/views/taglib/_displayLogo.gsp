@@ -2,16 +2,16 @@
 <%@ page import="org.pih.warehouse.core.User" %>
 <div class="logo">
     <g:if test="${attrs.includeLink}">
-        <g:hasHighestRoleAuthenticated>
+        <g:if test="${session?.user?.hasHighestRoleAuthenticated()}">
             <a href="${createLink(uri: '/stockMovement/list?direction=INBOUND')}">
                 <img src="${attrs?.logoUrl}" />
             </a>
-        </g:hasHighestRoleAuthenticated>
-        <g:hasHigherRoleThanAuthenticated>
+        </g:if>
+        <g:else>
             <a href="${createLink(uri: '/')}">
                 <img src="${attrs?.logoUrl}" />
             </a>
-        </g:hasHigherRoleThanAuthenticated>
+        </g:else>
     </g:if>
     <g:else>
         <img src="${attrs?.logoUrl}" />
