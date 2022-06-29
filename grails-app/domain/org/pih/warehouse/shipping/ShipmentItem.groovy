@@ -257,7 +257,7 @@ class ShipmentItem implements Comparable, Serializable {
                 id      : container?.id,
                 name    : container?.name,
                 type    : container?.containerType?.name,
-                status  : container?.containerStatus
+                status  : container?.containerStatus?.name
         ] : null
 
         return [
