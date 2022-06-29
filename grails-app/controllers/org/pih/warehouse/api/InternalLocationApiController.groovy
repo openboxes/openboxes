@@ -52,7 +52,10 @@ class InternalLocationApiController {
 
     def search = {
         log.info "search " + params
-        Location currentLocation = Location.get(session.warehouse.id)
+        Location currentLocation = Location.get(session?.warehouse?.id)
+        if (!currentLocation) {
+            throw new IllegalArgumentException("User must be logged into a location")
+        }
         Boolean excludeUnavailable = params.excludeUnavailable ? params.boolean("excludeUnavailable") : Boolean.TRUE
         ActivityCode [] activityCodes = params.activityCode ? params.list("activityCode") :
                 [ActivityCode.RECEIVE_STOCK, ActivityCode.PUTAWAY_STOCK]
