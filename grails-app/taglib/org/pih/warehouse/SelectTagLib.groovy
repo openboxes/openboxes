@@ -258,7 +258,11 @@ class SelectTagLib {
     }
 
     def selectBudgetCode = { attrs, body ->
-        attrs.from = BudgetCode.list()
+        if (attrs.active == "true") {
+            attrs.from = BudgetCode.findAllByActive(true)
+        } else {
+            attrs.from = BudgetCode.list()
+        }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code }
         out << g.select(attrs)

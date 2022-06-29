@@ -39,6 +39,8 @@
                     <thead>
                         <tr>
 
+                            <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
+
                             <g:sortableColumn property="id" title="${warehouse.message(code: 'budgetCode.id.label', default: 'Id')}" />
 
                             <g:sortableColumn property="code" title="${warehouse.message(code: 'budgetCode.code.label', default: 'Code')}" />
@@ -56,6 +58,18 @@
                     <tbody>
                     <g:each in="${budgetCodes}" status="i" var="budgetCode">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+                            <td>
+                                <g:if test="${budgetCode?.active }">
+                                    <span class="active">
+                                        <warehouse:message code="default.yes.label"/>
+                                    </span>
+                                </g:if>
+                                <g:else>
+                                    <span class="inactive">
+                                        <warehouse:message code="default.no.label"/>
+                                    </span>
+                                </g:else>
+                            </td>
 
                             <td><g:link action="edit" id="${budgetCode.id}">${fieldValue(bean: budgetCode, field: "id")}</g:link></td>
 

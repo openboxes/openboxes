@@ -40,7 +40,14 @@
 					<h2><warehouse:message code="default.create.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
-						
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="active"><warehouse:message code="user.active.label" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: budgetCode, field: 'active', 'errors')}">
+									<g:checkBox name="active" value="${budgetCode?.active}" />
+								</td>
+							</tr>
 							<tr class="prop">
 								<td valign="middle" class="name">
 									<label for="code"><warehouse:message code="budgetCode.code.label" default="Code" /></label>

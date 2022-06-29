@@ -94,6 +94,7 @@
 														id="budgetCode"
 														value="${orderAdjustment.budgetCode?.id}"
 														class="select2"
+														active="true"
 														noSelection="['':'']"/>
 								</td>
 							</tr>
