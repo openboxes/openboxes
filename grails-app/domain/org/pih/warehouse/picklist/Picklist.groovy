@@ -75,7 +75,7 @@ class Picklist implements Serializable {
         updatedBy(nullable: true)
     }
 
-    static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId', 'isFullyPicked', 'pickers']
+    static transients = ['pickablePicklistItems', 'pickablePicklistItemsByProductId', 'isFullyPicked', 'pickers', "completedPicklistItemCount", "totalPicklistItemCount", "pendingPicklistItemCount", "statusMessage"]
 
     Boolean getIsFullyPicked() {
         return !picklistItems.any { PicklistItem picklistItem ->
@@ -99,6 +99,22 @@ class Picklist implements Serializable {
         return getPicklistItems(product)?.groupBy {it.inventoryItem.lotNumber}
     }
 
+    def getTotalPicklistItemCount() {
+        return picklistItems?.size() ?: 0
+    }
+
+    String getPendingPicklistItemCount() {
+        return picklistItems.findAll { it.quantityRemaining > 0 }?.size() ?: 0
+    }
+
+    String getCompletedPicklistItemCount() {
+        return picklistItems.findAll { it.quantityRemaining == 0 }?.size() ?: 0
+    }
+
+    String getStatusMessage() {
+        return "${completedPicklistItemCount} / ${totalPicklistItemCount}"
+    }
+
     Set<Person> getPickers() {
         Set<Person> pickers = []
         if (picker) {
@@ -118,14 +134,18 @@ class Picklist implements Serializable {
 
     Map toJson() {
         [
-                id              : id,
-                version         : version,
-                name            : name,
-                description     : description,
-                picker          : picker,
-                datePicked      : datePicked?.format("MM/dd/yyyy"),
-                "requisition.id": requisition?.id,
-                picklistItems   : picklistItems
+                id                        : id,
+                version                   : version,
+                name                      : name,
+                description               : description,
+                picker                    : picker,
+                datePicked                : datePicked?.format("MM/dd/yyyy"),
+                "requisition.id"          : requisition?.id,
+                totalPicklistItemCount    : totalPicklistItemCount,
+                completedPicklistItemCount: completedPicklistItemCount,
+                pendingPicklistItemCount  : pendingPicklistItemCount,
+                statusMessage             : statusMessage,
+                picklistItems             : picklistItems
         ]
     }
 }

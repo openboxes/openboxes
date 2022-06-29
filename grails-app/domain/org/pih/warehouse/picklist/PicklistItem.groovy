@@ -90,6 +90,7 @@ class PicklistItem implements Serializable {
             "indexString",
             "index",
             "reasonCodeMessage",
+            "statusMessage"
     ]
 
     String getAssociatedLocation() {
@@ -129,8 +130,8 @@ class PicklistItem implements Serializable {
     }
 
     Integer getIndex() {
-        def index = picklist?.picklistItems?.findIndexOf {PicklistItem picklistItem -> picklistItem?.id == id }
-        return index?:1
+        def index = picklist?.picklistItems?.findIndexOf { PicklistItem picklistItem -> picklistItem?.id == id }
+        return index >= 0 ? index + 1 : 1
     }
 
     Integer getTotalCount() {
@@ -145,6 +146,11 @@ class PicklistItem implements Serializable {
         def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         return reasonCode ? (g.message(code: 'enum.ReasonCode.' + reasonCode)?:reasonCode) : null
     }
+
+    String getStatusMessage() {
+        return shortage ? "SHORTED" : quantityRemaining == 0 ? "COMPLETED" : quantityPicked == 0 ? "READY" : quantityRemaining > 0 ? "IN PROGRESS" : ""
+    }
+
 
     ProductPackage getPickUnitOfMeasure() {
         return requisitionItem?.product?.getProductPackage(quantity)
@@ -168,6 +174,7 @@ class PicklistItem implements Serializable {
                 id                          : id,
                 version                     : version,
                 status                      : status,
+                statusMessage               : statusMessage,
                 requisitionItemId           : requisitionItem?.id,
                 orderItemId                 : orderItem?.id,
                 binLocationId               : binLocation?.id,
@@ -197,24 +204,24 @@ class PicklistItem implements Serializable {
                 "binLocation.id"            : binLocation?.id,
                 "binLocation.name"          : binLocation?.name,
                 "binLocation.locationNumber": binLocation?.locationNumber,
-                "binLocation.locationType": binLocation?.locationType?.name,
-                "binLocation.zoneId"      : binLocation?.zone?.id,
-                "binLocation.zoneName"    : binLocation?.zone?.name,
-                quantityRequested         : requisitionItem?.quantity ?: 0,
-                quantityRemaining         : quantityRemaining ?: 0,
-                quantityToPick            : quantity ?: 0,
-                quantityPicked            : quantityPicked ?: 0,
-                quantityCanceled          : quantityCanceled ?: 0,
-                unitOfMeasure             : requisitionItem?.product?.unitOfMeasure ?: "EA",
-                pickUnitOfMeasure         : pickUnitOfMeasure,
-                pickTypeClassification    : PicklistItem.getPickTypeClassification(pickUnitOfMeasure?.uom?.code)?.name(),
-                shortage                  : shortage,
-                picker                    : picker,
-                datePicked                : datePicked,
-                index                     : index,
-                totalCount                : totalCount,
-                indexString               : indexString,
-                pickerName                : picker?.name,
+                "binLocation.locationType"  : binLocation?.locationType?.name,
+                "binLocation.zoneId"        : binLocation?.zone?.id,
+                "binLocation.zoneName"      : binLocation?.zone?.name,
+                quantityRequested           : requisitionItem?.quantity ?: 0,
+                quantityRemaining           : quantityRemaining ?: 0,
+                quantityToPick              : quantity ?: 0,
+                quantityPicked              : quantityPicked ?: 0,
+                quantityCanceled            : quantityCanceled ?: 0,
+                unitOfMeasure               : requisitionItem?.product?.unitOfMeasure ?: "EA",
+                pickUnitOfMeasure           : pickUnitOfMeasure,
+                pickTypeClassification      : PicklistItem.getPickTypeClassification(pickUnitOfMeasure?.uom?.code)?.name(),
+                shortage                    : shortage,
+                picker                      : picker,
+                datePicked                  : datePicked,
+                index                       : index,
+                totalCount                  : totalCount,
+                indexString                 : indexString,
+                pickerName                  : picker?.name,
         ]
     }
 }
