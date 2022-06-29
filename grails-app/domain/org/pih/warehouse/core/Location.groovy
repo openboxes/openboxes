@@ -396,7 +396,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     static Map toJson(Location location) {
-        return location.toJson(location?.locationType?.locationTypeCode)
+        return location ? location.toJson(location?.locationType?.locationTypeCode) : null
     }
 
 
