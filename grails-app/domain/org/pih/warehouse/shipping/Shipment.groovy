@@ -108,6 +108,9 @@ class Shipment implements Comparable, Serializable {
             "mostRecentReceiptItem",
             "status",
             "packingStatus",
+            "loadingStatus",
+            "packingStatusDetails",
+            "loadingStatusDetails",
             "totalItemCount",
             "packedItemCount",
             "unpackedItemCount",
@@ -125,6 +128,11 @@ class Shipment implements Comparable, Serializable {
             "totalValue",
             "totalVolume",
             "totalWeight",
+            "receivingScheduled",
+            "totalContainerCount",
+            "packedContainerCount",
+            "loadedContainerCount",
+            "emptyContainerCount",
     ]
 
     static mappedBy = [
@@ -275,6 +283,29 @@ class Shipment implements Comparable, Serializable {
 
     String getPackingStatus() {
         return "${packedItemCount} / ${totalItemCount}"
+    }
+
+    String getLoadingStatus() {
+        return "${loadedContainerCount} / ${totalContainerCount}"
+    }
+
+    Map getPackingStatusDetails() {
+        return [
+                statusMessage   : "${packedItemCount} / ${totalItemCount}",
+                packedItemCount : packedItemCount,
+                totalItemCount  : totalItemCount,
+                packingLocation : Location.toJson(packingScheduled?.eventLocation)
+        ]
+    }
+
+    Map getLoadingStatusDetails() {
+        return [
+                statusMessage       : "${loadedContainerCount} / ${totalContainerCount}",
+                loadedContainerCount: loadedContainerCount,
+                totalContainerCount : totalContainerCount,
+                emptyContainerCount : emptyContainerCount,
+                loadingLocation     : Location.toJson(packingScheduled?.eventLocation)
+        ]
     }
 
     Map getTotalVolume() {
@@ -553,6 +584,30 @@ class Shipment implements Comparable, Serializable {
         }
     }
 
+   Integer getTotalContainerCount() {
+       return containers?.size()?:0
+    }
+
+
+    Integer getLoadedContainerCount() {
+        return countContainerByStatus(ContainerStatus.LOADED) ?: 0
+    }
+
+    Integer getPackedContainerCount() {
+        return countContainerByStatus(ContainerStatus.PACKED) ?: 0
+    }
+
+    Integer countContainerByStatus(ContainerStatus containerStatus) {
+        return containers.count { it.containerStatus == containerStatus }
+    }
+
+    Set<Container> getContainerByStatus(ContainerStatus containerStatus) {
+        return containers.findAll { it.containerStatus == containerStatus }
+    }
+
+    Integer getEmptyContainerCount() {
+        return containers.count { it.shipmentItems.empty }
+    }
 
     Container addNewPallet(String name) {
         return addNewContainer(name, ContainerType.findById(Constants.PALLET_CONTAINER_TYPE_ID))
@@ -749,10 +804,10 @@ class Shipment implements Comparable, Serializable {
         def containerList = []
         def shipmentItemsByContainer = shipmentItems?.groupBy { it.container }
         shipmentItemsByContainer.each { container, shipmentItems ->
-            containerList << [id: container?.id, name: container?.name, type: container?.containerType?.name, shipmentItems: shipmentItems]
+            containerList << [id: container?.id, name: container?.name, status: container?.containerStatus?.name(), type: container?.containerType?.name, shipmentItems: shipmentItems]
         }
         def availableContainers = containers.collect { Container container ->
-            [id: container?.id, name: container?.name, containerNumber: container?.containerNumber, containerType: container?.containerType]
+            [id: container?.id, name: container?.name, status: container?.containerStatus.name(), containerNumber: container?.containerNumber, containerType: container?.containerType]
         }
 
         return [
@@ -761,7 +816,6 @@ class Shipment implements Comparable, Serializable {
                 shipmentNumber      : shipmentNumber,
                 status              : status?.code?.name(),
                 requisitionStatus   : requisition.status?.name(),
-                packingStatus       : packingStatus,
                 origin              : [
                         id  : origin?.id,
                         name: origin?.name,
@@ -777,15 +831,35 @@ class Shipment implements Comparable, Serializable {
                 actualShippingDate  : actualShippingDate?.format("MM/dd/yyyy HH:mm XXX"),
                 expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
                 actualDeliveryDate  : actualDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+
                 packingLocation     : packingScheduled?.eventLocation?.name ?: "Unassigned",
+                packingStatus       : packingStatus,
+                packingStatusDetails: packingStatusDetails,
+
                 loadingLocation     : loadingScheduled?.eventLocation?.name ?: "Unassigned",
-                totalCount          : totalItemCount,
-                unpackedCount       : unpackedItemCount,
-                shippedCount        : shipmentItemCount,
-                receivedCount       : shipmentItems?.findAll { it.isFullyReceived() }.size(),
+                loadingStatus       : loadingStatus,
+                loadingStatusDetails: loadingStatusDetails,
+
+                //packingLocation     : packingScheduled?.eventLocation,
+                //loadingLocation     : loadingScheduled?.eventLocation,
+
+                // shipment item status
+                totalItemCount      : totalItemCount,
+                unpackedItemCount   : unpackedItemCount,
+                shippedItemCount    : shipmentItemCount,
+                receivedItemCount   : shipmentItems?.findAll { it.isFullyReceived() }.size(),
+
+
+                // container status
+                loadedContainerCount: loadedContainerCount,
+                packedContainerCount: packedContainerCount,
+                totalContainerCount : totalContainerCount,
+
+                // associations
                 shipmentItems       : shipmentItems,
-                containers          : containerList,
+                containers          : containerList.sort { it.name },
                 availableContainers : availableContainers,
+
         ]
     }
 }

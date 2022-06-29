@@ -8,8 +8,6 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
-
-
 import grails.converters.JSON
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
@@ -27,6 +25,7 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.InternalLocation
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
@@ -108,6 +107,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(Container) { Container container ->
             return container?.toJson()
+        }
+
+        JSON.registerObjectMarshaller(Event) { Event event ->
+            return event.toJson()
         }
 
         JSON.registerObjectMarshaller(LocationGroup) { LocationGroup locationGroup ->

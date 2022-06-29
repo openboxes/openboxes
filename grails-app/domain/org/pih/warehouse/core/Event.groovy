@@ -49,6 +49,18 @@ class Event implements Comparable, Serializable {
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
 
+    Map toJson() {
+        return [
+                id: id,
+                eventDate: eventDate,
+                eventLocation: Location.toJson(eventLocation),
+                eventType: eventType,
+                latitude: latitude,
+                longitude: longitude,
+                observedBy: observedBy
+        ]
+    }
+
     int compareTo(obj) {
         def diff = obj?.eventDate <=> eventDate
         if (diff == 0) {
