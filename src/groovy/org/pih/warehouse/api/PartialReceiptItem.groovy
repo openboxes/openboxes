@@ -82,6 +82,7 @@ class PartialReceiptItem {
                 "product.productCode"           : inventoryItem?.product?.productCode,
                 "product.name"                  : inventoryItem?.product?.name,
                 "product.lotAndExpiryControl"   : inventoryItem?.product?.lotAndExpiryControl,
+                "product.handlingIcons"         : inventoryItem?.product?.handlingIcons,
                 "lotNumber"                     : lotNumber,
                 "expirationDate"                : expirationDate?.format("MM/dd/yyyy"),
                 "binLocation.id"                : binLocation?.id,
