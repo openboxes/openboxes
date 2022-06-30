@@ -85,6 +85,7 @@
                     <td class="product">
                         <g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
                             <format:product product="${shipmentItem?.inventoryItem?.product}"/>
+                            <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                         </g:link>
                     </td>
                     <td>
