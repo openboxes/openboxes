@@ -64,6 +64,9 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
+    // indicates whether this warehouse is being managed on the locally deployed system
+    Boolean active = Boolean.TRUE
+
     static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
 
     static hasMany = [productPackages: ProductPackage, productSupplierPreferences: ProductSupplierPreference]
@@ -98,6 +101,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
         comments(nullable: true)
 
         contractPrice(nullable: true)
+        active(nullable: true)
     }
 
     ProductPackage getDefaultProductPackage() {

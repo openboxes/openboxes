@@ -147,4 +147,5 @@
     <include file="0.8.x/changelog-2022-04-11-1000-alter-table-product-association-add-mutual-association.xml"/>
     <include file="0.8.x/changelog-2022-04-14-1200-add-dynamic-creation-activity.xml"/>
     <include file="0.8.x/changelog-2022-06-09-1430-add-missing-roles.xml"/>
+    <include file="0.8.x/changelog-2022-06-30-1606-add-active-column-to-product-supplier.xml"/>
 </databaseChangeLog>
