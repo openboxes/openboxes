@@ -93,6 +93,7 @@
         "sAjaxDataProp": "data",
         "fnServerParams": function (data) {
           data.push({ name: "includeInactive", value: "true"})
+          data.push({ name: "location.id", value: "${params.id}"})
         },
         "fnServerData": function (url, params, callback) {
           $.ajax({
