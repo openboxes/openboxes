@@ -103,7 +103,6 @@ class ReceiptService {
      * @return
      */
     PartialReceipt getPartialReceiptFromReceipt(Receipt receipt, boolean includeShipmentItems) {
-
         PartialReceipt partialReceipt = new PartialReceipt()
         partialReceipt.receipt = receipt
         partialReceipt.shipment = receipt.shipment
@@ -124,7 +123,7 @@ class ReceiptService {
 
             shipmentItems.each { ShipmentItem shipmentItem ->
                 Set<ReceiptItem> pendingReceiptItems =
-                        receipt.receiptItems.findAll { ReceiptItem receiptItem -> receiptItem.shipmentItem == shipmentItem }
+                        receipt.receiptItems.findAll { ReceiptItem receiptItem -> receiptItem.shipmentItem?.id == shipmentItem?.id }
 
                 if (pendingReceiptItems) {
                     pendingReceiptItems.each { ReceiptItem receiptItem ->
