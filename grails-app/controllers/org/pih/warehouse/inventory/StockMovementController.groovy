@@ -120,9 +120,17 @@ class StockMovementController {
         [stockMovement: stockMovement]
     }
 
-    def createPicklist = {
+    def allocate = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.PICKING, false, false, true, true)
+        flash.message = "Successfully allocated items for stock movement ${stockMovement?.identifier}"
+        redirect(action: "show", id: params.id)
+    }
+
+    def receive = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        stockMovementService.receiveStockMovement(stockMovement, new Date(), Boolean.TRUE)
+        flash.message = "Successfully auto received stock movement ${stockMovement?.identifier} at ${stockMovement?.destination}"
         redirect(action: "show", id: params.id)
     }
 

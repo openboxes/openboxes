@@ -2738,6 +2738,15 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
     }
 
+    void receiveStockMovement(StockMovement stockMovement, Date dateDelivered, Boolean creditStockOnReceipt = Boolean.TRUE) {
+        log.info ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} will be received")
+        Shipment shipment = stockMovement.shipment
+        if (shipment) {
+            String comment = "Shipment ${shipment.shipmentNumber} has been automatically received into ${shipment.destination}"
+            shipmentService.receiveShipments([shipment.id], comment, shipment?.createdBy?.id, shipment?.destination?.id, creditStockOnReceipt, dateDelivered)
+        }
+    }
+
     void validateRequisition(Requisition requisition) {
 
         requisition.requisitionItems.each { requisitionItem ->
