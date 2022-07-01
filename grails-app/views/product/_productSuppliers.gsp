@@ -38,6 +38,8 @@
                 <th>${attribute.name} (${attribute.code})</th>
             </g:each>
 
+            <th><g:message code="productSupplier.active.label" default="Active" /></th>
+
             <th><g:message code="default.actions.label" default="Actions" /></th>
 
             </thead>
@@ -98,6 +100,8 @@
                                     </g:each>
                                 </td>
                             </g:each>
+                            <td><g:checkBox value="${productSupplier.active}" name="active"/></td>
+
                             <td>
                                 <div class="button-group">
                                     <a href="javascript:void(0);" class="btn-show-dialog button"

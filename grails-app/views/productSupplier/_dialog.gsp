@@ -20,6 +20,16 @@
                 </tr>
                 <tr class="prop">
                     <td class="name">
+                        <label id="activeLabel" for="active">
+                            <warehouse:message code="productSupplier.active.label" />
+                        </label>
+                    </td>
+                    <td valign="top" class="value middle ${hasErrors(bean: productSupplier, field: 'active', 'errors')}">
+                        <g:checkBox name="active" value="${productSupplier?.active}" />
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <td class="name">
                         <label for="code"><warehouse:message code="productSupplier.code.label"/></label>
                     </td>
                     <td class="value ">
