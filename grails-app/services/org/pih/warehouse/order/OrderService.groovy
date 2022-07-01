@@ -63,6 +63,39 @@ class OrderService {
                         ilike("name", "%" + params.q + "%")
                         ilike("description", "%" + params.q + "%")
                         ilike("orderNumber", "%" + params.q + "%")
+
+                        orderItems {
+                            product {
+                                or {
+                                    ilike("name", "%" + params.q + "%")
+                                    ilike("productCode", "%" + params.q + "%")
+                                }
+                            }
+                        }
+
+                        orderItems {
+                            inventoryItem {
+                                ilike("lotNumber", "%" + params.q + "%")
+                            }
+                        }
+
+                        orderItems {
+                            originBinLocation {
+                                or {
+                                    ilike("name", "%" + params.q + "%")
+                                    ilike("locationNumber", "%" + params.q + "%")
+                                }
+                            }
+                        }
+
+                        orderItems {
+                            destinationBinLocation {
+                                or {
+                                    ilike("name", "%" + params.q + "%")
+                                    ilike("locationNumber", "%" + params.q + "%")
+                                }
+                            }
+                        }
                     }
                 }
                 if (orderTemplate.orderType) {

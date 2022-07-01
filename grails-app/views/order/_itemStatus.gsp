@@ -14,9 +14,9 @@
                 </g:if>
                 <th><warehouse:message code="product.productCode.label" /></th>
                 <th><warehouse:message code="product.label" /></th>
-                <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
-                <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
                 <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                    <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
+                    <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
                     <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
                     <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
                     <th class="right">${warehouse.message(code: 'order.received.label')}</th>
@@ -25,10 +25,11 @@
                     <th><warehouse:message code="order.totalPrice.label" /></th>
                 </g:if>
                 <g:elseif test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                    <th><warehouse:message code="inventoryItem.lotNumber.label" /></th>
-                    <th><warehouse:message code="inventoryItem.expirationDate.label" /></th>
-                    <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
-                    <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
+                    <th width="10%"><warehouse:message code="inventoryItem.lotNumber.label" /></th>
+                    <th width="10%"><warehouse:message code="inventoryItem.expirationDate.label" /></th>
+                    <th width="10%"><warehouse:message code="orderItem.originBinLocation.label" /></th>
+                    <th width="10%"><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
+                    <th>${warehouse.message(code: 'orderItem.quantity.label')}</th>
                 </g:elseif>
             </tr>
             </thead>
@@ -54,13 +55,13 @@
                             ${orderItem?.description }
                         </g:else>
                     </td>
-                    <td class="center">
-                        ${orderItem?.unitOfMeasure}
-                    </td>
-                    <td class="order-item-quantity right">
-                        ${orderItem?.quantity}
-                    </td>
                     <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                        <td class="center">
+                            ${orderItem?.unitOfMeasure}
+                        </td>
+                        <td class="order-item-quantity right">
+                            ${orderItem?.quantity}
+                        </td>
                         <td class="order-item-ordered right">
                             ${orderInstance.isPlaced()?orderItem?.quantity:0}
                         </td>
@@ -94,6 +95,10 @@
                         </td>
                         <td>
                             ${orderItem?.destinationBinLocation}
+                        </td>
+                        <td class="order-item-quantity">
+                            ${orderItem?.quantity}
+                            ${orderItem?.unitOfMeasure}
                         </td>
                     </g:elseif>
                 </tr>
