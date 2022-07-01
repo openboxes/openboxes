@@ -849,6 +849,11 @@ class Shipment implements Comparable, Serializable {
                 shippedItemCount    : shipmentItemCount,
                 receivedItemCount   : shipmentItems?.findAll { it.isFullyReceived() }.size(),
 
+                // deprecated (see shipment item status section)
+                totalCount          : totalItemCount,
+                unpackedCount       : unpackedItemCount,
+                shippedCount        : shipmentItemCount,
+                receivedCount       : shipmentItems?.findAll { it.isFullyReceived() }.size(),
 
                 // container status
                 loadedContainerCount: loadedContainerCount,
