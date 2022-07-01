@@ -304,7 +304,7 @@ class Shipment implements Comparable, Serializable {
                 loadedContainerCount: loadedContainerCount,
                 totalContainerCount : totalContainerCount,
                 emptyContainerCount : emptyContainerCount,
-                loadingLocation     : Location.toJson(packingScheduled?.eventLocation)
+                loadingLocation     : Location.toJson(loadingScheduled?.eventLocation)
         ]
     }
 
@@ -598,7 +598,7 @@ class Shipment implements Comparable, Serializable {
     }
 
     Integer countContainerByStatus(ContainerStatus containerStatus) {
-        return containers.count { it.containerStatus == containerStatus }
+        return containers.findAll { it.containerStatus == containerStatus }?.size()
     }
 
     Set<Container> getContainerByStatus(ContainerStatus containerStatus) {
