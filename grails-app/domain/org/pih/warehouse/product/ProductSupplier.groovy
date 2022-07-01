@@ -64,7 +64,6 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
-    // indicates whether this warehouse is being managed on the locally deployed system
     Boolean active = Boolean.TRUE
 
     static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
