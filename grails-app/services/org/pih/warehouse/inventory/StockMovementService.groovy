@@ -3076,8 +3076,7 @@ class StockMovementService {
     Boolean validatePicklistItem(PicklistItem picklistItem) {
         log.info "picklistItem " + picklistItem
         Location location = picklistItem?.picklist?.requisition?.origin
-        Integer quantityAvailable = picklistItem?.binLocation ? productAvailabilityService.getQuantityAvailableToPromise(location, picklistItem?.binLocation, picklistItem?.inventoryItem) :
-                productAvailabilityService.getAvailableItems(location, picklistItem?.inventoryItem)
+        Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromise(location, picklistItem?.binLocation, picklistItem?.inventoryItem)
 
         Integer quantityToPick = picklistItem.quantity
         quantityAvailable += (quantityToPick ?: 0)

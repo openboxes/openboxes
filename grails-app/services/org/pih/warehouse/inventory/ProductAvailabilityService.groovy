@@ -1152,6 +1152,9 @@ class ProductAvailabilityService {
             if (binLocation) {
                 eq("binLocation", binLocation)
             }
+            else {
+                isNull("binLocation")
+            }
         }
 
         return quantityAvailableToPromise ?: 0
