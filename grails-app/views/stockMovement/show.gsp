@@ -76,6 +76,7 @@
             <g:isUserAdmin>
                 <g:if test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKING ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKED ||
+                        stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PACKED ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTING ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTED ||
                         stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
@@ -94,6 +95,29 @@
                 </g:if>
             </g:isUserAdmin>
         </div>
+        <g:isSuperuser>
+            <div class="button-group">
+                <g:set var="isOutboundFromCurrentLocation" value="${stockMovement?.origin?.id == session?.warehouse?.id}"/>
+                <g:if test="${isOutboundFromCurrentLocation}">
+                    <g:if test="${stockMovement?.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
+                        <g:link controller="picklist" action="print" class="button" id="${stockMovement?.id}" target="_blank">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
+                            <warehouse:message code="default.print.label" args="[g.message(code: 'picklist.label', default: 'Picklist')]" default="Print picklist" />
+                        </g:link>
+                        <g:link controller="stockMovement" action="validatePicklist" class="button" id="${stockMovement?.id}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
+                            <warehouse:message code="stockMovement.validatePicklist.label" default="Validate picklist" />
+                        </g:link>
+                    </g:if>
+                    <g:elseif test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING, StockMovementStatusCode.REQUESTED]}">
+                        <g:link controller="stockMovement" action="allocate" class="button" id="${stockMovement?.id}">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
+                            <warehouse:message code="stockMovement.allocate.label" default="Allocate" />
+                        </g:link>
+                    </g:elseif>
+                </g:if>
+            </div>
+        </g:isSuperuser>
         <g:if test="${stockMovement?.destination?.id == session?.warehouse?.id}">
             <div class="button-group">
                 <g:if test="${(stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())}">
@@ -110,36 +134,20 @@
                 </g:if>
             </div>
         </g:if>
-        <g:isSuperuser>
+        <g:elseif test="${isSameOrigin && stockMovement?.hasBeenShipped() && !(stockMovement?.hasBeenReceived() || stockMovement.hasBeenPartiallyReceived())}">
             <div class="button-group">
-                <g:set var="isOutboundFromCurrentLocation" value="${stockMovement?.origin?.id == session?.warehouse?.id}"/>
-                <g:if test="${isOutboundFromCurrentLocation}">
-                    <g:if test="${stockMovement?.stockMovementStatusCode >= StockMovementStatusCode.PICKING}">
-                        <g:link controller="picklist" action="print" class="button" id="${stockMovement?.id}" target="_blank">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'printer.png')}" />&nbsp;
-                            <warehouse:message code="default.print.label" args="[g.message(code: 'picklist.label', default: 'Picklist')]" default="Print picklist" />
-                        </g:link>
-                        <g:link controller="stockMovement" action="validatePicklist" class="button" id="${stockMovement?.id}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'tick.png')}" />&nbsp;
-                            <warehouse:message code="stockMovement.validatePicklist.label" default="Validate picklist" />
-                        </g:link>
-                    </g:if>
-                    <g:elseif test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING, StockMovementStatusCode.REQUESTED]}">
-                        <g:link controller="stockMovement" action="createPicklist" class="button" id="${stockMovement?.id}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'map_clipboard.png')}" />&nbsp;
-                            <warehouse:message code="stockMovement.createPicklist.label" default="Create picklist" />
-                        </g:link>
-                    </g:elseif>
-                </g:if>
+                <g:link controller="stockMovement" action="receive" id="${stockMovement?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'lightning_go.png')}" />&nbsp;
+                    <warehouse:message code="default.button.autoReceive.label" default="Auto Receive" />
+                </g:link>
             </div>
-        </g:isSuperuser>
+        </g:elseif>
     </div>
     <div class="yui-gf">
         <div class="yui-u first">
             <div class="box">
                 <h2><g:message code="default.details.label" /></h2>
                 <div class="dialog">
-
                     <table>
                         <tr class="prop">
                             <td class="name">
@@ -154,14 +162,25 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
-                                    <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
+                                <g:if test="${stockMovement?.shipment?.status?.code > org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
+                                    <format:metadata obj="${stockMovement?.shipment?.status}"/>
                                 </g:if>
                                 <g:else>
-                                    ${stockMovement?.shipment?.status?.code?.displayStatus}
+                                    <format:metadata obj="${stockMovement?.requisition?.status}"/>
                                 </g:else>
                             </td>
                         </tr>
+%{--                        <tr class="prop">--}%
+%{--                            <td class="name">--}%
+%{--                                <g:message code="shipping.shipmentStatus.label"/>--}%
+%{--                            </td>--}%
+%{--                            <td class="value">--}%
+%{--                                ${stockMovement?.shipment?.mostRecentEvent?.eventType?.name?:stockMovement?.shipment?.status}--}%
+
+%{--                                status: ${stockMovement?.shipment?.currentStatus}--}%
+%{--                                event: ${stockMovement?.shipment?.currentEvent}--}%
+%{--                            </td>--}%
+%{--                        </tr>--}%
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.origin.label"/>

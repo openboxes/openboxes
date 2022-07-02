@@ -1759,8 +1759,8 @@ class ShipmentService {
         if (shipment?.receipts) {
             shipment?.receipts.toArray().each { Receipt receipt ->
                 shipment.removeFromReceipts(receipt)
-                receipt.delete()
-                shipment.save()
+                receipt.delete(flush:true)
+                shipment.save(flush:true)
             }
         }
     }
@@ -1771,7 +1771,7 @@ class ShipmentService {
             if (transactionInstance) {
                 transactionInstance.receipt = null
                 shipmentInstance.removeFromIncomingTransactions(transactionInstance)
-                transactionInstance?.delete()
+                transactionInstance?.delete(flush:true)
             }
         }
 
@@ -1783,7 +1783,7 @@ class ShipmentService {
             if (transactionInstance) {
                 transactionInstance?.receipt = null
                 shipmentInstance.removeFromOutgoingTransactions(transactionInstance)
-                transactionInstance?.delete()
+                transactionInstance?.delete(flush:true)
             }
         }
     }
@@ -1791,12 +1791,11 @@ class ShipmentService {
 
     void deleteEvent(Shipment shipmentInstance, Event eventInstance) {
         shipmentInstance.removeFromEvents(eventInstance)
-        eventInstance.delete()
         shipmentInstance.currentEvent = null
         shipmentInstance.currentStatus = null
+        eventInstance.delete()
         shipmentInstance.save()
     }
-
 
     void refreshCurrentStatus(String id) {
         def shipment = Shipment.get(id)

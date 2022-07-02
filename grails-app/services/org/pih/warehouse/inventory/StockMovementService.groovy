@@ -2738,6 +2738,15 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
     }
 
+    void receiveStockMovement(StockMovement stockMovement, Date dateDelivered, Boolean creditStockOnReceipt = Boolean.TRUE) {
+        log.info ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} will be received")
+        Shipment shipment = stockMovement.shipment
+        if (shipment) {
+            String comment = null // "Shipment ${shipment.shipmentNumber} has been automatically received into ${shipment.destination}"
+            shipmentService.receiveShipments([shipment.id], comment, shipment?.createdBy?.id, shipment?.destination?.id, creditStockOnReceipt, dateDelivered)
+        }
+    }
+
     void validateRequisition(Requisition requisition) {
 
         requisition.requisitionItems.each { requisitionItem ->
@@ -2767,14 +2776,21 @@ class StockMovementService {
         Requisition requisition = stockMovement?.requisition
         Shipment shipment = stockMovement?.requisition?.shipment ?: stockMovement?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
-            if (shipment.hasShipped()) {
+            if (shipment.wasPartiallyReceived() || shipment.wasReceived()) {
+                shipmentService.rollbackLastEvent(shipment)
+            }
+            else if (shipment.hasShipped()) {
+                shipmentService.rollbackLastEvent(shipment)
                 requisitionService.rollbackRequisition(requisition)
             }
-            shipmentService.rollbackLastEvent(shipment)
         } else {
             switch (stockMovement.requisition.status) {
                 case RequisitionStatus.ISSUED:
                     requisitionService.rollbackRequisition(stockMovement.requisition)
+                    requisition.save()
+                    break;
+                case RequisitionStatus.CHECKING:
+                    requisition.status = RequisitionStatus.PICKED
                     requisition.save()
                     break;
                 case RequisitionStatus.PICKED:
@@ -3067,8 +3083,7 @@ class StockMovementService {
     Boolean validatePicklistItem(PicklistItem picklistItem) {
         log.info "picklistItem " + picklistItem
         Location location = picklistItem?.picklist?.requisition?.origin
-        Integer quantityAvailable = picklistItem?.binLocation ? productAvailabilityService.getQuantityAvailableToPromise(location, picklistItem?.binLocation, picklistItem?.inventoryItem) :
-                productAvailabilityService.getAvailableItems(location, picklistItem?.inventoryItem)
+        Integer quantityAvailable = productAvailabilityService.getQuantityAvailableToPromise(location, picklistItem?.binLocation, picklistItem?.inventoryItem)
 
         Integer quantityToPick = picklistItem.quantity
         quantityAvailable += (quantityToPick ?: 0)
