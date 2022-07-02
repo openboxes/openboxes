@@ -33,7 +33,9 @@
         <g:each in="${shipmentInstance?.events?.sort { it?.eventDate}}" var="event">
             <tr class="prop ${(i++ % 2) == 0 ? 'odd' : 'even'}">
                 <td>
-                    <format:metadata obj="${event?.eventType}"/>
+                    <g:link controller="shipment" action="editEvent" id="${event?.id}" params="[shipmentId:shipmentInstance.id]">
+                        <format:metadata obj="${event?.eventType}"/>
+                    </g:link>
                 </td>
                 <td>
                     <g:formatDate date="${event.eventDate}" format="MMM d, yyyy"/>

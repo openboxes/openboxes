@@ -76,6 +76,7 @@
             <g:isUserAdmin>
                 <g:if test="${stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKING ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PICKED ||
+                        stockMovement?.stockMovementStatusCode == StockMovementStatusCode.PACKED ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTING ||
                         stockMovement?.stockMovementStatusCode == StockMovementStatusCode.REQUESTED ||
                         stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
@@ -110,7 +111,7 @@
                     </g:if>
                     <g:elseif test="${stockMovement?.stockMovementStatusCode in [StockMovementStatusCode.REQUESTING, StockMovementStatusCode.REQUESTED]}">
                         <g:link controller="stockMovement" action="allocate" class="button" id="${stockMovement?.id}">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_divide.png')}" />&nbsp;
+                            <img src="${resource(dir: 'images/icons/silk', file: 'clipboard.png')}" />&nbsp;
                             <warehouse:message code="stockMovement.allocate.label" default="Allocate" />
                         </g:link>
                     </g:elseif>
@@ -147,7 +148,6 @@
             <div class="box">
                 <h2><g:message code="default.details.label" /></h2>
                 <div class="dialog">
-
                     <table>
                         <tr class="prop">
                             <td class="name">
@@ -162,14 +162,25 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <g:if test="${stockMovement?.requisition?.status < RequisitionStatus.ISSUED}">
-                                    <format:metadata obj="${stockMovement?.requisition?.status?.displayStatus }"/>
+                                <g:if test="${stockMovement?.shipment?.status?.code > org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
+                                    <format:metadata obj="${stockMovement?.shipment?.status}"/>
                                 </g:if>
                                 <g:else>
-                                    ${stockMovement?.shipment?.status?.code?.displayStatus}
+                                    <format:metadata obj="${stockMovement?.requisition?.status}"/>
                                 </g:else>
                             </td>
                         </tr>
+%{--                        <tr class="prop">--}%
+%{--                            <td class="name">--}%
+%{--                                <g:message code="shipping.shipmentStatus.label"/>--}%
+%{--                            </td>--}%
+%{--                            <td class="value">--}%
+%{--                                ${stockMovement?.shipment?.mostRecentEvent?.eventType?.name?:stockMovement?.shipment?.status}--}%
+
+%{--                                status: ${stockMovement?.shipment?.currentStatus}--}%
+%{--                                event: ${stockMovement?.shipment?.currentEvent}--}%
+%{--                            </td>--}%
+%{--                        </tr>--}%
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.origin.label"/>

@@ -2742,7 +2742,7 @@ class StockMovementService {
         log.info ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} will be received")
         Shipment shipment = stockMovement.shipment
         if (shipment) {
-            String comment = "Shipment ${shipment.shipmentNumber} has been automatically received into ${shipment.destination}"
+            String comment = null // "Shipment ${shipment.shipmentNumber} has been automatically received into ${shipment.destination}"
             shipmentService.receiveShipments([shipment.id], comment, shipment?.createdBy?.id, shipment?.destination?.id, creditStockOnReceipt, dateDelivered)
         }
     }
@@ -2776,14 +2776,21 @@ class StockMovementService {
         Requisition requisition = stockMovement?.requisition
         Shipment shipment = stockMovement?.requisition?.shipment ?: stockMovement?.shipment
         if (shipment && shipment.currentStatus > ShipmentStatusCode.PENDING) {
-            if (shipment.hasShipped()) {
+            if (shipment.wasPartiallyReceived() || shipment.wasReceived()) {
+                shipmentService.rollbackLastEvent(shipment)
+            }
+            else if (shipment.hasShipped()) {
+                shipmentService.rollbackLastEvent(shipment)
                 requisitionService.rollbackRequisition(requisition)
             }
-            shipmentService.rollbackLastEvent(shipment)
         } else {
             switch (stockMovement.requisition.status) {
                 case RequisitionStatus.ISSUED:
                     requisitionService.rollbackRequisition(stockMovement.requisition)
+                    requisition.save()
+                    break;
+                case RequisitionStatus.CHECKING:
+                    requisition.status = RequisitionStatus.PICKED
                     requisition.save()
                     break;
                 case RequisitionStatus.PICKED:
