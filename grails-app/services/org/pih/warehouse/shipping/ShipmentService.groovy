@@ -1795,10 +1795,7 @@ class ShipmentService {
         shipmentInstance.currentStatus = null
         eventInstance.delete()
         shipmentInstance.save()
-        log.info "currentStatus: " + shipmentInstance?.currentStatus
-        log.info "currentEvent: " +  shipmentInstance?.currentEvent
     }
-
 
     void refreshCurrentStatus(String id) {
         def shipment = Shipment.get(id)
