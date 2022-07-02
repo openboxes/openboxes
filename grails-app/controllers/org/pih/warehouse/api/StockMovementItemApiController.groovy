@@ -59,7 +59,7 @@ class StockMovementItemApiController {
 
         log.debug("Updating picklist items")
         List picklistItems = jsonObject.remove("picklistItems")
-        String reasonCode = jsonObject.reasonCode
+        String reasonCode = jsonObject.reasonCode?:null
 
         if (!picklistItems) {
             throw new IllegalArgumentException("Must specifiy picklistItems")
