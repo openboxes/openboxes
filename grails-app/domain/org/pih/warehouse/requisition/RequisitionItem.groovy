@@ -559,11 +559,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                     quantityPicked += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantity }
                 }
             } else {
-                quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantity }
+                quantityPicked = picklistItems.sum { return it.quantity - it.quantityCanceled }
             }
-        } catch (Exception e) {
-
-        }
+        } catch (Exception e) { }
         return quantityPicked ?: 0
     }
 
@@ -576,7 +574,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                     quantityPicked += PicklistItem.findAllByRequisitionItem(substitutionItem).sum { it.quantityPicked }
                 }
             } else {
-                quantityPicked = PicklistItem.findAllByRequisitionItem(this).sum { it.quantityPicked }
+                quantityPicked = picklistItems.sum { it.quantityPicked }
             }
         } catch (Exception e) {
 
