@@ -30,6 +30,16 @@
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
+						<tr class="prop">
+							<td class="name">
+								<label id="activeLabel" for="active">
+									<warehouse:message code="productSupplier.active.label" />
+								</label>
+							</td>
+							<td valign="top" class="value middle ${hasErrors(bean: productSupplierInstance, field: 'active', 'errors')}">
+								<g:checkBox name="active" value="${productSupplierInstance?.active}" />
+							</td>
+						</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="product"><warehouse:message code="productSupplier.product.label" default="Product" /></label>
