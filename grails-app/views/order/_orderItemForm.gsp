@@ -52,6 +52,7 @@
         <g:selectBudgetCode name="budgetCode"
                             id="budgetCode"
                             class="select2"
+                            active="true"
                             noSelection="['':'']"/>
     </td>
     <td class="center middle">

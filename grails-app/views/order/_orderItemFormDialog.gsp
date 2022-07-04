@@ -147,6 +147,7 @@
                                         id="dlgBudgetCode"
                                         value="${orderItem.budgetCode?.id}"
                                         class="select2"
+                                        active="true"
                                         noSelection="['':'']"/>
                 </td>
             </tr>
@@ -314,6 +315,7 @@
                                         value="${orderItem.budgetCode?.id}"
                                         class="select2"
                                         noSelection="['':'']"
+                                        active="true"
                                         disabled="${orderItem.hasRegularInvoice}"/>
                 </td>
             </tr>

@@ -32,6 +32,7 @@ class BudgetCode implements Serializable {
     String code
     String name
     String description
+    Boolean active = true       // by default = true
 
     Organization organization
 
@@ -53,5 +54,6 @@ class BudgetCode implements Serializable {
         description(nullable: true)
         updatedBy(nullable: true)
         createdBy(nullable: true)
+        active(nullable: true)
     }
 }
