@@ -10,7 +10,6 @@
 package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
-import org.pih.warehouse.auth.AuthService
 import util.StringUtil
 import grails.converters.JSON
 
@@ -97,16 +96,6 @@ class User extends Person {
     boolean hasPrimaryRole(Location currentLocation) {
         def roles = getEffectiveRoles(currentLocation)
         return roles.roleType.find { RoleType.listPrimaryRoleTypes().contains(it) }
-    }
-
-    boolean hasHigherRoleThanAuthenticated() {
-        Location currentLocation = AuthService.currentLocation.get()
-        return getHighestRole(currentLocation)?.roleType == RoleType.ROLE_AUTHENTICATED
-    }
-
-    boolean hasHighestRoleAuthenticated() {
-        Location currentLocation = AuthService.currentLocation.get()
-        return getHighestRole(currentLocation)?.roleType != RoleType.ROLE_AUTHENTICATED
     }
 
     /**

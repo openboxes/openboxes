@@ -1025,6 +1025,8 @@ class EditItemsPage extends Component {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
         },
+        // eslint-disable-next-line max-len
+        reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
         substitutionItems: _.map(val.substitutionItems, sub => ({
           ...sub,
           requisitionItemId: val.requisitionItemId,
@@ -1032,6 +1034,8 @@ class EditItemsPage extends Component {
             ...sub.product,
             label: `${sub.productCode} ${sub.productName}`,
           },
+          // eslint-disable-next-line max-len
+          reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
         })),
       }),
     );
@@ -1153,9 +1157,13 @@ class EditItemsPage extends Component {
             editPageItems: _.map(data, item => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
+              // eslint-disable-next-line max-len
+              reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
                 requisitionItemId: item.requisitionItemId,
+                // eslint-disable-next-line max-len
+                reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
               })),
             })),
           },

@@ -137,6 +137,11 @@ class LocationService {
             }
         }
 
+        def outboundMovementLocations = locations.findAll {
+            (it.locationGroup == currentLocation.locationGroup) ||
+                    (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
+        }
+
         if (!isSuperuser) {
             if (direction == "INBOUND") {
                 return locations.findAll {
@@ -144,16 +149,16 @@ class LocationService {
                 }
             }
             if (direction == "OUTBOUND") {
-                return locations.findAll {
-                    (it.locationGroup == currentLocation.locationGroup) ||
-                            (it.locationGroup != currentLocation.locationGroup && it.locationType.locationTypeCode == LocationTypeCode.DEPOT)
-                }
+                return outboundMovementLocations
             }
         } else {
             if (direction == "INBOUND") {
                 return locations.findAll {
                     it.locationType.locationTypeCode == LocationTypeCode.SUPPLIER || !it.supports(ActivityCode.MANAGE_INVENTORY)
                 }
+            }
+            if (direction == "OUTBOUND") {
+                return outboundMovementLocations
             }
         }
 
