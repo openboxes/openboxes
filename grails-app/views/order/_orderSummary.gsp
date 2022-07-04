@@ -27,10 +27,13 @@
     </g:if>
     <g:if test="${orderInstance?.orderItems}">
         <g:set var="status" value="${0}"/>
-        <g:set var="columnsNumber" value="5"/>
+        <g:set var="columnsNumber" value="6"/>
         <table class="order-items" id="order-items">
             <thead>
             <tr>
+                <th class="bottom">
+                    <warehouse:message code="default.status.label"/>
+                </th>
                 <th class="bottom">
                     <warehouse:message code="product.productCode.label"/>
                 </th>
@@ -77,6 +80,11 @@
                 <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
                 <g:if test="${!isItemCanceled || orderInstance?.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
                     <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
+                        <td>
+                            <div class="tag ${orderItem?.isCanceled() ? 'tag-danger' : ''}">
+                                <format:metadata obj="${orderItem?.getOrderItemStatus()}"/>
+                            </div>
+                        </td>
                         <td style="color: ${orderItem?.product?.color}">
                             ${orderItem?.product?.productCode}
                         </td>
