@@ -103,6 +103,7 @@
                                 <th><g:message code="preferenceType.label" default="Preference Type" /></th>
                                 <th><g:message code="productSupplier.unitOfMeasure.label" default="Unit of Measure" /></th>
                                 <th><g:message code="productSupplier.unitPrice.label" default="Unit Price" /></th>
+                                <th><g:message code="productSupplier.active.label" default="Active" /></th>
                                 <th><g:message code="default.actions.label" default="Actions" /></th>
                             </tr>
                         </thead>
@@ -148,6 +149,7 @@
                                         ${g.formatNumber(number: productSupplierInstance?.defaultProductPackage?.productPrice?.price?:0.0)}
                                     </g:hasRoleFinance>
                                 </td>
+                                <td><g:checkBox value="${productSupplierInstance.active}" name="active"/></td>
                                 <td>
                                     <div class="button-group">
                                         <g:link action="edit" controller="productSupplier" id="${productSupplierInstance?.id}" class="button">
