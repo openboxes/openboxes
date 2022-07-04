@@ -124,6 +124,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     }
 
     static PROPERTIES = [
+            "active"                              : "active",
             "ID"                                  : "id",
             "Product Source Code"                 : "code",
             "Product Source Name"                 : "name",
