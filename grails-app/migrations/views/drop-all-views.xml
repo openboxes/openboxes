@@ -18,6 +18,7 @@
       DROP VIEW IF EXISTS order_payment_status_from_shipments;
       DROP VIEW IF EXISTS order_payment_status_from_adjustments;
       DROP VIEW IF EXISTS order_summary;
+      DROP VIEW IF EXISTS order_item_summary;
       DROP VIEW IF EXISTS product_demand;
       DROP VIEW IF EXISTS product_inventory_compare_view;
       DROP VIEW IF EXISTS product_inventory_expiry_view;
@@ -38,12 +39,6 @@
       DROP VIEW IF EXISTS substitution_item;
       DROP VIEW IF EXISTS supplier;
       DROP VIEW IF EXISTS stock_movement;
-      DROP VIEW IF EXISTS order_item_status;
-      DROP VIEW IF EXISTS order_receipt_status;
-      DROP VIEW IF EXISTS order_payment_status_from_shipments;
-      DROP VIEW IF EXISTS order_payment_status_from_adjustments;
-      DROP VIEW IF EXISTS order_summary;
-      DROP VIEW IF EXISTS order_item_summary;
     </sql>
   </changeSet>
 </databaseChangeLog>
