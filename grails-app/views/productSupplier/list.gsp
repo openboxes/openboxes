@@ -149,7 +149,7 @@
                                         ${g.formatNumber(number: productSupplierInstance?.defaultProductPackage?.productPrice?.price?:0.0)}
                                     </g:hasRoleFinance>
                                 </td>
-                                <td><g:checkBox value="${productSupplierInstance.active}" name="active"/></td>
+                                <td><g:checkBox onclick="return false;" value="${productSupplierInstance.active}" name="active"/></td>
                                 <td>
                                     <div class="button-group">
                                         <g:link action="edit" controller="productSupplier" id="${productSupplierInstance?.id}" class="button">
