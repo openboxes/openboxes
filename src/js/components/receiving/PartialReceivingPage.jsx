@@ -160,8 +160,9 @@ const TABLE_FIELDS = {
       'product.name': {
         type: (params) => {
           if (params.subfield) {
-            const fieldName = params.fieldName.replace('.name', '.handlingIcons');
-            const handlingIcons = _.get(params.values, fieldName);
+            const { parentIndex, rowIndex } = params;
+            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
+            const handlingIcons = _.get(params.values, fieldPath);
 
             const productNameWithIcons = (
               <div className="d-flex">
