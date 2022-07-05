@@ -52,6 +52,7 @@ import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.shipping.ReferenceNumber
@@ -834,6 +835,15 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'product.label'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.supplierCode.label', default: 'Supplier code'))
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
+
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.manufacturer.label', default: 'Manufacturer'))
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
+
+            row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'productSupplier.manufacturerCode.label', default: 'Manufacturer Code'))
+            row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
+
             row.createCell(CELL_INDEX).setCellValue("" + getMessageTagLib().message(code: 'inventory.lotNumber.label'))
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
@@ -906,6 +916,25 @@ class DocumentService {
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
+
+                String supplierOutput = ""
+                String manufacturerOutput = ""
+                String manufacturerCodeOutput = ""
+                def suppliersList = itemInstance?.orderItems*.productSupplier
+                ProductSupplier supplier = suppliersList?.get(0)
+                if (supplier && shipmentInstance.isFromPurchaseOrder) {
+                    supplierOutput += supplier.supplierCode
+                    manufacturerOutput += supplier.manufacturer
+                    manufacturerCodeOutput += supplier.manufacturerCode
+                }
+                row.createCell(CELL_INDEX).setCellValue(supplierOutput)
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+                row.createCell(CELL_INDEX).setCellValue(manufacturerOutput)
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
+
+                row.createCell(CELL_INDEX).setCellValue(manufacturerCodeOutput)
+                row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.lotNumber)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
