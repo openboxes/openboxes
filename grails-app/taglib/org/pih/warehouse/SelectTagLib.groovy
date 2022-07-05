@@ -201,7 +201,7 @@ class SelectTagLib {
         Product product = Product.get(attrs?.product?.id)
         Organization supplier = Organization.get(attrs?.supplier?.id)
         log.info ("product: ${product}, supplier ${supplier}")
-        attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier) ?: []
+        attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier).findAll { it.active } ?: []
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code + " - " + it.supplierCode + " - " + (it.manufacturer?.name?:"") + " - " + (it.manufacturerCode?:"") }
         out << g.select(attrs)
