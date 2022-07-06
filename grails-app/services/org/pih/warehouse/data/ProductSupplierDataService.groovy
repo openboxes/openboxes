@@ -46,7 +46,7 @@ class ProductSupplierDataService {
             def validityEndDate = params.globalPreferenceTypeValidityEndDate
             def contractPriceValidUntil = params.contractPriceValidUntil
 
-            if (active && (active != false && active != true)) {
+            if (active && !(active instanceof Boolean)) {
                 command.errors.reject("Row ${index + 1}: Active field has to be either empty or a boolean value (true/false)")
             }
 
