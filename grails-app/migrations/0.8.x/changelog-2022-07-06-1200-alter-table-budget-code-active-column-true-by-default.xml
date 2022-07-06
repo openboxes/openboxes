@@ -3,14 +3,12 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="kchelstowski" id="290620221200-0">
+    <changeSet author="kchelstowski" id="060720221200-0">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="budget_code" columnName="active" />
-            </not>
+            <columnExists tableName="budget_code" columnName="active" />
         </preConditions>
-        <addColumn tableName="budget_code">
-            <column name="active" type="BIT" />
-        </addColumn>
+        <sql>
+            UPDATE budget_code SET active = b'1' WHERE active IS NULL
+        </sql>
     </changeSet>
 </databaseChangeLog>
