@@ -1385,7 +1385,7 @@ class EditItemsPage extends Component {
   updateEditPageItem(values, editPageItem) {
     const editPageItemIndex = _.findIndex(this.state.values.editPageItems, item =>
       item.requisitionItemId === editPageItem.requisitionItemId);
-    const revisedItemIndex = _.findIndex(this.state.values.revisedItems, item =>
+    const revisedItemIndex = _.findIndex(this.state.revisedItems, item =>
       item.requisitionItemId === editPageItem.requisitionItemId);
 
     this.setState({
@@ -1406,7 +1406,9 @@ class EditItemsPage extends Component {
           },
         }),
       },
-      revisedItems: update(this.state.revisedItems, { $splice: [[revisedItemIndex, 1]] }),
+      revisedItems: update(this.state.revisedItems, revisedItemIndex > -1 ? {
+        $splice: [[revisedItemIndex, 1]],
+      } : {})
     });
   }
 
