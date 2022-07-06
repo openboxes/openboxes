@@ -196,7 +196,7 @@ CREATE OR REPLACE VIEW order_item_summary AS (
         IFNULL(quantity_shipped, 0) AS quantity_shipped,
         IFNULL(quantity_received, 0) AS quantity_received,
         IFNULL(quantity_invoiced, 0) AS quantity_invoiced,
-        COALESCE(payment_status, receipt_status, shipment_status, order_status) AS derived_status
+        COALESCE(payment_status, receipt_status, shipment_status, order_item_status, order_status) AS derived_status
     FROM (
         SELECT
             order_item.id AS order_item_id,
@@ -238,6 +238,6 @@ CREATE OR REPLACE VIEW order_item_summary AS (
             LEFT OUTER JOIN order_item_status ON order_item_status.order_item_id = order_item.id
             LEFT OUTER JOIN order_receipt_status ON order_receipt_status.order_item_id = order_item.id
             LEFT OUTER JOIN order_payment_status_from_shipments ON order_payment_status_from_shipments.order_item_id = order_item.id
-        WHERE `order`.order_type_id = 'PURCHASE_ORDER' AND order_item.order_item_status_code != 'CANCELED'
+        WHERE `order`.order_type_id = 'PURCHASE_ORDER'
         GROUP BY order_item.id, order_item_status.quantity_shipped, order_receipt_status.quantity_received, order_payment_status_from_shipments.shipment_item_quantity_invoiced
     ) AS order_item_summary);

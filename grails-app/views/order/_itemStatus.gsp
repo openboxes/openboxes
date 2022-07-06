@@ -29,6 +29,9 @@
         <table class="table table-bordered" id="order-items-status">
             <thead>
             <tr class="odd">
+                <th class="bottom">
+                    <warehouse:message code="default.status.label"/>
+                </th>
                 <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
                     <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
                 </g:if>
@@ -37,7 +40,6 @@
                 <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
                 <th class="right">${warehouse.message(code: 'orderItem.quantity.label')}</th>
                 <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                    <th class="right">${warehouse.message(code: 'order.ordered.label')}</th>
                     <th class="right">${warehouse.message(code: 'order.shipped.label')}</th>
                     <th class="right">${warehouse.message(code: 'order.received.label')}</th>
                     <th class="right">${warehouse.message(code: 'invoice.invoiced.label')}</th>
@@ -55,6 +57,11 @@
             <tbody>
             <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
+                    <td>
+                        <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                            <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
+                        </div>
+                    </td>
                     <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
                         <td>
                             ${orderItem?.orderItemStatusCode}
@@ -82,9 +89,6 @@
                     ${orderItem?.quantity}
                 </td>
                 <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                    <td class="order-item-ordered right">
-                        ${orderInstance.isPlaced()?orderItem?.quantity:0}
-                    </td>
                     <td class="order-item-fullfilled right">
                         ${orderItem?.quantityShipped}
                     </td>
