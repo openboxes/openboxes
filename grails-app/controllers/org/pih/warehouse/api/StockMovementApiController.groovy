@@ -157,8 +157,8 @@ class StockMovementApiController {
     def reviseItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
-        def revisedItems = stockMovementService.reviseItems(stockMovement)
-        render([data: revisedItems] as JSON)
+        stockMovementService.reviseItems(stockMovement)
+        render([data: 200] as JSON)
     }
 
     /**

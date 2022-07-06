@@ -1873,7 +1873,7 @@ class StockMovementService {
         return updatedStockMovement
     }
 
-    List reviseItems(StockMovement stockMovement) {
+    void reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
         def revisedItems = []
 
@@ -1887,7 +1887,9 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                if (requisitionItem.shipmentItems || requisitionItem.picklistItems) {
+                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                }
 
                 log.info "Item revised " + requisitionItem.id
 
@@ -1912,15 +1914,6 @@ class StockMovementService {
 
         createMissingPicklistItems(stockMovement)
         createMissingShipmentItems(stockMovement)
-
-        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-            if (stockMovementItem.statusCode == 'CHANGED') {
-                def editPageItem = getEditPageItem(stockMovementItem?.id)
-                revisedItems.add(editPageItem)
-            }
-        }
-
-        return revisedItems
     }
 
     void substituteItem(StockMovementItem stockMovementItem) {
