@@ -81,8 +81,8 @@
                 <g:if test="${!isItemCanceled || orderInstance?.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
                     <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
                         <td>
-                            <div class="tag ${orderItem?.isCanceled() ? 'tag-danger' : ''}">
-                                <format:metadata obj="${orderItem?.getOrderItemStatus()}"/>
+                            <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                                <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
                             </div>
                         </td>
                         <td style="color: ${orderItem?.product?.color}">

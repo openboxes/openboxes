@@ -58,8 +58,8 @@
             <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
                     <td>
-                        <div class="tag ${orderItem?.isCanceled() ? 'tag-danger' : ''}">
-                            <format:metadata obj="${orderItem?.getOrderItemStatus()}"/>
+                        <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                            <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
                         </div>
                     </td>
                     <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">

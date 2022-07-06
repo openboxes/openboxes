@@ -359,7 +359,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Boolean isCanceled() {
-        return getOrderItemStatus() == "CANCELED"
+        return orderItemStatusCode == OrderItemStatusCode.CANCELED
     }
 
 
