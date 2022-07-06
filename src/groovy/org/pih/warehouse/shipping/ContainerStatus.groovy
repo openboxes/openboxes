@@ -14,7 +14,9 @@ enum ContainerStatus {
     OPEN('Open'),
     PACKING('Packing'),
     PACKED('Packed'),
+    LOADING('Loading'),
     LOADED('Loaded'),
+    UNLOADING('Unloading'),
     UNLOADED('Unloaded'),
     UNPACKING('Unpacking'),
     UNPACKED('Unpacked'),
@@ -25,7 +27,7 @@ enum ContainerStatus {
     ContainerStatus(String name) { this.name = name }
 
     static list() {
-        [OPEN, PACKING, PACKED, LOADED, UNLOADED, UNPACKING, UNPACKED, CLOSED]
+        [OPEN, PACKING, PACKED, LOADING, LOADED, UNLOADING, UNLOADED, UNPACKING, UNPACKED, CLOSED]
     }
 }
 

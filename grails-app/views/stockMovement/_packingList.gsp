@@ -14,10 +14,11 @@
     <table>
         <tr>
             <th></th>
-            <th><warehouse:message code="shipping.container.label"/></th>
             <g:if test="${shipmentInstance?.isFromPurchaseOrder}">
                 <th><warehouse:message code="order.orderNumber.label"/></th>
             </g:if>
+            <th><warehouse:message code="container.label"/></th>
+            <th><warehouse:message code="container.containerStatus.label" default="Status"/></th>
             <th><warehouse:message code="product.productCode.label"/></th>
             <th><warehouse:message code="product.label"/></th>
             <th class="left">
@@ -47,7 +48,7 @@
                 <g:set var="shipmentItems" value="${shipmentInstance.findShipmentItemsByContainer(container)}"/>
                 <g:if test="${shipmentItems}">
                     <g:each var="shipmentItem" in="${shipmentItems}" status="i">
-                        <tr class="prop ${count++ % 2 == 0?'odd':'even'} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
+                        <tr class="${i == 0 ? 'prop' : ''} ${count++ % 2 == 0?'odd':'even'} ${shipmentItem?.hasRecalledLot?'recalled':''} shipmentItem">
                             <td>
                                 <g:if test="${shipmentItem?.hasRecalledLot}">
                                     <div data-toggle="tooltip" data-placement="top" title="${g.message(code:'inventoryItem.recalledLot.label')}">
@@ -65,13 +66,17 @@
                                 <g:if test="${i == 0}">
                                     <g:if test="${container}">
                                         ${container?.name}
-                                        <g:if test="${container?.containerNumber}">
-                                            (${container?.containerNumber})
-                                        </g:if>
                                     </g:if>
                                     <g:else>
                                         <g:message code="shipping.unpackedItems.label"/>
                                     </g:else>
+                                </g:if>
+                            </td>
+                            <td>
+                                <g:if test="${i == 0}">
+                                    <g:if test="${container}">
+                                        <span class="tag tag-alert">${container?.containerStatus}</span>
+                                    </g:if>
                                 </g:if>
                             </td>
                             <td>

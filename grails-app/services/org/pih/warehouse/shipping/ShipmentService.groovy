@@ -1853,6 +1853,11 @@ class ShipmentService {
             throw new IllegalStateException("Shipment item is already in container ${container?.name}")
         }
 
+        if (container) {
+            container.containerStatus = ContainerStatus.PACKING
+            container.save()
+        }
+
         // Move the entire shipment item into the specified container
         if (quantityToPack == shipmentItem.quantity) {
             ShipmentItem existingShipmentItem = shipment.shipmentItems.find { it.container == container &&
