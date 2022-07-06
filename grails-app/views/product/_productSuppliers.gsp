@@ -44,7 +44,7 @@
             <tbody>
                 <g:if test="${productInstance?.productSuppliers}">
 
-                    <g:each var="productSupplier" in="${productInstance?.productSuppliers.sort()}" status="status">
+                    <g:each var="productSupplier" in="${productInstance?.productSuppliers.findAll{ it.active }.sort()}" status="status">
 
                         <g:set var="defaultProductPackage" value="${productSupplier.defaultProductPackage}"/>
 

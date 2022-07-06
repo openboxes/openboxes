@@ -19,6 +19,7 @@ import EditLineModal from 'components/receiving/modals/EditLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -157,7 +158,23 @@ const TABLE_FIELDS = {
         },
       },
       'product.name': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => {
+          if (params.subfield) {
+            const { parentIndex, rowIndex } = params;
+            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
+            const handlingIcons = _.get(params.values, fieldPath);
+
+            const productNameWithIcons = (
+              <div className="d-flex">
+                <span className="text-truncate">
+                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+                </span>
+                {renderHandlingIcons(handlingIcons)}
+              </div>);
+            return <LabelField {...params} fieldValue={productNameWithIcons} />;
+          }
+          return null;
+        },
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',

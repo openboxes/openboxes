@@ -157,6 +157,7 @@ class LoadDataService {
             Map<String, String> currentItem = csvItems.get(i);
             Map<String, Object> newItem = new HashMap<String, String>();
 
+            newItem.put("active", currentItem.get("active"))
             newItem.put("id", currentItem.get("ID"));
             newItem.put("code", currentItem.get("Product Source Code"));
             newItem.put("name", currentItem.get("Product Source Name"));
