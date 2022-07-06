@@ -10,7 +10,7 @@
             </not>
         </preConditions>
         <addColumn tableName="budget_code">
-            <column name="active" type="BIT" />
+            <column name="active" type="BIT" defaultValueBoolean="true" />
         </addColumn>
     </changeSet>
 </databaseChangeLog>
