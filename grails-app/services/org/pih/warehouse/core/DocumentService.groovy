@@ -917,23 +917,17 @@ class DocumentService {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
-                String supplierOutput = ""
-                String manufacturerOutput = ""
-                String manufacturerCodeOutput = ""
+
                 def suppliersList = itemInstance?.orderItems*.productSupplier
                 ProductSupplier supplier = suppliersList?.get(0)
-                if (supplier && shipmentInstance.isFromPurchaseOrder) {
-                    supplierOutput += supplier.supplierCode
-                    manufacturerOutput += supplier.manufacturer
-                    manufacturerCodeOutput += supplier.manufacturerCode
-                }
-                row.createCell(CELL_INDEX).setCellValue(supplierOutput)
+
+                row.createCell(CELL_INDEX).setCellValue(supplier?.supplierCode ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
-                row.createCell(CELL_INDEX).setCellValue(manufacturerOutput)
+                row.createCell(CELL_INDEX).setCellValue(supplier?.manufacturer?.toString() ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
-                row.createCell(CELL_INDEX).setCellValue(manufacturerCodeOutput)
+                row.createCell(CELL_INDEX).setCellValue(supplier?.manufacturerCode ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.lotNumber)
