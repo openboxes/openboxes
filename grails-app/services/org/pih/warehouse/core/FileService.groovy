@@ -178,15 +178,20 @@ class FileService {
             BigDecimal quantity = shipmentItem?.quantity ?: 0
             BigDecimal unitCost = shipmentItem?.inventoryItem?.product?.pricePerUnit ?: 0.0
             BigDecimal totalCost = quantity * unitCost
+            def manufacturerNames = shipmentItem?.orderItems?.collect { it?.productSupplier?.manufacturer?.name }?.unique()
+            def manufacturerName = manufacturerNames ? manufacturerNames.first() : ''
+
             return [
-                    productCode   : shipmentItem.inventoryItem?.product?.productCode,
-                    productName   : shipmentItem.inventoryItem?.product?.name,
-                    unitOfMeasure : shipmentItem.inventoryItem?.product?.unitOfMeasure,
-                    lotNumber     : shipmentItem?.inventoryItem?.lotNumber ?: "",
-                    expirationDate: shipmentItem?.inventoryItem?.expirationDate?.format("dd-MMM-yyyy") ?: "",
-                    quantity      : numberFormat.format(quantity),
-                    unitCost      : decimalFormat.format(unitCost),
-                    totalCost     : decimalFormat.format(totalCost)
+                    productCode      : shipmentItem.inventoryItem?.product?.productCode,
+                    productName      : shipmentItem.inventoryItem?.product?.name,
+                    manufacturerName : manufacturerName,
+                    origin           : "",
+                    unitOfMeasure    : shipmentItem.inventoryItem?.product?.unitOfMeasure,
+                    lotNumber        : shipmentItem?.inventoryItem?.lotNumber ?: "",
+                    expirationDate   : shipmentItem?.inventoryItem?.expirationDate?.format("dd-MMM-yyyy") ?: "",
+                    quantity         : numberFormat.format(quantity),
+                    unitCost         : decimalFormat.format(unitCost),
+                    totalCost        : decimalFormat.format(totalCost)
             ]
         }
 
@@ -200,26 +205,30 @@ class FileService {
         }
         data.add(
                 [
-                        productCode   : null,
-                        productName   : null,
-                        unitOfMeasure : null,
-                        lotNumber     : null,
-                        expirationDate: null,
-                        quantity      : null,
-                        unitCost      : "Total",
-                        totalCost     : decimalFormat.format(totalCost)
+                        productCode      : null,
+                        productName      : null,
+                        manufacturerName : null,
+                        origin           : null,
+                        unitOfMeasure    : null,
+                        lotNumber        : null,
+                        expirationDate   : null,
+                        quantity         : null,
+                        unitCost         : "Total",
+                        totalCost        : decimalFormat.format(totalCost)
                 ]
         )
 
         def columns = [
-                productCode   : [label: "Code", ratio: 0.75],
-                productName   : [label: "Description", ratio: 2.0],
-                unitOfMeasure : [label: "UoM", ratio: 0.75],
-                lotNumber     : [label: "Batch No", ratio: 1.0],
-                expirationDate: [label: "Exp Date", ratio: 1.25],
-                quantity      : [label: "Quantity", ratio: 0.75],
-                unitCost      : [label: "Unit Cost (USD)", ratio: 0.75],
-                totalCost     : [label: "Total Cost (USD)", ratio: 1.0],
+                productCode      : [label: "Code", ratio: 0.75],
+                productName      : [label: "Description", ratio: 2.0],
+                manufacturerName : [label: "Manufacturer", ratio: 1.0],
+                origin           : [label: "Origin", ratio: 0.75],
+                unitOfMeasure    : [label: "UoM", ratio: 0.75],
+                lotNumber        : [label: "Batch No", ratio: 1.0],
+                expirationDate   : [label: "Exp Date", ratio: 1.0],
+                quantity         : [label: "Quantity", ratio: 0.75],
+                unitCost         : [label: "Unit Cost (USD)", ratio: 0.75],
+                totalCost        : [label: "Total Cost (USD)", ratio: 1.0],
         ]
 
         return [columns: columns, data: data]
