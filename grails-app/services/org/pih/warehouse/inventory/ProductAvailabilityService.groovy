@@ -56,12 +56,12 @@ class ProductAvailabilityService {
         }
     }
 
-    def refreshProductsAvailability(String locationId, def productIds, Boolean forceRefresh) {
+    def refreshProductsAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         // Calculate product availability for a single location/product, or all products within a single location
         if (locationId) {
             Location location = Location.load(locationId)
             if (productIds && locationId) {
-                productIds.each { productId ->
+                productIds.unique().each { productId ->
                     Product product = Product.load(productId)
                     refreshProductAvailability(location, product, forceRefresh)
                 }
@@ -72,7 +72,7 @@ class ProductAvailabilityService {
         }
         // Calculate product availability for a single product within all locations
         else if (productIds) {
-            productIds.each { productId ->
+            productIds.unique().each { productId ->
                 Product product = Product.load(productId)
                 refreshProductAvailability(product, forceRefresh)
             }
