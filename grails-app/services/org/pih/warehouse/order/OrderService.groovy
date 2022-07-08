@@ -653,10 +653,13 @@ class OrderService {
 
                     if (sourceCode) {
                         ProductSupplier productSource = ProductSupplier.findByCode(sourceCode)
-                        if (productSource && productSource.product != orderItem.product) {
-                            throw new ProductException("Wrong product source for given product")
-                        }
                         if (productSource) {
+                            if (productSource.product != orderItem.product) {
+                                throw new ProductException("Wrong product source for given product")
+                            }
+                            if (!productSource.active) {
+                                throw new ProductException("Product source ${sourceCode} is inactive")
+                            }
                             orderItem.productSupplier = productSource
                         }
                     } else {
