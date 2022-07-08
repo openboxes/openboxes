@@ -734,9 +734,13 @@ class OrderService {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
-                    if (code && !budgetCode) {
-                        throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
-
+                    if (code) {
+                        if (!budgetCode) {
+                            throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
+                        }
+                        if (!budgetCode.active) {
+                            throw new IllegalArgumentException("Budget code ${code} is inactive.")
+                        }
                     }
                     orderItem.budgetCode = budgetCode
 
