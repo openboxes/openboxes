@@ -40,6 +40,7 @@
                         <th class="col-4"><g:message code="stockMovement.origin.label"/></th>
                         <g:sortableColumn property="requestedDeliveryDate" title="${warehouse.message(code: 'stockMovement.requestedDeliveryDate.label', default: 'Requested')}" defaultOrder="desc" params="${pageParams}"/>
                         <g:sortableColumn property="expectedDeliveryDate" title="${warehouse.message(code: 'stockMovement.expectedDeliveryDate.label', default: 'Expected')}" defaultOrder="desc" params="${pageParams}"/>
+                        <th><g:message code="stockMovement.trackingNumber.label" /></th>
                         <th></th>
                     </tr>
                     <tr>
@@ -105,7 +106,14 @@
                         <td>
                             <div><g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="dd MMM yyyy"/></div>
                             <small><g:formatDate date="${stockMovement?.expectedDeliveryDate}" format="hh:mm a"/></small>
-
+                        </td>
+                        <td>
+                            <g:if test="${stockMovement?.trackingNumber}">
+                                <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
+                            </g:if>
+                            <g:else>
+                                Not Available
+                            </g:else>
                         </td>
                         <td>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">

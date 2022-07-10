@@ -112,7 +112,13 @@
                 <div class="col-12 col-sm-2 col-md-4 text-center mb-3 mt-sm-0">
                     <span class="text-muted d-block">Tracking Number</span>
                     <span class="text-5 font-weight-500 text-dark">
-                        ${stockMovement?.trackingNumber?:"Not Available"}
+                        <g:if test="${stockMovement?.trackingNumber}">
+                            <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
+                            <g:displayBarcode showData="${false}" data="${stockMovement.trackingUri}" format="QR_CODE"/>
+                        </g:if>
+                        <g:else>
+                            Not Available
+                        </g:else>
                     </span>
                 </div>
             </div>

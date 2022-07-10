@@ -54,7 +54,14 @@
                             <tr>
                                 <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">${inboundOrder.identifier}</g:link></td>
                                 <td>${inboundOrder.origin}</td>
-                                <td>${inboundOrder?.categories[0]?.name}</td>
+                                <td>
+                                    <g:if test="${inboundOrder?.categories}">
+                                        ${inboundOrder?.categories[0]?.name}
+                                    </g:if>
+                                    <g:else>
+                                        Not Available
+                                    </g:else>
+                                </td>
                                 <td>
                                     <g:if test="${inboundOrder?.expectedDeliveryDate}">
                                         ${g.formatDate(date: inboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
