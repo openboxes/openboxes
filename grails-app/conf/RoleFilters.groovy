@@ -66,14 +66,19 @@ class RoleFilters {
                 }
 
                 // Authorized users
-                def missBrowser = !userService.canUserBrowse(session.user)
+                def missBrowser = needBrowser(controllerName, actionName) && !userService.canUserBrowse(session.user)
                 def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
                 def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
                 def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
-                def invoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
+                def missInvoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
                 def missCustomer = needCustomer(controllerName, actionName) && !userService.hasRoleCustomer(session.user)
-                log.info "${missBrowser} ${missAdmin} ${missManager} ${missSuperuser} ${missCustomer}"
-                if (missBrowser || missManager || missAdmin || missSuperuser || invoice || missCustomer) {
+                log.info "browser: ${missBrowser}, admin: ${missAdmin}, manager: ${missManager}, superuser: ${missSuperuser}, customer: ${missCustomer}"
+                if (missBrowser || missManager || missAdmin || missSuperuser || missInvoice || missCustomer) {
+                    if (userService.hasRoleCustomer(session.user)) {
+                        flash.message = "User ${session.user?.username} does not have access to ${controllerName}/${actionName} for location ${session.warehouse?.name}"
+                        redirect(controller: "mobile", action: "index")
+                        return true
+                    }
                     log.info("User ${session?.user?.username} with roles does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
                     redirect(controller: "errors", action: "handleForbidden")
                     return false
@@ -81,6 +86,10 @@ class RoleFilters {
                 return true
             }
         }
+    }
+
+    static Boolean needBrowser(controllerName, actionName) {
+        return !needCustomer(controllerName, actionName)
     }
 
     static Boolean needSuperuser(controllerName, actionName) {
