@@ -118,6 +118,10 @@ class UserController {
         log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
 
+        if (!params.hasProperty("active")) {
+            userInstance.active = false
+        }
+
         userInstance.password = params?.password?.encodeAsPassword()
         userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
 

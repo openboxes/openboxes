@@ -1008,6 +1008,7 @@ class JsonController {
         def terms = params.term?.split(" ")
         terms?.each { term ->
             def result = Person.withCriteria {
+                eq("active", Boolean.TRUE)
                 or {
                     ilike("firstName", term + "%")
                     ilike("lastName", term + "%")

@@ -7,7 +7,7 @@ import apiClient from 'utils/apiClient';
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/persons?name=${searchTerm}`)
+      apiClient.get('/openboxes/api/persons', { params: { name: searchTerm, status: true } })
         .then(result => callback(_.map(result.data.data, obj => (
           {
             ...obj,
