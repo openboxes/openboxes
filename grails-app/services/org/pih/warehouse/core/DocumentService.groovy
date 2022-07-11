@@ -603,6 +603,9 @@ class DocumentService {
             sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 12) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 6) / ((double) 1 / 20)))
+            sheet.setColumnWidth((short) counter++, (short) ((50 * 5) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 4) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
             sheet.setColumnWidth((short) counter++, (short) ((50 * 3) / ((double) 1 / 20)))
@@ -919,7 +922,7 @@ class DocumentService {
 
 
                 def suppliersList = itemInstance?.orderItems*.productSupplier
-                ProductSupplier supplier = suppliersList?.get(0)
+                ProductSupplier supplier = suppliersList.size() > 0 ? suppliersList.get(0) : null
 
                 row.createCell(CELL_INDEX).setCellValue(supplier?.supplierCode ?: '')
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
