@@ -9,7 +9,7 @@
 **/
 package org.pih.warehouse.invoice
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
@@ -149,7 +149,7 @@ class Invoice implements Serializable {
 
     Float getTotalValueNormalized() {
         BigDecimal currentExchangeRate
-        String defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+        String defaultCurrencyCode = Holders.config.openboxes.locale.defaultCurrencyCode
         if (currencyUom?.code != defaultCurrencyCode) {
             currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyUom?.code).list()
         }

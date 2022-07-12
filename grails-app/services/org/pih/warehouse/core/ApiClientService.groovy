@@ -27,8 +27,6 @@ import org.grails.web.json.JSONObject
 
 class ApiClientService {
 
-    boolean transactional = false
-
     JSONObject get(String url) {
         return execute(new HttpGet(url))
     }

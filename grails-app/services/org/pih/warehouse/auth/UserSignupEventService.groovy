@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationListener
 
 class UserSignupEventService implements ApplicationListener<UserSignupEvent> {
 
-    boolean transactional = false
     def notificationService
 
     @Override

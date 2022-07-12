@@ -52,9 +52,7 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentService
-import org.pih.warehouse.shipping.ShipmentType
 import util.ReportUtil
-import java.text.SimpleDateFormat
 
 @Transactional
 class OrderService {
@@ -382,7 +380,7 @@ class OrderService {
     String generatePurchaseOrderSequenceNumber(Order order) {
         try {
             Integer sequenceNumber = getNextSequenceNumber(order.destinationParty.id)
-            String sequenceNumberFormat = ConfigurationHolder.config.openboxes.identifier.purchaseOrder.sequenceNumber.format
+            String sequenceNumberFormat = Holders.config.openboxes.identifier.purchaseOrder.sequenceNumber.format
             String sequenceNumberStr = identifierService.generateSequenceNumber(sequenceNumber.toString(), sequenceNumberFormat)
 
             // Properties to be used to get argument values for the template

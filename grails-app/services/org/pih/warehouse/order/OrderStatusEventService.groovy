@@ -9,11 +9,11 @@
  **/
 package org.pih.warehouse.order
 
+import grails.gorm.transactions.Transactional
 import org.springframework.context.ApplicationListener
 
+@Transactional
 class OrderStatusEventService implements ApplicationListener<OrderStatusEvent> {
-
-    boolean transactional = true
 
     OrderService orderService
 

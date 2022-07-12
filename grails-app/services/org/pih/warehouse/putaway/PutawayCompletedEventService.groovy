@@ -9,13 +9,14 @@
  **/
 package org.pih.warehouse.putaway
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.Putaway
 import org.pih.warehouse.api.PutawayItem
 import org.springframework.context.ApplicationListener
 
+@Transactional
 class PutawayCompletedEventService implements ApplicationListener<PutawayCompletedEvent> {
 
-    boolean transactional = true
     def grailsApplication
     def productAvailabilityService
 
