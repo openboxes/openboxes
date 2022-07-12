@@ -9,7 +9,7 @@
 **/
 package org.pih.warehouse.invoice
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Organization
@@ -65,7 +65,7 @@ class InvoiceItemCandidate {
             return "${quantityUom?.code}/${quantityPerUom as Integer}"
         }
         else {
-            def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+            def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
             return "${g.message(code:'default.ea.label').toUpperCase()}/1"
         }
     }
