@@ -269,6 +269,9 @@ class UserService {
                         ilike("email", "%" + term + "%")
                     }
                 }
+                if (params.status) {
+                    eq("active", Boolean.valueOf(params.status))
+                }
             }
             order("lastName", "desc")
         }

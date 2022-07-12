@@ -33,7 +33,7 @@ class PersonApiControllerTests extends ControllerUnitTestCase {
         // GIVEN
         controller.params.name = "John"
         controller.userService = [
-                findPersons: { String[] terms -> return [person] }
+                findPersons: { String[] terms, params -> return [person] }
         ]
         // WHEN
         controller.list()
