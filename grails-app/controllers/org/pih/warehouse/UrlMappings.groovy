@@ -1,3 +1,5 @@
+package org.pih.warehouse
+
 import grails.validation.ValidationException
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.ObjectNotFoundException
