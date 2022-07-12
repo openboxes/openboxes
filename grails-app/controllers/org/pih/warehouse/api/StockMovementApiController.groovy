@@ -158,7 +158,7 @@ class StockMovementApiController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
         stockMovementService.reviseItems(stockMovement)
-        render([data: 200] as JSON)
+        render status: 200
     }
 
     /**
