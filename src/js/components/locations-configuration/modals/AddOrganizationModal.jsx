@@ -56,7 +56,7 @@ class AddOrganizationModal extends Component {
     if (values.name) {
       this.props.showSpinner();
 
-      const locationUrl = '/openboxes/api/organizations';
+      const locationUrl = '/api/organizations';
 
       const payload = {
         name: values.name,

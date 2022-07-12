@@ -11,7 +11,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
-import apiClient, { flattenRequest } from 'utils/apiClient';
+import apiClient, {flattenRequest, stringUrlInterceptor} from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -159,7 +159,7 @@ class ReplenishmentSecondPage extends Component {
 
   fetchReplenishment() {
     this.props.showSpinner();
-    const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
+    const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
 
     return apiClient.get(url)
       .then((resp) => {
@@ -208,11 +208,11 @@ class ReplenishmentSecondPage extends Component {
   completeReplenishment() {
     if (this.state.values.replenishment.status === 'APPROVED') {
       this.props.showSpinner();
-      const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
+      const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'COMPLETED' };
       apiClient.post(url, flattenRequest(payload))
         .then(() => {
-          window.location = `/openboxes/stockTransfer/show/${this.props.match.params.replenishmentId}`;
+          window.location = stringUrlInterceptor(`/stockTransfer/show/${this.props.match.params.replenishmentId}`);
           this.props.hideSpinner();
         })
         .catch(() => this.props.hideSpinner());

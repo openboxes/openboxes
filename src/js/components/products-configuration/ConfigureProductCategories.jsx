@@ -30,7 +30,7 @@ class ConfigureProductCategories extends Component {
   componentDidMount() {
     this.props.showSpinner();
 
-    const url = '/openboxes/api/productsConfiguration/categoryOptions';
+    const url = '/api/productsConfiguration/categoryOptions';
 
     apiClient.get(url)
       .then((response) => {
@@ -74,7 +74,7 @@ class ConfigureProductCategories extends Component {
 
   importCategory(categoryName) {
     this.props.showSpinner();
-    const url = `/openboxes/api/productsConfiguration/importCategories?categoryOption=${categoryName}`;
+    const url = `/api/productsConfiguration/importCategories?categoryOption=${categoryName}`;
 
     apiClient.post(url)
       .then(() => {

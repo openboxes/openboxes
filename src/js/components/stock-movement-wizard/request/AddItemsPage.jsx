@@ -19,7 +19,7 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
@@ -1256,7 +1256,7 @@ class AddItemsPage extends Component {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
             redirectTo = '/dashboard';
           }
-          window.location = redirectTo;
+          window.location = stringUrlInterceptor(redirectTo);
         })
         .catch(() => {
           this.props.hideSpinner();
@@ -1395,7 +1395,7 @@ class AddItemsPage extends Component {
         .then(() => {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
             Alert.success(`${this.props.translate('react.stockMovement.request.submitMessage.label', 'Thank you for submitting your request. You can check the status of your request using stock movement number')} ${movementNumber}`);
-            this.props.history.push('/');
+            this.props.history.push(stringUrlInterceptor('/'));
             this.props.updateBreadcrumbs([]);
           } else {
             window.location = stringUrlInterceptor(`/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`);

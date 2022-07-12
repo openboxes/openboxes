@@ -43,7 +43,7 @@ class GlobalSearch extends Component {
           menuStyle={{ maxHeight: '500px' }}
           filterOptions={options => options}
           onChange={(value) => {
-            window.location = value.url;
+            window.location = stringUrlInterceptor(value.url);
           }}
           onInputChange={this.onInputChange}
           onEnterPress={() => {

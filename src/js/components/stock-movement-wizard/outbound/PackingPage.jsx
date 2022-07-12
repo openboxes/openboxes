@@ -375,7 +375,7 @@ class PackingPage extends Component {
   }
 
   validatePicklist() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
+    const url = `/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
     return apiClient.get(url);
   }
 

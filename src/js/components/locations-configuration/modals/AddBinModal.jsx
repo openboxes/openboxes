@@ -24,7 +24,7 @@ class AddBinModal extends Component {
 
   handleSubmit(values) {
     this.props.showSpinner();
-    apiClient.post('/openboxes/api/locations/', flattenRequest({
+    apiClient.post('/api/locations/', flattenRequest({
       ...values,
       parentLocation: { id: this.props.locationId },
       locationType: { id: values.locationType.id },

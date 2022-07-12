@@ -35,7 +35,7 @@ class ImportBinModal extends Component {
   }
 
   getSupportLinks() {
-    const url = '/openboxes/api/supportLinks';
+    const url = '/api/supportLinks';
 
     apiClient.get(url).then((response) => {
       const supportLinks = response.data.data;
@@ -45,7 +45,7 @@ class ImportBinModal extends Component {
 
   downloadBinLocationsTemplate() {
     this.props.showSpinner();
-    apiClient.get('/openboxes/api/locations/binLocations/template', { responseType: 'blob' })
+    apiClient.get('/api/locations/binLocations/template', { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, 'BinLocations_template.xls', 'application/vnd.ms-excel');
         this.props.hideSpinner();
@@ -64,7 +64,7 @@ class ImportBinModal extends Component {
       },
     };
 
-    const url = `/openboxes/api/locations/${this.props.locationId}/binLocations/import`;
+    const url = `/api/locations/${this.props.locationId}/binLocations/import`;
 
     return apiClient.post(url, formData, config)
       .then(() => {

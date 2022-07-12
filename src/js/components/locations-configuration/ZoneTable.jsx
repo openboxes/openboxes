@@ -117,7 +117,7 @@ class ZoneTable extends Component {
         pageText=""
         onFetchData={(state) => {
           const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-          apiClient.get('/openboxes/api/internalLocations/search', {
+          apiClient.get('/api/internalLocations/search', {
             params: {
               locationTypeCode: 'ZONE',
               offset: `${offset}`,

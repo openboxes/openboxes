@@ -8,7 +8,7 @@ import { fetchTranslations } from 'actions';
 import LoadDemoDataInfo from 'components/load-demo-data/LoadDemoDataInfo';
 import LoadDemoDataProgressScreen from 'components/load-demo-data/LoadDemoDataProgressScreen';
 import LoadDemoDataWelcome from 'components/load-demo-data/LoadDemoDataWelcome';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 
 export const LOAD_DATA_STEPS = {
   createFirstLocation: 'CREATE_FIRST_LOCATION',
@@ -31,7 +31,7 @@ class LoadDemoDataPage extends Component {
   componentDidMount() {
     this.props.fetchTranslations('', 'loadData');
 
-    apiClient.get('/openboxes/api/loadData/listOfDemoData')
+    apiClient.get('/api/loadData/listOfDemoData')
       .then((response) => {
         this.setState({ summaryData: response.data.data });
       });
@@ -44,13 +44,13 @@ class LoadDemoDataPage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push('/openboxes');
+    this.props.history.push(stringUrlInterceptor('/'));
   }
 
   stepHandler(step) {
     switch (step) {
       case LOAD_DATA_STEPS.createFirstLocation:
-        this.props.history.push('/openboxes/locationsConfiguration/create');
+        this.props.history.push(stringUrlInterceptor('/locationsConfiguration/create'));
         break;
       default:
         this.setState({ currentStep: step });

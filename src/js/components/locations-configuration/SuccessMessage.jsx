@@ -7,6 +7,7 @@ import { withRouter } from 'react-router-dom';
 import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
+import { stringUrlInterceptor } from "utils/apiClient";
 
 
 const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) => (
@@ -41,13 +42,13 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
                 defaultMessage="Create another location"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = '/openboxes/location/list'; }}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = stringUrlInterceptor('/location/list'); }}>
               <Translate
                 id="react.locationsConfiguration.success.viewLocationList"
                 defaultMessage="View Location List"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary" onClick={() => history.push('/openboxes/productsConfiguration/index')}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => history.push('/productsConfiguration/index')}>
               <Translate
                 id="react.locationsConfiguration.success.createCategoriesAndProducts="
                 defaultMessage="Create Categories and Products"

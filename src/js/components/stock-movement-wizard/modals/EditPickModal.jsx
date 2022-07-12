@@ -244,7 +244,7 @@ class EditPickModal extends Component {
   }
 
   fetchPickPageItem() {
-    const itemsUrl = `/openboxes/api/stockMovementItems/${this.state.attr.itemId}/details?stepNumber=4`;
+    const itemsUrl = `/api/stockMovementItems/${this.state.attr.itemId}/details?stepNumber=4`;
 
     apiClient.get(itemsUrl)
       .then((resp) => {

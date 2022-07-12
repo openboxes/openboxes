@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { hideSpinner, showSpinner } from 'actions/index';
 import VerticalTabs from 'components/Layout/VerticalTabs';
 import ImportProducts from 'components/products-configuration/ImportProducts';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -31,7 +31,7 @@ class ConfigureProducts extends Component {
   componentDidMount() {
     this.props.showSpinner();
 
-    const url = '/openboxes/api/productsConfiguration/productOptions';
+    const url = '/api/productsConfiguration/productOptions';
 
     apiClient.get(url)
       .then((response) => {
@@ -66,7 +66,7 @@ class ConfigureProducts extends Component {
             <Translate id="react.productsConfiguration.productListInfo2.label" />
           </div>
           <div>
-            <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href="/openboxes/product/list">
+            <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor("/product/list")}>
               <Translate id="react.productsConfiguration.viewProducts.label" defaultMessage="View Products List" />
             </a>
           </div>
@@ -104,7 +104,7 @@ class ConfigureProducts extends Component {
 
   importProduct(productName) {
     this.props.showSpinner();
-    const url = `/openboxes/api/productsConfiguration/importProducts?productOption=${productName}`;
+    const url = `/api/productsConfiguration/importProducts?productOption=${productName}`;
 
     apiClient.post(url)
       .then(() => {

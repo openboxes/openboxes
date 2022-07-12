@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 
 import { fetchTranslations } from 'actions';
 import Translate from 'utils/Translate';
+import { stringUrlInterceptor } from "utils/apiClient";
 
 class WelcomePage extends Component {
   componentDidMount() {
@@ -19,15 +20,15 @@ class WelcomePage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push('/openboxes');
+    this.props.history.push(stringUrlInterceptor('/'));
   }
 
   createLocation() {
-    this.props.history.push('/openboxes/locationsConfiguration/create');
+    this.props.history.push(stringUrlInterceptor('/locationsConfiguration/create'));
   }
 
   importLocations() {
-    this.props.history.push('/openboxes/locationsConfiguration/upload');
+    this.props.history.push(stringUrlInterceptor('/locationsConfiguration/upload'));
   }
 
   render() {

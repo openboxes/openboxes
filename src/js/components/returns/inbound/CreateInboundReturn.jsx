@@ -146,7 +146,7 @@ class CreateInboundReturn extends Component {
   fetchInboundReturn(props) {
     if (props.match.params.inboundReturnId) {
       props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${props.match.params.inboundReturnId}`;
+      const url = `/api/stockTransfers/${props.match.params.inboundReturnId}`;
       apiClient.get(url)
         .then((resp) => {
           const values = parseResponse(resp.data.data);
@@ -190,7 +190,7 @@ class CreateInboundReturn extends Component {
         type: 'RETURN_ORDER',
       };
 
-      const url = '/openboxes/api/stockTransfers/';
+      const url = '/api/stockTransfers/';
 
       apiClient.post(url, payload)
         .then((response) => {
@@ -199,7 +199,7 @@ class CreateInboundReturn extends Component {
             this.setState({
               values: resp,
             }, () => {
-              this.props.history.push(`/openboxes/stockTransfer/createInboundReturn/${this.state.values.id}`);
+              this.props.history.push(`/stockTransfer/createInboundReturn/${this.state.values.id}`);
               this.props.nextPage(this.state.values);
             });
           }

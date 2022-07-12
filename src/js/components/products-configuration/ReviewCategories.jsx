@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -27,7 +27,7 @@ class ReviewCategories extends Component {
 
   getCategoriesCount() {
     this.props.showSpinner();
-    apiClient.get('/openboxes/api/productsConfiguration/categoriesCount')
+    apiClient.get('/api/productsConfiguration/categoriesCount')
       .then((response) => {
         this.setState(
           { categoriesCount: response.data ? response.data.data : 0 },
@@ -39,7 +39,7 @@ class ReviewCategories extends Component {
 
   downloadCategories = () => {
     this.props.showSpinner();
-    apiClient.get('/openboxes/api/productsConfiguration/downloadCategories')
+    apiClient.get('/api/productsConfiguration/downloadCategories')
       .then((response) => {
         fileDownload(response.data, 'Categories.csv', 'text/csv');
         this.props.hideSpinner();
@@ -68,7 +68,7 @@ class ReviewCategories extends Component {
                 <button type="button" onClick={this.downloadCategories} className="btn btn-outline-primary float-right mt-3">
                   <Translate id="react.productsConfiguration.downloadCsvFile.label" defaultMessage="Download CSV file" />
                 </button>
-                <a href="/openboxes/category/tree" className="btn btn-primary float-right mt-3" target="_blank">
+                <a href={stringUrlInterceptor("/category/tree")} className="btn btn-primary float-right mt-3" target="_blank">
                   <Translate id="react.productsConfiguration.viewCategoryPage.label" defaultMessage="View Category Page" />
                 </a>
               </div>) : (

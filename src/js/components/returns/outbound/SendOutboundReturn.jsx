@@ -16,7 +16,7 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, {flattenRequest, parseResponse, stringUrlInterceptor} from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -224,7 +224,7 @@ class SendMovementPage extends Component {
   }
 
   fetchShipmentTypes() {
-    const url = '/openboxes/api/generic/shipmentType';
+    const url = '/api/generic/shipmentType';
 
     return apiClient.get(url)
       .then((response) => {
@@ -245,7 +245,7 @@ class SendMovementPage extends Component {
 
   fetchOutboundReturn() {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+    const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
 
     return apiClient.get(url)
       .then((resp) => {
@@ -269,7 +269,7 @@ class SendMovementPage extends Component {
 
   rollbackReturnOrder(values) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}/rollback`;
+    const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}/rollback`;
 
     const isOrigin = this.props.currentLocationId === values.origin.id;
 
@@ -294,13 +294,13 @@ class SendMovementPage extends Component {
       const payload = {
         ...values,
       };
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}/sendShipment`;
+      const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}/sendShipment`;
 
       this.saveValues(payload)
         .then(() => {
           apiClient.post(url, flattenRequest(payload))
             .then(() => {
-              window.location = `/openboxes/stockMovement/show/${this.props.match.params.outboundReturnId}`;
+              window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.outboundReturnId}`);
             })
             .catch(() => {
               this.props.hideSpinner();
@@ -340,7 +340,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${this.props.match.params.outboundReturnId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.outboundReturnId}`);
         });
     } else {
       confirmAlert({
@@ -352,7 +352,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${this.props.match.params.outboundReturnId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.outboundReturnId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -381,7 +381,7 @@ class SendMovementPage extends Component {
 
   saveValues(values) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+    const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
     const payload = {
       ...values,
       shipmentType: {
@@ -454,7 +454,7 @@ class SendMovementPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() => {
-                        window.location = `/openboxes/stockMovement/show/${this.props.match.params.outboundReturnId}`;
+                        window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.outboundReturnId}`);
                     }}
                     className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                   >

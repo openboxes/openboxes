@@ -113,7 +113,7 @@ class AddDestinationModal extends Component {
 
 
   fetchLocationTypes() {
-    const url = '/openboxes/api/locations/locationTypes?activityCode=DYNAMIC_CREATION';
+    const url = '/api/locations/locationTypes?activityCode=DYNAMIC_CREATION';
 
     apiClient.get(url)
       .then((response) => {
@@ -129,7 +129,7 @@ class AddDestinationModal extends Component {
 
   save(values) {
     this.props.showSpinner();
-    const url = '/openboxes/api/locations?useDefaultActivities=true';
+    const url = '/api/locations?useDefaultActivities=true';
 
     const { name, locationType, ...address } = values;
     const payload = { name, 'locationType.id': _.get(locationType, 'id') || '' };
@@ -143,7 +143,7 @@ class AddDestinationModal extends Component {
         this.props.onResponse(destination);
 
         if (!_.isEmpty(address)) {
-          const addressUrl = `/openboxes/api/locations/${destination.id}`;
+          const addressUrl = `/api/locations/${destination.id}`;
           return apiClient.post(addressUrl, flattenRequest({ address }));
         }
         return Promise.resolve();
