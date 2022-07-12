@@ -18,7 +18,7 @@ import DateField from 'components/form-elements/DateField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import apiClient, {flattenRequest, parseResponse, stringUrlInterceptor} from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -256,7 +256,7 @@ class AddItemsPage extends Component {
   fetchInboundReturn() {
     if (this.props.match.params.inboundReturnId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
+      const url = `/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
       apiClient.get(url)
         .then((resp) => {
           const inboundReturn = parseResponse(resp.data.data);
@@ -308,7 +308,7 @@ class AddItemsPage extends Component {
 
   saveStockTransfer(returnItems, status) {
     const itemsToSave = _.filter(returnItems, item => item.product && item.quantity > 0);
-    const updateItemsUrl = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
+    const updateItemsUrl = `/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
     const payload = {
       ...this.state.inboundReturn,
       stockTransferItems: itemsToSave,
@@ -346,7 +346,7 @@ class AddItemsPage extends Component {
     if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
       this.saveStockTransferInCurrentStep(formValues.returnItems)
         .then(() => {
-          window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`;
+          window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.inboundReturnId}`);
         });
     } else {
       confirmAlert({
@@ -358,7 +358,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`; },
+            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.inboundReturnId}`); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -399,7 +399,7 @@ class AddItemsPage extends Component {
   }
 
   removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockTransferItems/${itemId}`;
+    const removeItemsUrl = `/api/stockTransferItems/${itemId}`;
 
     return apiClient.delete(removeItemsUrl)
       .catch(() => {
@@ -410,7 +410,7 @@ class AddItemsPage extends Component {
 
   removeAll() {
     this.props.showSpinner();
-    const removeItemsUrl = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}/removeAllItems`;
+    const removeItemsUrl = `/api/stockTransfers/${this.props.match.params.inboundReturnId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
       .then(() => this.fetchInboundReturn())

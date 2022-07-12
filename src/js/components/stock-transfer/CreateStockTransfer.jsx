@@ -125,7 +125,7 @@ class CreateStockTransfer extends Component {
    */
   fetchStockTransferCandidates(locationId) {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers/candidates?location.id=${locationId}`;
+    const url = `/api/stockTransfers/candidates?location.id=${locationId}`;
 
     return apiClient.get(url)
       .then((resp) => {
@@ -152,7 +152,7 @@ class CreateStockTransfer extends Component {
    */
   createStockTransfer() {
     this.props.showSpinner();
-    const url = '/openboxes/api/stockTransfers/';
+    const url = '/api/stockTransfers/';
     const payload = {
       stockTransferItems: _.filter(
         this.state.stockTransferItems,
@@ -165,7 +165,7 @@ class CreateStockTransfer extends Component {
         const stockTransfer = parseResponse(response.data.data);
         this.props.hideSpinner();
 
-        this.props.history.push(`/openboxes/stockTransfer/create/${stockTransfer.id}`);
+        this.props.history.push(`/stockTransfer/create/${stockTransfer.id}`);
         this.props.nextPage({ stockTransfer });
       })
       .catch(() => this.props.hideSpinner());

@@ -91,7 +91,7 @@ class InboundReturns extends Component {
   fetchInitialValues() {
     if (this.props.match.params.inboundReturnId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
+      const url = `/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
 
       apiClient.get(url)
         .then((response) => {

@@ -45,7 +45,7 @@ class AddLocationGroupModal extends Component {
     if (values.name) {
       this.props.showSpinner();
 
-      const locationUrl = '/openboxes/api/locationGroups';
+      const locationUrl = '/api/locationGroups';
 
       const payload = {
         name: values.name,

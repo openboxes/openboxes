@@ -98,7 +98,7 @@ class Forecasting extends Component {
 
   saveForecasting(values) {
     this.props.showSpinner();
-    const locationUrl = `/openboxes/api/locations/${this.state.locationId}/updateForecastingConfiguration`;
+    const locationUrl = `/api/locations/${this.state.locationId}/updateForecastingConfiguration`;
     this.props.hideSpinner();
     apiClient.post(locationUrl, values)
       .then(() => {

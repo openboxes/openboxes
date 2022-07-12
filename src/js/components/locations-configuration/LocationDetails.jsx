@@ -16,7 +16,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AddLocationGroupModal from 'components/locations-configuration/modals/AddLocationGroupModal';
 import AddOrganizationModal from 'components/locations-configuration/modals/AddOrganizationModal';
-import apiClient from 'utils/apiClient';
+import apiClient, {stringUrlInterceptor} from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { convertToBase64 } from 'utils/file-utils';
 import { renderFormField } from 'utils/form-utils';
@@ -233,7 +233,7 @@ class LocationDetails extends Component {
 
   // eslint-disable-next-line class-methods-use-this
   getSupportLinks() {
-    const url = '/openboxes/api/supportLinks';
+    const url = '/api/supportLinks';
 
     apiClient.get(url).then((response) => {
       const supportLinks = response.data.data;
@@ -251,11 +251,11 @@ class LocationDetails extends Component {
   dataFetched = false;
 
   fetchLocation() {
-    const url = `/openboxes/api/locations/${this.props.match.params.locationId}`;
+    const url = `/api/locations/${this.props.match.params.locationId}`;
     apiClient.get(url).then((response) => {
       const location = response.data.data;
       if (!location) {
-        this.props.history.push('/openboxes/locationsConfiguration/create');
+        this.props.history.push(stringUrlInterceptor('/locationsConfiguration/create'));
         return;
       }
       this.setState({
@@ -294,7 +294,7 @@ class LocationDetails extends Component {
   }
 
   fetchLocationTypes() {
-    const url = '/openboxes/api/locations/locationTypes';
+    const url = '/api/locations/locationTypes';
 
     apiClient.get(url)
       .then((response) => {
@@ -317,7 +317,7 @@ class LocationDetails extends Component {
   }
 
   fetchSupportedActivities() {
-    const url = '/openboxes/api/locations/supportedActivities';
+    const url = '/api/locations/supportedActivities';
 
     apiClient.get(url)
       .then((response) => {
@@ -343,9 +343,9 @@ class LocationDetails extends Component {
 
       let locationUrl = '';
       if (values.locationId) {
-        locationUrl = `/openboxes/api/locations/${values.locationId}?useDefaultActivities=${this.state.useDefaultActivities}`;
+        locationUrl = `/api/locations/${values.locationId}?useDefaultActivities=${this.state.useDefaultActivities}`;
       } else {
-        locationUrl = `/openboxes/api/locations?useDefaultActivities=${this.state.useDefaultActivities}`;
+        locationUrl = `/api/locations?useDefaultActivities=${this.state.useDefaultActivities}`;
       }
 
       const payload = {
@@ -367,7 +367,7 @@ class LocationDetails extends Component {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
-          this.props.history.push(`/openboxes/locationsConfiguration/create/${resp.id}`);
+          this.props.history.push(`/locationsConfiguration/create/${resp.id}`);
           this.props.nextPage({
             ...values,
             locationId: resp.id,

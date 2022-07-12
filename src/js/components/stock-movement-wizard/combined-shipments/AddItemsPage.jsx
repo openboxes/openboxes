@@ -90,7 +90,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue,
         }) => ({
-          url: fieldValue && fieldValue.orderId ? `/openboxes/order/show/${fieldValue.orderId}` : '',
+          url: fieldValue && fieldValue.orderId ? `/order/show/${fieldValue.orderId}` : '',
         }),
         attributes: {
           formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
@@ -796,7 +796,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+    const removeItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
