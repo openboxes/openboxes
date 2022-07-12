@@ -9,7 +9,8 @@
  **/
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
+
 
 /**
  * A document is a file (e.g. document, image) that can be associated with an
@@ -70,7 +71,7 @@ class Document implements Serializable {
     }
 
     def getLink() {
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         return fileUri ?: g.createLink(controller: 'document', action: "download", id: id, absolute: true)
     }
 
