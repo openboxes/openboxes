@@ -7,7 +7,6 @@ import org.quartz.JobExecutionContext
 @DisallowConcurrentExecution
 class RefreshDemandDataJob {
 
-    def grailsApplication
     def reportService
 
     static triggers = {
@@ -16,7 +15,7 @@ class RefreshDemandDataJob {
     }
 
     def execute(JobExecutionContext context) {
-        Boolean enabled = grailsApplication.config.openboxes.jobs.refreshDemandDataJob.enabled
+        Boolean enabled = ConfigurationHolder.config.openboxes.jobs.refreshDemandDataJob.enabled
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing demand data: " + context.mergedJobDataMap)
