@@ -9,8 +9,6 @@ package org.pih.warehouse
  * You must not remove this notice, or any other, from this software.
  **/
 
-
-import org.apache.http.auth.AuthenticationException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -18,10 +16,10 @@ import org.pih.warehouse.core.User
 class SecurityInterceptor {
 
     static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
-    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation']
+    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
 
     static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api']
-    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation']
+    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
 
     def authService
 
@@ -35,7 +33,6 @@ class SecurityInterceptor {
         AuthService.currentLocation.set(null)
     }
     boolean before() {
-        log.debug "Security check [" + request.requestURI + "]"
 
         // Set the current user (if there's on in the session)
         if (session.user) {
@@ -62,11 +59,15 @@ class SecurityInterceptor {
             return true
         }
 
+        // This allows the menu to be g:include'd on mobile page (allowing for dynamic content to be added)
+        if (controllerName.equals("mobile") && actionName.equals("menu")) {
+            return true
+        }
 
         // Not sure when this happens
         if (params.controller == null) {
             redirect(controller: 'auth', action: 'login')
-            return false
+            return true
         }
         // When a request does not require authentication, we return true
         // FIXME In order to start working on sync use cases, we need to authenticate
@@ -96,7 +97,8 @@ class SecurityInterceptor {
             }
 
             if (RequestUtil.isAjax(request)) {
-                throw new AuthenticationException("Request requires authentication [${controllerName}:${actionName}]")
+                redirect(controller: "errors", action: "handleUnauthorized")
+                return false
             }
 
             redirect(controller: 'auth', action: 'login')
@@ -108,7 +110,8 @@ class SecurityInterceptor {
             session.user = null
 
             if (RequestUtil.isAjax(request)) {
-                throw new AuthenticationException("Request requires authentication [${controllerName}:${actionName}]")
+                redirect(controller: "errors", action: "handleUnauthorized")
+                return false
             }
 
             redirect(controller: 'auth', action: 'login')
@@ -118,13 +121,12 @@ class SecurityInterceptor {
         // When a user has not selected a warehouse and they are requesting an action that requires one,
         // we redirect to the choose warehouse page.
         if (!session.warehouse && !(actionsWithLocationNotRequired.contains(actionName) ||
-                controllersWithLocationNotRequired.contains(controllerName) || controllerName.endsWith("Api"))) {
+            controllersWithLocationNotRequired.contains(controllerName) || controllerName.endsWith("Api"))) {
 
             session.warehouseStillNotSelected = true
             log.info "Request ${controllerName}:${actionName} requires location, redirecting to chooseLocation ..."
             redirect(controller: 'dashboard', action: 'chooseLocation')
             return false
         }
-        return true
     }
 }
