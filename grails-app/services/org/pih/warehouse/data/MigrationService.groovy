@@ -43,8 +43,6 @@ class MigrationService {
     def persistenceInterceptor
     def dataSource
 
-    boolean transactional = true
-
     def getStockMovementsWithoutShipmentItems() {
         String query = """
             select 

@@ -14,8 +14,6 @@ import org.pih.warehouse.product.ProductPackage
 
 class UomService {
 
-    boolean transactional = false
-
     ProductPackage getProductPackage(Product product, UnitOfMeasure unitOfMeasure, Integer quantity) {
         return ProductPackage.createCriteria().get {
             eq("product", product)

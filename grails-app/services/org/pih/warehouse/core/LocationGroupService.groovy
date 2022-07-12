@@ -9,9 +9,10 @@
 **/
 package org.pih.warehouse.core
 
-class LocationGroupService {
+import grails.gorm.transactions.Transactional
 
-    boolean transactional = true
+@Transactional
+class LocationGroupService {
 
     List getLocationGroups(Map params) {
         def locationGroups = LocationGroup.createCriteria().list(params){
