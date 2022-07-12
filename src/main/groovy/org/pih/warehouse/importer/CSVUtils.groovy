@@ -15,7 +15,7 @@ import org.apache.commons.lang.StringUtils
 import org.mozilla.universalchardet.UniversalDetector
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
