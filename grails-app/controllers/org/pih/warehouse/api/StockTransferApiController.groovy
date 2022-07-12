@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -35,7 +35,7 @@ class StockTransferApiController {
     def shipmentService
     def stockTransferService
 
-    def list = {
+    def list() {
         if (!params.location) {
             def message = "Location parameter is required"
             response.status = 400
@@ -50,7 +50,7 @@ class StockTransferApiController {
         ] as JSON)
     }
 
-    def read = {
+    def read() {
         Order order = Order.get(params.id)
         if (!order) {
             throw new IllegalArgumentException("No stock transfer found for order ID ${params.id}")
@@ -64,7 +64,7 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
-    def create = {
+    def create() {
         JSONObject jsonObject = request.JSON
 
         User currentUser = User.get(session.user.id)
@@ -88,7 +88,7 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
 
         User currentUser = User.get(session.user.id)
@@ -212,7 +212,7 @@ class StockTransferApiController {
         return stockTransfer
     }
 
-    def stockTransferCandidates = {
+    def stockTransferCandidates() {
         Location location = Location.get(params.location.id)
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${params.location.id}")
@@ -222,7 +222,7 @@ class StockTransferApiController {
         render([data: stockTransferCandidates?.collect { it.toJson() }] as JSON)
     }
 
-    def returnCandidates = {
+    def returnCandidates() {
         Location location = Location.get(params.locationId)
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${params.locationId}")
@@ -232,19 +232,19 @@ class StockTransferApiController {
         render([data: stockTransferCandidates?.collect { it.toJson() }] as JSON)
     }
 
-    def removeItem = {
+    def removeItem() {
         Order order = stockTransferService.deleteStockTransferItem(params.id)
         StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
         stockTransferService.setQuantityOnHand(stockTransfer)
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
-    def removeAllItems = {
+    def removeAllItems() {
         Order order = stockTransferService.deleteAllStockTransferItems(params.id)
         render([data: StockTransfer.createFromOrder(order)?.toJson()] as JSON)
     }
 
-    def sendShipment = {
+    def sendShipment() {
         Order order = Order.get(params.id)
         if (!order) {
             throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
@@ -254,7 +254,7 @@ class StockTransferApiController {
         render status: 200
     }
 
-    def rollback = {
+    def rollback() {
         Location currentLocation = Location.get(session.warehouse.id)
 
         stockTransferService.rollbackReturnOrder(params.id as String, currentLocation)

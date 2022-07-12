@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.stockTransfer
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.DocumentGroupCode
@@ -37,7 +38,7 @@ class StockTransferService {
     def productAvailabilityService
     def picklistService
     def shipmentService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def orderService
 
     /**

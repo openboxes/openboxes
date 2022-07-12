@@ -396,7 +396,7 @@ class DocumentController {
         }
     }
 
-    def renderInvoiceTemplate = {
+    def renderInvoiceTemplate() {
         Shipment shipmentInstance = Shipment.get(params.shipmentId)
 
         if (!shipmentInstance) {

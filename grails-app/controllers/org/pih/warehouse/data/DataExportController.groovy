@@ -19,12 +19,12 @@ import java.nio.charset.Charset
 class DataExportController {
 
     def dataService
-    def index = {
+    def index() {
         List<Document> documents = Document.findAllByDocumentCode(DocumentCode.DATA_EXPORT)
         [documents: documents]
     }
 
-    def render = {
+    def render() {
         Document document = Document.get(params.id)
         String query = new String(document.fileContents, Charset.defaultCharset());
         if (query) {

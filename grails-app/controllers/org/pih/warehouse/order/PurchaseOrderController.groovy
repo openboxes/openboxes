@@ -22,14 +22,16 @@ class PurchaseOrderController {
     def identifierService
 
 
-    def index = { redirect(action: "create") }
+    def index() {
+        redirect(action: "create")
+    }
 
     def list = {
         render(template: "/common/react")
     }
 
 
-    def create = {
+    def create() {
         Location currentLocation = Location.get(session.warehouse.id)
         User user = User.get(session.user.id)
         if (!currentLocation.supports(ActivityCode.PLACE_ORDER)) {
@@ -41,7 +43,7 @@ class PurchaseOrderController {
     }
 
 
-    def edit = {
+    def edit() {
         Order order = Order.get(params?.id)
         Location currentLocation = Location.get(session.warehouse.id)
         if (!currentLocation.supports(ActivityCode.PLACE_ORDER)) {
@@ -56,7 +58,7 @@ class PurchaseOrderController {
     }
 
 
-    def saveOrderDetails = {
+    def saveOrderDetails() {
         def order
         if (params.order?.id) {
             order = Order.get(params.order.id)
@@ -88,7 +90,7 @@ class PurchaseOrderController {
     }
 
 
-    def addItems = {
+    def addItems() {
         Order order = Order.get(params?.id)
         def currentLocation = Location.get(session.warehouse.id)
         if (!currentLocation.supports(ActivityCode.PLACE_ORDER)) {

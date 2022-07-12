@@ -19,7 +19,7 @@ class SupplierController {
     def documentService
     def orderService
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         params.offset = params.offset ? params.int("offset") : 0
 
@@ -28,14 +28,14 @@ class SupplierController {
         [suppliers: suppliers, suppliersTotal: suppliers.totalCount]
     }
 
-    def show = {
+    def show() {
         Organization supplier = Organization.get(params.id)
         List<Document> documents = documentService.getAllDocumentsBySupplierOrganization(supplier)
 
         [supplier: supplier, documents: documents]
     }
 
-    def getPriceHistory = {
+    def getPriceHistory() {
         Organization supplier = Organization.get(params.supplierId)
         Product product = Product.get(params.productId)
         def data = orderService.getOrderItemsForPriceHistory(supplier, product, params.q)

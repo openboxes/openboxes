@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
@@ -44,7 +45,7 @@ class ProductAvailabilityService {
 
     def dataSource
     def gparsService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def persistenceInterceptor
     def productService
     def locationService

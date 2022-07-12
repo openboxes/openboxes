@@ -17,13 +17,13 @@ class LoadDataApiController extends BaseDomainApiController {
 
     def loadDataService;
 
-    def listOfDemoData = {
+    def listOfDemoData() {
         def listOfDemoData = grailsApplication.config.openboxes.configurationWizard.listOfDemoData
 
         render([data: listOfDemoData] as JSON)
     }
 
-    def load = {
+    def load() {
         def config = grailsApplication.config.openboxes.configurationWizard.dataInit;
 
         if (Boolean.valueOf(config.organizations.enabled)) {

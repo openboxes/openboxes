@@ -11,19 +11,19 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.LocationGroup
 
 class LocationGroupApiController extends BaseDomainApiController {
 
     def locationGroupService
 
-    def list = {
+    def list() {
         def locationGroups = locationGroupService.getLocationGroups(params)
         render ([data:locationGroups] as JSON)
     }
 
-    def read = {
+    def read() {
         LocationGroup locationGroup = LocationGroup.get(params.id)
         if (!locationGroup) {
             throw new IllegalArgumentException("No Location Group found for location group ID ${params.id}")
@@ -32,7 +32,7 @@ class LocationGroupApiController extends BaseDomainApiController {
         render([data: locationGroup] as JSON)
     }
 
-    def create = {
+    def create() {
         JSONObject jsonObject = request.JSON
 
         LocationGroup locationGroup = new LocationGroup()

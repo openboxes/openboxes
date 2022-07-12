@@ -18,7 +18,7 @@ class ProductAttributeValueController {
     def dataService
     def documentService
 
-    def exportProductAttribute = {
+    def exportProductAttribute() {
         def entityTypeCode = params.entityTypeCode ? params.entityTypeCode as EntityTypeCode : null
         def isEntitySupplier = entityTypeCode == EntityTypeCode.PRODUCT_SUPPLIER
         def productAttributes = ProductAttribute.createCriteria().list {
