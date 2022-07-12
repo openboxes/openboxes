@@ -46,8 +46,6 @@ class MigrationService {
     def dataSource
     def sessionFactory
 
-    boolean transactional = true
-
     def getStockMovementsWithoutShipmentItems() {
         String query = """
             select 

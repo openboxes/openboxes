@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import org.springframework.context.ApplicationListener
+
+@Transactional
 class RefreshProductAvailabilityEventService implements ApplicationListener<RefreshProductAvailabilityEvent> {
 
-    boolean transactional = true
     def grailsApplication
     def productAvailabilityService
 

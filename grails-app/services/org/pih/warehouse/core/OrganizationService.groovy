@@ -9,13 +9,13 @@
  **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 
+@Transactional
 class OrganizationService {
 
     def identifierService
-    boolean transactional = true
-
 
     List selectOrganizations(roleTypes) {
         return Organization.createCriteria().list {

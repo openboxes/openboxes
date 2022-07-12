@@ -10,6 +10,7 @@
 package org.pih.warehouse.shipping
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import grails.validation.ValidationException
 import org.apache.commons.validator.EmailValidator
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -46,8 +47,6 @@ import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.receiving.ReceiptStatusCode
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.Errors
-import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
-import grails.util.Holders
 
 import javax.mail.internet.InternetAddress
 import java.math.RoundingMode
@@ -2333,8 +2332,7 @@ class ShipmentService {
      * @return
      */
     String generateName(StockTransfer stockTransfer) {
-        final String separator =
-                ConfigurationHolder.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
+        final String separator = Holders.config.openboxes.generateName.separator ?: Constants.DEFAULT_NAME_SEPARATOR
 
         String originIdentifier = stockTransfer.origin?.locationNumber ?: stockTransfer.origin?.name
         String destinationIdentifier = stockTransfer.destination?.locationNumber ?: stockTransfer.destination?.name

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.replenishment
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.Replenishment
 import org.pih.warehouse.api.ReplenishmentItem
@@ -32,6 +33,7 @@ import org.pih.warehouse.product.Product
 
 import javax.xml.bind.ValidationException
 
+@Transactional
 class ReplenishmentService {
 
     def locationService
@@ -39,8 +41,6 @@ class ReplenishmentService {
     def productAvailabilityService
     def picklistService
     def grailsApplication
-
-    boolean transactional = true
 
     def getRequirements(Location location, InventoryLevelStatus inventoryLevelStatus) {
         def requirements = Requirement.createCriteria().list() {
