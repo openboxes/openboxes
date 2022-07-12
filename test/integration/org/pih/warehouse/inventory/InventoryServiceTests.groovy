@@ -335,37 +335,10 @@ class InventoryServiceTests extends GroovyTestCase {
 
     }
 
-    /**
-     * Fetch all objects of a given domain in chunks so as to not exceed Hibernate limits.
-     *
-     * @param domain a Grails domain class (User, Product, etc.)
-     * @param chunkIdx the desired chunk to retrieve, starting with 0
-     * @param chunkLen how many objects to fetch at a time
-     * @return collated results should be identical to domain.list()
-     */
-    private <D> List<D> listInChunks(Class<D> domain, int chunkIdx, int chunkLen = 512, int clearInterval = 10) {
-        if (chunkIdx % clearInterval == 0) {
-            sessionFactory?.currentSession?.clear()
-        }
-        List<D> results = domain.list(max: chunkLen, offset: (chunkIdx * chunkLen))
-        return results
-    }
-
     @Test
     void test_getQuantityByProductMap() {
         transactionEntryTestFixture()
-        int chunk = 0
-        Map<Product, Integer> map = [:]
-
-        while (true) {
-            def batch = listInChunks(TransactionEntry, chunk++)
-            if (batch.empty) {
-                break
-            }
-            inventoryService.getQuantityByProductMap(batch).each { k, v ->
-                map[k] = map.get(k, 0) + v
-            }
-        }
+        def map = inventoryService.getQuantityByProductMap(TransactionEntry.list())
 
         assert map[aspirinProduct] == 97
         assert map[tylenolProduct] == 25
@@ -411,18 +384,7 @@ class InventoryServiceTests extends GroovyTestCase {
     @Test
     void test_getQuantityByInventoryItemMap() {
         transactionEntryTestFixture()
-        int chunk = 0
-        Map<Product, Integer> map = [:]
-
-        while (true) {
-            def batch = listInChunks(TransactionEntry, chunk++)
-            if (batch.empty) {
-                break
-            }
-            inventoryService.getQuantityByInventoryItemMap(batch).each { k, v ->
-                map[k] = map.get(k, 0) + v
-            }
-        }
+        def map = inventoryService.getQuantityByInventoryItemMap(TransactionEntry.list())
 
         assert map[aspirinItem1] == 94
         assert map[aspirinItem2] == 3
