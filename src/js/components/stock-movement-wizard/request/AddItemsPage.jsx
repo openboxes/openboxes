@@ -21,7 +21,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import isRequestFromWard from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -1348,7 +1348,7 @@ class AddItemsPage extends Component {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
             redirectTo = '/dashboard';
           }
-          window.location = redirectTo;
+          window.location = stringUrlInterceptor(redirectTo);
         })
         .catch(() => {
           this.props.hideSpinner();
@@ -1490,7 +1490,7 @@ class AddItemsPage extends Component {
     );
     let redirectToURL = '';
     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-      redirectToURL = '/';
+      redirectToURL = stringUrlInterceptor('/');
     } else {
       redirectToURL = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
     }

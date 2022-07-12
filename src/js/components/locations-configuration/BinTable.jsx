@@ -125,7 +125,7 @@ class BinTable extends Component {
         pageText=""
         onFetchData={(state) => {
           const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-          apiClient.get('/openboxes/api/internalLocations/search', {
+          apiClient.get('/api/internalLocations/search', {
             paramsSerializer: parameters => queryString.stringify(parameters),
             params: {
               locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],

@@ -44,7 +44,7 @@ class ImportLocations extends Component {
   }
 
   getSupportLinks() {
-    const url = '/openboxes/api/supportLinks';
+    const url = '/api/supportLinks';
 
     apiClient.get(url).then((response) => {
       const supportLinks = response.data.data;
@@ -76,7 +76,7 @@ class ImportLocations extends Component {
       },
     };
 
-    const url = '/openboxes/api/locations/importCsv';
+    const url = '/api/locations/importCsv';
 
     return apiClient.post(url, formData, config)
       .then(() => {
@@ -91,7 +91,7 @@ class ImportLocations extends Component {
 
   downloadLocationsTemplate() {
     this.props.showSpinner();
-    apiClient.get('/openboxes/api/locations/template')
+    apiClient.get('/api/locations/template')
       .then((response) => {
         fileDownload(response.data, 'Locations_template.csv', 'text/csv');
         this.props.hideSpinner();
@@ -120,20 +120,20 @@ class ImportLocations extends Component {
               <a
                 type="button"
                 className="btn btn-outline-primary align-self-center w-auto mt-5"
-                href="/openboxes/location/list"
+                href={stringUrlInterceptor("/location/list")}
               >
                 <Translate id="react.locationsConfiguration.viewLocations.label" defaultMessage="View Location List" />
               </a>
               <a
                 type="button"
                 className="btn btn-outline-primary align-self-center w-auto mt-3"
-                href="/openboxes/productsConfiguration/index"
+                href={stringUrlInterceptor("/productsConfiguration/index")}
               >
                 <Translate id="react.locationsConfiguration.productWizard.label" defaultMessage="Product Creation Wizard" />
               </a>
               <a
                 className="align-self-center w-auto mt-3"
-                href="/openboxes"
+                href={stringUrlInterceptor("/")}
               >
                 <Translate id="react.locationsConfiguration.exitToDashboard.label" defaultMessage="Exit to Dashboard" />
               </a>

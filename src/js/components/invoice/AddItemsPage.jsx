@@ -13,7 +13,7 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -71,7 +71,7 @@ const FIELDS = {
           const orderId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].orderId;
-          return { url: orderId ? `/openboxes/order/show/${orderId}` : '' };
+          return { url: orderId ? `/order/show/${orderId}` : '' };
         },
       },
       shipmentNumber: {
@@ -83,7 +83,7 @@ const FIELDS = {
           const shipmentId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? `/openboxes/stockMovement/show/${shipmentId}` : '' };
+          return { url: shipmentId ? `/stockMovement/show/${shipmentId}` : '' };
         },
       },
       budgetCode: {
@@ -228,7 +228,7 @@ class AddItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/invoices/${this.state.values.id}/items?offset=${startIndex}&max=${this.props.pageSize}`;
+    const url = `/api/invoices/${this.state.values.id}/items?offset=${startIndex}&max=${this.props.pageSize}`;
     apiClient.get(url)
       .then((response) => {
         this.setInvoiceItems(response, startIndex);
@@ -270,7 +270,7 @@ class AddItemsPage extends Component {
    * @public
    */
   saveInvoiceItems(values) {
-    const url = `/openboxes/api/invoices/${this.state.values.id}/items`;
+    const url = `/api/invoices/${this.state.values.id}/items`;
     const payload = {
       id: values.id,
       invoiceItems: _.map(values.invoiceItems, item => ({
@@ -313,7 +313,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId, values, index) {
-    const removeItemsUrl = `/openboxes/api/invoices/${itemId}/removeItem`;
+    const removeItemsUrl = `/api/invoices/${itemId}/removeItem`;
     const item = values.invoiceItems[index];
     const newTotalValue = parseFloat(this.state.values.totalValue) - parseFloat(item.totalAmount);
     return apiClient.delete(removeItemsUrl)
@@ -339,7 +339,7 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     this.saveInvoiceItems(formValues)
       .then(() => {
-        window.location = `/openboxes/invoice/show/${formValues.id}`;
+        window.location = stringUrlInterceptor(`/invoice/show/${formValues.id}`);
       })
       .catch(() => this.props.hideSpinner());
   }

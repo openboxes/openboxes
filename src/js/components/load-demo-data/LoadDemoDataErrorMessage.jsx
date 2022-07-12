@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
+import {stringUrlInterceptor} from "utils/apiClient";
 
 const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
   <div className="success-wrapper">
@@ -29,7 +30,7 @@ const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
         </a>
       </p>
       <div className="success-buttons-section d-flex flex-column w-50">
-        <button type="button" className="btn btn-outline-primary" onClick={() => history.push('/openboxes')}>Back to dashboard</button>
+        <button type="button" className="btn btn-outline-primary" onClick={() => history.push(stringUrlInterceptor('/'))}>Back to dashboard</button>
       </div>
     </div>
   </div>

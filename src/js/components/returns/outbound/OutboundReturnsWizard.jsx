@@ -95,7 +95,7 @@ class OutboundReturns extends Component {
   fetchInitialValues() {
     if (this.props.match.params.outboundReturnId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+      const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
 
       apiClient.get(url)
         .then((response) => {

@@ -248,7 +248,7 @@ class AddItemsPage extends Component {
   fetchOutboundReturn() {
     if (this.props.match.params.outboundReturnId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+      const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
       apiClient.get(url)
         .then((resp) => {
           const outboundReturn = parseResponse(resp.data.data);
@@ -283,7 +283,7 @@ class AddItemsPage extends Component {
       selectedBinLocation
     ) {
       this.props.showSpinner();
-      const url = '/openboxes/api/stockTransfers/candidates';
+      const url = '/api/stockTransfers/candidates';
       const payload = {
         productId: selectedProductId,
         lotNumber: selectedLotNumber,
@@ -337,7 +337,7 @@ class AddItemsPage extends Component {
       status: 'APPROVED',
       stockTransferItems: _.values(this.state.selectedItems),
     };
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
+    const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
 
     apiClient.put(url, flattenRequest(payload))
       .then((resp) => {
@@ -350,7 +350,7 @@ class AddItemsPage extends Component {
 
   fetchBins() {
     this.props.showSpinner();
-    const url = '/openboxes/api/internalLocations';
+    const url = '/api/internalLocations';
 
     const mapBins = bins => (_.chain(bins)
       .orderBy(['name'], ['asc']).value()
