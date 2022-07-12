@@ -23,15 +23,15 @@ class StockTransferController {
     def stockTransferService
     def shipmentService
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def create = {
+    def create() {
         render(template: "/common/react", params: params)
     }
 
-    def edit = {
+    def edit() {
         Location currentLocation = Location.get(session.warehouse.id)
         def orderInstance = Order.get(params.id)
 
@@ -50,19 +50,19 @@ class StockTransferController {
         }
     }
 
-    def createOutboundReturn = {
+    def createOutboundReturn() {
         render(template: "/common/react", params: params)
     }
 
-    def createInboundReturn = {
+    def createInboundReturn() {
         render(template: "/common/react", params: params)
     }
 
-    def list = {
+    def list() {
         render(template: "/common/react")
     }
 
-    def show = {
+    def show() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
@@ -72,13 +72,13 @@ class StockTransferController {
         }
     }
 
-    def print = {
+    def print() {
         Order stockTransfer = Order.get(params.id)
 
         [stockTransfer: stockTransfer]
     }
 
-    def eraseStockTransfer = {
+    def eraseStockTransfer() {
         try {
             stockTransferService.deleteStockTransfer(params.id)
         } catch (IllegalArgumentException e) {
@@ -88,7 +88,7 @@ class StockTransferController {
         redirect(action: "list")
     }
 
-    def remove = {
+    def remove() {
         Location currentLocation = Location.get(session.warehouse.id)
         Order orderInstance = Order.get(params.orderId ?: params.id)
         StockMovementDirection direction = orderInstance?.getStockMovementDirection(currentLocation)
@@ -113,7 +113,7 @@ class StockTransferController {
 
     }
 
-    def rollback = {
+    def rollback() {
         Location currentLocation = Location.get(session.warehouse.id)
 
         try {

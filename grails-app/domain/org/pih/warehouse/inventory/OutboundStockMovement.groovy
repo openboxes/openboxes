@@ -1,7 +1,6 @@
 package org.pih.warehouse.inventory
 
-
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
@@ -19,8 +18,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 
-@Validateable
-class OutboundStockMovement implements Serializable {
+class OutboundStockMovement implements Serializable, Validateable {
 
     String id
     String name

@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
@@ -29,11 +30,9 @@ import org.pih.warehouse.product.Product
 @Transactional
 class RequisitionService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def identifierService
     def inventoryService
-    def productService
-    def shipmentService
 
     def getRequisitionStatistics(Location destination, Location origin, User user) {
         return getRequisitionStatistics(destination, origin, user, null, null)

@@ -28,7 +28,7 @@ class CombinedShipmentItemApiController {
     def orderService
     def combinedShipmentService
 
-    def getProductsInOrders = {
+    def getProductsInOrders() {
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
         def vendor = Location.get(params.vendor)
         def destination = Location.get(params.destination)
@@ -43,7 +43,7 @@ class CombinedShipmentItemApiController {
         render([data: products] as JSON)
     }
 
-    def getOrderOptions = {
+    def getOrderOptions() {
         def vendor = Location.get(params.vendor)
         def destination = Location.get(params.destination)
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
@@ -58,7 +58,7 @@ class CombinedShipmentItemApiController {
         ] as JSON)
     }
 
-    def findOrderItems = {
+    def findOrderItems() {
         List<Order> orders
         if (params.orderIds) {
             orders = Order.findAllByIdInList(params.orderIds)
@@ -94,7 +94,7 @@ class CombinedShipmentItemApiController {
         }] as JSON)
     }
 
-    def addItemsToShipment = {
+    def addItemsToShipment() {
         JSONObject jsonObject = request.JSON
         Shipment shipment = Shipment.get(params.id)
         if (!shipment) {
@@ -121,7 +121,7 @@ class CombinedShipmentItemApiController {
         render([data: shipment] as JSON)
     }
 
-    def importTemplate = { ImportDataCommand command ->
+    def importTemplate(ImportDataCommand command) {
         Shipment shipment = Shipment.get(params.id)
         def importFile = command.importFile
         if (importFile.isEmpty()) {
@@ -147,7 +147,7 @@ class CombinedShipmentItemApiController {
         render (status: 200, text: "Successfully imported template")
     }
 
-    def exportTemplate = {
+    def exportTemplate() {
         def sw = new StringWriter()
 
         def csv = new CSVWriter(sw, {

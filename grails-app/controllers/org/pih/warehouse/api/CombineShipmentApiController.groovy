@@ -13,7 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.order.Order
 
 class CombineShipmentApiController {
-    def read = {
+    def read() {
         def order = Order.get(params.id)
         render([data: order] as JSON)
     }

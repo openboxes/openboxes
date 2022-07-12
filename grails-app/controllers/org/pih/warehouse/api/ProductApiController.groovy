@@ -85,14 +85,14 @@ class ProductApiController extends BaseDomainApiController {
         render([data: data] as JSON)
     }
 
-    def productSummary = {
+    def productSummary() {
         def product = Product.load(params.id)
         def location = Location.load(session.warehouse.id)
         def quantityOnHand = ProductAvailability.findAllByProductAndLocation(product, location).sum { it.quantityOnHand }
         render([data: [product:[id: product.id], location: [id: location.id], quantityOnHand: quantityOnHand]] as JSON)
     }
 
-    def productAvailability = {
+    def productAvailability() {
         def product = Product.load(params.id)
         def location = Location.load(session.warehouse.id)
         def data = ProductAvailability.findAllByProductAndLocation(product, location)
@@ -248,7 +248,7 @@ class ProductApiController extends BaseDomainApiController {
         ]] as JSON)
     }
 
-    def productAvailabilityAndDemand = {
+    def productAvailabilityAndDemand() {
         Product product = Product.get(params.id)
         Location location = Location.get(params.locationId)
         def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, location)
@@ -257,7 +257,7 @@ class ProductApiController extends BaseDomainApiController {
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand, quantityAvailable: quantityAvailable] as JSON)
     }
 
-    def productDemand = {
+    def productDemand() {
         Product product = Product.get(params.id)
         Location origin = Location.get(params.originId)
         Location destination = Location.get(params.destinationId)

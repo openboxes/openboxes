@@ -30,13 +30,13 @@ class CreateShipmentWorkflowController {
     def inventoryService
     def userService
 
-    def index = {
+    def index() {
         log.info "CreateShipmentWorkflowController.index() -> " + params
         flash.type = params.type
         redirect(action: 'createShipment')
     }
 
-    def createShipmentFlow = {
+    def createShipmentFlow() {
 
         start {
             action {

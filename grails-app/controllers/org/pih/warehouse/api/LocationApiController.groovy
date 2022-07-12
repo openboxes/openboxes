@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.hibernate.Criteria
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
@@ -37,7 +37,7 @@ class LocationApiController extends BaseDomainApiController {
     def inventoryService
     def documentService
 
-    def read = {
+    def read() {
         Location location = Location.get(params.id)
         render([data: location] as JSON)
     }
@@ -93,7 +93,7 @@ class LocationApiController extends BaseDomainApiController {
     }
 
 
-    def productSummary = {
+    def productSummary() {
         Location currentLocation = Location.load(session.warehouse.id)
         def data = ProductAvailability.createCriteria().list {
             resultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
@@ -111,7 +111,7 @@ class LocationApiController extends BaseDomainApiController {
 
     }
 
-    def locationTypes = {
+    def locationTypes() {
         String[] activityCodes = params.list('activityCode');
         def locationTypes = LocationType.list()
 
@@ -134,13 +134,13 @@ class LocationApiController extends BaseDomainApiController {
         render ([data:data] as JSON)
     }
 
-    def supportedActivities = {
+    def supportedActivities() {
         def data = ActivityCode.list().collect { it.name() }
 
         render ([data:data] as JSON)
     }
 
-    def create = { Location location ->
+    def create(Location location) {
         JSONObject jsonObject = request.JSON
 
         bindLocationData(location, jsonObject)
@@ -162,7 +162,7 @@ class LocationApiController extends BaseDomainApiController {
         render ([data: location] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
 
         Location existingLocation = Location.get(params.id)
@@ -214,7 +214,7 @@ class LocationApiController extends BaseDomainApiController {
         return location
     }
 
-    def updateForecastingConfiguration = {
+    def updateForecastingConfiguration() {
         JSONObject jsonObject = request.JSON
         Location existingLocation = Location.get(params.id)
 
@@ -234,7 +234,7 @@ class LocationApiController extends BaseDomainApiController {
         render(status: 200)
     }
 
-    def delete = {
+    def delete() {
         def existingLocation = Location.get(params.id)
         if (!existingLocation) {
             throw new IllegalArgumentException("No Location found for location ID ${params.id}")
@@ -259,14 +259,14 @@ class LocationApiController extends BaseDomainApiController {
         render(status: 204)
     }
 
-    def downloadTemplate = {
+    def downloadTemplate() {
         def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description\n"
 
         response.setHeader("Content-disposition", "attachment; filename=\"Location_template.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
-    def importCsv = { ImportDataCommand command ->
+    def importCsv(ImportDataCommand command) {
         def importFile = command.importFile
 
         if (importFile.isEmpty()) {
@@ -282,7 +282,7 @@ class LocationApiController extends BaseDomainApiController {
         render status: 200
     }
 
-    def downloadBinLocationTemplate = {
+    def downloadBinLocationTemplate() {
         def filename = "binLocations.xls"
         try {
             def file = documentService.findFile("templates/" + filename)
@@ -295,7 +295,7 @@ class LocationApiController extends BaseDomainApiController {
         }
     }
 
-    def importBinLocations = {
+    def importBinLocations() {
         try {
             MultipartFile multipartFile = request.getFile('fileContents')
             if (multipartFile.empty) {

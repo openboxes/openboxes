@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -29,12 +29,12 @@ class ReplenishmentApiController {
     def picklistService
     def inventoryService
 
-    def list = {
+    def list() {
         List<Order> replenishments = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
         render([data: replenishments.collect { it.toJson() }] as JSON)
     }
 
-    def read = {
+    def read() {
         Order order = Order.get(params.id)
         if (!order) {
             throw new IllegalArgumentException("No replenishment found for order ID ${params.id}")
@@ -45,7 +45,7 @@ class ReplenishmentApiController {
         render([data: replenishment?.toJson()] as JSON)
     }
 
-    def create = {
+    def create() {
         Location currentLocation = Location.get(session.warehouse.id)
         JSONObject jsonObject = request.JSON
         User currentUser = User.get(session.user.id)
@@ -69,7 +69,7 @@ class ReplenishmentApiController {
         render([data: replenishment?.toJson()] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
 
         User currentUser = User.get(session.user.id)
@@ -144,14 +144,14 @@ class ReplenishmentApiController {
         return replenishment
     }
 
-    def statusOptions = {
+    def statusOptions() {
         def options = InventoryLevelStatus.listReplenishmentOptions()?.collect {
             [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.InventoryLevelStatus.' + it.name())}" ]
         }
         render([data: options] as JSON)
     }
 
-    def requirements = {
+    def requirements() {
         Location location = Location.get(params.location.id)
         if (!location) {
             throw new IllegalArgumentException("Can't find location with given id: ${params.location.id}")
@@ -163,13 +163,13 @@ class ReplenishmentApiController {
         render([data: requirements?.collect { it.toJson() }] as JSON)
     }
 
-    def removeItem = {
+    def removeItem() {
         replenishmentService.deleteReplenishmentItem(params.id)
         render status: 204
     }
 
    /** Returns picklist for specific order item (with picked items, available items and suggested items **/
-    def getPicklist = {
+    def getPicklist() {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
@@ -179,7 +179,7 @@ class ReplenishmentApiController {
         render([data: pickPageItem.toJson()] as JSON)
     }
 
-    def createPicklist = {
+    def createPicklist() {
         Order order = Order.get(params.id)
         if (!order) {
             throw new IllegalArgumentException("Can't find order with given id: ${params.id}")
@@ -192,7 +192,7 @@ class ReplenishmentApiController {
         render status: 201
     }
 
-    def createPicklistItem = {
+    def createPicklistItem() {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
@@ -204,7 +204,7 @@ class ReplenishmentApiController {
 
     }
 
-    def updatePicklist = {
+    def updatePicklist() {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
@@ -222,7 +222,7 @@ class ReplenishmentApiController {
         render status: 200
     }
 
-    def deletePicklist = {
+    def deletePicklist() {
         OrderItem orderItem = OrderItem.get(params.id)
         if (!orderItem) {
             throw new IllegalArgumentException("Can't find order item with given id: ${params.id}")
