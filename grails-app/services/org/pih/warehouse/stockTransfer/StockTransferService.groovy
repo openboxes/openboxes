@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.stockTransfer
 
+import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
@@ -29,17 +30,15 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
+@Transactional
 class StockTransferService {
 
-    def locationService
     def inventoryService
     def productAvailabilityService
     def picklistService
     def shipmentService
     def grailsApplication
     def orderService
-
-    boolean transactional = true
 
     /**
      * Gets paginated list of stock transfers (Orders with TRANSFER_ORDER type)

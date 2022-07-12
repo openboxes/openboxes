@@ -17,6 +17,7 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry
 import fr.opensagres.xdocreport.template.IContext
 import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
+import grails.gorm.transactions.Transactional
 import groovy.text.Template
 import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.jxls.common.Context
@@ -28,9 +29,9 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Shipment
 
+@Transactional
 class DocumentTemplateService {
 
-    boolean transactional = true
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
     def requisitionService
 

@@ -9,9 +9,10 @@
 **/
 package org.pih.warehouse.auth
 
-class RecaptchaService {
+import grails.gorm.transactions.Transactional
 
-    boolean transactional = true
+@Transactional
+class RecaptchaService {
 
     def apiClientService
     def grailsApplication

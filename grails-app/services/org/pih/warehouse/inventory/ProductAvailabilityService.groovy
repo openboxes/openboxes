@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
@@ -30,9 +31,8 @@ import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
 
+@Transactional
 class ProductAvailabilityService {
-
-    boolean transactional = true
 
     def dataSource
     def grailsApplication

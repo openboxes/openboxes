@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import org.pih.warehouse.product.ProductSupplier
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -258,9 +259,9 @@ class IdentifierService {
         Integer sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
         String sequenceNumberStr = generateSequenceNumber(sequenceNumber.toString())
 
-        String template = ConfigurationHolder.config.openboxes.identifier.productCode.format
-        String delimiter = ConfigurationHolder.config.openboxes.identifier.productCode.delimiter
-        Map properties = ConfigurationHolder.config.openboxes.identifier.productCode.properties
+        String template = Holders.config.openboxes.identifier.productCode.format
+        String delimiter = Holders.config.openboxes.identifier.productCode.delimiter
+        Map properties = Holders.config.openboxes.identifier.productCode.properties
         Map model = dataService.transformObject(productType, properties)
         // If no value present in the map (all are empty or null), then do not include delimiter
         if (model?.any { key, value -> value }) {

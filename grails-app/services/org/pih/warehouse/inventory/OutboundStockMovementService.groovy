@@ -9,14 +9,14 @@
 **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 
+@Transactional
 class OutboundStockMovementService {
-
-    boolean transactional = true
 
     def getStockMovement(String id) {
         OutboundStockMovement outboundStockMovement = OutboundStockMovement.get(id)
