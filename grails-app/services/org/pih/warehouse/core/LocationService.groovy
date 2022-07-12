@@ -17,7 +17,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
-import org.grails.plugins.csv.CSVMapReader
+import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
 

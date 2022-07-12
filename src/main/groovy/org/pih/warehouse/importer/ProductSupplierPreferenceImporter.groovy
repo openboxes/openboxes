@@ -9,15 +9,15 @@
  **/
 package org.pih.warehouse.importer
 
-
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.data.ProductSupplierDataService
 
 class ProductSupplierPreferenceImporter extends AbstractExcelImporter {
 
     ProductSupplierDataService productSupplierDataService
+    def excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -34,13 +34,13 @@ class ProductSupplierPreferenceImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            supplierCode         : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            organizationCode     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            organizationName     : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            preferenceTypeName   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            validityStartDate    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            validityEndDate      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            preferenceComments   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            supplierCode         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            organizationCode     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            organizationName     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            preferenceTypeName   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            validityStartDate    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            validityEndDate      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            preferenceComments   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
 
@@ -49,12 +49,12 @@ class ProductSupplierPreferenceImporter extends AbstractExcelImporter {
     }
 
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productSupplierPreferenceDataService")
+        return Holders.getApplication.getMainContext.getBean("productSupplierPreferenceDataService")
     }
 
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {

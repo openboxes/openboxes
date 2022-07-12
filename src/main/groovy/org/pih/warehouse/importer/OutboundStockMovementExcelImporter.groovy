@@ -9,10 +9,14 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.ExcelImportUtils
+import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
+
+    def excelImportService
+
     static Map columnMap = [
         sheet   : 'Sheet1',
             startRow : 1,
@@ -28,13 +32,13 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            "origin"    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "destination"   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "quantity": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            "requestedDeliveryDate": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "requestNumber": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "description": ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null])
+            "origin"    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "destination"   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "productCode"       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "quantity": ([expectedType: ExpectedPropertyType.IntType, defaultValue: null]),
+            "requestedDeliveryDate": ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "requestNumber": ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "description": ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
     OutboundStockMovementExcelImporter(String fileName) {
@@ -42,7 +46,7 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
     }
 
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("outboundStockMovementDataService")
+        return Holders.getApplication.getMainContext.getBean("outboundStockMovementDataService")
     }
 
     /**
@@ -54,7 +58,7 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
     }
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     /**

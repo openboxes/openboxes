@@ -10,7 +10,6 @@
 package org.pih.warehouse.core
 
 import grails.util.Holders
-import org.grails.plugins.excelimport.ExcelImportUtils
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -18,7 +17,6 @@ import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
-import grails.util.Holders
 
 /**
  * A location can be a customer, warehouse, or supplier.
