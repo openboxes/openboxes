@@ -52,7 +52,7 @@ const FIELDS = {
           const orderId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].orderId;
-          return { url: orderId ? `/openboxes/order/show/${orderId}` : '' };
+          return { url: orderId ? `/order/show/${orderId}` : '' };
         },
       },
       shipmentNumber: {
@@ -64,7 +64,7 @@ const FIELDS = {
           const shipmentId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? `/openboxes/stockMovement/show/${shipmentId}` : '' };
+          return { url: shipmentId ? `/stockMovement/show/${shipmentId}` : '' };
         },
       },
       budgetCode: {
@@ -207,7 +207,7 @@ class InvoiceItemsModal extends Component {
         quantityToInvoice: _.toInteger(item.quantityToInvoice),
       })),
     };
-    const url = `/openboxes/api/invoices/${invoiceId}/items`;
+    const url = `/api/invoices/${invoiceId}/items`;
 
     apiClient.post(url, payload)
       .then(() => {
@@ -293,7 +293,7 @@ class InvoiceItemsModal extends Component {
     const { selectedOrderNumbers, selectedShipmentNumbers, selectedInvoiceItems } = this.state;
     const { invoiceId } = this.props;
 
-    const url = `/openboxes/api/invoices/${invoiceId}/invoiceItemCandidates`;
+    const url = `/api/invoices/${invoiceId}/invoiceItemCandidates`;
 
     const payload = {
       orderNumbers: _.map(selectedOrderNumbers, orderNumber => orderNumber.value),
@@ -319,7 +319,7 @@ class InvoiceItemsModal extends Component {
 
   fetchOrderNumbers(invoiceId) {
     if (this.state.orderNumberOptions.length === 0) {
-      const url = `/openboxes/api/invoices/${invoiceId}/orders`;
+      const url = `/api/invoices/${invoiceId}/orders`;
       apiClient.get(url)
         .then((resp) => {
           this.setState({
@@ -333,7 +333,7 @@ class InvoiceItemsModal extends Component {
 
   fetchShipmentNumbers(invoiceId) {
     if (this.state.shipmentNumberOptions.length === 0) {
-      const url = `/openboxes/api/invoices/${invoiceId}/shipments`;
+      const url = `/api/invoices/${invoiceId}/shipments`;
       apiClient.get(url)
         .then((resp) => {
           this.setState({

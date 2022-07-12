@@ -161,7 +161,7 @@ class ZoneAndBinLocations extends Component {
   }
 
   fetchBinAndZoneTypes() {
-    const url = '/openboxes/api/locations/locationTypes';
+    const url = '/api/locations/locationTypes';
     apiClient.get(url)
       .then((response) => {
         const resp = response.data.data;
@@ -189,7 +189,7 @@ class ZoneAndBinLocations extends Component {
       zone: values.zoneLocation && { id: values.zoneLocation.id },
     };
 
-    apiClient.post(`/openboxes/api/locations/${values.id}`, flattenRequest(payload))
+    apiClient.post(`/api/locations/${values.id}`, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
         if (values.locationType.locationTypeCode === 'ZONE') {
@@ -233,7 +233,7 @@ class ZoneAndBinLocations extends Component {
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
-            apiClient.delete(`/openboxes/api/locations/${location.id}`)
+            apiClient.delete(`/api/locations/${location.id}`)
               .then(() => {
                 if (location.locationType.locationTypeCode === 'ZONE') {
                   this.refetchZoneTable();

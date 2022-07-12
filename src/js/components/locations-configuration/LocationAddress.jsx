@@ -85,7 +85,7 @@ class LocationAddress extends Component {
   }
 
   fetchLocation() {
-    const url = `/openboxes/api/locations/${this.props.match.params.locationId}`;
+    const url = `/api/locations/${this.props.match.params.locationId}`;
     apiClient.get(url).then((response) => {
       const location = response.data.data;
       this.setState({
@@ -105,7 +105,7 @@ class LocationAddress extends Component {
       },
     };
     this.props.showSpinner();
-    const locationUrl = `/openboxes/api/locations/${this.state.locationId}`;
+    const locationUrl = `/api/locations/${this.state.locationId}`;
     apiClient.post(locationUrl, flattenRequest(valuesAsAddressObject))
       .then(() => {
         this.props.hideSpinner();

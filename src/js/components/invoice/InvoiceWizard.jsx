@@ -97,7 +97,7 @@ class InvoiceWizard extends Component {
   fetchInitialValues() {
     if (this.props.match.params.invoiceId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/invoices/${this.props.match.params.invoiceId}`;
+      const url = `/api/invoices/${this.props.match.params.invoiceId}`;
       apiClient.get(url)
         .then((response) => {
           const values = {

@@ -16,7 +16,7 @@ const SupportButton = ({ locale, text, className }) => {
   }, []);
 
   useEffect(() => {
-    axios.get('/openboxes/api/helpscout/configuration/')
+    axios.get('/api/helpscout/configuration/')
       .then((response) => {
         window.Beacon('destroy');
         window.Beacon('init', response.data.localizedHelpScoutKey);

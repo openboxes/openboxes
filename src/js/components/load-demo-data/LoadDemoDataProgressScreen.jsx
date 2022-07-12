@@ -13,7 +13,7 @@ const LoadDemoDataProgressScreen = () => {
   const [supportLinks, setSupportLinks] = useState({});
 
   useEffect(() => {
-    apiClient.get('/openboxes/api/config/data/demo')
+    apiClient.get('/api/config/data/demo')
       .then(() => {
         setIsLoading(false);
       })
@@ -22,7 +22,7 @@ const LoadDemoDataProgressScreen = () => {
         setIsLoading(false);
       });
 
-    apiClient.get('/openboxes/api/supportLinks').then((response) => {
+    apiClient.get('/api/supportLinks').then((response) => {
       const links = response.data.data;
       setSupportLinks(links);
     });

@@ -91,7 +91,7 @@ class ReplenishmentWizard extends Component {
   fetchReplenishment() {
     if (this.props.match.params.replenishmentId) {
       this.props.showSpinner();
-      const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
+      const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
 
       apiClient.get(url)
         .then((response) => {

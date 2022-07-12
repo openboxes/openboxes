@@ -14,7 +14,7 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/replenishment/EditPickModal';
-import apiClient, { flattenRequest } from 'utils/apiClient';
+import apiClient, {flattenRequest, stringUrlInterceptor} from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -184,7 +184,7 @@ class ReplenishmentSecondPage extends Component {
 
   fetchReplenishment() {
     this.props.showSpinner();
-    const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
+    const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
 
     return apiClient.get(url)
       .then((resp) => {
@@ -206,7 +206,7 @@ class ReplenishmentSecondPage extends Component {
 
   recreatePickList() {
     this.props.showSpinner();
-    const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}/picklists`;
+    const url = `/api/replenishments/${this.props.match.params.replenishmentId}/picklists`;
 
     apiClient.post(url)
       .then(() => {
@@ -244,7 +244,7 @@ class ReplenishmentSecondPage extends Component {
   nextPage() {
     if (this.state.values.replenishment.status === 'PENDING') {
       this.props.showSpinner();
-      const url = `/openboxes/api/replenishments/${this.props.match.params.replenishmentId}`;
+      const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'APPROVED' };
       apiClient.post(url, flattenRequest(payload))
         .then(() => {
@@ -258,14 +258,14 @@ class ReplenishmentSecondPage extends Component {
   }
 
   printTransferOrder() {
-    const url = `/openboxes/replenishment/print/${this.props.match.params.replenishmentId}`;
+    const url = `/replenishment/print/${this.props.match.params.replenishmentId}`;
     window.open(url, '_blank');
   }
 
   revertUserPick(itemId) {
     this.props.showSpinner();
 
-    const revertPicklistUrl = `/openboxes/api/replenishments/${itemId}/picklistItem`;
+    const revertPicklistUrl = `/api/replenishments/${itemId}/picklistItem`;
 
     apiClient.post(revertPicklistUrl, {})
       .then(() => {
@@ -297,7 +297,7 @@ class ReplenishmentSecondPage extends Component {
   }
 
   saveAndExit() {
-    window.location = `/openboxes/stockTransfer/show/${this.props.match.params.replenishmentId}`;
+    window.location = stringUrlInterceptor(`/stockTransfer/show/${this.props.match.params.replenishmentId}`);
   }
 
   sortByBins() {

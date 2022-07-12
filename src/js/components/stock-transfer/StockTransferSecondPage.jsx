@@ -238,7 +238,7 @@ class StockTransferSecondPage extends Component {
 
   fetchStockTransfer() {
     this.props.showSpinner();
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
+    const url = `/api/stockTransfers/${this.props.match.params.stockTransferId}`;
 
     apiClient.get(url)
       .then((response) => {
@@ -268,7 +268,7 @@ class StockTransferSecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = '/openboxes/api/internalLocations';
+    const url = '/api/internalLocations';
 
     const mapBins = bins => (_.chain(bins)
       .orderBy(['label'], ['asc']).value()
@@ -302,7 +302,7 @@ class StockTransferSecondPage extends Component {
    * @public
    */
   saveStockTransfer(data, callback) {
-    const url = `/openboxes/api/stockTransfers/${this.props.match.params.stockTransferId}`;
+    const url = `/api/stockTransfers/${this.props.match.params.stockTransferId}`;
     const payload = prepareRequest(data, APPROVED);
     apiClient.put(url, flattenRequest(payload))
       .then((response) => {
@@ -332,7 +332,7 @@ class StockTransferSecondPage extends Component {
     const itemToDelete = _.get(this.state.stockTransfer.stockTransferItems, `[${itemIndex}]`);
 
     if (itemToDelete.id) {
-      const url = `/openboxes/api/stockTransferItems/${itemToDelete.id}`;
+      const url = `/api/stockTransferItems/${itemToDelete.id}`;
       apiClient.delete(url)
         .then((response) => {
           const stockTransfer = parseResponse(response.data.data);
@@ -387,7 +387,7 @@ class StockTransferSecondPage extends Component {
   }
 
   printStockTransfer() {
-    const url = `/openboxes/stockTransfer/print/${this.props.match.params.stockTransferId}`;
+    const url = `/stockTransfer/print/${this.props.match.params.stockTransferId}`;
 
     this.saveStockTransfer(
       this.state.stockTransfer,

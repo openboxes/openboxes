@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
-import apiClient from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 class ImportCategories extends Component {
   downloadProductTemplate() {
     this.props.showSpinner();
-    apiClient.get('/openboxes/batch/downloadCsvTemplate?template=products.csv')
+    apiClient.get('/batch/downloadCsvTemplate?template=products.csv')
       .then((response) => {
         fileDownload(response.data, 'Product_template.csv', 'text/csv');
         this.props.hideSpinner();
@@ -49,7 +49,7 @@ class ImportCategories extends Component {
           <Translate id="react.productsConfiguration.downloadProductTemplate2.label" />&nbsp;
         </div>
         <div className="align-self-end">
-          <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href="/openboxes/product/importAsCsv">
+          <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor("/product/importAsCsv")}>
             <Translate id="react.productsConfiguration.importProducts.label" defaultMessage="Import Products List" />
           </a>
         </div>

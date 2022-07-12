@@ -11,7 +11,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
-import apiClient, { parseResponse } from 'utils/apiClient';
+import apiClient, {parseResponse, stringUrlInterceptor} from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
@@ -55,7 +55,7 @@ const FIELDS = {
           if (fieldValue) {
             return (
               <div className="d-flex align-items-center justify-content-center">
-                <a target="_blank" rel="noopener noreferrer" href={`/openboxes/stockMovement/show/${fieldValue.id}`}>
+                <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(`/stockMovement/show/${fieldValue.id}`)}>
                   {fieldValue.requestNumber}
                 </a>
               </div>
@@ -121,7 +121,7 @@ class DetailsModal extends Component {
   }
 
   fetchPendingRequestsDetails() {
-    const url = `/openboxes/api/stockMovements/pendingRequisitionDetails?origin.id=${this.state.attr.originId}&product.id=${this.state.attr.productId}&stockMovementId=${this.state.attr.stockMovementId}`;
+    const url = `/api/stockMovements/pendingRequisitionDetails?origin.id=${this.state.attr.originId}&product.id=${this.state.attr.productId}&stockMovementId=${this.state.attr.stockMovementId}`;
 
     apiClient.get(url)
       .then((resp) => {
