@@ -422,7 +422,7 @@ class StockTransferService {
     }
 
     def getDocuments(StockTransfer stockTransfer) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         stockTransfer.documents = [[
             name        : g.message(code: "picklist.button.download.label"),
             documentType: DocumentGroupCode.PICKLIST.name(),

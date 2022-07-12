@@ -12,7 +12,7 @@ package org.pih.warehouse.importer
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

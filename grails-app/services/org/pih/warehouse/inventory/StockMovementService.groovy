@@ -2761,7 +2761,7 @@ class StockMovementService {
     }
 
     def getDisabledMessage(StockMovement stockMovement, Location currentLocation, Boolean isEditing = false) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
 
         boolean isSameOrigin = stockMovement?.origin?.id == currentLocation?.id
         boolean isSameDestination = stockMovement?.destination?.id == currentLocation?.id
