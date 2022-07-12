@@ -11,15 +11,15 @@ package org.pih.warehouse.core
 
 class LocationsConfigurationController {
 
-    def index = {
+    def index() {
         render(template: "/common/react")
     }
 
-    def create = {
+    def create() {
         render(template: "/common/react")
     }
 
-    def upload = {
+    def upload() {
         render(template: "/common/react")
     }
 }

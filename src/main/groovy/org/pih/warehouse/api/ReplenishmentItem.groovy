@@ -1,6 +1,6 @@
 package org.pih.warehouse.api
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.OrderItem
@@ -8,8 +8,7 @@ import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 
-@Validateable
-class ReplenishmentItem {
+class ReplenishmentItem implements Validateable {
     String id
     Product product
     Location replenishmentLocation // origin bin location

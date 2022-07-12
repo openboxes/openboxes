@@ -45,11 +45,11 @@ class MigrationController {
     }
 
 
-    def dataQuality = {
+    def dataQuality() {
 
     }
 
-    def dataMigration = {
+    def dataMigration() {
 
         def organizations = migrationService.getSuppliersForMigration()
         def productSuppliers = migrationService.getProductsForMigration()
@@ -64,7 +64,7 @@ class MigrationController {
         ]
     }
 
-    def dimensionTables = {
+    def dimensionTables() {
         [
                 locationDimensionCount: LocationDimension.count(),
                 productDimensionCount : ProductDimension.count(),
@@ -73,7 +73,7 @@ class MigrationController {
         ]
     }
 
-    def factTables = {
+    def factTables() {
         def stockoutFactCount = dataService.executeQuery("select count(*) as count from stockout_fact")[0]?.count ?: 0
         [
                 transactionFactCount     : TransactionFact.count(),
@@ -82,7 +82,7 @@ class MigrationController {
         ]
     }
 
-    def materializedViews = {
+    def materializedViews() {
         def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
         def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
 
@@ -118,7 +118,7 @@ class MigrationController {
         }
     }
 
-    def loadProductAvailability = {
+    def loadProductAvailability() {
         Location location = Location.get(params.id)
         def results = ProductAvailability.createCriteria().list {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -132,13 +132,13 @@ class MigrationController {
     }
 
 
-    def calculateProductAvailability = {
+    def calculateProductAvailability() {
         Location location = Location.get(params.id)
         def binLocations = productAvailabilityService.calculateBinLocations(location)
         render (status: 200, text: binLocations.size())
     }
 
-    def productAvailability = {
+    def productAvailability() {
 
         def countByLocation = ProductAvailability.createCriteria().list {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -166,7 +166,7 @@ class MigrationController {
         [data:data]
     }
 
-    def refreshProductAvailability = {
+    def refreshProductAvailability() {
         Location location = params?.location ?
                 Location.get(params.location?.id) :
                 Location.get(session.warehouse.id)
@@ -175,7 +175,7 @@ class MigrationController {
         render (status: 200, text: "Refreshed product availability for location ${location.name}")
     }
 
-    def compareProductAvailability = {
+    def compareProductAvailability() {
 
         log.info "params " + params
 

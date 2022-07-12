@@ -161,7 +161,7 @@ class OrganizationController {
         }
     }
 
-    def resetSequence = {
+    def resetSequence() {
         IdentifierTypeCode identifierTypeCode = params.identifierTypeCode as IdentifierTypeCode
         Integer sequenceNumber = params.sequenceNumber?:0 as Integer
         def organizationInstance = Organization.get(params.id)

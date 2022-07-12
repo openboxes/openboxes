@@ -20,6 +20,7 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
@@ -103,7 +104,7 @@ class ReportController {
         render([responseTime: responseTime] as JSON)
     }
 
-    def binLocationCsvHeader = { binLocation ->
+    def binLocationCsvHeader(def binLocation) {
         String csv = ""
         if (binLocation) {
             csv += g.message(code: 'default.status.label') + ","
@@ -127,7 +128,7 @@ class ReportController {
 
     }
 
-    def binLocationCsvRow = { binLocation ->
+    def binLocationCsvRow(def binLocation) {
         String csv = ""
 
         if (binLocation) {
@@ -605,7 +606,7 @@ class ReportController {
         render(view: 'showRequestDetailReport', params: params)
     }
 
-    def showCycleCountReport = {
+    def showCycleCountReport() {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
@@ -661,7 +662,7 @@ class ReportController {
         render(view: "showCycleCountReport", model: [rows: rows])
     }
 
-    def showForecastReport = {
+    def showForecastReport() {
         def origin = Location.get(session.warehouse.id)
         params.origin = origin.name
 

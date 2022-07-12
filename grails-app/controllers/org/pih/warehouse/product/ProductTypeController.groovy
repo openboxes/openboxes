@@ -16,23 +16,23 @@ class ProductTypeController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [productTypeInstanceList: ProductType.list(params), productTypeInstanceTotal: ProductType.count()]
     }
 
-    def create = {
+    def create() {
         def productTypeInstance = new ProductType(productTypeCode: ProductTypeCode.GOOD,
                 requiredFields: [ProductField.PRODUCT_CODE, ProductField.NAME, ProductField.CATEGORY, ProductField.GL_ACCOUNT])
         productTypeInstance.properties = params
         return [productTypeInstance: productTypeInstance]
     }
 
-    def save = {
+    def save() {
         if (params.supportedActivities) {
             params.supportedActivities = params.list("supportedActivities") as ProductActivityCode[]
         }
@@ -58,7 +58,7 @@ class ProductTypeController {
         }
     }
 
-    def show = {
+    def show() {
         def productTypeInstance = ProductType.get(params.id)
         if (!productTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
@@ -69,7 +69,7 @@ class ProductTypeController {
         }
     }
 
-    def edit = {
+    def edit() {
         def productTypeInstance = ProductType.get(params.id)
         if (!productTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
@@ -80,7 +80,7 @@ class ProductTypeController {
         }
     }
 
-    def update = {
+    def update() {
         def productTypeInstance = ProductType.get(params.id)
         if (productTypeInstance) {
             if (params.version) {
@@ -116,7 +116,7 @@ class ProductTypeController {
         }
     }
 
-    def delete = {
+    def delete() {
         if (params.id == ConfigurationHolder.config.openboxes.identifier.defaultProductType.id) {
             flash.message = "${warehouse.message(code: 'productType.cannotDeleteDefaultProductType.message')}"
             redirect(action: "list", id: params.id)

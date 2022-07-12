@@ -1,7 +1,7 @@
 package org.pih.warehouse.api
 
 import com.google.common.base.Enums
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -12,8 +12,7 @@ import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
-@Validateable
-class StockTransfer {
+class StockTransfer implements Validateable {
 
     String id
     Location origin

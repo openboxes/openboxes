@@ -17,7 +17,6 @@ import org.pih.warehouse.api.ReplenishmentPickPageItem
 import org.pih.warehouse.api.ReplenishmentStatus
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryLevelStatus
 import org.pih.warehouse.inventory.Requirement
@@ -29,7 +28,6 @@ import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.picklist.PicklistItem
-import org.pih.warehouse.product.Product
 
 import javax.xml.bind.ValidationException
 
@@ -40,7 +38,6 @@ class ReplenishmentService {
     def inventoryService
     def productAvailabilityService
     def picklistService
-    def grailsApplication
 
     def getRequirements(Location location, InventoryLevelStatus inventoryLevelStatus) {
         def requirements = Requirement.createCriteria().list() {

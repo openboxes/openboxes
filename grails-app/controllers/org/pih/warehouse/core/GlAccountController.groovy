@@ -12,28 +12,28 @@ package org.pih.warehouse.core
 import org.pih.warehouse.product.Product
 
 class GlAccountController {
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [glAccounts: GlAccount.list(params), glAccountsTotal: GlAccount.count()]
     }
 
-    def create = {
+    def create() {
         def glAccount = new GlAccount()
         glAccount.properties = params
         return [glAccount: glAccount]
     }
 
-    def edit = {
+    def edit() {
         def glAccount = GlAccount.get(params.id)
         def glAccountType = glAccount?.glAccountType ? GlAccountType.get(glAccount.glAccountType.id) : null
         return [glAccount: glAccount, glAccountTypeId: glAccountType?.id]
     }
 
-    def save = {
+    def save() {
         def glAccount = new GlAccount(params)
         if (glAccount.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), glAccount.id])}"
@@ -43,7 +43,7 @@ class GlAccountController {
         }
     }
 
-    def update = {
+    def update() {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {
             // If the glAccount is associated with ANY product, do not allow to deactivate it
@@ -67,7 +67,7 @@ class GlAccountController {
         }
     }
 
-    def delete = {
+    def delete() {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {
             try {

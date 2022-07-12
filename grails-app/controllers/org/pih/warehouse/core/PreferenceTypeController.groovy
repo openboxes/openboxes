@@ -11,27 +11,27 @@ package org.pih.warehouse.core
 
 class PreferenceTypeController {
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [preferenceTypes: PreferenceType.list(params), preferenceTypesTotal: PreferenceType.count()]
     }
 
-    def create = {
+    def create() {
         def preferenceType = new PreferenceType()
         preferenceType.properties = params
         return [preferenceType: preferenceType]
     }
 
-    def edit = {
+    def edit() {
         def preferenceType = PreferenceType.get(params.id)
         return [preferenceType: preferenceType]
     }
 
-    def save = {
+    def save() {
         def preferenceType = new PreferenceType(params)
         if (preferenceType.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'preferenceType.label', default: 'Preference Type'), preferenceType.id])}"
@@ -41,7 +41,7 @@ class PreferenceTypeController {
         }
     }
 
-    def update = {
+    def update() {
         def preferenceType = PreferenceType.get(params.id)
         if (preferenceType) {
             preferenceType.properties = params
@@ -57,7 +57,7 @@ class PreferenceTypeController {
         }
     }
 
-    def delete = {
+    def delete() {
         def preferenceType = PreferenceType.get(params.id)
         if (preferenceType) {
             try {

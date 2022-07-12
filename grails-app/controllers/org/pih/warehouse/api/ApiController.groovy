@@ -258,13 +258,13 @@ class ApiController {
         render([data: requestTypes] as JSON)
     }
 
-    def getSupportLinks = {
+    def getSupportLinks() {
         def supportLinks = grailsApplication.config.openboxes.supportLinks
 
         render([data: supportLinks] as JSON)
     }
 
-    def getResettingInstanceCommand = {
+    def getResettingInstanceCommand() {
         def resettingInstanceCommand = grailsApplication.config.openboxes.resettingInstance.command
 
         render([data: resettingInstanceCommand] as JSON)

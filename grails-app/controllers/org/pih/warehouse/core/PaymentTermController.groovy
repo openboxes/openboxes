@@ -11,23 +11,23 @@ package org.pih.warehouse.core
 
 class PaymentTermController {
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [paymentTerms: PaymentTerm.list(params), paymentTermsTotal: PaymentTerm.count()]
     }
 
-    def create = {
+    def create() {
         def paymentTerm = new PaymentTerm()
         paymentTerm.properties = params
         return [paymentTerm: paymentTerm]
     }
 
-    def edit = {
+    def edit() {
         def paymentTerm = PaymentTerm.get(params.id)
         return [paymentTerm: paymentTerm]
     }
 
-    def save = {
+    def save() {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {
             paymentTerm.properties = params
@@ -48,7 +48,7 @@ class PaymentTermController {
         }
     }
 
-    def delete = {
+    def delete() {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {
             try {

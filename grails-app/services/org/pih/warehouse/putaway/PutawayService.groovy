@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.putaway
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.AvailableItem
@@ -20,6 +21,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.TransferStockCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -33,7 +35,7 @@ class PutawayService {
     LocationService locationService
     InventoryService inventoryService
     def productAvailabilityService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def getPutawayCandidates(Location location) {
         List putawayItems = []

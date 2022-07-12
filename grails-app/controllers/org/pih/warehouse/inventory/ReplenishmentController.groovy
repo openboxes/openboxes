@@ -14,15 +14,15 @@ import org.pih.warehouse.picklist.Picklist
 
 class ReplenishmentController {
 
-    def index = {
+    def index() {
         redirect(action: "create", params: params)
     }
 
-    def create = {
+    def create() {
         render(template: "/common/react", params: params)
     }
 
-    def print = {
+    def print() {
         Order transferOrder = Order.get(params.id)
 
         def picklist = Picklist.findByOrder(transferOrder);

@@ -126,7 +126,7 @@ class DashboardApiController {
         render(sentStockMovements.toJson() as JSON)
     }
 
-    def getRequisitionsByYear = {
+    def getRequisitionsByYear() {
         Location location = Location.get(params.locationId)
         def requisitionsByYear = indicatorDataService.getRequisitionsByYear(location, params)
         render(requisitionsByYear.toJson() as JSON)
@@ -204,7 +204,7 @@ class DashboardApiController {
         render (numberData as JSON)
     }
 
-    def getOpenPurchaseOrdersCount = {
+    def getOpenPurchaseOrdersCount() {
         NumberData numberData = numberDataService.getOpenPurchaseOrdersCount(params)
         render (numberData as JSON)
     }

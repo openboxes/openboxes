@@ -1,5 +1,6 @@
 package org.pih.warehouse.dashboard
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -21,7 +22,7 @@ class IndicatorDataService {
 
     def dashboardService
     def dataService
-    def grailsApplication
+    GrailsApplication grailsApplication
     def messageService
 
     GraphData getExpirationSummaryData(Location location, def params) {
