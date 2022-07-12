@@ -5,6 +5,7 @@ import com.icegreen.greenmail.util.GreenMail
 import com.icegreen.greenmail.util.GreenMailUtil
 import com.icegreen.greenmail.util.ServerSetupTest
 import com.sun.mail.imap.IMAPStore
+import grails.core.GrailsApplication
 import grails.test.GrailsUnitTestCase
 import org.junit.Test
 
@@ -14,7 +15,7 @@ import javax.mail.Quota
 class MailServiceTests extends GrailsUnitTestCase {
 
 	MailService mailService
-	def grailsApplication
+	GrailsApplication grailsApplication
 
 	static GreenMail testSmtpService
 

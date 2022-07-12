@@ -17,7 +17,6 @@ import org.springframework.context.ApplicationListener
 @Transactional
 class PutawayCompletedEventService implements ApplicationListener<PutawayCompletedEvent> {
 
-    def grailsApplication
     def productAvailabilityService
 
     void onApplicationEvent(PutawayCompletedEvent event) {

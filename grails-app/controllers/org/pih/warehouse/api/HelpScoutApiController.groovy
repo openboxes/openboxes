@@ -10,16 +10,17 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.core.GrailsApplication
 
 class HelpScoutApiController {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def helpScoutService
 
     /**
      * Return localized configuration, as JSON, for a HelpScout Beacon object.
      */
-    def configuration = {
+    def configuration() {
         def json = [
             'color'                : grailsApplication.config.openboxes.helpscout.widget.color,
             'enableFabAnimation'   : false,

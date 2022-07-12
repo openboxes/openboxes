@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PartyType
@@ -21,12 +21,12 @@ class OrganizationApiController extends BaseDomainApiController {
     def organizationService
     def identifierService
 
-    def list = {
+    def list() {
         def organizations = organizationService.getOrganizations(params)
         render ([data:organizations] as JSON)
      }
 
-    def read = {
+    def read() {
         Organization organization = Organization.get(params.id)
         if (!organization) {
             throw new IllegalArgumentException("No Organization found for organization ID ${params.id}")
@@ -35,7 +35,7 @@ class OrganizationApiController extends BaseDomainApiController {
         render([data: organization] as JSON)
     }
 
-    def create = {
+    def create() {
         JSONObject jsonObject = request.JSON
 
         Organization organization = new Organization()

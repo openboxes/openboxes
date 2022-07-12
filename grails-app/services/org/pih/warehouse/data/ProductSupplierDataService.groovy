@@ -9,10 +9,9 @@
  **/
 package org.pih.warehouse.data
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.core.IdentifierService
 import groovy.sql.Sql
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
@@ -32,7 +31,7 @@ class ProductSupplierDataService {
     def uomService
     def identifierService
     def dataSource
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename

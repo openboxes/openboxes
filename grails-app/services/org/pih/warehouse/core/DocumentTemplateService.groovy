@@ -19,7 +19,7 @@ import fr.opensagres.xdocreport.template.TemplateEngineKind
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
 import grails.gorm.transactions.Transactional
 import groovy.text.Template
-import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.jxls.common.Context
 import org.jxls.util.JxlsHelper
 import org.pih.warehouse.order.Order

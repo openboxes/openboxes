@@ -11,7 +11,7 @@ package org.pih.warehouse.product
 
 class ProductsConfigurationController {
 
-    def index = {
+    def index() {
         render(template: "/common/react")
     }
 }

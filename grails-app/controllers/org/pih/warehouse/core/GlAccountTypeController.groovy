@@ -11,27 +11,27 @@ package org.pih.warehouse.core
 
 class GlAccountTypeController {
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [glAccountTypes: GlAccountType.list(params), glAccountTypesTotal: GlAccountType.count()]
     }
 
-    def create = {
+    def create() {
         def glAccountType = new GlAccountType()
         glAccountType.properties = params
         return [glAccountType: glAccountType]
     }
 
-    def edit = {
+    def edit() {
         def glAccountType = GlAccountType.get(params.id)
         return [glAccountType: glAccountType]
     }
 
-    def save = {
+    def save() {
         def glAccountType = new GlAccountType(params)
         if (glAccountType.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'glAccountType.label', default: 'GL Account Type'), glAccountType.id])}"
@@ -41,7 +41,7 @@ class GlAccountTypeController {
         }
     }
 
-    def update = {
+    def update() {
         def glAccountType = GlAccountType.get(params.id)
         if (glAccountType) {
             glAccountType.properties = params
@@ -57,7 +57,7 @@ class GlAccountTypeController {
         }
     }
 
-    def delete = {
+    def delete() {
         def glAccountType = GlAccountType.get(params.id)
         if (glAccountType) {
             try {

@@ -9,9 +9,11 @@
  **/
 package org.pih.warehouse.api
 
+import grails.core.GrailsApplication
+
 class HelpScoutService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
     def localizationService
     def messageSource
 

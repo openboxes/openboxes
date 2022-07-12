@@ -1,6 +1,6 @@
 package org.pih.warehouse.api
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
@@ -10,8 +10,7 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
 
-@Validateable
-class StockTransferItem {
+class StockTransferItem implements Validateable {
     String id
     String productAvailabilityId
     Product product

@@ -369,7 +369,7 @@ class InventoryItemController {
         render(template: "showPendingInboundStock", model: [product: product, itemsMap: itemsMap])
     }
 
-    def showPendingOutbound = {
+    def showPendingOutbound() {
         Product product = Product.get(params.id)
         Location location = Location.get(session?.warehouse?.id)
         def itemsMap = [:]
@@ -391,7 +391,7 @@ class InventoryItemController {
         render(template: "showPendingOutboundStock", model: [product: product, itemsMap: itemsMap])
     }
 
-    def showDemand = { StockCardCommand cmd ->
+    def showDemand() { StockCardCommand cmd ->
         use(TimeCategory) {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             // By default set last 12 months
@@ -486,7 +486,7 @@ class InventoryItemController {
     }
 
 
-    def showDocuments = {
+    def showDocuments() {
         def productInstance = Product.get(params.id)
         render(template: "showDocuments", model: [productInstance: productInstance])
     }
@@ -1054,7 +1054,7 @@ class InventoryItemController {
         redirect(action: "showStockCard", params: ['product.id': productInstance?.id])
     }
 
-    def recall = {
+    def recall() {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
             if (inventoryItem.lotNumber) {
@@ -1077,7 +1077,7 @@ class InventoryItemController {
         redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
     }
 
-    def revertRecall = {
+    def revertRecall() {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
             inventoryItem.lotStatus = null

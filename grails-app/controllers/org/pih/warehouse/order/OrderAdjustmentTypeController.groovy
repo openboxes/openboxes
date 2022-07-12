@@ -13,29 +13,29 @@ import org.pih.warehouse.core.Location
 
 class OrderAdjustmentTypeController {
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [orderAdjustmentTypes: OrderAdjustmentType.list(params), orderAdjustmentTypesTotal: OrderAdjustmentType.count()]
     }
 
-    def create = {
+    def create() {
         def orderAdjustmentType = new OrderAdjustmentType()
         orderAdjustmentType.properties = params
         def location = Location.get(session?.warehouse?.id)
         return [orderAdjustmentType: orderAdjustmentType, locationInstance: location]
     }
 
-    def edit = {
+    def edit() {
         def location = Location.get(session?.warehouse?.id)
         def orderAdjustmentType = OrderAdjustmentType.get(params.id)
         return [orderAdjustmentType: orderAdjustmentType, locationInstance: location]
     }
 
-    def save = {
+    def save() {
         def orderAdjustmentType = new OrderAdjustmentType(params)
         if (orderAdjustmentType.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'orderAdjustmentType.label', default: 'Order Adjustment Type'), orderAdjustmentType.id])}"
@@ -46,7 +46,7 @@ class OrderAdjustmentTypeController {
         }
     }
 
-    def update = {
+    def update() {
         def orderAdjustmentType = OrderAdjustmentType.get(params.id)
         if (orderAdjustmentType) {
             orderAdjustmentType.properties = params
@@ -63,7 +63,7 @@ class OrderAdjustmentTypeController {
         }
     }
 
-    def delete = {
+    def delete() {
         def orderAdjustmentType = OrderAdjustmentType.get(params.id)
         if (orderAdjustmentType) {
             try {

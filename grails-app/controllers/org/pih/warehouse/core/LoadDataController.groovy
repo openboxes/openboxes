@@ -11,7 +11,7 @@ package org.pih.warehouse.core
 
 class LoadDataController {
 
-    def index = {
+    def index() {
         render(template: "/common/react")
     }
 }

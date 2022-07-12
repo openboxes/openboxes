@@ -15,7 +15,7 @@ class UnitOfMeasureApiController extends BaseDomainApiController {
 
     def uomService
 
-    def currencies = {
+    def currencies() {
         def currencies = uomService.getCurrencies()
         render ([data:currencies] as JSON)
      }

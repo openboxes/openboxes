@@ -11,7 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
@@ -25,12 +25,12 @@ class InvoiceApiController {
     def identifierService
     def invoiceService
 
-    def list = {
+    def list() {
         List invoices = invoiceService.getInvoices(params)
         render([data: invoices.collect { it.toJson() }] as JSON)
     }
 
-    def read = {
+    def read() {
         Invoice invoice = Invoice.get(params.id)
         if (!invoice) {
             throw new IllegalArgumentException("No Invoice found for invoice ID ${params.id}")
@@ -39,7 +39,7 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-    def create = { Invoice invoice ->
+    def create(Invoice invoice) {
         JSONObject jsonObject = request.JSON
 
         Location currentLocation = Location.get(session.warehouse.id)
@@ -56,7 +56,7 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-    def update = {
+    def update() {
         JSONObject jsonObject = request.JSON
 
         Invoice existingInvoice = Invoice.get(params.id)
@@ -101,36 +101,36 @@ class InvoiceApiController {
         return invoice
     }
 
-    def getInvoiceItems = {
+    def getInvoiceItems() {
         List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(params.id, params.max, params.offset)
         render([data: invoiceItems, totalCount: invoiceItems.totalCount?:invoiceItems.size()] as JSON)
     }
 
-    def getInvoiceItemCandidates = {
+    def getInvoiceItemCandidates() {
         List<InvoiceItemCandidate> invoiceItemCandidates = invoiceService.getInvoiceItemCandidates(
             params.id, params.orderNumbers, params.shipmentNumbers
         )
         render([data: invoiceItemCandidates] as JSON)
     }
 
-    def getOrderNumbers = {
+    def getOrderNumbers() {
         List orderNumbers = invoiceService.getDistinctFieldFromInvoiceItemCandidates(params.id, "orderNumber")
 
         render([data: orderNumbers] as JSON)
     }
 
-    def getShipmentNumbers = {
+    def getShipmentNumbers() {
         List shipmentNumbers = invoiceService.getDistinctFieldFromInvoiceItemCandidates(params.id, "shipmentNumber")
 
         render([data: shipmentNumbers] as JSON)
     }
 
-    def removeItem = {
+    def removeItem() {
         invoiceService.removeInvoiceItem(params.id)
         render status: 204
     }
 
-    def updateItems = {
+    def updateItems() {
         JSONObject jsonObject = request.JSON
 
         Invoice invoice = Invoice.get(params.id)
@@ -139,7 +139,7 @@ class InvoiceApiController {
         render status: 204
     }
 
-    def submitInvoice = {
+    def submitInvoice() {
         Invoice invoice = Invoice.get(params.id)
         if (!invoice) {
             throw new IllegalArgumentException("No Invoice found for invoice ID ${params.id}")
@@ -148,7 +148,7 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-    def postInvoice = {
+    def postInvoice() {
         Invoice invoice = Invoice.get(params.id)
         if (!invoice) {
             throw new IllegalArgumentException("No Invoice found for invoice ID ${params.id}")
@@ -158,7 +158,7 @@ class InvoiceApiController {
     }
 
 
-    def getPrepaymentItems = {
+    def getPrepaymentItems() {
         Invoice invoice = Invoice.get(params.id)
         List<InvoiceItem> prepaymentItems = invoice.prepaymentItems
         render([data: prepaymentItems, totalCount: prepaymentItems.size()] as JSON)

@@ -18,11 +18,11 @@ class ProductsConfigurationApiController {
     def productService
     def userService
 
-    def getCategoriesCount = {
+    def getCategoriesCount() {
         render([data: Category.count()] as JSON)
     }
 
-    def downloadCategories = {
+    def downloadCategories() {
         def objects = Category.list()
         def data = dataService.transformObjects(objects, Category.CSV_PROPERTIES)
         String csv = dataService.generateCsv(data)
@@ -31,13 +31,13 @@ class ProductsConfigurationApiController {
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
-    def importCategories = {
+    def importCategories() {
         productService.importCategories(params.categoryOption)
 
         render status: 200
     }
 
-    def importCategoryCsv = { ImportDataCommand command ->
+    def importCategoryCsv(ImportDataCommand command) {
         try {
             def importFile = command.importFile
 
@@ -61,14 +61,14 @@ class ProductsConfigurationApiController {
         render status: 200
     }
 
-    def downloadCategoryTemplate = {
+    def downloadCategoryTemplate() {
         def csv = "Category Name,Parent Category Name\n"
 
         response.setHeader("Content-disposition", "attachment; filename=\"Category_template.csv\"")
         render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
     }
 
-    def importProducts = {
+    def importProducts() {
         if (!userService.isSuperuser(session?.user)) {
             throw new Exception("You are not authorized to perform this action")
         }
@@ -78,13 +78,13 @@ class ProductsConfigurationApiController {
         render status: 200
     }
 
-    def categoryOptions = {
+    def categoryOptions() {
         def categoryOptions = grailsApplication.config.openboxes.configurationWizard.categoryOptions
 
         render([data: categoryOptions] as JSON)
     }
 
-    def productOptions = {
+    def productOptions() {
         def productOptions = grailsApplication.config.openboxes.configurationWizard.productOptions
 
         render([data: productOptions] as JSON)

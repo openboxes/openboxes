@@ -9,13 +9,14 @@
 **/
 package org.pih.warehouse.auth
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 
 @Transactional
 class RecaptchaService {
 
     def apiClientService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def validate(String token) {
         String secretKey = grailsApplication.config.openboxes.signup.recaptcha.v2.secretKey

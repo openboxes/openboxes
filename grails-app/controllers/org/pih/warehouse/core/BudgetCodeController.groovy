@@ -11,28 +11,28 @@ package org.pih.warehouse.core
 
 class BudgetCodeController {
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [budgetCodes: BudgetCode.list(params), budgetCodesTotal: BudgetCode.count()]
     }
 
-    def create = {
+    def create() {
         def budgetCode = new BudgetCode()
         budgetCode.properties = params
         return [budgetCode: budgetCode]
     }
 
-    def edit = {
+    def edit() {
         def budgetCode = BudgetCode.get(params.id)
         def organization = budgetCode?.organization ? Organization.get(budgetCode.organization.id) : null
         return [budgetCode: budgetCode, organizationId: organization?.id]
     }
 
-    def save = {
+    def save() {
         def budgetCode = new BudgetCode(params)
         if (budgetCode.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), budgetCode.id])}"
@@ -42,7 +42,7 @@ class BudgetCodeController {
         }
     }
 
-    def update = {
+    def update() {
         def budgetCode = BudgetCode.get(params.id)
         if (budgetCode) {
             budgetCode.properties = params
@@ -59,7 +59,7 @@ class BudgetCodeController {
         }
     }
 
-    def delete = {
+    def delete() {
         def budgetCode = BudgetCode.get(params.id)
         if (budgetCode) {
             try {
