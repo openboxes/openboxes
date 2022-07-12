@@ -9,15 +9,15 @@
  **/
 package org.pih.warehouse.importer
 
-
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
-import org.grails.plugins.excelimport.ExcelImportUtils
+import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.data.ProductSupplierAttributeDataService
 
 class ProductSupplierAttributeImporter extends AbstractExcelImporter {
 
     ProductSupplierAttributeDataService productSupplierAttributeDataService
+    def excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -32,11 +32,11 @@ class ProductSupplierAttributeImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            productCode         : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            productSupplierCode : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            attributeCode       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            attributeValue      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            unitOfMeasure       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            productCode         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productSupplierCode : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            attributeCode       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            attributeValue      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            unitOfMeasure       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
 
@@ -45,12 +45,12 @@ class ProductSupplierAttributeImporter extends AbstractExcelImporter {
     }
 
     def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productSupplierAttributeDataService")
+        return Holders.getApplication.getMainContext.getBean("productSupplierAttributeDataService")
     }
 
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {

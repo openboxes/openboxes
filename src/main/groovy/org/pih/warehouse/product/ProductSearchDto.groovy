@@ -1,6 +1,6 @@
 package org.pih.warehouse.product
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 
 class ProductSearchDto {
 
@@ -29,7 +29,7 @@ class ProductSearchDto {
     Boolean exactMatch = Boolean.FALSE
 
     def getApplicationTagLib() {
-        return ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
     }
 
     def getHandlingIcons() {
