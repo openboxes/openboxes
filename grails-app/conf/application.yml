@@ -147,7 +147,7 @@ grails:
         encoding: UTF-8
     views:
         default:
-            codec: none
+            codec: 'html'
         enable:
             jsessionid: false
         gsp:
@@ -221,50 +221,26 @@ environments:
 openboxes:
     ajaxRequest:
         timeout: 10000
-    # Dashboard configuration to allow specific ordering of widgets (overrides enabled/disabled config)
+
+    breadcrumbsConfig:
+        # TODO COPY breadcrumbsConfig
+
     dashboard:
-        column1:
-            widgets: ["requisitionItemSummary", "requisitionSummary", "receiptSummary", "shipmentSummary", "indicatorSummary"]
-        column2:
-            widgets: ["binLocationSummary", "expiringSummary", "productSummary", "genericProductSummary",]
-        column3:
-            widgets: ["newsSummary", "activitySummary", "valueSummary", "tagSummary", "catalogsSummary"]
+        yearTypes:
+            fiscalYear:
+                start: "07/01" # format: MM/DD, For PIH and the Govt of Dominica fiscal year start July 1
+                end: "06/30" # format: MM/DD
+                labelYearPrefix: "FY "
+                yearFormat: "yy"
+            calendarYear:
+                start: "01/01"
+                end: "12/31"
+                labelYearPrefix: ""
+                yearFormat: "yyyy"
 
-        # Column 1
-        requisitionItemSummary:
-            enabled: true
-        requisitionSummary:
-            enabled: false
-        receiptSummary:
-            enabled: true
-        shipmentSummary:
-            enabled: true
-        indicatorSummary:
-            enabled: false
-
-        # Column 2
-        binLocationSummary:
-            enabled: true
-        productSummary:
-            enabled: true
-        genericProductSummary:
-            enabled: false
-        expiringSummary:
-            enabled: true
-
-        # Column 3
-        newsSummary:
-            enabled: true
-            newsItems: []
-            limit: 25
-        activitySummary:
-            enabled: true
-        valueSummary:
-            enabled: false
-        tagSummary:
-            enabled: true
-        catalogsSummary:
-            enabled: true
+    dashboardConfig:
+        dashboards:
+            # TODO COPY dashboardConfig
 
     # OpenBoxes identifier config
     identifier:
@@ -276,6 +252,7 @@ openboxes:
         order:
             format: "NNNLLL"
         organization:
+            format: "AAA"
             minSize: 2
             maxSize: 4
         product:
@@ -290,6 +267,34 @@ openboxes:
             format: "NNNLLL"
         sequenceNumber:
             format: "00000"
+        invoice:
+            format: "NNNLLL"
+        location:
+            format: "NNNLLL"
+        purchaseOrder:
+            # TODO: Fixme (generatorType as enum)
+            # generatorType: IdentifierGeneratorTypeCode.SEQUENCE
+            sequenceNumber:
+                format: "000000"
+            format: "PO-$\{destinationPartyCode}-$\{sequenceNumber}"
+            properties: ["destinationPartyCode": "destinationParty.code" ]
+        productCode:
+            # TODO: Fixme (generatorType as enum)
+            # generatorType: IdentifierGeneratorTypeCode.SEQUENCE
+            delimiter: "-"
+            format: "$\{productTypeCode}$\{delimiter}$\{sequenceNumber}"
+            properties:
+                productTypeCode: "code"
+
+    order:
+        orderStatusPropertyMap:
+            PLACED: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
+
+    purchaseOrder:
+        editableProperties:
+            status: "PLACED"
+            deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
+
 
     # OpenBoxes default line printer port
     linePrinterTerminal:
@@ -326,6 +331,13 @@ openboxes:
     # User signup
     signup:
         enabled: true
+        recaptcha:
+            enabled: false
+            v2:
+                siteKey: ""
+                secretKey: ""
+        additionalQuestions:
+            enabled: false
 
     # UserVoice widget
     uservoice:
@@ -338,6 +350,13 @@ openboxes:
         widget:
             enabled: false
             url: "//v2.zopim.com/?2T7RMi7ERqr3s8N20KQ3wOBRudcwosBA"
+
+    # HelpScout beacon
+    helpscout:
+        widget:
+            color: "#3AB4B1"
+            enabled: true
+            key: "44ee4f01-5334-4b93-ad25-03037903eb80"
 
     # JIRA Issue Collector
     jira:
@@ -373,6 +392,8 @@ openboxes:
         delay: 300
         minLength: 3
 
+    refreshAnalyticsDataOnStartup:
+        enabled: true
 
     jobs:
         # Send stock alerts
@@ -500,7 +521,7 @@ openboxes:
     inventorySnapshot:
         batchSize: 100
 
-    # Global megamenu configuration
+    # TODO: COPY NEW VERSION OF MEGAMENU
     megamenu:
         dashboard:
             enabled: true
@@ -536,6 +557,11 @@ openboxes:
             enabled: true
         stockRequest:
             enabled: true
+
+    # TODO: COPY supportLinks, configurationWizard and configurationWizard
+    supportLinks:
+    resettingInstance:
+    configurationWizard:
 
     # Allow users to customize logo image url as well as label
     logo:
