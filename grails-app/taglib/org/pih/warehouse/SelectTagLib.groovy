@@ -373,14 +373,14 @@ class SelectTagLib {
     }
 
     def selectPerson = { attrs, body ->
-        attrs.from = Person.list().sort { it.firstName }
+        attrs.from = Person.list().findAll { it.active }.sort { it.firstName }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 
     def selectRecipient = { attrs, body ->
-        attrs.from = Person.findAllByEmailIsNotNull().sort { it.firstName }
+        attrs.from = Person.findAllByEmailIsNotNull().findAll { it.active }.sort { it.firstName }
         attrs.optionKey = 'email'
         attrs.optionValue = { it.name }
         out << g.select(attrs)

@@ -260,7 +260,9 @@ class UserService {
 
     def findPersons(String[] terms, params) {
         def results = Person.createCriteria().list(params) {
-
+            if (params.status) {
+                eq("active", Boolean.valueOf(params.status))
+            }
             if (terms) {
                 terms.each { term ->
                     or {
@@ -268,9 +270,6 @@ class UserService {
                         ilike("lastName", "%" + term + "%")
                         ilike("email", "%" + term + "%")
                     }
-                }
-                if (params.status) {
-                    eq("active", Boolean.valueOf(params.status))
                 }
             }
             order("lastName", "desc")

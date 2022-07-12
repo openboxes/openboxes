@@ -102,9 +102,8 @@ export function fetchOrganizations() {
 }
 
 export function fetchUsers() {
-  const url = '/openboxes/api/generic/person';
-  const request = apiClient.get(url);
-
+  const url = '/openboxes/api/persons';
+  const request = apiClient.get(url, { params: { status: true } });
   return {
     type: FETCH_USERS,
     payload: request,
