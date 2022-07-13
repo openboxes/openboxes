@@ -33,7 +33,7 @@ class Person implements Comparable, Serializable {
 
     static constraints = {
         firstName(blank: false, maxSize: 255)
-        lastName(blank: false, maxSize: 255)
+        lastName(blank: true, maxSize: 255)
         phoneNumber(nullable: true, maxSize: 255)
         email(nullable: true, email: true, maxSize: 255)
     }
@@ -50,7 +50,7 @@ class Person implements Comparable, Serializable {
     }
 
     String getLastInitial() {
-        lastName?.substring(0, 1)
+        lastName ? lastName.substring(0, 1) : ""
     }
 
     String toString() {
