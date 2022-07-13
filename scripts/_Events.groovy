@@ -95,7 +95,7 @@ eventRunAppStart = {
     def proc = command.execute()
     proc.waitFor()
     println "${proc.in.text}"
-    if (proc.exitValue() == 1) {
+    if (proc.exitValue() != 0) {
         event("ReactBuildFailed", ["React build FAILED"])
     } else {
         println "React build finished"
