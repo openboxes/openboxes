@@ -1045,8 +1045,8 @@ class StockMovementService {
         }
 
         Picklist picklist = requisitionItem?.requisition?.picklist
-        log.info "Clear picklist"
         if (picklist) {
+            log.info "Clear picklist"
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
             }.toArray().each {
@@ -1056,12 +1056,14 @@ class StockMovementService {
                 it.delete()
             }
             picklist.save()
+
+            // Save requisition item before PA refresh
+            requisitionItem.save(flush: true)
+
+            productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
+        } else {
+            requisitionItem.save(flush: true)
         }
-
-        // Save requisition item before PA refresh
-        requisitionItem.save(flush: true)
-
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
     }
 
     void createMissingPicklistItems(StockMovement stockMovement) {
@@ -1083,6 +1085,10 @@ class StockMovementService {
     }
 
     void createMissingPicklistForStockMovementItem(StockMovementItem stockMovementItem) {
+        if (stockMovementItem?.requisitionItem?.requisition?.status < RequisitionStatus.PICKING) {
+            return
+        }
+
         if (stockMovementItem.statusCode == 'SUBSTITUTED') {
             for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
                 createMissingPicklistItems(subStockMovementItem)
@@ -1873,7 +1879,7 @@ class StockMovementService {
         return updatedStockMovement
     }
 
-    List reviseItems(StockMovement stockMovement) {
+    void reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
         def revisedItems = []
 
@@ -1887,7 +1893,9 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                if (requisitionItem.shipmentItems || requisitionItem.picklistItems) {
+                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                }
 
                 log.info "Item revised " + requisitionItem.id
 
@@ -1912,15 +1920,6 @@ class StockMovementService {
 
         createMissingPicklistItems(stockMovement)
         createMissingShipmentItems(stockMovement)
-
-        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-            if (stockMovementItem.statusCode == 'CHANGED') {
-                def editPageItem = getEditPageItem(stockMovementItem?.id)
-                revisedItems.add(editPageItem)
-            }
-        }
-
-        return revisedItems
     }
 
     void substituteItem(StockMovementItem stockMovementItem) {
@@ -2049,6 +2048,9 @@ class StockMovementService {
     }
 
     void removeShipmentAndPicklistItemsForModifiedRequisitionItem(RequisitionItem requisitionItem) {
+        if (requisitionItem?.requisition?.status < RequisitionStatus.PICKING) {
+            return
+        }
 
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
 
