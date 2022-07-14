@@ -162,10 +162,7 @@ class TmsIntegrationService {
     }
 
     def handleMessages(String directory, List<String> subdirectories) {
-
         subdirectories.each { subdirectory ->
-
-            Map message
             try {
                 def messages = fileTransferService.listMessages(directory, [subdirectory])
                 messages.eachWithIndex { msg, index ->
@@ -173,36 +170,38 @@ class TmsIntegrationService {
                 }
                 messages = messages.findAll { it.isRegularFile && it.name.endsWith(".xml")}
                 if (messages) {
-                    messages.each {
-                        // Assign message for exception handling
-                        message = it
+                    messages.each { Map message ->
                         if (message) {
-                            String xmlContents = fileTransferService.retrieveMessage(message.path)
-                            log.info "Handling message ${message}:\n${xmlContents}"
-                            handleMessage(xmlContents)
+                            try {
+                                String xmlContents = fileTransferService.retrieveMessage(message.path)
+                                log.info "Handling message ${message}:\n${xmlContents}"
+                                handleMessage(xmlContents)
 
-                            // Archive message on success so that other messages can be processed
-                            Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
-                            if (archiveMessageOnSuccess) {
-                                log.info "Archiving message ${message}"
-                                archiveMessage(message.path)
+                                // Archive message on success so that other messages can be processed
+                                Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
+                                if (archiveMessageOnSuccess) {
+                                    log.info "Archiving message ${message}"
+                                    archiveMessage(message.path)
+                                }
+                            } catch (Exception e) {
+                                log.error("Message ${message?.name} not processed due to error: " + e.message, e)
+                                if (message) {
+                                    failMessage(message?.path, e)
+
+                                    // Archive message on failure so that other messages can be processed
+                                    // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
+                                    Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
+                                    if (archiveOnFailure) {
+                                        archiveMessage(message.path)
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
             catch (Exception e) {
-                log.error("Message ${message?.name} not processed due to error: " + e.message, e)
-                if (message) {
-                    failMessage(message?.path, e)
-
-                    // Archive message on failure so that other messages can be processed
-                    // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
-                    Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
-                    if (archiveOnFailure) {
-                        archiveMessage(message.path)
-                    }
-                }
+                log.error("An error occurred while processing messages in message queue ${subdirectory}: " + e.message, e)
             }
         }
     }
@@ -489,7 +488,7 @@ class TmsIntegrationService {
             def filename = FilenameUtils.getBaseName(filePath)
             def path = FilenameUtils.getFullPathNoEndSeparator(filePath)
             log.info "Storing error message to ${filename} in directory ${path}"
-            fileTransferService.storeMessage("${filename}-stacktrace.log", stacktrace, path)
+            fileTransferService.storeMessage("${filename}-stacktrace.txt", stacktrace, path)
         } catch (Exception e) {
             log.error("Unable to write error file to ftp server: " + e.message, e)
         }

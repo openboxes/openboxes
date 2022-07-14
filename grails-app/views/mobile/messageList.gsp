@@ -79,7 +79,7 @@
                 </thead>
                 <tbody>
                 <g:each var="message" in="${messages}">
-                    <tr class="${message.name.endsWith('log')?'table-danger':''}">
+                    <tr class="${message.name.endsWith('log') || message.name.endsWith('txt') ? 'table-danger':''}">
                         <td class="col col-md-8">
                             ${message.name}
                             <div class="text-sm-left text-muted">${message.path}</div>
