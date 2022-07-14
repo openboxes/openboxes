@@ -58,16 +58,18 @@ class MobileController {
         def productCount = ProductSummary.countByLocation(location)
         def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
-        StockMovement inboundCriteria = new StockMovement(destination: location, stockMovementType: StockMovementType.INBOUND)
+        StockMovement inboundCriteria = new StockMovement(destination: location,
+                receiptStatusCodes: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED],
+                stockMovementType: StockMovementType.INBOUND)
         Map inboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
-        def inboundOrders = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
-        def inboundCount = inboundOrders.size()?:0
-        def inboundPending = inboundOrders.findAll { !it.isReceived }
-        if (!inboundPending?.empty && inboundPending.size() > 10) {
-            inboundPending = inboundPending.subList(0, 10)
-        }
+        def inboundPending = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
+        def inboundCount = inboundPending?.size()?:0
 
-        StockMovement outboundCriteria = new StockMovement(origin: location, stockMovementType: StockMovementType.OUTBOUND)
+
+        StockMovement outboundCriteria = new StockMovement(origin: location,
+                stockMovementType: StockMovementType.OUTBOUND,
+                receiptStatusCodes: [ShipmentStatusCode.PENDING]
+        )
         Map outboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
         def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, outboundParams)
 
@@ -75,7 +77,15 @@ class MobileController {
         def outboundPending = outboundOrders.findAll { it.stockMovementStatusCode < StockMovementStatusCode.DISPATCHED }
         def readyToBePicked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }
         def readyToBePacked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKED }
-        def inTransit = outboundOrders.findAll{ it.isShipped && !it.isReceived }
+
+        StockMovement inTransitCriteria = new StockMovement(
+                origin: location,
+                stockMovementType: StockMovementType.OUTBOUND,
+                requisitionStatusCodes: [RequisitionStatus.ISSUED],
+                receiptStatusCodes: [ShipmentStatusCode.SHIPPED]
+        )
+        Map inTransitParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
+        def inTransit = stockMovementService.getStockMovements(inTransitCriteria, inTransitParams)
 
         if (!outboundPending?.empty && outboundPending.size() > 10) {
             outboundPending = outboundPending.subList(0, 10)
@@ -89,14 +99,16 @@ class MobileController {
         [
                 indicators: [
                         [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                        [name: "Inbound Orders", class: "fa fa-shopping-cart", count: inboundCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id', location.id])],
-                        [name: "Outbound Orders", class: "fa fa-truck", count: outboundCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id', location.id])],
-                        [name: "Ready to be picked", class: "fa fa-cart-plus", count: readyToBePicked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
-                        [name: "Ready to be packed", class: "fa fa-box-open", count: readyToBePacked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])]
+                        [name: "Inbound &rsaquo; Pending", class: "fa fa-shopping-cart", count: inboundCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id': location.id, status: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]])],
+                        [name: "Outbound &rsaquo; Pending", class: "fa fa-truck", count: outboundCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id': location.id, receiptStatusCodes: ShipmentStatusCode.PENDING])],
+                        [name: "Outbound &rsaquo; Ready to be picked", class: "fa fa-cart-arrow-down", count: readyToBePicked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
+                        [name: "Outbound &rsaquo; Ready to be packed", class: "fa fa-box-open", count: readyToBePacked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
+                        [name: "Outbound &rsaquo; In Transit", class: "fa fa-map", count: inTransit?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [receiptStatusCodes: ShipmentStatusCode.SHIPPED, status: RequisitionStatus.ISSUED])]
                 ],
                 inboundPending: inboundPending,
                 outboundPending: outboundPending,
                 readyToBePicked: readyToBePicked,
+                readyToBePacked: readyToBePacked,
                 inTransit: inTransit,
                 inventorySummary: inventorySummary,
         ]
@@ -160,10 +172,13 @@ class MobileController {
 
         StockMovement stockMovement = new StockMovement(origin: origin, destination: destination, stockMovementType: StockMovementType.INBOUND)
         if (params.status) {
-            stockMovement.receiptStatusCodes = [params.status as ShipmentStatusCode]
+            stockMovement.receiptStatusCodes = params.list("status").collect { it as ShipmentStatusCode }
         }
         if (params.identifier) {
            stockMovement.identifier = "%" + params.identifier + "%"
+        }
+        if (params.trackingNumber) {
+           stockMovement.trackingNumber = "%" + params.trackingNumber + "%"
         }
         if (params.requestedDeliveryDateFilter) {
             params.requestedDeliveryDates = DateUtil.parseDateRange(params.requestedDeliveryDateFilter, "dd/MMM/yyyy", " - ")
@@ -180,14 +195,15 @@ class MobileController {
         log.info "outboundList params ${params}"
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
 
-        RequisitionStatus requisitionStatus = params.status ? params.status as RequisitionStatus : null
+        List<ShipmentStatusCode> receiptStatusCodes = params.receiptStatusCodes ? params.list("receiptStatusCodes").collect { it as ShipmentStatusCode } : null
+
         StockMovement stockMovement = new StockMovement(
-                origin: origin, stockMovementType: StockMovementType.OUTBOUND)
+                origin: origin, stockMovementType: StockMovementType.OUTBOUND, receiptStatusCodes: receiptStatusCodes)
 
         params.max = params.max?:10
         params.offset = params.offset?:0
         params.sort = params?.sort?:"expectedDeliveryDate"
-        params.order = params?.sort?:"asc"
+        params.order = params?.order?:"asc"
 
         if (params.identifier) {
            stockMovement.identifier = "%" + params.identifier + "%"
@@ -198,8 +214,8 @@ class MobileController {
         }
 
         if (params.status) {
-            RequisitionStatus requisitionStatusCode = params.status as RequisitionStatus
-            stockMovement.stockMovementStatusCode = RequisitionStatus.toStockMovementStatus(requisitionStatusCode)
+            def requisitionStatusCodes = params.list("status").collect { it as RequisitionStatus }
+            stockMovement.requisitionStatusCodes = requisitionStatusCodes
         }
 
         if (params.destinationId) {
@@ -312,11 +328,9 @@ class MobileController {
 
         if (params.redirectUrl) {
             redirect(url: params.redirectUrl)
+            return
         }
-        else {
-            redirect (action: (params.type == "outbound" ? 'outboundList' : 'inboundList'))
-        }
-
+        redirect (action: (params.type == "outbound" ? 'outboundList' : 'inboundList'))
     }
 
     def inboundDetails = {
