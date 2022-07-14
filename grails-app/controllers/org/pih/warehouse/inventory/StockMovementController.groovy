@@ -467,9 +467,8 @@ class StockMovementController {
                 shipment.removeEvent(shipment?.loadingScheduled)
             }
 
-            if (params.trackingNumber) {
-                stockMovementService.createOrUpdateTrackingNumber(shipment, params.trackingNumber)
-            }
+            // Add or remove tracking number
+            stockMovementService.createOrUpdateTrackingNumber(shipment, params.trackingNumber)
 
             shipment.save()
         }
