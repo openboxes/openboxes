@@ -10,6 +10,9 @@
 
     <div class="row g-0 mb-2">
         <div class="col col-md-12">
+
+            <span class="h3">Dashboard</span>
+
             <div class="float-end">
                 <button type="button" class="btn btn-outline-primary"
                     data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-dolly"></i> Import Inbound</button>
@@ -37,7 +40,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title"> Upcoming deliveries to ${session.warehouse.name} (${inboundPending?.size()?:0})</h5>
+                    <h5 class="card-title">Inbound &rsaquo; Upcoming deliveries to ${session.warehouse.name} (${inboundPending?.size()?:0})</h5>
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
@@ -51,28 +54,28 @@
                         </thead>
                         <tbody>
                             <g:each var="inboundOrder" in="${inboundPending}">
-                            <tr>
-                                <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">${inboundOrder.identifier}</g:link></td>
-                                <td>${inboundOrder.origin}</td>
-                                <td>
-                                    <g:if test="${inboundOrder?.categories}">
-                                        ${inboundOrder?.categories[0]?.name}
-                                    </g:if>
-                                    <g:else>
-                                        Not Available
-                                    </g:else>
-                                </td>
-                                <td>
-                                    <g:if test="${inboundOrder?.expectedDeliveryDate}">
-                                        ${g.formatDate(date: inboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
-                                    </g:if>
-                                    <g:else>
-                                        <i>${g.formatDate(date: inboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
-                                    </g:else>
-                                </td>
-                                <td>${inboundOrder.currentStatus}</td>
-                                <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">Details</g:link></td>
-                            </tr>
+                                <tr>
+                                    <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">${inboundOrder.identifier}</g:link></td>
+                                    <td>${inboundOrder.origin}</td>
+                                    <td>
+                                        <g:if test="${inboundOrder?.categories}">
+                                            ${inboundOrder?.categories[0]?.name}
+                                        </g:if>
+                                        <g:else>
+                                            Not Available
+                                        </g:else>
+                                    </td>
+                                    <td>
+                                        <g:if test="${inboundOrder?.expectedDeliveryDate}">
+                                            ${g.formatDate(date: inboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                                        </g:if>
+                                        <g:else>
+                                            <i>${g.formatDate(date: inboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
+                                        </g:else>
+                                    </td>
+                                    <td>${inboundOrder.currentStatus}</td>
+                                    <td><g:link controller="mobile" action="inboundDetails" id="${inboundOrder?.id}" class="card-link">Details</g:link></td>
+                                </tr>
                             </g:each>
                         </tbody>
                     </table>
@@ -89,43 +92,8 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Upcoming deliveries to venues (${outboundPending?.size()?:0})</h5>
-                    <table class="table table-borderless table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th class="col-2">Order Number</th>
-                                <th class="col-3">Destination</th>
-                                <th class="col-3">Delivery for FA</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-1">Status</th>
-                                <th class="col-1">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <g:each var="outboundOrder" in="${outboundPending}">
-                                <tr>
-                                    <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">${outboundOrder.identifier}</g:link></td>
-                                    <td>${outboundOrder.destination}</td>
-                                    <td>${outboundOrder?.categories[0]?.name}</td>
-                                    <td>
-                                        <g:if test="${outboundOrder?.expectedDeliveryDate}">
-                                            ${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
-                                        </g:if>
-                                        <g:else>
-                                            <i>${g.formatDate(date: outboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
-                                        </g:else>
-                                    </td>
-                                    <td>${outboundOrder.status}</td>
-                                    <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">Details</g:link></td>
-                                </tr>
-                            </g:each>
-                        </tbody>
-                    </table>
-                    <g:unless test="${outboundPending}">
-                        <div class="alert alert-primary text-muted text-center">
-                            There are no upcoming deliveries to venues
-                        </div>
-                    </g:unless>
+                    <h5 class="card-title">Outbound &rsaquo; Upcoming deliveries to venues (${outboundPending?.size()?:0})</h5>
+                    <g:render template="outboundTable" model="[stockMovements: outboundPending]"/>
                 </div>
             </div>
         </div>
@@ -134,43 +102,8 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Orders to be picked (${readyToBePicked?.size()?:0})</h5>
-                    <table class="table table-borderless table-striped">
-                        <thead>
-                            <tr>
-                                <th class="col-2">Order Number</th>
-                                <th class="col-3">Destination</th>
-                                <th class="col-3">Delivery for FA</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-1">Status</th>
-                                <th class="col-1">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <g:each var="outboundOrder" in="${readyToBePicked}">
-                                <tr>
-                                    <td>${outboundOrder.identifier}</td>
-                                    <td>${outboundOrder.origin}</td>
-                                    <td>${outboundOrder?.categories[0]?.name}</td>
-                                    <td>
-                                        <g:if test="${outboundOrder?.expectedDeliveryDate}">
-                                            ${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
-                                        </g:if>
-                                        <g:else>
-                                            <i>${g.formatDate(date: outboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
-                                        </g:else>
-                                    </td>
-                                    <td>${outboundOrder.status}</td>
-                                    <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">Details</g:link></td>
-                                </tr>
-                            </g:each>
-                        </tbody>
-                    </table>
-                    <g:unless test="${readyToBePicked}">
-                        <div class="alert alert-primary text-muted text-center">
-                            There are no orders ready to be picked
-                        </div>
-                    </g:unless>
+                    <h5 class="card-title">Outbound &rsaquo; Orders to be picked (${readyToBePicked?.size()?:0})</h5>
+                    <g:render template="outboundTable" model="[stockMovements: readyToBePicked]"/>
                 </div>
             </div>
         </div>
@@ -179,48 +112,18 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Orders in transit (${inTransit?.size()?:0})</h5>
-                    <table class="table table-borderless table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th class="col-2">Order Number</th>
-                                <th class="col-3">Destination</th>
-                                <th class="col-3">Delivery for FA</th>
-                                <th class="col-2">Delivery Date</th>
-                                <th class="col-1">Status</th>
-                                <th class="col-1">Tracking</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <g:each var="outboundOrder" in="${inTransit}">
-                                <tr>
-                                    <td><g:link controller="mobile" action="outboundDetails" id="${outboundOrder?.id}" class="card-link">${outboundOrder.identifier}</g:link></td>
-                                    <td>${outboundOrder.destination}</td>
-                                    <td>${outboundOrder?.categories[0]?.name}</td>
-                                    <td>
-                                        <g:if test="${outboundOrder?.expectedDeliveryDate}">
-                                            ${g.formatDate(date: outboundOrder.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
-                                        </g:if>
-                                        <g:else>
-                                            <i>${g.formatDate(date: outboundOrder.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
-                                        </g:else>
-                                    </td>
-                                    <td>${outboundOrder.currentStatus}</td>
-                                    <td>
-                                        <g:if test="${stockMovement?.trackingNumber}">
-                                            <g:link url="${stockMovement.trackingUri}">${stockMovement?.trackingNumber}</g:link>
-                                            <g:displayBarcode showData="${false}" data="${stockMovement.trackingUri}" format="QR_CODE"/>
-                                        </g:if>
-                                    </td>
-                                </tr>
-                            </g:each>
-                        </tbody>
-                    </table>
-                    <g:unless test="${inTransit}">
-                        <div class="alert alert-primary text-muted text-center">
-                            There are no orders in transit
-                        </div>
-                    </g:unless>
+                    <h5 class="card-title">Outbound &rsaquo; Orders to be packed (${readyToBePacked?.size()?:0})</h5>
+                    <g:render template="outboundTable" model="[stockMovements: readyToBePacked]"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Outbound &rsaquo; Orders in transit (${inTransit?.size()?:0})</h5>
+                    <g:render template="outboundTable" model="[stockMovements: inTransit]"/>
                 </div>
             </div>
         </div>
@@ -230,7 +133,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Inventory summary (${inventorySummary?.size()?:0})</h5>
+                    <h5 class="card-title">Inventory Summary (${inventorySummary?.size()?:0})</h5>
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
