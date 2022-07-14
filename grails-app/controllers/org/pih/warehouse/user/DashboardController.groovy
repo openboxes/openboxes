@@ -200,7 +200,7 @@ class DashboardController {
             }
 
             // Send customers to mobile dashboard
-            if (user && userService.isUserInRole(user, RoleType.ROLE_CUSTOMER)) {
+            if (user && userService.hasRoleCustomerOnly(user)) {
                 redirect(controller: 'mobile', action: 'index')
                 return
             }

@@ -150,6 +150,7 @@ enum RoleType {
 
     static listPrimaryRoleTypes() {
         [
+                ROLE_CUSTOMER,
                 ROLE_BROWSER,
                 ROLE_ASSISTANT,
                 ROLE_MANAGER,

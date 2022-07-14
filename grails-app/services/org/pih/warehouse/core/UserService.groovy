@@ -185,6 +185,24 @@ class UserService {
         return false
     }
 
+    Boolean hasRoleCustomer(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_CUSTOMER]
+            return getEffectiveRoles(user).any { Role role -> roleTypes.contains(role.roleType) }
+        }
+        return false
+    }
+
+    Boolean hasRoleCustomerOnly(User u) {
+        if (u) {
+            def user = User.get(u.id)
+            def roleTypes = [RoleType.ROLE_CUSTOMER]
+            return getEffectiveRoles(user).every { Role role -> roleTypes.contains(role.roleType) }
+        }
+        return false
+    }
+
     Boolean canEditUserRoles(User currentUser, User otherUser) {
         def location = AuthService.currentLocation.get()
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))

@@ -1,3 +1,7 @@
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
+
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -11,11 +15,12 @@ class RoleFilters {
     def userService
     def dependsOn = [SecurityFilters]
     def static changeActions = ['delete', 'create', 'add', 'process', 'save',
-                                'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
+                                'update', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
     def static changeControllers = ['createProductFromTemplate']
 
     def static managerActions = [
-            'stockMovementItemApi': ['eraseItem']
+            'stockMovementItemApi': ['eraseItem'],
+            'batch': ['importData']
     ]
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin']
@@ -46,6 +51,14 @@ class RoleFilters {
             'invoice': ['*']
     ]
 
+    def static customerActions = [
+            'mobile': ['*'],
+            'product': ['barcode', 'renderImage'],
+            'picklist': ['print'],
+            'stockMovement': ['printPackingList'],
+    ]
+
+
     def filters = {
         readonlyCheck(controller: '*', action: '*') {
             before = {
@@ -56,15 +69,28 @@ class RoleFilters {
                     return true
                 }
 
+
+                if (userService.hasRoleCustomerOnly(session.user)) {
+                    if (allowCustomerAccess(controllerName, actionName)) {
+                        return true
+                    }
+                    else {
+                        flash.message = "User ${session.user?.username} does not have access to ${controllerName}/${actionName} for location ${session.warehouse?.name}"
+                        redirect(controller: "mobile", action: "index")
+                        return true
+                    }
+                }
+
                 // Authorized users
                 def missBrowser = !userService.canUserBrowse(session.user)
                 def missManager = needManager(controllerName, actionName) && !userService.isUserManager(session.user)
                 def missAdmin = needAdmin(controllerName, actionName) && !userService.isUserAdmin(session.user)
                 def missSuperuser = needSuperuser(controllerName, actionName) && !userService.isSuperuser(session.user)
-                def invoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
+                def missInvoice = needInvoice(controllerName, actionName) && !userService.hasRoleInvoice(session.user)
 
-                if (missBrowser || missManager || missAdmin || missSuperuser || invoice) {
-                    log.info("User ${session?.user?.username} does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
+                log.info "browser: ${missBrowser}, admin: ${missAdmin}, manager: ${missManager}, superuser: ${missSuperuser}"
+                if (missBrowser || missManager || missAdmin || missSuperuser || missInvoice) {
+                    log.info("User ${session?.user?.username} with roles does not have access to ${controllerName}/${actionName} in location ${session?.warehouse?.name}")
                     redirect(controller: "errors", action: "handleForbidden")
                     return false
                 }
@@ -93,6 +119,10 @@ class RoleFilters {
 
     static Boolean needInvoice(controllerName, actionName) {
         invoiceActions[controllerName]?.contains("*") || invoiceActions[controllerName]?.contains(actionName)
+    }
+
+    static Boolean allowCustomerAccess(controllerName, actionName) {
+        customerActions[controllerName]?.contains("*") || customerActions[controllerName]?.contains(actionName)
     }
 
 }
