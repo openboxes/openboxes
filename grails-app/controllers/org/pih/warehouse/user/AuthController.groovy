@@ -115,7 +115,7 @@ class AuthController {
                     return
                 }
 
-                if (userService.isUserInRole(userInstance, RoleType.ROLE_CUSTOMER)) {
+                if (userService.hasRoleCustomerOnly(userInstance)) {
                     redirect(controller: 'mobile', action: 'index')
                     return
                 }

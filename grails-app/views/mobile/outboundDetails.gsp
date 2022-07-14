@@ -15,6 +15,9 @@
     </ul>
 </g:if>
 
+<g:isSuperuser>
+    <g:set var="isSuperuser" value="${true}"/>
+</g:isSuperuser>
 
 <div class="card">
     <div class="card-header">
@@ -374,9 +377,14 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="card-title text-muted h5">
-                                                    <g:link controller="shipment" action="editEvent"
-                                                            id="${event?.id}"
-                                                            params="[shipmentId: stockMovement?.shipment?.id]">${event?.name ?: 'Unspecified'}</g:link>
+                                                    <g:if test="${isSuperuser}">
+                                                        <g:link controller="shipment" action="editEvent"
+                                                                id="${event?.id}"
+                                                                params="[shipmentId: stockMovement?.shipment?.id]">${event?.name ?: 'Unspecified'}</g:link>
+                                                    </g:if>
+                                                    <g:else>
+                                                        ${event?.name ?: 'Unspecified'}
+                                                    </g:else>
                                                 </div>
                                                 <div class="text-muted">${formatDate(date: event?.date, format: "MMM dd, yyyy HH:mm:ss z")}</div>
                                             </div>
