@@ -488,7 +488,7 @@ class TmsIntegrationService {
             def filename = FilenameUtils.getBaseName(filePath)
             def path = FilenameUtils.getFullPathNoEndSeparator(filePath)
             log.info "Storing error message to ${filename} in directory ${path}"
-            fileTransferService.storeMessage("${filename}-stacktrace.log", stacktrace, path)
+            fileTransferService.storeMessage("${filename}-stacktrace.txt", stacktrace, path)
         } catch (Exception e) {
             log.error("Unable to write error file to ftp server: " + e.message, e)
         }
