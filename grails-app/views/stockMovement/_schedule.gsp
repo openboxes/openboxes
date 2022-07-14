@@ -10,6 +10,15 @@
 			<table>
 				<tbody>
 				<tr class="prop">
+					<td valign="top" class="name"><label><g:message
+							code="stockMovement.trackingNumber.label" /></label>
+					</td>
+					<td valign="top"
+						class="value ${hasErrors(bean: stockMovement, field: 'trackingNumber', 'errors')}">
+						<g:textField name="trackingNumber" value="${stockMovement?.trackingNumber}" class="text large"/>
+					</td>
+				</tr>
+				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message
 							code="requisition.requestedDeliveryDate.label" /></label>
 					</td>
