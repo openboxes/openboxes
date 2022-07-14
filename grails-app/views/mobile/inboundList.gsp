@@ -24,8 +24,12 @@
 
 <div class="row g-0 mb-2">
     <div class="col col-md-12">
-        <button type="button" class="btn btn-outline-primary float-end"
-            data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-file-import"></i> Import Orders</button>
+
+        <span class="h3">Inbound <small>(Showing ${stockMovements?.size()?:0} of ${stockMovements.totalCount})</small></span>
+        <div class="btn-group float-end">
+            <button type="button" class="btn btn-outline-primary float-end"
+                data-bs-toggle="modal" data-bs-target="#inboundModal"><i class="fa fa-file-import"></i> Import Order(s)</button>
+        </div>
     </div>
 </div>
 <div class="row g-0">
@@ -37,15 +41,15 @@
                     <tr>
                         <th class="col-2"><g:message code="stockMovement.status.label" default="Status"/></th>
                         <th class="col-2"><g:message code="requisition.orderNumber.label"/></th>
-                        <th class="col-4"><g:message code="stockMovement.origin.label"/></th>
+                        <th class="col-3"><g:message code="stockMovement.origin.label"/></th>
                         <g:sortableColumn property="requestedDeliveryDate" title="${warehouse.message(code: 'stockMovement.requestedDeliveryDate.label', default: 'Requested')}" defaultOrder="desc" params="${pageParams}"/>
                         <g:sortableColumn property="expectedDeliveryDate" title="${warehouse.message(code: 'stockMovement.expectedDeliveryDate.label', default: 'Expected')}" defaultOrder="desc" params="${pageParams}"/>
-                        <th><g:message code="stockMovement.trackingNumber.label" /></th>
+                        <th class="col-2"><g:message code="stockMovement.trackingNumber.label" /></th>
                         <th></th>
                     </tr>
                     <tr>
                         <th>
-                            <g:select name="status" class="form-select"
+                            <g:select name="status" class="form-control"
                                       from="${org.pih.warehouse.shipping.ShipmentStatusCode.list()}"
                                       optionKey="name"
                                       optionValue="${format.metadata(obj:it)}"
@@ -67,6 +71,9 @@
                         <th>
                             <g:textField name="expectedDeliveryDateFilter" class="date-filter form-control" size="10"
                                          value="${params.expectedDeliveryDateFilter}"/>
+                        </th>
+                        <th>
+                            <g:textField name="trackingNumber" value="${params.trackingNumber}" class="form-control" size="8"/>
                         </th>
                         <th class="col-1 text-center">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>

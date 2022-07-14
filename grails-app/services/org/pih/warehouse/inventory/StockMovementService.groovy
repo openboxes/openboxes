@@ -479,6 +479,19 @@ class StockMovementService {
                 le("expectedDeliveryDate", params.expectedDeliveryDateTo)
             }
 
+            log.info "tracking number " + criteria.trackingNumber
+            if (criteria.trackingNumber) {
+                ReferenceNumberType trackingNumberType = ReferenceNumberType.findById(Constants.TRACKING_NUMBER_TYPE_ID)
+                if (trackingNumberType) {
+                    referenceNumbers {
+                        and {
+                            eq("referenceNumberType", trackingNumberType)
+                            ilike("identifier", criteria.trackingNumber)
+                        }
+                    }
+                }
+            }
+
             // Mobile Controller - Inbound List
             if (params.requestedDeliveryDates && params.list("requestedDeliveryDates").size() == 2) {
                 requisition {

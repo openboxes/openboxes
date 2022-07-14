@@ -16,13 +16,28 @@
 
 <div class="row g-0 mb-2">
     <div class="col col-md-12 ">
+        <g:set var="rangeStart" value="${Integer.valueOf(params.offset)+1}"/>
+        <g:set var="rangeEnd" value="${Integer.valueOf(params.offset?:0) + Integer.valueOf(params.max?:0)}"/>
+        <g:set var="rangeEnd" value="${rangeEnd > stockMovements?.totalCount ? stockMovements?.totalCount : rangeEnd}"/>
+        <span class="h3">Outbound </span><span class="text-small text-muted">Showing ${rangeStart} - ${rangeEnd} of ${stockMovements?.totalCount} results</span>
         <div class="btn-group float-end">
-            <button type="button" class="btn btn-outline-primary "
-                    data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Delivery Orders</button>
+            <button type="button" class="btn btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#outboundModal"><i class="fa fa-file-import"></i> Import Delivery Order(s)</button>
         </div>
+        <g:link controller="mobile" action="outboundList">Clear Search</g:link>
     </div>
 </div>
-
+<div class="row">
+    <div class="col-12">
+        <g:each in="['receiptStatusCodes', 'status', 'identifier', 'trackingNumber']" >
+            <g:if test="${params[it]}">
+                <div class="badge bg-secondary">
+                    ${it}=${params.list(it).join(",")}
+                </div>
+            </g:if>
+        </g:each>
+    </div>
+</div>
 <div class="row g-0">
     <div class="col">
         <g:set var="pageParams" value="${pageScope.variables['params']}"/>
@@ -63,7 +78,7 @@
                         <g:selectEventType name="eventType" value="${params.eventType}" class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]" />
                     </th>
                     <th>
-
+                        <g:select name="isUploaded" disabled="${true}" from="${[]}" class="form-control" noSelection="['':warehouse.message(code:'default.all.label')]"/>
                     </th>
                     <th class="col-1 text-center">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filter</button>
@@ -135,9 +150,9 @@
                 </tbody>
             </table>
         </g:form>
-        <ul class="pagination">
+        <div class="pagination">
             <g:pagination total="${stockMovements.totalCount}" params="${pageParams}"/>
-        </ul>
+        </div>
     </div>
 </div>
 
