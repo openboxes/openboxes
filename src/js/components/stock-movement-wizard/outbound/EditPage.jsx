@@ -246,8 +246,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
         }) => {
-          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
-            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
           return {
             disabled: fieldValue === null || fieldValue === undefined || subfield || isSubstituted,
             options: reasonCodes,
