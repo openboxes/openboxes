@@ -134,12 +134,20 @@
                 </g:if>
             </div>
         </g:if>
-        <g:elseif test="${isSameOrigin && stockMovement?.hasBeenShipped() && !(stockMovement?.hasBeenReceived() || stockMovement.hasBeenPartiallyReceived())}">
+        <g:elseif test="${isSameOrigin && stockMovement?.isShipped}">
             <div class="button-group">
-                <g:link controller="stockMovement" action="receive" id="${stockMovement?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'lightning_go.png')}" />&nbsp;
-                    <warehouse:message code="default.button.autoReceive.label" default="Auto Receive" />
-                </g:link>
+                <g:if test="${!(stockMovement?.hasBeenReceived() || stockMovement.hasBeenPartiallyReceived())}">
+                    <g:link controller="stockMovement" action="receive" id="${stockMovement?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'lightning_go.png')}" />&nbsp;
+                        <warehouse:message code="default.button.autoReceive.label" default="Auto Receive" />
+                    </g:link>
+                </g:if>
+                <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                    </g:link>
+                </g:if>
             </div>
         </g:elseif>
     </div>
@@ -159,7 +167,7 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.status.label"/>
+                                <g:message code="stockMovement.orderStatus.label" default="Order Status"/>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.shipment?.status?.code > org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
@@ -170,17 +178,18 @@
                                 </g:else>
                             </td>
                         </tr>
-%{--                        <tr class="prop">--}%
-%{--                            <td class="name">--}%
-%{--                                <g:message code="shipping.shipmentStatus.label"/>--}%
-%{--                            </td>--}%
-%{--                            <td class="value">--}%
-%{--                                ${stockMovement?.shipment?.mostRecentEvent?.eventType?.name?:stockMovement?.shipment?.status}--}%
-
-%{--                                status: ${stockMovement?.shipment?.currentStatus}--}%
-%{--                                event: ${stockMovement?.shipment?.currentEvent}--}%
-%{--                            </td>--}%
-%{--                        </tr>--}%
+                        <g:if test="${stockMovement?.shipment?.status?.code == org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="stockMovement.shipmentStatus.label" default="Shipping Status"/>
+                                </td>
+                                <td class="value">
+                                    <span title="${stockMovement?.shipment?.displayStatus}">
+                                        <format:metadata obj="${stockMovement?.shipment?.displayStatus}"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <g:message code="stockMovement.origin.label"/>
