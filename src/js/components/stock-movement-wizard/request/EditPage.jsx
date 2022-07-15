@@ -297,8 +297,7 @@ const AD_HOCK_FIELDS = {
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
-          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
-            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
           return {
             disabled: fieldValue === null ||
               fieldValue === undefined ||
@@ -597,8 +596,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
-          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
-            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
           return {
             disabled: fieldValue === null ||
               fieldValue === undefined ||
@@ -897,8 +895,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex, showOnly,
         }) => {
-          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
-            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
           return {
             disabled: fieldValue === null ||
               fieldValue === undefined ||
