@@ -121,9 +121,14 @@ class StockMovementController {
     }
 
     def allocate = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.PICKING, false, false, true, true)
-        flash.message = "Successfully allocated items for stock movement ${stockMovement?.identifier}"
+        try {
+            StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.PICKING, false, false, true, true)
+            flash.message = "Successfully allocated items for stock movement ${stockMovement?.identifier}"
+        } catch (ValidationException e) {
+            flash.message = e.message
+            flash.errors = e.errors
+        }
         redirect(action: "show", id: params.id)
     }
 
