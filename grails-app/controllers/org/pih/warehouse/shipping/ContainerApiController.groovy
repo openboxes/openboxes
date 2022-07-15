@@ -15,6 +15,7 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.BaseDomainApiController
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
+import org.pih.warehouse.inventory.LotStatusCode
 
 class ContainerApiController extends BaseDomainApiController {
 
@@ -95,7 +96,26 @@ class ContainerApiController extends BaseDomainApiController {
             throw new IllegalArgumentException("Can't find container with given id: ${params.id}")
         }
 
-        shipmentService.updateContainerStatus(container, ContainerStatus.valueOf(params.status))
+        ContainerStatus updatedContainerStatus = ContainerStatus.valueOf(params.status)
+        if (!updatedContainerStatus || !(updatedContainerStatus in ContainerStatus.list())) {
+            throw new IllegalArgumentException("Must provide valid container status (${params.status})")
+        }
+
+        if (updatedContainerStatus == ContainerStatus.MISSING) {
+            container.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
+                shipmentItem.quantity = 0
+                shipmentItem.inventoryItem.lotStatus = LotStatusCode.MISSING
+            }
+        }
+
+        if (container.containerStatus == ContainerStatus.MISSING && container.containerStatus != updatedContainerStatus) {
+            container.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
+                shipmentItem.quantity = shipmentItem.quantityPicked
+                shipmentItem.inventoryItem.lotStatus = null
+            }
+        }
+
+        shipmentService.updateContainerStatus(container, updatedContainerStatus)
         render status: 200
     }
 }
