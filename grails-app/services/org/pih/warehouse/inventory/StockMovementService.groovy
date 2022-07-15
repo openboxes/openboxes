@@ -3070,9 +3070,12 @@ class StockMovementService {
     Boolean validatePicklist(StockMovement stockMovement) {
         Picklist picklist = stockMovement?.requisition?.picklist
         if (picklist) {
-            validatePicklist(picklist)
-            if (picklist.hasErrors()) {
-                throw new ValidationException("Picklist has validation errors", picklist.errors)
+            // Only validate the picklist before and during picking, not after it has been picked
+            if (stockMovement?.stockMovementStatusCode <= StockMovementStatusCode.PICKING) {
+                validatePicklist(picklist)
+                if (picklist.hasErrors()) {
+                    throw new ValidationException("Picklist has validation errors", picklist.errors)
+                }
             }
 
             Shipment shipment = Shipment.findByRequisition(stockMovement?.requisition)
@@ -3083,7 +3086,6 @@ class StockMovementService {
     }
 
     Boolean validatePicklist(Picklist picklist) {
-
         picklist.picklistItems.each { PicklistItem picklistItem ->
             validatePicklistItem(picklistItem)
         }
@@ -3103,7 +3105,6 @@ class StockMovementService {
 
         log.info "quantityToPick ${quantityToPick} > quantityAvailable ${quantityAvailable}? ${quantityToPick > quantityAvailable}"
         if (quantityToPick > quantityAvailable) {
-            String errorMessage = "Insufficient quantity available ({0} {1}) to fulfill {2} {3} of item {4} ({5}) at location {6}"
             Object [] arguments = [
                     quantityAvailable,
                     picklistItem?.inventoryItem?.product?.unitOfMeasure?:"EA",
@@ -3112,9 +3113,11 @@ class StockMovementService {
                     picklistItem?.inventoryItem?.product?.productCode,
                     picklistItem?.inventoryItem?.lotNumber,
                     picklistItem?.binLocation?.name,
-
             ] as Object[]
-            picklistItem.picklist.errors.reject("picklist.insufficientQuantityAvailable.message", arguments, errorMessage)
+            String defaultErrorMessage = "Insufficient quantity available (${arguments[0]} ${arguments[1]}) " +
+                    "to fulfill ${arguments[2]} ${arguments[3]} " +
+                    "of item ${arguments[4]} (${arguments[5]}) at location ${arguments[6]}"
+            picklistItem.picklist.errors.reject("picklist.insufficientQuantityAvailable.message", arguments, defaultErrorMessage)
         }
     }
 }

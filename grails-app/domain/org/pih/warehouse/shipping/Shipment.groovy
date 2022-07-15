@@ -133,6 +133,7 @@ class Shipment implements Comparable, Serializable {
             "packedContainerCount",
             "loadedContainerCount",
             "emptyContainerCount",
+            "displayStatus",
     ]
 
     static mappedBy = [
@@ -490,6 +491,20 @@ class Shipment implements Comparable, Serializable {
         }
     }
 
+    ShipmentStatusCode getDisplayStatus() {
+        Boolean allContainersLoaded = !containers?.empty && containers?.every { it.containerStatus in [ContainerStatus.LOADED] }
+        Boolean anyContainerLoading = !containers?.empty && containers?.any { it.containerStatus in [ContainerStatus.LOADED, ContainerStatus.LOADING] }
+        Boolean allContainersPacked = !containers?.empty && containers?.every { it.containerStatus in [ContainerStatus.PACKED] }
+        Boolean anyContainerPacking = !containers?.empty && containers?.any {it.containerStatus in [ContainerStatus.PACKED, ContainerStatus.PACKING] }
+        Boolean allItemsPacked = shipmentItems?.every { it.container }
+        return (allContainersLoaded && allItemsPacked) ? ShipmentStatusCode.LOADED :
+                (anyContainerLoading && allItemsPacked) ? ShipmentStatusCode.LOADING :
+                        (allContainersPacked && allItemsPacked) ? ShipmentStatusCode.PACKED :
+                                anyContainerPacking ? ShipmentStatusCode.PACKING :
+                                        currentStatus?.name() ?:
+                                                ShipmentStatusCode?.PENDING
+    }
+
     /**
      * Adds a new container to the shipment of the specified type
      */
@@ -587,7 +602,6 @@ class Shipment implements Comparable, Serializable {
    Integer getTotalContainerCount() {
        return containers?.size()?:0
     }
-
 
     Integer getLoadedContainerCount() {
         return countContainerByStatus(ContainerStatus.LOADED) ?: 0
@@ -816,6 +830,7 @@ class Shipment implements Comparable, Serializable {
                 shipmentNumber      : shipmentNumber,
                 status              : status?.code?.name(),
                 requisitionStatus   : requisition.status?.name(),
+                displayStatus       : displayStatus.name(),
                 origin              : [
                         id  : origin?.id,
                         name: origin?.name,
