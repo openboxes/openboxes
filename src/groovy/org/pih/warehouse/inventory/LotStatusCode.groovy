@@ -17,10 +17,11 @@ enum LotStatusCode {
     QUARANTINED,
     EXPIRED,
     RESERVED,
-    DAMAGED
+    DAMAGED,
+    MISSING
 
     static list() {
-        [APPROVED, RECALLED, ON_HOLD, QUARANTINED, EXPIRED, RESERVED, DAMAGED]
+        [APPROVED, RECALLED, ON_HOLD, QUARANTINED, EXPIRED, RESERVED, DAMAGED, MISSING]
     }
 
     static listAvailable() {
@@ -28,7 +29,7 @@ enum LotStatusCode {
     }
 
     static listUnavailable() {
-        [RECALLED, ON_HOLD, QUARANTINED, EXPIRED, RESERVED, DAMAGED]
+        [RECALLED, ON_HOLD, QUARANTINED, EXPIRED, RESERVED, DAMAGED, MISSING]
     }
 
     String toString() { return name() }
