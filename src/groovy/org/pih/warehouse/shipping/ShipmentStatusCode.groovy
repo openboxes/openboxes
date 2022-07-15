@@ -16,6 +16,10 @@ enum ShipmentStatusCode {
     CREATED(0),
     PENDING(10),
     ACCEPTED(20),
+    PACKING(22),
+    PACKED(24),
+    LOADING(26),
+    LOADED(28),
     SHIPPED(30),
     PARTIALLY_RECEIVED(40),
     RECEIVED(50)
@@ -45,7 +49,7 @@ enum ShipmentStatusCode {
 
     String toString() { return name() }
 
-static toStockMovementStatus(ShipmentStatusCode shipmentStatusCode) {
+    static toStockMovementStatus(ShipmentStatusCode shipmentStatusCode) {
         switch(shipmentStatusCode) {
             case ShipmentStatusCode.PENDING:
                 return StockMovementStatusCode.PENDING

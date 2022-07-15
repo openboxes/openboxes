@@ -61,27 +61,52 @@
                         <g:elseif test="${picklistItem?.quantityPicked == 0 && picklistItem?.quantityRemaining > 0}"><div class="tag tag-info">Ready</div></g:elseif>
                     </td>
                     <td>
-                        <g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id}">
-                            <g:if test="${j==0}">${picklistItem?.inventoryItem?.product?.productCode}</g:if>
-                        </g:link>
+                        <g:if test="${j==0}">
+                            <g:if test="${picklistItem?.inventoryItem?.product?.productCode}">
+                                <div class="box-barcode">
+                                    <g:displayBarcode data="${picklistItem?.inventoryItem?.product?.productCode}" height="20"/>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                <g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id}">
+                                    ${picklistItem?.inventoryItem?.product?.productCode}
+                                </g:link>
+                            </g:else>
+                        </g:if>
                     </td>
                     <td>
-                        <g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id}">
-                            <g:if test="${j==0}">${picklistItem?.inventoryItem?.product?.name}</g:if>
-                        </g:link>
+                        <g:if test="${j==0}">
+                            <g:link controller="inventoryItem" action="showStockCard" id="${picklistItem?.inventoryItem?.product?.id}">
+                                ${picklistItem?.inventoryItem?.product?.name}
+                            </g:link>
+                        </g:if>
                     </td>
                     <td>
                         <g:if test="${picklistItem?.binLocation}">
-                            <g:link controller="location" action="edit" id="${picklistItem?.binLocation?.id}">
-                                ${picklistItem?.binLocation?.name}
-                            </g:link>
+                            <g:if test="${picklistItem?.binLocation?.locationNumber}">
+                                <div class="box-barcode">
+                                    <g:displayBarcode data="${picklistItem?.binLocation?.locationNumber}" height="20"/>
+                                </div>
+                            </g:if>
+                            <g:else>
+                                <g:link controller="location" action="edit" id="${picklistItem?.binLocation?.id}">
+                                    ${picklistItem?.binLocation?.name}
+                                </g:link>
+                            </g:else>
                         </g:if>
                         <g:else>
                             ${g.message(code:'default.label')}
                         </g:else>
                     </td>
                     <td>
-                        ${picklistItem?.inventoryItem?.lotNumber?:g.message(code:'default.label')}
+                        <g:if test="${picklistItem?.inventoryItem?.lotNumber}">
+                            <div class="box-barcode">
+                                <g:displayBarcode data="${picklistItem?.inventoryItem?.lotNumber}" height="20"/>
+                            </div>
+                        </g:if>
+                        <g:else>
+                            ${picklistItem?.inventoryItem?.lotNumber?:g.message(code:'default.label')}
+                        </g:else>
                     </td>
                     <td>
                         ${picklistItem?.inventoryItem?.expirationDate}
