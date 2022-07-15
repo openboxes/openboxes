@@ -91,6 +91,7 @@ class TmsIntegrationService {
     def xsdValidatorService
     def notificationService
     def locationService
+    def userService
     def stockMovementService
 
     String serialize(final Object object, final Class clazz) {
@@ -329,18 +330,31 @@ class TmsIntegrationService {
 
         if (shipment) {
             // Create new shipment event to represent status update if one does not already exist
-            Event existingEvent = shipment?.events?.find { it.eventType == eventType }
-            if (!existingEvent) {
+            Event event = shipment?.events?.find { it.eventType == eventType }
+            if (!event) {
                 log.info "Creating new event ${eventType} since it does not exist"
                 // OBKN-378 TransientObjectException: object references an unsaved transient instance
-                existingEvent = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
-                existingEvent.save(flush: true, failOnError: true)
-                shipment.addToEvents(existingEvent)
+                event = new Event(eventType: eventType, eventDate: eventDate, longitude: longitude, latitude: latitude)
+                event.save(flush: true, failOnError: true)
+                shipment.addToEvents(event)
                 shipment.save(flush: true)
             }
 
             // If successful, send shipment status notification
-            notificationService.sendShipmentStatusNotification(shipment, existingEvent, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+            notificationService.sendShipmentStatusNotification(shipment, event, shipment.origin, [RoleType.ROLE_SHIPMENT_NOTIFICATION])
+
+            // Send notifications to shipment event subscribers
+            def notificationEvents = grailsApplication.config.openboxes.integration.sendNotificationOnEvents
+            log.info "Trigger event notification if ${event?.eventType?.code} in ${notificationEvents}: ${event?.eventType?.code in notificationEvents}"
+            if (notificationEvents && event?.eventType?.code in notificationEvents) {
+                def subscribers = []
+                subscribers.addAll(userService.findUsersByRoleTypes(shipment.origin, [RoleType.ROLE_SHIPMENT_EVENT_NOTIFICATION]))
+                subscribers.addAll(userService.findUsersByRoleTypes(shipment.destination, [RoleType.ROLE_SHIPMENT_EVENT_NOTIFICATION]))
+                subscribers = subscribers.unique()
+                log.info "Sending notification for event ${event?.eventType?.code} to users ${subscribers} " +
+                        "with role ${RoleType.ROLE_SHIPMENT_EVENT_NOTIFICATION}"
+                notificationService.sendShipmentStatusNotification(shipment, event, subscribers)
+            }
         }
     }
 
@@ -421,7 +435,7 @@ class TmsIntegrationService {
 
     def triggerOutboundInventoryUpdates(String trackingNumber, String status, Date dateShipped = null) {
         List outboundTransactionTriggerStatuses = grailsApplication.config.openboxes.integration.createOutboundTransactionOnStatusUpdate
-        log.info "Triggering outbound inventory update ${trackingNumber} if ${status} in ${outboundTransactionTriggerStatuses}"
+        log.info "Trigger outbound inventory update ${trackingNumber} if ${status} in ${outboundTransactionTriggerStatuses}: ${status in outboundTransactionTriggerStatuses}"
         if (status in outboundTransactionTriggerStatuses) {
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
             log.info ("Stock movement ${stockMovement?.identifier} with status ${stockMovement?.status} will be shipped")
@@ -436,7 +450,7 @@ class TmsIntegrationService {
 
     def triggerInboundInventoryUpdates(String trackingNumber, String status, Date dateDelivered = null) {
         List inboundTransactionTriggerStatuses = grailsApplication.config.openboxes.integration.createInboundTransactionOnStatusUpdate
-        log.info "Triggering inbound inventory update ${trackingNumber} if ${status} in ${inboundTransactionTriggerStatuses}"
+        log.info "Trigger inbound inventory update ${trackingNumber} if ${status} in ${inboundTransactionTriggerStatuses}: ${status in inboundTransactionTriggerStatuses}"
         if (status in inboundTransactionTriggerStatuses) {
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
             log.info "stockmovement ${stockMovement.hasBeenShipped()} ${stockMovement.isReceived} ${stockMovement?.stockMovementStatusCode}"

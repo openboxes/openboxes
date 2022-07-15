@@ -1473,6 +1473,7 @@ openboxes.integration.resolveEmptyNamespace.enabled = false
 openboxes.integration.tracking.uri = "https://tms.etrucknow.com/tracking/orderTracking/%s"
 openboxes.integration.createOutboundTransactionOnStatusUpdate = ["PICKUP"]
 openboxes.integration.createInboundTransactionOnStatusUpdate = ["DELIVERY"]
+openboxes.integration.sendNotificationOnEvents = ["ORIGIN_GATE_OUT", "DELIVERY"]
 
 // Webhook integration
 openboxes.integration.webhook.tripNotificationRetry.enabled = false
