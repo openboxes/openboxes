@@ -297,7 +297,7 @@ class StockMovementController {
     }
 
 
-    def uploadDocuments() { BulkDocumentCommand command ->
+    def uploadDocuments(BulkDocumentCommand command ) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         Shipment shipment = stockMovement.shipment
 

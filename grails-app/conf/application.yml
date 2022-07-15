@@ -222,9 +222,6 @@ openboxes:
     ajaxRequest:
         timeout: 10000
 
-    breadcrumbsConfig:
-        # TODO COPY breadcrumbsConfig
-
     dashboard:
         yearTypes:
             fiscalYear:
@@ -237,10 +234,6 @@ openboxes:
                 end: "12/31"
                 labelYearPrefix: ""
                 yearFormat: "yyyy"
-
-    dashboardConfig:
-        dashboards:
-            # TODO COPY dashboardConfig
 
     # OpenBoxes identifier config
     identifier:
@@ -272,17 +265,16 @@ openboxes:
         location:
             format: "NNNLLL"
         purchaseOrder:
-            # TODO: Fixme (generatorType as enum)
-            # generatorType: IdentifierGeneratorTypeCode.SEQUENCE
+            generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
             sequenceNumber:
                 format: "000000"
-            format: "PO-$\{destinationPartyCode}-$\{sequenceNumber}"
-            properties: ["destinationPartyCode": "destinationParty.code" ]
+            format: 'PO-$\{destinationPartyCode}-$\{sequenceNumber}' # single quote for curly braces escape character
+            properties:
+                destinationPartyCode: "destinationParty.code"
         productCode:
-            # TODO: Fixme (generatorType as enum)
-            # generatorType: IdentifierGeneratorTypeCode.SEQUENCE
+            generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
             delimiter: "-"
-            format: "$\{productTypeCode}$\{delimiter}$\{sequenceNumber}"
+            format: '$\{productTypeCode}$\{delimiter}$\{sequenceNumber}' # single quote for curly braces escape character
             properties:
                 productTypeCode: "code"
 
@@ -520,48 +512,6 @@ openboxes:
     # Inventory snapshot configuration
     inventorySnapshot:
         batchSize: 100
-
-    # TODO: COPY NEW VERSION OF MEGAMENU
-    megamenu:
-        dashboard:
-            enabled: true
-        analytics:
-            enabled: true
-        inventory:
-            enabled: true
-        orders:
-            enabled: true
-        requisitions:
-            enabled: false
-        shipping:
-            enabled: false
-        stockMovement:
-            enabled: true
-        receiving:
-            enabled: true
-        reporting:
-            enabled: true
-        products:
-            enabled: true
-        putaways:
-            enabled: true
-        configuration:
-            enabled: true
-        customLinks:
-            enabled: false
-        inbound:
-            enabled: true
-        outbound:
-            enabled: true
-        requisitionTemplate:
-            enabled: true
-        stockRequest:
-            enabled: true
-
-    # TODO: COPY supportLinks, configurationWizard and configurationWizard
-    supportLinks:
-    resettingInstance:
-    configurationWizard:
 
     # Allow users to customize logo image url as well as label
     logo:

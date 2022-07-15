@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
 import org.grails.core.io.ResourceLocator
+import org.grails.io.support.ClassPathResource
 import org.pih.warehouse.LocalizationUtil
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -42,6 +43,7 @@ class LocalizationService {
 
         return LocalizationUtil.getLocalizedString(value, getCurrentLocale())
     }
+
     /**
      * Get a locale based on the given language code. Returns default if no language code is specified.
      *
@@ -80,6 +82,8 @@ class LocalizationService {
         messagesProperties.load(resource.inputStream)
 
         return messagesProperties
+    }
+
     Properties getMessagesPropertiesWithPrefix(String prefix, Locale locale) {
         return getMessagesProperties(locale).findAll {
             it.key.startsWith(prefix)
