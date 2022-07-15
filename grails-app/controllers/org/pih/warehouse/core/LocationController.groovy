@@ -10,7 +10,6 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.springcache.annotations.CacheFlush
 import grails.validation.ValidationException
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction

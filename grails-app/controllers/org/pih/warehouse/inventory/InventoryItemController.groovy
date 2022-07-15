@@ -13,24 +13,20 @@ import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
-import org.grails.plugins.csv.CSVWriter
+import org.apache.commons.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
-import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
-import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentItemException
 import org.pih.warehouse.DateUtil
-import util.ConfigHelper
 import grails.core.GrailsApplication
 
 import java.text.DateFormat
@@ -391,7 +387,7 @@ class InventoryItemController {
         render(template: "showPendingOutboundStock", model: [product: product, itemsMap: itemsMap])
     }
 
-    def showDemand() { StockCardCommand cmd ->
+    def showDemand(StockCardCommand cmd) {
         use(TimeCategory) {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             // By default set last 12 months

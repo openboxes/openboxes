@@ -10,7 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.converters.JSON
-import org.grails.plugins.csv.CSVWriter
+import org.apache.commons.csv.CSVWriter
 import org.pih.warehouse.product.Product
 
 class SupplierController {
