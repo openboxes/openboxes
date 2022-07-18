@@ -50,7 +50,7 @@ class Person implements Comparable, Serializable {
     }
 
     String getLastInitial() {
-        lastName?.substring(0, 1)
+        lastName ? lastName.substring(0, 1) : ""
     }
 
     String toString() {
