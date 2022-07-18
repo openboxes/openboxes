@@ -100,6 +100,7 @@ const NumberCard = SortableElement(({
   sparklineData = null,
   translate,
   currencyCode,
+  hideDraghandle,
 }) => {
   let isSparkline = false;
   if (sparklineData != null) {
@@ -141,7 +142,7 @@ const NumberCard = SortableElement(({
               </Tooltip>
             </div>
         : null}
-        <DragHandle />
+        {!hideDraghandle && <DragHandle />}
       </div>
     </Tooltip>
   ) :
