@@ -28,6 +28,7 @@
 									<th>${warehouse.message(code: 'default.quantityOrdered.label', default: "Quantity Ordered")}</th>
 									<th>${warehouse.message(code: 'default.quantityShipped.label', default: "Quantity Shipped")}</th>
 									<th>${warehouse.message(code: 'default.quantityReceived.label', default: "Quantity Received")}</th>
+									<th>${warehouse.message(code: 'default.quantityCanceled.label', default: "Quantity Canceled")}</th>
 									<th>${warehouse.message(code: 'default.quantityInvoiced.label', default: "Quantity Invoiced")}</th>
 									<th>${warehouse.message(code: 'default.derivedStatus.label', default: "Derived Status")}</th>
 								</tr>
@@ -68,6 +69,9 @@
 										</td>
 										<td class="middle">
 											${orderItemSummary.quantityReceived}
+										</td>
+										<td class="middle">
+											${orderItemSummary.quantityCanceled}
 										</td>
 										<td class="middle">
 											${orderItemSummary.quantityInvoiced}
