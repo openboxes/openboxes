@@ -8,6 +8,9 @@ on:
 
 jobs:
   build:
+    env:
+      JAVA_TOOL_OPTIONS: -Dstringchararrayaccessor.disabled=true
+
     runs-on: ubuntu-latest
 
     steps:
@@ -78,7 +81,9 @@ jobs:
     - name: npm run bundle
       run: npm run bundle
 
-    - name: grails compile
+      # if this step fails midway through, the next will pick up where it left off
+    - continue-on-error: true
+      name: grails compile
       run: ~/grails-1.3.9/bin/grails compile
 
     - name: 'grails test-app unit:'
