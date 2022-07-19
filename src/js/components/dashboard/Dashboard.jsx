@@ -32,7 +32,7 @@ defaults.scale.ticks.beginAtZero = true;
 
 // eslint-disable-next-line no-shadow
 const SortableCards = SortableContainer(({
-  data, loadIndicator, allLocations, myDashboardActive,
+  data, loadIndicator, allLocations, personalDashboardActive,
 }) => (
   <div className="card-component">
     {data.map((value, index) =>
@@ -55,15 +55,15 @@ const SortableCards = SortableContainer(({
           loadIndicator={loadIndicator}
           allLocations={allLocations}
           size={value.size}
-          disabled={!myDashboardActive}
-          hideDraghandle={!myDashboardActive}
+          disabled={!personalDashboardActive}
+          hideDraghandle={!personalDashboardActive}
         />
       ))}
   </div>
 ));
 
 
-const SortableNumberCards = SortableContainer(({ data, myDashboardActive }) => (
+const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
   <div className="card-component">
     {data.map((value, index) => (
       (
@@ -79,8 +79,8 @@ const SortableNumberCards = SortableContainer(({ data, myDashboardActive }) => (
           cardDataTooltip={value.tooltipData}
           cardInfo={value.info}
           sparklineData={value.data}
-          disabled={!myDashboardActive}
-          hideDraghandle={!myDashboardActive}
+          disabled={!personalDashboardActive}
+          hideDraghandle={!personalDashboardActive}
         />
       )
     ))}
@@ -341,12 +341,12 @@ class Dashboard extends Component {
     }
   };
 
-  isMyDashboardActive() {
+  isPersonalDashboardActive() {
     return this.props.activeConfig === 'personal';
   }
 
   render() {
-    const isMyDashboardActive = this.isMyDashboardActive();
+    const isPersonalDashboardActive = this.isPersonalDashboardActive();
     let numberCards;
     if (this.props.numberData.length) {
       numberCards = (
@@ -356,7 +356,7 @@ class Dashboard extends Component {
           onSortEnd={this.sortEndHandleNumber}
           axis="xy"
           useDragHandle
-          myDashboardActive={isMyDashboardActive}
+          personalDashboardActive={isPersonalDashboardActive}
         />
       );
     } else {
@@ -399,10 +399,10 @@ class Dashboard extends Component {
               loadIndicator={this.loadIndicator}
               axis="xy"
               useDragHandle
-              myDashboardActive={isMyDashboardActive}
+              personalDashboardActive={isPersonalDashboardActive}
             />
             <ArchiveIndicator hideArchive={!this.state.isDragging} />
-            {isMyDashboardActive &&
+            {isPersonalDashboardActive &&
               <UnarchiveIndicators
                 graphData={this.props.indicatorsData}
                 numberData={this.props.numberData}
