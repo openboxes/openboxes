@@ -13,8 +13,8 @@ CREATE OR REPLACE VIEW order_item_status AS
             product.product_code        AS product_code,
             order_item.quantity * order_item.quantity_per_uom    AS quantity_ordered, -- to compare with shipped quantity which is already multiplied by qty per uom
             CASE
-              WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
-              ELSE 0
+                WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
+                ELSE 0
           	END AS quantity_shipped
         FROM `order`
             LEFT OUTER JOIN order_item ON order.id = order_item.order_id
@@ -22,9 +22,8 @@ CREATE OR REPLACE VIEW order_item_status AS
             LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
             LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
             LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
-        WHERE `order`.order_type_id = 'PURCHASE_ORDER'
-          AND order_item.order_item_status_code != 'CANCELLED'
-        GROUP BY `order`.id, `order`.order_number, product.product_code, order_item.id, shipment.current_status
+        WHERE `order`.order_type_id = 'PURCHASE_ORDER' AND order_item.order_item_status_code != 'CANCELLED'
+        GROUP BY `order`.id, order_item.id
     )
 AS order_item_status;
 
@@ -54,7 +53,7 @@ CREATE OR REPLACE VIEW order_receipt_status AS
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
           AND shipment.current_status = 'RECEIVED' OR shipment.current_status = 'PARTIALLY_RECEIVED'
-        GROUP BY `order`.id, `order`.order_number, order_item.id, shipment.id
+        GROUP BY `order`.id, `order`.order_number, order_item.id
     )
 AS order_receipt_status;
 
@@ -154,7 +153,7 @@ CREATE OR REPLACE VIEW order_item_summary AS (
             quantity_uom_id,
             quantity_per_uom,
             unit_price,
-            quantity * quantity_per_uom                     AS quantity_ordered,
+            order_item_status.quantity_ordered              AS quantity_ordered,
             order_item_status.quantity_shipped              AS quantity_shipped,
             order_receipt_status.quantity_received          AS quantity_received,
             order_receipt_status.quantity_canceled          AS quantity_canceled,
@@ -167,8 +166,8 @@ CREATE OR REPLACE VIEW order_item_summary AS (
             END AS shipment_status,
             CASE
 	            WHEN (IFNULL(SUM(order_receipt_status.quantity_received), 0) = 0) THEN NULL
-                WHEN ((IFNULL(SUM(order_receipt_status.quantity_ordered), 0) - IFNULL(SUM(order_receipt_status.quantity_canceled), 0)) <= IFNULL(SUM(order_receipt_status.quantity_received), 0)) THEN 'RECEIVED'
-                WHEN ((IFNULL(SUM(order_receipt_status.quantity_ordered), 0) - IFNULL(SUM(order_receipt_status.quantity_canceled), 0)) > IFNULL(SUM(order_receipt_status.quantity_received), 0) AND IFNULL(SUM(quantity_received), 0) > 0) THEN 'PARTIALLY_RECEIVED'
+                WHEN ((IFNULL(SUM(order_item_status.quantity_ordered), 0) - IFNULL(SUM(order_receipt_status.quantity_canceled), 0)) <= IFNULL(SUM(order_receipt_status.quantity_received), 0)) THEN 'RECEIVED'
+                WHEN ((IFNULL(SUM(order_item_status.quantity_ordered), 0) - IFNULL(SUM(order_receipt_status.quantity_canceled), 0)) > IFNULL(SUM(order_receipt_status.quantity_received), 0) AND IFNULL(SUM(order_receipt_status.quantity_received), 0) > 0) THEN 'PARTIALLY_RECEIVED'
                 ELSE NULL
             END AS receipt_status,
             CASE
@@ -184,7 +183,7 @@ CREATE OR REPLACE VIEW order_item_summary AS (
             LEFT OUTER JOIN order_receipt_status ON order_receipt_status.order_item_id = order_item.id
             LEFT OUTER JOIN order_payment_status_from_shipments ON order_payment_status_from_shipments.order_item_id = order_item.id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
-        GROUP BY order_item.id, order_item_status.quantity_shipped, order_receipt_status.quantity_received, order_receipt_status.quantity_canceled, order_payment_status_from_shipments.shipment_item_quantity_invoiced
+        GROUP BY order_item.id
     ) AS order_item_summary);
 
 CREATE OR REPLACE VIEW order_summary AS (
