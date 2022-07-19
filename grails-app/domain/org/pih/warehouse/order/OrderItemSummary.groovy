@@ -18,6 +18,7 @@ class OrderItemSummary implements Serializable {
     Integer quantityOrdered
     Integer quantityShipped
     Integer quantityReceived
+    Integer quantityCanceled
     Integer quantityInvoiced
     String derivedStatus
 
@@ -40,6 +41,7 @@ class OrderItemSummary implements Serializable {
         quantityOrdered(nullable: true)
         quantityShipped(nullable: true)
         quantityReceived(nullable: true)
+        quantityCanceled(nullable: true)
         quantityInvoiced(nullable: true)
         derivedStatus(nullable: true)
     }
@@ -59,6 +61,7 @@ class OrderItemSummary implements Serializable {
             quantityOrdered         : quantityOrdered,
             quantityShipped         : quantityShipped,
             quantityReceived        : quantityReceived,
+            quantityCanceled        : quantityCanceled,
             quantityInvoiced        : quantityInvoiced,
             derivedStatus           : derivedStatus
         ]
