@@ -232,6 +232,10 @@ class UserService {
         return isUserInRole(user.id, [roleType])
     }
 
+    Boolean isUserInRole(User user, Collection roleTypes) {
+        return isUserInRole(user.id, roleTypes)
+    }
+
     Boolean isUserInRole(String userId, Collection roleTypes) {
         Collection acceptedRoleTypes = RoleType.expand(roleTypes)
         User user = getUser(userId)

@@ -18,6 +18,7 @@ enum RoleType {
     ROLE_ASSISTANT('Assistant', 3),
     ROLE_BROWSER('Browser', 4),
     ROLE_AUTHENTICATED('Authenticated', 5),
+    ROLE_ANONYMOUS('Anonymous', 6),
 
     // Complementary roles that provide additional functionality
     ROLE_FINANCE('Financial User', 100),
