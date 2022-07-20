@@ -1110,21 +1110,21 @@ openboxes.purchaseOrder.editableProperties = [
         ]
 ]
 
-
 openboxes.security.rbac.rules = [
-        [controller: 'auth', actions: ['*'], access: [RoleType.ROLE_ANONYMOUS]],
-        [controller: 'dashboard', actions: ['getExpirationSummary'], access: [RoleType.ROLE_AUTHENTICATED]],
-        [controller: 'dashboard', actions: ['*'], access: [RoleType.ROLE_AUTHENTICATED]],
-        [controller: 'product', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'person', actions: ['list'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'user', actions: ['list'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'location', actions: ['edit'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'shipper', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'locationGroup', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'locationType', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
-        [controller: 'shipper', actions: ['create'], access: [RoleType.ROLE_ADMIN]],
         [controller: '*', actions: ['delete'], access: [RoleType.ROLE_SUPERUSER]],
-        [controller: '*', actions: ['remove'], access: [RoleType.ROLE_SUPERUSER]]
+        [controller: '*', actions: ['remove'], access: [RoleType.ROLE_SUPERUSER]],
+        [controller: '*', actions: ['removeItem'], access: [RoleType.ROLE_MANAGER]],
+        // We probably need a way to handle wildcard in actions as well
+        //[controller: '*', actions: ['remove*'], access: [RoleType.ROLE_SUPERUSER]],
+        //[controller: '*', actions: ['delete*'], access: [RoleType.ROLE_SUPERUSER]]
+        // ... otherwise we'll need to include explicit rules for everything
+        [controller: 'order', actions: ['remove'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'order', actions: ['removeOrderItem'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'invoice', actions: ['eraseInvoice'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'stockTransfer', actions: ['eraseStockTransfer'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'stockMovementItemApi', actions: ['eraseItem'], access: [RoleType.ROLE_MANAGER]],
+        // Other controller actions that might need explicit rules
+        //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
 
 // OpenBoxes default uploads directory location
