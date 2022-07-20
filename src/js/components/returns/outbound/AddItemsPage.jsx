@@ -70,7 +70,16 @@ const FIELDS = {
         flexWidth: '1',
       },
       'product.name': {
-        type: LabelField,
+        type: (params) => {
+          const { rowIndex, values } = params;
+          const handlingIcons = _.get(values, `returnItems[${rowIndex}].product.handlingIcons`, []);
+          const productNameWithIcons = (
+            <div className="d-flex">
+              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+              {renderHandlingIcons(handlingIcons)}
+            </div>);
+          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
+        },
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
         flexWidth: '4.5',
@@ -466,10 +475,10 @@ class AddItemsPage extends Component {
                 filterOption={options => options}
                 cache={false}
                 optionRenderer={option => (
-                  <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+                  <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
                     {option.label}
                     &nbsp;
-                    {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+                    {renderHandlingIcons(option.handlingIcons)}
                   </strong>
                 )}
                 valueRenderer={option => (

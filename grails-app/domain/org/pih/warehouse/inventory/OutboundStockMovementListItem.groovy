@@ -1,19 +1,19 @@
 package org.pih.warehouse.inventory
 
 import org.codehaus.groovy.grails.validation.Validateable
-import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderItemStatusCode
-import org.pih.warehouse.requisition.*
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionSourceType
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.pih.warehouse.shipping.ShipmentType
 
 @Validateable
 class OutboundStockMovementListItem implements Serializable {
@@ -35,7 +35,6 @@ class OutboundStockMovementListItem implements Serializable {
     Date dateRequested
     Person requestedBy
 
-    Integer lineItemCount
 
     ShipmentStatusCode shipmentStatus
 
@@ -64,7 +63,8 @@ class OutboundStockMovementListItem implements Serializable {
             "isReceived",
             "totalValue",
             "pending",
-            "electronicType"
+            "electronicType",
+            "lineItemCount"
     ]
 
     static mapping = {
@@ -121,6 +121,10 @@ class OutboundStockMovementListItem implements Serializable {
                 requestType         : requestType,
                 sourceType          : sourceType?.name,
         ]
+    }
+
+    Integer getLineItemCount() {
+        return requisition ? RequisitionItem.countByRequisition(requisition) : order ? OrderItem.countByOrder(order) : 0
     }
 
     Boolean isPending() {

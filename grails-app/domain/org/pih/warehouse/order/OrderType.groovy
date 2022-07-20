@@ -46,6 +46,18 @@ class OrderType implements Serializable {
         return code == Constants.RETURN_ORDER
     }
 
+    Boolean isPurchaseOrder() {
+        return orderTypeCode == OrderTypeCode.PURCHASE_ORDER
+    }
+
+    Boolean isPutawayOrder() {
+        return code == Constants.PUTAWAY_ORDER
+    }
+
+    Boolean isTransferOrder() {
+        return orderTypeCode == OrderTypeCode.TRANSFER_ORDER
+    }
+
     static mapping = {
         id generator: 'uuid'
     }

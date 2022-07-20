@@ -87,7 +87,7 @@ class InvoiceItem implements Serializable {
         glAccount(nullable: true)
         budgetCode(nullable: true)
 
-        quantity(nullable: false, min: 1)
+        quantity(nullable: false, min: 0) // min = 0 for canceled items
         quantityUom(nullable: true)
         quantityPerUom(nullable: false)
         amount(nullable: true)

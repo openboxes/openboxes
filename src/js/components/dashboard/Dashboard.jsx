@@ -31,7 +31,9 @@ defaults.scale.ticks.beginAtZero = true;
 // TODO: OBPIH-4385 Refactor/Split this file into separate components
 
 // eslint-disable-next-line no-shadow
-const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) => (
+const SortableCards = SortableContainer(({
+  data, loadIndicator, allLocations, personalDashboardActive,
+}) => (
   <div className="card-component">
     {data.map((value, index) =>
       (
@@ -53,13 +55,15 @@ const SortableCards = SortableContainer(({ data, loadIndicator, allLocations }) 
           loadIndicator={loadIndicator}
           allLocations={allLocations}
           size={value.size}
+          disabled={!personalDashboardActive}
+          hideDraghandle={!personalDashboardActive}
         />
       ))}
   </div>
 ));
 
 
-const SortableNumberCards = SortableContainer(({ data }) => (
+const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
   <div className="card-component">
     {data.map((value, index) => (
       (
@@ -75,6 +79,8 @@ const SortableNumberCards = SortableContainer(({ data }) => (
           cardDataTooltip={value.tooltipData}
           cardInfo={value.info}
           sparklineData={value.data}
+          disabled={!personalDashboardActive}
+          hideDraghandle={!personalDashboardActive}
         />
       )
     ))}
@@ -335,7 +341,12 @@ class Dashboard extends Component {
     }
   };
 
+  isPersonalDashboardActive() {
+    return this.props.activeConfig === 'personal';
+  }
+
   render() {
+    const isPersonalDashboardActive = this.isPersonalDashboardActive();
     let numberCards;
     if (this.props.numberData.length) {
       numberCards = (
@@ -345,6 +356,7 @@ class Dashboard extends Component {
           onSortEnd={this.sortEndHandleNumber}
           axis="xy"
           useDragHandle
+          personalDashboardActive={isPersonalDashboardActive}
         />
       );
     } else {
@@ -387,17 +399,20 @@ class Dashboard extends Component {
               loadIndicator={this.loadIndicator}
               axis="xy"
               useDragHandle
+              personalDashboardActive={isPersonalDashboardActive}
             />
             <ArchiveIndicator hideArchive={!this.state.isDragging} />
-            <UnarchiveIndicators
-              graphData={this.props.indicatorsData}
-              numberData={this.props.numberData}
-              dashboardConfig={this.props.dashboardConfig}
-              activeConfig={this.props.activeConfig}
-              showPopout={this.state.showPopout}
-              unarchiveHandler={this.unarchiveHandler}
-              handleAdd={this.handleAdd}
-            />
+            {isPersonalDashboardActive &&
+              <UnarchiveIndicators
+                graphData={this.props.indicatorsData}
+                numberData={this.props.numberData}
+                dashboardConfig={this.props.dashboardConfig}
+                activeConfig={this.props.activeConfig}
+                showPopout={this.state.showPopout}
+                unarchiveHandler={this.unarchiveHandler}
+                handleAdd={this.handleAdd}
+              />
+            }
           </div>
         </div>
       </div>

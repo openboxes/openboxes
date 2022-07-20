@@ -118,6 +118,13 @@ class UserController {
         log.info "attempt to save the user; show form with validation errors on failure"
         def userInstance = new User(params)
 
+        // Default value for active field on Person is set to True
+        // which is inherited by User
+        // but when creating a new user default value should be set to False
+        if (!params.hasProperty("active")) {
+            userInstance.active = false
+        }
+
         userInstance.password = params?.password?.encodeAsPassword()
         userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
 

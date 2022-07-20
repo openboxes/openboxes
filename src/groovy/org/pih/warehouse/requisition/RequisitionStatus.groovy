@@ -25,6 +25,9 @@ enum RequisitionStatus {
     CANCELED(9),
     DELETED(10),
     ERROR(11),
+    // for Outbound Stock Movement mapping
+    DISPATCHED(0),
+    REQUESTED(0),
     // Removed
     OPEN(0),
     FULFILLED(0),
@@ -53,11 +56,11 @@ enum RequisitionStatus {
     /* remove OPEN, FULFILLED */
 
     static list() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED]
     }
 
     static listPending() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, PENDING, REQUESTED]
     }
 
     static listCompleted() {

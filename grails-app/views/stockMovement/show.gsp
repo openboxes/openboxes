@@ -98,11 +98,20 @@
                     </g:link>
                 </g:elseif>
                 <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
-                    <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
-                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
-                        <warehouse:message code="default.button.delete.label" />
-                    </g:link>
+                    <g:if test="${stockMovement?.order}">
+                        <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                            &nbsp;<warehouse:message code="default.button.delete.label" />
+                        </g:link>
+                    </g:if>
+                    <g:else>
+                        <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                            <warehouse:message code="default.button.delete.label" />
+                        </g:link>
+                    </g:else>
                 </g:if>
             </g:isUserAdmin>
             <g:isSuperuser>
@@ -170,7 +179,7 @@
                                 <g:message code="stockMovement.stocklist.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.stocklist?.name?:"N/A"}
+                                ${stockMovement?.stocklist?.name?:"None"}
                             </td>
                         </tr>
                         <tr class="prop">
@@ -202,7 +211,12 @@
                                 <g:message code="shipping.shipmentType.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                <g:if test="${stockMovement?.shipmentType}">
+                                    <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                </g:if>
+                                <g:else>
+                                    ${g.message(code:"default.none.label")}
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">

@@ -91,6 +91,12 @@ class LocalizationService {
         return messagesProperties.sort()
     }
 
+    Properties getMessagesPropertiesWithPrefix(String prefix, Locale locale) {
+        return getMessagesProperties(locale).findAll {
+            it.key.startsWith(prefix)
+        }
+    }
+
 
     /**
      * Get messages properties while running app using deployed WAR.

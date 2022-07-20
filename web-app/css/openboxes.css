@@ -1054,6 +1054,23 @@ button.action-btn, button.previous, button.next {
     padding: 5px;
     text-decoration: none;
 }
+.actions .download-subbuttons button {
+    all: unset;
+    display: block;
+    padding: 5px;
+    font-weight: normal;
+    color: #666;
+    font-size: 0.9em;
+    font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;
+    line-height: 12px;
+    text-align: left;
+}
+
+.actions .download-subbuttons:hover {
+    display: block;
+    background-color: lightgrey;
+    text-decoration: none;
+}
 
 /* Flow Header */
 .currentState { font-weight: bold; background-color: #eee; color: blue; }
@@ -2950,8 +2967,8 @@ span.canceled, div.canceled {
 
 /* HelpScout's default positioning wastes space and clobbers page content */
 .BeaconContainer {
-    right: 5px !important;
     bottom: 5px !important;
+    right: 5px !important;
 }
 
 /* Pill button

@@ -29,7 +29,7 @@ class ProductType {
     }
 
     static constraints = {
-        name(blank: false)
+        name(blank: false, unique: true)
         code(nullable: true, unique: true)
         productTypeCode(nullable: false)
         productIdentifierFormat(nullable: true)

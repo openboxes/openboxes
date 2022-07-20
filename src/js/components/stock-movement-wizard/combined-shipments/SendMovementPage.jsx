@@ -157,12 +157,14 @@ const SUPPLIER_FIELDS = {
         label: 'react.stockMovement.packLevel1.label',
         defaultMessage: 'Pack level 1',
         flexWidth: '3',
+        getDynamicAttr: ({ isPalletNameEmpty }) => ({ hide: isPalletNameEmpty }),
       },
       boxName: {
         type: LabelField,
         label: 'react.stockMovement.packLevel2.label',
         defaultMessage: 'Pack level 2',
         flexWidth: '3',
+        getDynamicAttr: ({ isBoxNameEmpty }) => ({ hide: isBoxNameEmpty }),
       },
       productCode: {
         type: LabelField,
@@ -176,6 +178,9 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '7',
+        getDynamicAttr: ({ isBoxNameEmpty, isPalletNameEmpty }) => ({
+          flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
+        }),
         attributes: {
           className: 'text-left',
           formatValue: value => (
@@ -553,7 +558,7 @@ class SendMovementPage extends Component {
         'You are not able to send shipment from a location other than origin. Change your current location.',
       ));
       this.props.hideSpinner();
-    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, shipmentType => shipmentType.label === 'Default').value) {
+    } else if (values.shipmentType.id === _.find(this.state.shipmentTypes, shipmentType => shipmentType.label === 'Default').id) {
       Alert.error(this.props.translate(
         'react.stockMovement.alert.populateShipmentType.label',
         'Please populate shipment type before continuing',
@@ -822,6 +827,10 @@ class SendMovementPage extends Component {
                       isRowLoaded: this.isRowLoaded,
                       isPaginated: this.props.isPaginated,
                       isFirstPageLoaded: this.state.isFirstPageLoaded,
+                      // eslint-disable-next-line max-len
+                      isBoxNameEmpty: _.every(this.state.values.tableItems, ({ boxName }) => !boxName),
+                      // eslint-disable-next-line max-len
+                      isPalletNameEmpty: _.every(this.state.values.tableItems, ({ palletName }) => !palletName),
                     }))}
                 </div>
               </div>

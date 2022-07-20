@@ -9,7 +9,7 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
@@ -19,6 +19,7 @@ import EditLineModal from 'components/receiving/modals/EditLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -157,7 +158,23 @@ const TABLE_FIELDS = {
         },
       },
       'product.name': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => {
+          if (params.subfield) {
+            const { parentIndex, rowIndex } = params;
+            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
+            const handlingIcons = _.get(params.values, fieldPath);
+
+            const productNameWithIcons = (
+              <div className="d-flex">
+                <span className="text-truncate">
+                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+                </span>
+                {renderHandlingIcons(handlingIcons)}
+              </div>);
+            return <LabelField {...params} fieldValue={productNameWithIcons} />;
+          }
+          return null;
+        },
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -210,19 +227,15 @@ const TABLE_FIELDS = {
           labelKey: 'name',
         },
       },
-      recipient: {
-        type: params => (params.subfield ? <SelectField {...params} /> : null),
-        fieldKey: '',
-        flexWidth: '1',
+      'recipient.name': {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.recipient.label',
         defaultMessage: 'Recipient',
-        getDynamicAttr: ({ users, shipmentReceived, fieldValue }) => ({
-          options: users,
-          disabled: shipmentReceived || isReceived(true, fieldValue),
-        }),
+        headerAlign: 'left',
+        flexWidth: '1',
         attributes: {
-          valueKey: 'id',
-          labelKey: 'name',
+          className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       quantityShipped: {
@@ -406,19 +419,15 @@ class PartialReceivingPage extends Component {
 
   componentDidMount() {
     this.fetchPartialReceiptCandidates();
-    if (this.props.partialReceivingTranslationsFetched && !this.props.usersFetched) {
+    if (this.props.partialReceivingTranslationsFetched) {
       this.dataFetched = true;
-      this.props.fetchUsers();
     }
     this.props.hideSpinner();
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched
-      && !this.props.usersFetched) {
+    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
-
-      this.props.fetchUsers();
     }
   }
 
@@ -739,7 +748,6 @@ class PartialReceivingPage extends Component {
                         saveEditLine: this.saveEditLine,
                         setLocation: this.setLocation,
                         bins: this.props.bins,
-                        users: this.props.users,
                         hasBinLocationSupport: this.props.hasBinLocationSupport,
                         locationId: this.props.locationId,
                         shipmentReceived: this.state.values.shipmentStatus === 'RECEIVED',
@@ -764,8 +772,6 @@ class PartialReceivingPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  usersFetched: state.users.fetched,
-  users: state.users.data,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   partialReceivingTranslationsFetched: state.session.fetchedTranslations.partialReceiving,
   hasPartialReceivingSupport: state.session.currentLocation.hasPartialReceivingSupport,
@@ -773,7 +779,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchUsers,
+  showSpinner, hideSpinner,
 })(PartialReceivingPage);
 
 PartialReceivingPage.propTypes = {
@@ -781,13 +787,6 @@ PartialReceivingPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
-  /** Function fetching users */
-  fetchUsers: PropTypes.func.isRequired,
-  /** Indicator if users' data is fetched */
-  usersFetched: PropTypes.bool.isRequired,
-  /** Array of available users  */
-  users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  /** Is true when currently selected location supports bins */
   hasBinLocationSupport: PropTypes.bool.isRequired,
   /** Array of available bin locations  */
   bins: PropTypes.arrayOf(PropTypes.shape({})),

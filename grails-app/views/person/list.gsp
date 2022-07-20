@@ -11,9 +11,10 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
+
             <div class="list dialog">
 
-				<div class="buttonBar">            	
+				<div class="buttonBar">
 	            	<span class="linkButton">
 	            		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
 	            	</span>
@@ -21,10 +22,10 @@
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'person.label').toLowerCase()]"/></g:link>
 	            	</span>
             	</div>
-            
+
 	            <div class="box">
                     <h2><g:message code="default.list.label" args="[g.message(code:'persons.label')]"/></h2>
-					<g:form action="list" method="get">
+                    <g:form action="list" method="get">
                         <div class="filter">
                             <label><warehouse:message code="default.search.label"/></label>
                             <g:textField name="q" size="45" value="${params.q }" class="text"/>
@@ -33,10 +34,12 @@
                                 alt="Save" /> ${warehouse.message(code: 'default.button.find.label')}
                             </button>
                         </div>
-					</g:form>
+                    </g:form>
                     <table>
                         <thead>
                             <tr>
+
+                                <g:sortableColumn property="active" title="${warehouse.message(code: 'user.active.label')}" />
 
                                 <g:sortableColumn property="lastName" title="${warehouse.message(code: 'default.name.label')}" />
 
@@ -53,6 +56,11 @@
                         <g:each in="${personInstanceList}" status="i" var="personInstance">
                             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
+                                <td>
+                                    <g:if test="${personInstance?.active }">
+                                        <span class="active"><warehouse:message code="default.yes.label"/></span></g:if>
+                                    <g:else><span class="inactive"><warehouse:message code="default.no.label"/></span></g:else>
+                                </td>
 
                                 <td>
                                     <g:link action="edit" id="${personInstance.id}">

@@ -96,7 +96,11 @@ class Order implements Serializable {
             "isPrepaymentInvoiceAllowed",
             "isPrepaymentRequired",
             "canGenerateInvoice",
+            "isPurchaseOrder",
             "isReturnOrder",
+            "isPutawayOrder",
+            "isReturnOrder",
+            "isTransferOrder",
             // Statuses
             "pending",
             "placed",
@@ -438,8 +442,20 @@ class Order implements Serializable {
         return orderAdjustments.findAll {!it.canceled }
     }
 
+    Boolean getIsPurchaseOrder() {
+        return orderType?.isPurchaseOrder()
+    }
+
     Boolean getIsReturnOrder() {
         return orderType?.isReturnOrder()
+    }
+
+    Boolean getIsPutawayOrder() {
+        return orderType?.isPutawayOrder()
+    }
+
+    Boolean getIsTransferOrder() {
+        return orderType?.isTransferOrder()
     }
 
     // isInbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns

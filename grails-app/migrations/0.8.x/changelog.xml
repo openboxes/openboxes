@@ -146,4 +146,9 @@
     <include file="0.8.x/changelog-2022-03-01-0850-add-unique-constraint-party-type-code.xml"/>
     <include file="0.8.x/changelog-2022-04-11-1000-alter-table-product-association-add-mutual-association.xml"/>
     <include file="0.8.x/changelog-2022-04-14-1200-add-dynamic-creation-activity.xml"/>
+    <include file="0.8.x/changelog-2022-06-09-1430-add-missing-roles.xml"/>
+    <include file="0.8.x/changelog-2022-06-29-1200-alter-table-budget-code-add-column-active.xml"/>
+    <include file="0.8.x/changelog-2022-06-30-1606-add-active-column-to-product-supplier.xml"/>
+    <include file="0.8.x/changelog-2022-07-06-1200-alter-table-budget-code-active-column-true-by-default.xml" />
+    <include file="0.8.x/changelog-2022-07-11-1300-move-active-column-from-user-to-person.xml"/>
 </databaseChangeLog>

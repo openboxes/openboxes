@@ -117,10 +117,10 @@ const VENDOR_FIELDS = {
           options: [],
           showValueTooltip: true,
           optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+            <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
               {option.label}
               &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+              {renderHandlingIcons(option.handlingIcons)}
             </strong>
           ),
           valueRenderer: option => (
@@ -743,7 +743,7 @@ class AddItemsPage extends Component {
    */
   saveAndExit(formValues) {
     const errors = this.validate(formValues).lineItems;
-    if (!errors.length) {
+    if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
           window.location = `/openboxes/stockMovement/show/${formValues.stockMovementId}`;

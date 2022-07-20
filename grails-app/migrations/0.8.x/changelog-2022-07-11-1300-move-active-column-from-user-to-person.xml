@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="DariuszRodzewicz" id="1107221300-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="person" columnName="active"/>
+            </not>
+        </preConditions>
+        <comment>Add ACTIVE column if it does not exist on PERSON table</comment>
+        <addColumn tableName="person">
+            <column name="active" type="BIT" defaultValueBoolean="true"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="DariuszRodzewicz" id="1107221300-1">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="person" columnName="active"/>
+                <columnExists tableName="user" columnName="active"/>
+            </and>
+        </preConditions>
+        <comment>Move ACTIVE field data from USER table to PERSON table</comment>
+        <sql>
+            UPDATE person, user
+            SET person.active=user.active
+            WHERE person.id=user.id;
+        </sql>
+    </changeSet>
+    <changeSet author="DariuszRodzewicz" id="1107221300-2">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="person" columnName="active"/>
+                <columnExists tableName="user" columnName="active"/>
+            </and>
+        </preConditions>
+        <comment>Drop ACTIVE column on USER TABLE if it exists on both PERSON and USER TABLES</comment>
+        <dropColumn tableName="user" columnName="active"/>
+    </changeSet>
+</databaseChangeLog>

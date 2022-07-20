@@ -14,7 +14,7 @@
   },
   "scripts": {
     "watch": "webpack --watch --colors --progress --mode=development",
-    "bundle": "webpack --mode=production",
+    "bundle": "webpack --no-color --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",
     "styleguide:build": "styleguidist build",
@@ -62,7 +62,7 @@
     "immutability-helper": "2.7.1",
     "js-file-download": "0.4.1",
     "lodash": "4.17.21",
-    "moment": "2.22.2",
+    "moment": "2.29.4",
     "popper.js": "1.14.7",
     "prop-types": "15.8.1",
     "query-string": "6.10.1",
@@ -131,6 +131,6 @@
     "sass-loader": "7.1.0",
     "url-loader": "1.0.1",
     "webpack": "4.41.6",
-    "webpack-cli": "3.1.2"
+    "webpack-cli": "4.9.2"
   }
 }

@@ -29,19 +29,18 @@ class InvoiceController {
     }
 
     def list = {
-        params.max = params.max?:10
-        params.offset = params.offset?:0
-        params.createdBy = params.createdBy ?: null
+        def invoiceParams = [:]
+        invoiceParams.max = params.max?:10
+        invoiceParams.offset = params.offset?:0
+        invoiceParams.createdBy = params.createdBy ?: null
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-        params.dateInvoiced = params.dateInvoiced ? dateFormat.parse(params.dateInvoiced) : null
-        params.invoiceNumber = params.invoiceNumber ?: ""
+        invoiceParams.dateInvoiced = params.dateInvoiced ? dateFormat.parse(params.dateInvoiced) : null
+        invoiceParams.invoiceNumber = params.invoiceNumber ?: ""
         def location = Location.get(session.warehouse.id)
-        params.partyFromId = location?.organization?.id
-        def invoices = invoiceService.listInvoices(params)
+        invoiceParams.partyFromId = location?.organization?.id
+        def invoices = invoiceService.listInvoices(invoiceParams)
 
-        [
-                invoices         : invoices,
-        ]
+        [invoices: invoices]
     }
 
     def show = {
@@ -106,11 +105,6 @@ class InvoiceController {
         if (!order) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
             redirect(action: "list")
-        }
-
-        if (!order.activeOrderItems && !order.activeOrderAdjustments) {
-            flash.message = "${warehouse.message(code: 'invoices.emptyOrder.message')}"
-            redirect(controller: "order", action: "create", params: [id: order.id])
         }
 
         Invoice invoice = invoiceService.generateInvoice(order)

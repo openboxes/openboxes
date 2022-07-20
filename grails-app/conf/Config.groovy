@@ -1110,6 +1110,23 @@ openboxes.purchaseOrder.editableProperties = [
         ]
 ]
 
+openboxes.security.rbac.rules = [
+        [controller: '*', actions: ['delete'], access: [RoleType.ROLE_SUPERUSER]],
+        [controller: '*', actions: ['remove'], access: [RoleType.ROLE_SUPERUSER]],
+        [controller: '*', actions: ['removeItem'], access: [RoleType.ROLE_MANAGER]],
+        // We probably need a way to handle wildcard in actions as well
+        //[controller: '*', actions: ['remove*'], access: [RoleType.ROLE_SUPERUSER]],
+        //[controller: '*', actions: ['delete*'], access: [RoleType.ROLE_SUPERUSER]]
+        // ... otherwise we'll need to include explicit rules for everything
+        [controller: 'order', actions: ['remove'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'order', actions: ['removeOrderItem'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'invoice', actions: ['eraseInvoice'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'stockTransfer', actions: ['eraseStockTransfer'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'stockMovementItemApi', actions: ['eraseItem'], access: [RoleType.ROLE_MANAGER]],
+        // Other controller actions that might need explicit rules
+        //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
+]
+
 // OpenBoxes default uploads directory location
 openboxes.uploads.location = "uploads"
 
@@ -1557,6 +1574,7 @@ openboxes {
                         [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
                         [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
                         [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
                     ]
                 ],
                 [

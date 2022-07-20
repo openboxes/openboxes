@@ -13,12 +13,15 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.shipping.Shipment
 
 class StockTransferController {
 
     def stockTransferService
+    def shipmentService
 
     def index = {
         redirect(action: "list", params: params)
@@ -31,6 +34,14 @@ class StockTransferController {
     def edit = {
         Location currentLocation = Location.get(session.warehouse.id)
         def orderInstance = Order.get(params.id)
+
+        boolean isSameOrigin = orderInstance?.origin?.id == currentLocation?.id
+        boolean isSameDestination = orderInstance?.destination?.id == currentLocation?.id
+        if (!(isSameOrigin || isSameDestination)) {
+            flash.error = g.message(code: "retrunOrder.isDifferentLocation.message")
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
+        }
 
         if(orderInstance?.getStockMovementDirection(currentLocation) == StockMovementDirection.INBOUND) {
             redirect(action: "createInboundReturn", params: params)
@@ -96,5 +107,44 @@ class StockTransferController {
             redirect(action: "list")
         }
         redirect(action: "list")
+    }
+
+    def remove = {
+        Location currentLocation = Location.get(session.warehouse.id)
+        Order orderInstance = Order.get(params.orderId ?: params.id)
+        StockMovementDirection direction = orderInstance?.getStockMovementDirection(currentLocation)
+
+        if (!orderInstance) {
+            throw new IllegalArgumentException("Order instance not found for this stock transfer")
+        }
+
+        try {
+            stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
+        } catch (IllegalArgumentException e) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        }
+
+        if (direction == StockMovementDirection.INBOUND) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND])
+        } else if (direction == StockMovementDirection.OUTBOUND) {
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+        } else {
+            redirect(action: "list")
+        }
+
+    }
+
+    def rollback = {
+        Location currentLocation = Location.get(session.warehouse.id)
+
+        try {
+            stockTransferService.rollbackReturnOrder(params.id as String, currentLocation)
+            flash.message = "Successfully rolled back return order with ID ${params.id}"
+        } catch (IllegalArgumentException e) {
+            log.error("Unable to rollback return order with ID ${params.id}: " + e.message)
+            flash.message = e.message
+        }
+
+        redirect( controller: "stockMovement", action: "show", id: params.id)
     }
 }

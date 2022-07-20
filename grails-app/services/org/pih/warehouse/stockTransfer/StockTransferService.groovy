@@ -410,4 +410,25 @@ class StockTransferService {
             uri         : g.createLink(controller: 'picklist', action: "returnPrint", id: stockTransfer?.id, absolute: true),
         ]]
     }
+
+    def rollbackReturnOrder(String orderId, Location currentLocation) {
+        Order order = Order.get(orderId)
+        if (!order) {
+            throw new IllegalArgumentException("Can't find order with given id: ${orderId}")
+        }
+
+        if(currentLocation != order?.origin && currentLocation != order?.destination) {
+            throw new IllegalArgumentException("Can't rollback shipment from current location")
+        }
+
+        Shipment returnOrderShipment = order.shipments.first() as Shipment;
+        if(!returnOrderShipment) {
+            throw new IllegalArgumentException("Order with id: ${orderId} has no shipments")
+        }
+
+        // For returns there should be only one shipment for the given order
+        shipmentService.rollbackLastEvent(returnOrderShipment)
+        order.status = OrderStatus.PLACED;
+
+    }
 }

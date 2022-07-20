@@ -23,19 +23,19 @@
         e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
       }(window, document, window.Beacon || function () {
       });
-      window.Beacon("init", "${grailsApplication.config.openboxes.helpscout.widget.key}")
-      window.Beacon("config", {
-        "color": "${grailsApplication.config.openboxes.helpscout.widget.color}",
-        "enableFabAnimation": false
-      })
-      /*
-       * Use a scriptlet block to prevent html-escaping localization labels, which are JSON.
-       * More modern grails versions have a built-in raw() method to do this, but...
-       * https://stackoverflow.com/questions/1337464/overriding-grails-views-default-codec-html-config-back-to-none
-       */
-      window.Beacon("config", <%=LocalizationApiController.localizeHelpScoutLabels(grailsApplication, session?.user?.locale)%>)
     </script>
     <!-- end magical HelpScout incantations -->
+
+    <!-- now, configure the widget the preceding code created for us -->
+    <script type="text/javascript">
+      let configUrl = new URL('/openboxes/api/helpscout/configuration/', window.location.href)
+      fetch(configUrl.toString(), { credentials: 'same-origin' })
+        .then(response => response.json())
+        .then(configJson => {
+          window.Beacon('init', configJson.localizedHelpScoutKey);
+          window.Beacon('config', configJson)
+        })
+    </script>
 </g:if>
 
 <div id="header" class="yui-b">
@@ -115,7 +115,7 @@
                         <li>
                             <button class="action-hover-btn button helpscout top" onclick="Beacon('toggle');">
                                 <i class="far fa-life-ring"></i>
-                                <g:message code="default.support.label" default="Support" />
+                                <warehouse:message code="default.support.label" default="Support" />
                             </button>
                         </li>
                     </g:if>

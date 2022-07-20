@@ -81,9 +81,9 @@ class StocklistManagement extends Component {
 
   fetchUsers() {
     this.props.showSpinner();
-    const url = '/openboxes/api/generic/person';
+    const url = '/openboxes/api/persons';
 
-    apiClient.get(url)
+    apiClient.get(url, { params: { status: true } })
       .then((response) => {
         this.setState({ users: response.data.data, usersFetched: true });
       })

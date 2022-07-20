@@ -1,16 +1,39 @@
 <%@ page import="org.pih.warehouse.order.OrderItemStatusCode;" %>
 <%@ page import="org.pih.warehouse.order.OrderType;" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
+<%@ page import="org.pih.warehouse.core.Constants;" %>
+
+
+<script>
+  $(document).ready(function() {
+    $("#orderItemsFilter").keyup(function(event){
+      const filterCell = 1; // product name
+      const filterValue = $("#orderItemsFilter")
+        .val()
+        .toUpperCase();
+      const tableRows = $("#order-items tr.dataRow");
+      filterTableItems(filterCell, filterValue, tableRows)
+    });
+  });
+</script>
+
+
 <div class="box">
     <h2>
         <warehouse:message code="default.summary.label"/>
     </h2>
+    <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+        <input type="text" id="orderItemsFilter" class="text large" placeholder="Filter by product name"/>
+    </g:if>
     <g:if test="${orderInstance?.orderItems}">
         <g:set var="status" value="${0}"/>
-        <g:set var="columnsNumber" value="5"/>
-        <table class="order-items">
+        <g:set var="columnsNumber" value="6"/>
+        <table class="order-items" id="order-items">
             <thead>
             <tr>
+                <th class="bottom">
+                    <warehouse:message code="default.status.label"/>
+                </th>
                 <th class="bottom">
                     <warehouse:message code="product.productCode.label"/>
                 </th>
@@ -56,7 +79,12 @@
             <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
                 <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
                 <g:if test="${!isItemCanceled || orderInstance?.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
+                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
+                        <td>
+                            <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                                <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
+                            </div>
+                        </td>
                         <td style="color: ${orderItem?.product?.color}">
                             ${orderItem?.product?.productCode}
                         </td>
@@ -64,6 +92,7 @@
                             <g:link controller="inventoryItem" action="showStockCard"
                                     style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
                                 <format:product product="${orderItem?.product}"/>
+                                <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>
                         <g:if test="${!isItemCanceled}">
@@ -139,3 +168,4 @@
         <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
     </g:else>
 </div>
+

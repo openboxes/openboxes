@@ -1,0 +1,20 @@
+.badge {
+    position: relative;
+}
+
+.badge:before {
+    content: attr(data-count);
+    position: absolute;
+    top: -0.45em;
+    right: -0.45em;
+    min-width: 0.8em;
+    height: 1.8em;
+    display: grid;
+    padding: 0 0.5em;
+    place-items: center;
+    font-size: 0.8em;
+    border-radius: 1em;
+    background-color: rgb(235, 0, 20);
+    color: white;
+}
+

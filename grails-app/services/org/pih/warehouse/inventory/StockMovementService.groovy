@@ -899,7 +899,13 @@ class StockMovementService {
             def statusCode = substitutionItems ? RequisitionItemStatus.SUBSTITUTED :
                     it.quantity_revised != null ? RequisitionItemStatus.CHANGED : RequisitionItemStatus.APPROVED
 
-            List<AvailableItem> availableItems = availableItemsMap[it.product_id]
+            // Collect to make a deep clone of Available Items, to avoid overriding Available Items from availableItemsMap[it.product_id]
+            List<AvailableItem> availableItems = availableItemsMap[it.product_id].collect { AvailableItem availableItem -> new AvailableItem(
+                inventoryItem: availableItem.inventoryItem,
+                binLocation: availableItem.binLocation,
+                quantityAvailable: availableItem.quantityAvailable,
+                quantityOnHand: availableItem.quantityOnHand
+            )}
             def picklist = (picklistItemsMap && picklistItemsMap[it.product_id]) ? picklistItemsMap[it.product_id] : []
             availableItems = calculateQuantityAvailableToPromise(availableItems, picklist)
 
@@ -1039,8 +1045,8 @@ class StockMovementService {
         }
 
         Picklist picklist = requisitionItem?.requisition?.picklist
-        log.info "Clear picklist"
         if (picklist) {
+            log.info "Clear picklist"
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
             }.toArray().each {
@@ -1050,12 +1056,14 @@ class StockMovementService {
                 it.delete()
             }
             picklist.save()
+
+            // Save requisition item before PA refresh
+            requisitionItem.save(flush: true)
+
+            productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
+        } else {
+            requisitionItem.save(flush: true)
         }
-
-        // Save requisition item before PA refresh
-        requisitionItem.save(flush: true)
-
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
     }
 
     void createMissingPicklistItems(StockMovement stockMovement) {
@@ -1077,6 +1085,10 @@ class StockMovementService {
     }
 
     void createMissingPicklistForStockMovementItem(StockMovementItem stockMovementItem) {
+        if (stockMovementItem?.requisitionItem?.requisition?.status < RequisitionStatus.PICKING) {
+            return
+        }
+
         if (stockMovementItem.statusCode == 'SUBSTITUTED') {
             for (StockMovementItem subStockMovementItem : stockMovementItem.substitutionItems) {
                 createMissingPicklistItems(subStockMovementItem)
@@ -1867,7 +1879,7 @@ class StockMovementService {
         return updatedStockMovement
     }
 
-    List reviseItems(StockMovement stockMovement) {
+    void reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
         def revisedItems = []
 
@@ -1881,7 +1893,9 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                if (requisitionItem.shipmentItems || requisitionItem.picklistItems) {
+                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                }
 
                 log.info "Item revised " + requisitionItem.id
 
@@ -1906,15 +1920,6 @@ class StockMovementService {
 
         createMissingPicklistItems(stockMovement)
         createMissingShipmentItems(stockMovement)
-
-        stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
-            if (stockMovementItem.statusCode == 'CHANGED') {
-                def editPageItem = getEditPageItem(stockMovementItem?.id)
-                revisedItems.add(editPageItem)
-            }
-        }
-
-        return revisedItems
     }
 
     void substituteItem(StockMovementItem stockMovementItem) {
@@ -2043,6 +2048,9 @@ class StockMovementService {
     }
 
     void removeShipmentAndPicklistItemsForModifiedRequisitionItem(RequisitionItem requisitionItem) {
+        if (requisitionItem?.requisition?.status < RequisitionStatus.PICKING) {
+            return
+        }
 
         removeShipmentItemsForModifiedRequisitionItem(requisitionItem)
 
@@ -2707,10 +2715,10 @@ class StockMovementService {
             return g.message(code: "stockMovement.hasAlreadyBeenReceived.message", args: [stockMovement?.identifier])
         } else if (!(stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived())) {
             return g.message(code: "stockMovement.hasNotBeenShipped.message", args: [stockMovement?.identifier])
-        } else if (!stockMovement?.hasBeenIssued() && !stockMovement?.isFromOrder) {
-            return g.message(code: "stockMovement.hasNotBeenIssued.message", args: [stockMovement?.identifier])
         } else if (!isSameDestination) {
             return g.message(code: "stockMovement.isDifferentLocation.message")
+        } else if (!stockMovement?.hasBeenIssued() && !stockMovement?.isFromOrder) {
+            return g.message(code: "stockMovement.hasNotBeenIssued.message", args: [stockMovement?.identifier])
         }
     }
 

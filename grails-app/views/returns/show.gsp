@@ -80,15 +80,14 @@
                         <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
-                        stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
-                    <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
+                <g:elseif test="${stockMovement?.hasBeenShipped()}">
+                    <g:link controller="stockTransfer" action="rollback" id="${stockMovement.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
                 </g:elseif>
                 <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
-                    <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                    <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
                             onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                         <warehouse:message code="default.button.delete.label" />
@@ -126,7 +125,7 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipment?.status}"/>
+                                <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.statusCode}"/>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -174,7 +173,12 @@
                                 <g:message code="shipping.shipmentType.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                <g:if test="${stockMovement?.shipmentType}">
+                                    <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
+                                </g:if>
+                                <g:else>
+                                    ${g.message(code:"default.none.label")}
+                                </g:else>
                             </td>
                         </tr>
                         <tr class="prop">

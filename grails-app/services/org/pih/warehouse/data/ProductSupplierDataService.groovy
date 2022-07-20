@@ -35,6 +35,7 @@ class ProductSupplierDataService {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
 
+            def active = params.active
             def productCode = params.productCode
             def supplierName = params.supplierName
             def manufacturerName = params.manufacturerName
@@ -44,6 +45,10 @@ class ProductSupplierDataService {
             def validityStartDate = params.globalPreferenceTypeValidityStartDate
             def validityEndDate = params.globalPreferenceTypeValidityEndDate
             def contractPriceValidUntil = params.contractPriceValidUntil
+
+            if (active && !(active instanceof Boolean)) {
+                command.errors.reject("Row ${index + 1}: Active field has to be either empty or a boolean value (true/false)")
+            }
 
             if (!params.name) {
                 command.errors.reject("Row ${index + 1}: Product Source Name is required")
@@ -135,9 +140,9 @@ class ProductSupplierDataService {
     void process(ImportDataCommand command) {
         log.info "Process data " + command.filename
 
-        command.data.eachWithIndex { params, index ->
-            ProductSupplier productSupplier = createOrUpdate(params)
-            if (productSupplier.validate()) {
+        command.data.each { params ->
+            ProductSupplier.withNewSession {
+                ProductSupplier productSupplier = createOrUpdate(params)
                 productSupplier.save(failOnError: true)
             }
         }

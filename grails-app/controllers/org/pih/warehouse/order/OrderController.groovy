@@ -29,6 +29,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.web.multipart.MultipartFile
 
+import java.math.RoundingMode
+
 class OrderController {
     def orderService
     def stockMovementService
@@ -63,8 +65,8 @@ class OrderController {
         params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
 
         // Pagination parameters
-        params.max = params.format ? null : params.max?:10
-        params.offset = params.format ? null : params.offset?:0
+        params.max = (params.format || params.downloadOrders) ? null : params.max?:10
+        params.offset = (params.format || params.downloadOrders) ? null : params.offset?:0
 
         def orderTemplate = new Order(params)
         orderTemplate.orderType = orderType
@@ -131,6 +133,57 @@ class OrderController {
                         orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
                         orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
                         orderItem?.budgetCode?.code,
+                )
+            }
+
+            response.setHeader("Content-disposition", "attachment; filename=\"OrdersLineItems-${new Date().format("MM/dd/yyyy")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+        }
+
+        if (params.downloadOrders && orders) {
+            def csv = CSVUtils.getCSVPrinter()
+            csv.printRecord(
+                    "Status",
+                    "PO Number",
+                    "Name",
+                    "Supplier",
+                    "Destination name",
+                    "Ordered by",
+                    "Ordered on",
+                    "Payment method",
+                    "Payment terms",
+                    "Line items",
+                    "Ordered",
+                    "Shipped",
+                    "Received",
+                    "Invoiced",
+                    "Currency code",
+                    "Total Amount (Local Currency)",
+                    "Total Amount (Default Currency)"
+            )
+
+            orders.each { order ->
+                Integer lineItemsSize = order?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }.size() ?: 0
+                BigDecimal totalPrice = new BigDecimal(order?.total).setScale(2, RoundingMode.HALF_UP)
+                BigDecimal totalPriceNormalized = order?.totalNormalized.setScale(2, RoundingMode.HALF_UP)
+                csv.printRecord(
+                        order?.displayStatus,
+                        order?.orderNumber,
+                        order?.name,
+                        "${order?.origin?.name} (${order?.origin?.organization?.code})",
+                        "${order?.destination?.name} (${order?.destination?.organization?.code})",
+                        order?.orderedBy?.name,
+                        order?.dateOrdered?.format("MM/dd/yyyy"),
+                        order?.paymentMethodType?.name,
+                        order?.paymentTerm?.name,
+                        lineItemsSize,
+                        order?.orderedOrderItems?.size() ?: 0,
+                        order?.shippedOrderItems?.size() ?: 0,
+                        order?.receivedOrderItems?.size() ?: 0,
+                        order?.invoiceItems?.size() ?: 0,
+                        order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
+                        "${totalPrice} ${order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
+                        "${totalPriceNormalized} ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
                 )
             }
 
@@ -333,35 +386,19 @@ class OrderController {
     }
 
     def deleteAdjustment = {
-        def orderInstance = Order.get(params.order.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
-            redirect(action: "list")
-        } else {
-            User user = User.get(session?.user?.id)
-            def canEdit = orderService.canManageAdjustments(orderInstance, user)
-            if(canEdit) {
-                def orderAdjustment = OrderAdjustment.get(params?.id)
-                if (!orderAdjustment) {
-                    flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
-                    redirect(action: "show", id: orderInstance?.id)
-                } else {
-                    if (orderAdjustment.hasRegularInvoice) {
-                        throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-                    }
-                    orderInstance.removeFromOrderAdjustments(orderAdjustment)
-                    orderAdjustment.delete()
-                    if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-                        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                        redirect(controller:"purchaseOrder", action: "addItems", id: orderInstance.id, params:['skipTo': 'adjustments'])
-                    } else {
-                        render(view: "show", model: [orderInstance: orderInstance])
-                    }
-                }
-            } else {
-                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-            }
+        User user = User.get(session?.user?.id)
+
+        OrderAdjustment orderAdjustment = OrderAdjustment.get(params?.id)
+        if (!orderAdjustment) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustment.label', default: 'Order Adjustment'), params.id])}"
+            redirect(action: "show", id: params.order.id)
         }
+
+        orderService.deleteAdjustment(orderAdjustment, user)
+
+        flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.order.id])}"
+        redirect(controller:"purchaseOrder", action: "addItems", id: params.order.id, params:['skipTo': 'adjustments'])
+
     }
 
 
@@ -643,20 +680,16 @@ class OrderController {
     }
 
     def removeOrderItem = {
+        User user = User.get(session?.user?.id)
+
         OrderItem orderItem = OrderItem.get(params.id)
-        if (orderItem) {
-            if (orderItem.hasShipmentAssociated() || !orderService.canOrderItemBeEdited(orderItem, session.user)) {
-                throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
-            }
-            Order order = orderItem.order
-            order.removeFromOrderItems(orderItem)
-            orderItem.delete()
-            order.save(flush:true)
-            render (status: 200, text: "Successfully deleted order item")
-        }
-        else {
+        if (!orderItem) {
             render (status: 404, text: "Unable to locate order item")
         }
+
+        orderService.removeOrderItem(orderItem, user)
+
+        render (status: 200, text: "Successfully deleted order item")
     }
 
     def saveOrderItem = {
@@ -1040,5 +1073,21 @@ class OrderController {
         params.offset = params.offset?:0
         def orderSummaryList = orderService.getOrderSummaryList(params)
         render(view: "orderSummaryList", model: [orderSummaryList: orderSummaryList ?: []], params: params)
+    }
+
+    // For testing order item derived status feature. orderItemSummary action gets the data from extended SQL view
+    def orderItemSummary = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def orderItemSummaryList = orderService.getOrderItemSummaryList(params)
+        render(view: "orderItemSummaryList", model: [orderItemSummaryList: orderItemSummaryList ?: [], actionName: "orderItemSummary"], params: params)
+    }
+
+    // For testing order item derived status feature. orderItemDetails action gets the data from simplified SQL view
+    def orderItemDetails = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def orderItemDetailsList = orderService.getOrderItemDetailsList(params)
+        render(view: "orderItemSummaryList", model: [orderItemSummaryList: orderItemDetailsList ?: []], actionName: "orderItemDetails", params: params)
     }
 }

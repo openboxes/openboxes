@@ -84,6 +84,11 @@ class UrlMappings {
             action = [GET: "load"]
         }
 
+        "/api/helpscout/configuration" {
+            controller = { "helpScoutApi" }
+            action = [GET: "configuration"]
+        }
+
         // Stock Movement Item API
 
         "/api/stockMovementItems"(parseRequest: true) {
@@ -377,6 +382,11 @@ class UrlMappings {
         "/api/stockTransfers/$id/sendShipment"(parseRequest: true) {
             controller = { "stockTransferApi" }
             action = [POST: "sendShipment"]
+        }
+
+        "/api/stockTransfers/$id/rollback" {
+            controller = { "stockTransferApi" }
+            action = [POST: "rollback"]
         }
 
         "/api/stockTransfers/$id/removeAllItems"(parseRequest: true) {

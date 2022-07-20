@@ -18,9 +18,11 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentType
 
 import java.text.SimpleDateFormat
@@ -141,7 +143,7 @@ class StockTransferApiController {
         }
 
         if (jsonObject.shipmentType) {
-            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType)
+            stockTransfer.shipmentType = ShipmentType.get(jsonObject.shipmentType?.id)
         }
 
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
@@ -165,7 +167,7 @@ class StockTransferApiController {
             stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
             stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
             stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
-            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient"]) ? Person.load(stockTransferItemMap["recipient"]) : null
+            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient.id"]) ? Person.load(stockTransferItemMap["recipient.id"]) : null
 
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin
@@ -182,9 +184,10 @@ class StockTransferApiController {
 
             // For inbound returns
             Date expirationDate = stockTransferItemMap.expirationDate && stockTransferItemMap.expirationDate != JSONObject.NULL ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+            String lotNumber = stockTransferItemMap.lotNumber && stockTransferItemMap.lotNumber != JSONObject.NULL ? stockTransferItemMap.lotNumber : null
             stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                     stockTransferItem.product,
-                    stockTransferItemMap.lotNumber ? stockTransferItemMap.lotNumber : null,
+                    lotNumber,
                     expirationDate
             )
 
@@ -237,6 +240,13 @@ class StockTransferApiController {
         }
 
         shipmentService.sendShipment(order)
+        render status: 200
+    }
+
+    def rollback = {
+        Location currentLocation = Location.get(session.warehouse.id)
+
+        stockTransferService.rollbackReturnOrder(params.id as String, currentLocation)
         render status: 200
     }
 }

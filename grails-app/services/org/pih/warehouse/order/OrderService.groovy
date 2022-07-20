@@ -489,6 +489,9 @@ class OrderService {
 
 
     void deleteOrder(Order orderInstance) {
+        orderInstance.shipments?.each { Shipment it ->
+            shipmentService.deleteShipment(it)
+        }
         deleteTransactions(orderInstance)
         orderInstance.delete(flush: true)
     }
@@ -650,10 +653,13 @@ class OrderService {
 
                     if (sourceCode) {
                         ProductSupplier productSource = ProductSupplier.findByCode(sourceCode)
-                        if (productSource && productSource.product != orderItem.product) {
-                            throw new ProductException("Wrong product source for given product")
-                        }
                         if (productSource) {
+                            if (productSource.product != orderItem.product) {
+                                throw new ProductException("Wrong product source for given product")
+                            }
+                            if (!productSource.active) {
+                                throw new ProductException("Product source ${sourceCode} is inactive")
+                            }
                             orderItem.productSupplier = productSource
                         }
                     } else {
@@ -728,9 +734,13 @@ class OrderService {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
-                    if (code && !budgetCode) {
-                        throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
-
+                    if (code) {
+                        if (!budgetCode) {
+                            throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
+                        }
+                        if (!budgetCode.active) {
+                            throw new IllegalArgumentException("Budget code ${code} is inactive.")
+                        }
                     }
                     orderItem.budgetCode = budgetCode
 
@@ -960,6 +970,25 @@ class OrderService {
         }
     }
 
+    def getOrderItemSummaryList(Map params) {
+        return OrderItemSummary.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+            if (params.derivedStatus) {
+                'in'("derivedStatus", params.derivedStatus)
+            }
+        }
+    }
+
+    def getOrderItemDetailsList(Map params) {
+        return OrderItemDetails.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+        }
+    }
+
     List<OrderItem> getOrderItemsForPriceHistory(Organization supplierOrganization, Product productInstance, String query) {
         def terms = "%" + query + "%"
         def orderItems = OrderItem.createCriteria().list() {
@@ -1022,4 +1051,35 @@ class OrderService {
 
         return orderItems
     }
+
+    def deleteAdjustment(OrderAdjustment orderAdjustment, User user) {
+        Order order = orderAdjustment.order;
+        if (!canManageAdjustments(order, user) || orderAdjustment.hasInvoices){
+            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+        }
+
+        order.removeFromOrderAdjustments(orderAdjustment)
+        orderAdjustment.delete()
+
+        if (order.hasErrors()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+        order.save(flush: true)
+    }
+
+    def removeOrderItem(OrderItem orderItem, User user) {
+        if (orderItem.hasShipmentAssociated() || !canOrderItemBeEdited(orderItem, user) || orderItem.hasInvoices) {
+            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+        }
+
+        Order order = orderItem.order
+        order.removeFromOrderItems(orderItem)
+        orderItem.delete()
+
+        if (order.hasErrors()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+        order.save(flush:true)
+    }
+
 }

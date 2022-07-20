@@ -5,6 +5,7 @@
 
   <changeSet id="1580848680306-1" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/product-demand-view.sql"/>
+    <sqlFile path="views/product-demand-details.sql"/>
   </changeSet>
   <changeSet id="1580848680306-2" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/product-inventory-snapshot-view.sql"/>
@@ -87,5 +88,8 @@
   </changeSet>
   <changeSet id="1580848680306-29" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/stock-movement-list-item.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-30" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
+    <sqlFile path="views/order-item-details.sql"/>
   </changeSet>
 </databaseChangeLog>

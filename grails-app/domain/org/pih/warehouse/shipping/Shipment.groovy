@@ -109,8 +109,11 @@ class Shipment implements Comparable, Serializable {
             "consigneeAddress",
             "receipt",
             "isFromPurchaseOrder",
+            "purchaseOrder",
             "orders",
             "isFromReturnOrder",
+            "isFromPutawayOrder",
+            "isFromTransferOrder",
             "returnOrder"
     ]
 
@@ -272,7 +275,12 @@ class Shipment implements Comparable, Serializable {
                     a?.container?.parentContainer?.sortOrder <=> b?.container?.parentContainer?.sortOrder ?:
                             a?.container?.sortOrder <=> b?.container?.sortOrder ?:
                                     a?.requisitionItem?.orderIndex <=> b?.requisitionItem?.orderIndex ?:
-                                            a?.sortOrder <=> b?.sortOrder
+                                            a?.sortOrder <=> b?.sortOrder ?:
+                                                    a?.inventoryItem?.product?.name <=> b?.inventoryItem?.product?.name ?:
+                                                            a?.inventoryItem?.lotNumber <=> b?.inventoryItem?.lotNumber ?:
+                                                                    a?.product?.name <=> b?.product?.name ?:
+                                                                            a?.lotNumber <=> b?.lotNumber ?:
+                                                                                    b?.quantity <=> a?.quantity
             return sortOrder
         }
 
@@ -294,9 +302,14 @@ class Shipment implements Comparable, Serializable {
         return containerMap
 
     }
+
     // for inbounds and outbounds only
     Order getReturnOrder() {
-        return orders.find{ it.isReturnOrder }
+        return orders?.find { it.isReturnOrder }
+    }
+
+    Order getPurchaseOrder() {
+        return orders?.find { it.isPurchaseOrder }
     }
 
     List<Order> getOrders() {
@@ -320,11 +333,20 @@ class Shipment implements Comparable, Serializable {
     }
 
     Boolean getIsFromPurchaseOrder() {
-        return !shipmentItems?.orderItems?.flatten()?.isEmpty()
+        return !orders?.isEmpty() && orders.every { it.isPurchaseOrder }
     }
 
     Boolean getIsFromReturnOrder() {
-        return orders.any{ it.isReturnOrder}
+        return !orders?.isEmpty() && orders?.every { it.isReturnOrder }
+    }
+
+    Boolean getIsFromPutawayOrder() {
+        return !orders?.isEmpty() && orders?.every { it.isPutawayOrder }
+    }
+
+    Boolean getIsFromTransferOrder() {
+        // Check if is transfer order, but exclude Putaways and Returns
+        return !orders?.isEmpty() && orders?.every { it.isTransferOrder } && !orders?.any { it.isPutawayOrder } && !orders?.any { it.isReturnOrder }
     }
 
     Boolean isStockMovement() {

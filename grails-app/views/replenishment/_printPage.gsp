@@ -10,15 +10,15 @@
             </tr>
             <tr class="theader">
                 <th><warehouse:message code="report.number.label"/></th>
+                <th class="center">${warehouse.message(code: 'orderItem.currentBin.label')}</th>
                 <th>${warehouse.message(code: 'product.productCode.label')}</th>
                 <th>${warehouse.message(code: 'product.name.label')}</th>
                 <th class="center" style="min-width: 150px;">${warehouse.message(code: 'default.lotSerialNo.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.expiry.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.transferToBin.label')}</th>
                 <th class="center">${warehouse.message(code: 'orderItem.qtyToTransfer.label')}</th>
-                <th class="center">${warehouse.message(code: 'inventoryLevel.binLocation.label')}</th>
                 <th class="center">${warehouse.message(code: 'requisitionItem.suggestedPick.label')}</th>
-                <th class="center" style="min-width: 100px">${warehouse.message(code:'default.notes.label')}</th>
+                <th class="center" style="min-width: 100px">${warehouse.message(code: 'default.notes.label')}</th>
             </tr>
         </thead>
         <tbody>
@@ -40,27 +40,9 @@
 
                 <g:while test="${j < numInventoryItem}">
                     <tr class="prop" style="background-color: ${backgroundColor}">
-                        <g:if test="${j==0}">
+                        <g:if test="${j == 0}">
                             <td class="center" width="1%" rowspan="${numInventoryItem}">
                                 ${i + 1}
-                            </td>
-                            <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                ${lineItem?.product?.productCode}
-                            </td>
-                            <td width="50%" rowspan="${numInventoryItem}">
-                                ${lineItem?.product?.name}
-                            </td>
-                            <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                ${lineItem?.inventoryItem?.lotNumber}
-                            </td>
-                            <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                <g:formatDate date="${lineItem?.inventoryItem?.expirationDate}" format="MM/dd/yyyy"/>
-                            </td>
-                            <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                ${lineItem?.destinationBinLocation?.name}
-                            </td>
-                            <td class="center" width="1%" rowspan="${numInventoryItem}">
-                                ${lineItem?.quantity}
                             </td>
                         </g:if>
                         <td class="center middle">
@@ -70,6 +52,33 @@
                                 </div>
                             </g:if>
                         </td>
+                        <g:if test="${j == 0}">
+                            <td class="center" width="1%" rowspan="${numInventoryItem}">
+                                ${lineItem?.product?.productCode}
+                            </td>
+                        </g:if>
+                        <g:if test="${j == 0}">
+                            <td width="50%" rowspan="${numInventoryItem}">
+                                ${lineItem?.product?.name}
+                            </td>
+                        </g:if>
+                        <td class="center" width="1%">
+                            ${groupedPicklistItems[j]?.inventoryItem?.lotNumber}
+                        </td>
+                        <td class="center" width="1%">
+                            <g:formatDate date="${groupedPicklistItems[j]?.inventoryItem?.expirationDate}"
+                                          format="MM/dd/yyyy"/>
+                        </td>
+                        <g:if test="${j == 0}">
+                            <td class="center" width="1%" rowspan="${numInventoryItem}">
+                                ${lineItem?.destinationBinLocation?.name}
+                            </td>
+                        </g:if>
+                        <g:if test="${j == 0}">
+                            <td class="center" width="1%" rowspan="${numInventoryItem}">
+                                ${lineItem?.quantity}
+                            </td>
+                        </g:if>
                         <td class="middle center">
                             <g:if test="${groupedPicklistItems}">
                                 ${groupedPicklistItems[j]?.quantity ?: 0}

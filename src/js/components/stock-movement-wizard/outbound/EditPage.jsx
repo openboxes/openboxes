@@ -48,7 +48,9 @@ const FIELDS = {
       rowValues, subfield, showOnlyErroredItems, itemFilter,
     }) => {
       let className = rowValues.statusCode === 'SUBSTITUTED' ? 'crossed-out ' : '';
-      if (!subfield) { className += 'font-weight-bold'; }
+      if (rowValues.quantityAvailable < rowValues.quantityRequested) {
+        className += 'font-weight-bold';
+      }
       const filterOutItems = itemFilter && !(
         rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
         rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
@@ -73,7 +75,7 @@ const FIELDS = {
       product: {
         type: LabelField,
         headerAlign: 'left',
-        flexWidth: '2.5',
+        flexWidth: '3.5',
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
@@ -95,7 +97,9 @@ const FIELDS = {
         label: 'react.stockMovement.requested.label',
         defaultMessage: 'Requested',
         flexWidth: '1.1',
+        headerAlign: 'right',
         attributes: {
+          className: 'text-right',
           formatValue: value => (value ? (value.toLocaleString('en-US')) : value),
         },
       },
@@ -106,15 +110,16 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
+          let className = 'text-right';
           if (fieldValue && (!fieldValue.quantityOnHand ||
             fieldValue.quantityOnHand < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className = `${className} text-danger`;
           }
           return {
             className,
           };
         },
+        headerAlign: 'right',
         attributes: {
           formatValue: value => (value.quantityOnHand ? (value.quantityOnHand.toLocaleString('en-US')) : value.quantityOnHand),
         },
@@ -126,15 +131,16 @@ const FIELDS = {
         flexWidth: '1',
         fieldKey: '',
         getDynamicAttr: ({ fieldValue }) => {
-          let className = '';
+          let className = 'text-right';
           if (fieldValue && (!fieldValue.quantityAvailable ||
             fieldValue.quantityAvailable < fieldValue.quantityRequested)) {
-            className = 'text-danger';
+            className = `${className} text-danger`;
           }
           return {
             className,
           };
         },
+        headerAlign: 'right',
         attributes: {
           formatValue: value => (value.quantityAvailable ? (value.quantityAvailable.toLocaleString('en-US')) : value.quantityAvailable),
         },
@@ -154,13 +160,17 @@ const FIELDS = {
           },
           showValueTooltip: true,
         }),
+        headerAlign: 'right',
+        attributes: {
+          className: 'text-right',
+        },
       },
       detailsButton: {
         label: 'react.stockMovement.details.label',
         defaultMessage: 'Details',
         type: DetailsModal,
-        fieldKey: '',
         flexWidth: '1',
+        fieldKey: '',
         attributes: {
           title: 'react.stockMovement.pendingRequisitionDetails.label',
           defaultTitleMessage: 'Pending Requisition Details',
@@ -181,6 +191,7 @@ const FIELDS = {
           btnContainerClassName: 'float-right',
           btnOpenAsIcon: true,
           btnOpenStyle: { border: 'none', cursor: 'pointer' },
+          btnOpenIcon: 'fa-search',
         }),
       },
       substituteButton: {
@@ -235,8 +246,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, subfield, reasonCodes, updateRow, values, rowIndex,
         }) => {
-          const isSubstituted = values.lineItems && values.lineItems[rowIndex] &&
-            values.lineItems[rowIndex].statusCode === 'SUBSTITUTED';
+          const isSubstituted = fieldValue && fieldValue.statusCode === 'SUBSTITUTED';
           return {
             disabled: fieldValue === null || fieldValue === undefined || subfield || isSubstituted,
             options: reasonCodes,
@@ -356,9 +366,12 @@ class EditItemsPage extends Component {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,
         },
-        reasonCode: this.props.reasonCodes.find(({ value }) => value === val.reasonCode),
+        // eslint-disable-next-line max-len
+        reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
         substitutionItems: _.map(val.substitutionItems, sub => ({
           ...sub,
+          // eslint-disable-next-line max-len
+          reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(val.reasonCode, value)),
           requisitionItemId: val.requisitionItemId,
           product: {
             ...sub.product,
@@ -478,9 +491,12 @@ class EditItemsPage extends Component {
             editPageItems: _.map(data, item => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
-              reasonCode: this.props.reasonCodes.find(({ value }) => value === item.reasonCode),
+              // eslint-disable-next-line max-len
+              reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
               substitutionItems: _.map(item.substitutionItems, sub => ({
                 ...sub,
+                // eslint-disable-next-line max-len
+                reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
                 requisitionItemId: item.requisitionItemId,
               })),
             })),
@@ -609,12 +625,30 @@ class EditItemsPage extends Component {
 
     return this.reviseRequisitionItems(formValues)
       .then((resp) => {
-        const editPageItems = _.get(resp, 'data.data');
-        if (editPageItems && editPageItems.length) {
+        // If reponse 200, then save revise items taken from the payload
+        const payload = JSON.parse(resp.config.data);
+        if (payload.lineItems && payload.lineItems.length) {
+          const savedItemIds = payload.lineItems.map(item => item.id);
+          // Map to have the required field
+          // (requisitionItemId, quantityRevised and reasonCode as obj)
+          const savedItems = payload.lineItems.map(item => ({
+            ...item,
+            requisitionItemId: item.id,
+            reasonCode: _.find(
+              this.props.reasonCodes,
+              ({ value }) => _.includes(item.reasonCode, value),
+            ),
+          }));
+          // Get old revise items, that were not changed in this request
+          const oldItems = _.filter(
+            this.state.values.editPageItems,
+            item => savedItemIds.indexOf(item.requisitionItemId) < 0,
+          );
           this.setState({
-            revisedItems: [...this.state.revisedItems, ...editPageItems],
+            revisedItems: [...oldItems, ...savedItems],
           });
         }
+
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -709,7 +743,7 @@ class EditItemsPage extends Component {
   updateEditPageItem(values, editPageItem) {
     const editPageItemIndex = _.findIndex(this.state.values.editPageItems, item =>
       item.requisitionItemId === editPageItem.requisitionItemId);
-    const revisedItemIndex = _.findIndex(this.state.values.revisedItems, item =>
+    const revisedItemIndex = _.findIndex(this.state.revisedItems, item =>
       item.requisitionItemId === editPageItem.requisitionItemId);
 
     this.setState({
@@ -729,7 +763,9 @@ class EditItemsPage extends Component {
           },
         }),
       },
-      revisedItems: update(this.state.revisedItems, { $splice: [[revisedItemIndex, 1]] }),
+      revisedItems: update(this.state.revisedItems, revisedItemIndex > -1 ? {
+        $splice: [[revisedItemIndex, 1]],
+      } : {}),
     });
   }
 

@@ -18,6 +18,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate from 'utils/Translate';
 
 
@@ -97,7 +98,23 @@ const TABLE_FIELDS = {
         },
       },
       'product.name': {
-        type: params => (params.subfield ? <LabelField {...params} /> : null),
+        type: (params) => {
+          if (params.subfield) {
+            const { parentIndex, rowIndex } = params;
+            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
+            const handlingIcons = _.get(params.values, fieldPath);
+
+            const productNameWithIcons = (
+              <div className="d-flex">
+                <span className="text-truncate">
+                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+                </span>
+                {renderHandlingIcons(handlingIcons)}
+              </div>);
+            return <LabelField {...params} fieldValue={productNameWithIcons} />;
+          }
+          return null;
+        },
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -462,6 +479,7 @@ class ReceivingCheckScreen extends Component {
                     hasBinLocationSupport: this.props.hasBinLocationSupport,
                     cancelAllRemaining: this.cancelAllRemaining,
                     hasPartialReceivingSupport: this.props.hasPartialReceivingSupport,
+                    values,
                 }))}
               </div>
               <div className="submit-buttons">

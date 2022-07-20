@@ -3,12 +3,11 @@ import queryString from 'query-string';
 
 import apiClient from 'utils/apiClient';
 
-const INBOUND = 'INBOUND';
 
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/persons?name=${searchTerm}`)
+      apiClient.get('/openboxes/api/persons', { params: { name: searchTerm, status: true } })
         .then(result => callback(_.map(result.data.data, obj => (
           {
             ...obj,
@@ -35,7 +34,7 @@ export const debounceLocationsFetch = (
     if (searchTerm && searchTerm.length >= minSearchLength) {
       const activityCodesParams = activityCodes ? activityCodes.map(activityCode => `&activityCodes=${activityCode}`).join('') : '';
       const { direction } = queryString.parse(window.location.search);
-      const directionParam = fetchAll ? null : (direction || INBOUND);
+      const directionParam = fetchAll ? null : direction;
       apiClient.get(`/openboxes/api/locations?name=${searchTerm}${directionParam ? `&direction=${directionParam}` : ''}${activityCodesParams}${isReturnOrder ? '&isReturnOrder=true' : ''}`)
         .then(result => callback(_.map(result.data.data, (obj) => {
           const locationType = withTypeDescription ? ` [${obj.locationType.description}]` : '';

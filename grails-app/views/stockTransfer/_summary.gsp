@@ -62,7 +62,7 @@
             </g:link>
         </g:else>
         <g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_SUPERUSER, org.pih.warehouse.core.RoleType.ROLE_ADMIN, org.pih.warehouse.core.RoleType.ROLE_MANAGER]">
-            <g:if test="${orderInstance?.status == OrderStatus.PENDING}">
+            <g:if test="${orderInstance?.status == OrderStatus.PENDING || orderInstance?.status == OrderStatus.APPROVED}">
                 <g:link class="button" controller="stockTransfer" action="eraseStockTransfer" id="${orderInstance?.id}"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                     <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />

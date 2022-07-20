@@ -45,6 +45,7 @@ class PutAwayPage extends Component {
     const columns = this.getColumns();
     this.state = {
       pendingPutAways: [],
+      readyPutAways: [],
       putawayItems: [],
       columns,
       selection: new Set(),
@@ -185,25 +186,20 @@ class PutAwayPage extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const putawayItems = [];
-        const pendingPutAways = [];
-        const putAwayCandidates = parseResponse(response.data.data);
+        const putAwayCandidates = parseResponse(response.data.data)
+          .map(item => ({ ...item, _id: _.uniqueId('item_') }));
 
-        putAwayCandidates.forEach((item) => {
-          // this _id is used internally in TreeTable
-          const _id = _.uniqueId('item_');
-          if (item.putawayStatus !== 'READY') {
-            pendingPutAways.push({ _id, ...item });
-          } else {
-            putawayItems.push({
-              _id,
-              ...item,
-              putawayFacility: { id: item.currentFacility ? item.currentFacility.id : null },
-            });
-          }
-        });
+        const pendingPutAways = putAwayCandidates.filter(({ putawayStatus }) => putawayStatus !== 'READY');
+        const readyPutAways = putAwayCandidates
+          .filter(({ putawayStatus }) => putawayStatus === 'READY')
+          .map(item => ({
+            ...item,
+            putawayFacility: { id: item.currentFacility ? item.currentFacility.id : null },
+          }));
 
-        this.setState({ putawayItems, pendingPutAways }, () => this.props.hideSpinner());
+        this.setState({
+          putawayItems: readyPutAways, pendingPutAways, readyPutAways,
+        }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -262,14 +258,13 @@ class PutAwayPage extends Component {
    * @public
    */
   filterPutAways(includePending) {
-    let putawayItems = [];
     if (includePending) {
-      putawayItems = [...this.state.putawayItems, ...this.state.pendingPutAways];
+      this.setState({
+        putawayItems: [...this.state.readyPutAways, ...this.state.pendingPutAways], expanded: {},
+      });
     } else {
-      putawayItems = _.filter(this.state.putawayItems, val => val.putawayStatus === 'READY');
+      this.setState({ putawayItems: [...this.state.readyPutAways], expanded: {} });
     }
-
-    this.setState({ putawayItems, expanded: {} });
   }
 
   /**
@@ -434,10 +429,12 @@ class PutAwayPage extends Component {
             <div className="mr-1"><Translate id="react.putAway.lines.label" defaultMessage="Lines in pending putaways" />:</div>
             <div style={{ width: '150px' }}>
               <Select
-                options={[{ value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> },
-                  { value: true, label: <Translate id="react.putAway.include.label" defaultMessage="Include" /> }]}
-                onChange={val => this.filterPutAways(val)}
-                initialValue={false}
+                options={[
+                  { value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> },
+                  { value: true, label: <Translate id="react.putAway.include.label" defaultMessage="Include" /> },
+                ]}
+                onChange={val => this.filterPutAways(val.value)}
+                initialValue={{ value: false, label: <Translate id="react.putAway.exclude.label" defaultMessage="Exclude" /> }}
                 clearable={false}
                 className="select-xs"
               />

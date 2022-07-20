@@ -201,13 +201,16 @@ class SubstitutionsModal extends Component {
       sub.quantitySelected > 0);
     const originalItem = _.find(values.substitutions, sub => sub.originalItem)
       || this.state.attr.lineItem;
+    const substitutionReasonCode = _.get(values, 'reasonCode.value');
 
     const url = `/openboxes/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
       substitutionItems: _.map(substitutions, (sub, key) => ({
         'newProduct.id': sub.product.id,
         newQuantity: sub.quantitySelected,
-        reasonCode: values.reasonCode === 'SUBSTITUTION' ? values.reasonCode : `SUBSTITUTION${values.reasonCode ? ` (${values.reasonCode})` : ''}`,
+        reasonCode: substitutionReasonCode === 'SUBSTITUTION'
+          ? substitutionReasonCode
+          : `SUBSTITUTION${substitutionReasonCode ? ` (${substitutionReasonCode})` : ''}`,
         // Sort order of substitution items should be different for each of them so it is increased
         sortOrder: originalItem.sortOrder + key,
       })),

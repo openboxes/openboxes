@@ -84,10 +84,10 @@ const FIELDS = {
           options: [],
           showValueTooltip: true,
           optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+            <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
               {option.label}
               &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+              {renderHandlingIcons(option.handlingIcons)}
             </strong>
           ),
           valueRenderer: option => (
@@ -370,10 +370,10 @@ class AddItemsPage extends Component {
 
   saveAndExit(formValues) {
     const errors = this.validate(formValues).returnItems;
-    if (!errors.length) {
+    if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
       this.saveStockTransferInCurrentStep(formValues.returnItems)
         .then(() => {
-          window.location = `/openboxes/stockTransfers/show/${this.props.match.params.inboundReturnId}`;
+          window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`;
         });
     } else {
       confirmAlert({
@@ -385,7 +385,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = `/openboxes/stockTransfers/show/${this.props.match.params.inboundReturnId}`; },
+            onClick: () => { window.location = `/openboxes/stockMovement/show/${this.props.match.params.inboundReturnId}`; },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

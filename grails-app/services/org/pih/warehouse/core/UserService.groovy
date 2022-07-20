@@ -232,6 +232,10 @@ class UserService {
         return isUserInRole(user.id, [roleType])
     }
 
+    Boolean isUserInRole(User user, Collection roleTypes) {
+        return isUserInRole(user.id, roleTypes)
+    }
+
     Boolean isUserInRole(String userId, Collection roleTypes) {
         Collection acceptedRoleTypes = RoleType.expand(roleTypes)
         User user = getUser(userId)
@@ -260,7 +264,9 @@ class UserService {
 
     def findPersons(String[] terms, params) {
         def results = Person.createCriteria().list(params) {
-
+            if (params.status) {
+                eq("active", Boolean.valueOf(params.status))
+            }
             if (terms) {
                 terms.each { term ->
                     or {

@@ -20,7 +20,7 @@
 	            </div>
             </g:hasErrors>
 
-			<div class="buttonBar">            	
+			<div class="buttonBar">
             	<span class="linkButton">
             		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
             	</span>
@@ -37,13 +37,21 @@
 	                        <tbody>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
+	                                    <label for="active"><warehouse:message code="user.active.label" default="Active" /></label>
+	                                </td>
+	                                <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'active', 'errors')}">
+										<g:checkBox name="active" value="${personInstance?.active}" />
+	                                </td>
+	                            </tr>
+								<tr class="prop">
+	                                <td valign="top" class="name">
 	                                    <label for="firstName"><warehouse:message code="person.firstName.label" default="First Name" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: personInstance, field: 'firstName', 'errors')}">
 	                                    <g:textField name="firstName" value="${personInstance?.firstName}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                    <label for="lastName"><warehouse:message code="person.lastName.label" default="Last Name" /></label>
@@ -52,7 +60,7 @@
 	                                    <g:textField name="lastName" value="${personInstance?.lastName}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                    <label for="email"><warehouse:message code="person.email.label" default="Email" /></label>
@@ -61,7 +69,7 @@
 	                                    <g:textField name="email" value="${personInstance?.email}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                    <label for="phoneNumber"><warehouse:message code="person.phoneNumber.label" default="Phone Number" /></label>
@@ -70,8 +78,8 @@
 	                                    <g:textField name="phoneNumber" value="${personInstance?.phoneNumber}" />
 	                                </td>
 	                            </tr>
-	                        
-	                        
+
+
 		                        <tr class="prop">
 		                        	<td valign="top" class="name"></td>
 		                        	<td valign="top" clsas="value left">
@@ -79,11 +87,11 @@
 						                   <g:submitButton name="create" class="save" value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
 						                   &nbsp;
 						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-						                   
-						                </div>                        	
+
+						                </div>
 		                        	</td>
 		                        </tr>
-		                        
+
 	                        </tbody>
 	                    </table>
 	                </div>
