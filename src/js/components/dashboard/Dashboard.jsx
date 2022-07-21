@@ -138,6 +138,8 @@ const ConfigurationsList = ({
   );
 };
 
+const MAIN_DASHBOARD_CONFIG = 'mainDashboard';
+
 
 class Dashboard extends Component {
   constructor(props) {
@@ -151,37 +153,59 @@ class Dashboard extends Component {
       configModified: false,
       allLocations: [],
       pageFilters: [],
+      subdashboardKeys: [],
     };
-    this.config = 'personal';
     this.fetchLocations();
   }
 
   componentDidMount() {
-    this.config = this.getConfigIdFromParams() || sessionStorage.getItem('dashboardKey') || this.config;
     if (this.props.currentLocation !== '') {
-      this.fetchData(this.config);
+      this.getSubdashboardKeys().then(() => this.fetchData(this.determineActiveConfig()));
     }
     this.loadPageFilters(this.props.activeConfig);
   }
 
   componentDidUpdate(prevProps) {
-    this.config = this.getConfigIdFromParams() || sessionStorage.getItem('dashboardKey') || this.config;
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
     if (prevLocation !== newLocation) {
-      this.fetchData(this.config);
+      this.getSubdashboardKeys().then(() => this.fetchData(this.determineActiveConfig()));
     }
     if (prevProps.dashboardConfig.dashboards !== this.props.dashboardConfig.dashboards) {
       this.loadPageFilters(this.props.activeConfig);
     }
   }
 
-  getConfigIdFromParams() {
-    if (this.props.match.params.configId) {
-      return this.props.match.params.configId === 'index' ? this.props.activeConfig : this.props.match.params.configId;
+  getDashboardIdFromParams() {
+    const dashboardId = this.props.match.params.configId;
+    if (dashboardId && dashboardId !== 'index') {
+      return dashboardId;
     }
+    return MAIN_DASHBOARD_CONFIG;
+  }
 
-    return '';
+  getSubdashboardKeys() {
+    const dashboardId = this.getDashboardIdFromParams();
+    const url = `/openboxes/api/dashboard/${dashboardId}/subdashboardKeys`;
+    return apiClient.get(url)
+      .then((res) => {
+        const subdashboardKeys = res.data;
+        if (subdashboardKeys) {
+          this.setState({ subdashboardKeys });
+        }
+      });
+  }
+
+  determineActiveConfig() {
+    if (this.props.match.params.configId && this.props.match.params.configId !== 'index') {
+      return this.props.match.params.configId;
+    }
+    const configFromSessionStorage = sessionStorage.getItem('dashboardKey');
+    // eslint-disable-next-line max-len
+    if (configFromSessionStorage && this.state.subdashboardKeys.includes(configFromSessionStorage)) {
+      return configFromSessionStorage;
+    }
+    return 'personal';
   }
 
   dataFetched = false;
@@ -236,6 +260,8 @@ class Dashboard extends Component {
         this.props.currentLocation,
         config,
         this.props.currentUser,
+        // Determine which dashboard (id) to fetch
+        this.getDashboardIdFromParams(),
       );
     }
   };
@@ -261,7 +287,7 @@ class Dashboard extends Component {
     };
 
     apiClient.post(url, payload).then(() => {
-      this.props.fetchConfig();
+      this.props.fetchConfig(this.getDashboardIdFromParams());
       this.setState({ configModified: false });
     });
   };

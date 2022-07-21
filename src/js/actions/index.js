@@ -377,9 +377,9 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   };
 }
 
-export function fetchConfigAndData(locationId, config = 'personal', userId, filterSelected) {
+export function fetchConfigAndData(locationId, config = 'personal', userId, id, filterSelected) {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/config').then((res) => {
+    apiClient.get(`/openboxes/api/dashboard/${id}/config`).then((res) => {
       dispatch({
         type: FETCH_CONFIG_AND_SET_ACTIVE,
         payload: {
@@ -392,9 +392,9 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, filt
   };
 }
 
-export function fetchConfig() {
+export function fetchConfig(id) {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/config').then((res) => {
+    apiClient.get(`/openboxes/api/dashboard/${id}/config`).then((res) => {
       dispatch({
         type: FETCH_CONFIG,
         payload: {
