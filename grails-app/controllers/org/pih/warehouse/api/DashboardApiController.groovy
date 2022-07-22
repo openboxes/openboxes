@@ -23,7 +23,8 @@ class DashboardApiController {
     }
 
     def getSubdashboardKeys = {
-        def config = grailsApplication.config.openboxes.dashboardConfig.dashboards[params.id ?: "mainDashboard"]
+        def mainDashboardId = grailsApplication.config.openboxes.dashboardConfig.mainDashboardId
+        def config = grailsApplication.config.openboxes.dashboardConfig.dashboards[params.id ?: mainDashboardId]
         render(config.keySet() as JSON)
     }
 

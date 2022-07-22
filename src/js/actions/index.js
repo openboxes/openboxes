@@ -310,7 +310,7 @@ export function reloadIndicator(indicatorConfig, params, locationId) {
 function getData(dispatch, dashboardConfig, locationId, config = 'personal', userId = '') {
   // new reference so that the original config is not modified
 
-  const dashboard = dashboardConfig.dashboards[config] || {};
+  const dashboard = dashboardConfig.dashboard[config] || {};
   const widgets = _.map(dashboard.widgets, widget => ({
     ...dashboardConfig.dashboardWidgets[widget.widgetId],
     order: widget.order,

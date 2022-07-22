@@ -408,6 +408,7 @@ openboxes {
 
 openboxes {
     dashboardConfig {
+        mainDashboardId = "mainDashboard"
         dashboards {
             mainDashboard {
                 personal {
