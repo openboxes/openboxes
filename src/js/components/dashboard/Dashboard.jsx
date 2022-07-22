@@ -138,6 +138,8 @@ const ConfigurationsList = ({
   );
 };
 
+const MAIN_DASHBOARD_CONFIG = 'mainDashboard';
+
 
 class Dashboard extends Component {
   constructor(props) {
@@ -151,45 +153,67 @@ class Dashboard extends Component {
       configModified: false,
       allLocations: [],
       pageFilters: [],
+      subdashboardKeys: [],
     };
-    this.config = 'personal';
     this.fetchLocations();
   }
 
   componentDidMount() {
-    this.config = this.getConfigIdFromParams() || sessionStorage.getItem('dashboardKey') || this.config;
     if (this.props.currentLocation !== '') {
-      this.fetchData(this.config);
+      this.getSubdashboardKeys().then(() => this.fetchData(this.determineActiveConfig()));
     }
     this.loadPageFilters(this.props.activeConfig);
   }
 
   componentDidUpdate(prevProps) {
-    this.config = this.getConfigIdFromParams() || sessionStorage.getItem('dashboardKey') || this.config;
     const prevLocation = prevProps.currentLocation;
     const newLocation = this.props.currentLocation;
     if (prevLocation !== newLocation) {
-      this.fetchData(this.config);
+      this.getSubdashboardKeys().then(() => this.fetchData(this.determineActiveConfig()));
     }
-    if (prevProps.dashboardConfig.dashboards !== this.props.dashboardConfig.dashboards) {
+    if (prevProps.dashboardConfig.dashboard !== this.props.dashboardConfig.dashboard) {
       this.loadPageFilters(this.props.activeConfig);
     }
   }
 
-  getConfigIdFromParams() {
-    if (this.props.match.params.configId) {
-      return this.props.match.params.configId === 'index' ? this.props.activeConfig : this.props.match.params.configId;
+  getDashboardIdFromParams() {
+    const dashboardId = this.props.match.params.configId;
+    if (dashboardId && dashboardId !== 'index') {
+      return dashboardId;
     }
+    return MAIN_DASHBOARD_CONFIG;
+  }
 
-    return '';
+  getSubdashboardKeys() {
+    const dashboardId = this.getDashboardIdFromParams();
+    const url = `/openboxes/api/dashboard/${dashboardId}/subdashboardKeys`;
+    return apiClient.get(url)
+      .then((res) => {
+        const subdashboardKeys = res.data;
+        if (subdashboardKeys) {
+          this.setState({ subdashboardKeys });
+        }
+      });
+  }
+
+  determineActiveConfig() {
+    if (this.props.match.params.configId && this.props.match.params.configId !== 'index') {
+      return this.props.match.params.configId;
+    }
+    const configFromSessionStorage = sessionStorage.getItem('dashboardKey');
+    // eslint-disable-next-line max-len
+    if (configFromSessionStorage && this.state.subdashboardKeys.includes(configFromSessionStorage)) {
+      return configFromSessionStorage;
+    }
+    return 'personal';
   }
 
   dataFetched = false;
 
   loadPageFilters(config = '') {
     let pageFilters = [];
-    if (this.props.dashboardConfig.dashboards) {
-      const allPages = Object.entries(this.props.dashboardConfig.dashboards)
+    if (this.props.dashboardConfig.dashboard) {
+      const allPages = Object.entries(this.props.dashboardConfig.dashboard)
         .map(([key, value]) => [key, value]);
       allPages.forEach((page) => {
         const filters = Object.entries(page[1].filters)
@@ -223,7 +247,7 @@ class Dashboard extends Component {
   fetchData = (config = 'personal') => {
     sessionStorage.setItem('dashboardKey', config);
     this.props.resetIndicators();
-    if (this.props.dashboardConfig && this.props.dashboardConfig.dashboards) {
+    if (this.props.dashboardConfig && this.props.dashboardConfig.dashboard) {
       this.props.fetchIndicators(
         this.props.dashboardConfig,
         config,
@@ -236,6 +260,8 @@ class Dashboard extends Component {
         this.props.currentLocation,
         config,
         this.props.currentUser,
+        // Determine which dashboard (id) to fetch
+        this.getDashboardIdFromParams(),
       );
     }
   };
@@ -253,21 +279,21 @@ class Dashboard extends Component {
 
     const url = '/openboxes/api/dashboard/config';
     const payload = {
-      ...this.props.dashboardConfig.dashboards,
+      ...this.props.dashboardConfig.dashboard,
       [this.props.activeConfig]: {
-        ...this.props.dashboardConfig.dashboards[this.props.activeConfig],
+        ...this.props.dashboardConfig.dashboard[this.props.activeConfig],
         widgets,
       },
     };
 
     apiClient.post(url, payload).then(() => {
-      this.props.fetchConfig();
+      this.props.fetchConfig(this.getDashboardIdFromParams());
       this.setState({ configModified: false });
     });
   };
 
   loadIndicator = (widgetId, params) => {
-    const dashboardConf = this.props.dashboardConfig.dashboards[this.props.activeConfig];
+    const dashboardConf = this.props.dashboardConfig.dashboard[this.props.activeConfig];
     const widget = _.find(dashboardConf.widgets, w => w.widgetId === widgetId);
     const widgetConf = {
       ...this.props.dashboardConfig.dashboardWidgets[widgetId],
@@ -366,7 +392,7 @@ class Dashboard extends Component {
     return (
       <div className="dashboard-container">
         <ConfigurationsList
-          configs={this.props.dashboardConfig.dashboards || {}}
+          configs={this.props.dashboardConfig.dashboard || {}}
           loadConfigData={this.fetchData}
           activeConfig={this.props.activeConfig}
           showNav={this.state.showNav}
@@ -384,7 +410,7 @@ class Dashboard extends Component {
 
         <div className="filter-and-cards-container">
           <Filter
-            configs={this.props.dashboardConfig.dashboards || {}}
+            configs={this.props.dashboardConfig.dashboard || {}}
             activeConfig={this.props.activeConfig}
             fetchData={this.fetchData}
             pageFilters={this.state.pageFilters}
@@ -460,7 +486,7 @@ Dashboard.propTypes = {
     id: PropTypes.number,
   })).isRequired,
   dashboardConfig: PropTypes.shape({
-    dashboards: PropTypes.shape({}),
+    dashboard: PropTypes.shape({}),
     dashboardWidgets: PropTypes.shape({}),
   }).isRequired,
   activeConfig: PropTypes.string.isRequired,

@@ -432,7 +432,17 @@ class UrlMappings {
 
         "/api/dashboard/config"(parseRequest: true) {
             controller = { "dashboardApi" }
-            action = [GET: "config", POST: "updateConfig"]
+            action = [POST: "updateConfig"]
+        }
+
+        "/api/dashboard/$id/config"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "config"]
+        }
+
+        "/api/dashboard/$id/subdashboardKeys"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getSubdashboardKeys"]
         }
 
         "/api/dashboard/breadcrumbsConfig"(parseRequest: true) {

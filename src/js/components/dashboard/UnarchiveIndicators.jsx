@@ -195,7 +195,7 @@ UnarchiveIndicators.propTypes = {
   graphData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   numberData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   dashboardConfig: PropTypes.shape({
-    dashboards: PropTypes.shape({}),
+    dashboard: PropTypes.shape({}),
     dashboardWidgets: PropTypes.shape({}),
   }).isRequired,
   unarchiveHandler: PropTypes.func.isRequired,

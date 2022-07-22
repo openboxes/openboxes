@@ -406,27 +406,29 @@ class UserService {
         return false
     }
 
-    def getDashboardConfig(User user) {
-        def config = grailsApplication.config.openboxes.dashboardConfig
+    def getDashboardConfig(User user, String id) {
+        def fullConfig = grailsApplication.config.openboxes.dashboardConfig
+        def mainDashboardId = grailsApplication.config.openboxes.dashboardConfig.mainDashboardId
+        def resultConfig = [
+                dashboard: fullConfig.dashboards[id ?: mainDashboardId],
+                dashboardWidgets: fullConfig.dashboardWidgets
+        ]
         def userConfig = user.deserializeDashboardConfig()
-        Boolean configChanged = false
 
         if (userConfig != null) {
-            int userConfigSize = userConfig.size()
-            int configSize = config.dashboards.size()
-            // If the size is different, that mean that the config has changed
-            if (userConfigSize != configSize) {
-                return config
-            }
-            if (!configChanged) {
-                config = [
-                        dashboards          : userConfig,
-                        dashboardWidgets    : config.dashboardWidgets
-                ]
+            if (id == mainDashboardId) {
+                int userConfigSize = userConfig.size()
+                int resultConfigSize = resultConfig.dashboard.size()
+                if (userConfigSize == resultConfigSize) {
+                    resultConfig = [
+                            dashboard          : userConfig,
+                            dashboardWidgets   : resultConfig.dashboardWidgets
+                    ]
+                }
             }
         }
 
-        return config
+        return resultConfig
     }
 
     def updateDashboardConfig(User user, Object config) {
