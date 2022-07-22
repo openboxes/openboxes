@@ -390,21 +390,25 @@ class TmsIntegrationService {
             }
             else {
                 log.info "Attaching document ${fileName} to ${stockMovement.identifier}"
-                Document document = new Document()
-                if (documentType) {
-                    document.documentNumber = "${documentType}-${trackingNumber}"
+
+                Document document = stockMovement.shipment.documents.find { it.name == fileName }
+                if (!document) {
+                    document = new Document()
+                    if (documentType) {
+                        document.documentNumber = "${documentType}-${trackingNumber}"
+                    }
+                    document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
+                    document.name = fileName
+                    document.filename = fileName
+                    document.fileContents = fileContents.bytes
+
+                    // FIXME we need to figure out a way to detect the mimetype of the file
+                    document.contentType = "application/octet-stream"
+                    document.save(flush: true, failOnError: true)
+
+                    stockMovement.shipment.addToDocuments(document)
+                    stockMovement.shipment.save(flush: true)
                 }
-                document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
-                document.name = fileName
-                document.filename = fileName
-                document.fileContents = fileContents.bytes
-
-                // FIXME we need to figure out a way to detect the mimetype of the file
-                document.contentType = "application/octet-stream"
-                document.save(flush:true, failOnError: true)
-
-                stockMovement.shipment.addToDocuments(document)
-                stockMovement.shipment.save(flush:true)
             }
         }
     }
