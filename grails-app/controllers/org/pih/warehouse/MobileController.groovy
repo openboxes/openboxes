@@ -61,22 +61,37 @@ class MobileController {
         StockMovement inboundCriteria = new StockMovement(destination: location,
                 receiptStatusCodes: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED],
                 stockMovementType: StockMovementType.INBOUND)
-        Map inboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
+        Map inboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
         def inboundPending = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
-        def inboundCount = inboundPending?.size()?:0
+        def inboundCount = inboundPending?.totalCount ?: 0
 
 
         StockMovement outboundCriteria = new StockMovement(origin: location,
                 stockMovementType: StockMovementType.OUTBOUND,
                 receiptStatusCodes: [ShipmentStatusCode.PENDING]
         )
-        Map outboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
+        Map outboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
         def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, outboundParams)
+        def outboundCount = outboundOrders.totalCount ?: 0
+        def outboundPending = outboundOrders
 
-        def outboundCount = outboundOrders.size()?:0
-        def outboundPending = outboundOrders.findAll { it.stockMovementStatusCode < StockMovementStatusCode.DISPATCHED }
-        def readyToBePicked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKING }
-        def readyToBePacked = outboundOrders.findAll{ it.stockMovementStatusCode == StockMovementStatusCode.PICKED }
+        StockMovement readyToBePickedCriteria = new StockMovement(
+                origin: location,
+                stockMovementType: StockMovementType.OUTBOUND,
+                requisitionStatusCodes: [RequisitionStatus.PICKING],
+                receiptStatusCodes: [ShipmentStatusCode.PENDING]
+        )
+        Map readyToBePickedParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+        def readyToBePicked = stockMovementService.getStockMovements(readyToBePickedCriteria, readyToBePickedParams)
+
+        StockMovement readyToBePackedCriteria = new StockMovement(
+                origin: location,
+                stockMovementType: StockMovementType.OUTBOUND,
+                requisitionStatusCodes: [RequisitionStatus.PICKED],
+                receiptStatusCodes: [ShipmentStatusCode.PENDING]
+        )
+        Map readyToBePackedParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+        def readyToBePacked = stockMovementService.getStockMovements(readyToBePackedCriteria, readyToBePackedParams)
 
         StockMovement inTransitCriteria = new StockMovement(
                 origin: location,
@@ -84,32 +99,30 @@ class MobileController {
                 requisitionStatusCodes: [RequisitionStatus.ISSUED],
                 receiptStatusCodes: [ShipmentStatusCode.SHIPPED]
         )
-        Map inTransitParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false]
+        Map inTransitParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
         def inTransit = stockMovementService.getStockMovements(inTransitCriteria, inTransitParams)
-
-        if (!outboundPending?.empty && outboundPending.size() > 10) {
-            outboundPending = outboundPending.subList(0, 10)
-        }
 
         def inventorySummary = ProductSummary.createCriteria().list() {
             eq("location", location)
             order("product", "asc")
         }
 
+        def indicators = [
+                [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
+                [name: "Inbound &rsaquo; Pending", class: "fa fa-shopping-cart", count: inboundCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id': location.id, status: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]])],
+                [name: "Outbound &rsaquo; Pending", class: "fa fa-truck", count: outboundCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id': location.id, receiptStatusCodes: ShipmentStatusCode.PENDING])],
+                [name: "Outbound &rsaquo; Ready to be picked", class: "fa fa-cart-arrow-down", count: readyToBePicked?.totalCount ?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
+                [name: "Outbound &rsaquo; Ready to be packed", class: "fa fa-box-open", count: readyToBePacked?.totalCount?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
+                [name: "Outbound &rsaquo; In Transit", class: "fa fa-map", count: inTransit?.totalCount ?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: [receiptStatusCodes: ShipmentStatusCode.SHIPPED, status: RequisitionStatus.ISSUED])]
+        ]
+
         [
-                indicators: [
-                        [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                        [name: "Inbound &rsaquo; Pending", class: "fa fa-shopping-cart", count: inboundCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id': location.id, status: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]])],
-                        [name: "Outbound &rsaquo; Pending", class: "fa fa-truck", count: outboundCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id': location.id, receiptStatusCodes: ShipmentStatusCode.PENDING])],
-                        [name: "Outbound &rsaquo; Ready to be picked", class: "fa fa-cart-arrow-down", count: readyToBePicked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
-                        [name: "Outbound &rsaquo; Ready to be packed", class: "fa fa-box-open", count: readyToBePacked?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
-                        [name: "Outbound &rsaquo; In Transit", class: "fa fa-map", count: inTransit?.size()?:0, url: g.createLink(controller: "mobile", action: "outboundList", params: [receiptStatusCodes: ShipmentStatusCode.SHIPPED, status: RequisitionStatus.ISSUED])]
-                ],
-                inboundPending: inboundPending,
-                outboundPending: outboundPending,
-                readyToBePicked: readyToBePicked,
-                readyToBePacked: readyToBePacked,
-                inTransit: inTransit,
+                indicators      : indicators,
+                inboundPending  : inboundPending,
+                outboundPending : outboundPending,
+                readyToBePicked : readyToBePicked,
+                readyToBePacked : readyToBePacked,
+                inTransit       : inTransit,
                 inventorySummary: inventorySummary,
         ]
     }
@@ -193,7 +206,7 @@ class MobileController {
 
     def outboundList = {
         log.info "outboundList params ${params}"
-        Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
+        Location origin = Location.get(params["origin.id"]?params["origin.id"]:session.warehouse.id)
 
         List<ShipmentStatusCode> receiptStatusCodes = params.receiptStatusCodes ? params.list("receiptStatusCodes").collect { it as ShipmentStatusCode } : null
 

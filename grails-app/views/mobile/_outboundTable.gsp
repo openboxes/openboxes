@@ -37,7 +37,7 @@
     </tbody>
 </table>
 <g:unless test="${stockMovements}">
-    <div class="alert alert-primary text-muted text-center">
-        No orders matching criteria
+    <div class="alert alert-secondary text-muted text-center">
+        There are no orders matching that criteria
     </div>
 </g:unless>
