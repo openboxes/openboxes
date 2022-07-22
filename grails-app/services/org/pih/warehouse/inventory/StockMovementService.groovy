@@ -13,6 +13,7 @@ import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -537,6 +538,7 @@ class StockMovementService {
         log.info "criteria: ${params}"
 
         def requisitions = Requisition.createCriteria().list(max: params.max, offset: params.offset) {
+            resultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
             eq("isTemplate", Boolean.FALSE)
 
             if (stockMovement?.receiptStatusCodes) {
