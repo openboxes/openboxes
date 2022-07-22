@@ -2524,16 +2524,20 @@ class StockMovementService {
                 referenceNumber = new ReferenceNumber()
                 referenceNumber.identifier = trackingNumber
                 referenceNumber.referenceNumberType = trackingNumberType
+                referenceNumber.save(flush:true)
                 shipment.addToReferenceNumbers(referenceNumber)
+                shipment.save(flush:true)
             }
             // Update the existing reference number
             else {
                 referenceNumber.identifier = trackingNumber
+                referenceNumber.save(flush:true)
             }
         }
         // Reference number exists but the user-defined tracking number was empty so we should delete
         else if (referenceNumber) {
             shipment.removeFromReferenceNumbers(referenceNumber)
+            shipment.save(flush:true)
         }
         return referenceNumber
     }
