@@ -24,7 +24,7 @@
                 </td>
                 <td>
                     <g:if test="${stockMovement?.expectedDeliveryDate}">
-                        ${g.formatDate(date: stockMovement.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                        <p>${g.formatDate(date: stockMovement.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}</p>
                     </g:if>
                     <g:else>
                         <i>${g.formatDate(date: stockMovement.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
@@ -37,7 +37,7 @@
     </tbody>
 </table>
 <g:unless test="${stockMovements}">
-    <div class="alert alert-primary text-muted text-center">
-        No orders matching criteria
+    <div class="alert alert-secondary text-muted text-center">
+        There are no orders matching that criteria
     </div>
 </g:unless>

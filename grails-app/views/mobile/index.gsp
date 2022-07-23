@@ -40,7 +40,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Inbound &rsaquo; Upcoming deliveries to ${session.warehouse.name} (${inboundPending?.size()?:0})</h5>
+                    <h5 class="card-title">Inbound &rsaquo; Upcoming deliveries to ${session.warehouse.name} (Showing ${inboundPending?.size()?:0} of ${inboundPending?.totalCount})</h5>
                     <table class="table table-borderless table-striped">
                         <thead>
                             <tr>
@@ -80,7 +80,7 @@
                         </tbody>
                     </table>
                     <g:unless test="${inboundPending}">
-                        <div class="alert alert-primary text-muted text-center">
+                        <div class="alert alert-secondary text-muted text-center">
                             There are no upcoming deliveries to ${session.warehouse.name}
                         </div>
                     </g:unless>
@@ -92,7 +92,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Outbound &rsaquo; Upcoming deliveries to venues (${outboundPending?.size()?:0})</h5>
+                    <h5 class="card-title">Outbound &rsaquo; Upcoming deliveries to venues (Showing ${outboundPending?.size()?:0} of ${outboundPending?.totalCount})</h5>
                     <g:render template="outboundTable" model="[stockMovements: outboundPending]"/>
                 </div>
             </div>
@@ -102,7 +102,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Outbound &rsaquo; Orders to be picked (${readyToBePicked?.size()?:0})</h5>
+                    <h5 class="card-title">Outbound &rsaquo; Orders to be picked (Showing ${readyToBePicked?.size()?:0} of ${readyToBePicked.totalCount?:0})</h5>
                     <g:render template="outboundTable" model="[stockMovements: readyToBePicked]"/>
                 </div>
             </div>
@@ -112,7 +112,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Outbound &rsaquo; Orders to be packed (${readyToBePacked?.size()?:0})</h5>
+                    <h5 class="card-title">Outbound &rsaquo; Orders to be packed (Showing ${readyToBePacked?.size()?:0} of ${readyToBePacked?.totalCount?:0})</h5>
                     <g:render template="outboundTable" model="[stockMovements: readyToBePacked]"/>
                 </div>
             </div>
@@ -122,7 +122,7 @@
         <div class="col-md-12">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Outbound &rsaquo; Orders in transit (${inTransit?.size()?:0})</h5>
+                    <h5 class="card-title">Outbound &rsaquo; Orders in transit (Showing ${inTransit?.size()?:0} of ${inTransit?.totalCount?:0})</h5>
                     <g:render template="outboundTable" model="[stockMovements: inTransit]"/>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                         </tbody>
                     </table>
                     <g:unless test="${inventorySummary}">
-                        <div class="alert alert-primary text-muted text-center">
+                        <div class="alert alert-secondary text-muted text-center">
                             There are no items in inventory
                         </div>
                     </g:unless>
