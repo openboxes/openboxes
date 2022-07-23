@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import grails.validation.ValidationException
+import groovyx.gpars.GParsPool
 import net.schmizz.sshj.sftp.SFTPException
 import org.apache.commons.net.util.Base64
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException
@@ -56,51 +57,68 @@ class MobileController {
 
         Location location = Location.get(session.warehouse.id)
         def productCount = ProductSummary.countByLocation(location)
-        def productListUrl = g.createLink(controller: "mobile", action: "productList")
 
-        StockMovement inboundCriteria = new StockMovement(destination: location,
-                receiptStatusCodes: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED],
-                stockMovementType: StockMovementType.INBOUND)
-        Map inboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
-        def inboundPending = stockMovementService.getStockMovements(inboundCriteria, inboundParams)
-        def inboundCount = inboundPending?.totalCount ?: 0
+        def inboundPendingQuery = {
+            StockMovement inboundCriteria = new StockMovement(destination: location,
+                    receiptStatusCodes: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED],
+                    stockMovementType: StockMovementType.INBOUND)
+            Map inboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+            return stockMovementService.getStockMovements(inboundCriteria, inboundParams)
+        }
 
+        def outboundPendingQuery = {
+            StockMovement outboundCriteria = new StockMovement(origin: location,
+                    stockMovementType: StockMovementType.OUTBOUND,
+                    receiptStatusCodes: [ShipmentStatusCode.PENDING]
+            )
+            Map outboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+            return stockMovementService.getStockMovements(outboundCriteria, outboundParams)
+        }
 
-        StockMovement outboundCriteria = new StockMovement(origin: location,
-                stockMovementType: StockMovementType.OUTBOUND,
-                receiptStatusCodes: [ShipmentStatusCode.PENDING]
-        )
-        Map outboundParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
-        def outboundOrders = stockMovementService.getStockMovements(outboundCriteria, outboundParams)
-        def outboundCount = outboundOrders.totalCount ?: 0
-        def outboundPending = outboundOrders
+        def readyToBePickedQuery = {
+            StockMovement readyToBePickedCriteria = new StockMovement(
+                    origin: location,
+                    stockMovementType: StockMovementType.OUTBOUND,
+                    requisitionStatusCodes: [RequisitionStatus.PICKING],
+                    receiptStatusCodes: [ShipmentStatusCode.PENDING]
+            )
+            Map readyToBePickedParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+            return stockMovementService.getStockMovements(readyToBePickedCriteria, readyToBePickedParams)
+        }
 
-        StockMovement readyToBePickedCriteria = new StockMovement(
-                origin: location,
-                stockMovementType: StockMovementType.OUTBOUND,
-                requisitionStatusCodes: [RequisitionStatus.PICKING],
-                receiptStatusCodes: [ShipmentStatusCode.PENDING]
-        )
-        Map readyToBePickedParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
-        def readyToBePicked = stockMovementService.getStockMovements(readyToBePickedCriteria, readyToBePickedParams)
+        def readyToBePackedQuery = {
+            StockMovement readyToBePackedCriteria = new StockMovement(
+                    origin: location,
+                    stockMovementType: StockMovementType.OUTBOUND,
+                    requisitionStatusCodes: [RequisitionStatus.PICKED],
+                    receiptStatusCodes: [ShipmentStatusCode.PENDING]
+            )
+            Map readyToBePackedParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+            return stockMovementService.getStockMovements(readyToBePackedCriteria, readyToBePackedParams)
 
-        StockMovement readyToBePackedCriteria = new StockMovement(
-                origin: location,
-                stockMovementType: StockMovementType.OUTBOUND,
-                requisitionStatusCodes: [RequisitionStatus.PICKED],
-                receiptStatusCodes: [ShipmentStatusCode.PENDING]
-        )
-        Map readyToBePackedParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
-        def readyToBePacked = stockMovementService.getStockMovements(readyToBePackedCriteria, readyToBePackedParams)
+        }
 
-        StockMovement inTransitCriteria = new StockMovement(
-                origin: location,
-                stockMovementType: StockMovementType.OUTBOUND,
-                requisitionStatusCodes: [RequisitionStatus.ISSUED],
-                receiptStatusCodes: [ShipmentStatusCode.SHIPPED]
-        )
-        Map inTransitParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
-        def inTransit = stockMovementService.getStockMovements(inTransitCriteria, inTransitParams)
+        def inTransitQuery = {
+            StockMovement inTransitCriteria = new StockMovement(
+                    origin: location,
+                    stockMovementType: StockMovementType.OUTBOUND,
+                    requisitionStatusCodes: [RequisitionStatus.ISSUED],
+                    receiptStatusCodes: [ShipmentStatusCode.SHIPPED]
+            )
+            Map inTransitParams = [sort: "requestedDeliveryDate", order: "asc", includeStockMovementItems: false, max: 10, offset: 0]
+            return stockMovementService.getStockMovements(inTransitCriteria, inTransitParams)
+        }
+
+        def inboundPending
+        def outboundPending
+        def readyToBePicked
+        def readyToBePacked
+        def inTransit
+
+        GParsPool.withPool {
+            (inboundPending, outboundPending, readyToBePicked, readyToBePacked, inTransit) =
+                    GParsPool.executeAsyncAndWait({ inboundPendingQuery() }, { outboundPendingQuery() }, { readyToBePickedQuery() }, { readyToBePackedQuery() }, { inTransitQuery() })
+        }
 
         def inventorySummary = ProductSummary.createCriteria().list() {
             eq("location", location)
@@ -109,8 +127,8 @@ class MobileController {
 
         def indicators = [
                 [name: "Inventory Items", class: "fa fa-box", count: productCount, url: g.createLink(controller: "mobile", action: "productList")],
-                [name: "Inbound &rsaquo; Pending", class: "fa fa-shopping-cart", count: inboundCount, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id': location.id, status: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]])],
-                [name: "Outbound &rsaquo; Pending", class: "fa fa-truck", count: outboundCount, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id': location.id, receiptStatusCodes: ShipmentStatusCode.PENDING])],
+                [name: "Inbound &rsaquo; Pending", class: "fa fa-shopping-cart", count: inboundPending?.totalCount ?:0, url: g.createLink(controller: "mobile", action: "inboundList", params: ['origin.id': location.id, status: [ShipmentStatusCode.PENDING, ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]])],
+                [name: "Outbound &rsaquo; Pending", class: "fa fa-truck", count: outboundPending?.totalCount ?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: ['origin.id': location.id, receiptStatusCodes: ShipmentStatusCode.PENDING])],
                 [name: "Outbound &rsaquo; Ready to be picked", class: "fa fa-cart-arrow-down", count: readyToBePicked?.totalCount ?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKING])],
                 [name: "Outbound &rsaquo; Ready to be packed", class: "fa fa-box-open", count: readyToBePacked?.totalCount?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: [status: RequisitionStatus.PICKED])],
                 [name: "Outbound &rsaquo; In Transit", class: "fa fa-map", count: inTransit?.totalCount ?: 0, url: g.createLink(controller: "mobile", action: "outboundList", params: [receiptStatusCodes: ShipmentStatusCode.SHIPPED, status: RequisitionStatus.ISSUED])]
