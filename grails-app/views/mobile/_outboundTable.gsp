@@ -24,7 +24,7 @@
                 </td>
                 <td>
                     <g:if test="${stockMovement?.expectedDeliveryDate}">
-                        ${g.formatDate(date: stockMovement.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}
+                        <p>${g.formatDate(date: stockMovement.expectedDeliveryDate, format: "dd MMM yyyy HH:mm")}</p>
                     </g:if>
                     <g:else>
                         <i>${g.formatDate(date: stockMovement.requestedDeliveryDate, format: "dd MMM yyyy")}</i>
