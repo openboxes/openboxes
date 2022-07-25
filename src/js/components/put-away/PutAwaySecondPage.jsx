@@ -12,7 +12,7 @@ import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import SplitLineModal from 'components/put-away/SplitLineModal';
-import apiClient, { parseResponse, flattenRequest, stringUrlInterceptor } from 'utils/apiClient';
+import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';

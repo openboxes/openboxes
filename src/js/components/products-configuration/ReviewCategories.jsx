@@ -68,7 +68,7 @@ class ReviewCategories extends Component {
                 <button type="button" onClick={this.downloadCategories} className="btn btn-outline-primary float-right mt-3">
                   <Translate id="react.productsConfiguration.downloadCsvFile.label" defaultMessage="Download CSV file" />
                 </button>
-                <a href={stringUrlInterceptor("/category/tree")} className="btn btn-primary float-right mt-3" target="_blank">
+                <a href={stringUrlInterceptor('/category/tree')} className="btn btn-primary float-right mt-3" rel="noopener noreferrer" target="_blank">
                   <Translate id="react.productsConfiguration.viewCategoryPage.label" defaultMessage="View Category Page" />
                 </a>
               </div>) : (

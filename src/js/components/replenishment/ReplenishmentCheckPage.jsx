@@ -11,7 +11,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
-import apiClient, {flattenRequest, stringUrlInterceptor} from 'utils/apiClient';
+import apiClient, { flattenRequest, stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 

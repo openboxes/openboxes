@@ -21,11 +21,10 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AlertMessage from 'utils/AlertMessage';
-import { handleError, handleSuccess } from 'utils/apiClient';
+import { handleError, handleSuccess, stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
-import { stringUrlInterceptor } from '../../../utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 

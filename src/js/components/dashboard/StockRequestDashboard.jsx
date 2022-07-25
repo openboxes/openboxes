@@ -116,7 +116,7 @@ class StockRequestDashboard extends Component {
             />
           </h3>
           <a
-            href={stringUrlInterceptor("/stockMovement/createRequest")}
+            href={stringUrlInterceptor('/stockMovement/createRequest')}
             className="btn btn-primary d-flex justify-content-center align-items-center font-weight-bold"
           >
             <i className="fa fa-plus mr-1" />
