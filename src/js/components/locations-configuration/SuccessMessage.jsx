@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 import { withRouter } from 'react-router-dom';
 
+import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
-import { stringUrlInterceptor } from "utils/apiClient";
 
 
 const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) => (

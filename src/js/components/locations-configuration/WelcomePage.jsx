@@ -5,8 +5,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { fetchTranslations } from 'actions';
+import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
-import { stringUrlInterceptor } from "utils/apiClient";
 
 class WelcomePage extends Component {
   componentDidMount() {
