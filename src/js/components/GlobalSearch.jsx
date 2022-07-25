@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { debounceGlobalSearch } from 'utils/option-utils';
 import { stringUrlInterceptor } from 'utils/apiClient';
+import { debounceGlobalSearch } from 'utils/option-utils';
 import Select from 'utils/Select';
 
 

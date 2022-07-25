@@ -3,10 +3,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
+import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
-import {stringUrlInterceptor} from "utils/apiClient";
 
 const LoadDemoDataSuccessMessage = ({ history, supportLinks }) => (
   <div className="success-wrapper">
