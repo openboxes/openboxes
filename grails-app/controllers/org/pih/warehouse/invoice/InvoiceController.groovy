@@ -29,13 +29,12 @@ class InvoiceController {
     }
 
     def list = {
-        def invoiceParams = [:]
-        invoiceParams.max = params.max?:10
-        invoiceParams.offset = params.offset?:0
-        invoiceParams.createdBy = params.createdBy ?: null
+        def invoiceParams = params.clone()
+
+        invoiceParams.max = invoiceParams.max ?: 10
+        invoiceParams.offset = invoiceParams.offset ?: 0
         def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
         invoiceParams.dateInvoiced = params.dateInvoiced ? dateFormat.parse(params.dateInvoiced) : null
-        invoiceParams.invoiceNumber = params.invoiceNumber ?: ""
         def location = Location.get(session.warehouse.id)
         invoiceParams.partyFromId = location?.organization?.id
         def invoices = invoiceService.listInvoices(invoiceParams)
