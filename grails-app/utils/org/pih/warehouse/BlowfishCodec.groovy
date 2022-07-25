@@ -14,6 +14,7 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
+// FIXME this class doesn't seem to be used anywhere
 class BlowfishCodec {
 
     static encode = { String target ->
@@ -44,11 +45,5 @@ class BlowfishCodec {
      */
     private static getPassphrase() {
         "secret12".getBytes("UTF-8")
-    }
-
-    static void main(args) {
-        if (args) {
-            println encode(args[0])
-        }
     }
 }
