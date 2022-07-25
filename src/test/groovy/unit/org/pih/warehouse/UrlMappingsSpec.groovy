@@ -56,6 +56,6 @@ class UrlMappingsSpec extends Specification {
         // CATEGORIES
         assertForwardUrlMapping("/api/categories/123", controller: 'categoryApi', action: "delete")
         // STOCK MOVEMENT ITEMS
-        assertForwardUrlMapping("/api/stockMovementItems/123/removeItem", controller: 'stockMovementItemApi', action: "removeItem")
+        assertForwardUrlMapping("/api/stockMovementItems/123/removeItem", controller: 'stockMovementItemApi', action: "eraseItem")
     }
 }
