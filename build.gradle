@@ -32,6 +32,7 @@ buildscript {
 
 plugins {
 
+    id 'application'
     id 'eclipse'
     id 'groovy'
     id 'idea'
@@ -52,6 +53,7 @@ apply plugin: 'org.grails.grails-gsp'
 apply plugin: 'org.grails.grails-web'
 
 group 'com.openboxes'
+mainClassName = 'org.pih.warehouse.Application'
 sourceCompatibility = 1.8
 version '0.9.0-SNAPSHOT'
 
