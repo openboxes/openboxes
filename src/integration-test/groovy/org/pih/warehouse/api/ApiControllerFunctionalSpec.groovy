@@ -58,9 +58,6 @@ class ApiControllerFunctionalSpec extends Specification {
         location = Location.findOrCreateWhere([locationNumber: "TEST", name: "Test Warehouse", locationType: defaultLocationType, organization: organization]).save()
     }
 
-    def cleanup() {
-    }
-
     void "list products"() {
         given:
         String cookie = authenticate("admin", "password", location)
