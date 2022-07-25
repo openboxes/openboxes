@@ -1,225 +1,118 @@
 /**
- * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * Copyright (c) 2022 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
  * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
  * which can be found in the file epl-v10.html at the root of this distribution.
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/
+ */
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 buildscript {
-    repositories {
-        mavenLocal()
-        //mavenCentral()
-        maven { url "https://repo1.maven.org/maven2" }
-        //maven { url "https://repo.grails.org/grails/core" }
-        maven { url "https://repo.grails.org/grails/plugins/" }
-        maven { url "https://repo.grails.org/grails/plugins-releases/" }
-        maven { url "https://repo.grails.org/grails/core/" }
+    configurations.all {
+        /*
+         * JGit is a transitive dependency of gradle-git-properties, which
+         * predates it and does not pin it. JGit stopped supporting Java 8
+         * in release 6.x, and the patched version of gradle-git-properties
+         * does not support Gradle 3.5; see
+         * https://github.com/n0mer/gradle-git-properties/issues/195
+         *
+         * That being said, Grails 3.3.x apparently works with Gradle 4.x:
+         * http://docs.grails.org/3.3.14/guide/single.html#dependencyUpgrades
+         * Although forcing the latest 5.x build, as we do here, works just fine.
+         */
+        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
     }
     dependencies {
-        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.15.1"
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:2.2.0"
-        classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
-        classpath "gradle.plugin.com.virgo47.gradle:ClasspathJar:1.0.0"
-
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
+        classpath "org.grails:grails-gradle-plugin:${grailsVersion}"
+        classpath "org.grails.plugins:database-migration:${grailsDatabaseMigrationVersion}"
+    }
+    repositories {
+        maven { url 'https://repo.grails.org/grails/core' }
     }
 }
 
-//include gradle-node plugin
 plugins {
-    id "com.moowork.node" version "0.12"
-    id "com.virgo47.ClasspathJar" version "1.0.0"
+
+    id 'application'  // enables `mainClassName`, below
+    id 'eclipse'
+    id 'groovy'
+    id 'idea'
+    id 'project-report'
+    id 'war'
+
+    // git magic: releases past v2.3.0 require Gradle 5.1+, but Grails 3.3.x uses 3.5
+    id 'com.gorylenko.gradle-git-properties' version '2.2.4'
+
+    // enables `node` block; this version uses the same Gradle as Grails 3.3.x
+    id 'com.moowork.node' version '1.2.0'
+
+    // resolves a Windows-specific build issue
+    id 'com.virgo47.ClasspathJar' version '1.0.0'
 }
 
-//grails.project.class.dir = "target/classes"
-//grails.project.docs.output.dir = "web-app/docs"
-//grails.project.test.class.dir = "target/test-classes"
-//grails.project.test.reports.dir = "target/test-reports"
-//
-//grails.plugin.location.liquibase = "liquibase/"
+apply plugin: 'asset-pipeline'  // enables `assets` block, but see deps below
+apply plugin: 'org.grails.grails-gsp'
+apply plugin: 'org.grails.grails-web'
 
-version "0.9.0-SNAPSHOT"
-group "com.openboxes"
+group 'com.openboxes'
+mainClassName = 'org.pih.warehouse.Application'
+sourceCompatibility = 1.8
+version '0.9.0-SNAPSHOT'
+
+assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
+assets {
+    excludes = [
+        '**/bundle.*.css',
+        '**/bundle.*.js',
+    ]
+    minifyOptions = [
+        languageMode: 'ES6',
+        optimizationLevel: 'SIMPLE',
+        targetLanguage: 'ES5',
+    ]
+}
+
+bootRun {
+    addResources = true
+    dependsOn = ['npmInstall', 'npm_run_bundle']
+    jvmArgs = [
+        '-Dspring.output.ansi.enabled=always',
+        '-Xdebug',
+        '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
+    ]
+    systemProperties System.properties
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.grails:grails-bom:${grailsVersion}"
+    }
+    applyMavenExclusions true
+}
 
 node {
-    version = '10.12.0'
-    npmVersion = '6.13.6'
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
+    npmVersion = '6.14.17'
+    version = '14.20.0'
 }
-
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-apply plugin:"asset-pipeline"
-apply plugin:"org.grails.grails-gsp"
-apply plugin:"com.gorylenko.gradle-git-properties"
 
 repositories {
-    mavenLocal()
-    //mavenCentral()
-    //maven { url "https://repo.grails.org/grails/core" }
-    maven { url "https://repo1.maven.org/maven2" }
-    maven { url "https://repo.grails.org/grails/plugins/" }
-    maven { url "https://repo.grails.org/grails/plugins-releases/" }
-    maven { url "https://repo.grails.org/grails/core/" }
-//    grailsPlugins()
-//    grailsHome()
-//    grailsCentral()
-//
+    mavenCentral()
+    maven { url 'https://repo.grails.org/grails/core' }
+    // deprecated: only needed for two dependencies (barcode4j, google-analytics)
+    maven { url 'https://repo.grails.org/grails/plugins' }
 }
 
-dependencies {
-    compile "org.springframework.boot:spring-boot-starter-logging"
-    compile "org.springframework.boot:spring-boot-autoconfigure"
-    compile "org.grails:grails-core"
-    compile "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
-    compile "org.grails:grails-web-boot"
-    compile "org.grails:grails-logging"
-    compile "org.grails:grails-plugin-rest"
-    compile "org.grails:grails-plugin-databinding"
-    compile "org.grails:grails-plugin-i18n"
-    compile "org.grails:grails-plugin-services"
-    compile "org.grails:grails-plugin-url-mappings"
-    compile "org.grails:grails-plugin-interceptors"
-    compile "org.grails.plugins:cache"
-    compile "org.grails.plugins:async"
-    compile "org.grails.plugins:scaffolding"
-    compile "org.grails.plugins:events"
-    compile "org.grails.plugins:hibernate5"
-    compile "org.hibernate:hibernate-core:5.1.16.Final"
-    compile "org.grails.plugins:gsp"
-    console "org.grails:grails-console"
-    profile "org.grails.profiles:web"
-    runtime "org.glassfish.web:el-impl:2.1.2-b03"
-    runtime "com.h2database:h2"
-    runtime "org.apache.tomcat:tomcat-jdbc"
-    runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.15.1"
-    testCompile "org.grails:grails-test-mixins:3.3.0"
-    testCompile "org.grails:grails-plugin-testing"
-    testCompile "org.grails:grails-gorm-testing-support"
-    testCompile "org.grails.plugins:geb"
-    testCompile "org.grails:grails-web-testing-support"
-    testCompile "org.grails.plugins:geb:1.1.2"  // before was test(name: 'geb', version: '0.6.3') {}
-    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // was 2.25.0, 2.47.1 was auto-generated by grails 3.3.10
-        // excludes "htmlunit"
-    testRuntime "net.sourceforge.htmlunit:htmlunit:2.18" // was 2.10
-        // excludes "xml-apis"
-    testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:2.47.1" // 2.47.1 was auto-generated by grails 3.3.10
-    testRuntime "org.seleniumhq.selenium:selenium-firefox-driver:2.47.1" // was 2.25.0
-    testRuntime "org.seleniumhq.selenium:selenium-ie-driver:2.47.1" // was 2.25.0
-    testRuntime "org.seleniumhq.selenium:selenium-support:2.47.1"// was 2.25.0
-
-    compile 'org.grails.plugins:database-migration:3.1.0.RC1'
-    compile 'org.liquibase:liquibase-core:3.6.1'
-
-    // Required by database connection
-    compile "mysql:mysql-connector-java:5.1.47" // latest (5) 5.1.48, latest (8) 8.0.17
-
-    // Required by database connection pool
-    compile "com.mchange:c3p0:0.9.5.3" // latest 0.9.5.4
-
-    // Required by docx4j functionality
-    compile "org.docx4j:docx4j:2.8.1" // latest 8.1.x
-        // excludes "commons-logging:commons-logging:1.0.4", "commons-codec", "commons-io"
-
-    // Required for barcode4j
-    compile "com.google.zxing:javase:2.0" // maybe 3.3.1
-
-    // Required by MailService (should replace with grails mail plugin)
-    compile "commons-fileupload:commons-fileupload:1.4"
-    compile "org.apache.commons:commons-email:1.3" // maybe 1.6-SNAPSHOT
-    compile "org.apache.commons:commons-text:1.3" // used to generate sequential identiifers
-    compile "commons-beanutils:commons-beanutils:1.9.4"
-    compile "commons-lang:commons-lang:2.6" // ok
-    compile "org.jadira.usertype:usertype.jodatime:1.9" // maybe 2.1 (but the lates version is from 2012)
-
-    // Required by LDAP
-    compile "com.unboundid:unboundid-ldapsdk:2.3.6" // latest version 4.0.1
-
-    // Render Zebra labels
-    compile "fr.w3blog:zebra-zpl:0.0.3" // ??
-
-    // Fake SMTP server
-    testRuntime "dumbster:dumbster:1.6" // ??
-
-    // Required for GPars
-    compile "org.codehaus.gpars:gpars:1.2.1" // latest 1.2.1
-    compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0" // ??
-    compile "org.codehaus.jsr166-mirror:extra166y:1.7.0" // ??
-
-    // Unknown
-    //    build "org.jboss.tattletale:tattletale-ant:1.2.0.Beta2" { excludes "ant", "javassist" }
-    //    compile "org.codehaus.groovy.modules.http-builder:http-builder:0.6" {
-    //        excludes "xercesImpl", "groovy", "commons-lang", "commons-codec"
-    //    }
-    // REST client (used by translation and currency services)
-    compile "org.apache.httpcomponents:httpclient:4.5.12"
-
-    // Required by functionality (need to be upgraded or replaced)
-    compile "org.grails.plugins:rendering:2.0.3" // was 0.4.4
-    compile "org.grails.plugins:excel-import:3.0.2" // was 0.3
-        // excludes "poi-contrib", "poi-scratchpad"
-    compile 'org.grails.plugins:external-config:1.4.0'
-    runtime "org.grails.plugins:external-config-reload:1.4.1" // was 1.4.0
-    compile "org.grails.plugins:csv:1.0.1" // this is latest Grails version: 1.2 > *
-
-    // Can probably be removed after migration
-    runtime "org.grails.plugins:cache-headers:1.1.7" // was 1.1.5
-    runtime "org.grails.plugins:resources:1.2.14" // was 1.1.6
-    runtime "org.grails.plugins:cached-resources:1.0" // this is latest, Grails version: 1.2 > *
-        // excludes "resources", "cache-headers"
-
-    // Still used but probably can be replaced
-    compile "org.grails.plugins:barcode4j:0.3" // was 0.2.1
-    //compile "org.grails.plugins:pretty-time:3.0.2.Final-1.0.0" // was 0.3
-    compile 'org.grails.plugins:grails-pretty-time:4.0.0'
-    compile "org.grails.plugins:console:1.5.12" // was 1.1
-    compile "org.grails.plugins:image-builder:0.2" // this is latest, Grails version: 1.3.7 > *
-    compile "org.grails.plugins:joda-time:1.5" // was 1.4
-    //compile "org.grails.plugins:springcache:1.3.1" // this is latest, Grails version: 1.2.0 > *
-    compile 'org.grails.plugins:cache:4.0.3'
-    compile "org.grails.plugins:webflow:2.1.0" // was 1.3.8
-    compile "org.grails.plugins:yui:2.8.2.1" // this is latest, Grails version: 1.2 > *
-//    compile "org.grails.plugins:spring-events:1.2" // this is latest, Grails version: 1.2.0 > *
-
-    compile "org.grails.plugins:google-analytics:2.3.3" // was 1.0
-
-    testCompile "org.grails.plugins:code-coverage:2.0.3-3" // was 1.2.5
-    compile group: 'io.micronaut', name: 'micronaut-http-client', version: '1.0.0.RC3'
-
-    // new plugins
-    compile("org.grails.plugins:sentry:11.7.24")
-    compile ('org.grails.plugins:quartz:2.0.13')
-    compile 'org.grails.plugins:quartz-monitor:1.3'
-    //compile "org.grails.plugins:quartz2:2.1.6.2" // this is latest, Grails version: 1.3.7 > *
-
-
-    // Replacement for grails remote taglib
-    compile ('org.grails.plugins:ajax-tags:1.0.0')
-
-    // Used by PDF rendering plugin
-    // NoSuchMethodError: org.springframework.test.context.MergedContextConfiguration.getContextCustomizers()Ljava/util/Set;
-    //runtime "org.springframework:spring-test:4.2.1.RELEASE"
-    runtime 'org.xhtmlrenderer:core-renderer:R8'
-    runtime 'com.lowagie:itext:2.1.0'
-
-    // Used by XLS rendering and Excel Importers
-    compile ('org.apache.poi:poi:3.17')
-
-    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
-    testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
-    compile group: 'org.grails.plugins', name: 'rest-client-builder', version: '2.1.1'
-
-
-}
-
+/*
+ * Add migrations to `sourceSets` *before* introducing liquibase dependencies.
+ * See https://grails.github.io/grails-database-migration/3.1.0/index.html.
+ */
 sourceSets {
     main {
         resources {
@@ -228,94 +121,277 @@ sourceSets {
     }
 }
 
-
 war {
-    archiveName = "openboxes.war"
+    archiveName = 'openboxes.war'
 }
 
-bootRun {
-    jvmArgs = ["-Dspring.output.ansi.enabled=always", "-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"]
-    addResources = true
-    String springProfilesActive = 'spring.profiles.active'
-    systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+dependencies {
+
+    // manage static assets: see https://github.com/bertramdev/asset-pipeline#documentation-1.
+    runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
+    assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipelineVersion}"
+    assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipelineVersion}"
+
+    compile 'com.google.zxing:javase:3.5.0'  // barcode support
+
+    testImplementation 'com.icegreen:greenmail:1.6.9'  // MailServiceTests
+
+    // see https://www.mchange.com/projects/c3p0/#quickstart
+    implementation 'com.mchange:c3p0:0.9.5.5'
+    implementation 'com.mchange:mchange-commons-java:0.2.20'
+
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+    implementation 'commons-lang:commons-lang:2.6'  // FIXME update to commons-lang3
+
+    compile "fr.opensagres.xdocreport:xdocreport:${xDocReportVersion}"
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
+
+    // FIXME assess which, if any, of these sub-dependencies are still needed
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}"
+    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xDocReportVersion}"
+
+    implementation 'fr.w3blog:zebra-zpl:0.0.3'  // ZebraUtils.printZpl(), Labelary API, etc.
+
+    /*
+     * FIXME Used in only one place: ApiControllerFunctionalSpec.groovy.
+     * FIXME Use apache's httpclient instead.
+     */
+    testCompile 'io.micronaut:micronaut-http-client:1.0.0.RC3'
+
+    /*
+     * FIXME Version 8.0.23+ changes an API Liquibase <=3.10.3 depends on.
+     *
+     * https://github.com/liquibase/liquibase/issues/1639
+     *
+     * Once Liquibase 3.10.4 is out, we can use later versions, and remove
+     * the `serverTimezone=UTC` arguments in our jdbc:mysql: strings.
+     *
+     * N.B. the 8 here refers to Java's release, not to MySQL's: this
+     * is the correct library to use to access MySql 5.7 from Java 8.
+     */
+    compile 'mysql:mysql-connector-java:8.0.22'
+
+    testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
+
+    implementation 'org.apache.commons:commons-csv:1.9.0'
+    compile 'org.apache.commons:commons-email:1.5'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    compile 'org.apache.poi:poi:3.17'
+
+    /*
+     * Prevent java.sql.SQLException: No suitable driver found for jdbc:mysql://
+     *
+     * See https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html
+     *
+     * TODO do we need to specify an explicit version here?
+     */
+    runtime 'org.apache.tomcat:tomcat-jdbc'
+
+    // enables `import groovy.sql.Sql`
+    implementation 'org.codehaus.groovy:groovy-sql'
+
+    // enables `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
+    implementation 'org.codehaus.gpars:gpars:1.2.1'
+
+    /*
+     * We can't update docx4j without refactoring ReportService.groovy
+     * to not use org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer.
+     */
+    compile 'org.docx4j:docx4j:2.8.1'  // FIXME update to 8.3.x
+
+    // required for GORM/hibernate validators
+    compile 'org.glassfish.web:javax.el:2.2.5'
+
+    // enables web ui to grails console (no source dependencies)
+    runtime 'org.grails:grails-console'
+
+    // this, or something in it, is needed for jodaTime plugin
+    compile 'org.grails:grails-dependencies'
+
+    // sets up grails log framework (uses logback under the hood)
+    implementation 'org.grails:grails-logging'
+
+    // enables `import grails.converters.JSON`
+    implementation 'org.grails:grails-plugin-rest'
+
+    // prevents Grails from thinking services are broken Domain objects
+    implementation 'org.grails:grails-plugin-services'
+
+    /*
+    * Deprecated: use https://github.com/grails/grails-testing-support.
+    *
+    * Replace instances of, e.g., `import grails.test.mixin`.
+    * See https://testing.grails.org/latest/guide/index.html#upgrading.
+    */
+    testCompile 'org.grails:grails-test-mixins:3.3.0'
+
+    /*
+     * Enables `import grails.testing.web.controllers.ControllerUnitTest`.
+     * Using `testCompile` prevents integrationTestCompileClasspath warnings.
+     */
+    testCompile 'org.grails:grails-web-testing-support'
+
+    // prevents java.lang.ClassNotFoundException for classes we don't directly consume
+    implementation 'org.grails.plugins:async'
+
+    // FIXME replace with com.google.zxing
+    implementation 'org.grails.plugins:barcode4j:0.3'
+
+    // enables userAgentIdentService.isMobile() and <browser:is*> tags
+    implementation 'org.grails.plugins:browser-detection:3.4.0'
+
+    // enables `import grails.plugin.cache.Cacheable`
+    implementation 'org.grails.plugins:cache'
+
+    // enables `grails test-app -coverage`
+    testImplementation 'org.grails.plugins:code-coverage:2.0.3-3'
+
+    implementation 'org.grails.plugins:csv:1.0.1'  // FIXME use commons-csv instead
+
+    // enables liquibase migrations: not present in BOM, so we pin the version
+    compile "org.grails.plugins:database-migration:${grailsDatabaseMigrationVersion}"
+
+    implementation 'org.grails.plugins:excel-import:3.0.2'  // FIXME use commons-csv instead
+
+    // enables `import geb.*`
+    testCompile 'org.grails.plugins:geb'
+
+    // enables <ga:*> tags, which we use only once
+    implementation 'org.grails.plugins:google-analytics:2.3.3'
+
+    // enables prettytime.display(), which we use only three times
+    implementation 'org.grails.plugins:grails-pretty-time:4.0.0'
+
+    // enables `import org.grails.plugins.web.taglib.*`
+    implementation 'org.grails.plugins:gsp'
+
+    // enables `import grails.orm, org.hibernate, org.springframework.orm`
+    compile "org.grails.plugins:hibernate5:${gormVersion}"
+
+    /*
+     * FIXME Configure this properly.
+     *
+     * See https://plugins.grails.org/plugin/agorapulse/newrelic
+     * and https://docs.newrelic.com/docs/new-relic-solutions/best-practices-guides/full-stack-observability/browser-monitoring-best-practices-java/
+     */
+    implementation 'org.grails.plugins:newrelic:5.2.0'
+
+    // enables `import org.quartz.*`
+    compile 'org.grails.plugins:quartz:2.0.13'
+
+    // enables http://localhost:8080//quartz to list all scheduled jobs
+    implementation 'org.grails.plugins:quartz-monitor:1.3'
+
+    /*
+     * FIXME Stop using grails.plugins.rendering.pdf.PdfRenderingService.
+     *
+     * Need `compile` here to pick up trans. deps. like RenderingTrait.
+     */
+    compile 'org.grails.plugins:rendering:2.0.3'
+
+    /*
+     * FIXME Configure this properly.
+     *
+     * See https://plugins.grails.org/plugin/agorapulse/sentry.
+     */
+    compile 'org.grails.plugins:sentry:11.7.25'
+
+    /*
+     * Enables `import org.hibernate.tool.schema.TargetType`.
+     *
+     * Be careful using more modern versions; using releases 5.3+ may raise
+     * java.lang.ClassNotFoundException: org.hibernate.internal.util.xml.XMLHelper.
+     *
+     * We use the latest point release after 5.1.4, which GORM requests.
+     */
+    compile 'org.hibernate:hibernate-core:5.1.17.Final'
+    compile 'org.hibernate:hibernate-ehcache:5.1.17.Final'
+
+    // FIXME org.joda.time.* is redundant in Java 8
+    implementation 'org.jadira.usertype:usertype.jodatime:2.0.1'
+
+    // used in only one place: DocumentTemplateService.groovy
+    implementation 'org.jxls:jxls:2.12.0'
+
+    // see https://grails.github.io/grails-database-migration/3.1.0/index.html
+    compile 'org.liquibase:liquibase-core:3.10.3'
+    implementation 'org.liquibase.ext:liquibase-hibernate5:3.10.1'
+
+    testCompile "org.seleniumhq.selenium:htmlunit-driver:${htmlUnitVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-api:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+
+    /*
+     * Prevent 'Unable to start EmbeddedWebApplicationContext
+     * due to missing EmbeddedServletContainerFactory bean.'
+     */
+    compile 'org.springframework.boot:spring-boot-starter-web'
 }
 
-tasks.withType(Test) {
-    systemProperty "geb.env", System.getProperty('geb.env')
-    systemProperty "geb.build.reportsDir", reporting.file("geb/integrationTest")
-    systemProperty "webdriver.chrome.driver", System.getProperty('webdriver.chrome.driver')
-    systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
-    testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat 'full'
-    }
-}
-
-assets {
-    minifyJs = true
-    minifyCss = true
-
-    minifyOptions = [
-        languageMode: 'ES6',
-        targetLanguage: 'ES5',
-        optimizationLevel: 'SIMPLE',
-    ]
-
-    excludes = [
-        "**/bundle.*.js",
-        "**/bundle.*.css",
-    ]
-}
-
-//Generate webpack bundle when starting up the app
-//bootRun.dependsOn(['npmInstall', 'npm_run_bundle'])
-
-//Generate webpack bundle when packaging the app
-assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
-
+/*
+ * Update `.../META-INF/grails.build.info` after any successful build.
+ */
 buildProperties.doLast {
-    // Find the right file
-    File grailsBuildInfoFile = it.outputs.files.files.find { it.name == 'grails.build.info' }
-    if(!grailsBuildInfoFile) return // No need to continue if the file is not there
+    File grailsBuildInfoFile = it.outputs.files.files.find {
+        it.name == 'grails.build.info'
+    }
+    if (!grailsBuildInfoFile) {
+        return  // nothing to do
+    }
+
+    Map<String, String> env = System.getenv()
     Properties properties = new Properties()
-    // Read properties from the file
     grailsBuildInfoFile.withInputStream {
         properties.load(it)
     }
-    // Add new properties from various sources
-    properties.setProperty('build.time', new Date().format("yyyy-MM-dd HH:mm:ss"))
-    // Get a System property
-    properties.setProperty('build.java.version', System.getProperty('java.version'))
-    // Get the host name where the build was created
-    properties.setProperty('build.host', InetAddress.localHost.hostName)
-    properties.setProperty("build.tag", System.getenv('BUILD_TAG')?: "N/A")
-    properties.setProperty("build.username", System.properties['user.name'])
 
-    // Add property set by your CI (in this case Bamboo)
-    Map<String, String> env = System.getenv()
-    if(env.bamboo_buildNumber) {
-        properties.setProperty('build.number', env.bamboo_buildNumber)
-        properties.setProperty('build.git.revision', env.bamboo_planRepository_revision)
+    properties.setProperty('build.host', InetAddress.localHost.hostName)
+    properties.setProperty('build.java.version', System.getProperty('java.version'))
+    properties.setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
+    properties.setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+    properties.setProperty('build.username', System.properties['user.name'])
+
+    if (env.bamboo_buildNumber) {
         properties.setProperty('build.git.branch', env.bamboo_planRepository_branch)
+        properties.setProperty('build.git.revision', env.bamboo_planRepository_revision)
+        properties.setProperty('build.number', env.bamboo_buildNumber)
     }
 
-    // Write the properties back to the file
     grailsBuildInfoFile.withOutputStream {
-        properties.store(it,null)
+        properties.store(it, null)
     }
 }
-apply plugin: "com.virgo47.ClasspathJar"
 
-ext {
-    dockerBuildDir = mkdir("${buildDir}/docker")
+tasks.withType(Test) {
+    systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
+    systemProperty 'geb.env', System.getProperty('geb.env')
+    systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
+    systemProperty 'webdriver.firefox.driver', System.getProperty('webdriver.firefox.driver')
+    testLogging {
+        events 'failed', 'passed', 'skipped'
+        exceptionFormat 'full'
+    }
 }
 
 task prepareDocker(type: Copy, dependsOn: assemble) {
     description = 'Copy files from ./docker and openboxes.war to Docker temporal build directory'
     group = 'Docker'
 
-    from 'docker/Dockerfile'
     from 'build/libs/openboxes.war'
+    from 'docker/Dockerfile'
 
-    into dockerBuildDir
+    into mkdir("${buildDir}/docker")
 }
