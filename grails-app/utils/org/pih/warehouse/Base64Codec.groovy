@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse
 
+// FIXME this class doesn't seem to be used anywhere
 class Base64Codec {
 
     static decode = { String target ->
@@ -17,12 +18,5 @@ class Base64Codec {
 
     static encode = { String target ->
         return (target.bytes).encodeBase64()
-    }
-
-    static void main(args) {
-        String encodedPassword = encode("secret")
-        println "encoded: " + encodedPassword
-        String decodedPassword = decode(encodedPassword)
-        println "decoded: " + decodedPassword
     }
 }
