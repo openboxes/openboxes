@@ -173,16 +173,19 @@ endpoints:
 hibernate:
     cache:
         queries: false
-        use_second_level_cache: false
+        provider_class: net.sf.ehcache.hibernate.EhCacheProvider
+        region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
         use_query_cache: true
+        use_second_level_cache: false
 
 dataSource:
     pooled: true
     jmxExport: true
-    driverClassName: com.mysql.jdbc.Driver
-    username: 'root'
-    password: 'password'
-    dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: 'openboxes'
+    password: 'openboxes'
+    dialect: org.hibernate.dialect.MySQL57InnoDBDialect
     logSql: false
     formatSql: false
     properties:
@@ -208,15 +211,15 @@ environments:
     development:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false&createDatabaseIfNotExist=true
     test:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false&createDatabaseIfNotExist=true
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false&createDatabaseIfNotExist=true
     production:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?useSSL=false
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
 ---
 openboxes:
     ajaxRequest:

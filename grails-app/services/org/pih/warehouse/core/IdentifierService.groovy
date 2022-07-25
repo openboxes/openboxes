@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
@@ -28,6 +27,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.receiving.Receipt
+import java.sql.SQLIntegrityConstraintViolationException
 
 @Transactional
 class IdentifierService {
@@ -397,7 +397,7 @@ class IdentifierService {
                         println product.errors
                     }
                 }
-            } catch (MySQLIntegrityConstraintViolationException e) {
+            } catch (SQLIntegrityConstraintViolationException e) {
                 log.warn("Unable to assign identifier due to constraint violation: " + e.message, e)
             } catch (Exception e) {
                 log.warn("Unable to assign identifier to product with ID " + product?.id + ": " + e.message, e)

@@ -477,7 +477,7 @@ class DataService {
      * @return
      */
     def importData() {
-        def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.jdbc.Driver")
+        def sql = Sql.newInstance("jdbc:mysql://localhost:3306/mydb", "user", "pswd", "com.mysql.cj.jdbc.Driver")
         def people = sql.dataSet("PERSON")
         new File("users.csv").splitEachLine(",") { fields ->
             people.add(
