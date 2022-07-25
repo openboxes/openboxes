@@ -13,6 +13,12 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationController
+import org.pih.warehouse.core.LocationGroup
+import org.pih.warehouse.core.LocationService
+import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Organization
 import org.springframework.mock.web.MockMultipartFile
 import spock.lang.Specification
 
@@ -31,15 +37,16 @@ class LocationControllerTests extends Specification {
 		def main = new Organization(id: "MAIN", code: "MAIN", name: "Main Org")
 		def sister = new Organization(id: "SIS", code: "SIS", name: "Sister Org")
 
-		mockConfig """
-		openboxes { 
-			identifier {
-				organization { 
-					minSize = 2
-					maxSize = 4
-				}
-			}
-		}"""
+		// FIXME this is the old GrailsUnitTestCase API
+//		mockConfig """
+//		openboxes {
+//			identifier {
+//				organization {
+//					minSize = 2
+//					maxSize = 4
+//				}
+//			}
+//		}"""
 
 
 		mockDomain(Location, [
@@ -68,7 +75,7 @@ class LocationControllerTests extends Specification {
 //		controller.locationService = locationServiceMock.createMock()
 
 		depot = LocationType.get("1")
-		assertNotNull depot
+		assert depot != null
 	}
 
 	void "index should redirect to list page"() {
