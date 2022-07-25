@@ -85,29 +85,36 @@ class RoleFilters {
                             it.controller == "*" && it.actions.contains("*")
                 }
 
-                log.info "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
                 if (!rule) {
                     log.info "No rule for ${controllerName}:${actionName} -> allow anonymous"
-                    if (!session.rbacRules) session.rbacRules = []
-                    session.rbacRules << "${controllerName}:${actionName}"
-                }
-                else {
+                } else {
+                    log.info "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
+                    def minimumRequiredRole = rule.accessRules?.minimumRequiredRole
+                    def supplementalRoles = rule.accessRules?.supplementalRoles ?: []
 
-                    if (rule.access?.contains(RoleType.ROLE_ANONYMOUS) || (session.user && userService.isUserInRole(session.user, rule?.access))) {
-                        log.info "User has access to ${controllerName}.${actionName}"
+                    Boolean isMinimumRequiredRole = true
+                    if (session.user && minimumRequiredRole) {
+                        isMinimumRequiredRole = userService.isUserInRole(session.user, minimumRequiredRole)
                     }
-                    else {
+
+                    Boolean isUserInRole = true
+                    if (session.user && supplementalRoles.size() > 0) {
+                        isUserInRole = userService.isUserInRole(session.user, supplementalRoles)
+                    }
+
+                    if (session.user && isMinimumRequiredRole && isUserInRole) {
+                        log.info "User has access to ${controllerName}.${actionName}"
+                        return true
+                    } else {
                         return false
                     }
                 }
-
 
                 // Anonymous
                 if (SecurityFilters.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" ||
                         SecurityFilters.controllersWithAuthUserNotRequired.contains(controllerName)) {
                     return true
                 }
-
 
                 // Authorized users
                 def isNotAuthenticated = !userService.isUserInRole(session.user, RoleType.ROLE_AUTHENTICATED)
