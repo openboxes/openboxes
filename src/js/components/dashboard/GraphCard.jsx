@@ -14,8 +14,8 @@ import LoadingCard from 'components/dashboard/LoadingCard';
 import Numbers from 'components/dashboard/Numbers';
 import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import TableCard from 'components/dashboard/TableCard';
+import { stringUrlInterceptor } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 // TODO: OBPIH-4384 Refactor FilterComponent to be more generic.

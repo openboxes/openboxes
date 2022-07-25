@@ -49,7 +49,7 @@ class ImportCategories extends Component {
           <Translate id="react.productsConfiguration.downloadProductTemplate2.label" />&nbsp;
         </div>
         <div className="align-self-end">
-          <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor("/product/importAsCsv")}>
+          <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor('/product/importAsCsv')}>
             <Translate id="react.productsConfiguration.importProducts.label" defaultMessage="Import Products List" />
           </a>
         </div>

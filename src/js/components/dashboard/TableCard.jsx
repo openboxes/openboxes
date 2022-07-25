@@ -1,7 +1,8 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { stringUrlInterceptor } from '../../utils/apiClient';
+
+import { stringUrlInterceptor } from 'utils/apiClient';
 
 
 /* global _ */

@@ -66,7 +66,7 @@ class ConfigureProducts extends Component {
             <Translate id="react.productsConfiguration.productListInfo2.label" />
           </div>
           <div>
-            <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor("/product/list")}>
+            <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor('/product/list')}>
               <Translate id="react.productsConfiguration.viewProducts.label" defaultMessage="View Products List" />
             </a>
           </div>

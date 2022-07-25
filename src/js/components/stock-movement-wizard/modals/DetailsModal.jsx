@@ -11,7 +11,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
-import apiClient, {parseResponse, stringUrlInterceptor} from 'utils/apiClient';
+import apiClient, { parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
