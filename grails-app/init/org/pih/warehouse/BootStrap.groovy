@@ -11,9 +11,11 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import liquibase.Contexts
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
+import liquibase.resource.FileSystemResourceAccessor
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -464,10 +466,22 @@ class BootStrap {
             if (connection == null) {
                 throw new RuntimeException("Connection could not be created.")
             }
-            def classLoader = getClass().classLoader
-            def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+            /*
+             * FIXME This patch is unlikely to work in production. OBGM-333
+             *
+             * Previously, we used org.liquibase.grails.GrailsFileOpener here
+             * (from a plugin, https://github.com/liquibase/grails-liquibase/,
+             * that ceased development at Grails 1.3.6).
+             *
+             * The path manipulation here is probably dependent on a local install.
+             */
+            def fileOpener = new FileSystemResourceAccessor(
+                "${servletContext.getRealPath('/')}../../../grails-app/migrations/"
+            )
+
+            def database = DatabaseFactory.getInstance()
+                .findCorrectDatabaseImplementation(connection)
             boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: " + isRunningMigrations)
             log.info("Setting default schema to " + connection.catalog)
@@ -478,13 +492,13 @@ class BootStrap {
 
             //If nothing has been created yet, let's create all new database objects with the install scripts
             if (!ranChangeSets) {
-                liquibase = new Liquibase("install/install.xml", fileOpener, database)
-                liquibase.update(null)
+                liquibase = new Liquibase("install/changelog.xml", fileOpener, database)
+                liquibase.update(null as Contexts)
             }
 
             // Run through the updates in the master changelog
-            liquibase = new Liquibase("changelog.xml", fileOpener, database)
-            liquibase.update(null)
+            liquibase = new Liquibase("upgrade/changelog.xml", fileOpener, database)
+            liquibase.update(null as Contexts)
         }
         finally {
             if (liquibase && liquibase.database) {
