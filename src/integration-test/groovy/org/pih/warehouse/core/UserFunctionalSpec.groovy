@@ -18,9 +18,6 @@ class UserFunctionalSpec extends GebSpec {
         at DashboardPage
     }
 
-    def cleanup() {
-    }
-
     void "test page with user list loading"() {
         when:"The page with user list is visited"
             go 'user/list'
