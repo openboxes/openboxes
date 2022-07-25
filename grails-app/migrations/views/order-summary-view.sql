@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW order_item_status AS
             product.product_code        AS product_code,
             order_item.quantity * order_item.quantity_per_uom    AS quantity_ordered, -- to compare with shipped quantity which is already multiplied by qty per uom
             CASE
-                WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
+                WHEN COALESCE(shipment.current_status) IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
                 ELSE 0
           	END AS quantity_shipped
         FROM `order`
@@ -153,11 +153,11 @@ CREATE OR REPLACE VIEW order_item_summary AS (
             quantity_uom_id,
             quantity_per_uom,
             unit_price,
-            order_item_status.quantity_ordered              AS quantity_ordered,
-            order_item_status.quantity_shipped              AS quantity_shipped,
-            order_receipt_status.quantity_received          AS quantity_received,
-            order_receipt_status.quantity_canceled          AS quantity_canceled,
-            order_payment_status_from_shipments.shipment_item_quantity_invoiced        AS quantity_invoiced,
+            SUM(order_item_status.quantity_ordered)         AS quantity_ordered,
+            SUM(order_item_status.quantity_shipped)         AS quantity_shipped,
+            SUM(order_receipt_status.quantity_received)     AS quantity_received,
+            SUM(order_receipt_status.quantity_canceled)     AS quantity_canceled,
+            SUM(order_payment_status_from_shipments.shipment_item_quantity_invoiced)        AS quantity_invoiced,
             CASE
                 WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) + IFNULL(SUM(order_item_status.quantity_shipped), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) = IFNULL(SUM(order_item_status.quantity_shipped), 0)) THEN 'SHIPPED'
@@ -174,7 +174,7 @@ CREATE OR REPLACE VIEW order_item_summary AS (
                 WHEN (IFNULL(SUM(order_payment_status_from_shipments.quantity_ordered), 0) = 0) THEN NULL
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0) = IFNULL(SUM(shipment_item_invoiced), 0)) THEN 'INVOICED'
                 WHEN (IFNULL(SUM(shipment_payment_ordered), 0)  > 0 AND IFNULL(SUM(shipment_item_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
-                WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 and IFNULL(sum(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
+                WHEN (IFNULL(sum(order_payment_status_from_shipments.quantity_ordered), 0) > 0 AND IFNULL(SUM(order_payment_status_from_shipments.shipment_item_quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
                 ELSE NULL
             END AS payment_status
         FROM order_item

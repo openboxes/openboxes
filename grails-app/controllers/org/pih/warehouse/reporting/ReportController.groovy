@@ -47,6 +47,7 @@ class ReportController {
     def forecastingService
     def shipmentService
     def orderService
+    def userService
     StdScheduler quartzScheduler
 
     def refreshProductDemand = {
@@ -730,5 +731,21 @@ class ReportController {
         }
 
         render(view: 'showForecastReport', params: params)
+    }
+
+    def amountOutstandingOnOrdersReport = {
+        def hasRoleFinance = userService.hasRoleFinance(session?.user)
+        if (!hasRoleFinance) {
+            flash.message = "You do not have permission to view financial data"
+            return
+        }
+
+        def rows = reportService.getAmountOutstandingOnOrders(session?.warehouse?.id)
+
+        def filename = "AmountOutstandingOnOrders-${new Date().format("dd MMM yyyy hhmmss")}"
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
+        documentService.generateExcel(response.outputStream, rows)
+        response.outputStream.flush()
     }
 }
