@@ -13,7 +13,7 @@ CREATE OR REPLACE VIEW order_item_status AS
             product.product_code        AS product_code,
             order_item.quantity * order_item.quantity_per_uom    AS quantity_ordered, -- to compare with shipped quantity which is already multiplied by qty per uom
             CASE
-                WHEN COALESCE(shipment.current_status) IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
+                WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN SUM(shipment_item.quantity)
                 ELSE 0
           	END AS quantity_shipped
         FROM `order`
@@ -23,7 +23,7 @@ CREATE OR REPLACE VIEW order_item_status AS
             LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
             LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER' AND order_item.order_item_status_code != 'CANCELLED'
-        GROUP BY `order`.id, order_item.id
+        GROUP BY `order`.id, order_item.id, shipment.id
     )
 AS order_item_status;
 
@@ -53,7 +53,7 @@ CREATE OR REPLACE VIEW order_receipt_status AS
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
           AND shipment.current_status = 'RECEIVED' OR shipment.current_status = 'PARTIALLY_RECEIVED'
-        GROUP BY `order`.id, `order`.order_number, order_item.id
+        GROUP BY `order`.id, `order`.order_number, order_item.id, shipment.id
     )
 AS order_receipt_status;
 

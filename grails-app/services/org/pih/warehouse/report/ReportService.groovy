@@ -22,6 +22,8 @@ import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.invoice.InvoiceType
+import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
@@ -837,6 +839,7 @@ class ReportService implements ApplicationContextAware {
     def getAmountOutstandingOnOrders(String currentLocationId) {
         Location currentLocation = Location.get(currentLocationId)
         def additionalFilter = ""
+        def prepaymentInvoice = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
         def queryParams
         if (currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)) {
             /**
@@ -845,7 +848,7 @@ class ReportService implements ApplicationContextAware {
              *  - Do not filter by destination
              */
             additionalFilter = "AND destination.organization_id = :buyerOrganizationId "
-            queryParams = [buyerOrganizationId: currentLocation?.organization?.id]
+            queryParams = [prepaymentInvoiceId: prepaymentInvoice?.id, buyerOrganizationId: currentLocation?.organization?.id]
         } else {
             /**
              * In locations without that activity code:
@@ -853,7 +856,7 @@ class ReportService implements ApplicationContextAware {
              *  - Do not filter by buyer org
              * */
             additionalFilter = "AND o.destination_id = :currentLocationId "
-            queryParams = [currentLocationId: currentLocation?.id]
+            queryParams = [prepaymentInvoiceId: prepaymentInvoice?.id, currentLocationId: currentLocation?.id]
         }
 
         String orderItemsQuery = """
@@ -877,13 +880,15 @@ class ReportService implements ApplicationContextAware {
                     LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
                     LEFT OUTER JOIN shipment_invoice ON shipment_invoice.shipment_item_id = shipment_item.id
                     LEFT OUTER JOIN invoice_item ON invoice_item.id = shipment_invoice.invoice_item_id
+                    LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_item.order_item_status_code != 'CANCELLED'
+                    AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
                     ${additionalFilter}
                 GROUP BY o.id, order_item.id, shipment_item.id
             ) AS order_item_invoice_summary 
-            WHERE order_item_invoice_summary.quantity_ordered > order_item_invoice_summary.quantity_invoiced
-            GROUP BY id;
+            GROUP BY id
+            HAVING order_item_invoice_summary.quantity_ordered > SUM(order_item_invoice_summary.quantity_invoiced);
         """
 
         String orderAdjustmentsQuery = """
@@ -897,8 +902,10 @@ class ReportService implements ApplicationContextAware {
                     LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
                     LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
                     LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
+                    LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_adjustment.canceled IS NOT TRUE
+                    AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
                     ${additionalFilter}
                 GROUP BY o.id, order_adjustment.id, invoice_item.id
             ) AS order_adjustment_invoice_summary
