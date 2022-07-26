@@ -439,7 +439,7 @@ class TmsIntegrationService {
         if (status in outboundTransactionTriggerStatuses) {
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
             log.info ("Stock movement ${stockMovement?.identifier} with status ${stockMovement?.status} will be shipped")
-            if (!stockMovement.hasBeenShipped() && stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PACKED) {
+            if (!stockMovement.hasBeenShipped() && stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKED) {
                 stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.DISPATCHED)
             }
             else {
