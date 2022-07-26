@@ -882,7 +882,7 @@ class ReportService implements ApplicationContextAware {
                     LEFT OUTER JOIN invoice_item ON invoice_item.id = shipment_invoice.invoice_item_id
                     LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
-                    AND order_item.order_item_status_code != 'CANCELLED'
+                    AND order_item.order_item_status_code != 'CANCELED'
                     AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
                     ${additionalFilter}
                 GROUP BY o.id, order_item.id, shipment_item.id
@@ -961,13 +961,13 @@ class ReportService implements ApplicationContextAware {
                 "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice),
                 "Qty Ordered not shipped (UOM)"                     : orderedNotShipped,
                 "Qty Ordered not shipped (Each)"                    : orderedNotShipped * orderItem?.quantityPerUom,
-                "Value ordered not shipped"                         : currencyNumberFormat.format((orderedNotShipped * orderItem?.quantityPerUom * orderItem?.unitPrice) ?: 0),
+                "Value ordered not shipped"                         : currencyNumberFormat.format((orderedNotShipped * orderItem?.unitPrice) ?: 0),
                 "Qty Shipped not Invoiced (UOM)"                    : shippedNotInvoiced,
                 "Qty Shipped not Invoiced (Each)"                   : shippedNotInvoiced * orderItem?.quantityPerUom,
-                "Value Shipped not invoiced"                        : currencyNumberFormat.format((shippedNotInvoiced * orderItem?.quantityPerUom * orderItem?.unitPrice) ?: 0),
+                "Value Shipped not invoiced"                        : currencyNumberFormat.format((shippedNotInvoiced * orderItem?.unitPrice) ?: 0),
                 "Total Qty not Invoiced (UOM)"                      : quantityNotInvoiced,
                 "Total Qty not Invoiced (Each)"                     : quantityNotInvoiced * orderItem?.quantityPerUom,
-                "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.quantityPerUom * orderItem?.unitPrice) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.unitPrice) ?: 0),
                 "Budget Code"                                       : orderItem?.budgetCode?.code,
                 "Recipient"                                         : orderItem?.recipient?.name,
                 "Estimated Ready Date"                              : orderItem?.estimatedReadyDate,
