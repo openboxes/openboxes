@@ -14,10 +14,8 @@ import java.time.format.DateTimeFormatter
 buildscript {
     configurations.all {
         /*
-         * JGit is a transitive dependency of gradle-git-properties, which
-         * predates it and does not pin it. JGit stopped supporting Java 8
-         * in release 6.x, and the patched version of gradle-git-properties
-         * does not support Gradle 3.5; see
+         * Without this intervention, gradle-git-properties will pull in
+         * a version of JGit that requires Java 11+, but we use 8; see
          * https://github.com/n0mer/gradle-git-properties/issues/195
          */
         resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
@@ -34,18 +32,16 @@ buildscript {
 
 plugins {
 
-    id 'application'  // enables `mainClassName`, below
     id 'eclipse'
     id 'groovy'
     id 'idea'
     id 'project-report'
     id 'war'
 
-    // git magic: releases past v2.3.0 require Gradle 5.1+, but Grails 3.3.x uses 3.5
+    // git magic: releases past v2.3.0 require Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
-    // enables `node` block; this version uses the same Gradle as Grails 3.3.x
-    id 'com.moowork.node' version '1.2.0'
+    id 'com.moowork.node' version '1.3.1'  // enables `node` block below
 
     // resolves a Windows-specific build issue
     id 'com.virgo47.ClasspathJar' version '1.0.0'
@@ -56,7 +52,6 @@ apply plugin: 'org.grails.grails-gsp'
 apply plugin: 'org.grails.grails-web'
 
 group 'com.openboxes'
-mainClassName = 'org.pih.warehouse.Application'
 sourceCompatibility = 1.8
 version '0.9.0-SNAPSHOT'
 
@@ -117,8 +112,8 @@ sourceSets {
     }
 }
 
-war {
-    archiveName = 'openboxes.war'
+springBoot {
+    mainClass = 'org.pih.warehouse.Application'
 }
 
 dependencies {
@@ -127,6 +122,9 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
     assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipelineVersion}"
     assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipelineVersion}"
+
+    // exposes javax.annotation.Nullable, com.google.common.base.Enums, etc.
+    implementation 'com.google.guava:guava:31.1-jre'
 
     compile 'com.google.zxing:javase:3.5.0'  // barcode support
 
@@ -371,6 +369,16 @@ buildProperties.doLast {
     }
 }
 
+task prepareDocker(type: Copy, dependsOn: assemble) {
+    description = 'Copy files from ./docker and openboxes.war to Docker temporal build directory'
+    group = 'Docker'
+
+    from 'build/libs/openboxes.war'
+    from 'docker/Dockerfile'
+
+    into mkdir("${buildDir}/docker")
+}
+
 tasks.withType(Test) {
     systemProperty 'geb.build.reportsDir', reporting.file('geb/integrationTest')
     systemProperty 'geb.env', System.getProperty('geb.env')
@@ -382,12 +390,6 @@ tasks.withType(Test) {
     }
 }
 
-task prepareDocker(type: Copy, dependsOn: assemble) {
-    description = 'Copy files from ./docker and openboxes.war to Docker temporal build directory'
-    group = 'Docker'
-
-    from 'build/libs/openboxes.war'
-    from 'docker/Dockerfile'
-
-    into mkdir("${buildDir}/docker")
+war {
+    archiveName = 'openboxes.war'
 }
