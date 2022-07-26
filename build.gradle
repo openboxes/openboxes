@@ -19,10 +19,6 @@ buildscript {
          * in release 6.x, and the patched version of gradle-git-properties
          * does not support Gradle 3.5; see
          * https://github.com/n0mer/gradle-git-properties/issues/195
-         *
-         * That being said, Grails 3.3.x apparently works with Gradle 4.x:
-         * http://docs.grails.org/3.3.14/guide/single.html#dependencyUpgrades
-         * Although forcing the latest 5.x build, as we do here, works just fine.
          */
         resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
     }
