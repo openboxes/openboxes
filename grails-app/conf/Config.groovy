@@ -1536,8 +1536,9 @@ openboxes {
                         label: "report.orderReports.label",
                         defaultLabel: "Order Reports",
                         menuItems: [
-                                [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
-                                [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
+                            [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
+                            [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
+                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstandng Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", requiredRole: [RoleType.ROLE_FINANCE]],
                         ]
                 ],
                 [

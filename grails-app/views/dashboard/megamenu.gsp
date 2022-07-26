@@ -460,6 +460,13 @@
                             <warehouse:message code="report.reorderReport.label" default="Reorder Report"/>
                         </g:link>
                     </div>
+                    <g:hasRoleFinance>
+                        <div class="mm-menu-item">
+                            <g:link controller="report" action="amountOutstandingOnOrdersReport">
+                                <warehouse:message code="report.amountOutstandingReport.label" default="Amount Outstandng Report"/>
+                            </g:link>
+                        </div>
+                    </g:hasRoleFinance>
                 </div>
 
                 <div class="mm-content-section">
