@@ -118,6 +118,10 @@ springBoot {
     mainClass = 'org.pih.warehouse.Application'
 }
 
+war {
+    archiveName = 'openboxes.war'
+}
+
 dependencies {
 
     // manage static assets: see https://github.com/bertramdev/asset-pipeline#documentation-1.
@@ -390,8 +394,4 @@ tasks.withType(Test) {
         events 'failed', 'passed', 'skipped'
         exceptionFormat 'full'
     }
-}
-
-war {
-    archiveName = 'openboxes.war'
 }
