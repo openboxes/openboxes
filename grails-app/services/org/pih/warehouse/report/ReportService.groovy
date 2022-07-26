@@ -847,7 +847,7 @@ class ReportService implements ApplicationContextAware {
              *  - Filter by buyer organization = org of the location you are currently in
              *  - Do not filter by destination
              */
-            additionalFilter = "AND destination.organization_id = :buyerOrganizationId "
+            additionalFilter = "AND o.destination_party_id = :buyerOrganizationId "
             queryParams = [prepaymentInvoiceId: prepaymentInvoice?.id, buyerOrganizationId: currentLocation?.organization?.id]
         } else {
             /**
@@ -874,7 +874,6 @@ class ReportService implements ApplicationContextAware {
                     IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)  AS quantity_shipped,
                     IFNULL(SUM(invoice_item.quantity / order_item.quantity_per_uom), 0)  AS quantity_invoiced
                 FROM `order` o
-                    JOIN location AS destination ON o.destination_id = destination.id
                     LEFT OUTER JOIN order_item ON o.id = order_item.order_id
                     LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
                     LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
@@ -898,7 +897,6 @@ class ReportService implements ApplicationContextAware {
                     o.id AS order_id,
                     IFNULL(invoice_item.quantity, 0) AS quantity_invoiced
                 FROM `order` o
-                    JOIN location AS destination ON o.destination_id = destination.id
                     LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
                     LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
                     LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
