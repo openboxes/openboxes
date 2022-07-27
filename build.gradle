@@ -81,6 +81,15 @@ bootRun {
     systemProperties System.properties
 }
 
+configurations.all {
+    // standardize on slf4j/logback
+    exclude group: 'commons-logging', module: 'commons-logging'
+    exclude group: 'log4j', module: 'log4j'
+    exclude group: 'org.apache.logging.log4j', module: 'log4j'
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+    exclude group: 'org.apache.logging.log4j', module: 'log4j-1.2-api'
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.grails:grails-bom:${grailsVersion}"
@@ -124,6 +133,9 @@ war {
 
 dependencies {
 
+    compile "ch.qos.logback:logback-classic:${logbackVersion}"
+    compile "ch.qos.logback:logback-core:${logbackVersion}"
+
     // manage static assets: see https://github.com/bertramdev/asset-pipeline#documentation-1.
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
     assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipelineVersion}"
@@ -139,6 +151,8 @@ dependencies {
     // see https://www.mchange.com/projects/c3p0/#quickstart
     implementation 'com.mchange:c3p0:0.9.5.5'
     implementation 'com.mchange:mchange-commons-java:0.2.20'
+
+    implementation 'com.sun.mail:javax.mail:1.5.6'
 
     implementation 'commons-beanutils:commons-beanutils:1.9.4'
     implementation 'commons-fileupload:commons-fileupload:1.4'
@@ -333,6 +347,11 @@ dependencies {
     testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+
+    compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+    compile "org.slf4j:jul-to-slf4j:${slf4jVersion}"
+    compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+    compile "org.slf4j:slf4j-api:${slf4jVersion}"
 
     /*
      * Prevent 'Unable to start EmbeddedWebApplicationContext
