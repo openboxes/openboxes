@@ -947,6 +947,7 @@ class ReportService implements ApplicationContextAware {
             def quantityNotInvoiced = quantityOrdered - quantityInvoiced > 0 ? quantityOrdered - quantityInvoiced : 0
 
             NumberFormat currencyNumberFormat = getCurrencyNumberFormat()
+            NumberFormat integerFormat =  NumberFormat.getIntegerInstance()
 
             def printRow = [
                 "Supplier"                                          : "${organization?.code} - ${organization?.name}",
@@ -957,14 +958,14 @@ class ReportService implements ApplicationContextAware {
                 "Description"                                       : orderItem?.product?.description,
                 "UOM"                                               : orderItem?.unitOfMeasure,
                 "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice),
-                "Qty Ordered not shipped (UOM)"                     : orderedNotShipped,
-                "Qty Ordered not shipped (Each)"                    : orderedNotShipped * orderItem?.quantityPerUom,
+                "Qty Ordered not shipped (UOM)"                     : integerFormat.format(orderedNotShipped),
+                "Qty Ordered not shipped (Each)"                    : integerFormat.format(orderedNotShipped * orderItem?.quantityPerUom),
                 "Value ordered not shipped"                         : currencyNumberFormat.format((orderedNotShipped * orderItem?.unitPrice) ?: 0),
-                "Qty Shipped not Invoiced (UOM)"                    : shippedNotInvoiced,
-                "Qty Shipped not Invoiced (Each)"                   : shippedNotInvoiced * orderItem?.quantityPerUom,
+                "Qty Shipped not Invoiced (UOM)"                    : integerFormat.format(shippedNotInvoiced),
+                "Qty Shipped not Invoiced (Each)"                   : integerFormat.format(shippedNotInvoiced * orderItem?.quantityPerUom),
                 "Value Shipped not invoiced"                        : currencyNumberFormat.format((shippedNotInvoiced * orderItem?.unitPrice) ?: 0),
-                "Total Qty not Invoiced (UOM)"                      : quantityNotInvoiced,
-                "Total Qty not Invoiced (Each)"                     : quantityNotInvoiced * orderItem?.quantityPerUom,
+                "Total Qty not Invoiced (UOM)"                      : integerFormat.format(quantityNotInvoiced),
+                "Total Qty not Invoiced (Each)"                     : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
                 "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.unitPrice) ?: 0),
                 "Budget Code"                                       : orderItem?.budgetCode?.code,
                 "Recipient"                                         : orderItem?.recipient?.name,
@@ -997,7 +998,7 @@ class ReportService implements ApplicationContextAware {
                 "Code"                                              : "",
                 "Description"                                       : orderAdjustment?.description,
                 "UOM"                                               : "",
-                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format((orderAdjustment?.amount) ?: 0),
+                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
                 "Qty Ordered not shipped (UOM)"                     : "",
                 "Qty Ordered not shipped (Each)"                    : "",
                 "Value ordered not shipped"                         : "",
@@ -1006,7 +1007,7 @@ class ReportService implements ApplicationContextAware {
                 "Value Shipped not invoiced"                        : "",
                 "Total Qty not Invoiced (UOM)"                      : "",
                 "Total Qty not Invoiced (Each)"                     : 1,
-                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.amount) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
                 "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
                 "Recipient"                                         : "",
                 "Estimated Ready Date"                              : "",

@@ -742,7 +742,7 @@ class ReportController {
 
         def rows = reportService.getAmountOutstandingOnOrders(session?.warehouse?.id)
 
-        def filename = "AmountOutstandingOnOrders-${new Date().format("dd MMM yyyy hhmmss")}"
+        def filename = "AmountOutstandingOnOrders-${session?.warehouse?.name}-${new Date().format("dd-MMM-yyyy-hh:mm")}"
         response.contentType = "application/vnd.ms-excel"
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
         documentService.generateExcel(response.outputStream, rows)
