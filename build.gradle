@@ -321,13 +321,20 @@ dependencies {
     /*
      * Enables `import org.hibernate.tool.schema.TargetType`.
      *
-     * Be careful using more modern versions; using releases 5.3+ may raise
+     * Be careful using more modern versions; using 5.3+ may make GORM raise e.g.
      * java.lang.ClassNotFoundException: org.hibernate.internal.util.xml.XMLHelper.
      *
-     * We use the latest point release after 5.1.4, which GORM requests.
+     * Note that database-migration plugin 3.1.x transitively requests Hibernate
+     * 5.4.4+, while the GORM we use wants 5.1.4. They can't both get what they
+     * want: we can reduce but not eliminate the discrepancy by using the latest
+     * release in the 5.1.x series, and pinning slightly older liquibase-core and
+     * liquibase-hibernate versions (see below).
      */
-    compile 'org.hibernate:hibernate-core:5.1.17.Final'
-    compile 'org.hibernate:hibernate-ehcache:5.1.17.Final'
+    compile "org.hibernate:hibernate-c3p0:${hibernateVersion}"
+    compile "org.hibernate:hibernate-core:${hibernateVersion}"
+    compile "org.hibernate:hibernate-ehcache:${hibernateVersion}"
+    compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
+    compile "org.hibernate:hibernate-envers:${hibernateVersion}"
 
     // FIXME org.joda.time.* is redundant in Java 8
     implementation 'org.jadira.usertype:usertype.jodatime:2.0.1'
@@ -335,9 +342,12 @@ dependencies {
     // used in only one place: DocumentTemplateService.groovy
     implementation 'org.jxls:jxls:2.12.0'
 
-    // see https://grails.github.io/grails-database-migration/3.1.0/index.html
-    compile 'org.liquibase:liquibase-core:3.10.3'
-    implementation 'org.liquibase.ext:liquibase-hibernate5:3.10.1'
+    /*
+     * Be careful not to upgrade to a hibernate version GORM doesn't support.
+     * See https://grails.github.io/grails-database-migration/3.0.4/index.html
+     */
+    compile 'org.liquibase:liquibase-core:3.5.5'
+    compile 'org.liquibase.ext:liquibase-hibernate5:3.6'
 
     testCompile "org.seleniumhq.selenium:htmlunit-driver:${htmlUnitVersion}"
     testCompile "org.seleniumhq.selenium:selenium-api:${seleniumVersion}"
