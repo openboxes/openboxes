@@ -13,7 +13,6 @@ import org.apache.commons.mail.Email
 import org.apache.commons.mail.EmailAttachment
 import org.apache.commons.mail.HtmlEmail
 import org.apache.commons.mail.SimpleEmail
-import org.pih.warehouse.util.ExceptionUtil
 
 import javax.mail.util.ByteArrayDataSource
 
@@ -193,7 +192,7 @@ class MailService {
                 email.setStartTLSEnabled(startTlsEnabled)
             }
         } catch (Exception e) {
-            log.error("could not create ${summary}: ${ExceptionUtil.summarize(e)}")
+            log.error("could not create ${summary}", e)
             return false
         }
 
@@ -202,7 +201,7 @@ class MailService {
             email.send()
             return true
         } catch (Exception e) {
-            log.error("could not send ${summary}: ${ExceptionUtil.summarize(e)}")
+            log.error("could not send ${summary}", e)
             return false
         }
         return false
