@@ -22,29 +22,29 @@ import org.pih.warehouse.product.ProductGroup
 
 class DbHelper {
 
-    static Category getOrCreateCategory(String name) {
+    static Category findOrCreateCategory(String name) {
         Category.findByName(name) ?: new Category(name: name).save(failOnError: true, flush: true)
     }
 
-    static Location getOrCreateLocation(String name, LocationType locationType = null, String organizationName = null) {
+    static Location findOrCreateLocation(String name, LocationType locationType = null, String organizationName = null) {
         Location.findByName(name) ?: new Location(
             locationType: locationType ?: LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID),
             name: name,
-            organization: getOrCreateOrganization(organizationName ?: "DbHelper's Dummy Organization")
+            organization: findOrCreateOrganization(organizationName ?: "DbHelper's Dummy Organization")
         ).save(failOnError: true, flush: true)
     }
 
-    static Location getOrCreateLocationWithInventory(String name) {
-        Location warehouse = getOrCreateLocation(name)
+    static Location findOrCreateLocationWithInventory(String name) {
+        Location warehouse = findOrCreateLocation(name)
         createInventory(warehouse)
         return warehouse
     }
 
-    static LocationType getOrCreateLocationType(String name) {
+    static LocationType findOrCreateLocationType(String name) {
         LocationType.findByName(name) ?: new LocationType(name: name).save(failOnError: true, flush: true)
     }
 
-    static InventoryItem getOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate = new Date().plus(30)) {
+    static InventoryItem findOrCreateInventoryItem(Product product, String lotNumber, Date expirationDate = new Date().plus(30)) {
         InventoryItem.findByProductAndLotNumber(product, lotNumber) ?: new InventoryItem(
             expirationDate: expirationDate,
             lotNumber: lotNumber,
@@ -52,7 +52,7 @@ class DbHelper {
         ).save(failOnError: true, flush: true)
     }
 
-    static Organization getOrCreateOrganization(String name) {
+    static Organization findOrCreateOrganization(String name) {
         Organization.findByName(name) ?: new Organization(
             code: name[0..3],
             name: name,
@@ -60,25 +60,25 @@ class DbHelper {
         ).save(failOnError: true, flush: true)
     }
 
-    static Product getOrCreateProduct(String productName, String categoryName = 'Medicines') {
+    static Product findOrCreateProduct(String productName, String categoryName = 'Medicines') {
         Product.findByName(productName) ?: new Product(
-            category: getOrCreateCategory(categoryName),
+            category: findOrCreateCategory(categoryName),
             name: productName,
             productCode: productName,
         ).save(failOnError: true, flush: true)
     }
 
-    static ProductGroup getOrCreateProductGroup(String groupName, String categoryName) {
+    static ProductGroup findOrCreateProductGroup(String groupName, String categoryName) {
         ProductGroup.findByName(groupName) ?: new ProductGroup(
-            category: getOrCreateCategory(categoryName),
+            category: findOrCreateCategory(categoryName),
             name: groupName,
         ).save(failOnError: true, flush: true)
     }
 
-    static Product getOrCreateProductWithGroups(String name, List<String> groupNames) {
-        Product product = getOrCreateProduct(name, 'Integration')
+    static Product findOrCreateProductWithGroups(String name, List<String> groupNames) {
+        Product product = findOrCreateProduct(name, 'Integration')
         groupNames.each {
-            ProductGroup productGroup = getOrCreateProductGroup(it, 'Integration')
+            ProductGroup productGroup = findOrCreateProductGroup(it, 'Integration')
             product.addToProductGroups(productGroup)
             productGroup.addToProducts(product).save(failOnError: true, flush: true)
         }
@@ -86,19 +86,19 @@ class DbHelper {
         product.save(failOnError: true, flush: true)
     }
 
-    static Product getOrCreateProductWithTags(String name, List<String> tagNames) {
-        Product product = getOrCreateProduct(name, 'Integration')
+    static Product findOrCreateProductWithTags(String name, List<String> tagNames) {
+        Product product = findOrCreateProduct(name, 'Integration')
         tagNames.each {
-            product.addToTags(getOrCreateTag(it)).save(failOnError: true, flush: true)
+            product.addToTags(findOrCreateTag(it)).save(failOnError: true, flush: true)
         }
         return product
     }
 
-    static Tag getOrCreateTag(String tagName) {
+    static Tag findOrCreateTag(String tagName) {
         Tag.findByTag(tagName) ?: new Tag(tag: tagName).save(failOnError: true, flush: true)
     }
 
-    static User getOrCreateUser(firstName, lastName, email, username, password, active) {
+    static User findOrCreateUser(firstName, lastName, email, username, password, active) {
         User.findByUsernameOrEmail(username, email) ?: new User(
             active: active,
             email: email,
@@ -109,8 +109,8 @@ class DbHelper {
         ).save(failOnError: true, flush: true)
     }
 
-    static User getOrCreateAdminUser(firstName, lastName, email, username, password, active) {
-        User user = getOrCreateUser(firstName, lastName, email, username, password, active)
+    static User findOrCreateAdminUser(firstName, lastName, email, username, password, active) {
+        User user = findOrCreateUser(firstName, lastName, email, username, password, active)
         Role admin = Role.findByRoleType(RoleType.ROLE_ADMIN)
         assert admin
         user.addToRoles(admin).save(failOnError: true, flush: true)
@@ -146,7 +146,7 @@ class DbHelper {
         def transaction = new Transaction(inventory: location.inventory, transactionType: transactionType, createdBy: User.get(2), transactionDate: transactionDate)
         TransactionEntry transactionEntry = new TransactionEntry()
         transactionEntry.quantity = quantity
-        transactionEntry.inventoryItem = getOrCreateInventoryItem(product, lotNumber, expirationDate)
+        transactionEntry.inventoryItem = findOrCreateInventoryItem(product, lotNumber, expirationDate)
         transaction.addToTransactionEntries(transactionEntry)
         transaction.save(failOnError: true, flush: true)
 

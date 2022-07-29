@@ -37,19 +37,19 @@ class StockMovementServiceTests extends GroovyTestCase {
 	protected void setUp() {
 		super.setUp()
 
-		def origin = DbHelper.getOrCreateLocation('Boston Headquarters')
+		def origin = DbHelper.findOrCreateLocation('Boston Headquarters')
 		assertNotNull(origin)
-		def destination = DbHelper.getOrCreateLocation('Miami Warehouse')
+		def destination = DbHelper.findOrCreateLocation('Miami Warehouse')
 		assertNotNull(destination)
-		def product1 = DbHelper.getOrCreateProduct('Advil 200mg')
+		def product1 = DbHelper.findOrCreateProduct('Advil 200mg')
 		assertNotNull(product1)
-		def product2 = DbHelper.getOrCreateProduct('Tylenol 325mg')
+		def product2 = DbHelper.findOrCreateProduct('Tylenol 325mg')
 		assertNotNull(product2)
 		requisitionItem1 = new RequisitionItem(id: "item1", description: "item1", product: product1, quantity: 10)
 		assertNotNull(requisitionItem1)
 		requisitionItem2 = new RequisitionItem(id: "item2", description: "item2", product: product2, quantity: 20)
 		assertNotNull(requisitionItem2)
-		def person = DbHelper.getOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
+		def person = DbHelper.findOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
 
 		requisition = new Requisition(
 				requestNumber: "SM1",

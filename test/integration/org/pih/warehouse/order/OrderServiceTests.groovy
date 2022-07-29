@@ -14,10 +14,10 @@ class OrderServiceTests extends GroovyTestCase {
 
 	protected void setUp() {
 		super.setUp()
-		def locationType = DbHelper.getOrCreateLocationType('Depot')
-		DbHelper.getOrCreateLocation('Origin', locationType)
-		DbHelper.getOrCreateLocation('Destination', locationType)
-		DbHelper.getOrCreateAdminUser('Justin', 'Miranda', 'justin.miranda@gmail.com', 'justin.miranda', 'password', true)
+		def locationType = DbHelper.findOrCreateLocationType('Depot')
+		DbHelper.findOrCreateLocation('Origin', locationType)
+		DbHelper.findOrCreateLocation('Destination', locationType)
+		DbHelper.findOrCreateAdminUser('Justin', 'Miranda', 'justin.miranda@gmail.com', 'justin.miranda', 'password', true)
 
 		ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.RANDOM
 	}

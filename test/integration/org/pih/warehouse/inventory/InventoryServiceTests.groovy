@@ -64,11 +64,11 @@ class InventoryServiceTests extends GroovyTestCase {
         supplierLocationType = LocationType.get(Constants.SUPPLIER_LOCATION_TYPE_ID)
 
         // get or create a default location
-        acmeLocation = DbHelper.getOrCreateLocation('Acme Supply Company', supplierLocationType)
+        acmeLocation = DbHelper.findOrCreateLocation('Acme Supply Company', supplierLocationType)
 
         // create some default warehouses and inventories
-        bostonLocation = DbHelper.getOrCreateLocation('Boston Location', warehouseLocationType)
-        haitiLocation = DbHelper.getOrCreateLocation('Haiti Location', warehouseLocationType)
+        bostonLocation = DbHelper.findOrCreateLocation('Boston Location', warehouseLocationType)
+        haitiLocation = DbHelper.findOrCreateLocation('Haiti Location', warehouseLocationType)
 
         bostonInventory = DbHelper.createInventory(bostonLocation)
         haitiInventory = DbHelper.createInventory(haitiLocation)
@@ -81,10 +81,10 @@ class InventoryServiceTests extends GroovyTestCase {
         transactionType_transferOut =  TransactionType.get(Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) //id:9
 
         // create some products
-        aspirinProduct = DbHelper.getOrCreateProduct('Aspirin' + UUID.randomUUID().toString()[0..5])
-        tylenolProduct = DbHelper.getOrCreateProduct('Tylenol' + UUID.randomUUID().toString()[0..5])
-        ibuprofenProduct = DbHelper.getOrCreateProduct('Ibuprofen' + UUID.randomUUID().toString()[0..5])
-        advilProduct = DbHelper.getOrCreateProduct('Advil' + UUID.randomUUID().toString()[0..5])
+        aspirinProduct = DbHelper.findOrCreateProduct('Aspirin' + UUID.randomUUID().toString()[0..5])
+        tylenolProduct = DbHelper.findOrCreateProduct('Tylenol' + UUID.randomUUID().toString()[0..5])
+        ibuprofenProduct = DbHelper.findOrCreateProduct('Ibuprofen' + UUID.randomUUID().toString()[0..5])
+        advilProduct = DbHelper.findOrCreateProduct('Advil' + UUID.randomUUID().toString()[0..5])
         ibuprofenProduct.description = 'Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)'
         ibuprofenProduct.save(flush: true)
 
@@ -99,9 +99,9 @@ class InventoryServiceTests extends GroovyTestCase {
 
 
         // create some inventory items
-        aspirinItem1 = DbHelper.getOrCreateInventoryItem(aspirinProduct, '1', new Date().plus(100))
-        aspirinItem2 = DbHelper.getOrCreateInventoryItem(aspirinProduct, '2', new Date().plus(10))
-        tylenolItem = DbHelper.getOrCreateInventoryItem(tylenolProduct, 'lot9383')
+        aspirinItem1 = DbHelper.findOrCreateInventoryItem(aspirinProduct, '1', new Date().plus(100))
+        aspirinItem2 = DbHelper.findOrCreateInventoryItem(aspirinProduct, '2', new Date().plus(10))
+        tylenolItem = DbHelper.findOrCreateInventoryItem(tylenolProduct, 'lot9383')
     }
 
     private void transactionEntryTestFixture() {

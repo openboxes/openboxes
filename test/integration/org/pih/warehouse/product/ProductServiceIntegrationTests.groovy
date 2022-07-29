@@ -30,37 +30,37 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		super.setUp()
 
 		Role financeRole = Role.findByRoleType(RoleType.ROLE_FINANCE)
-		User user = DbHelper.getOrCreateAdminUser('Justin', 'Miranda', 'justin@openboxes.com', 'jmiranda', 'password', true)
+		User user = DbHelper.findOrCreateAdminUser('Justin', 'Miranda', 'justin@openboxes.com', 'jmiranda', 'password', true)
 		user.addToRoles(financeRole)
 		user.save()
 
 		AuthService.currentUser.set(user)
 
-		product1 = DbHelper.getOrCreateProductWithGroups('boo floweree 250mg', ['Hoo moodiccina', 'Boo floweree'])
-		product2 = DbHelper.getOrCreateProductWithGroups('boo pill', ['Boo floweree'])
-		product3 = DbHelper.getOrCreateProductWithGroups('foo', ['Hoo moodiccina'])
-		product4 = DbHelper.getOrCreateProductWithGroups('abc tellon', ['Hoo moodiccina'])
-		product5 = DbHelper.getOrCreateProductWithGroups('goomoon', ['Boo floweree'])
-		product6 = DbHelper.getOrCreateProductWithGroups('buhoo floweree root', [])
+		product1 = DbHelper.findOrCreateProductWithGroups('boo floweree 250mg', ['Hoo moodiccina', 'Boo floweree'])
+		product2 = DbHelper.findOrCreateProductWithGroups('boo pill', ['Boo floweree'])
+		product3 = DbHelper.findOrCreateProductWithGroups('foo', ['Hoo moodiccina'])
+		product4 = DbHelper.findOrCreateProductWithGroups('abc tellon', ['Hoo moodiccina'])
+		product5 = DbHelper.findOrCreateProductWithGroups('goomoon', ['Boo floweree'])
+		product6 = DbHelper.findOrCreateProductWithGroups('buhoo floweree root', [])
 		group1 = ProductGroup.findByName("Hoo moodiccina")
 		group2 = ProductGroup.findByName("Boo floweree")
 
 		// Create new root category if it doesn't exist
-		def category = DbHelper.getOrCreateCategory('ROOT')
+		def category = DbHelper.findOrCreateCategory('ROOT')
 		category.isRoot = true
 		category.save(failOnError: true, flush: true)
         assertTrue !category.hasErrors()
 
         // Create products with tags
-		DbHelper.getOrCreateProductWithTags('Ibuprofen 200mg tablet', ['nsaid', 'pain', 'favorite'])
-		DbHelper.getOrCreateProductWithTags('Acetaminophen 325mg tablet', ['pain', 'pain reliever'])
-		DbHelper.getOrCreateProductWithTags('Naproxen 220mg tablet', ['pain reliever', 'pain', 'nsaid', 'fever reducer'])
+		DbHelper.findOrCreateProductWithTags('Ibuprofen 200mg tablet', ['nsaid', 'pain', 'favorite'])
+		DbHelper.findOrCreateProductWithTags('Acetaminophen 325mg tablet', ['pain', 'pain reliever'])
+		DbHelper.findOrCreateProductWithTags('Naproxen 220mg tablet', ['pain reliever', 'pain', 'nsaid', 'fever reducer'])
 
 		// Create a tag without products
-		DbHelper.getOrCreateTag('tagwithnoproducts')
+		DbHelper.findOrCreateTag('tagwithnoproducts')
 
 		// Create a product with a unique product code
-		def product7 = DbHelper.getOrCreateProduct('Test Product')
+		def product7 = DbHelper.findOrCreateProduct('Test Product')
 		product7.productCode = 'AB13'
 		product7.save(failOnError: true, flush: true)
 		assertNotNull product7
@@ -114,7 +114,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Ignore
 	void importProducts_shouldNotUpdateProductsWhenSaveToDatabaseIsFalse() {
-		def product = DbHelper.getOrCreateProduct('Sudafed')
+		def product = DbHelper.findOrCreateProduct('Sudafed')
 		assertNotNull product.id
 		def row1 = ["${product.id}", "", "Sudafed 2", "OTC Medicines", "Description", "Unit of Measure", "tag1,tag2", "0.01", "Manufacture", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
@@ -167,7 +167,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Test
 	void importProducts_shouldUpdateNameOnExistingProduct() {
-		def productBefore = DbHelper.getOrCreateProduct('Sudafed')
+		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 		assertNotNull productBefore.id
 		def row1 = ["${productBefore.id}", "AB12", "", "Sudafed 2.0", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
@@ -182,7 +182,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Test
 	void importProducts_shouldUpdateAllFieldsOnExistingProduct() {
-		def productBefore = DbHelper.getOrCreateProduct('Sudafed')
+		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 		assertNotNull productBefore.id
 		def row1 = [productBefore.id, "AB12", "", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, "true", null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
@@ -213,7 +213,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     void importProducts_shouldAddExistingTags() {
 		def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
 		def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
-		def productBefore = DbHelper.getOrCreateProduct('Sudafed')
+		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 
         assertNotNull productBefore.id
         assertEquals 0, productBefore?.tags?.size()?:0
@@ -238,7 +238,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         def tag1 = new Tag(tag: "tag1").save(flush: true, failOnError: true);
         def tag2 = new Tag(tag: "tag2").save(flush: true, failOnError: true);
 
-		def product = DbHelper.getOrCreateProduct('Sudafed')
+		def product = DbHelper.findOrCreateProduct('Sudafed')
 
         assertNotNull product.id
         assertEquals 0, product?.tags?.size()?:0
@@ -349,8 +349,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Test
 	void getExistingProducts() {
-		def product1 = DbHelper.getOrCreateProduct('Sudafed')
-		def product2 = DbHelper.getOrCreateProduct('Advil')
+		def product1 = DbHelper.findOrCreateProduct('Sudafed')
+		def product2 = DbHelper.findOrCreateProduct('Advil')
 		assertNotNull product1.id
 		def row1 = ["${product1.id}", "", "Sudafed", "Medicines", "", "", "", "", "false", "", "", "", ""]
 		def row2 = ["${product2.id}", "", "Advil", "Medicines", "", "", "", "", "", "false", "", "", "", ""]
@@ -364,7 +364,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
     @Test
 	void getExistingProducts_shouldReturnAdvil() {
-		def product = DbHelper.getOrCreateProduct('Advil')
+		def product = DbHelper.findOrCreateProduct('Advil')
 		assertNotNull product.id
 		def row1 = ["", "", "Sudafed", "Medicines", "", "", "", "", "false", "", "", "", ""]
 		def row2 = ["${product.id}", "", "Advil", "Medicines", "", "", "", "", "false", "", "", "", ""]

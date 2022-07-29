@@ -19,7 +19,7 @@ class ProductIntegrationTests extends GroovyTestCase {
 
     @Test
     void getInventoryLevel_shouldNotFailOnNonPersistedProduct() {
-        def bostonLocation = DbHelper.getOrCreateLocationWithInventory('Boston Location')
+        def bostonLocation = DbHelper.findOrCreateLocationWithInventory('Boston Location')
         def product = new Product()
         product.getInventoryLevel(bostonLocation.id)
     }
@@ -27,7 +27,7 @@ class ProductIntegrationTests extends GroovyTestCase {
 
     @Test
     void testSaveProductProductGroup(){
-        def suppliers = DbHelper.getOrCreateCategory('Supplies')
+        def suppliers = DbHelper.findOrCreateCategory('Supplies')
         def name = "Test" + UUID.randomUUID().toString()[0..5]
         def group = new ProductGroup(name: name + "group", category: suppliers)
         assert group.save(flush:true, failOnError:true)
@@ -64,10 +64,10 @@ class ProductIntegrationTests extends GroovyTestCase {
 
     @Test
     void testLatestInventoryDate(){
-        def product = DbHelper.getOrCreateProduct('TestProductABC')
-        def depotLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
-        Location boston = DbHelper.getOrCreateLocation('Boston Headquarters', depotLocationType)
-        Location miami = DbHelper.getOrCreateLocation('Miami Warehouse', depotLocationType)
+      def product = DbHelper.findOrCreateProduct('TestProductABC')
+      def depotLocationType = LocationType.get(Constants.WAREHOUSE_LOCATION_TYPE_ID)
+      Location boston = DbHelper.findOrCreateLocation('Boston Headquarters', depotLocationType)
+      Location miami = DbHelper.findOrCreateLocation('Miami Warehouse', depotLocationType)
       def tenDaysAgo = new Date().minus(10)
       def fiveDaysAgo = new Date().minus(5)
       def threeDaysAgo = new Date().minus(3)
@@ -86,8 +86,8 @@ class ProductIntegrationTests extends GroovyTestCase {
 
     @Test
     void getBinLocation_shouldReturnCorrectBinLocation() {
-        def product = DbHelper.getOrCreateProduct('TestProductABC')
-        Location boston = DbHelper.getOrCreateLocationWithInventory('Boston Headquarters')
+        def product = DbHelper.findOrCreateProduct('TestProductABC')
+        Location boston = DbHelper.findOrCreateLocationWithInventory('Boston Headquarters')
         def inventoryLevel = DbHelper.createInventoryLevel(product, boston, "A1-01-01", InventoryStatus.SUPPORTED, 0, 100, 500)
         assertNotNull inventoryLevel
         assertEquals "A1-01-01", product.getBinLocation(boston.id)
@@ -95,15 +95,15 @@ class ProductIntegrationTests extends GroovyTestCase {
 
     @Test
     void getBinLocation_shouldReturnNullWhenInventoryLevelIsNull() {
-        def product = DbHelper.getOrCreateProduct('TestProductABC')
-        Location boston = DbHelper.getOrCreateLocationWithInventory('Boston Headquarters')
+        def product = DbHelper.findOrCreateProduct('TestProductABC')
+        Location boston = DbHelper.findOrCreateLocationWithInventory('Boston Headquarters')
         assertNull product.getBinLocation(boston.id)
     }
 
     @Test
     void getBinLocation_shouldReturnNullWhenBinLocationIsNull() {
-        def product = DbHelper.getOrCreateProduct('TestProductABC')
-        Location boston = DbHelper.getOrCreateLocationWithInventory('Boston Headquarters')
+        def product = DbHelper.findOrCreateProduct('TestProductABC')
+        Location boston = DbHelper.findOrCreateLocationWithInventory('Boston Headquarters')
         def inventoryLevel = DbHelper.createInventoryLevel(product, boston, null, InventoryStatus.SUPPORTED, 0, 100, 500)
         assertNotNull inventoryLevel
         assertNull product.getBinLocation(boston.id)

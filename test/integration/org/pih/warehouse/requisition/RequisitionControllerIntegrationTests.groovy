@@ -31,10 +31,10 @@ class RequisitionControllerIntegrationTests extends GroovyTestCase {
 
     @Test
     void list_shouldListRequisitions() {
-        Location location = DbHelper.getOrCreateLocation('Boston Headquarters')
+        Location location = DbHelper.findOrCreateLocation('Boston Headquarters')
 
-        def product1 = DbHelper.getOrCreateProduct('Advil 200mg')
-        def product2 = DbHelper.getOrCreateProduct('Tylenol 325mg')
+        def product1 = DbHelper.findOrCreateProduct('Advil 200mg')
+        def product2 = DbHelper.findOrCreateProduct('Tylenol 325mg')
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()

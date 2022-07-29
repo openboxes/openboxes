@@ -41,8 +41,8 @@ class RequisitionIntegrationTests extends GroovyTestCase {
     @Test
     void save_shouldSaveRequisition() {
         def location = Location.list().first()
-        def product1 = DbHelper.getOrCreateProduct('Advil 200mg')
-        def product2 = DbHelper.getOrCreateProduct('Tylenol 325mg')
+        def product1 = DbHelper.findOrCreateProduct('Advil 200mg')
+        def product2 = DbHelper.findOrCreateProduct('Tylenol 325mg')
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()
@@ -67,20 +67,20 @@ class RequisitionIntegrationTests extends GroovyTestCase {
 
     @Test
     void save_shouldSaveRequisitionItemOnly() {
-        def person = DbHelper.getOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
+        def person = DbHelper.findOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
         def requisition = new Requisition(
                 name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
                 commodityClass: CommodityClass.MEDICATION,
                 type:  RequisitionType.NON_STOCK,
-                origin: DbHelper.getOrCreateLocation('somewhere over the rainbow'),
-                destination: DbHelper.getOrCreateLocation('where the buffalo roam'),
+                origin: DbHelper.findOrCreateLocation('somewhere over the rainbow'),
+                destination: DbHelper.findOrCreateLocation('where the buffalo roam'),
                 requestedBy: person,
                 dateRequested: new Date(),
                 requestedDeliveryDate: new Date().plus(1))
 
         assert requisition.save(flush:true)
 
-        def product = DbHelper.getOrCreateProduct('Advil 200mg')
+        def product = DbHelper.findOrCreateProduct('Advil 200mg')
         def item = new RequisitionItem(product: product, quantity: 10, requestedBy: person)
         requisition.addToRequisitionItems(item)
 

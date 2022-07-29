@@ -13,7 +13,7 @@ class UserServiceIntegrationTests extends GroovyTestCase{
 
 	void test_getAllAdminUsers() {
 		// Create a new inactive user who has role ROLE_ADMIN
-		User adminUser = DbHelper.getOrCreateAdminUser('Firstson', 'Miranda III', 'fmiranda@pih.org', 'fmiranda', 'password', false)
+		User adminUser = DbHelper.findOrCreateAdminUser('Firstson', 'Miranda III', 'fmiranda@pih.org', 'fmiranda', 'password', false)
 		assertNotNull adminUser
 		assertFalse adminUser.active
 		
