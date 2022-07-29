@@ -14,7 +14,7 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/replenishment/EditPickModal';
-import apiClient, {flattenRequest, stringUrlInterceptor} from 'utils/apiClient';
+import apiClient, { flattenRequest, stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 

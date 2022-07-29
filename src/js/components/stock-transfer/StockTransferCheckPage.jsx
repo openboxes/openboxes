@@ -10,7 +10,7 @@ import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { extractNonCanceledItems } from 'components/stock-transfer/utils';
-import apiClient, {flattenRequest, parseResponse, stringUrlInterceptor} from 'utils/apiClient';
+import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';

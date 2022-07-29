@@ -9,25 +9,26 @@
  **/
 package org.pih.warehouse.core
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
-import org.pih.warehouse.product.ProductSupplier
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import org.apache.commons.lang.RandomStringUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.WordUtils
-import org.apache.commons.text.StringSubstitutor
+import org.apache.commons.lang.text.StrSubstitutor
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.inventory.Transaction
-import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.receiving.Receipt
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.shipping.Shipment
+
+import java.sql.SQLIntegrityConstraintViolationException
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Transactional
 class IdentifierService {
@@ -296,7 +297,7 @@ class IdentifierService {
     }
 
     def renderTemplate(String template, Map model) {
-        return StringSubstitutor.replace(template, model)
+        return StrSubstitutor.replace(template, model)
     }
 
     void assignTransactionIdentifiers() {
@@ -335,7 +336,7 @@ class IdentifierService {
                         println product.errors
                     }
                 }
-            } catch (MySQLIntegrityConstraintViolationException e) {
+            } catch (SQLIntegrityConstraintViolationException e) {
                 log.warn("Unable to assign identifier due to constraint violation: " + e.message, e)
             } catch (Exception e) {
                 log.warn("Unable to assign identifier to product with ID " + product?.id + ": " + e.message, e)

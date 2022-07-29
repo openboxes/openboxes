@@ -51,10 +51,7 @@ class InventoryItemControllerTests extends Specification {
                 getInventoryItemsWithQuantity: { product, inv ->
                     return ["pro1": [[id:"item1"], [id:"item2"], [id:"item3"], [id:"item4"]]]
                 },
-                getQuantityByProductMap { transactionEntryList ->
-                    return [:]
-                },
-                getQuantityAvailableToPromise { location, product ->
+                getQuantityAvailableToPromise: { location, product ->
                     return 0
                 },
         ]

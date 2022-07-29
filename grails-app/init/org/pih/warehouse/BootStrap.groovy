@@ -7,13 +7,15 @@ package org.pih.warehouse
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/
-
+ */
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import liquibase.Contexts
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
+import liquibase.database.jvm.JdbcConnection
+import liquibase.resource.FileSystemResourceAccessor
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -29,14 +31,15 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.jobs.RefreshDemandDataJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
@@ -57,7 +60,6 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.pih.warehouse.core.Address
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
@@ -460,14 +462,26 @@ class BootStrap {
         Liquibase liquibase = null
         try {
 
-            def connection = dataSource.getConnection()
+            def connection = new JdbcConnection(dataSource.getConnection())
             if (connection == null) {
                 throw new RuntimeException("Connection could not be created.")
             }
-            def classLoader = getClass().classLoader
-            def fileOpener = classLoader.loadClass("org.liquibase.grails.GrailsFileOpener").getConstructor().newInstance()
 
-            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
+            /*
+             * FIXME This patch is unlikely to work in production. OBGM-333
+             *
+             * Previously, we used org.liquibase.grails.GrailsFileOpener here
+             * (from a plugin, https://github.com/liquibase/grails-liquibase/,
+             * that ceased development at Grails 1.3.6).
+             *
+             * The path manipulation here is probably dependent on a local install.
+             */
+            def fileOpener = new FileSystemResourceAccessor(
+                "${servletContext.getRealPath('/')}../../../grails-app/migrations/"
+            )
+
+            def database = DatabaseFactory.getInstance()
+                .findCorrectDatabaseImplementation(connection)
             boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
             log.info("Liquibase running: " + isRunningMigrations)
             log.info("Setting default schema to " + connection.catalog)
@@ -478,13 +492,13 @@ class BootStrap {
 
             //If nothing has been created yet, let's create all new database objects with the install scripts
             if (!ranChangeSets) {
-                liquibase = new Liquibase("install/install.xml", fileOpener, database)
-                liquibase.update(null)
+                liquibase = new Liquibase("install/changelog.xml", fileOpener, database)
+                liquibase.update(null as Contexts)
             }
 
             // Run through the updates in the master changelog
-            liquibase = new Liquibase("changelog.xml", fileOpener, database)
-            liquibase.update(null)
+            liquibase = new Liquibase("upgrade/changelog.xml", fileOpener, database)
+            liquibase.update(null as Contexts)
         }
         finally {
             if (liquibase && liquibase.database) {
