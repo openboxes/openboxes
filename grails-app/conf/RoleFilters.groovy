@@ -92,6 +92,8 @@ class RoleFilters {
                     def minimumRequiredRole = rule.accessRules?.minimumRequiredRole
                     def supplementalRoles = rule.accessRules?.supplementalRoles ?: []
 
+                    Boolean isAnonymous = minimumRequiredRole == RoleType.ROLE_ANONYMOUS
+
                     Boolean isMinimumRequiredRole = true
                     if (session.user && minimumRequiredRole) {
                         isMinimumRequiredRole = userService.isUserInRole(session.user, minimumRequiredRole)
@@ -102,7 +104,7 @@ class RoleFilters {
                         isUserInRole = userService.isUserInRole(session.user, supplementalRoles)
                     }
 
-                    if (session.user && isMinimumRequiredRole && isUserInRole) {
+                    if (isAnonymous || (session.user && isMinimumRequiredRole && isUserInRole)) {
                         log.info "User has access to ${controllerName}.${actionName}"
                         return true
                     } else {
