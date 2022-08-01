@@ -1117,18 +1117,19 @@ openboxes.purchaseOrder.editableProperties = [
 ]
 
 openboxes.security.rbac.rules = [
-        [controller: '*', actions: ['delete'], access: [RoleType.ROLE_SUPERUSER]],
-        [controller: '*', actions: ['remove'], access: [RoleType.ROLE_SUPERUSER]],
-        [controller: '*', actions: ['removeItem'], access: [RoleType.ROLE_MANAGER]],
+        [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+        [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+        [controller: '*', actions: ['removeItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
         // We probably need a way to handle wildcard in actions as well
         //[controller: '*', actions: ['remove*'], access: [RoleType.ROLE_SUPERUSER]],
         //[controller: '*', actions: ['delete*'], access: [RoleType.ROLE_SUPERUSER]]
         // ... otherwise we'll need to include explicit rules for everything
-        [controller: 'order', actions: ['remove'], access: [RoleType.ROLE_MANAGER]],
-        [controller: 'order', actions: ['removeOrderItem'], access: [RoleType.ROLE_MANAGER]],
-        [controller: 'invoice', actions: ['eraseInvoice'], access: [RoleType.ROLE_MANAGER]],
-        [controller: 'stockTransfer', actions: ['eraseStockTransfer'], access: [RoleType.ROLE_MANAGER]],
-        [controller: 'stockMovementItemApi', actions: ['eraseItem'], access: [RoleType.ROLE_MANAGER]],
+        [controller: 'order', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'invoice', actions: ['eraseInvoice'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'invoiceApi', actions: ['removeItem'],  accessRules: [  minimumRequiredRole: RoleType.ROLE_MANAGER, supplementalRoles: [RoleType.ROLE_INVOICE] ]],
+        [controller: 'stockTransfer', actions: ['eraseStockTransfer'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'stockMovementItemApi', actions: ['eraseItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
         // Other controller actions that might need explicit rules
         //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
