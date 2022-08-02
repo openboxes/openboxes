@@ -27,6 +27,7 @@ class LocationService {
     GrailsApplication grailsApplication
     def dataService
     def productTypeService
+    def userService
 
 
     Location findInternalLocation(Location parentLocation, String[] names) {
