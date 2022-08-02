@@ -872,7 +872,7 @@ class ReportService implements ApplicationContextAware {
                     o.id AS order_id,
                     order_item.quantity AS quantity_ordered,
                     IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)  AS quantity_shipped,
-                    IFNULL(SUM(invoice_item.quantity / order_item.quantity_per_uom), 0)  AS quantity_invoiced
+                    IFNULL(SUM(invoice_item.quantity), 0)  AS quantity_invoiced
                 FROM `order` o
                     LEFT OUTER JOIN order_item ON o.id = order_item.order_id
                     LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
@@ -891,11 +891,18 @@ class ReportService implements ApplicationContextAware {
         """
 
         String orderAdjustmentsQuery = """
-            SELECT * FROM (
+            SELECT 
+                order_adjustment_invoice_summary.id,
+                order_adjustment_invoice_summary.order_id,
+                SUM(order_adjustment_invoice_summary.quantity_invoiced)
+            FROM (
                 SELECT 
                     order_adjustment.id AS id,
                     o.id AS order_id,
-                    IFNULL(invoice_item.quantity, 0) AS quantity_invoiced
+                    CASE
+                        WHEN (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL) THEN 0
+                        ELSE 1
+                    END as quantity_invoiced
                 FROM `order` o
                     LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
                     LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
@@ -903,11 +910,11 @@ class ReportService implements ApplicationContextAware {
                     LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
                 WHERE o.order_type_id = 'PURCHASE_ORDER'
                     AND order_adjustment.canceled IS NOT TRUE
-                    AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
                     ${additionalFilter}
                 GROUP BY o.id, order_adjustment.id, invoice_item.id
             ) AS order_adjustment_invoice_summary
-            WHERE order_adjustment_invoice_summary.quantity_invoiced = 0;
+            GROUP BY id
+            HAVING SUM(order_adjustment_invoice_summary.quantity_invoiced) = 0;
         """
 
         List orderItemResults = dataService.executeQuery(orderItemsQuery, queryParams)
@@ -969,8 +976,8 @@ class ReportService implements ApplicationContextAware {
                 "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.unitPrice) ?: 0),
                 "Budget Code"                                       : orderItem?.budgetCode?.code,
                 "Recipient"                                         : orderItem?.recipient?.name,
-                "Estimated Ready Date"                              : orderItem?.estimatedReadyDate,
-                "Actual Ready Date"                                 : orderItem?.actualReadyDate,
+                "Estimated Ready Date"                              : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
+                "Actual Ready Date"                                 : orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
             ]
 
             rows << printRow
@@ -995,7 +1002,7 @@ class ReportService implements ApplicationContextAware {
                 "Destination Name"                                  : orderAdjustment?.order?.destination?.name,
                 "PO Number"                                         : orderAdjustment?.order?.orderNumber,
                 "Type"                                              : "Adjustment",
-                "Code"                                              : "",
+                "Code"                                              : orderAdjustment?.orderItem?.product?.productCode ?: "",
                 "Description"                                       : orderAdjustment?.description,
                 "UOM"                                               : "",
                 "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
