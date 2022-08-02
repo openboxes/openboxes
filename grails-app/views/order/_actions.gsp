@@ -132,6 +132,19 @@
 					</g:isUserInRole>
 				</g:supports>
 			</g:if>
+			<g:if test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
+				<g:isSuperuser>
+					<div class="action-menu-item">
+						<g:link controller="order" action="remove" id="${orderInstance?.id}"
+								disabled="${orderInstance?.status != OrderStatus.PENDING}"
+								disabledMessage="${g.message(code:'order.errors.delete.message')}"
+								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
+							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
+						</g:link>
+					</div>
+				</g:isSuperuser>
+			</g:if>
         </div>
 	</span>
 </g:if>
