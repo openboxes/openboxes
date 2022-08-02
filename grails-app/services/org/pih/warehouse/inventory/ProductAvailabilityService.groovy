@@ -11,7 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.orm.PagedResultList
+import org.pih.warehouse.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
