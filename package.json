@@ -13,7 +13,7 @@
     "test": "test"
   },
   "scripts": {
-    "watch": "webpack --watch --colors --progress --mode=development",
+    "watch": "webpack --watch --progress --mode=development",
     "bundle": "webpack --no-color --mode=production",
     "test": "jest",
     "styleguide": "styleguidist server",

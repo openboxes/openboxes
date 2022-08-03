@@ -37,7 +37,7 @@ openboxes {
             enabled = true
             label = "dashboard.label"
             defaultLabel = "Dashboard"
-            href = "/${appName}/dashboard/index"
+            href = "/dashboard/index"
         }
         analytics {
             enabled = true
@@ -46,9 +46,9 @@ openboxes {
             defaultLabel = "Analytics"
             menuItems = [
                 // TODO: Add option to include label 'beta'
-                [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/inventoryBrowser/index"],
-                [label: "inventory.snapshot.label", defaultLabel: "Inventory Snapshots", href: "/${appName}/snapshot/list"],
-                [label: "consumption.report.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/list"]
+                [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/inventoryBrowser/index"],
+                [label: "inventory.snapshot.label", defaultLabel: "Inventory Snapshots", href: "/snapshot/list"],
+                [label: "consumption.report.label", defaultLabel: "Consumption Report", href: "/consumption/list"]
             ]
         }
         inventory {
@@ -61,7 +61,7 @@ openboxes {
                     label: "inventory.browse.label",
                     defaultLabel: "Browse Inventory",
                     menuItems: [
-                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/${appName}/inventory/browse?resetSearch=true"],
+                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/inventory/browse?resetSearch=true"],
                         // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
                     ],
                 ],
@@ -69,11 +69,11 @@ openboxes {
                     label: "inventory.manage.label",
                     defaultLabel: "Manage Inventory",
                     menuItems: [
-                        [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/${appName}/inventory/manage"],
-                        [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
-                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/create"],
-                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/list"],
-                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/index"]
+                        [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/inventory/manage"],
+                        [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/batch/importData?type=inventory&execution=e1s1"],
+                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/create"],
+                        [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/list"],
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/index"]
                     ]
                 ]
             ]
@@ -87,11 +87,11 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
-                        [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderType=PURCHASE_ORDER"],
-                        [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
-                        [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
-                        [label: "dashboard.supplierDashboard.label", defaultLabel: "Supplier Dashboard", href: "/${appName}/dashboard/supplier"]
+                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
+                        [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/order/list?orderType=PURCHASE_ORDER"],
+                        [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/supplier/list"],
+                        [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/stockMovement/createCombinedShipments?direction=INBOUND"],
+                        [label: "dashboard.supplierDashboard.label", defaultLabel: "Supplier Dashboard", href: "/dashboard/supplier"]
                     ]
                 ]
             ]
@@ -106,8 +106,8 @@ openboxes {
                     label: "react.invoicing.label",
                     defaultLabel: "Invoicing",
                     menuItems: [
-                        [label: "react.invoice.createInvoice.label", defaultLabel: "Create Invoice", href: "/${appName}/invoice/create"],
-                        [label: "react.invoice.list.label", defaultLabel: "List Invoices", href: "/${appName}/invoice/list"],
+                        [label: "react.invoice.createInvoice.label", defaultLabel: "Create Invoice", href: "/invoice/create"],
+                        [label: "react.invoice.list.label", defaultLabel: "List Invoices", href: "/invoice/list"],
                     ]
                 ]
             ]
@@ -122,10 +122,10 @@ openboxes {
                     label: "stockMovements.label",
                     defaultLabel: "Stock Movements",
                     menuItems: [
-                        [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/${appName}/stockMovement/createInbound?direction=INBOUND"],
-                        [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
-                        [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
-                        [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/${appName}/stockTransfer/createInboundReturn"]
+                        [label: "inbound.create.label", defaultLabel: "Create Inbound Movement", href: "/stockMovement/createInbound?direction=INBOUND"],
+                        [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/stockMovement/createRequest"],
+                        [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/stockMovement/list?direction=INBOUND"],
+                        [label: "inboundReturns.create.label", defaultLabel: "Create Inbound Return", href: "/stockTransfer/createInboundReturn"]
                     ]
                 ],
                 [
@@ -133,8 +133,8 @@ openboxes {
                     defaultLabel: "Putaways",
                     requiredActivitiesAll: ActivityCode.binTrackingList(),
                     menuItems: [
-                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
-                        [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
+                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putAway/index"],
+                        [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
                     ]
                 ]
             ]
@@ -149,9 +149,9 @@ openboxes {
                     label: "",
                     defaultLabel: "Stock Movement",
                     menuItems: [
-                        [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
-                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
-                        [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/${appName}/stockTransfer/createOutboundReturn"]
+                        [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/stockMovement/createOutbound?direction=OUTBOUND"],
+                        [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/stockMovement/list?direction=OUTBOUND"],
+                        [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/stockTransfer/createOutboundReturn"]
                     ]
                 ]
             ]
@@ -165,45 +165,45 @@ openboxes {
                     label: "report.inventoryReports.label",
                     defaultLabel: "Inventory Reports",
                     menuItems: [
-                        [label: "report.inStockReport.label", defaultLabel: "In Stock Report", href: "/${appName}/inventory/listInStock"],
-                        [label: "report.binLocationReport.label", defaultLabel: "Bin Location Report", href: "/${appName}/report/showBinLocationReport"],
-                        [label: "report.expiredStockReport.label", defaultLabel: "Expired Stock Report", href: "/${appName}/inventory/listExpiredStock"],
-                        [label: "report.expiringStockReport.label", defaultLabel: "Expiring Stock Report", href: "/${appName}/inventory/listExpiringStock"],
-                        [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
-                        [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/report/showCycleCountReport"],
-                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
-                        [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
+                        [label: "report.inStockReport.label", defaultLabel: "In Stock Report", href: "/inventory/listInStock"],
+                        [label: "report.binLocationReport.label", defaultLabel: "Bin Location Report", href: "/report/showBinLocationReport"],
+                        [label: "report.expiredStockReport.label", defaultLabel: "Expired Stock Report", href: "/inventory/listExpiredStock"],
+                        [label: "report.expiringStockReport.label", defaultLabel: "Expiring Stock Report", href: "/inventory/listExpiringStock"],
+                        [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/report/showInventoryByLocationReport"],
+                        [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/report/showCycleCountReport"],
+                        [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/inventory/show"],
+                        [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/report/showOnOrderReport"]
                     ]
                 ],
                 [
                     label: "report.orderReports.label",
                     defaultLabel: "Order Reports",
                     menuItems: [
-                        [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
-                        [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
+                        [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/report/showForecastReport"],
+                        [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/inventory/reorderReport"],
                     ]
                 ],
                 [
                     label: "report.transactionReports.label",
                     defaultLabel: "Transaction Reports",
                     menuItems: [
-                        [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/${appName}/report/showTransactionReport"],
-                        [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/${appName}/consumption/show"],
-                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/${appName}/report/showRequestDetailReport"],
+                        [label: "report.showTransactionReport.label", defaultLabel: "Transaction Report", href: "/report/showTransactionReport"],
+                        [label: "report.consumption.label", defaultLabel: "Consumption Report", href: "/consumption/show"],
+                        [label: "report.requestDetailReport.label", defaultLabel: "Request Detail Report", href: "/report/showRequestDetailReport"],
                     ]
                 ],
                 [
                     label: "dataExports.label",
                     defaultLabel: "Data Exports",
                     menuItems: [
-                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
-                        [label: "export.productSources.label", defaultLabel: "Export product sources", href: "/${appName}/productSupplier/export"],
-                        [label: "export.latestInventory.label", defaultLabel: "Export latest inventory date", href: "/${appName}/inventory/exportLatestInventoryDate"],
-                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/${appName}/inventoryLevel/export"],
-                        [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/${appName}/requisition/export"],
-                        [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/${appName}/report/exportBinLocation?downloadFormat=csv"],
-                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/${appName}/report/exportDemandReport?downloadFormat=csv"],
-                        [label: "export.custom.label", defaultLabel: "Custom data exports", href: "/${appName}/dataExport/index"]
+                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv"],
+                        [label: "export.productSources.label", defaultLabel: "Export product sources", href: "/productSupplier/export"],
+                        [label: "export.latestInventory.label", defaultLabel: "Export latest inventory date", href: "/inventory/exportLatestInventoryDate"],
+                        [label: "export.inventoryLevels.label", defaultLabel: "Export inventory levels", href: "/inventoryLevel/export"],
+                        [label: "export.requisitions.label", defaultLabel: "Export requisitions", href: "/requisition/export"],
+                        [label: "export.binLocations.label", defaultLabel: "Export bin locations", href: "/report/exportBinLocation?downloadFormat=csv"],
+                        [label: "export.productDemand.label", defaultLabel: "Export product demand", href: "/report/exportDemandReport?downloadFormat=csv"],
+                        [label: "export.custom.label", defaultLabel: "Custom data exports", href: "/dataExport/index"]
                     ]
                 ]
             ]
@@ -218,35 +218,35 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "product.create.label", defaultLabel: "Create product", href: "/${appName}/product/create"],
-                        [label: "products.list.label", defaultLabel: "List Products", href: "/${appName}/product/list"],
-                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
-                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
-                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
-                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
+                        [label: "product.create.label", defaultLabel: "Create product", href: "/product/create"],
+                        [label: "products.list.label", defaultLabel: "List Products", href: "/product/list"],
+                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/product/batchEdit"],
+                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/product/importAsCsv"],
+                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv"],
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
                     ]
                 ],
                 [
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "categories.label", defaultLabel: "Categories", href: "/${appName}/category/tree"],
-                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/${appName}/productCatalog/list"],
-                        [label: "product.tags.label", defaultLabel: "Tags", href: "/${appName}/tag/list"],
-                        [label: "attributes.label", defaultLabel: "Attributes", href: "/${appName}/attribute/list"],
-                        [label: "product.associations.label", defaultLabel: "Associations", href: "/${appName}/productAssociation/list"],
+                        [label: "categories.label", defaultLabel: "Categories", href: "/category/tree"],
+                        [label: "product.catalogs.label", defaultLabel: "Catalogs", href: "/productCatalog/list"],
+                        [label: "product.tags.label", defaultLabel: "Tags", href: "/tag/list"],
+                        [label: "attributes.label", defaultLabel: "Attributes", href: "/attribute/list"],
+                        [label: "product.associations.label", defaultLabel: "Associations", href: "/productAssociation/list"],
                     ]
                 ],
                 [
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/${appName}/productSupplier/list"],
-                        [label: "product.components.label", defaultLabel: "Components", href: "/${appName}/productComponent/list"],
-                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/${appName}/productGroup/list"],
-                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/${appName}/unitOfMeasure/list"],
-                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/${appName}/unitOfMeasureClass/list"],
-                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/${appName}/unitOfMeasureConversion/list"]
+                        [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/productSupplier/list"],
+                        [label: "product.components.label", defaultLabel: "Components", href: "/productComponent/list"],
+                        [label: "productGroups.label", defaultLabel: "Generic Products", href: "/productGroup/list"],
+                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/unitOfMeasure/list"],
+                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/unitOfMeasureClass/list"],
+                        [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/unitOfMeasureConversion/list"]
                     ]
                 ]
             ]
@@ -256,8 +256,8 @@ openboxes {
             label = "requisitionTemplates.label"
             defaultLabel = "Stock Lists"
             menuItems = [
-                [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/${appName}/requisitionTemplate/list"],
-                [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/${appName}/requisitionTemplate/create"],
+                [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/requisitionTemplate/list"],
+                [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/requisitionTemplate/create"],
             ]
         }
         configuration {
@@ -270,62 +270,62 @@ openboxes {
                     label: "admin.label",
                     defaultLabel: "Administration",
                     menuItems: [
-                        [label: "default.settings.label", defaultLabel: "Settings", href: "/${appName}/admin/showSettings"],
-                        [label: "cache.label", defaultLabel: "Cache", href: "/${appName}/admin/cache"],
-                        [label: "console.label", defaultLabel: "Console", href: "/${appName}/console/index"],
-                        [label: "dataImport.label", defaultLabel: "Data Import", href: "/${appName}/batch/importData"],
-                        [label: "dataMigration.label", defaultLabel: "Data Migration", href: "/${appName}/migration/index"],
-                        [label: "email.label", defaultLabel: "Email", href: "/${appName}/admin/sendMail"],
-                        [label: "localization.label", defaultLabel: "Localization", href: "/${appName}/localization/list"]
+                        [label: "default.settings.label", defaultLabel: "Settings", href: "/admin/showSettings"],
+                        [label: "cache.label", defaultLabel: "Cache", href: "/admin/cache"],
+                        [label: "console.label", defaultLabel: "Console", href: "/console/index"],
+                        [label: "dataImport.label", defaultLabel: "Data Import", href: "/batch/importData"],
+                        [label: "dataMigration.label", defaultLabel: "Data Migration", href: "/migration/index"],
+                        [label: "email.label", defaultLabel: "Email", href: "/admin/sendMail"],
+                        [label: "localization.label", defaultLabel: "Localization", href: "/localization/list"]
                     ]
                 ],
                 [
                     label: "parties.label",
                     defaultLabel: "Locations",
                     menuItems: [
-                        [label: "locations.label", defaultLabel: "Locations", href: "/${appName}/location/list"],
-                        [label: "locationGroups.label", defaultLabel: "Location groups", href: "/${appName}/locationGroup/list"],
-                        [label: "locationTypes.label", defaultLabel: "Location types", href: "/${appName}/locationType/list"],
-                        [label: "organizations.label", defaultLabel: "Organizations", href: "/${appName}/organization/list"],
-                        [label: "partyRoles.label", defaultLabel: "Party roles", href: "/${appName}/partyRole/list"],
-                        [label: "partyTypes.label", defaultLabel: "Party types", href: "/${appName}/partyType/list"],
-                        [label: "person.list.label", defaultLabel: "People", href: "/${appName}/person/list"],
-                        [label: "roles.label", defaultLabel: "Roles", href: "/${appName}/role/list"],
-                        [label: "users.label", defaultLabel: "Users", href: "/${appName}/user/list"],
+                        [label: "locations.label", defaultLabel: "Locations", href: "/location/list"],
+                        [label: "locationGroups.label", defaultLabel: "Location groups", href: "/locationGroup/list"],
+                        [label: "locationTypes.label", defaultLabel: "Location types", href: "/locationType/list"],
+                        [label: "organizations.label", defaultLabel: "Organizations", href: "/organization/list"],
+                        [label: "partyRoles.label", defaultLabel: "Party roles", href: "/partyRole/list"],
+                        [label: "partyTypes.label", defaultLabel: "Party types", href: "/partyType/list"],
+                        [label: "person.list.label", defaultLabel: "People", href: "/person/list"],
+                        [label: "roles.label", defaultLabel: "Roles", href: "/role/list"],
+                        [label: "users.label", defaultLabel: "Users", href: "/user/list"],
                     ]
                 ],
                 [
                     label: "transactions.label",
                     defaultLabel: "Transactions",
                     menuItems: [
-                        [label: "transactionsTypes.label", defaultLabel: "Transactions Types", href: "/${appName}/transactionType"],
-                        [label: "transactions.label", defaultLabel: "Transactions", href: "/${appName}/inventory/listAllTransactions"],
-                        [label: "transaction.add.label", defaultLabel: "Add transaction", href: "/${appName}/inventory/editTransaction"],
-                        [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory"],
-                        [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/${appName}/batch/importData?type=inventoryLevel"]
+                        [label: "transactionsTypes.label", defaultLabel: "Transactions Types", href: "/transactionType"],
+                        [label: "transactions.label", defaultLabel: "Transactions", href: "/inventory/listAllTransactions"],
+                        [label: "transaction.add.label", defaultLabel: "Add transaction", href: "/inventory/editTransaction"],
+                        [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/batch/importData?type=inventory"],
+                        [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/batch/importData?type=inventoryLevel"]
                     ]
                 ],
                 [
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
-                        [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
-                        [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
-                        [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
-                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/${appName}/paymentMethodType/list"],
-                        [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
-                        [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],
-                        [label: "shippers.label", defaultLabel: "Shippers", href: "/${appName}/shipper/list"],
-                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/${appName}/shipmentWorkflow/list"],
-                        [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/${appName}/productsConfiguration/index"],
-                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/${appName}/locationsConfiguration/index"],
-                        [label: "loadData.label", defaultLabel: "Load Data", href: "/${appName}/loadData/index"],
-                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/${appName}/resettingInstanceInfo/index"]
+                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/budgetCode/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/containerType/list"],
+                        [label: "documents.label", defaultLabel: "Documents", href: "/document/list"],
+                        [label: "documentTypes.label", defaultLabel: "Document Types", href: "/documentType/list"],
+                        [label: "eventTypes.label", defaultLabel: "Event Types", href: "/eventType/list"],
+                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/glAccountType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/glAccount/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/orderAdjustmentType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/paymentMethodType/list"],
+                        [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/paymentTerm/list"],
+                        [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/preferenceType/list"],
+                        [label: "shippers.label", defaultLabel: "Shippers", href: "/shipper/list"],
+                        [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/shipmentWorkflow/list"],
+                        [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/productsConfiguration/index"],
+                        [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/locationsConfiguration/index"],
+                        [label: "loadData.label", defaultLabel: "Load Data", href: "/loadData/index"],
+                        [label: "resetInstance.label", defaultLabel: "Reset your instance", href: "/resettingInstanceInfo/index"]
                     ]
                 ]
             ]
@@ -388,8 +388,8 @@ openboxes {
                     label       : "stockMovements.label",
                     defaultLabel: "Stock Movements",
                     menuItems   : [
-                        [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/${appName}/stockMovement/createRequest"],
-                        [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/${appName}/stockMovement/list?direction=INBOUND"],
+                        [label: "stockRequest.create.label", defaultLabel: "Create Stock Request", href: "/stockMovement/createRequest"],
+                        [label: "inbound.list.label", defaultLabel: "List Inbound Movements", href: "/stockMovement/list?direction=INBOUND"],
                     ]
                 ]
             ]
@@ -572,7 +572,7 @@ openboxes {
                 name = "Fill Rate"
                 filters {
                     category {
-                        endpoint = "/${appName}/categoryApi/list"
+                        endpoint = "/categoryApi/list"
                     }
                 }
                 widgets = [
@@ -591,7 +591,7 @@ openboxes {
                 name = "Supplier Dashboard"
                 filters {
                     supplier {
-                        endpoint = "/${appName}/api/locations?direction=INBOUND"
+                        endpoint = "/api/locations?direction=INBOUND"
                     }
                 }
                 widgets = [
@@ -611,7 +611,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.putaways.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/inProgressPutaways"
+                endpoint = "/api/dashboard/inProgressPutaways"
             }
             inventoryByLotAndBin {
                 enabled = true
@@ -620,7 +620,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.inStock.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/inventoryByLotAndBin"
+                endpoint = "/api/dashboard/inventoryByLotAndBin"
             }
             inProgressShipments {
                 enabled = true
@@ -629,7 +629,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.shipments.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/inProgressShipments"
+                endpoint = "/api/dashboard/inProgressShipments"
             }
             receivingBin {
                 enabled = true
@@ -638,7 +638,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.products.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/receivingBin"
+                endpoint = "/api/dashboard/receivingBin"
             }
             itemsInventoried {
                 enabled = true
@@ -647,7 +647,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.items.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/itemsInventoried"
+                endpoint = "/api/dashboard/itemsInventoried"
             }
             defaultBin {
                 enabled = true
@@ -656,7 +656,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.products.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/defaultBin"
+                endpoint = "/api/dashboard/defaultBin"
             }
             negativeInventory {
                 enabled = true
@@ -665,7 +665,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.products.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/productWithNegativeInventory"
+                endpoint = "/api/dashboard/productWithNegativeInventory"
             }
             expiredStock {
                 enabled = true
@@ -674,7 +674,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.products.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/expiredProductsInStock"
+                endpoint = "/api/dashboard/expiredProductsInStock"
             }
             openStockRequests {
                 enabled = true
@@ -683,7 +683,7 @@ openboxes {
                 subtitle = "react.dashboard.requests.subtitle.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/openStockRequests"
+                endpoint = "/api/dashboard/openStockRequests"
             }
             inventoryValue {
                 enabled = true
@@ -692,7 +692,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.inStock.label"
                 numberType = 'dollars'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/inventoryValue"
+                endpoint = "/api/dashboard/inventoryValue"
             }
 
             fillRateSnapshot {
@@ -701,7 +701,7 @@ openboxes {
                 info = "react.dashboard.fillRateSnapshot.info.label"
                 graphType = 'sparkline'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/fillRateSnapshot"
+                endpoint = "/api/dashboard/fillRateSnapshot"
             }
 
             requisitionCountByYear {
@@ -710,7 +710,7 @@ openboxes {
                 info = "react.dashboard.requisitionCountByYear.info.label"
                 graphType = "bar"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/requisitionsByYear"
+                endpoint = "/api/dashboard/requisitionsByYear"
                 yearTypeFilter {
                     parameter = "yearType"
                     defaultValue = "fiscalYear"
@@ -726,7 +726,7 @@ openboxes {
                 info = "react.dashboard.inventorySummaryData.info.label"
                 graphType = "horizontalBar"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/inventorySummary"
+                endpoint = "/api/dashboard/inventorySummary"
                 datalabel = true
                 colors {
                     labels {
@@ -742,7 +742,7 @@ openboxes {
                 info = "react.dashboard.expirationSummaryData.info.label"
                 graphType = "line"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/expirationSummary"
+                endpoint = "/api/dashboard/expirationSummary"
                 timeFilter = true
                 colors {
                     datasets {
@@ -765,7 +765,7 @@ openboxes {
                 info = "react.dashboard.incomingStock.info.label"
                 graphType = "numbers"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/incomingStock"
+                endpoint = "/api/dashboard/incomingStock"
                 colors {
                     datasets {
                         state6 = ["first"]
@@ -780,7 +780,7 @@ openboxes {
                 info = "react.dashboard.outgoingStock.info.label"
                 graphType = "numbers"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/outgoingStock"
+                endpoint = "/api/dashboard/outgoingStock"
                 colors {
                     datasets {
                         success = ["first"]
@@ -795,7 +795,7 @@ openboxes {
                 info = "react.dashboard.receivedStockData.info.label"
                 graphType = "bar"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/receivedStockMovements"
+                endpoint = "/api/dashboard/receivedStockMovements"
                 timeFilter = true
                 stacked = true
                 datalabel = true
@@ -806,7 +806,7 @@ openboxes {
                 info = "react.dashboard.discrepancy.info.label"
                 graphType = "table"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/discrepancy"
+                endpoint = "/api/dashboard/discrepancy"
                 timeFilter = true
             }
             delayedShipments {
@@ -815,7 +815,7 @@ openboxes {
                 info = "react.dashboard.delayedShipments.info.label"
                 graphType = "numberTable"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/delayedShipments"
+                endpoint = "/api/dashboard/delayedShipments"
                 colors {
                     datasets {
                         state5 = ["first"]
@@ -830,7 +830,7 @@ openboxes {
                 info = "react.dashboard.sentStockMovements.info.label"
                 graphType = "bar"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/sentStockMovements"
+                endpoint = "/api/dashboard/sentStockMovements"
                 timeFilter = true
                 stacked = true
                 datalabel = true
@@ -841,7 +841,7 @@ openboxes {
                 info = ""
                 graphType = "bar"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/lossCausedByExpiry"
+                endpoint = "/api/dashboard/lossCausedByExpiry"
                 timeFilter = true
                 stacked = true
                 colors {
@@ -858,7 +858,7 @@ openboxes {
                 info = ""
                 graphType = "numbersCustomColors"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/productsInventoried"
+                endpoint = "/api/dashboard/productsInventoried"
                 colors {
                     datasets {
                         state6 = ["first"]
@@ -873,7 +873,7 @@ openboxes {
                 info = "react.dashboard.percentageAdHoc.info.label"
                 graphType = "doughnut"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/percentageAdHoc"
+                endpoint = "/api/dashboard/percentageAdHoc"
                 legend = true
                 datalabel = true
                 colors {
@@ -890,7 +890,7 @@ openboxes {
                 graphType = "bar"
                 type = 'graph'
                 legend = true
-                endpoint = "/${appName}/api/dashboard/fillRate"
+                endpoint = "/api/dashboard/fillRate"
                 timeFilter = true
                 locationFilter = true
                 timeLimit = 12
@@ -912,7 +912,7 @@ openboxes {
                 info = "react.dashboard.stockOutLastMonth.info.label"
                 graphType = "doughnut"
                 type = 'graph'
-                endpoint = "/${appName}/api/dashboard/stockOutLastMonth"
+                endpoint = "/api/dashboard/stockOutLastMonth"
                 legend = true
                 datalabel = true
                 colors {
@@ -932,7 +932,7 @@ openboxes {
                 subtitle = "react.dashboard.subtitle.purchaseOrders.label"
                 numberType = 'number'
                 type = 'number'
-                endpoint = "/${appName}/api/dashboard/openPurchaseOrdersCount"
+                endpoint = "/api/dashboard/openPurchaseOrdersCount"
             }
         }
     }
@@ -945,63 +945,63 @@ breadcrumbsConfig {
         defaultActionLabel = "Create Inbound"
         listLabel = "react.stockMovement.label"
         defaultListLabel = "Stock Movement"
-        actionUrl = "/${appName}/stockMovement/createInbound/"
-        listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
+        actionUrl = "/stockMovement/createInbound/"
+        listUrl   = "/stockMovement/list?direction=INBOUND"
     }
     outbound {
         actionLabel = "react.stockMovement.outbound.create.label"
         defaultActionLabel = "Create Outbound"
         listLabel = "react.stockMovement.label"
         defaultListLabel = "Stock Movement"
-        actionUrl = "/${appName}/stockMovement/createOutbound/"
-        listUrl = "/${appName}/stockMovement/list?direction=OUTBOUND"
+        actionUrl = "/stockMovement/createOutbound/"
+        listUrl = "/stockMovement/list?direction=OUTBOUND"
     }
     request {
         actionLabel = "react.stockMovement.request.create.label"
         defaultActionLabel = "Create Request"
         listLabel = "react.stockMovement.label"
         defaultListLabel = "Stock Movement"
-        actionUrl = "/${appName}/stockMovement/createRequest/"
-        listUrl = "/${appName}/stockMovement/list?direction=INBOUND"
+        actionUrl = "/stockMovement/createRequest/"
+        listUrl = "/stockMovement/list?direction=INBOUND"
     }
     verifyRequest {
         actionLabel = "react.stockMovement.request.verify.label"
         defaultActionLabel = "Verify Request"
         listLabel = "react.stockMovement.label"
         defaultListLabel = "Stock Movement"
-        actionUrl = "/${appName}/stockMovement/list"
-        listUrl = "/${appName}/stockMovement/list"
+        actionUrl = "/stockMovement/list"
+        listUrl = "/stockMovement/list"
     }
     putAway {
         actionLabel = "react.putAway.createPutAway.label"
         defaultActionLabel = "Create Putaway"
         listLabel = "react.breadcrumbs.order.label"
         defaultListLabel = "Order"
-        actionUrl = "/${appName}/putAway/create/"
-        listUrl = "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
+        actionUrl = "/putAway/create/"
+        listUrl = "/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
     }
     combinedShipments {
         actionLabel = "shipmentFromPO.label"
         defaultActionLabel = "Ship from PO"
         listLabel = "react.stockMovement.label"
         defaultListLabel = "Stock Movement"
-        actionUrl = "/${appName}/stockMovement/createCombinedShipments/"
-        listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
+        actionUrl = "/stockMovement/createCombinedShipments/"
+        listUrl   = "/stockMovement/list?direction=INBOUND"
     }
     invoice {
         actionLabel = "react.invoice.create.label"
         defaultActionLabel = "Create"
         listLabel = "react.invoice.label"
         defaultListLabel = "Invoice"
-        actionUrl = "/${appName}/invoice/create/"
-        listUrl   = "/${appName}/invoice/list/"
+        actionUrl = "/invoice/create/"
+        listUrl   = "/invoice/list/"
     }
     stockTransfer {
         actionLabel = "react.stockTransfer.createStockTransfer.label"
         defaultActionLabel = "Create Stock Transfer"
         listLabel = "react.stockTransfer.label"
         defaultListLabel = "Stock Transfer"
-        actionUrl = "/${appName}/stockTransfer/create/"
+        actionUrl = "/stockTransfer/create/"
         listUrl = "/"
     }
     replenishment {
@@ -1009,7 +1009,7 @@ breadcrumbsConfig {
         defaultActionLabel = "Create Replenishment"
         listLabel = "react.replenishment.label"
         defaultListLabel = "Replenishment"
-        actionUrl = "/${appName}/replenishment/create/"
+        actionUrl = "/replenishment/create/"
         listUrl = "/"
     }
     outboundReturns {
@@ -1017,7 +1017,7 @@ breadcrumbsConfig {
         defaultActionLabel = "Create Outbound Return"
         listLabel = "react.outboundReturns.label"
         defaultListLabel = "Outbound Returns"
-        actionUrl = "/${appName}/stockTransfer/createOutboundReturn/"
+        actionUrl = "/stockTransfer/createOutboundReturn/"
         listUrl = "/"
     }
     inboundReturns {
@@ -1025,18 +1025,18 @@ breadcrumbsConfig {
         defaultActionLabel = "Create Inbound Return"
         listLabel = "react.inboundReturns.label"
         defaultListLabel = "Inbound Returns"
-        actionUrl = "/${appName}/stockTransfer/createInboundReturn/"
+        actionUrl = "/stockTransfer/createInboundReturn/"
         listUrl = "/"
     }
     productsConfiguration {
         actionLabel = "productsConfiguration.label"
         defaultActionLabel = "Categories and Products Configuration"
-        actionUrl = "/${appName}/productsConfiguration/index"
+        actionUrl = "/productsConfiguration/index"
     }
     locationsConfiguration {
         actionLabel = "locationsConfiguration.label"
         defaultActionLabel = "Locations Configuration"
-        actionUrl = "/${appName}/locationsConfiguration/create"
+        actionUrl = "/locationsConfiguration/create"
     }
 }
 

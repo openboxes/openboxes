@@ -128,5 +128,7 @@ class SecurityInterceptor {
             redirect(controller: 'dashboard', action: 'chooseLocation')
             return false
         }
+
+        return true
     }
 }
