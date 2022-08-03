@@ -745,7 +745,7 @@ class ReportController {
         def filename = "AmountOutstandingOnOrders-${session?.warehouse?.name}-${new Date().format("dd-MMM-yyyy-hh:mm")}"
         response.contentType = "application/vnd.ms-excel"
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
-        documentService.generateAmountOutstandingOnOrdersxcel(response.outputStream, rows)
+        documentService.generateExcel(response.outputStream, rows)
         response.outputStream.flush()
     }
 }

@@ -1634,36 +1634,4 @@ class DocumentService {
 
         return documents
     }
-
-    void generateAmountOutstandingOnOrdersxcel(OutputStream outputStream, List<Map> data) {
-        try {
-            Workbook workbook = new HSSFWorkbook()
-            HSSFSheet sheet = workbook.createSheet("Sheet1")
-            createExcelHeader(sheet, 0, data.get(0).keySet().toList())
-            data.eachWithIndex { Map dataRow, index ->
-                createExcelRow(sheet, index + 1, dataRow)
-            }
-
-            sheet.setColumnWidth((short) 0, (short) ((50 * 4) / ((double) 1 / 20))) // Supplier
-            sheet.setColumnWidth((short) 2, (short) ((50 * 4) / ((double) 1 / 20))) // PO Number
-            sheet.setColumnWidth((short) 3, (short) ((50 * 2) / ((double) 1 / 20))) // Type
-            sheet.setColumnWidth((short) 5, (short) ((50 * 6) / ((double) 1 / 20))) // Description
-            sheet.setColumnWidth((short) 7, (short) ((50 * 4) / ((double) 1 / 20))) // Cost per UOM
-            sheet.setColumnWidth((short) 8, (short) ((50 * 6) / ((double) 1 / 20))) // Qty Ordered not shipped (UOM)
-            sheet.setColumnWidth((short) 9, (short) ((50 * 6) / ((double) 1 / 20))) // Qty Ordered not shipped (Each)
-            sheet.setColumnWidth((short) 10, (short) ((50 * 6) / ((double) 1 / 20))) // Value ordered not shipped
-            sheet.setColumnWidth((short) 11, (short) ((50 * 6) / ((double) 1 / 20))) // Qty Shipped not Invoiced (UOM)
-            sheet.setColumnWidth((short) 12, (short) ((50 * 6) / ((double) 1 / 20))) // Qty Shipped not Invoiced (Each)
-            sheet.setColumnWidth((short) 13, (short) ((50 * 6) / ((double) 1 / 20))) // Value Shipped not invoiced
-            sheet.setColumnWidth((short) 14, (short) ((50 * 6) / ((double) 1 / 20))) // Total Qty not Invoiced (UOM)
-            sheet.setColumnWidth((short) 15, (short) ((50 * 6) / ((double) 1 / 20))) // Total Qty not Invoiced (Each)
-            sheet.setColumnWidth((short) 16, (short) ((50 * 6) / ((double) 1 / 20))) // Total Value not invoiced
-            sheet.setColumnWidth((short) 19, (short) ((50 * 4) / ((double) 1 / 20))) // Estimated Ready Date
-
-            workbook.write(outputStream)
-            outputStream.close()
-        } catch (IOException e) {
-            log.error("IO exception while generating amount outstanding on orders excel file")
-        }
-    }
 }
