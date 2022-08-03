@@ -306,7 +306,6 @@ class StockMovementController {
 
     def remove = {
         Location currentLocation = Location.get(session.warehouse.id)
-        boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
             if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
@@ -332,10 +331,6 @@ class StockMovementController {
         params.direction = (currentLocation == stockMovement.origin) ? StockMovementDirection.OUTBOUND :
                 (currentLocation == stockMovement.destination) ? StockMovementDirection.INBOUND : "ALL"
 
-        if (isCentralPurchasingEnabled) {
-            redirect(controller: 'order', action: "list", params: [orderTypeCode: OrderTypeCode.PURCHASE_ORDER])
-            return
-        }
         redirect(action: "list", params:params)
     }
 
