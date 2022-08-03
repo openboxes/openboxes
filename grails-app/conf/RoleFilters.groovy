@@ -29,7 +29,6 @@ class RoleFilters {
             'shipper'      : ['create'],
             'locationGroup': ['create'],
             'locationType' : ['create'],
-            '*'            : ['remove']
     ]
 
     def static superuserControllers = []
