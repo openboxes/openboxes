@@ -900,7 +900,7 @@ class ReportService implements ApplicationContextAware {
                     order_adjustment.id AS id,
                     o.id AS order_id,
                     CASE
-                        WHEN (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL) THEN 0
+                        WHEN (invoice.invoice_type_id = :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL) THEN 0
                         ELSE 1
                     END as quantity_invoiced
                 FROM `order` o
