@@ -96,7 +96,7 @@
                                     <i class="fa fa-cog"></i> Actions
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <li><g:link controller="mobile" action="messageDetails"
+                                    <li><g:link controller="mobile" action="messageDetails" target="_blank"
                                                 class="dropdown-item" params="[path: message.path]">
                                         <i class="fa fa-file-download"></i> Download</g:link></li>
                                     <li><g:link controller="mobile" action="messageValidate"
@@ -110,7 +110,7 @@
                                         <i class="fa fa-archive"></i> Archive</g:link></li>
                                     <li><g:link controller="mobile" action="messageDelete"
                                                 class="dropdown-item text-danger" params="[path: message.path]">
-                                        <i class="fa fa-ban"></i> Delete</g:link></li>
+                                        <i class="fa fa-trash"></i> Delete</g:link></li>
                                     </ul>
                                 </div>
                         </td>

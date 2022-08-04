@@ -66,6 +66,7 @@ import org.pih.warehouse.integration.xml.pod.DocumentUpload
 import org.pih.warehouse.integration.xml.trip.Orders
 import org.pih.warehouse.integration.xml.trip.Trip
 import org.pih.warehouse.inventory.StockMovementStatusCode
+import org.pih.warehouse.jobs.MessageHandlingJob
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.requisition.Requisition
@@ -173,30 +174,7 @@ class TmsIntegrationService {
                 if (messages) {
                     messages.each { Map message ->
                         if (message) {
-                            try {
-                                String xmlContents = fileTransferService.retrieveMessage(message.path)
-                                log.info "Handling message ${message}:\n${xmlContents}"
-                                handleMessage(xmlContents)
-
-                                // Archive message on success so that other messages can be processed
-                                Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
-                                if (archiveMessageOnSuccess) {
-                                    log.info "Archiving message ${message}"
-                                    archiveMessage(message.path)
-                                }
-                            } catch (Exception e) {
-                                log.error("Message ${message?.name} not processed due to error: " + e.message, e)
-                                if (message) {
-                                    failMessage(message?.path, e)
-
-                                    // Archive message on failure so that other messages can be processed
-                                    // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
-                                    Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
-                                    if (archiveOnFailure) {
-                                        archiveMessage(message.path)
-                                    }
-                                }
-                            }
+                            MessageHandlingJob.triggerNow([messagePath: message.path])
                         }
                     }
                 }
@@ -207,10 +185,32 @@ class TmsIntegrationService {
         }
     }
 
-    def handleMessage(String xmlContents) {
-        validateMessage(xmlContents)
-        Object messageObject = deserialize(xmlContents)
-        handleMessage(messageObject)
+    def handleMessage(String messagePath) {
+        try {
+            String xmlContents = fileTransferService.retrieveMessage(messagePath)
+            validateMessage(xmlContents)
+            Object messageObject = deserialize(xmlContents)
+            handleMessage(messageObject)
+
+            // Archive message on success so that other messages can be processed
+            Boolean archiveMessageOnSuccess = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnSuccess.enabled
+            if (archiveMessageOnSuccess) {
+                archiveMessage(messagePath)
+            }
+        } catch (Exception e) {
+            log.error("Message ${messagePath} was not processed due to error: " + e.message, e)
+            if (messagePath) {
+                failMessage(messagePath, e)
+
+                // Archive message on failure so that other messages can be processed
+                // Not recommended as this can lead to unexpected outcomes given that this will allow other messages to be processed
+                Boolean archiveOnFailure = grailsApplication.config.openboxes.integration.ftp.inbound.archiveOnFailure.enabled
+                if (archiveOnFailure) {
+                    archiveMessage(messagePath)
+                }
+            }
+            throw e
+        }
     }
 
     def handleMessage(DocumentUpload documentUpload) {
@@ -225,10 +225,10 @@ class TmsIntegrationService {
     def handleMessage(AcceptanceStatus acceptanceStatus) {
         log.info "Acceptance status: trackingNumbers=" + acceptanceStatus.tripOrderDetails.orderId + ", acceptanceTimestamp=${acceptanceStatus?.acceptanceTimestamp}"
         List<String> trackingNumbers = acceptanceStatus.tripOrderDetails.orderId
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
         Date acceptanceTimestamp = new Date()
         try {
             if (acceptanceStatus.acceptanceTimestamp) {
+                SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
                 acceptanceTimestamp = dateFormatter.parse(acceptanceStatus.acceptanceTimestamp)
             }
         } catch (ParseException e) {
@@ -243,16 +243,15 @@ class TmsIntegrationService {
     def handleMessage(Execution execution) {
         log.info "Trip execution " + execution.toString()
         SimpleDateFormat dateFormatter = new SimpleDateFormat(grailsApplication.config.openboxes.integration.defaultDateFormat)
-
         execution.executionStatus.each { ExecutionStatus executionStatus ->
             String trackingNumber = executionStatus.orderId
             String statusCode = executionStatus.status
             BigDecimal latitude = executionStatus?.geoData?.latitude
             BigDecimal longitude = executionStatus?.geoData?.longitude
             Date eventDate = dateFormatter.parse(executionStatus.dateTime)
-            createEvent(trackingNumber, statusCode, eventDate, latitude, longitude)
             triggerOutboundInventoryUpdates(trackingNumber, statusCode, eventDate)
             triggerInboundInventoryUpdates(trackingNumber, statusCode, eventDate)
+            createEvent(trackingNumber, statusCode, eventDate, latitude, longitude)
         }
     }
 
@@ -366,8 +365,7 @@ class TmsIntegrationService {
                 stockMovement.shipment = stockMovementService.createShipment(stockMovement, false)
             }
             stockMovementService.createOrUpdateTrackingNumber(stockMovement?.shipment, trackingNumber)
-        }
-        else {
+        } else {
             log.warn("Unable to locate a stock movement with identifier ${identifier}")
         }
     }
@@ -440,6 +438,8 @@ class TmsIntegrationService {
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
             log.info ("Stock movement ${stockMovement?.identifier} with status ${stockMovement?.status} will be shipped")
             if (!stockMovement.hasBeenShipped() && stockMovement.stockMovementStatusCode >= StockMovementStatusCode.PICKED) {
+                // Override date shipped if provided
+                stockMovement.dateShipped = dateShipped?:new Date()
                 stockMovementService.transitionRequisitionBasedStockMovement(stockMovement, StockMovementStatusCode.DISPATCHED)
             }
             else {
@@ -454,7 +454,10 @@ class TmsIntegrationService {
         if (status in inboundTransactionTriggerStatuses) {
             StockMovement stockMovement = stockMovementService.findByTrackingNumber(trackingNumber, Boolean.FALSE)
             log.info "stockmovement ${stockMovement.hasBeenShipped()} ${stockMovement.isReceived} ${stockMovement?.stockMovementStatusCode}"
-            if(stockMovement.hasBeenShipped() && !stockMovement.isReceived) {
+            if (!stockMovement?.hasBeenShipped()) {
+                throw new IllegalStateException("Stock movement ${stockMovement?.identifier} cannot be received because it has not been shipped yet")
+            }
+            else if(stockMovement.hasBeenShipped() && !stockMovement.isReceived) {
                 log.info ("Stock movement ${stockMovement.identifier} with status ${stockMovement.status} will be received")
                 Shipment shipment = stockMovement.shipment
                 if (shipment) {
