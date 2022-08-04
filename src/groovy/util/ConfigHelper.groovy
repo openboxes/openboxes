@@ -8,6 +8,7 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package util
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 // See http://jira.codehaus.org/browse/GRAILS-6515
 class ConfigHelper {
@@ -27,6 +28,18 @@ class ConfigHelper {
             return value
         }
 
+    }
+
+    static findAccessRule(String controllerName, String actionName, Object rules) {
+        ArrayList rule = rules.findAll {
+            (it.controller == controllerName && it.actions.contains(actionName)) ||
+                    (it.controller == controllerName && it.actions.contains("*")) ||
+                    (it.controller == "*" && it.actions.contains("*"))
+        }
+        if (rule?.size() > 1) {
+            throw new Exception("There can't be more than one rule specified for this controller and action!")
+        }
+        return rule?.size() > 0 ? rule.first() : null
     }
 
 }
