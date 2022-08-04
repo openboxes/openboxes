@@ -1124,7 +1124,7 @@ openboxes.security.rbac.rules = [
         //[controller: '*', actions: ['remove*'], access: [RoleType.ROLE_SUPERUSER]],
         //[controller: '*', actions: ['delete*'], access: [RoleType.ROLE_SUPERUSER]]
         // ... otherwise we'll need to include explicit rules for everything
-        [controller: 'order', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'order', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
         [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
         [controller: 'invoice', actions: ['eraseInvoice'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
         [controller: 'invoiceApi', actions: ['removeItem'],  accessRules: [  minimumRequiredRole: RoleType.ROLE_MANAGER, supplementalRoles: [RoleType.ROLE_INVOICE] ]],
