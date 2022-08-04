@@ -183,7 +183,7 @@ class StockMovementService {
                         }
                         break
                     case StockMovementStatusCode.DISPATCHED:
-                        issueRequisitionBasedStockMovement(stockMovement.id)
+                        issueRequisitionBasedStockMovement(stockMovement)
                         break
                     default:
                         throw new IllegalArgumentException("Cannot update status with invalid status ${status}")
@@ -2539,6 +2539,7 @@ class StockMovementService {
         // Reference number exists but the user-defined tracking number was empty so we should delete
         else if (referenceNumber) {
             shipment.removeFromReferenceNumbers(referenceNumber)
+            referenceNumber.delete()
             shipment.save(flush:true)
         }
         return referenceNumber
@@ -2741,20 +2742,16 @@ class StockMovementService {
         shipmentService.sendShipment(shipment, "Sent on ${new Date()}", user, shipment.origin, stockMovement.dateShipped ?: new Date())
     }
 
-    void issueRequisitionBasedStockMovement(String id) {
-
+    void issueRequisitionBasedStockMovement(StockMovement stockMovement) {
         User user = AuthService.currentUser.get()
-        StockMovement stockMovement = getStockMovement(id, Boolean.FALSE)
         Requisition requisition = stockMovement.requisition
-        def shipment = requisition.shipment
-
         validateRequisition(requisition)
 
-        if (!shipment) {
+        if (!requisition.shipment) {
             throw new IllegalStateException("There are no shipments associated with stock movement ${requisition.requestNumber}")
         }
 
-        shipmentService.sendShipment(shipment, null, user, requisition.origin, stockMovement.dateShipped ?: new Date())
+        shipmentService.sendShipment(requisition.shipment, null, user, requisition.origin, stockMovement.dateShipped?:new Date())
     }
 
     void receiveStockMovement(StockMovement stockMovement, Date dateDelivered, Boolean creditStockOnReceipt = Boolean.TRUE) {

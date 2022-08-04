@@ -461,8 +461,14 @@ class MobileController {
     }
 
     def messageListProcess = {
-        tmsIntegrationService.handleMessages()
+        try {
+            tmsIntegrationService.handleMessages()
+            flash.message = "Message processing is running in the background - please check back in a few minutes."
 
+        } catch (Exception e) {
+            log.error("Processing messages failed due to error: " + e.message, e)
+            flash.message = "Processing messages failed due to error: " + e.message
+        }
         redirect(action: "messageList")
     }
 
@@ -523,21 +529,12 @@ class MobileController {
 
     def messageProcess = {
         try {
-            String xmlContents = fileTransferService.retrieveMessage(params.path)
-            tmsIntegrationService.validateMessage(xmlContents)
-            Object messageObject = tmsIntegrationService.deserialize(xmlContents)
-            tmsIntegrationService.handleMessage(messageObject)
+            tmsIntegrationService.handleMessage(params.path)
             flash.message = "Message ${params.path} has been processed successfully"
-
-            Boolean archiveOnSuccess = grailsApplication.config.openboxes.integration.ftp.archiveOnSuccess
-            if (archiveOnSuccess) {
-                tmsIntegrationService.archiveMessage(params.path)
-            }
         }
         catch (Exception e) {
             log.error("Message was not processed due to error: " + e.message, e)
             flash.message = "Message ${params.path} was not processed due to error: " + e.message
-            tmsIntegrationService.failMessage(params.path, e)
         }
         redirect(action: "messageList")
     }
