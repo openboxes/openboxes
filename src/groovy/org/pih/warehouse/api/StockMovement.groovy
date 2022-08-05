@@ -80,6 +80,10 @@ class StockMovement {
     Shipment shipment
     List documents
 
+    static transients = [
+            "electronicType"
+    ]
+
     static constraints = {
         id(nullable: true)
         name(nullable: true)
@@ -111,7 +115,6 @@ class StockMovement {
         requestType(nullable: true)
         sourceType(nullable: true)
     }
-
 
     Map toJson() {
         return [
@@ -224,13 +227,12 @@ class StockMovement {
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
         // stock request /stockRequest/remove/:id
-        if (this.isElectronicType()) {
+        if (electronicType) {
             User user = AuthService.currentUser.get()
-            def rules = ConfigurationHolder.config.openboxes.security.rbac.rules
-            def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove", rules)
+            def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
             def userRoles = user.getEffectiveRoles(currentLocation)
             if (!userRoles.any { Role role -> role.roleType == accessRule?.accessRules?.minimumRequiredRole }) {
-                throw new IllegalAccessException("User must be in role Admin to delete stock request")
+                throw new IllegalAccessException("You don't have minimum required role to perform this action")
             }
         }
 

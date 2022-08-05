@@ -1,67 +1,60 @@
 package org.pih.warehouse.utils
 
 import grails.test.GrailsUnitTestCase
+import org.junit.Before
 import org.junit.Test
 import org.pih.warehouse.core.RoleType
 import util.ConfigHelper
 
 class ConfigHelperTests extends GrailsUnitTestCase {
+    @Before
+    void setUp() {
+        super.setUp()
+        String rbacRulesConfig = """
+            openboxes { 
+                security {
+                    rbac { 
+                        rules = [
+                            [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+                            [controller : "stockRequest", actions : ["remove"], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_MANAGER ]],
+                            [controller : "stockRequest", actions : ["remove"], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_ADMIN ]],
+                            [controller: 'stockRequest', actions: ['removeItem'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_BROWSER ]],
+                            [controller: 'order', actions: ['*'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_SUPERUSER ]],
+                        ]
+                    }    
+                }    
+            }
+        """
+        mockConfig(rbacRulesConfig)
+    }
     @Test
-    void findAccessRule_shouldReturnCorrectRule() {
-        def rules = [
-            [controller: 'order', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
-            [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
-            [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
-            [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]]
-        ]
+    void findAccessRule_shouldReturnCorrectRuleWhenTwoRulesForTheSameControllerAndAction() {
+        // More specified role is expected to be returned
         def expectedResult = [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]]
-        assertEquals expectedResult, ConfigHelper.findAccessRule("stockRequest", "remove", rules)
+        assertEquals expectedResult, ConfigHelper.findAccessRule("stockRequest", "remove")
     }
 
-    @Test
-    void findAccessRule_shouldReturnExceptionWhenTwoRulesForTheSameControllerAndAction() {
-        def rules = [
-                [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
-                [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
-                [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
-                [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_MANAGER]]
-        ]
-        def message = shouldFail(Exception) {
-            ConfigHelper.findAccessRule("stockRequest", "remove", rules)
-        }
-        assertTrue message == "There can't be more than one rule specified for this controller and action!"
-    }
 
     @Test
     void findAccessRule_shouldReturnCorrectRuleWhenTwoActionsContainingTheSameStringFirstScenario() {
-        def rules = [
-                [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
-                [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
-                [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
-                [controller: 'stockRequest', actions: ['removeItem'], accessRules: [minimumRequiredRole: RoleType.ROLE_MANAGER]]
-        ]
         def expectedResult = [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]]
-        assertEquals expectedResult, ConfigHelper.findAccessRule("stockRequest", "remove", rules)
+        assertEquals expectedResult, ConfigHelper.findAccessRule("stockRequest", "remove")
     }
 
     @Test
     void findAccessRule_shouldReturnCorrectRuleWhenTwoActionsContainingTheSameStringSecondScenario() {
-        def rules = [
-                [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
-                [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
-                [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
-                [controller: 'stockRequest', actions: ['removeItem'], accessRules: [minimumRequiredRole: RoleType.ROLE_MANAGER]]
-        ]
-        def expectedResult = [controller: 'stockRequest', actions: ['removeItem'], accessRules: [minimumRequiredRole: RoleType.ROLE_MANAGER]]
-        assertEquals expectedResult, ConfigHelper.findAccessRule("stockRequest", "removeItem", rules)
+        def expectedResult = [controller: 'stockRequest', actions: ['removeItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_BROWSER ]]
+        assertEquals expectedResult, ConfigHelper.findAccessRule("stockRequest", "removeItem")
     }
 
     @Test
     void findAccessRule_shouldReturnNullIfNotExistingRule() {
-        def rules = [
-                [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
-                [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
-        ]
-        assertNull ConfigHelper.findAccessRule("stockRequest", "remove", rules)
+        assertNull ConfigHelper.findAccessRule("stockMovement", "show")
+    }
+
+    @Test
+    void findAccessRule_shouldReturnCorrectRuleIfControllerHasAsteriskAsActions() {
+        def expectedResult = [controller: 'order', actions: ['*'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]]
+        assertEquals expectedResult, ConfigHelper.findAccessRule("order", "remove")
     }
 }

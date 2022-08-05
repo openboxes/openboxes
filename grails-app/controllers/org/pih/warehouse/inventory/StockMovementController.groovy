@@ -307,13 +307,13 @@ class StockMovementController {
     def remove = {
         Location currentLocation = Location.get(session.warehouse.id)
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        boolean isRequestedUrlForStockRequest = params.isStockRequest ?: false
-
+        String[] urlParts = request.request.requestURI.split("/")
+        boolean isRequestedUrlForStockRequest = urlParts[2] == "stockRequest"
         // Check if URL is /stockRequest and if the stockMovement we are trying to delete is a request
         // OR check if url is /stockMovement and the stockMovement we are trying to delete is not request to prevent user from trying to delete request using /stockMovement URL
-        if ((params.expectedSourceType == RequisitionSourceType.ELECTRONIC && (!isRequestedUrlForStockRequest || !stockMovement.isElectronicType())) ||
-            params.expectedSourceType != RequisitionSourceType.ELECTRONIC && !isRequestedUrlForStockRequest && stockMovement.isElectronicType()) {
-                throw new IllegalAccessException("You are trying to do something malicious, please stop")
+        if ((isRequestedUrlForStockRequest && !stockMovement.electronicType) ||
+            (!isRequestedUrlForStockRequest && stockMovement.electronicType)) {
+                throw new IllegalAccessException("You can't delete the stock movement: ${stockMovement.name} using this URL")
         }
         if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
             if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {

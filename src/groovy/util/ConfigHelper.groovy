@@ -30,16 +30,16 @@ class ConfigHelper {
 
     }
 
-    static findAccessRule(String controllerName, String actionName, Object rules) {
+    static findAccessRule(String controllerName, String actionName) {
+        def rules = ConfigurationHolder.config.openboxes.security.rbac.rules
+
+        // If there is more than one rule specified for the same controller and action, determine which Role is "higher" by sortOrder of RoleType enum, and return the "higher" one
         ArrayList rule = rules.findAll {
             (it.controller == controllerName && it.actions.contains(actionName)) ||
                     (it.controller == controllerName && it.actions.contains("*")) ||
                     (it.controller == "*" && it.actions.contains("*"))
-        }
-        if (rule?.size() > 1) {
-            throw new Exception("There can't be more than one rule specified for this controller and action!")
-        }
-        return rule?.size() > 0 ? rule.first() : null
+        }.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }
+        return rule?.size() > 0 ? rule?.first() : null
     }
 
 }

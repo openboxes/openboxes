@@ -28,8 +28,6 @@ class UrlMappings {
 
         "/stockRequest/$action/$id**?" {
             controller = "stockMovement"
-            isStockRequest = true
-            expectedSourceType = RequisitionSourceType.ELECTRONIC
         }
 
         "/$controller/$action?/$id?" {
