@@ -9,15 +9,14 @@
  **/
 package org.pih.warehouse
 
-import sun.misc.BASE64Encoder
+import org.apache.commons.codec.binary.Base64
 
 import java.security.MessageDigest
-
 
 class PasswordCodec {
     static encode = { String str ->
         MessageDigest md = MessageDigest.getInstance('SHA')
         md.update(str.getBytes('UTF-8'))
-        return (new BASE64Encoder()).encode(md.digest())
+        return new String(Base64.encodeBase64(md.digest()))
     }
 }
