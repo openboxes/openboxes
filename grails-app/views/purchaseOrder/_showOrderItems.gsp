@@ -496,10 +496,20 @@
         }
 
         function saveOrderItem() {
+            const _ = require('lodash');
             var data = $("#orderItemForm").serialize();
             data += '&orderIndex=' + $("#orderItemsTable tbody tr").length;
             if (validateItemsForm()) {
-              if ($("#validationCode").val() == 'WARN' && !confirm(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label').replaceAll( /(')/, '\\\\$1' )}"))) {
+              /*
+               * OBPIH-3671 introduced a patch here to escape single quotes,
+               * but in a way that broke GSP parsing in Grails 3; lodash.escape()
+               * sanitizes a string more thoroughly and doesn't confuse GSP.
+               *
+               * TODO If we need to sanitize output from warehouse.message()
+               * TODO here, we may need to elsewhere -- should we escape all
+               * TODO localized strings? Further discussion at OBGM-343.
+               */
+              if ($("#validationCode").val() == 'WARN' && !confirm(_.escape(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label').replaceAll( /(')/, '\\\\$1' )}")))) {
                 return false
               } else {
                 $.ajax({
