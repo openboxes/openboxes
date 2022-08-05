@@ -102,17 +102,13 @@ jobs:
         echo "dataSource.password=${{ env.OPENBOXES_PASSWORD }}" > ~/.grails/openboxes-config.properties
         echo "dataSource.url=jdbc:mysql://localhost:3306/${{ env.DB_DATABASE }}?allowPublicKeyRetrieval=true&useSSL=false" >> ~/.grails/openboxes-config.properties
         echo "dataSource.username=${{ env.OPENBOXES_USER }}" >> ~/.grails/openboxes-config.properties
-        echo "openboxes.fixtures.enabled=true" >> ~/.grails/openboxes-config.properties
-        echo "openboxes.jobs.dataCleaningJob.enabled=false" >> ~/.grails/openboxes-config.properties
-        echo "openboxes.jobs.refreshDemandDataJob.enabled=false" >> ~/.grails/openboxes-config.properties
-        echo "openboxes.jobs.refreshInventorySnapshotJob.enabled=false" >> ~/.grails/openboxes-config.properties
-        #
-        # FIXME Strangely, enabled = false doesn't disable refreshProductAvailabilityJob,
-        # FIXME but setting delayInMilliseconds to a high value has the same practical effect.
-        #
-        echo "openboxes.jobs.refreshProductAvailabilityJob.enabled=false" >> ~/.grails/openboxes-config.properties
-        echo "openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds=3600000" >> ~/.grails/openboxes-config.properties
-        echo "openboxes.refreshAnalyticsDataOnStartup.enabled=false" >> ~/.grails/openboxes-config.properties
+
+        echo "openboxes.fixtures.enabled=true" > ~/.grails/openboxes-config.groovy
+        echo "openboxes.jobs.dataCleaningJob.enabled=false" >> ~/.grails/openboxes-config.groovy
+        echo "openboxes.jobs.refreshDemandDataJob.enabled=false" >> ~/.grails/openboxes-config.groovy
+        echo "openboxes.jobs.refreshInventorySnapshotJob.enabled=false" >> ~/.grails/openboxes-config.groovy
+        echo "openboxes.jobs.refreshProductAvailabilityJob.enabled=false" >> ~/.grails/openboxes-config.groovy
+        echo "openboxes.refreshAnalyticsDataOnStartup.enabled=false" >> ~/.grails/openboxes-config.groovy
 
       #
       # Liquibase migrations from scratch are very, very slow. For performance,
