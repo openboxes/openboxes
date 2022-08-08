@@ -240,17 +240,16 @@ class ForecastingService {
                 destination_name,
                 product_demand_details.product_code,
                 product_name,
+                product.price_per_unit,
                 quantity_requested,
                 quantity_picked,
                 reason_code,
                 reason_code_classification,
                 quantity_demand
             FROM product_demand_details
+            LEFT JOIN product ON product.id = product_demand_details.product_id
             """
 
-        if (params.category) {
-            query += " JOIN product ON product.id = product_demand_details.product_id"
-        }
         if (params.tags && params.tags != "null") {
             query += " LEFT JOIN product_tag ON product_tag.product_id = product_demand_details.product_id"
         }
@@ -302,6 +301,7 @@ class ForecastingService {
             [
                     productCode             : it?.product_code,
                     productName             : it?.product_name,
+                    unitPrice               : it?.price_per_unit,
                     origin                  : it?.origin_name,
                     requestNumber           : it?.request_number,
                     destination             : it?.destination_name,

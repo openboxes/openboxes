@@ -1824,6 +1824,7 @@ class JsonController {
                     "Destination" { it.destination }
                     "Product Code" { it.productCode }
                     "Product Name" { it.productName }
+                    "Unit Price" { it.unitPrice }
                     "Quantity Requested" { it.qtyRequested }
                     "Quantity Issued" { it.qtyIssued }
                     "Quantity Demand" { it.qtyDemand }
@@ -1836,15 +1837,16 @@ class JsonController {
                             requestNumber           : it.requestNumber,
                             dateRequested           : it.dateRequested,
                             dateIssued              : it.dateIssued,
-                            origin                  : StringEscapeUtils.escapeCsv(it.origin),
-                            destination             : StringEscapeUtils.escapeCsv(it.destination),
+                            origin                  : it.origin,
+                            destination             : it.destination,
                             productCode             : it.productCode,
-                            productName             : StringEscapeUtils.escapeCsv(it.productName),
+                            productName             : it.productName,
+                            unitPrice               : it.unitPrice ?: '',
                             qtyRequested            : it.quantityRequested,
                             qtyIssued               : it.quantityIssued,
                             qtyDemand               : it.quantityDemand,
-                            reasonCode              : it.reasonCode,
-                            reasonCodeClassification: it.reasonCodeClassification,
+                            reasonCode              : it.reasonCode ?: '',
+                            reasonCodeClassification: it.reasonCodeClassification ?: '',
                     ]
                 }
 
