@@ -35,11 +35,12 @@ CREATE OR REPLACE VIEW order_receipt_status AS
         SUM(quantity_canceled) AS quantity_canceled
     FROM (
         SELECT
-            `order`.id                                              AS order_id,
-            `order`.order_number                                    AS order_number,
-            order_item.id                                           AS order_item_id,
-            SUM(receipt_item.quantity_received)                     AS quantity_received,
-            SUM(receipt_item.quantity_canceled)                     AS quantity_canceled
+            `order`.id               AS order_id,
+            `order`.order_number     AS order_number,
+            order_item.id            AS order_item_id,
+            -- quantity divided by order_item.quantity_per_uom to match other quantities that are in uom
+            SUM(receipt_item.quantity_received / order_item.quantity_per_uom)   AS quantity_received,
+            SUM(receipt_item.quantity_canceled / order_item.quantity_per_uom)   AS quantity_canceled
         FROM `order`
             LEFT OUTER JOIN order_item ON `order`.id = order_item.order_id
             LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
@@ -73,11 +74,12 @@ CREATE OR REPLACE VIEW order_item_payment_status AS
             LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
             LEFT OUTER JOIN shipment_invoice ON shipment_invoice.shipment_item_id = shipment_item.id
             LEFT OUTER JOIN invoice_item ON invoice_item.id = shipment_invoice.invoice_item_id
-            LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id AND invoice.date_posted IS NOT NULL
+            LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_item.order_item_status_code != 'CANCELLED'
           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
-        GROUP BY `order`.id, order_item.id, shipment_item.id
+          AND invoice.date_posted IS NOT NULL
+        GROUP BY `order`.id, order_item.id, invoice_item.id, shipment_item.id
     )
 AS order_item_payment_status
 GROUP BY order_item_id;
@@ -103,11 +105,12 @@ CREATE OR REPLACE VIEW order_adjustment_payment_status AS
             LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
             LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
             LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
-            LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id AND invoice.date_posted IS NOT NULL
+            LEFT OUTER JOIN invoice ON invoice.id = invoice_item.invoice_id
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_adjustment.canceled IS NOT TRUE
           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
-        GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id, invoice.date_submitted
+          AND invoice.date_posted IS NOT NULL
+        GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id
     )
 AS order_adjustment_payment_status;
 
@@ -146,21 +149,21 @@ CREATE OR REPLACE VIEW order_item_summary AS (
             SUM(order_receipt_status.quantity_canceled)         AS quantity_canceled,
             SUM(order_item_payment_status.quantity_invoiced)    AS quantity_invoiced,
             CASE
-                WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) + IFNULL(SUM(order_item_status.quantity_shipped), 0) = 0) THEN NULL
-                WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) = IFNULL(SUM(order_item_status.quantity_shipped), 0)) THEN 'SHIPPED'
-                WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) > 0 AND IFNULL(SUM(order_item_status.quantity_shipped), 0) > 0) THEN 'PARTIALLY_SHIPPED'
+                WHEN SUM(order_item_status.quantity_ordered) + SUM(order_item_status.quantity_shipped) = 0 THEN NULL
+                WHEN SUM(order_item_status.quantity_ordered) = SUM(order_item_status.quantity_shipped) THEN 'SHIPPED'
+                WHEN SUM(order_item_status.quantity_ordered) > 0 AND SUM(order_item_status.quantity_shipped) > 0 THEN 'PARTIALLY_SHIPPED'
                 ELSE NULL
             END AS shipment_status,
             CASE
-	            WHEN (IFNULL(SUM(order_receipt_status.quantity_received), 0) = 0) THEN NULL
-                WHEN ((IFNULL(SUM(order_item_status.quantity_ordered), 0) - IFNULL(SUM(order_receipt_status.quantity_canceled), 0)) <= IFNULL(SUM(order_receipt_status.quantity_received), 0)) THEN 'RECEIVED'
-                WHEN ((IFNULL(SUM(order_item_status.quantity_ordered), 0) - IFNULL(SUM(order_receipt_status.quantity_canceled), 0)) > IFNULL(SUM(order_receipt_status.quantity_received), 0) AND IFNULL(SUM(order_receipt_status.quantity_received), 0) > 0) THEN 'PARTIALLY_RECEIVED'
+	            WHEN SUM(order_receipt_status.quantity_received) = 0 THEN NULL
+                WHEN (SUM(order_item_status.quantity_ordered) - SUM(order_receipt_status.quantity_canceled)) <= SUM(order_receipt_status.quantity_received) THEN 'RECEIVED'
+                WHEN (SUM(order_item_status.quantity_ordered) - SUM(order_receipt_status.quantity_canceled)) > SUM(order_receipt_status.quantity_received) AND SUM(order_receipt_status.quantity_received) > 0 THEN 'PARTIALLY_RECEIVED'
                 ELSE NULL
             END AS receipt_status,
             CASE
-                WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) = 0) THEN NULL
-                WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) = IFNULL(SUM(order_item_payment_status.quantity_invoiced), 0)) THEN 'INVOICED'
-                WHEN (IFNULL(SUM(order_item_status.quantity_ordered), 0) > IFNULL(SUM(order_item_payment_status.quantity_invoiced), 0) AND IFNULL(SUM(order_item_payment_status.quantity_invoiced), 0) > 0) THEN 'PARTIALLY_INVOICED'
+                WHEN SUM(order_item_status.quantity_ordered) + SUM(order_item_payment_status.quantity_invoiced) = 0 THEN NULL
+                WHEN SUM(order_item_status.quantity_ordered) = SUM(order_item_payment_status.quantity_invoiced) THEN 'INVOICED'
+                WHEN SUM(order_item_status.quantity_ordered) > SUM(order_item_payment_status.quantity_invoiced) AND SUM(order_item_payment_status.quantity_invoiced) > 0 THEN 'PARTIALLY_INVOICED'
                 ELSE NULL
             END AS payment_status
         FROM order_item
@@ -213,7 +216,7 @@ CREATE OR REPLACE VIEW order_summary AS (
                 ELSE NULL
             END AS receipt_status,
             CASE
-                WHEN SUM(items_and_adjustments_union.quantity_ordered) = 0 THEN NULL
+                WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.adjustments_count)) = 0 THEN NULL
                 WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.adjustments_count)) = (SUM(items_and_adjustments_union.quantity_invoiced) + SUM(items_and_adjustments_union.adjustments_invoiced)) THEN 'INVOICED'
                 WHEN (SUM(items_and_adjustments_union.quantity_ordered) + SUM(items_and_adjustments_union.adjustments_count)) > 0 AND (SUM(items_and_adjustments_union.quantity_invoiced) + SUM(items_and_adjustments_union.adjustments_invoiced) > 0) THEN 'PARTIALLY_INVOICED'
                 ELSE NULL
