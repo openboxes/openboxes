@@ -15,11 +15,13 @@ class ConfigHelperTests extends GrailsUnitTestCase {
                 security {
                     rbac { 
                         rules = [
-                            [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+                            [controller: '*', actions: ['*'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_SUPERUSER ]],
+                            [controller: "order", actions: ['show'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_SUPERUSER ]],
+                            [controller: 'order', actions: ['*'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_SUPERUSER ]],
+                            [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_SUPERUSER ]],
                             [controller : "stockRequest", actions : ["remove"], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_MANAGER ]],
                             [controller : "stockRequest", actions : ["remove"], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_ADMIN ]],
                             [controller: 'stockRequest', actions: ['removeItem'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_BROWSER ]],
-                            [controller: 'order', actions: ['*'], accessRules: [ minimumRequiredRole: org.pih.warehouse.core.RoleType.ROLE_SUPERUSER ]],
                         ]
                     }    
                 }    
@@ -48,13 +50,21 @@ class ConfigHelperTests extends GrailsUnitTestCase {
     }
 
     @Test
-    void findAccessRule_shouldReturnNullIfNotExistingRule() {
-        assertNull ConfigHelper.findAccessRule("stockMovement", "show")
+    void findAccessRule_shouldReturnGenericRuleIfNotExistingForControllerButGenericExists() {
+        def expectedResult = [controller: '*', actions: ['*'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]]
+        assertEquals expectedResult, ConfigHelper.findAccessRule("inventoryItem", "create")
     }
 
     @Test
     void findAccessRule_shouldReturnCorrectRuleIfControllerHasAsteriskAsActions() {
         def expectedResult = [controller: 'order', actions: ['*'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]]
         assertEquals expectedResult, ConfigHelper.findAccessRule("order", "remove")
+    }
+
+    @Test
+    void findAccessRule_shouldReturnMoreSpecifiedRuleIfAdditionalExisitingRuleForControllerButActionIsAsterisk() {
+        def expectedResult = [controller: 'order', actions: ['show'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER ]]
+        assertEquals expectedResult, ConfigHelper.findAccessRule("order", "show")
+
     }
 }
