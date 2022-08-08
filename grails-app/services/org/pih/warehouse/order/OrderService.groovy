@@ -598,7 +598,7 @@ class OrderService {
      * @param orderItems
      * @return
      */
-    boolean importOrderItems(String orderId, String supplierId, List orderItems, Location currentLocation) {
+    boolean importOrderItems(String orderId, String supplierId, List orderItems, Location currentLocation, User user) {
 
         int count = 0
         try {
@@ -635,6 +635,10 @@ class OrderService {
                     } else {
                         orderItem = new OrderItem()
                         orderItem.orderIndex = order.orderItems ? order.orderItems.size() : 0
+                    }
+
+                    if (!canOrderItemBeEdited(orderItem, user)) {
+                        throw new UnsupportedOperationException("You do not have permissions to perform this action")
                     }
 
                     Product product
@@ -700,6 +704,9 @@ class OrderService {
                     }
 
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
+                    if (orderItem.hasInvoices && orderItem.unitPrice != parsedUnitPrice) {
+                        throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced.")
+                    }
                     if (parsedUnitPrice < 0) {
                         throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}.")
                     }
@@ -734,6 +741,10 @@ class OrderService {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
+
+                    if (orderItem.hasInvoices && orderItem.budgetCode != budgetCode) {
+                        throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
+                    }
                     if (code) {
                         if (!budgetCode) {
                             throw new IllegalArgumentException("Could not find budget code with code: ${code}.")

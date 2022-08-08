@@ -863,7 +863,7 @@ class OrderController {
                 List lineItems = orderService.parseOrderItems(multipartFile.inputStream.text)
                 log.info "Line items: " + lineItems
 
-                if (orderService.importOrderItems(params.id, params.supplierId, lineItems, currentLocation)) {
+                if (orderService.importOrderItems(params.id, params.supplierId, lineItems, currentLocation, session.user)) {
                     flash.message = "Successfully imported ${lineItems?.size()} order line items. "
                 } else {
                     flash.message = "Failed to import packing list items due to an unknown error."

@@ -1112,7 +1112,7 @@ openboxes.order.orderStatusPropertyMap = [
 openboxes.purchaseOrder.editableProperties = [
         [
                 status: OrderStatus.PLACED,
-                deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
+                deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitOfMeasure"]
         ]
 ]
 
