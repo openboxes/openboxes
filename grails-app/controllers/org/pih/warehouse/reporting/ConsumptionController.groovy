@@ -138,10 +138,7 @@ class ConsumptionController {
                     command.rows[product] = new ShowConsumptionRowCommand()
                     command.rows[product].command = command
                     command.rows[product].product = product
-                }
-
-                if(!userHasFinanceRole) {
-                    command.rows[product].product.pricePerUnit = 0
+                    command.rows[product].pricePerUnit = userHasFinanceRole ? product?.pricePerUnit : 0
                 }
 
                 // Keep track of quantity out based on transaction type
@@ -304,7 +301,7 @@ class ConsumptionController {
 
             def csvrows = []
             command.rows.each { key, ShowConsumptionRowCommand row ->
-                def valueConsumed = (row?.totalConsumptionQuantity ?: 0) * (row.product?.pricePerUnit ?: 0)
+                def valueConsumed = (row?.totalConsumptionQuantity ?: 0) * (row.pricePerUnit ?: 0)
 
                 def csvrow = [
                         'Product code'                                : row.product.productCode ?: '',
@@ -312,7 +309,7 @@ class ConsumptionController {
                         'Category'                                    : row.product?.category?.name,
                         'Formulary'                                   : row.product?.productCatalogsToString(),
                         'Tag'                                         : row.product?.tagsToString(),
-                        'Unit Price'                                  : g.formatNumber(number: row.product.pricePerUnit, format: '###.#', maxFractionDigits: 2) ?: '',
+                        'Unit Price'                                  : g.formatNumber(number: row.pricePerUnit, format: '###.#', maxFractionDigits: 2) ?: '',
                         'UoM'                                         : row.product.unitOfMeasure ?: '',
                         'Qty Issued'                                  : g.formatNumber(number: row.issuedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Qty Consumed'                                : g.formatNumber(number: row.consumedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
@@ -533,6 +530,8 @@ class ShowConsumptionRowCommand {
     Product product
     ShowConsumptionCommand command
     InventoryLevel inventoryLevel
+
+    Double pricePerUnit = 0
 
     Integer onHandQuantity = 0
     Integer transferInQuantity = 0
