@@ -2,8 +2,8 @@ CREATE OR REPLACE VIEW order_item_status AS
     SELECT
         order_id,
         order_number,
-        quantity_ordered,
-        SUM(quantity_shipped) AS quantity_shipped,
+        IFNULL(quantity_ordered, 0)         AS quantity_ordered,
+        IFNULL(SUM(quantity_shipped), 0)    AS quantity_shipped,
         order_item_id
     FROM (
         SELECT
@@ -31,8 +31,8 @@ CREATE OR REPLACE VIEW order_receipt_status AS
         order_id,
         order_item_id,
         order_number,
-        SUM(quantity_received) AS quantity_received,
-        SUM(quantity_canceled) AS quantity_canceled
+        IFNULL(SUM(quantity_received), 0) AS quantity_received,
+        IFNULL(SUM(quantity_canceled), 0) AS quantity_canceled
     FROM (
         SELECT
             `order`.id               AS order_id,
@@ -59,7 +59,7 @@ CREATE OR REPLACE VIEW order_item_payment_status AS
         order_id,
         order_number,
         order_item_id,
-        SUM(quantity_ordered)  				AS quantity_ordered,
+        IFNULL(SUM(quantity_ordered), 0)  	AS quantity_ordered,
         IFNULL(SUM(quantity_invoiced), 0) 	AS quantity_invoiced
     FROM (
         SELECT
@@ -100,7 +100,10 @@ CREATE OR REPLACE VIEW order_adjustment_payment_status AS
             `order`.order_number                AS order_number,
             order.status                        AS order_status,
             invoice_item.id				        AS invoice_item_id,
-            IFNULL(invoice_item.quantity, 0)    AS quantity_invoiced
+            CASE
+                WHEN invoice.date_posted IS NOT NULL THEN IFNULL(invoice_item.quantity, 0)
+                ELSE 0
+            END AS quantity_invoiced
         FROM `order`
             LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id
             LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
@@ -109,7 +112,6 @@ CREATE OR REPLACE VIEW order_adjustment_payment_status AS
         WHERE `order`.order_type_id = 'PURCHASE_ORDER'
           AND order_adjustment.canceled IS NOT TRUE
           AND (invoice.invoice_type_id != '5' OR invoice.invoice_type_id IS NULL)
-          AND invoice.date_posted IS NOT NULL
         GROUP BY `order`.id, `order`.order_number, invoice_item.id, order_adjustment.id
     )
 AS order_adjustment_payment_status;
