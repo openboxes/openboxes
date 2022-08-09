@@ -55,7 +55,7 @@
                                     <g:set var="monthlyQuantity" value="${row.monthlyQuantity}"/>
                                     <g:set var="onHandQuantity" value="${row.onHandQuantity}"/>
                                     <g:set var="numberOfMonthsLeft" value="${onHandQuantity / monthlyQuantity}"/>
-                                    <g:set var="totalConsumptionValue" value="${(product?.pricePerUnit ?: 0) * row.totalConsumptionQuantity}"/>
+                                    <g:set var="totalConsumptionValue" value="${(row.pricePerUnit ?: 0) * row.totalConsumptionQuantity}"/>
 
                                     <tr>
                                         <td>
@@ -75,7 +75,7 @@
                                             </a>
                                         </td>
                                         <td class="center">
-                                            <g:formatNumber number="${product.pricePerUnit}" maxFractionDigits="2"/>
+                                            <g:formatNumber number="${row.pricePerUnit}" maxFractionDigits="2"/>
                                         </td>
                                         <td class="center">
                                             <div class="debit">${row.issuedQuantity}</div>
