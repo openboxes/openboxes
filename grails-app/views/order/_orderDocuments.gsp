@@ -26,7 +26,12 @@
                             <g:link action="editDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]">
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
                             </g:link>
-                            <g:link action="deleteDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+
+                            <g:link controller="order" action="deleteDocument" id="${documentInstance.id}"
+                                    params="['order.id':orderInstance?.id]"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    disabledMessage="You do not have minimum required role to perform this action"
+                            >
                                 <img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
                             </g:link>
                         </td>
@@ -90,7 +95,11 @@
                                 <img src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
                             </g:link>
 
-                            <g:link action="deleteDocument" id="${documentInstance.id}" params="['order.id':orderInstance?.id]" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                            <g:link controller="order" action="deleteDocument" id="${documentInstance.id}"
+                                    params="['order.id':orderInstance?.id]"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    disabledMessage="You do not have minimum required role to perform this action"
+                            >
                                 <img src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
                             </g:link>
                         </td>
