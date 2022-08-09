@@ -33,39 +33,18 @@ class ConfigHelper {
     static findAccessRule(String controllerName, String actionName) {
         def rules = ConfigurationHolder.config.openboxes.security.rbac.rules
 
+        ArrayList<Closure> filters = [
+            { it.controller == controllerName && it.actions.contains(actionName) },
+            { it.controller == controllerName && it.actions.contains("*") },
+            { it.controller == "*" && it.actions.contains("*") }
+        ]
+        // Find the rules for each filter and find the first non empty from the top (filters on the top are higher priority)
+        def rule = filters
+                    .collect { rules.findAll(it) }
+                    .find { it.size() != 0 }
+
         // If there is more than one rule specified for the same controller and action, determine which Role is "higher" by sortOrder of RoleType enum, and return the "higher" one
-
-        ArrayList rule = []
-
-        // First try to find a rule specified for the controllerName and actionName
-        rule = rules.findAll {
-            (it.controller == controllerName && it.actions.contains(actionName))
-        }.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }
-
-        if (rule.size() > 0) {
-            return rule.first()
-        }
-
-        // If didn't find anything then try to find a rule for controllerName and action *
-        rule = rules.findAll {
-            (it.controller == controllerName && it.actions.contains("*"))
-        }.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }
-
-        if (rule.size() > 0) {
-            return rule.first()
-        }
-
-        // In the end try to find generic rule (controller="*" and action="*")
-        rule = rules.findAll {
-            (it.controller == "*" && it.actions.contains("*"))
-        }.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }
-
-        if (rule.size() > 0) {
-            return rule.first()
-        }
-
-        // If not a single rule found, return null
-        return null
+        return rule?.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }?.first()
     }
 
 }
