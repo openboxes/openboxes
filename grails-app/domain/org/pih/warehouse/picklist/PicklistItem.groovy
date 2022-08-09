@@ -12,6 +12,7 @@ package org.pih.warehouse.picklist
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
@@ -185,8 +186,8 @@ class PicklistItem implements Serializable {
                 comment                     : comment,
 
                 // Used in Bin Replenishment feature
-                binLocation                 : binLocation,
-                zone                        : binLocation?.zone,
+                binLocation                 : binLocation?.toJson(LocationTypeCode.INTERNAL),
+                zone                        : binLocation?.zone?.toJson(LocationTypeCode.ZONE),
                 product                     : inventoryItem?.product,
                 inventoryItem               : inventoryItem,
                 lotNumber                   : inventoryItem?.lotNumber,
