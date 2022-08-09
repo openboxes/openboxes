@@ -1,34 +1,30 @@
 package org.pih.warehouse.order
 
+import grails.validation.ValidationException
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.junit.Test
+import org.pih.warehouse.core.IdentifierGeneratorTypeCode
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
-
 import testutils.DbHelper
 
-
-
 class OrderServiceTests extends GroovyTestCase {
-	
-	
+
 	def orderService
+
 	protected void setUp() {
-		def locationType = new LocationType(name: "Depot").save(flush:true)
-		assertNotNull(locationType)
-		def origin = new Location(name: "Origin", locationType: locationType).save(flush:true)
-		assertNotNull(origin)
-		def destination = new Location(name: "Destination", locationType: locationType).save(flush:true)
-		assertNotNull(destination)
-		DbHelper.createAdmin("Justin", "Miranda", "justin.miranda@gmail.com", "justin.miranda", "password", true)
-		def purchase_order = OrderTypeCode.PURCHASE_ORDER
-		def orderType = new OrderType(name: purchase_order.name(), code: purchase_order.name(), orderTypeCode: purchase_order)
-		assertNotNull(orderType)
+		super.setUp()
+		def locationType = DbHelper.findOrCreateLocationType('Depot')
+		DbHelper.findOrCreateLocation('Origin', locationType)
+		DbHelper.findOrCreateLocation('Destination', locationType)
+		DbHelper.findOrCreateAdminUser('Justin', 'Miranda', 'justin.miranda@gmail.com', 'justin.miranda', 'password', true)
+
+		ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.RANDOM
 	}
 
 	@Test
-	void saveOrder_shouldThrowOrderException() {
-		shouldFail(OrderException) {
+	void saveOrder_shouldThrowValidationException() {
+		shouldFail(ValidationException) {
 			def newOrder = new Order()
 			orderService.saveOrder(newOrder)
 		} 

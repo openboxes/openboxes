@@ -6,12 +6,9 @@ import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
-import org.pih.warehouse.inventory.Inventory;
 import org.pih.warehouse.inventory.InventoryItem
-// import org.pih.warehouse.inventory.InventoryService;
-import org.pih.warehouse.picklist.Picklist;
+import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
-// import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.springframework.context.ApplicationEvent
@@ -46,9 +43,6 @@ class RequisitionItemTests extends GrailsUnitTestCase {
         mockDomain(Picklist, [picklist])
         mockDomain(Requisition, [requisition])
         mockDomain(RequisitionItem)
-
-
-
     }
 
     protected void tearDown() {

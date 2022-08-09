@@ -13,7 +13,6 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -29,6 +28,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+
 /**
  * An product is an instance of a generic.  For instance,
  * the product might be Ibuprofen, but the product is Advil 200mg
@@ -616,17 +616,29 @@ class Product implements Comparable, Serializable {
      *
      * @return
      */
-    String toString() { return "${name}" }
+    @Override
+    String toString() { return name }
 
     /**
      * Sort by name
      */
+    @Override
     int compareTo(obj) {
+        return name <=> obj?.name ?: id <=> obj?.id
+    }
 
-        def sortOrder =
-                name <=> obj?.name ?:
-                        id <=> obj?.id
-        return sortOrder
+    @Override
+    int hashCode() {
+        return id?.hashCode() ?: super.hashCode()
+    }
+
+    @Override
+    boolean equals(Object o) {
+        if (o instanceof Product) {
+            Product that = (Product) o
+            return this.id == that.id
+        }
+        return false
     }
 
     /**
@@ -682,4 +694,3 @@ class Product implements Comparable, Serializable {
         ]
     }
 }
-

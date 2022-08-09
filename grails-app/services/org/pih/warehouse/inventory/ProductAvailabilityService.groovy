@@ -12,7 +12,6 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
-import groovy.time.TimeCategory
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
@@ -24,7 +23,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
@@ -44,16 +42,13 @@ class ProductAvailabilityService {
     def dataService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
-        log.info "Triggering refresh product availability"
-        use(TimeCategory) {
-            Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
-            def delayInMilliseconds = delayStart ?
-                    grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds : 0
-            Date runAt = new Date() + delayInMilliseconds.milliseconds
-            log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
-            RefreshProductAvailabilityJob.schedule(runAt,
-                    [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
-        }
+        Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
+        def delayInMilliseconds = delayStart ?
+            Integer.valueOf(grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds) : 0
+        Date runAt = new Date(System.currentTimeMillis() + delayInMilliseconds)
+        log.info "Triggering refresh product availability with ${delayInMilliseconds} ms delay"
+        RefreshProductAvailabilityJob.schedule(runAt,
+            [locationId: locationId, productIds: productIds, forceRefresh: forceRefresh])
     }
 
     def refreshProductsAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
@@ -753,6 +748,9 @@ class ProductAvailabilityService {
     }
 
     void updateProductAvailability(Product product) {
+        if (!product || !product.id || !product.productCode) {
+            return
+        }
         def results = ProductAvailability.executeUpdate(
                 "update ProductAvailability a " +
                         "set a.productCode = :productCode " +
@@ -763,7 +761,7 @@ class ProductAvailabilityService {
                         productCode: product.productCode
                 ]
         )
-        log.info "Updated ${results} product availability records for product ${product?.productCode}"
+        log.info "Updated ${results} product availability records for product ${product.productCode}"
     }
 
 

@@ -6,7 +6,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.product.Product
+import testutils.DbHelper
 
 class RequisitionIntegrationTests extends GroovyTestCase {
 
@@ -32,7 +32,7 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         requisition.save()
         assertTrue requisition.hasErrors()
         println requisition.errors
-        assertEquals 3, requisition.errors.errorCount
+        assertEquals 4, requisition.errors.errorCount
         assertTrue requisition.errors.hasFieldErrors("destination")
         assertTrue requisition.errors.hasFieldErrors("origin")
         assertTrue requisition.errors.hasFieldErrors("requestedBy")
@@ -41,8 +41,8 @@ class RequisitionIntegrationTests extends GroovyTestCase {
     @Test
     void save_shouldSaveRequisition() {
         def location = Location.list().first()
-        def product1 = Product.findByName("Advil 200mg")
-        def product2 = Product.findByName("Tylenol 325mg")
+        def product1 = DbHelper.findOrCreateProduct('Advil 200mg')
+        def product2 = DbHelper.findOrCreateProduct('Tylenol 325mg')
         def item1 = new RequisitionItem(product: product1, quantity: 10)
         def item2 = new RequisitionItem(product: product2, quantity: 20)
         def person = Person.list().first()
@@ -63,33 +63,29 @@ class RequisitionIntegrationTests extends GroovyTestCase {
         requisition.errors.each{ println(it)}
 
         assert requisition.save(flush:true)
-
-
     }
 
     @Test
-    void save_shouldSaveRequisitionItemOnly(){
-        def location = Location.list().first()
-        def person = Person.list().first()
+    void save_shouldSaveRequisitionItemOnly() {
+        def person = DbHelper.findOrCreateUser('Axl', 'Rose', 'axl@hotmail.com', 'axl', 'Sw337_Ch1ld', false)
         def requisition = new Requisition(
                 name:'testRequisition'+ UUID.randomUUID().toString()[0..5],
                 commodityClass: CommodityClass.MEDICATION,
                 type:  RequisitionType.NON_STOCK,
-                origin: location,
-                destination: location,
+                origin: DbHelper.findOrCreateLocation('somewhere over the rainbow'),
+                destination: DbHelper.findOrCreateLocation('where the buffalo roam'),
                 requestedBy: person,
                 dateRequested: new Date(),
                 requestedDeliveryDate: new Date().plus(1))
 
         assert requisition.save(flush:true)
 
-        def product = Product.findByName("Advil 200mg")
-		def item = new RequisitionItem(product: product, quantity: 10)
-		requisition.addToRequisitionItems(item);
-		
-		assert requisition.save(flush:true)
-		assertEquals 1, requisition.requisitionItems.size()
+        def product = DbHelper.findOrCreateProduct('Advil 200mg')
+        def item = new RequisitionItem(product: product, quantity: 10, requestedBy: person)
+        requisition.addToRequisitionItems(item)
 
+        assert requisition.save(flush: true)
+        assertEquals 1, requisition.requisitionItems.size()
     }
 
     /**
