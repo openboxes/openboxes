@@ -1130,6 +1130,8 @@ openboxes.security.rbac.rules = [
         [controller: 'invoiceApi', actions: ['removeItem'],  accessRules: [  minimumRequiredRole: RoleType.ROLE_MANAGER, supplementalRoles: [RoleType.ROLE_INVOICE] ]],
         [controller: 'stockTransfer', actions: ['eraseStockTransfer'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
         [controller: 'stockMovementItemApi', actions: ['eraseItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+        [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+        [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
         // Other controller actions that might need explicit rules
         //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
