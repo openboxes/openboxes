@@ -14,18 +14,23 @@ import java.time.format.DateTimeFormatter
 buildscript {
     configurations.all {
         /*
-         * Without this intervention, gradle-git-properties will pull in
-         * a version of JGit that requires Java 11+, but we use 8; see
-         * https://github.com/n0mer/gradle-git-properties/issues/195
+         * The gradle-git-properties plugin pulls in JGit 6.x, which
+         * requires Java 11+; for our builds to succeed we need 5.x.
+         *
+         * See https://github.com/n0mer/gradle-git-properties/issues/195
          */
-        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
+        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5+'
     }
     dependencies {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
         classpath "org.grails:grails-gradle-plugin:${grailsVersion}"
-        classpath "org.grails.plugins:database-migration:${grailsDatabaseMigrationVersion}"
+        classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
+        classpath "org.grails.plugins:hibernate5:${gormVersion-'.RELEASE'}"
+        classpath 'org.grails.plugins:views-gradle:1.3.0'
+        classpath 'org.owasp:dependency-check-gradle:7.1.1'
     }
     repositories {
+        mavenCentral()
         maven { url 'https://repo.grails.org/grails/core' }
     }
 }
@@ -36,21 +41,25 @@ plugins {
     id 'eclipse'
     id 'groovy'
     id 'idea'
+    id 'maven'
     id 'project-report'
     id 'war'
 
-    // git magic: releases past v2.3.0 require Gradle 5.1+
+    // git magic, but releases past v2.3.0 require Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
-    id 'com.moowork.node' version '1.3.1'  // enables `node` block below
+    // enable `npmInstall` target, as well as the `node` block below
+    id 'com.moowork.node' version '1.3.1'
 
-    // resolves a Windows-specific build issue
+    // resolve a Windows-specific build issue
     id 'com.virgo47.ClasspathJar' version '1.0.0'
 }
 
-apply plugin: 'asset-pipeline'  // enables `assets` block, but see deps below
+apply plugin: 'asset-pipeline'  // enable `assets` block, but see deps below
 apply plugin: 'org.grails.grails-gsp'
 apply plugin: 'org.grails.grails-web'
+apply plugin: 'org.grails.plugins.views-json'
+apply plugin: 'org.owasp.dependencycheck'  // enable dependencyCheckAnalyze task
 
 group 'com.openboxes'
 mainClassName = 'org.pih.warehouse.Application'
@@ -81,20 +90,168 @@ bootRun {
     systemProperties System.properties
 }
 
-configurations.all {
-    // standardize on slf4j/logback
-    exclude group: 'commons-logging', module: 'commons-logging'
-    exclude group: 'log4j', module: 'log4j'
-    exclude group: 'org.apache.logging.log4j', module: 'log4j'
-    exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
-    exclude group: 'org.apache.logging.log4j', module: 'log4j-1.2-api'
+configurations {
+    all {
+        // standardize on slf4j/logback
+        exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'log4j', module: 'log4j'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-1.2-api'
+
+        resolutionStrategy {
+
+            /*
+             * A number of our dependencies comprise tightly coupled module
+             * groups. A straightforward way to prevent intra-dependency
+             * version skew is to apply useVersion() on a group-wide basis.
+             */
+            eachDependency { DependencyResolveDetails details ->
+
+                if (details.requested.group == 'com.bertramlabs.plugins') {
+                    details.because 'enforce consistent asset-pipeline versioning'
+                    details.useVersion(assetPipelineVersion)
+                }
+
+                if (details.requested.group == 'com.h2database') {
+                    if (details.requested.name == 'h2') {
+                        details.because 'ensure security patches are consistently applied'
+                        details.useVersion(h2Databaseversion)
+                    }
+                }
+
+                if (details.requested.group.startsWith('com.fasterxml.jackson')) {
+                    details.because 'enforce consistent Jackson versioning'
+                    if (details.requested.name == 'jackson-databind') {
+                        // one module has a series of 8(!) security hotfixes
+                        details.useVersion(jacksonVersion + '.8')
+                    } else {
+                        details.useVersion(jacksonVersion)
+                    }
+                }
+
+                if (details.requested.group == 'org.apache.httpcomponents') {
+                    details.because 'enforce consistent httpcomponents versioning'
+                    if (details.requested.name == 'httpcore') {
+                        details.useVersion(httpCoreVersion)
+                    } else {
+                        details.useVersion(httpComponentsVersion)
+                    }
+                }
+
+                if (details.requested.group == 'org.apache.poi') {
+                    details.because 'enforce consistent POI versioning'
+                    details.useVersion(poiVersion)
+                }
+
+                if (details.requested.group.startsWith('org.apache.tomcat')) {
+                    if (details.requested.name != 'tomcat-embed-logging-log4j') {
+                        details.because 'enforce consistent Tomcat versioning'
+                        details.useVersion(tomcatVersion)
+                    }
+                }
+
+                if (details.requested.group == 'org.ow2.asm') {
+                    details.because 'enforce a Java-8 compatible ASM release'
+                    details.useVersion(asmVersion)
+                }
+
+                if (details.requested.group == 'org.codehaus.groovy') {
+                    details.because 'enforce consistent Groovy versioning'
+                    details.useVersion(groovyVersion)
+                }
+
+                if (details.requested.group == 'org.eclipse.jetty') {
+                    details.because 'enforce consistent Eclipse Jetty versioning'
+                    details.useVersion(jettyVersion)
+                }
+
+                if (details.requested.group == 'org.hibernate') {
+                    if (details.requested.name != 'hibernate-validator') {
+                        details.because 'enforce consistent hibernate versioning'
+                        details.useVersion(hibernateVersion)
+                    }
+                }
+
+                if (details.requested.group == 'org.jboss.byteman') {
+                    details.because 'avoid beta byteman releases'
+                    details.useVersion(jbossBytemanVersion)
+                }
+
+                if (details.requested.group == 'org.seleniumhq.selenium') {
+                    if (details.requested.name.startsWith('selenium-')) {
+                        details.because 'enforce consistent Selenium versioning'
+                        details.useVersion(seleniumVersion)
+                    }
+                }
+
+                if (details.requested.group == 'org.slf4j') {
+                    details.because 'enforce consistent slf4j versioning'
+                    details.useVersion(slf4jVersion)
+                }
+
+                if (details.requested.group == 'org.springframework') {
+                    if (VersionNumber.parse(details.requested.version).major == 4) {
+                        details.because 'enforce consistent Spring versioning'
+                        details.useVersion(springframeworkVersion)
+                    }
+                }
+            }
+
+            // fail-fast if Gradle pulls in multiple versions of one dependency
+            failOnVersionConflict()
+
+            /*
+             * We can use `force` to ensure consistent sub-(sub-)dependency
+             * versions, and/or to apply security patches to packages we
+             * wouldn't mark in the `dependencies` block because we don't
+             * consume their API's directly.
+             */
+            force 'com.github.sommeri:less4j:1.17.2'
+            force 'com.google.protobuf:protobuf-java:3.21.4'  // security patch
+            force 'com.lowagie:itext:2.1.7'
+            force 'commons-cli:commons-cli:1.5.0'
+            force 'commons-fileupload:commons-fileupload:1.4'  // security patch
+            force 'commons-io:commons-io:2.11.0'  // security patch
+            force 'commons-validator:commons-validator:1.7'
+            force 'javax.validation:validation-api:2.0.1.Final'
+            force 'jline:jline:2.14.6'
+            force 'joda-time:joda-time:2.10.14'  // timezone fixes
+            force 'net.bytebuddy:byte-buddy:1.12.13'
+            force 'opensymphony:sitemesh:2.4.2'
+            force 'org.antlr:antlr-runtime:3.5.3'
+            force 'org.apache.ant:ant:1.10.12'  // security patch
+            force 'org.apache.ant:ant-launcher:1.10.12'  // security patch
+            force 'org.apache.commons:commons-lang3:3.12.0'  // security patch
+            force 'org.apache.commons:commons-text:1.9'
+            force 'org.dom4j:dom4j:2.1.3'  // security patch
+            force 'org.jboss.logging:jboss-logging:3.3.1.Final'  // security patch
+            force 'org.quartz-scheduler:quartz:2.3.2'
+            force 'org.reactivestreams:reactive-streams:1.0.4'
+            force 'xalan:serializer:2.7.2'  // security patch
+            force 'xalan:xalan:2.7.2'  // security patch
+            force 'xerces:xercesImpl:2.12.2'  // security patch
+        }
+    }
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.grails:grails-bom:${grailsVersion}"
+dependencyCheckAnalyze.dependsOn(['npmInstall', 'npm_run_bundle'])
+dependencyCheck {
+    analyzers {
+        assemblyEnabled = false
+        nodeAudit {
+            enabled = true
+            skipDevDependencies = true
+            yarnEnabled = false  // we use npm exclusively
+        }
+        retirejs.enabled = true
     }
-    applyMavenExclusions true
+
+    autoUpdate = true
+    failBuildOnCVSS = 11
+    format = 'ALL'
+    junitFailOnCVSS = 11
+    skipTestGroups = true
 }
 
 node {
@@ -113,7 +270,8 @@ repositories {
 
 /*
  * Add migrations to `sourceSets` *before* introducing liquibase dependencies.
- * See https://grails.github.io/grails-database-migration/3.1.0/index.html.
+ *
+ * See https://grails.github.io/grails-database-migration/3.1.0/index.html
  */
 sourceSets {
     main {
@@ -136,27 +294,44 @@ dependencies {
     compile "ch.qos.logback:logback-classic:${logbackVersion}"
     compile "ch.qos.logback:logback-core:${logbackVersion}"
 
-    // manage static assets: see https://github.com/bertramdev/asset-pipeline#documentation-1.
-    runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
-    assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipelineVersion}"
-    assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipelineVersion}"
+    /*
+     * Manage static assets in the grails-app/assets/ directory.
+     *
+     * See https://github.com/bertramdev/asset-pipeline#documentation-1
+     */
+    runtime 'com.bertramlabs.plugins:asset-pipeline-grails'
+    assets 'com.bertramlabs.plugins:less-asset-pipeline'
+    assets 'com.bertramlabs.plugins:sass-asset-pipeline'
 
-    // exposes javax.annotation.Nullable, com.google.common.base.Enums, etc.
-    implementation 'com.google.guava:guava:31.1-jre'
+    // security patch
+    assets 'com.google.code.gson:gson:2.8.9'
+    compile 'com.google.code.gson:gson:2.8.9'
+
+    // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
+    compile 'com.google.guava:guava:31.1-jre'
 
     compile 'com.google.zxing:javase:3.5.0'  // barcode support
 
-    testImplementation 'com.icegreen:greenmail:1.6.9'  // MailServiceTests
+    testImplementation 'com.icegreen:greenmail:1.6.10'
 
     // see https://www.mchange.com/projects/c3p0/#quickstart
-    implementation 'com.mchange:c3p0:0.9.5.5'
-    implementation 'com.mchange:mchange-commons-java:0.2.20'
+    compile 'com.mchange:c3p0:0.9.5.5'
+    compile 'com.mchange:mchange-commons-java:0.2.20'
 
-    implementation 'com.sun.mail:javax.mail:1.5.6'
+    // expose com.sun.mail.imap.IMAPStore to MailServiceTests
+    testImplementation 'com.sun.mail:javax.mail:1.5.6'
 
-    implementation 'commons-beanutils:commons-beanutils:1.9.4'
+    assets 'commons-beanutils:commons-beanutils:1.9.4'
+    compile 'commons-beanutils:commons-beanutils:1.9.4'
+
+    compile 'commons-codec:commons-codec:1.15'
+
+    // FIXME migrate to commons-collections4
+    implementation 'commons-collections:commons-collections:3.2.2'
+
     implementation 'commons-fileupload:commons-fileupload:1.4'
-    implementation 'commons-lang:commons-lang:2.6'  // FIXME update to commons-lang3
+
+    compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
     compile "fr.opensagres.xdocreport:xdocreport:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
@@ -180,25 +355,19 @@ dependencies {
      */
     testCompile 'io.micronaut:micronaut-http-client:1.0.0.RC3'
 
-    /*
-     * FIXME Version 8.0.23+ changes an API Liquibase <=3.10.3 depends on.
-     *
-     * https://github.com/liquibase/liquibase/issues/1639
-     *
-     * Once Liquibase 3.10.4 is out, we can use later versions, and remove
-     * the `serverTimezone=UTC` arguments in our jdbc:mysql: strings.
-     *
-     * N.B. the 8 here refers to Java's release, not to MySQL's: this
-     * is the correct library to use to access MySql 5.7 from Java 8.
-     */
-    compile 'mysql:mysql-connector-java:8.0.22'
+    assets 'junit:junit:4.13.2'
+    testCompile 'junit:junit:4.13.2'
+
+    compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
 
     testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
     implementation 'org.apache.commons:commons-csv:1.9.0'
     compile 'org.apache.commons:commons-email:1.5'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    compile 'org.apache.poi:poi:3.17'
+    implementation 'org.apache.httpcomponents:httpclient'
+
+    implementation 'org.apache.poi:poi'
+    implementation 'org.apache.poi:poi-scratchpad'
 
     /*
      * Prevent java.sql.SQLException: No suitable driver found for jdbc:mysql://
@@ -209,11 +378,11 @@ dependencies {
      */
     runtime 'org.apache.tomcat:tomcat-jdbc'
 
-    // enables `import groovy.sql.Sql`
-    implementation 'org.codehaus.groovy:groovy-sql'
-
-    // enables `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
+    // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
+
+    // enable `import groovy.sql.Sql`
+    implementation 'org.codehaus.groovy:groovy-sql'
 
     /*
      * We can't update docx4j without refactoring ReportService.groovy
@@ -224,70 +393,103 @@ dependencies {
     // required for GORM/hibernate validators
     compile 'org.glassfish.web:javax.el:2.2.5'
 
-    // enables web ui to grails console (no source dependencies)
-    runtime 'org.grails:grails-console'
+    // enable grails console web ui
+    console 'org.grails:grails-console'
 
-    // this, or something in it, is needed for jodaTime plugin
-    compile 'org.grails:grails-dependencies'
+    /*
+     * Enable unit tests of domain activity; see
+     * https://testing.grails.org/1.1.5/guide/index.html
+     */
+    testCompile 'org.grails:grails-gorm-testing-support'
 
-    // sets up grails log framework (uses logback under the hood)
+    // set up grails log framework (logback under the hood)
     implementation 'org.grails:grails-logging'
 
-    // enables `import grails.converters.JSON`
-    implementation 'org.grails:grails-plugin-rest'
+    // prevent `java.lang.NullPointerException: Cannot invoke method registerStructuredEditor() on null object`
+    compile 'org.grails:grails-plugin-databinding'
 
-    // prevents Grails from thinking services are broken Domain objects
-    implementation 'org.grails:grails-plugin-services'
+    // prevent `java.lang.ClassNotFoundException: grails.artefact.Interceptor`
+    compile 'org.grails:grails-plugin-interceptors'
+
+    // enable `import grails.converters.JSON`
+    compile 'org.grails:grails-plugin-rest'
+
+    // prevent Grails from thinking services are broken Domain objects
+    compile 'org.grails:grails-plugin-services'
 
     /*
-    * Deprecated: use https://github.com/grails/grails-testing-support.
+    * Deprecated: use https://github.com/grails/grails-testing-support
     *
-    * Replace instances of, e.g., `import grails.test.mixin`.
-    * See https://testing.grails.org/latest/guide/index.html#upgrading.
+    * FIXME Refactor instances of, e.g., `import grails.test.mixin`.
+    *
+    * See https://testing.grails.org/latest/guide/index.html#upgrading
     */
-    testCompile 'org.grails:grails-test-mixins:3.3.0'
+    testCompile('org.grails:grails-test-mixins:3.3.0') {
+        // prevent requests for ancient versions of sub-dependencies
+        exclude group: 'org.grails', module: 'grails-web-jsp'
+        exclude group: 'org.objenesis', module: 'objenesis'
+    }
+
+    compile 'org.grails:grails-web-boot'
 
     /*
-     * Enables `import grails.testing.web.controllers.ControllerUnitTest`.
+     * Enable `import grails.testing.web.controllers.ControllerUnitTest`.
      * Using `testCompile` prevents integrationTestCompileClasspath warnings.
      */
     testCompile 'org.grails:grails-web-testing-support'
 
-    // prevents java.lang.ClassNotFoundException for classes we don't directly consume
+    /*
+     * <g:formRemote> and <g:remoteLink> were deprecated in Grails 3.0:
+     *
+     * http://docs.grails.org/3.0.x/ref/Tags/formRemote.html
+     *
+     * They no longer appear in the 3.1 documentation. This plugin gives
+     * them an additional lease on life, although leaving it out doesn't
+     * seem to break anything.
+     */
+    compile 'org.grails.plugins:ajax-tags:1.0.0'
+
+    // prevent java.lang.ClassNotFoundException for a few classes we don't directly consume
     implementation 'org.grails.plugins:async'
 
     // FIXME replace with com.google.zxing
     implementation 'org.grails.plugins:barcode4j:0.3'
 
-    // enables userAgentIdentService.isMobile() and <browser:is*> tags
-    implementation 'org.grails.plugins:browser-detection:3.4.0'
+    /*
+     * Enable userAgentIdentService.isMobile() and <browser:is*> tags.
+     *
+     * Integration tests break messily if this is set to `implementation`.
+     */
+    compile 'org.grails.plugins:browser-detection:3.4.0'
 
-    // enables `import grails.plugin.cache.Cacheable`
-    implementation 'org.grails.plugins:cache'
+    // enable `import grails.plugin.cache.Cacheable`
+    implementation 'org.grails.plugins:cache:4.0.3'
 
-    // enables `grails test-app -coverage`
+    // enable `grails test-app -coverage`
     testImplementation 'org.grails.plugins:code-coverage:2.0.3-3'
 
-    implementation 'org.grails.plugins:csv:1.0.1'  // FIXME use commons-csv instead
+    // FIXME use commons-csv instead
+    implementation 'org.grails.plugins:csv:1.0.1'
 
-    // enables liquibase migrations: not present in BOM, so we pin the version
-    compile "org.grails.plugins:database-migration:${grailsDatabaseMigrationVersion}"
+    // enable liquibase migrations
+    compile "org.grails.plugins:database-migration:${databaseMigrationVersion}"
 
-    implementation 'org.grails.plugins:excel-import:3.0.2'  // FIXME use commons-csv instead
+    // FIXME use commons-csv instead
+    implementation 'org.grails.plugins:excel-import:3.0.2'
 
-    // enables `import geb.*`
+    // enable `import geb.*`
     testCompile 'org.grails.plugins:geb'
 
-    // enables <ga:*> tags, which we use only once
+    // enable <ga:*> tags, which we use only once
     implementation 'org.grails.plugins:google-analytics:2.3.3'
 
-    // enables prettytime.display(), which we use only three times
+    // enable prettytime.display(), which we use only three times
     implementation 'org.grails.plugins:grails-pretty-time:4.0.0'
 
-    // enables `import org.grails.plugins.web.taglib.*`
-    implementation 'org.grails.plugins:gsp'
+    // enable `import org.grails.plugins.web.taglib.*`
+    compile 'org.grails.plugins:gsp'
 
-    // enables `import grails.orm, org.hibernate, org.springframework.orm`
+    // enable `import grails.orm, org.hibernate, org.springframework.orm`
     compile "org.grails.plugins:hibernate5:${gormVersion}"
 
     /*
@@ -298,10 +500,10 @@ dependencies {
      */
     implementation 'org.grails.plugins:newrelic:5.2.0'
 
-    // enables `import org.quartz.*`
+    // enable `import org.quartz.*`
     compile 'org.grails.plugins:quartz:2.0.13'
 
-    // enables http://localhost:8080//quartz to list all scheduled jobs
+    // list all scheduled jobs at e.g. http://localhost:8080/openboxes/quartz
     implementation 'org.grails.plugins:quartz-monitor:1.3'
 
     /*
@@ -311,63 +513,78 @@ dependencies {
      */
     compile 'org.grails.plugins:rendering:2.0.3'
 
+    // enable `static scaffold` declarations
+    compile 'org.grails.plugins:scaffolding'
+
     /*
      * FIXME Configure this properly.
      *
-     * See https://plugins.grails.org/plugin/agorapulse/sentry.
+     * See https://plugins.grails.org/plugin/agorapulse/sentry
      */
     compile 'org.grails.plugins:sentry:11.7.25'
 
     /*
-     * Enables `import org.hibernate.tool.schema.TargetType`.
+     * These plugins enable grails-app/views/*.gson files. I don't think
+     * we use this functionality, but they are included by this command:
      *
-     * Be careful using more modern versions; using 5.3+ may make GORM raise e.g.
-     * java.lang.ClassNotFoundException: org.hibernate.internal.util.xml.XMLHelper.
+     * $ grails create-app openboxes --profile react-webpack
      *
-     * Note that database-migration plugin 3.1.x transitively requests Hibernate
-     * 5.4.4+, while the GORM we use wants 5.1.4. They can't both get what they
-     * want: we can reduce but not eliminate the discrepancy by using the latest
-     * release in the 5.1.x series, and pinning slightly older liquibase-core and
-     * liquibase-hibernate versions (see below).
+     * See http://views.grails.org/1.2.10/
      */
-    compile "org.hibernate:hibernate-c3p0:${hibernateVersion}"
-    compile "org.hibernate:hibernate-core:${hibernateVersion}"
-    compile "org.hibernate:hibernate-ehcache:${hibernateVersion}"
-    compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
-    compile "org.hibernate:hibernate-envers:${hibernateVersion}"
+    compile 'org.grails.plugins:views-json-templates'
+    compile 'org.grails.plugins:views-json'
 
-    // FIXME org.joda.time.* is redundant in Java 8
+    profile 'org.grails.profiles:react-webpack'
+
+    // enable `import org.hibernate.tool.schema.TargetType`, etc.
+    implementation 'org.hibernate:hibernate-c3p0'
+    compile 'org.hibernate:hibernate-core'
+    runtime 'org.hibernate:hibernate-ehcache'
+    implementation 'org.hibernate:hibernate-java8'
+    testImplementation 'org.hibernate:hibernate-testing'
+
+    // joda-time support for hibernate
     implementation 'org.jadira.usertype:usertype.jodatime:2.0.1'
 
     // used in only one place: DocumentTemplateService.groovy
     implementation 'org.jxls:jxls:2.12.0'
 
-    /*
-     * Be careful not to upgrade to a hibernate version GORM doesn't support.
-     * See https://grails.github.io/grails-database-migration/3.0.4/index.html
-     */
-    compile 'org.liquibase:liquibase-core:3.5.5'
-    compile 'org.liquibase.ext:liquibase-hibernate5:3.6'
+    // strict dependency of database-migration plugin; see gradle.properties
+    compile "org.liquibase:liquibase-core:${liquibaseVersion}"
 
-    testCompile "org.seleniumhq.selenium:htmlunit-driver:${htmlUnitVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-api:${seleniumVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"
-    testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+    testRuntime "org.seleniumhq.selenium:htmlunit-driver:${htmlUnitVersion}"
 
-    compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
-    compile "org.slf4j:jul-to-slf4j:${slf4jVersion}"
-    compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
-    compile "org.slf4j:slf4j-api:${slf4jVersion}"
+    testCompile 'org.seleniumhq.selenium:selenium-api'
+    testRuntime 'org.seleniumhq.selenium:selenium-chrome-driver'
+    testRuntime 'org.seleniumhq.selenium:selenium-edge-driver'
+    testRuntime 'org.seleniumhq.selenium:selenium-ie-driver'
+    testRuntime 'org.seleniumhq.selenium:selenium-firefox-driver'
+    testRuntime 'org.seleniumhq.selenium:selenium-safari-driver'
+
+    compile 'org.slf4j:jcl-over-slf4j'
+    compile 'org.slf4j:jul-to-slf4j'
+    compile 'org.slf4j:log4j-over-slf4j'
+    compile 'org.slf4j:slf4j-api'
+
+    // enable `import spock.lang.*`
+    testCompile 'org.spockframework:spock-core:1.3-groovy-2.4'
+    testCompile 'org.spockframework:spock-spring:1.3-groovy-2.4'
+
+    // may enable '/health' and '/info' endpoints
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // set up Spring log framework (logback under the hood)
+    compile 'org.springframework.boot:spring-boot-starter-logging'
 
     /*
      * Prevent 'Unable to start EmbeddedWebApplicationContext
      * due to missing EmbeddedServletContainerFactory bean.'
      */
     compile 'org.springframework.boot:spring-boot-starter-web'
+
+    // security patch
+    compile 'org.yaml:snakeyaml:1.30'
+    console 'org.yaml:snakeyaml:1.30'
 }
 
 /*
@@ -405,13 +622,21 @@ buildProperties.doLast {
 }
 
 task prepareDocker(type: Copy, dependsOn: assemble) {
-    description = 'Copy files from ./docker and openboxes.war to Docker temporal build directory'
+    description = 'Copy files from ./docker and openboxes.war to build directory'
     group = 'Docker'
 
     from 'build/libs/openboxes.war'
     from 'docker/Dockerfile'
 
     into mkdir("${buildDir}/docker")
+}
+
+task writePom {
+    description = 'Derive a Maven-compatible pom.xml file for downstream analysis'
+    group = 'Reporting'
+    doLast {
+        pom {}.writeTo('pom.xml')
+    }
 }
 
 tasks.withType(Test) {
