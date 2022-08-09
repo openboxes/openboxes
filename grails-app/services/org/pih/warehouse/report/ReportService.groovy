@@ -871,12 +871,19 @@ class ReportService implements ApplicationContextAware {
                     order_item.id AS id,
                     o.id AS order_id,
                     order_item.quantity AS quantity_ordered,
-                    IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)  AS quantity_shipped,
-                    IFNULL(SUM(invoice_item.quantity), 0)  AS quantity_invoiced
+                    CASE
+                        WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)
+                        ELSE 0
+                    END AS quantity_shipped,
+                    CASE 
+                        WHEN invoice.date_posted IS NULL THEN 0
+                        ELSE IFNULL(SUM(invoice_item.quantity), 0) 
+                    END AS quantity_invoiced
                 FROM `order` o
                     LEFT OUTER JOIN order_item ON o.id = order_item.order_id
                     LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
                     LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
+                    LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
                     LEFT OUTER JOIN shipment_invoice ON shipment_invoice.shipment_item_id = shipment_item.id
                     LEFT OUTER JOIN invoice_item ON invoice_item.id = shipment_invoice.invoice_item_id
                     LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
@@ -884,7 +891,7 @@ class ReportService implements ApplicationContextAware {
                     AND order_item.order_item_status_code != 'CANCELED'
                     AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
                     ${additionalFilter}
-                GROUP BY o.id, order_item.id, shipment_item.id
+                GROUP BY o.id, order_item.id, shipment_item.id, invoice_item.id
             ) AS order_item_invoice_summary 
             GROUP BY id
             HAVING order_item_invoice_summary.quantity_ordered > SUM(order_item_invoice_summary.quantity_invoiced);
@@ -900,7 +907,7 @@ class ReportService implements ApplicationContextAware {
                     order_adjustment.id AS id,
                     o.id AS order_id,
                     CASE
-                        WHEN (invoice.invoice_type_id = :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL) THEN 0
+                        WHEN (invoice.invoice_type_id = :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL OR invoice.date_posted IS NULL) THEN 0
                         ELSE 1
                     END as quantity_invoiced
                 FROM `order` o
