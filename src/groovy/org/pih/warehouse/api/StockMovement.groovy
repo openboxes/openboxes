@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
@@ -178,9 +179,9 @@ class StockMovement {
                 received         : isReceived,
                 requestType      : requestType,
                 sourceType       : sourceType?.name(),
-                receivingLocation: shipment?.receivingScheduled?.eventLocation,
-                packingLocation  : shipment?.packingScheduled?.eventLocation,
-                loadingLocation  : shipment?.loadingScheduled?.eventLocation,
+                receivingLocation: receivingLocation?.toJson(LocationTypeCode.INTERNAL),
+                packingLocation  : packingLocation?.toJson(LocationTypeCode.INTERNAL),
+                loadingLocation  : loadingLocation?.toJson(LocationTypeCode.INTERNAL),
         ]
     }
 

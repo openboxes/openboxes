@@ -389,7 +389,15 @@ class Location implements Comparable<Location>, java.io.Serializable {
                         zoneName: zone?.name,
                         active: active
                 ]
-
+            case LocationTypeCode.ZONE:
+                return [
+                        id: id,
+                        name: name,
+                        locationNumber: locationNumber,
+                        locationType: locationType?.name,
+                        locationTypeCode: locationType?.locationTypeCode?.name(),
+                        active: active
+                ]
             default:
                 return toJson()
         }
