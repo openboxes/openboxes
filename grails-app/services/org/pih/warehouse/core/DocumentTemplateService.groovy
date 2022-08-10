@@ -147,6 +147,20 @@ class DocumentTemplateService {
         order.deliverto = deliverto?.properties?:[:]
         order.deliverto.address = deliverto?.address?:nullAddress
 
+        order['deliverto.address'] = deliverto?.address?.address ?: ""
+        order['deliverto.address2'] = deliverto?.address?.address2 ?: ""
+        order['deliverto.city'] = deliverto?.address?.city ?: ""
+        order['deliverto.stateOrProvince'] = deliverto?.address?.stateOrProvince ?: ""
+        order['deliverto.postalCode'] = deliverto?.address?.postalCode ?: ""
+        order['deliverto.country'] = deliverto?.address?.country ?: ""
+
+        order['origin.address'] = order?.origin?.address?.address ?: "No Address on File"
+        order['origin.address2'] = order?.origin?.address?.address2 ?: ""
+        order['origin.city'] = order?.origin?.address?.city ?: ""
+        order['origin.stateOrProvince'] = order?.origin?.address?.stateOrProvince ?: ""
+        order['origin.postalCode'] = order?.origin?.address?.postalCode ?: ""
+        order['origin.country'] = order?.origin?.address?.country ?: ""
+
         // Add order item fields to metadata
         FieldsMetadata metadata = report.createFieldsMetadata();
         metadata.addFieldAsList("orderItems.code")
