@@ -704,7 +704,7 @@ class OrderService {
                     }
 
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
-                    if (orderItem.hasInvoices && orderItem.unitPrice != parsedUnitPrice) {
+                    if (orderItem.hasRegularInvoice && orderItem.unitPrice != parsedUnitPrice) {
                         throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced.")
                     }
                     if (parsedUnitPrice < 0) {
@@ -742,7 +742,7 @@ class OrderService {
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
 
-                    if (orderItem.hasInvoices && orderItem.budgetCode != budgetCode) {
+                    if (orderItem.hasRegularInvoice && orderItem.budgetCode != budgetCode) {
                         throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
                     }
                     if (code) {
