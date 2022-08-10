@@ -17,7 +17,7 @@ class OrganizationService {
     boolean transactional = true
 
 
-    List selectOrganizations(roleTypes) {
+    List selectOrganizations(roleTypes, active = false) {
         return Organization.createCriteria().list {
             projections {
                 property("id")
@@ -27,6 +27,9 @@ class OrganizationService {
                 roles {
                     'in'("roleType", roleTypes)
                 }
+            }
+            if (active) {
+                eq('active', active)
             }
             order("name", "asc")
         }.collect {
@@ -85,6 +88,9 @@ class OrganizationService {
                 roles {
                     'in'("roleType", roleTypes)
                 }
+            }
+            if (params.active) {
+                eq('active', true)
             }
         }
         return organizations

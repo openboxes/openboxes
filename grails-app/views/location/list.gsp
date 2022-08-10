@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.Organization; org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.core.Organization; org.pih.warehouse.core.Location; org.pih.warehouse.core.LocationStatus" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -84,6 +84,7 @@
                                         <g:sortableColumn property="locationNumber" title="${warehouse.message(code: 'location.locationNumber.label')}" class="bottom"/>
                                         <g:sortableColumn property="locationType" title="${warehouse.message(code: 'location.locationType.label')}" class="bottom"/>
                                         <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
+                                        <g:sortableColumn property="status" title="${warehouse.message(code: 'location.status.label')}" class="bottom"/>
                                         <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
                                         <g:each var="activity" in="${org.pih.warehouse.core.ActivityCode.list()}">
                                             <th class="bottom">
@@ -107,6 +108,18 @@
                                             </td>
                                             <td class="left middle"><format:metadata obj="${locationInstance?.locationType}"/></td>
                                             <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
+                                            <td class="middle">
+                                                <g:if test="${locationInstance?.status == LocationStatus.ENABLED }">
+                                                    <span class="active">
+                                                        ENABLED
+                                                    </span>
+                                                </g:if>
+                                                <g:else>
+                                                    <span class="inactive">
+                                                        DISABLED
+                                                    </span>
+                                                </g:else>
+                                            </td>
                                             <td class="left middle">
                                                 <g:if test="${locationInstance.active }">
                                                     <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>

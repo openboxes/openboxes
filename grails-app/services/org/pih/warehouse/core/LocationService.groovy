@@ -114,6 +114,10 @@ class LocationService {
         def locations = new HashSet()
         locations += getLocations(fields, params)
 
+        if (params.locationChooser) {
+            locations = locations.findAll { Location location -> location.status == LocationStatus.ENABLED }
+        }
+
         if (params.applyUserFilter) {
             locations = locations.findAll { location -> user.hasPrimaryRole(location) }
         }
@@ -287,18 +291,19 @@ class LocationService {
         }
 
         if (locations) {
-            locations = locations.collect { Location location ->
-                [
-                        id              : location?.id,
-                        name            : location?.name,
-                        foregroundColor : location.fgColor,
-                        backgroundColor : location?.bgColor,
-                        organizationName: location?.organization?.name,
-                        locationType    : location.locationType?.name,
-                        locationGroup   : location?.locationGroup?.name,
+            locations = locations.findAll{ Location location -> location.status == LocationStatus.ENABLED }
+                                    .collect { Location location ->
+                                        [
+                                                id              : location?.id,
+                                                name            : location?.name,
+                                                foregroundColor : location.fgColor,
+                                                backgroundColor : location?.bgColor,
+                                                organizationName: location?.organization?.name,
+                                                locationType    : location.locationType?.name,
+                                                locationGroup   : location?.locationGroup?.name,
 
-                ]
-            }
+                                        ]
+                                    }
             locationMap = locations.groupBy { it?.organizationName }
             locationMap = locationMap.sort { a, b -> nullHigh.compare(a?.key, b?.key) }
         }

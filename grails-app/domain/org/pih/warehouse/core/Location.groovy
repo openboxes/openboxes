@@ -100,7 +100,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         cache true
     }
 
-    static transients = ["transactions", "events", "shipments", "requests", "orders", "managedLocally"]
+    static transients = ["transactions", "events", "shipments", "requests", "orders", "managedLocally", "status"]
 
     List getTransactions() { return Transaction.findAllByDestinationOrSource(this, this) }
 
@@ -304,6 +304,16 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     Boolean isPickable() {
         return !onHold
+    }
+
+    LocationStatus getStatus() {
+        if (organization) {
+            if (active && organization.active) {
+                return LocationStatus.ENABLED
+            }
+            return LocationStatus.DISABLED
+        }
+        return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
     }
 
     static PROPERTIES = [
