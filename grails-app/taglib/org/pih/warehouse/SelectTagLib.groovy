@@ -235,7 +235,7 @@ class SelectTagLib {
     }
 
     def selectOrganization = { attrs, body ->
-        attrs.from = organizationService.selectOrganizations(attrs.roleTypes, attrs.active ?: false)
+        attrs.from = organizationService.selectOrganizations(attrs.roleTypes, attrs.active ?: false, attrs.currentOrganizationId)
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
         out << g.select(attrs)

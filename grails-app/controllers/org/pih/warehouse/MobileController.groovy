@@ -71,7 +71,7 @@ class MobileController {
         User user = User.get(session.user.id)
         Location warehouse = Location.get(session.warehouse.id)
         render (view: "/mobile/chooseLocation",
-            model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse)])
+            model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse, true)])
     }
 
     def productList = {

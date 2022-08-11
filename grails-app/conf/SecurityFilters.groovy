@@ -119,7 +119,7 @@ class SecurityFilters {
                     return false
                 }
                 // Check if a user is logged to disabled location (location.active or organization.active is false) - if so, redirect to location chooser
-                Location currentLocation = Location.get(session?.warehouse?.id)
+                Location currentLocation = AuthService.currentLocation.get()
                 if (currentLocation && (currentLocation.status != LocationStatus.ENABLED)) {
                     flash.message = "Your location is disabled (either the associated organization or your location itself became inactive)"
                     session.warehouse = null

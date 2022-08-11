@@ -110,11 +110,11 @@ class LocationService {
         return locations
     }
 
-    def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user) {
+    def getLocations(String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User user, Boolean excludeDisabled = false) {
         def locations = new HashSet()
         locations += getLocations(fields, params)
 
-        if (params.locationChooser) {
+        if (excludeDisabled) {
             locations = locations.findAll { Location location -> location.status == LocationStatus.ENABLED }
         }
 
@@ -253,7 +253,7 @@ class LocationService {
     }
 
 
-    Map getLoginLocationsMap(User user, Location currentLocation) {
+    Map getLoginLocationsMap(User user, Location currentLocation, Boolean excludeDisabled = false) {
         log.info "Get login locations for user ${user} and location ${currentLocation})"
         def locationMap = [:]
         def locations = new HashSet()
@@ -291,8 +291,10 @@ class LocationService {
         }
 
         if (locations) {
-            locations = locations.findAll{ Location location -> location.status == LocationStatus.ENABLED }
-                                    .collect { Location location ->
+            if (excludeDisabled) {
+                locations = locations.findAll{ Location location -> location.status == LocationStatus.ENABLED }
+            }
+            locations = locations.collect { Location location ->
                                         [
                                                 id              : location?.id,
                                                 name            : location?.name,

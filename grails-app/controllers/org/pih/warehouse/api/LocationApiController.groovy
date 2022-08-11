@@ -70,7 +70,7 @@ class LocationApiController extends BaseDomainApiController {
             locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) && it.status == LocationStatus.ENABLED }
         } else if (params.locationChooser && requestorInAnyLocation && inRoleBrowser) {
             locations = locationService.getRequestorLocations(currentUser)
-            locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+            locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser, true)
         } else {
             if (params.locationChooser && requestorInAnyLocation) {
                 locations += locationService.getRequestorLocations(currentUser)
@@ -83,7 +83,7 @@ class LocationApiController extends BaseDomainApiController {
                     }
                 }
             } else {
-                locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+                locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser, params.locationChooser ? true : false)
             }
         }
         render ([data:locations] as JSON)
@@ -148,7 +148,7 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         // If the organization chosen for the created location is inactive, throw an exception
-        if (!location.organization.active) {
+        if (!location.organization?.active) {
             throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
         }
 

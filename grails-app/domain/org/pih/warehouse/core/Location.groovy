@@ -308,10 +308,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     LocationStatus getStatus() {
         if (organization) {
-            if (active && organization.active) {
-                return LocationStatus.ENABLED
-            }
-            return LocationStatus.DISABLED
+            return (active && organization.active) ? LocationStatus.ENABLED : LocationStatus.DISABLED
         }
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
     }

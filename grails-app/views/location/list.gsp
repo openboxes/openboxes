@@ -109,16 +109,9 @@
                                             <td class="left middle"><format:metadata obj="${locationInstance?.locationType}"/></td>
                                             <td class="left middle">${locationInstance?.locationGroup?:warehouse.message(code:'default.none.label')}</td>
                                             <td class="middle">
-                                                <g:if test="${locationInstance?.status == LocationStatus.ENABLED }">
-                                                    <span class="active">
-                                                        ENABLED
-                                                    </span>
-                                                </g:if>
-                                                <g:else>
-                                                    <span class="inactive">
-                                                        DISABLED
-                                                    </span>
-                                                </g:else>
+                                                <span class="${locationInstance?.status == LocationStatus.ENABLED ? 'active' : 'inactive' }">
+                                                    <format:metadata obj="${locationInstance?.status}"/>
+                                                </span>
                                             </td>
                                             <td class="left middle">
                                                 <g:if test="${locationInstance.active }">
