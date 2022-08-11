@@ -354,6 +354,11 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return picklistItems
     }
 
+    /**
+     * Fetching OrderItemSummary by OrderItem.
+     * NOTE: This should not be use if there is option to fetch OrderItemSummary by Order
+     *       Use order.getOrderItemsDerivedStatus() instead
+     * */
     String getOrderItemStatus() {
         return OrderItemSummary.get(id)?.derivedStatus
     }

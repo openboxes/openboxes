@@ -468,6 +468,15 @@ class Order implements Serializable {
         return isReturnOrder && origin == currentLocation && destination != currentLocation
     }
 
+    /**
+     * Gets map of derived status for order items (OrderItem id as key and derived status as value)
+     * Done to improve performance of getting order items derived statuses on order/show page
+     * */
+    def getOrderItemsDerivedStatus() {
+        def orderItemSymmaryList =  OrderItemSummary.findAllByOrder(this)
+        return orderItemSymmaryList.inject([:]) { map, OrderItemSummary item -> map << [(item?.id): item?.derivedStatus] }
+    }
+
     Map toJson() {
         return [
                 id         : id,

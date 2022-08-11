@@ -52,12 +52,13 @@
             </tr>
             </thead>
             <tbody>
+            <g:set var="orderItemsDerivedStatus" value="${orderInstance?.getOrderItemsDerivedStatus()}"/>
             <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
-                    <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                    <g:if test="${orderInstance?.isPurchaseOrder}">
                         <td>
                             <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
-                                <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
+                                <format:metadata obj="${!orderItem?.canceled && orderItemsDerivedStatus[orderItem?.id] ? orderItemsDerivedStatus[orderItem?.id] : orderItem?.orderItemStatusCode?.name()}"/>
                             </div>
                         </td>
                     </g:if>
