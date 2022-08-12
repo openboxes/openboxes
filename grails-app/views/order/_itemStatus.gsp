@@ -32,9 +32,6 @@
                 <th class="bottom">
                     <warehouse:message code="default.status.label"/>
                 </th>
-                <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-                    <th><warehouse:message code="orderItem.orderItemStatusCode.label" /></th>
-                </g:if>
                 <th><warehouse:message code="product.productCode.label" /></th>
                 <th><warehouse:message code="product.label" /></th>
                 <th class="center">${warehouse.message(code: 'product.unitOfMeasure.label')}</th>
@@ -57,11 +54,13 @@
             <tbody>
             <g:each var="orderItem" in="${orderInstance?.listOrderItems()}" status="i">
                 <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRowItemStatus">
-                    <td>
-                        <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
-                            <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
-                        </div>
-                    </td>
+                    <g:if test="${orderInstance.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                        <td>
+                            <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                                <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
+                            </div>
+                        </td>
+                    </g:if>
                     <g:if test="${orderInstance.orderType==OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
                         <td>
                             ${orderItem?.orderItemStatusCode}
