@@ -27,13 +27,16 @@
     </g:if>
     <g:if test="${orderInstance?.orderItems}">
         <g:set var="status" value="${0}"/>
-        <g:set var="columnsNumber" value="6"/>
+        <g:set var="columnsNumber" value="5"/>
         <table class="order-items" id="order-items">
             <thead>
             <tr>
-                <th class="bottom">
-                    <warehouse:message code="default.status.label"/>
-                </th>
+                <g:if test="${orderInstance?.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                    <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}" />
+                    <th class="bottom">
+                        <warehouse:message code="default.status.label"/>
+                    </th>
+                </g:if>
                 <th class="bottom">
                     <warehouse:message code="product.productCode.label"/>
                 </th>
@@ -80,11 +83,13 @@
                 <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
                 <g:if test="${!isItemCanceled || orderInstance?.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
                     <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
-                        <td>
-                            <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
-                                <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
-                            </div>
-                        </td>
+                        <g:if test="${orderInstance?.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                            <td>
+                                <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                                    <format:metadata obj="${orderItem?.canceled ? orderItem?.orderItemStatusCode?.name() : orderItem?.getOrderItemStatus()}"/>
+                                </div>
+                            </td>
+                        </g:if>
                         <td style="color: ${orderItem?.product?.color}">
                             ${orderItem?.product?.productCode}
                         </td>
