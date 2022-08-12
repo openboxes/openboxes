@@ -47,12 +47,18 @@ class CombinedShipmentItemApiController {
         def vendor = Location.get(params.vendor)
         def destination = Location.get(params.destination)
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
-        render([data: orders.findAll{ it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } }.collect {
-            [
-                id: it.id,
-                orderNumber: it.orderNumber
-            ]
-        }] as JSON)
+        render([data: orders
+                .findAll{
+                    it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } &&
+                    !it.orderItems.every { OrderItem item -> item.canceled}
+                }
+                .collect {
+                    [
+                        id: it.id,
+                        orderNumber: it.orderNumber
+                    ]
+                }
+        ] as JSON)
     }
 
     def findOrderItems = {
