@@ -373,12 +373,14 @@ class ProductService {
         def rootCategory = Category.getRootCategory()
         if (!rootCategory) {
             def categories = Category.findAllByParentCategoryIsNull()
-            if (categories && categories.size() == 1) {
-                rootCategory = categories.get(0)
-            } else {
-                rootCategory = new Category()
-                rootCategory.categories = []
-                categories.each { rootCategory.categories << it }
+            if (categories) {
+                if (categories.size() == 1) {
+                    rootCategory = categories.get(0)
+                } else {
+                    rootCategory = new Category()
+                    rootCategory.categories = []
+                    categories.each { rootCategory.categories << it }
+                }
             }
         }
         return rootCategory
