@@ -148,7 +148,7 @@ class LocationApiController extends BaseDomainApiController {
         }
 
         // If the organization chosen for the created location is inactive, throw an exception
-        if (!location.organization?.active) {
+        if (location.organization && !location.organization?.active) {
             throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
         }
 
