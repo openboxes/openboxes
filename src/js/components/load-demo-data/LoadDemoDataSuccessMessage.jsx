@@ -17,9 +17,9 @@ const LoadDemoDataSuccessMessage = ({ history, supportLinks }) => (
       <p className="w-75">
         <Translate
           id="react.loadData.success.content.label"
-          defaultMessage="You are not ready to start your exploration of OpenBoxes!
+          defaultMessage="You are now ready to start your exploration of OpenBoxes!
                                     Go to your dashboard to get started.
-                                    For guidance on how to use OpenBoxes,be sure to refer to our"
+                                    For guidance on how to use OpenBoxes, be sure to refer to our"
         />
         {' '}
         <a href={supportLinks.knowledgeBase} className="knowledge-base-link">
