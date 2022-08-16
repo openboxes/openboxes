@@ -92,59 +92,59 @@
 					</g:link>
 				</div>
 			</g:elseif>
-			<g:isUserInRole roles="[RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_ASSISTANT, RoleType.ROLE_MANAGER]">
-				<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
-					<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
-						<g:isSuperuser>
-							<div class="action-menu-item">
-								<hr/>
-							</div>
-
-							<div class="action-menu-item">
-								<g:hasRoleApprover>
-									<g:set var="isApprover" value="${true}"/>
-								</g:hasRoleApprover>
-								<g:if test="${!isApprover}">
-									<g:set var="disabledMessage" value="${g.message(code: 'errors.noPermissions.label')}"/>
-								</g:if>
-								<g:elseif test="${orderInstance?.shipments}">
-									<g:set var="disabledMessage"
-										   value="${g.message(code: 'order.errors.rollback.message')}"/>
-								</g:elseif>
-								<g:if test="${orderInstance?.isPlaced()}">
-									<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
-											onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-											disabled="${orderInstance?.shipments || !isApprover}"
-											disabledMessage="${disabledMessage}">
-										<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}"/>
-										&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status")}
-									</g:link>
-								</g:if>
-							</div>
-						</g:isSuperuser>
+			<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
+				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
+					<g:isSuperuser>
+						<div class="action-menu-item">
+							<hr/>
+						</div>
+						<div class="action-menu-item">
+							<g:hasRoleApprover>
+								<g:set var="isApprover" value="${true}"/>
+							</g:hasRoleApprover>
+							<g:if test="${!isApprover}">
+								<g:set var="disabledMessage" value="${g.message(code:'errors.noPermissions.label')}"/>
+							</g:if>
+							<g:elseif test="${orderInstance?.shipments}">
+								<g:set var="disabledMessage" value="${g.message(code: 'order.errors.rollback.message')}"/>
+							</g:elseif>
+							<g:if test="${orderInstance?.isPlaced()}">
+								<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
+										onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+										disabled="${orderInstance?.shipments || !isApprover}"
+										disabledMessage="${disabledMessage}">
+									<img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />
+									&nbsp;${warehouse.message(code: 'order.rollbackOrderStatus.label', default: "Rollback order status" )}
+								</g:link>
+							</g:if>
+						</div>
+					</g:isSuperuser>
+					<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
 						<div class="action-menu-item">
 							<g:link controller="order" action="remove" id="${orderInstance?.id}"
 									disabled="${orderInstance?.status != OrderStatus.PENDING}"
-									disabledMessage="${g.message(code: 'order.errors.delete.message')}"
+									disabledMessage="${g.message(code:'order.errors.delete.message')}"
 									onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-								<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
 								&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
 							</g:link>
 						</div>
-					</g:supports>
-				</g:if>
-				<g:elseif test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
+					</g:isUserInRole>
+				</g:supports>
+			</g:if>
+			<g:elseif test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
+				<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
 					<div class="action-menu-item">
 						<g:link controller="order" action="remove" id="${orderInstance?.id}"
 								disabled="${orderInstance?.status != OrderStatus.PENDING}"
 								disabledMessage="${g.message(code: 'order.errors.delete.message')}"
 								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}"/>
+							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
 							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
 						</g:link>
 					</div>
-				</g:elseif>
-			</g:isUserInRole>
+				</g:isUserInRole>
+			</g:elseif>
 		</div>
 	</span>
 </g:if>
