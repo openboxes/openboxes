@@ -84,9 +84,9 @@ class LocationController {
             }
 
             Organization currentOrganization = locationInstance.organization
-            Organization pickedOrganization = Organization.get(params.organization?.id)
-            if (pickedOrganization && (pickedOrganization?.id != currentOrganization?.id) && !pickedOrganization?.active) {
-                throw new IllegalArgumentException("The organization ${pickedOrganization?.name} is inactive, you can't assign it to the location")
+            Organization selectedOrganization = Organization.get(params.organization?.id)
+            if (selectedOrganization && (selectedOrganization?.id != currentOrganization?.id) && !selectedOrganization?.active) {
+                throw new IllegalArgumentException("The organization ${selectedOrganization?.name} is inactive, you can't assign it to the location")
             }
             locationInstance.properties = params
 

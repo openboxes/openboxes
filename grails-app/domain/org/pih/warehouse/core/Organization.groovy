@@ -21,7 +21,7 @@ class Organization extends Party {
     String name
     String description
     Location defaultLocation
-    Boolean active = true   // by default = true
+    Boolean active = true
 
     Date dateCreated
     Date lastUpdated
