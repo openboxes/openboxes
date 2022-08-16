@@ -662,7 +662,7 @@ class OrderService {
                                 throw new ProductException("Wrong product source for given product")
                             }
                             if (!productSource.active) {
-                                throw new ProductException("Product source ${sourceCode} is inactive")
+                                throw new ProductException("Product source ${sourceCode} for product ${productCode} is inactive")
                             }
                             orderItem.productSupplier = productSource
                         }
@@ -681,6 +681,9 @@ class OrderService {
                         ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams, false)
 
                         if (productSupplier) {
+                            if (!productSupplier.active) {
+                                throw new ProductException("Product source ${productSupplier.code} for product ${productCode} is inactive")
+                            }
                             orderItem.productSupplier = productSupplier
                         }
                     }
