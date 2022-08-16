@@ -679,12 +679,16 @@ class OrderService {
                                               supplier: supplier,
                                               sourceName: sourceName]
                         ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams, false)
+                        def supplierParamFilled = supplierCode || manufacturerName || manufacturerCode
 
                         if (productSupplier) {
-                            if (!productSupplier.active) {
+                            if (!productSupplier.active && supplierParamFilled) {
                                 throw new ProductException("Product source ${productSupplier.code} for product ${productCode} is inactive")
                             }
-                            orderItem.productSupplier = productSupplier
+                            // If it matches a product source for empty params (rare case), but it's inactive, treat it as if there was not a product source
+                            if (productSupplier.active) {
+                                orderItem.productSupplier = productSupplier
+                            }
                         }
                     }
 

@@ -302,7 +302,8 @@ class ProductSupplierDataService {
                 'manufacturerCode': manufacturerCode,
                 'supplierCode': supplierCode,
         ])
-        def productSupplier = data ? ProductSupplier.get(data.first().id) : null
+        ArrayList<ProductSupplier> productSuppliers = data?.collect{ it -> ProductSupplier.get(it?.id) }?.sort{ !it?.active }
+        def productSupplier = !!productSuppliers ? productSuppliers?.first() : null
         return productSupplier
     }
 
