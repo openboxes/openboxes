@@ -14,7 +14,7 @@
 				<g:selectCategory id="category"
 								  name="categoryId"
 								  class="chzn-select-deselect"
-								  noSelection="['null':'']"
+								  noSelection="['':'']"
 								  data-placeholder="Select a category"
 								  value="${commandInstance?.category?.id}"/>
 			</div>
