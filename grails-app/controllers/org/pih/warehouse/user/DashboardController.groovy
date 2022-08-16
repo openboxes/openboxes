@@ -213,7 +213,7 @@ class DashboardController {
             return
         }
 
-        def loginLocationsMap = locationService.getLoginLocationsMap(user, warehouse)
+        def loginLocationsMap = locationService.getLoginLocationsMap(user, warehouse, true)
         def savedLocations = user.warehouse && loginLocationsMap.containsValue(user.warehouse) ? [user.warehouse] : null
 
         if (userAgentIdentService.isMobile()) {
@@ -228,7 +228,7 @@ class DashboardController {
 
     def changeLocation = {
         User user = User.get(session.user.id)
-        Map loginLocationsMap = locationService.getLoginLocationsMap(user, null)
+        Map loginLocationsMap = locationService.getLoginLocationsMap(user, null, true)
         List savedLocations = [user?.warehouse, session?.warehouse].unique() - null
         render(template: "loginLocations", model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
     }

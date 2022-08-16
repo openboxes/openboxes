@@ -154,7 +154,10 @@
                                               optionKey="id"
                                               value="${locationInstance?.organization?.id}"
                                               optionValue="${{ format.metadata(obj: it) }}"
-                                              noSelection="['null': '']"/>
+                                              noSelection="['null': '']"
+                                              active="${true}"
+                                              currentOrganizationId="${locationInstance?.organization?.id ?: ''}"
+                                    />
                                 </td>
                             </tr>
                             <tr class="prop">
