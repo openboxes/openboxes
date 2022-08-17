@@ -463,8 +463,8 @@ class StockMovementController {
             def settings = [separatorChar: ',', skipLines: 1]
             Integer sortOrder = 0
             csv.toCsvReader(settings).eachLine { tokens ->
-
-                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, stockMovement, currentLocation)
+                Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND
+                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, validateLotAndExpiry)
                 stockMovementItem.stockMovement = stockMovement
                 stockMovementItem.sortOrder = sortOrder
                 stockMovement.lineItems.add(stockMovementItem)
