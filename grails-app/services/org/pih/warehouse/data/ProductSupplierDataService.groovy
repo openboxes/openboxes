@@ -302,7 +302,9 @@ class ProductSupplierDataService {
                 'manufacturerCode': manufacturerCode,
                 'supplierCode': supplierCode,
         ])
+        // Sort productSuppliers by active field, so we make sure that if there is more than one and one of then could be inactive, that the active ones are "moved" to the top of list
         ArrayList<ProductSupplier> productSuppliers = data?.collect{ it -> ProductSupplier.get(it?.id) }?.sort{ !it?.active }
+        // Double negation below is equivalent to productSuppliers.size() > 0 ? productSuppliers.first() : null (empty list is treated as true, so we can't do "productSuppliers ?")
         def productSupplier = !!productSuppliers ? productSuppliers?.first() : null
         return productSupplier
     }

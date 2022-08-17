@@ -679,6 +679,7 @@ class OrderService {
                                               supplier: supplier,
                                               sourceName: sourceName]
                         ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams, false)
+                        // Check if any of search term fields for productSupplier are filled
                         def supplierParamFilled = supplierCode || manufacturerName || manufacturerCode
 
                         if (productSupplier) {
