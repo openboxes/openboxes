@@ -231,7 +231,7 @@ class StockMovementItem {
     }
 
 
-    static StockMovementItem createFromTokens(String[] tokens) {
+    static StockMovementItem createFromTokens(String[] tokens, Boolean validateLotAndExpiry) {
         String requisitionItemId = tokens[0] ?: null
         String productCode = tokens[1] ?: null
         String productName = tokens[2] ?: null
@@ -275,8 +275,10 @@ class StockMovementItem {
             throw new IllegalArgumentException("Product '${productCode} ${productName}' could not be found")
         }
 
-        if (product.lotAndExpiryControl && (!expirationDate || !lotNumber)) {
-            throw new IllegalArgumentException("Both lot number and expiry date are required for the '${productCode} ${productName}' product.")
+        if (validateLotAndExpiry) {
+            if (product.lotAndExpiryControl && (!expirationDate || !lotNumber)) {
+                throw new IllegalArgumentException("Both lot number and expiry date are required for the '${productCode} ${productName}' product.")
+            }
         }
 
         StockMovementItem stockMovementItem = new StockMovementItem()
