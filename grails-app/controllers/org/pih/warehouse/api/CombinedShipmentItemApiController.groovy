@@ -50,7 +50,7 @@ class CombinedShipmentItemApiController {
         render([data: orders
                 .findAll{
                     it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } &&
-                    !it.orderItems.every { OrderItem item -> item.canceled}
+                    !it.orderItems.any { OrderItem item -> item.canceled}
                 }
                 .collect {
                     [
