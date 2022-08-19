@@ -7,7 +7,7 @@
 <script>
   $(document).ready(function() {
     $("#orderItemsFilter").keyup(function(event){
-      const filterCell = 1; // product name
+      const filterCell = 2; // product name
       const filterValue = $("#orderItemsFilter")
         .val()
         .toUpperCase();
@@ -73,6 +73,7 @@
                 <th class="right bottom">
                     <warehouse:message code="orderItem.totalPrice.label" default="Total amount"/>
                 </th>
+                %{-- When adding/removing a column, make sure to check the filterCell in function for filtering above --}%
 
             </tr>
             </thead>
