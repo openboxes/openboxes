@@ -478,10 +478,6 @@ openboxes {
                                     widgetId: "inProgressPutaways",
                                     order   : 4
                             ],
-                            [
-                                    widgetId: "itemsInventoried",
-                                    order   : 5
-                            ],
 
                             [
                                     widgetId: "inventorySummary",
