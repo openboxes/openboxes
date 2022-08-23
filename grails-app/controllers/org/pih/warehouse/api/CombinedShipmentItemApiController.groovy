@@ -48,10 +48,7 @@ class CombinedShipmentItemApiController {
         def destination = Location.get(params.destination)
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         render([data: orders
-                .findAll{
-                    it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } &&
-                    !it.orderItems.any { OrderItem item -> item.canceled}
-                }
+                .findAll{it.orderItems.any { item -> (item.getQuantityRemainingToShip() > 0) && !item.canceled }}
                 .collect {
                     [
                         id: it.id,
