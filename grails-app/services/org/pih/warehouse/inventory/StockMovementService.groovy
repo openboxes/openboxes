@@ -2043,6 +2043,9 @@ class StockMovementService {
 
         // Delete all shipment items
         shipmentItems.each { ShipmentItem shipmentItem ->
+            Shipment shipment = shipmentItem?.shipment
+            // Remove shipment item from shipment to avoid re-saving by cascade after deleting item
+            shipment?.removeFromShipmentItems(shipmentItem)
             shipmentItem.delete()
         }
     }
