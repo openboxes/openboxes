@@ -1130,6 +1130,7 @@ openboxes.security.rbac.rules = [
         [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
         [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
         [controller: 'glAccount', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+        [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         // Other controller actions that might need explicit rules
         //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
