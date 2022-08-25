@@ -192,7 +192,10 @@ CREATE OR REPLACE VIEW order_summary AS (
         shipment_status,
         receipt_status,
         payment_status,
-        COALESCE(payment_status, receipt_status, shipment_status, order_status) AS derived_status
+        CASE
+            WHEN  shipment_status = 'SHIPPED' AND receipt_status = 'RECEIVED' AND payment_status = 'INVOICED' THEN 'COMPLETED'
+            ELSE COALESCE(payment_status, receipt_status, shipment_status, order_status)
+        END AS derived_status
     FROM (
         SELECT
             id,
