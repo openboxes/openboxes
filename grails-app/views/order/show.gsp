@@ -44,6 +44,8 @@
                                 <warehouse:message code="order.orderHeader.label" default="Order Header"/>
                             </h2>
                             <table>
+                                %{-- For fetching derived statuses (preparing the list of order ids to be sent with request) --}%
+                                <g:hiddenField id="orderId" name="orderId" value="${orderInstance?.id}"/>
                                 <tbody>
                                 <tr class="prop">
                                     <td valign="top" class="name">
@@ -58,7 +60,7 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <format:metadata obj="${orderInstance?.displayStatus}"/>
+                                        <span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -279,6 +281,8 @@
                     },
                     selected: ${params.tab ? params.tab : 0}
                 });
+
+                fetchOrderDerivedStatus();
             });
 
             function filterTableItems(cellIndex, filterValue, tableRows) {
@@ -293,6 +297,17 @@
                   $(currentRow).show();
                 } else {
                   $(currentRow).hide();
+                }
+              });
+            }
+
+            function fetchOrderDerivedStatus() {
+              const orderId = $('#orderId').val();
+              $.ajax({
+                url: "${request.contextPath}/json/getOrdersDerivedStatus",
+                data: "order.id=" + orderId,
+                success: function(data, textStatus, jqXHR){
+                  $("." + orderId).text(data[orderId]);
                 }
               });
             }

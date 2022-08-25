@@ -37,6 +37,9 @@ enum ShipmentStatusCode {
         [CREATED, PENDING, SHIPPED, PARTIALLY_RECEIVED]
     }
 
+    static listShipped() {
+        [SHIPPED, PARTIALLY_RECEIVED, RECEIVED]
+    }
 
     String getName() { return name() }
 

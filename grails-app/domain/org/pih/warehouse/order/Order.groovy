@@ -169,9 +169,11 @@ class Order implements Serializable {
         return status
     }
 
+    /**
+     * Do not use this for getting POs status. Use orderService.getOrdersDerivedStatus instead.
+     * */
     def getDisplayStatus() {
-        for (ShipmentStatusCode statusCode in
-                [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.SHIPPED]) {
+        for (ShipmentStatusCode statusCode in ShipmentStatusCode.listShipped()) {
             if (shipments.any { Shipment shipment -> shipment?.currentStatus == statusCode}) {
                 if (ShipmentStatusCode.RECEIVED == statusCode && hasRegularInvoice) {
                     return OrderStatus.COMPLETED
@@ -180,9 +182,9 @@ class Order implements Serializable {
                 return statusCode
             }
         }
+
         return status
     }
-
 
     /**
      * Checks to see if this order has been received, or partially received, and

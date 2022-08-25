@@ -1876,6 +1876,11 @@ class JsonController {
 
         render([fieldRemoved: fieldRemoved] as JSON)
     }
+
+    def getOrdersDerivedStatus = {
+        List orderIds = params.order.id ? params.list("order.id") : null
+        render orderService.getOrdersDerivedStatus(orderIds) as JSON
+    }
 }
 
 

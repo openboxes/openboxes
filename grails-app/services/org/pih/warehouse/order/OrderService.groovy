@@ -1101,4 +1101,30 @@ class OrderService {
         order.save(flush:true)
     }
 
+    /**
+     * Gets map of derived status for orders (Order id as a key and derived status as a value)
+     * Done to improve performance of getting orders derived statuses on order list page
+     * */
+    def getOrdersDerivedStatus(List orderIds) {
+        if (!orderIds) {
+            return [:]
+        }
+
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def orderSummaryList =  OrderSummary.findAllByIdInList(orderIds)
+        def results = orderSummaryList.inject([:]) { map, OrderSummary orderSummary ->
+            map << [(orderSummary?.id): g.message(code: "enum.OrderSummaryStatus.${orderSummary?.derivedStatus}")]
+        }
+
+        // Check if any order was not fetched from OrderSummary, then get derived status from the old Order.displayStatus
+        def summaryIds = orderSummaryList?.collect { it?.id }
+        (orderIds - summaryIds).each { String orderId ->
+            Order order = Order.get(orderId)
+            if (order && !results[order.id]) {
+                results[order.id] = g.message(code: "enum.OrderSummaryStatus.${order.displayStatus?.name()}")
+            }
+        }
+
+        return results
+    }
 }
