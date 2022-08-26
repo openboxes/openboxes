@@ -103,7 +103,7 @@ sql_basename="$REMOTE_HOST-$REMOTE_DB-$LOCAL_DB"
 declare -a ignored_remote_tables
 
 echo -n "Counting products in remote database $REMOTE_HOST:$REMOTE_DB ..."
-remote_product_cnt=$(ssh "$REMOTE_HOST" "PATH=${MYSQL_PATH} mysql -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' '$REMOTE_DB' -Nse 'select count(id) from product;'")
+remote_product_cnt=$(ssh "$REMOTE_HOST" "PATH=$MYSQL_PATH mysql -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' '$REMOTE_DB' -Nse 'select count(id) from product;'")
 echo " $remote_product_cnt"
 
 if [ ! "${do_copy_product_demand:-}" ]
@@ -126,8 +126,18 @@ then
 	done
 fi
 
+#
+# Some views may refer to the remote database by name; if so, the sed
+# expression in this command will map them to the local database's name.
+#
 echo "Exporting schema (ignoring ${#ignored_remote_tables[@]} tables) from remote database $REMOTE_HOST:$REMOTE_DB ..."
-/usr/bin/time ssh "$REMOTE_HOST" "PATH=${MYSQL_PATH} mysqldump -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' --opt --allow-keywords --single-transaction --no-data ${ignored_remote_tables[*]:-} '$REMOTE_DB' | gzip -cf" | gunzip -c > "${sql_basename}-schema.sql"
+/usr/bin/time ssh "$REMOTE_HOST" \
+    "PATH=$MYSQL_PATH mysqldump -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' \
+    --opt --allow-keywords --single-transaction --no-data \
+    ${ignored_remote_tables[*]:-} '$REMOTE_DB' | gzip -cf" | \
+    gunzip -c | \
+    sed "/SQL SECURITY DEFINER/! s/\`$REMOTE_DB\`/\`$LOCAL_DB\`/g" > \
+    "${sql_basename}-schema.sql"
 
 database_exists=$($local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -Nse "select count(schema_name) from information_schema.schemata where schema_name = '$LOCAL_DB';")
 if [ "${do_clobber:-}" ]
@@ -145,10 +155,10 @@ $local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "create data
 $local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" -e 'select 1' > /dev/null
 
 echo "Inserting schema into local database $LOCAL_DB ..."
-/usr/bin/time $local_sudo  mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" < "${sql_basename}-schema.sql"
+/usr/bin/time $local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" < "${sql_basename}-schema.sql"
 
 echo "Listing tables in remote database $REMOTE_HOST:$REMOTE_DB ..."
-nocopy_tables=$(ssh "$REMOTE_HOST" "PATH=${MYSQL_PATH} mysql -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' -Nse 'select table_name from information_schema.tables where (table_schema like \"$REMOTE_DB\") and (table_name like \"%_dimension\" or table_name like \"%_fact\" or table_name like \"%_snapshot\");'")
+nocopy_tables=$(ssh "$REMOTE_HOST" "PATH=$MYSQL_PATH mysql -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' -Nse 'select table_name from information_schema.tables where (table_schema like \"$REMOTE_DB\") and (table_name like \"%_dimension\" or table_name like \"%_fact\" or table_name like \"%_snapshot\");'")
 
 for it in $nocopy_tables
 do
@@ -157,7 +167,11 @@ do
 done
 
 echo "Exporting data (ignoring ${#ignored_remote_tables[@]} tables) from remote database $REMOTE_HOST:$REMOTE_DB ..."
-/usr/bin/time ssh "$REMOTE_HOST" "PATH=${MYSQL_PATH} mysqldump -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' --opt --allow-keywords --single-transaction --no-create-info ${ignored_remote_tables[*]:-} '$REMOTE_DB' | gzip -cf" | gunzip -c > "${sql_basename}-data.sql"
+/usr/bin/time ssh "$REMOTE_HOST" \
+    "PATH=$MYSQL_PATH mysqldump -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' \
+    --opt --allow-keywords --single-transaction --no-create-info \
+    ${ignored_remote_tables[*]:-} '$REMOTE_DB' | gzip -cf" | \
+    gunzip -c > "${sql_basename}-data.sql"
 
 #
 # Prevent "ERROR 2006 (HY000): MySQL server has gone away" by temporarily
