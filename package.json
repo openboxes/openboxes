@@ -127,7 +127,7 @@
     "mini-css-extract-plugin": "0.4.4",
     "node-sass": "4.14.1",
     "optimize-css-assets-webpack-plugin": "5.0.1",
-    "react-styleguidist": "9.2.0",
+    "react-styleguidist": "11.2.0",
     "react-test-renderer": "16.8.6",
     "sass-loader": "7.1.0",
     "url-loader": "1.0.1",
