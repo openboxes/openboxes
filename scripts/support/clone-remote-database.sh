@@ -8,15 +8,16 @@ usage()
 	set +xv
 	echo >&2 "$0 - clone a remote mysql database to a local machine for testing"
 	echo >&2 ""
-	echo >&2 "Usage: $0 [-Pf] [-l <LOCAL_DB>] [-p <PATH> ] [-r <REMOTE_DB>] REMOTE_HOST"
+	echo >&2 "Usage: $0 [-fsP] [-l <LOCAL_DB>] [-p <PATH> ] [-r <REMOTE_DB>] REMOTE_HOST"
 	echo >&2 "REMOTE_HOST -- name or ip of remote host (passed to ssh)"
 	echo >&2 "LOCAL_DB -- name of new database to create locally (default: 'openboxes')"
 	echo >&2 "REMOTE_DB -- name of database to clone from REMOTE_HOST (default: 'openboxes')"
 	echo >&2 "PATH -- path under which mysql is installed on remote host"
 	echo >&2 ""
 	echo >&2 "Flags:"
-	echo >&2 "  -P Copy product_demand tables (will fail if refreshProductDemandData is running on remote)"
 	echo >&2 "  -f Completely delete \$LOCAL_DB, if it exists, before cloning -- use with care!"
+	echo >&2 "  -s use sudo when accessing local database (if using auth_socket for root)"
+	echo >&2 "  -P Copy product_demand tables (will fail if refreshProductDemandData is running on remote)"
 	exit 1
 }
 
@@ -42,6 +43,7 @@ LOCAL_DB="openboxes"
 LOCAL_DB_USERNAME="root"
 REMOTE_DB="openboxes"
 REMOTE_DB_USERNAME="root"
+local_sudo=
 
 MYSQL_PATH=/usr/bin:/usr/local/mysql/bin
 
@@ -57,7 +59,7 @@ fi
 
 set -u
 
-while getopts 'fhl:p:r:P' o
+while getopts 'fhl:p:r:sP' o
 do
 	case "${o}" in
 	f)
@@ -77,6 +79,9 @@ do
 	r)
 		REMOTE_DB=${OPTARG}
 		[ "$REMOTE_DB" ] || usage
+		;;
+	s)
+		local_sudo=sudo
 		;;
 	P)
 		do_copy_product_demand=1
@@ -124,11 +129,11 @@ fi
 echo "Exporting schema (ignoring ${#ignored_remote_tables[@]} tables) from remote database $REMOTE_HOST:$REMOTE_DB ..."
 /usr/bin/time ssh "$REMOTE_HOST" "PATH=${MYSQL_PATH} mysqldump -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' --opt --allow-keywords --single-transaction --no-data ${ignored_remote_tables[*]:-} '$REMOTE_DB' | gzip -cf" | gunzip -c > "${sql_basename}-schema.sql"
 
-database_exists=$(mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -Nse "select count(schema_name) from information_schema.schemata where schema_name = '$LOCAL_DB';")
+database_exists=$($local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -Nse "select count(schema_name) from information_schema.schemata where schema_name = '$LOCAL_DB';")
 if [ "${do_clobber:-}" ]
 then
 	echo "Clobbering local database $LOCAL_DB ..."
-	mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "drop database if exists \`$LOCAL_DB\`;"
+	$local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "drop database if exists \`$LOCAL_DB\`;"
 elif [ "$database_exists" -ne 0 ]
 then
 	echo >&2 "Database \`$LOCAL_DB\` exists and -f was not set!"
@@ -136,11 +141,11 @@ then
 fi
 
 echo "Initializing local database $LOCAL_DB ..."
-mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "create database \`$LOCAL_DB\` default charset utf8; grant all on \`$LOCAL_DB\`.* to 'openboxes'@'localhost' identified by 'openboxes';"
-mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" -e 'select 1' > /dev/null
+$local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "create database \`$LOCAL_DB\` default charset utf8; grant all on \`$LOCAL_DB\`.* to 'openboxes'@'localhost' identified by 'openboxes';"
+$local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" -e 'select 1' > /dev/null
 
 echo "Inserting schema into local database $LOCAL_DB ..."
-/usr/bin/time mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" < "${sql_basename}-schema.sql"
+/usr/bin/time $local_sudo  mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" < "${sql_basename}-schema.sql"
 
 echo "Listing tables in remote database $REMOTE_HOST:$REMOTE_DB ..."
 nocopy_tables=$(ssh "$REMOTE_HOST" "PATH=${MYSQL_PATH} mysql -u '$REMOTE_DB_USERNAME' -p'$REMOTE_DB_PASSWORD' -Nse 'select table_name from information_schema.tables where (table_schema like \"$REMOTE_DB\") and (table_name like \"%_dimension\" or table_name like \"%_fact\" or table_name like \"%_snapshot\");'")
@@ -162,24 +167,24 @@ echo "Exporting data (ignoring ${#ignored_remote_tables[@]} tables) from remote 
 #
 # see also https://stackoverflow.com/questions/10474922/error-2006-hy000-mysql-server-has-gone-away
 #
-curr_max_packet=$(mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -Nse "select @@max_allowed_packet;")
+curr_max_packet=$($local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -Nse "select @@max_allowed_packet;")
 if [ "$curr_max_packet" -lt 16777216 ]
 then
 	echo "Temporarily increasing max_allowed_packet to 16M ..."
-	mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "set global max_allowed_packet=16*1024*1024;"
+	$local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "set global max_allowed_packet=16*1024*1024;"
 fi
 
 echo "Inserting data into local database $LOCAL_DB (this may take several minutes) ..."
-/usr/bin/time mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" < "${sql_basename}-data.sql" --max-allowed-packet=16M --reconnect --wait
+/usr/bin/time $local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" < "${sql_basename}-data.sql" --max-allowed-packet=16M --reconnect --wait
 
 if [ "$curr_max_packet" -lt 16777216 ]
 then
 	echo "Restoring previous max_allowed_packet ..."
-	mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "set global max_allowed_packet=${curr_max_packet};"
+	$local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" -e "set global max_allowed_packet=${curr_max_packet};"
 fi
 
 echo -n "Counting products in local database $REMOTE_HOST:$LOCAL_DB ..."
-local_product_cnt=$(mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" -Nse 'select count(id) from product;')
+local_product_cnt=$($local_sudo mysql -u "$LOCAL_DB_USERNAME" -p"$LOCAL_DB_PASSWORD" "$LOCAL_DB" -Nse 'select count(id) from product;')
 echo " $local_product_cnt"
 
 end_tm=$(date '+%s')
