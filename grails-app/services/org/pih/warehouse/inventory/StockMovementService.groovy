@@ -1917,9 +1917,6 @@ class StockMovementService {
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
-
-        createMissingPicklistItems(stockMovement)
-        createMissingShipmentItems(stockMovement)
     }
 
     void substituteItem(StockMovementItem stockMovementItem) {
