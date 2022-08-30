@@ -33,14 +33,14 @@
                     </tr>
                 </g:if>
                 <tr>
-                    <td class="b-t0 b-r0">${requisitionItem?.product?.productCode}</td>
-                    <td class="b-t0 b-r0">${requisitionItem?.product?.name?.encodeAsHTML()}</td>
-                    <td class="b-t0 b-r0">${requisitionItem?.productPackage ? requisitionItem.productPackage.uom?.code + "/" + requisitionItem.productPackage.quantity + " -- " + requisitionItem.productPackage.uom?.name : 'EA/1'}</td>
-                    <td class="b-t0 b-r0">${requisitionItem.quantity}</td>
-                    <td class="b-t0 b-r0"></td>
-                    <td class="b-t0 b-r0"></td>
-                    <td class="b-t0 b-r0 gray-background"></td>
-                    <td class="b-t0 gray-background"></td>
+                    <wordwrap:td class="b-t0 b-r0">${requisitionItem?.product?.productCode}</wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0">${requisitionItem?.product?.name?.encodeAsHTML()}</wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0">${requisitionItem?.productPackage ? requisitionItem.productPackage.uom?.code + "/" + requisitionItem.productPackage.quantity + " -- " + requisitionItem.productPackage.uom?.name : 'EA/1'}</wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0">${requisitionItem.quantity}</wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0"></wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0"></wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0 gray-background"></wordwrap:td>
+                    <wordwrap:td class="b-t0 gray-background"></wordwrap:td>
                 </tr>
             </g:each>
         </tbody>

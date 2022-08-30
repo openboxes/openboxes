@@ -5,16 +5,12 @@
 <head>
     <style>
 
-        table {border-collapse: collapse; page-break-inside: auto;}
         thead {display: table-header-group;}
         tr {page-break-inside: avoid; page-break-after: auto;}
         td {vertical-align: top; }
         th { background-color: lightgrey; font-weight: bold;}
         body { font-size: 11px; }
-        * {
-            padding: 0;
-            margin: 0;
-        }
+
         div.header {
             display: block;
             text-align: center;
@@ -41,12 +37,9 @@
             page-break-before: avoid;
         }
         table {
-            -fs-table-paginate: paginate;
-            page-break-inside: avoid;
             border-collapse: collapse;
             border-spacing: 0;
             margin: 5px;
-
         }
         .page-content {
             page-break-before: always;
@@ -97,11 +90,11 @@
                 <td>
                     <g:displayReportLogo/>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${requisition.requestNumber}
 
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${requisition?.name }
                 </td>
             </tr>
@@ -111,36 +104,36 @@
             <h2>${warehouse.message(code:"default.details.label", default: 'Details')}</h2>
             <table class="border">
                 <tr>
-                    <td>
+                    <td style="white-space: nowrap;">
                         <label><warehouse:message code="requisition.origin.label"/>:</label>
                     </td>
-                    <td>
+                    <td style="white-space: nowrap;">
                         ${requisition.origin?.name}
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td style="white-space: nowrap;">
                         <label><warehouse:message code="requisition.destination.label"/>:</label>
                     </td>
-                    <td>
+                    <td style="white-space: nowrap;">
                         ${requisition.destination?.name}
                     </td>
                 </tr>
 
                 <tr>
-                    <td>
+                    <td style="white-space: nowrap;">
                         <label><warehouse:message code="requisition.date.label"/>:</label>
                     </td>
-                    <td>
+                    <td style="white-space: nowrap;">
                         <g:formatDate
                                 date="${requisition?.dateRequested}" format="MMM d, yyyy  hh:mma"/>
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td style="white-space: nowrap;">
                         <label><warehouse:message code="picklist.datePrinted.label" default="Date printed"/>:</label>
                     </td>
-                    <td>
+                    <td style="white-space: nowrap;">
                         <g:formatDate
                                 date="${new Date()}" format="MMM d, yyyy hh:mma"/>
                     </td>
@@ -153,94 +146,94 @@
         <h2>${warehouse.message(code:"default.signatures.label", default: 'Signatures')}</h2>
         <table>
             <tr>
-                <td width="15%"></td>
-                <td width="20%"><warehouse:message code="default.name.label"/></td>
-                <td width="40%"><warehouse:message code="default.signature.label"/></td>
-                <td width="15%" class="center"><warehouse:message code="default.date.label"/></td>
-                <td width="10%" class="center"><warehouse:message code="default.time.label"/></td>
+                <th width="15%"></th>
+                <th width="20%"><warehouse:message code="default.name.label"/></th>
+                <th width="40%"><warehouse:message code="default.signature.label"/></th>
+                <th width="15%" class="center"><warehouse:message code="default.date.label"/></th>
+                <th width="10%" class="center"><warehouse:message code="default.time.label"/></th>
             </tr>
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <label><warehouse:message code="requisition.requestedBy.label"/></label>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${requisition?.requestedBy?.name}
                 </td>
                 <td>
 
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateRequested}" format="MMM d, yyyy"/>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateRequested}" format="hh:mma"/>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <label><warehouse:message code="requisition.createdBy.label"/></label>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${requisition?.createdBy?.name}
                 </td>
                 <td>
 
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateCreated}" format="MMM d, yyyy"/>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateCreated}" format="hh:mma"/>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <label><warehouse:message code="requisition.verifiedBy.label"/></label>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${requisition?.verifiedBy?.name}
                 </td>
                 <td>
 
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateVerified}" format="MMM d, yyyy"/>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateVerified}" format="hh:mma"/>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <label><warehouse:message code="requisition.pickedBy.label"/></label>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${picklist?.picker?.name}
                 </td>
                 <td>
 
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${picklist?.datePicked}" format="MMM d, yyyy"/>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${picklist?.datePicked}" format="hh:mma"/>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td style="white-space: nowrap;">
                     <label><warehouse:message code="requisition.reviewedBy.label" default="Checked by"/></label>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     ${requisition?.checkedBy?.name}
                 </td>
                 <td>
 
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateChecked}" format="MMM d, yyyy"/>
                 </td>
-                <td>
+                <td style="white-space: nowrap;">
                     <g:formatDate date="${requisition?.dateChecked}" format="hh:mma"/>
                 </td>
             </tr>
