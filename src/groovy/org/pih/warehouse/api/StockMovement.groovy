@@ -245,7 +245,7 @@ class StockMovement {
         boolean isDepot = origin?.isDepot()
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
-        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || !isPending() || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
+        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || (!isFromOrder && !isPending()) || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
     }
 
     Boolean isReceivingAuthorized(Location currentLocation) {
