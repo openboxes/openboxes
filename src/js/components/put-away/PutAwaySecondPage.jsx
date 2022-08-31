@@ -313,7 +313,7 @@ class PutAwaySecondPage extends Component {
             putAway.putawayItems,
             val => ({
               ...val,
-              putawayLocation: val.putawayLocation.id ? {
+              putawayLocation: (val.putawayLocation.id || val.preferredBin.id) ? {
                 id: val.putawayLocation.id ? val.putawayLocation.id : val.preferredBin.id,
                 name: val.putawayLocation.name ? val.putawayLocation.name : val.preferredBin.name,
                 zoneId: val.putawayLocation.id ? val.putawayLocation.zoneId :
@@ -542,7 +542,7 @@ class PutAwaySecondPage extends Component {
           parseResponse(response.data.data.putawayItems),
           val => ({
             ...val,
-            putawayLocation: val.putawayLocation.id ? {
+            putawayLocation: (val.putawayLocation.id || val.preferredBin.id) ? {
               id: val.putawayLocation.id ? val.putawayLocation.id : val.preferredBin.id,
               name: val.putawayLocation.name ? val.putawayLocation.name : val.preferredBin.name,
               zoneId: val.putawayLocation.id ? val.putawayLocation.zoneId : val.preferredBin.zoneId,
