@@ -157,7 +157,13 @@ class StockMovementApiController {
     def reviseItems = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         bindStockMovement(stockMovement, request.JSON)
+        // First revise the items
         stockMovementService.reviseItems(stockMovement)
+        // Then create missing picklist items and shipment items (previously this part was done in the stockMovementService.reviseItems,
+        // but since the stockMovementService is transactional there were issues with not properly refreshed product availability
+        // (old values were pulled and validation was failing)
+        stockMovementService.createMissingPicklistItems(stockMovement)
+        stockMovementService.createMissingShipmentItems(stockMovement)
         render status: 200
     }
 

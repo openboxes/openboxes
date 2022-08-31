@@ -108,7 +108,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityRemainingToShip",
             "invoiceItems",
             "quantityInvoiced",
-            "quantityInvoicedInStandardUom"
+            "quantityInvoicedInStandardUom",
+            "orderItemStatus",
+            "canceled"
     ]
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
@@ -350,6 +352,19 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     def retrievePicklistItems() {
         def picklistItems = PicklistItem.findAllByOrderItem(this)
         return picklistItems
+    }
+
+    /**
+     * Fetching OrderItemSummary by OrderItem.
+     * NOTE: This should not be use if there is option to fetch OrderItemSummary by Order
+     *       Use order.getOrderItemsDerivedStatus() instead
+     * */
+    String getOrderItemStatus() {
+        return OrderItemSummary.get(id)?.derivedStatus
+    }
+
+    Boolean isCanceled() {
+        return orderItemStatusCode == OrderItemStatusCode.CANCELED
     }
 
 

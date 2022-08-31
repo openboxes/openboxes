@@ -1,5 +1,6 @@
-<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionSourceType; org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.api.StockMovementDirection" %>
+<%@ page import="org.pih.warehouse.core.RoleType" %>
 <g:if test="${stockMovement?.id }">
     <span id="stockmovement-action-menu" class="action-menu">
         <button class="action-btn ">
@@ -39,27 +40,38 @@
                     </g:link>
                 </g:else>
             </div>
-            <g:isUserAdmin>
-                <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
-                    <hr/>
-                    <div class="action-menu-item">
-                        <g:if test="${stockMovement?.order}">
+            <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
+                <hr/>
+                <div class="action-menu-item">
+                    <g:if test="${stockMovement?.order}">
+                        <g:isUserAdmin>
                             <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
                                     onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
                                 &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
                             </g:link>
-                        </g:if>
-                        <g:else>
-                            <g:link controller="stockMovement" action="remove" id="${stockMovement?.id}"
-                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
-                                &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
-                            </g:link>
-                        </g:else>
-                    </div>
-                </g:if>
-            </g:isUserAdmin>
+                        </g:isUserAdmin>
+                    </g:if>
+                    <g:elseif test="${stockMovement?.electronicType}">
+                        <g:link controller="stockRequest" action="remove" id="${stockMovement?.id}"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                disabledMessage="You do not have minimum required role to delete stock request"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                            &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
+                        </g:link>
+                    </g:elseif>
+                    <g:else>
+                        <g:link controller="stockMovement" action="remove" id="${stockMovement?.id}"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                disabledMessage="You do not have minimum required role to delete stock movement"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                            &nbsp;${warehouse.message(code: 'default.delete.label', args:[warehouse.message(code:'stockMovement.label')])}
+                        </g:link>
+                    </g:else>
+                </div>
+            </g:if>
         </div>
     </span>
 </g:if>

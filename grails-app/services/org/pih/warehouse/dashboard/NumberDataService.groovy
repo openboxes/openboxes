@@ -28,10 +28,31 @@ class NumberDataService {
     }
 
     NumberData getInProgressShipments(def user, def location) {
-        def shipments = Requisition.executeQuery("select count(*) from Requisition r join r.shipments s where r.origin = :location and s.currentStatus = 'PENDING' and r.createdBy = :user",
-                ['location': location, 'user': user]);
 
-        return new NumberData(shipments[0], "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
+        OrderType returnOrderType = OrderType.get(Constants.RETURN_ORDER)
+
+        def requisitionShipmentCount = Requisition.executeQuery("""
+                    SELECT COUNT(*) FROM Requisition r 
+                    JOIN r.shipments s 
+                    WHERE r.origin = :location 
+                    AND s.currentStatus = 'PENDING' 
+                    AND r.createdBy = :user
+                """,
+                ['location': location, 'user': user]).get(0)
+
+        def returnOrderShipmentCount = Order.executeQuery("""
+                    SELECT COUNT(DISTINCT o.id) FROM Order o
+                    LEFT JOIN o.orderItems oi
+                    LEFT JOIN oi.shipmentItems si
+                    LEFT JOIN si.shipment s
+                    WHERE o.origin = :location
+                    AND o.orderType = :orderType
+                    AND s.currentStatus = 'PENDING' 
+                    AND o.createdBy = :user
+                """,
+                ['location': location, 'user': user, 'orderType': returnOrderType]).get(0)
+
+        return new NumberData(requisitionShipmentCount + returnOrderShipmentCount, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
     }
 
     NumberData getInProgressPutaways(def user, def location) {

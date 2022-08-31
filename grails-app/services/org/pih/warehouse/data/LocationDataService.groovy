@@ -99,6 +99,10 @@ class LocationDataService {
                 command.errors.reject("Row ${index + 1}: '${organizations.size()}' records found for organization name '${params.organization}'. Please specify by entering the organization code instead")
             }
 
+            if (organizations && !organizations.first()?.active) {
+                command.errors.reject("Row ${index + 1}: Organization ${organizations.first().name} is inactive. You can't assign it to any location")
+            }
+
             // Do not allow to change internal type location to non-internal
             if (params.locationType && location && (location.locationType.isInternalLocation() || location.locationType.isZone()) && !(LocationType.findByNameLike(params.locationType + "%").isInternalLocation() || LocationType.findByNameLike(params.locationType + "%").isZone())) {
                 command.errors.reject("Row ${index + 1}: Changing Location Type from internal to '${params.locationType}' is not possible")
@@ -138,7 +142,7 @@ class LocationDataService {
         if (!location.inventory && !location.parentLocation) {
             location.inventory = new Inventory(['warehouse': location])
         }
-        def locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
+        def locationType = params.locationType ? LocationType.findByName(params.locationType) : null
         def currentLocationType = location.locationType
 
         //Do not allow to change internal type location to non-internal

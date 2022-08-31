@@ -22,6 +22,7 @@ class Person implements Comparable, Serializable {
     String phoneNumber
     Date dateCreated
     Date lastUpdated
+    Boolean active = true
 
     static mapping = {
         tablePerHierarchy false
@@ -36,6 +37,7 @@ class Person implements Comparable, Serializable {
         lastName(blank: false, maxSize: 255)
         phoneNumber(nullable: true, maxSize: 255)
         email(nullable: true, email: true, maxSize: 255)
+        active(nullable: true)
     }
 
     int compareTo(Object obj) {

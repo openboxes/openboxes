@@ -196,7 +196,7 @@ class LocationDetails extends Component {
       debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedOrganizationsFetch =
-      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, []);
+      debounceOrganizationsFetch(this.props.debounceTime, this.props.minSearchLength, [], true);
     this.getSupportLinks = this.getSupportLinks.bind(this);
   }
 

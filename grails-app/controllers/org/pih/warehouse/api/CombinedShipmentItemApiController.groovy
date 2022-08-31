@@ -47,12 +47,15 @@ class CombinedShipmentItemApiController {
         def vendor = Location.get(params.vendor)
         def destination = Location.get(params.destination)
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
-        render([data: orders.findAll{ it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } }.collect {
-            [
-                id: it.id,
-                orderNumber: it.orderNumber
-            ]
-        }] as JSON)
+        render([data: orders
+                .findAll{it.orderItems.any { item -> (item.getQuantityRemainingToShip() > 0) && !item.canceled }}
+                .collect {
+                    [
+                        id: it.id,
+                        orderNumber: it.orderNumber
+                    ]
+                }
+        ] as JSON)
     }
 
     def findOrderItems = {
@@ -160,33 +163,51 @@ class CombinedShipmentItemApiController {
             "Pack level 2" { it.boxName }
             "Recipient" { it.recipient }
             "Budget code" { it.budgetCode }
+            "Supplier code" { it.supplierCode }
         })
 
         if (params.blank) {
-            csv << [orderNumber: "", id: "", productCode: "", productName: "", lotNumber: "", expiry: "", quantityToShip: "", unitOfMeasure: "", palletName: "", boxName: "", recipient: "", budgetCode: ""]
+            csv << [
+                orderNumber     : "",
+                id              : "",
+                productCode     : "",
+                productName     : "",
+                lotNumber       : "",
+                expiry          : "",
+                quantityToShip  : "",
+                unitOfMeasure   : "",
+                palletName      : "",
+                boxName         : "",
+                recipient       : "",
+                budgetCode      : "",
+                supplierCode    : "",
+            ]
         } else {
             def vendor = Location.get(params.vendor)
             def destination = Location.get(params.destination)
             def orders = orderService.getOrdersForCombinedShipment(vendor, destination)
             def orderItems = OrderItem.findAllByOrderInList(orders)
-            orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.each {orderItem ->
-                String quantityUom = "${orderItem?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
-                String quantityPerUom = orderItem?.quantityPerUom?.toInteger()
-                String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
-                csv << [
-                        orderNumber         : orderItem.order.orderNumber,
-                        id                  : orderItem.id,
-                        productCode         : orderItem.product.productCode,
-                        productName         : orderItem.product.name,
-                        lotNumber           : '',
-                        expiry              : '',
-                        quantityToShip      : orderItem.getQuantityRemainingToShip(),
-                        unitOfMeasure       : unitOfMeasure,
-                        palletName          : '',
-                        boxName             : '',
-                        recipient           : orderItem.recipient ?: '',
-                        budgetCode          : StringEscapeUtils.escapeCsv(orderItem.budgetCode?.code) ?: '',
-                ]
+            orderItems
+                .findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }
+                .each {orderItem ->
+                    String quantityUom = "${orderItem?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
+                    Integer quantityPerUom = orderItem?.quantityPerUom?.toInteger() ?: 1
+                    String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
+                    csv << [
+                            orderNumber         : orderItem.order.orderNumber,
+                            id                  : orderItem.id,
+                            productCode         : orderItem.product.productCode,
+                            productName         : orderItem.product.name,
+                            lotNumber           : '',
+                            expiry              : '',
+                            quantityToShip      : orderItem.getQuantityRemainingToShip(),
+                            unitOfMeasure       : unitOfMeasure,
+                            palletName          : '',
+                            boxName             : '',
+                            recipient           : orderItem.recipient ?: '',
+                            budgetCode          : StringEscapeUtils.escapeCsv(orderItem.budgetCode?.code) ?: '',
+                            supplierCode        : orderItem?.productSupplier?.supplierCode ?: '',
+                    ]
             }
         }
 

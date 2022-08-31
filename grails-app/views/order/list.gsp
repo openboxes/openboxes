@@ -90,7 +90,8 @@
 										</td>
 									</tr>
 								</g:unless>
-
+								%{-- For fetching derived statuses (preparing the list of order ids to be sent with request) --}%
+								<g:hiddenField id="orderIds" name="orderIds" value="${orders?.collect { it?.id }?.join('&order.id=')}"/>
 								<g:each var="orderInstance" in="${orders}" status="i">
 
 									<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
@@ -101,7 +102,7 @@
 										</td>
 										<td class="middle">
 											<div class="tag">
-												<format:metadata obj="${orderInstance?.displayStatus}"/>
+												<span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
 											</div>
 										</td>
 										<td class="middle">
@@ -187,6 +188,8 @@
 
 		<script type="text/javascript">
 			$(document).ready(function() {
+				fetchOrdersDerivedStatus();
+
 				$(".clear-all")
 				.click(function () {
 					$('#statusStartDate-datepicker')
@@ -220,6 +223,19 @@
 					.datepicker('setDate', null);
 				});
 			});
+
+			function fetchOrdersDerivedStatus() {
+				const orderIds = $('#orderIds').val();
+				$.ajax({
+					url: "${request.contextPath}/json/getOrdersDerivedStatus",
+					data: "order.id=" + orderIds,
+					success: function(data, textStatus, jqXHR){
+						for (const [orderId, derivedStatus] of Object.entries(data)) {
+							$("." + orderId).text(derivedStatus);
+						}
+					}
+				});
+			}
         </script>
     </body>
 </html>

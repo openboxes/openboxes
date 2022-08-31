@@ -9,10 +9,10 @@
  **/
 
 
-
 import grails.converters.JSON
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -28,14 +28,15 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.jobs.RefreshDemandDataJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
@@ -56,15 +57,12 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
-import org.pih.warehouse.core.Address
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
 
 class BootStrap {
 
-    def identifierService
-    def grailsApplication
     def uploadService
     DataSource dataSource
 
@@ -496,7 +494,7 @@ class BootStrap {
         // Create uploads directory if it doesn't already exist
         uploadService.findOrCreateUploadsDirectory()
 
-        Boolean refreshAnalyticsDataOnStartup = grailsApplication.config.openboxes.refreshAnalyticsDataOnStartup.enabled
+        Boolean refreshAnalyticsDataOnStartup = ConfigurationHolder.config.openboxes.refreshAnalyticsDataOnStartup.enabled
         if (refreshAnalyticsDataOnStartup) {
             // Refresh stock out data on startup to make sure the fact table is created
             RefreshStockoutDataJob.triggerNow()

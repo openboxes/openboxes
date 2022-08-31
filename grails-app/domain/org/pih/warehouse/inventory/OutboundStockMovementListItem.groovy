@@ -9,6 +9,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
+import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
@@ -124,7 +125,16 @@ class OutboundStockMovementListItem implements Serializable {
     }
 
     Integer getLineItemCount() {
-        return requisition ? RequisitionItem.countByRequisition(requisition) : order ? OrderItem.countByOrder(order) : 0
+        if (requisition) {
+            RequisitionItem[] approvedItems = requisition.requisitionItems.findAll{ it ->
+                it.status == RequisitionItemStatus.APPROVED
+            }
+            return approvedItems.size()
+        }
+        if (order) {
+            return OrderItem.countByOrder(order)
+        }
+        return 0
     }
 
     Boolean isPending() {

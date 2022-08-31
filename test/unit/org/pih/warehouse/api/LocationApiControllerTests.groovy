@@ -65,7 +65,7 @@ class LocationApiControllerTests extends ControllerUnitTestCase {
                 hasRoleRequestorInAnyLocations: { User user -> return false }
         ]
         controller.locationService = [
-                getLocations: { String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User u -> [location] }
+                getLocations: { String[] fields, Map params, Boolean isSuperuser, String direction, Location currentLocation, User u, Boolean excludeDisabled -> [location] }
         ]
         // WHEN
         controller.list()

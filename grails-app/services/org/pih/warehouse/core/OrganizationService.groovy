@@ -17,7 +17,7 @@ class OrganizationService {
     boolean transactional = true
 
 
-    List selectOrganizations(roleTypes) {
+    List selectOrganizations(ArrayList<RoleType> roleTypes, Boolean active = false, currentOrganizationId) {
         return Organization.createCriteria().list {
             projections {
                 property("id")
@@ -26,6 +26,12 @@ class OrganizationService {
             if (roleTypes) {
                 roles {
                     'in'("roleType", roleTypes)
+                }
+            }
+            if (active) {
+                or {
+                    eq('id', currentOrganizationId)
+                    eq('active', active)
                 }
             }
             order("name", "asc")
@@ -85,6 +91,9 @@ class OrganizationService {
                 roles {
                     'in'("roleType", roleTypes)
                 }
+            }
+            if (params.active) {
+                eq('active', true)
             }
         }
         return organizations

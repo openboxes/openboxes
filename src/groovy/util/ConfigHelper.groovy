@@ -8,6 +8,7 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package util
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 // See http://jira.codehaus.org/browse/GRAILS-6515
 class ConfigHelper {
@@ -27,6 +28,23 @@ class ConfigHelper {
             return value
         }
 
+    }
+
+    static findAccessRule(String controllerName, String actionName) {
+        def rules = ConfigurationHolder.config.openboxes.security.rbac.rules
+
+        ArrayList<Closure> filters = [
+            { it.controller == controllerName && it.actions.contains(actionName) },
+            { it.controller == controllerName && it.actions.contains("*") },
+            { it.controller == "*" && it.actions.contains("*") }
+        ]
+        // Find the rules for each filter and find the first non empty from the top (filters on the top are higher priority)
+        def rule = filters
+                    .collect { rules.findAll(it) }
+                    .find { it.size() != 0 }
+
+        // If there is more than one rule specified for the same controller and action, determine which Role is "higher" by sortOrder of RoleType enum, and return the "higher" one
+        return rule?.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }?.first()
     }
 
 }

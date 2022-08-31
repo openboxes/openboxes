@@ -83,6 +83,7 @@
             <div class="canceled">
                 <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
                     ${requisitionItem?.product?.name}
+                    <g:renderHandlingIcons product="${requisitionItem?.product}" />
                 </g:link>
             </div>
         </g:if>
@@ -90,19 +91,22 @@
             <div class="canceled">
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
                 ${requisitionItem?.product?.name}
+                <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
                     <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
                         ${substitutionItem?.product?.name}
+                        <g:renderHandlingIcons product="${substitutionItem?.product}" />
                     </g:link>
                 </div>
             </g:each>
         </g:elseif>
         <g:else>
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-            <format:product product="${requisitionItem?.product}"/>
+                <format:product product="${requisitionItem?.product}"/>
+                <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
         </g:else>
     </td>

@@ -139,6 +139,7 @@ class OrderService {
                 eq("origin", origin)
                 eq("destination", destination)
                 eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
+                ge("status", OrderStatus.PLACED)
             }
         }
     }
@@ -598,7 +599,7 @@ class OrderService {
      * @param orderItems
      * @return
      */
-    boolean importOrderItems(String orderId, String supplierId, List orderItems, Location currentLocation) {
+    boolean importOrderItems(String orderId, String supplierId, List orderItems, Location currentLocation, User user) {
 
         int count = 0
         try {
@@ -637,6 +638,10 @@ class OrderService {
                         orderItem.orderIndex = order.orderItems ? order.orderItems.size() : 0
                     }
 
+                    if (!canOrderItemBeEdited(orderItem, user)) {
+                        throw new UnsupportedOperationException("You do not have permissions to perform this action")
+                    }
+
                     Product product
                     if (productCode) {
                         product = Product.findByProductCode(productCode)
@@ -653,10 +658,13 @@ class OrderService {
 
                     if (sourceCode) {
                         ProductSupplier productSource = ProductSupplier.findByCode(sourceCode)
-                        if (productSource && productSource.product != orderItem.product) {
-                            throw new ProductException("Wrong product source for given product")
-                        }
                         if (productSource) {
+                            if (productSource.product != orderItem.product) {
+                                throw new ProductException("Wrong product source for given product")
+                            }
+                            if (!productSource.active) {
+                                throw new ProductException("Product source ${sourceCode} for product ${productCode} is inactive")
+                            }
                             orderItem.productSupplier = productSource
                         }
                     } else {
@@ -672,9 +680,17 @@ class OrderService {
                                               supplier: supplier,
                                               sourceName: sourceName]
                         ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams, false)
+                        // Check if any of search term fields for productSupplier are filled
+                        def supplierParamFilled = supplierCode || manufacturerName || manufacturerCode
 
                         if (productSupplier) {
-                            orderItem.productSupplier = productSupplier
+                            if (!productSupplier.active && supplierParamFilled) {
+                                throw new ProductException("Product source ${productSupplier.code} for product ${productCode} is inactive")
+                            }
+                            // If it matches a product source for empty params (rare case), but it's inactive, treat it as if there was not a product source
+                            if (productSupplier.active) {
+                                orderItem.productSupplier = productSupplier
+                            }
                         }
                     }
 
@@ -697,6 +713,9 @@ class OrderService {
                     }
 
                     BigDecimal parsedUnitPrice = CSVUtils.parseNumber(unitPrice, "unitPrice")
+                    if (orderItem.id && orderItem.hasRegularInvoice && orderItem.unitPrice != parsedUnitPrice) {
+                        throw new IllegalArgumentException("Cannot update the unit price on a line that is already invoiced.")
+                    }
                     if (parsedUnitPrice < 0) {
                         throw new IllegalArgumentException("Wrong unit price value: ${parsedUnitPrice}.")
                     }
@@ -731,9 +750,17 @@ class OrderService {
                         throw new IllegalArgumentException("Budget code is required.")
                     }
                     BudgetCode budgetCode = BudgetCode.findByCode(code)
-                    if (code && !budgetCode) {
-                        throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
 
+                    if (orderItem.id && orderItem.hasRegularInvoice && orderItem.budgetCode != budgetCode) {
+                        throw new IllegalArgumentException("Cannot update the budget code on a line that is already invoiced.")
+                    }
+                    if (code) {
+                        if (!budgetCode) {
+                            throw new IllegalArgumentException("Could not find budget code with code: ${code}.")
+                        }
+                        if (!budgetCode.active) {
+                            throw new IllegalArgumentException("Budget code ${code} is inactive.")
+                        }
                     }
                     orderItem.budgetCode = budgetCode
 
@@ -963,6 +990,25 @@ class OrderService {
         }
     }
 
+    def getOrderItemSummaryList(Map params) {
+        return OrderItemSummary.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+            if (params.derivedStatus) {
+                'in'("derivedStatus", params.derivedStatus)
+            }
+        }
+    }
+
+    def getOrderItemDetailsList(Map params) {
+        return OrderItemDetails.createCriteria().list(params) {
+            if (params.orderNumber) {
+                ilike("orderNumber", "%${params.orderNumber}%")
+            }
+        }
+    }
+
     List<OrderItem> getOrderItemsForPriceHistory(Organization supplierOrganization, Product productInstance, String query) {
         def terms = "%" + query + "%"
         def orderItems = OrderItem.createCriteria().list() {
@@ -1024,5 +1070,62 @@ class OrderService {
         }
 
         return orderItems
+    }
+
+    def deleteAdjustment(OrderAdjustment orderAdjustment, User user) {
+        Order order = orderAdjustment.order;
+        if (!canManageAdjustments(order, user) || orderAdjustment.hasInvoices){
+            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+        }
+
+        order.removeFromOrderAdjustments(orderAdjustment)
+        orderAdjustment.delete()
+
+        if (order.hasErrors()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+        order.save(flush: true)
+    }
+
+    def removeOrderItem(OrderItem orderItem, User user) {
+        if (orderItem.hasShipmentAssociated() || !canOrderItemBeEdited(orderItem, user) || orderItem.hasInvoices) {
+            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+        }
+
+        Order order = orderItem.order
+        order.removeFromOrderItems(orderItem)
+        orderItem.delete()
+
+        if (order.hasErrors()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
+        order.save(flush:true)
+    }
+
+    /**
+     * Gets map of derived status for orders (Order id as a key and derived status as a value)
+     * Done to improve performance of getting orders derived statuses on order list page
+     * */
+    def getOrdersDerivedStatus(List orderIds) {
+        if (!orderIds) {
+            return [:]
+        }
+
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def orderSummaryList =  OrderSummary.findAllByIdInList(orderIds)
+        def results = orderSummaryList.inject([:]) { map, OrderSummary orderSummary ->
+            map << [(orderSummary?.id): g.message(code: "enum.OrderSummaryStatus.${orderSummary?.derivedStatus}")]
+        }
+
+        // Check if any order was not fetched from OrderSummary, then get derived status from the old Order.displayStatus
+        def summaryIds = orderSummaryList?.collect { it?.id }
+        (orderIds - summaryIds).each { String orderId ->
+            Order order = Order.get(orderId)
+            if (order && !results[order.id]) {
+                results[order.id] = g.message(code: "enum.OrderSummaryStatus.${order.displayStatus?.name()}")
+            }
+        }
+
+        return results
     }
 }

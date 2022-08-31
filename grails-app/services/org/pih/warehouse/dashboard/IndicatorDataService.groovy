@@ -4,6 +4,9 @@ import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionType
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderType
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.inventory.InventorySnapshot
@@ -510,24 +513,86 @@ class IndicatorDataService {
     GraphData getOutgoingStock(Location location) {
         Date today = new Date()
         today.clearTime()
-        def m4 = today - 4
-        def m7 = today - 7
+        Date fourDaysAgo = today - 4
+        Date sevenDaysAgo = today - 7
+        OrderType returnOrderType = OrderType.get(Constants.RETURN_ORDER)
 
-        def greenData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated > :day and r.origin = :location and r.status <> 'ISSUED'""",
-                ['day': m4, 'location': location])
+        def createdAfterRequesitionCount = Requisition.executeQuery("""
+                SELECT COUNT(*) FROM Requisition 
+                WHERE dateCreated > :day 
+                AND origin = :location 
+                AND status <> 'ISSUED'
+            """,
+            ['day': fourDaysAgo, 'location': location]).get(0)
 
-        def yellowData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated >= :dayOne and r.dateCreated <= :dayTwo and r.origin = :location and r.status <> 'ISSUED'""",
-                ['dayOne': m7, 'dayTwo': m4, 'location': location])
+        def createdAfterReturnOrderCount = Order.executeQuery("""
+                SELECT COUNT(DISTINCT o.id) FROM Order o
+                LEFT JOIN o.orderItems oi
+                LEFT JOIN oi.shipmentItems si
+                LEFT JOIN si.shipment s
+                WHERE o.origin = :location
+                AND o.orderType = :orderType
+                AND o.dateCreated > :day 
+                AND (s.currentStatus <> 'SHIPPED' OR s.currentStatus IS NULL)
+            """,
+            ['day': fourDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
 
-        def redData = Requisition.executeQuery("""select count(r) from Requisition r where r.dateCreated < :day and r.origin = :location and r.status <> 'ISSUED'""",
-                ['day': m7, 'location': location])
 
-        def baseUrl = '/openboxes/stockMovement/list?direction=OUTBOUND'
-        def status = '&status=' + RequisitionStatus.listPending().join('&status=')
+        def createdBetweenRequesitionCount = Requisition.executeQuery("""
+                SELECT COUNT(*) FROM Requisition 
+                WHERE dateCreated >= :dayFrom
+                AND dateCreated <= :dayTo
+                AND origin = :location 
+                AND status <> 'ISSUED'
+            """,
+            ['dayFrom': sevenDaysAgo, 'dayTo': fourDaysAgo, 'location': location]).get(0)
 
-        ColorNumber green = new ColorNumber(greenData[0], 'Created < 4 days ago', baseUrl + status + "&createdAfter=${m4.format("MM/dd/yyyy")}")
-        ColorNumber yellow = new ColorNumber(yellowData[0], 'Created > 4 days ago', baseUrl + status + "&createdAfter=${m7.format("MM/dd/yyyy")}&createdBefore=${m4.format("MM/dd/yyyy")}")
-        ColorNumber red = new ColorNumber(redData[0], 'Created > 7 days ago', baseUrl + status + "&createdBefore=${m7.format("MM/dd/yyyy")}")
+        def createdBetweenReturnOrderCount = Order.executeQuery("""
+                SELECT COUNT(DISTINCT o.id) FROM Order o
+                LEFT JOIN o.orderItems oi
+                LEFT JOIN oi.shipmentItems si
+                LEFT JOIN si.shipment s
+                WHERE o.origin = :location
+                AND o.orderType = :orderType
+                AND o.dateCreated >= :dayFrom
+                AND o.dateCreated <= :dayTo
+                AND (s.currentStatus <> 'SHIPPED' OR s.currentStatus IS NULL)
+            """,
+            ['dayFrom': sevenDaysAgo, 'dayTo': fourDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
+
+
+        def createdBeforeRequesitionCount = Requisition.executeQuery("""
+                SELECT COUNT(*) FROM Requisition 
+                WHERE dateCreated < :day 
+                AND origin = :location 
+                AND status <> 'ISSUED'
+            """,
+            ['day': sevenDaysAgo, 'location': location]).get(0)
+
+        def createdBeforeReturnOrderCount = Order.executeQuery("""
+                SELECT COUNT(DISTINCT o.id) FROM Order o
+                LEFT JOIN o.orderItems oi
+                LEFT JOIN oi.shipmentItems si
+                LEFT JOIN si.shipment s
+                WHERE o.origin = :location
+                AND o.orderType = :orderType
+                AND o.dateCreated < :day 
+                AND (s.currentStatus <> 'SHIPPED' OR s.currentStatus IS NULL)
+            """,
+            ['day': sevenDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
+
+
+        String baseUrl = '/openboxes/stockMovement/list?direction=OUTBOUND'
+        String statusQuery = RequisitionStatus.listPending().collect { "&status=$it" }.join('')
+        String dateFormat = "MM/dd/yyyy"
+
+        String createdAfterQuery = "&createdAfter=${fourDaysAgo.format(dateFormat)}"
+        String createdBetweenQuery = "&createdAfter=${sevenDaysAgo.format(dateFormat)}&createdBefore=${fourDaysAgo.format(dateFormat)}"
+        String createdBeforeQuery = "&createdBefore=${sevenDaysAgo.format(dateFormat)}"
+
+        ColorNumber green = new ColorNumber(createdAfterRequesitionCount + createdAfterReturnOrderCount, 'Created < 4 days ago', baseUrl + statusQuery + createdAfterQuery)
+        ColorNumber yellow = new ColorNumber(createdBetweenRequesitionCount + createdBetweenReturnOrderCount, 'Created > 4 days ago', baseUrl + statusQuery + createdBetweenQuery)
+        ColorNumber red = new ColorNumber(createdBeforeRequesitionCount + createdBeforeReturnOrderCount, 'Created > 7 days ago', baseUrl + statusQuery + createdBeforeQuery)
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 

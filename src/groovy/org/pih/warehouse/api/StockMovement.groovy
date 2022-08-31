@@ -8,6 +8,8 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -21,6 +23,8 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
+import org.pih.warehouse.auth.AuthService
+import util.ConfigHelper
 
 
 @Validateable
@@ -76,6 +80,10 @@ class StockMovement {
     Shipment shipment
     List documents
 
+    static transients = [
+            "electronicType"
+    ]
+
     static constraints = {
         id(nullable: true)
         name(nullable: true)
@@ -107,7 +115,6 @@ class StockMovement {
         requestType(nullable: true)
         sourceType(nullable: true)
     }
-
 
     Map toJson() {
         return [
@@ -218,6 +225,16 @@ class StockMovement {
         boolean isDestination = destination?.id == currentLocation.id
         boolean canOriginManageInventory = origin?.supports(ActivityCode.MANAGE_INVENTORY)
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
+
+        // stock request /stockRequest/remove/:id
+        if (electronicType) {
+            User user = AuthService.currentUser.get()
+            def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
+            def userRoles = user.getEffectiveRoles(currentLocation)
+            if (!userRoles.any { Role role -> role.roleType == accessRule?.accessRules?.minimumRequiredRole }) {
+                throw new IllegalAccessException("You don't have minimum required role to perform this action")
+            }
+        }
 
         return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder))
     }

@@ -849,12 +849,8 @@ class ShipmentService {
      * @param shipment
      */
     void deleteShipment(Shipment shipment) {
-        shipment.shipmentItems.toArray().each { ShipmentItem shipmentItem ->
-            shipment.removeFromShipmentItems(shipmentItem)
-            shipmentItem.orderItems.toArray().flatten().each { OrderItem orderItem ->
-                orderItem.removeFromShipmentItems(shipmentItem)
-            }
-            shipmentItem.delete()
+        shipment?.shipmentItems?.toArray()?.flatten()?.each {
+            deleteShipmentItem(it, false)
         }
         shipment.delete()
     }
@@ -955,15 +951,18 @@ class ShipmentService {
      *
      * @param item
      */
-    void deleteShipmentItem(ShipmentItem shipmentItem) {
+    void deleteShipmentItem(ShipmentItem shipmentItem, boolean saveParent = true) {
         if (shipmentItem) {
             def shipment = Shipment.get(shipmentItem.shipment.id)
             shipment.removeFromShipmentItems(shipmentItem)
-            shipmentItem.orderItems.toArray().each { OrderItem orderItem ->
+            shipmentItem?.orderItems?.toArray()?.flatten()?.each { OrderItem orderItem ->
                 orderItem.removeFromShipmentItems(shipmentItem)
+                orderItem.save()
             }
-            //shipmentItem.delete()
-            shipment.save(flush:true)
+            if (saveParent) {
+                shipment.save(flush: true)
+            }
+            shipmentItem.delete()
         }
     }
 

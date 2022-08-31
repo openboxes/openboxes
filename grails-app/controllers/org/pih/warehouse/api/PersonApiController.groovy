@@ -17,7 +17,7 @@ class PersonApiController extends BaseDomainApiController {
 
     def list = {
         String[] terms = params?.name?.split(",| ")?.findAll { it }
-        def people = userService.findPersons(terms)
+        def people = userService.findPersons(terms, params)
         render([data: people] as JSON)
     }
 }

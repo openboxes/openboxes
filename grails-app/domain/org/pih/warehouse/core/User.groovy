@@ -17,7 +17,6 @@ import grails.converters.JSON
 class User extends Person {
 
     String id
-    Boolean active = false                // default = false?
     String username            // email or username
     String password            // encrypted password
     String passwordConfirm        // password confirm used on signup and password reset
@@ -46,7 +45,6 @@ class User extends Person {
     }
     static transients = ["passwordConfirm"]
     static constraints = {
-        active(nullable: true)
         username(blank: false, unique: true, maxSize: 255)
         password(blank: false, minSize: 6, maxSize: 255, validator: { password, obj ->
             def passwordConfirm = obj.properties['passwordConfirm']

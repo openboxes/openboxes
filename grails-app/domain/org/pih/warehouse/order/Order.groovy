@@ -169,9 +169,11 @@ class Order implements Serializable {
         return status
     }
 
+    /**
+     * Do not use this for getting POs status. Use orderService.getOrdersDerivedStatus instead.
+     * */
     def getDisplayStatus() {
-        for (ShipmentStatusCode statusCode in
-                [ShipmentStatusCode.RECEIVED, ShipmentStatusCode.PARTIALLY_RECEIVED, ShipmentStatusCode.SHIPPED]) {
+        for (ShipmentStatusCode statusCode in ShipmentStatusCode.listShipped()) {
             if (shipments.any { Shipment shipment -> shipment?.currentStatus == statusCode}) {
                 if (ShipmentStatusCode.RECEIVED == statusCode && hasRegularInvoice) {
                     return OrderStatus.COMPLETED
@@ -180,9 +182,9 @@ class Order implements Serializable {
                 return statusCode
             }
         }
+
         return status
     }
-
 
     /**
      * Checks to see if this order has been received, or partially received, and
@@ -466,6 +468,15 @@ class Order implements Serializable {
     // isOutbound is temporary distinction between outbound and inbound used only for Outbound and Inbound Returns
     Boolean isOutbound(Location currentLocation) {
         return isReturnOrder && origin == currentLocation && destination != currentLocation
+    }
+
+    /**
+     * Gets map of derived status for order items (OrderItem id as key and derived status as value)
+     * Done to improve performance of getting order items derived statuses on order/show page
+     * */
+    def getOrderItemsDerivedStatus() {
+        def orderItemSymmaryList =  OrderItemSummary.findAllByOrder(this)
+        return orderItemSymmaryList.inject([:]) { map, OrderItemSummary item -> map << [(item?.id): item?.derivedStatus] }
     }
 
     Map toJson() {

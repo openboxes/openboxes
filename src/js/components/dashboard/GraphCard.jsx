@@ -148,6 +148,7 @@ const GraphCard = SortableElement(({
   allLocations,
   size = null,
   translate,
+  hideDraghandle,
 }) => {
   let graph;
   let label = ['react.dashboard.timeFilter.last.label', 'last'];
@@ -227,7 +228,7 @@ const GraphCard = SortableElement(({
               </Tooltip>
             </div>
         : null}
-        <DragHandle />
+        {!hideDraghandle && <DragHandle />}
       </div>
       <div className="content-card">
 

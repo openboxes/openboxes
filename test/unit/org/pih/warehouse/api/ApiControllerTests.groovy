@@ -16,7 +16,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.User
-import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 class ApiControllerTests extends ControllerUnitTestCase {
 
@@ -112,10 +111,18 @@ class ApiControllerTests extends ControllerUnitTestCase {
         controller.messageSource = [
                 getMessage: { String code, Object[] args, String defaultMessage, Locale locale -> return "localized string" }
         ]
+        controller.helpScoutService = [
+            getLocalizedHelpScoutKey: { -> return 'helpscout-key-123' }
+        ]
         controller.session.user = user
         controller.session.warehouse = location
         controller.session.impersonateUserId = null
         controller.session.hostname = "Unknown"
+
+        controller.helpScoutService = new HelpScoutService()
+        controller.helpScoutService.grailsApplication = controller.grailsApplication
+        controller.helpScoutService.localizationService = controller.localizationService
+        controller.helpScoutService.messageSource = controller.messageSource
         // WHEN
         controller.getAppContext()
         // THEN
@@ -130,5 +137,8 @@ class ApiControllerTests extends ControllerUnitTestCase {
         assertEquals("0.8.9", jsonResponse.data.appVersion)
         assertEquals("develop", jsonResponse.data.branchName)
         assertEquals("test", jsonResponse.data.environment)
+
+        assert jsonResponse.data.isHelpScoutEnabled
+        assert jsonResponse.data.localizedHelpScoutKey == 'localized string'  // from what was GIVEN
     }
 }

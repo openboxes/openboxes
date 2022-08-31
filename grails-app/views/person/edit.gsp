@@ -20,7 +20,7 @@
 	            </div>
             </g:hasErrors>
 
-			<div class="buttonBar">            	
+			<div class="buttonBar">
             	<span class="linkButton">
             		<g:link class="list" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'persons.label').toLowerCase()]"/></g:link>
             	</span>
@@ -36,6 +36,14 @@
 	                <div class="dialog">
 	                    <table>
 	                        <tbody>
+								<tr class="prop">
+									<td valign="top" class="name">
+										<label for="active"><warehouse:message code="user.active.label" default="Active" /></label>
+									</td>
+									<td valign="top" class="value ${hasErrors(bean: personInstance, field: 'active', 'errors')}">
+										<g:checkBox name="active" value="${personInstance?.active}" />
+									</td>
+								</tr>
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                    <label for="type"><warehouse:message code="person.type.label" default="Type" /></label>
@@ -67,7 +75,7 @@
 	                                    <g:textField name="lastName" value="${personInstance?.lastName}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="email"><warehouse:message code="person.email.label" default="Email" /></label>
@@ -76,7 +84,7 @@
 	                                    <g:textField name="email" value="${personInstance?.email}" />
 	                                </td>
 	                            </tr>
-	                        
+
 	                            <tr class="prop">
 	                                <td valign="top" class="name">
 	                                  <label for="phoneNumber"><warehouse:message code="person.phoneNumber.label" default="Phone Number" /></label>
@@ -85,20 +93,20 @@
 	                                    <g:textField name="phoneNumber" value="${personInstance?.phoneNumber}" />
 	                                </td>
 	                            </tr>
-	                        	                        
+
                             	<tr class="prop">
 		                        	<td valign="top" class="name"></td>
-		                        	<td valign="top" class="value">                        	
+		                        	<td valign="top" class="value">
 						                <div class="left">
 						                    <g:actionSubmit class="save" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Update')}" />
 						                   &nbsp;
 						                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 						                   &nbsp;
 						                   <g:link action="list">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
-						                    
+
 						                </div>
-		    						</td>                    	
-	                        	</tr>	                        
+		    						</td>
+	                        	</tr>
 	                        </tbody>
 	                    </table>
 	                </div>

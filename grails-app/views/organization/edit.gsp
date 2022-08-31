@@ -29,13 +29,21 @@
                     <warehouse:message code="default.add.label" args="[g.message(code:'organization.label')]"/>
                 </g:link>
             </div>
-			<g:form method="post" >
+			<g:form method="post" onsubmit="return validateForm();">
 				<g:hiddenField name="id" value="${organizationInstance?.id}" />
 				<g:hiddenField name="version" value="${organizationInstance?.version}" />
 				<div class="box">
 					<h2><warehouse:message code="default.edit.label" args="[entityName]" /></h2>
 					<table>
 						<tbody>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="active"><warehouse:message code="user.active.label" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'active', 'errors')}">
+									<g:checkBox name="active" value="${organizationInstance?.active}" id="active" />
+								</td>
+							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
 								  <label for="organization.id"><warehouse:message code="default.id.label" default="ID" /></label>
@@ -142,7 +150,7 @@
 							<tr class="prop">
 								<td valign="top"></td>
 								<td valign="top left">
-                                    <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}" />
+                                    <g:actionSubmit class="button" action="update" value="${warehouse.message(code: 'default.button.update.label', default: 'Update')}"/>
                                     <g:actionSubmit class="button" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 								</td>
 							</tr>
@@ -151,5 +159,15 @@
 				</div>
             </g:form>
         </div>
+		<script type="text/javascript">
+			function validateForm()  {
+				const checked = ($("#active").attr("checked") === 'checked');
+				const currentValue = $("#active").val();
+				if (checked && currentValue) {
+					return true;
+				}
+				return confirm('${warehouse.message(code:'organization.confirm.inactive.message')}')
+			}
+		</script>
     </body>
 </html>

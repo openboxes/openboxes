@@ -1,4 +1,6 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.core.RoleType" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -97,23 +99,37 @@
                         <warehouse:message code="default.button.rollback.label" />
                     </g:link>
                 </g:elseif>
+            </g:isUserAdmin>
                 <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
                     <g:if test="${stockMovement?.order}">
-                        <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
-                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
-                            &nbsp;<warehouse:message code="default.button.delete.label" />
-                        </g:link>
+                        <g:isUserAdmin>
+                            <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                                &nbsp;<warehouse:message code="default.button.delete.label" />
+                            </g:link>
+                        </g:isUserAdmin>
                     </g:if>
+                    <g:elseif test="${stockMovement?.electronicType}">
+                        <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                disabledMessage="You do not have minimum required role to delete stock request"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                            <warehouse:message code="default.button.delete.label" />
+                        </g:link>
+                    </g:elseif>
                     <g:else>
                         <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
-                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                disabledMessage="You do not have minimum required role to delete stock movement"
+                        >
                             <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                             <warehouse:message code="default.button.delete.label" />
                         </g:link>
                     </g:else>
                 </g:if>
-            </g:isUserAdmin>
+
             <g:isSuperuser>
                 <a href="javascript:void(0);" class="button btn-show-dialog"
                     data-height="600" data-width="1000"

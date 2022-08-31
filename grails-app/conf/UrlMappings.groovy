@@ -1,6 +1,7 @@
 import grails.validation.ValidationException
 import org.apache.http.auth.AuthenticationException
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.requisition.RequisitionSourceType
 
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
@@ -22,6 +23,10 @@ class UrlMappings {
         }
 
         "/stockMovement/$action/$id**?" {
+            controller = "stockMovement"
+        }
+
+        "/stockRequest/$action/$id**?" {
             controller = "stockMovement"
         }
 
@@ -432,7 +437,17 @@ class UrlMappings {
 
         "/api/dashboard/config"(parseRequest: true) {
             controller = { "dashboardApi" }
-            action = [GET: "config", POST: "updateConfig"]
+            action = [POST: "updateConfig"]
+        }
+
+        "/api/dashboard/$id/config"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "config"]
+        }
+
+        "/api/dashboard/$id/subdashboardKeys"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getSubdashboardKeys"]
         }
 
         "/api/dashboard/breadcrumbsConfig"(parseRequest: true) {

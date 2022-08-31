@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.ActivityCode" %>
+<%@ page import="org.pih.warehouse.core.RoleType; org.pih.warehouse.core.ActivityCode" %>
 <%@ page import="org.pih.warehouse.core.Constants" %>
 <%@ page import="org.pih.warehouse.core.Location" %>
 <%@ page import="org.pih.warehouse.order.OrderStatus" %>
@@ -92,9 +92,9 @@
 					</g:link>
 				</div>
 			</g:elseif>
-			<g:isSuperuser>
-				<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
-					<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
+			<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
+				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
+					<g:isSuperuser>
 						<div class="action-menu-item">
 							<hr/>
 						</div>
@@ -118,6 +118,8 @@
 								</g:link>
 							</g:if>
 						</div>
+					</g:isSuperuser>
+					<g:isUserInRole roles="[RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_ASSISTANT, RoleType.ROLE_MANAGER]">
 						<div class="action-menu-item">
 							<g:link controller="order" action="remove" id="${orderInstance?.id}"
 									disabled="${orderInstance?.status != OrderStatus.PENDING}"
@@ -127,9 +129,11 @@
 								&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
 							</g:link>
 						</div>
-					</g:supports>
-				</g:if>
-				<g:if test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
+					</g:isUserInRole>
+				</g:supports>
+			</g:if>
+			<g:if test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
+				<g:isSuperuser>
 					<div class="action-menu-item">
 						<g:link controller="order" action="remove" id="${orderInstance?.id}"
 								disabled="${orderInstance?.status != OrderStatus.PENDING}"
@@ -139,8 +143,8 @@
 							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
 						</g:link>
 					</div>
-				</g:if>
-			</g:isSuperuser>
+				</g:isSuperuser>
+			</g:if>
         </div>
 	</span>
 </g:if>

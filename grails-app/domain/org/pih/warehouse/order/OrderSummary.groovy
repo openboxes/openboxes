@@ -13,6 +13,13 @@ class OrderSummary {
 
     String id
     String orderNumber
+
+    Integer quantityOrdered
+    Integer quantityShipped
+    Integer quantityReceived
+    Integer quantityCanceled
+    Integer quantityInvoiced
+
     String orderStatus
     String receiptStatus
     String shipmentStatus
@@ -26,6 +33,13 @@ class OrderSummary {
 
     static constraints = {
         orderNumber(nullable:false)
+
+        quantityOrdered(nullable: true)
+        quantityShipped(nullable: true)
+        quantityReceived(nullable: true)
+        quantityCanceled(nullable: true)
+        quantityInvoiced(nullable: true)
+
         orderStatus(nullable:true)
         receiptStatus(nullable:true)
         shipmentStatus(nullable:true)
@@ -37,6 +51,11 @@ class OrderSummary {
         return [
             id: id,
             orderNumber: orderNumber,
+            quantityOrdered: quantityOrdered,
+            quantityShipped: quantityShipped,
+            quantityReceived: quantityReceived,
+            quantityCanceled: quantityCanceled,
+            quantityInvoiced: quantityInvoiced,
             orderStatus: orderStatus,
             receiptStatus: receiptStatus,
             shipmentStatus: shipmentStatus,

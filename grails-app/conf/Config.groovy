@@ -408,207 +408,209 @@ openboxes {
 
 openboxes {
     dashboardConfig {
+        mainDashboardId = "mainDashboard"
         dashboards {
-            personal {
-                name = "My Dashboard"
-                filters {}
-                widgets = [
-                        [
-                            widgetId: "inventoryByLotAndBin",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "receivingBin",
-                            order: 2
-                        ],
-                        [
-                            widgetId: "inProgressShipments",
-                            order: 3
-                        ],
-                        [
-                            widgetId: "inProgressPutaways",
-                            order: 4
-                        ],
+            mainDashboard {
+                personal {
+                    name = "My Dashboard"
+                    filters {}
+                    widgets = [
+                            [
+                                    widgetId: "inventoryByLotAndBin",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "receivingBin",
+                                    order   : 2
+                            ],
+                            [
+                                    widgetId: "inProgressShipments",
+                                    order   : 3
+                            ],
+                            [
+                                    widgetId: "inProgressPutaways",
+                                    order   : 4
+                            ],
 
-                        [
-                            widgetId: "inventorySummary",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "expirationSummary",
-                            order: 2
-                        ],
-                        [
-                            widgetId: "incomingStock",
-                            order: 3
-                        ],
-                        [
-                            widgetId: "outgoingStock",
-                            order: 4
-                        ],
-                        [
-                            widgetId: "delayedShipments",
-                            order: 5
-                        ],
-                        [
-                            widgetId: "discrepancy",
-                            order: 6
-                        ]
-                ]
-            }
-            warehouse {
-                name = "Warehouse Management"
-                filters {}
-                widgets = [
-                        [
-                            widgetId: "inventoryByLotAndBin",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "receivingBin",
-                            order: 2
-                        ],
-                        [
-                            widgetId: "inProgressShipments",
-                            order: 3
-                        ],
-                        [
-                            widgetId: "inProgressPutaways",
-                            order: 4
-                        ],
-                        [
-                            widgetId: "itemsInventoried",
-                            order: 5
-                        ],
-
-                        [
-                            widgetId: "inventorySummary",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "expirationSummary",
-                            order: 2
-                        ],
-                        [
-                            widgetId: "incomingStock",
-                            order: 3
-                        ],
-                        [
-                            widgetId: "outgoingStock",
-                            order: 4
-                        ],
-                        [
-                            widgetId: "delayedShipments",
-                            order: 5
-                        ],
-                        [
-                            widgetId: "discrepancy",
-                            order: 6
-                        ]
-                ]
-            }
-            inventory {
-                name = "Inventory Management"
-                filters {}
-                widgets = [
-                        [
-                            widgetId: "receivingBin",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "defaultBin",
-                            order: 2
-                        ],
-                        [
-                            widgetId: "negativeInventory",
-                            order: 3
-                        ],
-                        [
-                            widgetId: "expiredStock",
-                            order: 4
-                        ],
-                        [
-                            widgetId: "openStockRequests",
-                            order: 5
-                        ],
-
-                        [
-                            widgetId: "delayedShipments",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "productsInventoried",
-                            order: 2
-                        ]
-                ]
-            }
-            transaction {
-                name = "Transaction Management"
-                filters {}
-                widgets = [
-                        [
-                            widgetId: "fillRateSnapshot",
-                            order: 1
-                        ],
-
-                        [
-                            widgetId: "receivedStockMovements",
-                            order: 1
-                        ],
-                        [
-                            widgetId: "sentStockMovements",
-                            order: 2
-                        ],
-                        [
-                            widgetId: "lossCausedByExpiry",
-                            order: 3
-                        ],
-                        [
-                            widgetId: "percentageAdHoc",
-                            order: 4
-                        ],
-                        [
-                            widgetId: "fillRate",
-                            order: 5
-                        ],
-                        [
-                            widgetId: "stockOutLastMonth",
-                            order: 6
-                        ]
-                ]
-            }
-            fillRate {
-                name = "Fill Rate"
-                filters {
-                    category {
-                        endpoint = "/${appName}/categoryApi/list"
-                    }
+                            [
+                                    widgetId: "inventorySummary",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "expirationSummary",
+                                    order   : 2
+                            ],
+                            [
+                                    widgetId: "incomingStock",
+                                    order   : 3
+                            ],
+                            [
+                                    widgetId: "outgoingStock",
+                                    order   : 4
+                            ],
+                            [
+                                    widgetId: "delayedShipments",
+                                    order   : 5
+                            ],
+                            [
+                                    widgetId: "discrepancy",
+                                    order   : 6
+                            ]
+                    ]
                 }
-                widgets = [
-                        [
-                            widgetId: "fillRateSnapshot",
-                            order: 1
-                        ],
+                warehouse {
+                    name = "Warehouse Management"
+                    filters {}
+                    widgets = [
+                            [
+                                    widgetId: "inventoryByLotAndBin",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "receivingBin",
+                                    order   : 2
+                            ],
+                            [
+                                    widgetId: "inProgressShipments",
+                                    order   : 3
+                            ],
+                            [
+                                    widgetId: "inProgressPutaways",
+                                    order   : 4
+                            ],
 
-                        [
-                            widgetId: "fillRate",
-                            order: 1
-                        ]
-                ]
+                            [
+                                    widgetId: "inventorySummary",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "expirationSummary",
+                                    order   : 2
+                            ],
+                            [
+                                    widgetId: "incomingStock",
+                                    order   : 3
+                            ],
+                            [
+                                    widgetId: "outgoingStock",
+                                    order   : 4
+                            ],
+                            [
+                                    widgetId: "delayedShipments",
+                                    order   : 5
+                            ],
+                            [
+                                    widgetId: "discrepancy",
+                                    order   : 6
+                            ]
+                    ]
+                }
+                inventory {
+                    name = "Inventory Management"
+                    filters {}
+                    widgets = [
+                            [
+                                    widgetId: "receivingBin",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "defaultBin",
+                                    order   : 2
+                            ],
+                            [
+                                    widgetId: "negativeInventory",
+                                    order   : 3
+                            ],
+                            [
+                                    widgetId: "expiredStock",
+                                    order   : 4
+                            ],
+                            [
+                                    widgetId: "openStockRequests",
+                                    order   : 5
+                            ],
+
+                            [
+                                    widgetId: "delayedShipments",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "productsInventoried",
+                                    order   : 2
+                            ]
+                    ]
+                }
+                transaction {
+                    name = "Transaction Management"
+                    filters {}
+                    widgets = [
+                            [
+                                    widgetId: "fillRateSnapshot",
+                                    order   : 1
+                            ],
+
+                            [
+                                    widgetId: "receivedStockMovements",
+                                    order   : 1
+                            ],
+                            [
+                                    widgetId: "sentStockMovements",
+                                    order   : 2
+                            ],
+                            [
+                                    widgetId: "lossCausedByExpiry",
+                                    order   : 3
+                            ],
+                            [
+                                    widgetId: "percentageAdHoc",
+                                    order   : 4
+                            ],
+                            [
+                                    widgetId: "fillRate",
+                                    order   : 5
+                            ],
+                            [
+                                    widgetId: "stockOutLastMonth",
+                                    order   : 6
+                            ]
+                    ]
+                }
+                fillRate {
+                    name = "Fill Rate"
+                    filters {
+                        category {
+                            endpoint = "/${appName}/categoryApi/list"
+                        }
+                    }
+                    widgets = [
+                            [
+                                    widgetId: "fillRateSnapshot",
+                                    order   : 1
+                            ],
+
+                            [
+                                    widgetId: "fillRate",
+                                    order   : 1
+                            ]
+                    ]
+                }
+
             }
             supplier {
-                name = "Supplier Dashboard"
-                filters {
-                    supplier {
-                        endpoint = "/${appName}/api/locations?direction=INBOUND"
+                supplier {
+                    name = "Supplier Dashboard"
+                    filters {
+                        supplier {
+                            endpoint = "/${appName}/api/locations?direction=INBOUND"
+                        }
                     }
-                }
-                widgets = [
-                    [
-                        widgetId: "numberOfOpenPurchaseOrders",
-                        order: 1
+                    widgets = [
+                            [
+                                    widgetId: "numberOfOpenPurchaseOrders",
+                                    order   : 1
+                            ]
                     ]
-                ]
+                }
             }
         }
         // TODO: OBPIH-4384 Refactor indicator filters to be more generic (currently filters are hardcoded on the frontend, these should be defined here and rendered there basing on config)
@@ -1106,8 +1108,32 @@ openboxes.order.orderStatusPropertyMap = [
 openboxes.purchaseOrder.editableProperties = [
         [
                 status: OrderStatus.PLACED,
-                deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
+                deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitOfMeasure"]
         ]
+]
+
+openboxes.security.rbac.rules = [
+        [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+        [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+        [controller: '*', actions: ['removeItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        // We probably need a way to handle wildcard in actions as well
+        //[controller: '*', actions: ['remove*'], access: [RoleType.ROLE_SUPERUSER]],
+        //[controller: '*', actions: ['delete*'], access: [RoleType.ROLE_SUPERUSER]]
+        // ... otherwise we'll need to include explicit rules for everything
+        [controller: 'order', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+        [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'order', actions: ['deleteDocument'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN ]],
+        [controller: 'invoice', actions: ['eraseInvoice'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'invoiceApi', actions: ['removeItem'],  accessRules: [  minimumRequiredRole: RoleType.ROLE_MANAGER, supplementalRoles: [RoleType.ROLE_INVOICE] ]],
+        [controller: 'stockTransfer', actions: ['eraseStockTransfer'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+        [controller: 'stockMovementItemApi', actions: ['eraseItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+        [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+        [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
+        [controller: 'glAccount', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+        [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+        [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+        // Other controller actions that might need explicit rules
+        //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
 
 // OpenBoxes default uploads directory location
@@ -1513,8 +1539,9 @@ openboxes {
                         label: "report.orderReports.label",
                         defaultLabel: "Order Reports",
                         menuItems: [
-                                [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
-                                [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
+                            [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
+                            [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
+                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstandng Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", requiredRole: [RoleType.ROLE_FINANCE]],
                         ]
                 ],
                 [

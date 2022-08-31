@@ -1008,6 +1008,7 @@ class JsonController {
         def terms = params.term?.split(" ")
         terms?.each { term ->
             def result = Person.withCriteria {
+                eq("active", Boolean.TRUE)
                 or {
                     ilike("firstName", term + "%")
                     ilike("lastName", term + "%")
@@ -1764,7 +1765,8 @@ class JsonController {
                         LEFT OUTER JOIN preference_type default_preference_type ON default_preference.preference_type_id = default_preference_type.id
                         LEFT OUTER JOIN  product_supplier_preference preference ON preference.product_supplier_id = ps.id AND preference.destination_party_id = :destinationPartyId
                         LEFT OUTER JOIN preference_type party_preference_type ON preference.preference_type_id = party_preference_type.id
-                        WHERE product_id = :productId
+                        WHERE ps.active = 1
+                        AND product_id = :productId
                         AND supplier_id = :supplierId
                         AND CASE WHEN preference.id IS NOT NULL THEN party_preference_type.validation_code != :validationCode ELSE
                         (CASE WHEN default_preference.id IS NOT NULL THEN default_preference_type.validation_code != :validationCode ELSE true END) END
@@ -1822,6 +1824,7 @@ class JsonController {
                     "Destination" { it.destination }
                     "Product Code" { it.productCode }
                     "Product Name" { it.productName }
+                    "Unit Price" { it.unitPrice }
                     "Quantity Requested" { it.qtyRequested }
                     "Quantity Issued" { it.qtyIssued }
                     "Quantity Demand" { it.qtyDemand }
@@ -1834,15 +1837,16 @@ class JsonController {
                             requestNumber           : it.requestNumber,
                             dateRequested           : it.dateRequested,
                             dateIssued              : it.dateIssued,
-                            origin                  : StringEscapeUtils.escapeCsv(it.origin),
-                            destination             : StringEscapeUtils.escapeCsv(it.destination),
+                            origin                  : it.origin,
+                            destination             : it.destination,
                             productCode             : it.productCode,
-                            productName             : StringEscapeUtils.escapeCsv(it.productName),
+                            productName             : it.productName,
+                            unitPrice               : it.unitPrice ?: '',
                             qtyRequested            : it.quantityRequested,
                             qtyIssued               : it.quantityIssued,
                             qtyDemand               : it.quantityDemand,
-                            reasonCode              : it.reasonCode,
-                            reasonCodeClassification: it.reasonCodeClassification,
+                            reasonCode              : it.reasonCode ?: '',
+                            reasonCodeClassification: it.reasonCodeClassification ?: '',
                     ]
                 }
 
@@ -1871,6 +1875,11 @@ class JsonController {
         }
 
         render([fieldRemoved: fieldRemoved] as JSON)
+    }
+
+    def getOrdersDerivedStatus = {
+        List orderIds = params.order.id ? params.list("order.id") : null
+        render orderService.getOrdersDerivedStatus(orderIds) as JSON
     }
 }
 

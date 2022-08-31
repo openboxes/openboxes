@@ -7,9 +7,18 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'order.label', default: 'Order').toLowerCase()}" />
         <title><warehouse:message code="default.view.label" args="[entityName]" /></title>
+        <link rel="stylesheet" href="${createLinkTo(dir: 'css', file: 'badge.css')}" type="text/css" />
+
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
         <style>
             .canceled-item { background-color: grey; }
+
+            .ui-tabs-nav > .badge::before {
+                background-color: rgb(192, 192, 192);
+            }
+            .ui-tabs-nav > .ui-state-active.badge::before {
+                background-color: green;
+            }
         </style>
     </head>
     <body>
@@ -49,7 +58,7 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <format:metadata obj="${orderInstance?.displayStatus}"/>
+                                        <span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
                                     </td>
                                 </tr>
                                 <tr class="prop">
@@ -223,8 +232,12 @@
                                     <li><a href="#tabs-invoices"><warehouse:message code="invoices.label"/></a></li>
                                 </g:if>
                                 <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
-                                <li><a href="#tabs-comments"><warehouse:message code="comments.label" default="Comments"/></a></li>
-
+                                <li
+                                    data-count="${orderInstance.comments.size() < 1000 ? orderInstance.comments.size() : '999+' }"
+                                    class="${orderInstance.comments.size() > 0 ? 'badge' : ''}"
+                                >
+                                    <a href="#tabs-comments"><warehouse:message code="comments.label" default="Comments"/></a>
+                                </li>
                             </ul>
                             <div id="tabs-summary" class="ui-tabs-hide">
                                 <g:render template="/order/orderSummary"/>
@@ -267,6 +280,22 @@
                     selected: ${params.tab ? params.tab : 0}
                 });
             });
+
+            function filterTableItems(cellIndex, filterValue, tableRows) {
+              // Loop through all table rows, and hide those who don't match the search query
+              $.each(tableRows, function(index, currentRow) {
+                // If filter matches text value then we display, otherwise hide
+                const txtValue = $(currentRow)
+                  .find("td")
+                  .eq(cellIndex)
+                  .text();
+                if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+                  $(currentRow).show();
+                } else {
+                  $(currentRow).hide();
+                }
+              });
+            }
         </script>
     </body>
 </html>

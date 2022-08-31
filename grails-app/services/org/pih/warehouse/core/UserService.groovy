@@ -232,6 +232,10 @@ class UserService {
         return isUserInRole(user.id, [roleType])
     }
 
+    Boolean isUserInRole(User user, Collection roleTypes) {
+        return isUserInRole(user.id, roleTypes)
+    }
+
     Boolean isUserInRole(String userId, Collection roleTypes) {
         Collection acceptedRoleTypes = RoleType.expand(roleTypes)
         User user = getUser(userId)
@@ -260,7 +264,9 @@ class UserService {
 
     def findPersons(String[] terms, params) {
         def results = Person.createCriteria().list(params) {
-
+            if (params.status) {
+                eq("active", Boolean.valueOf(params.status))
+            }
             if (terms) {
                 terms.each { term ->
                     or {
@@ -400,27 +406,23 @@ class UserService {
         return false
     }
 
-    def getDashboardConfig(User user) {
-        def config = grailsApplication.config.openboxes.dashboardConfig
+    def getDashboardConfig(User user, String id) {
+        def fullConfig = grailsApplication.config.openboxes.dashboardConfig
+        def mainDashboardId = grailsApplication.config.openboxes.dashboardConfig.mainDashboardId
+        def resultConfig = [
+                dashboard: fullConfig.dashboards[id ?: mainDashboardId],
+                dashboardWidgets: fullConfig.dashboardWidgets
+        ]
         def userConfig = user.deserializeDashboardConfig()
-        Boolean configChanged = false
 
-        if (userConfig != null) {
-            int userConfigSize = userConfig.size()
-            int configSize = config.dashboards.size()
-            // If the size is different, that mean that the config has changed
-            if (userConfigSize != configSize) {
-                return config
-            }
-            if (!configChanged) {
-                config = [
-                        dashboards          : userConfig,
-                        dashboardWidgets    : config.dashboardWidgets
-                ]
+        if (userConfig && id == mainDashboardId) {
+            def personalDashboard = userConfig?.personal
+            if (personalDashboard && resultConfig.dashboard?.personal) {
+                resultConfig.dashboard.personal = personalDashboard
             }
         }
 
-        return config
+        return resultConfig
     }
 
     def updateDashboardConfig(User user, Object config) {

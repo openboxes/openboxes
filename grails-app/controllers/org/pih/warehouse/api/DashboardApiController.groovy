@@ -17,9 +17,15 @@ class DashboardApiController {
 
     def config = {
         User user = User.get(session.user.id)
-        def config = userService.getDashboardConfig(user)
+        def config = userService.getDashboardConfig(user, params.id)
 
         render(config as JSON)
+    }
+
+    def getSubdashboardKeys = {
+        def mainDashboardId = grailsApplication.config.openboxes.dashboardConfig.mainDashboardId
+        def config = grailsApplication.config.openboxes.dashboardConfig.dashboards[params.id ?: mainDashboardId]
+        render(config.keySet() as JSON)
     }
 
     def updateConfig = {

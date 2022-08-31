@@ -35,6 +35,7 @@ class ProductSupplierDataService {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
 
+            def active = params.active
             def productCode = params.productCode
             def supplierName = params.supplierName
             def manufacturerName = params.manufacturerName
@@ -44,6 +45,10 @@ class ProductSupplierDataService {
             def validityStartDate = params.globalPreferenceTypeValidityStartDate
             def validityEndDate = params.globalPreferenceTypeValidityEndDate
             def contractPriceValidUntil = params.contractPriceValidUntil
+
+            if (active && !(active instanceof Boolean)) {
+                command.errors.reject("Row ${index + 1}: Active field has to be either empty or a boolean value (true/false)")
+            }
 
             if (!params.name) {
                 command.errors.reject("Row ${index + 1}: Product Source Name is required")
@@ -297,7 +302,10 @@ class ProductSupplierDataService {
                 'manufacturerCode': manufacturerCode,
                 'supplierCode': supplierCode,
         ])
-        def productSupplier = data ? ProductSupplier.get(data.first().id) : null
+        // Sort productSuppliers by active field, so we make sure that if there is more than one and one of then could be inactive, that the active ones are "moved" to the top of list
+        ArrayList<ProductSupplier> productSuppliers = data?.collect{ it -> ProductSupplier.get(it?.id) }?.sort{ !it?.active }
+        // Double negation below is equivalent to productSuppliers.size() > 0 ? productSuppliers.first() : null (empty list is treated as true, so we can't do "productSuppliers ?")
+        def productSupplier = !!productSuppliers ? productSuppliers?.first() : null
         return productSupplier
     }
 

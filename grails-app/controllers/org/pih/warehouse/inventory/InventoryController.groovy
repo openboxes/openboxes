@@ -136,7 +136,8 @@ class InventoryController {
 
         // Set defaults
         command.location = command?.location ?: Location.get(session.warehouse.id)
-        command.category = params.categoryId ? Category.get(params.categoryId) : productService.getRootCategory()
+        def category = params.categoryId ? Category.get(params.categoryId) : productService.getRootCategory()
+        command.category = category?.id ? category : null
         command.maxResults = params?.max as Integer
         command.offset = params?.offset as Integer
         command.searchResults = productAvailabilityService.searchProducts(command)

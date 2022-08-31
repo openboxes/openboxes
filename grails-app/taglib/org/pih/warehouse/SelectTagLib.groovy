@@ -201,7 +201,7 @@ class SelectTagLib {
         Product product = Product.get(attrs?.product?.id)
         Organization supplier = Organization.get(attrs?.supplier?.id)
         log.info ("product: ${product}, supplier ${supplier}")
-        attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier) ?: []
+        attrs.from = ProductSupplier.findAllByProductAndSupplier(product, supplier).findAll { it.active } ?: []
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code + " - " + it.supplierCode + " - " + (it.manufacturer?.name?:"") + " - " + (it.manufacturerCode?:"") }
         out << g.select(attrs)
@@ -235,7 +235,7 @@ class SelectTagLib {
     }
 
     def selectOrganization = { attrs, body ->
-        attrs.from = organizationService.selectOrganizations(attrs.roleTypes)
+        attrs.from = organizationService.selectOrganizations(attrs.roleTypes, attrs.active ?: false, attrs.currentOrganizationId)
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
@@ -258,7 +258,11 @@ class SelectTagLib {
     }
 
     def selectBudgetCode = { attrs, body ->
-        attrs.from = BudgetCode.list()
+        if (attrs.active == "true") {
+            attrs.from = BudgetCode.findAllByActive(true)
+        } else {
+            attrs.from = BudgetCode.list()
+        }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code }
         out << g.select(attrs)
@@ -369,14 +373,14 @@ class SelectTagLib {
     }
 
     def selectPerson = { attrs, body ->
-        attrs.from = Person.list().sort { it.firstName }
+        attrs.from = Person.list().findAll { it.active }.sort { it.firstName }
         attrs.optionKey = 'id'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 
     def selectRecipient = { attrs, body ->
-        attrs.from = Person.findAllByEmailIsNotNull().sort { it.firstName }
+        attrs.from = Person.findAllByEmailIsNotNull().findAll { it.active }.sort { it.firstName }
         attrs.optionKey = 'email'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
@@ -426,7 +430,7 @@ class SelectTagLib {
         def location = Location.get(attrs.id)
 
         if (location && location.hasBinLocationSupport()) {
-            attrs.from = Location.findAllByParentLocationAndActive(location, true).sort {
+            attrs.from = locationService.getBinLocations(location).sort {
                 it?.name?.toLowerCase()
             }
         }
@@ -486,7 +490,7 @@ class SelectTagLib {
 
             // use sparingly - this is expensive since it requires multiple database queries
             if (activityCode) {
-                attrs.from = attrs.from.findAll { it.supports(activityCode) || (!it.supports(activityCode) && it.supports(ActivityCode.SUBMIT_REQUEST)) }
+                attrs.from = attrs.from.findAll { it.supports(activityCode) }
             }
         }
 

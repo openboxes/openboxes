@@ -22,7 +22,7 @@ package org.pih.warehouse.inventory
  * you have a CREDIT transaction of 25, followed by a DEBIT transaction of 10, your current quantity
  * for that item (assuming there are no other transactions) would be 15
  *
- * An INVENTORY transaction overrides any previously DEBIT or CREDIT transactions.  For instance, given the 
+ * An INVENTORY transaction overrides any previously DEBIT or CREDIT transactions.  For instance, given the
  * following set of transactions for a given inventory item:
  *
  * 1/1/2001 - CREDIT - quantity = 25

@@ -14,6 +14,7 @@ import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.util.RequestUtil
+import org.pih.warehouse.core.LocationStatus
 
 class SecurityFilters {
 
@@ -116,6 +117,12 @@ class SecurityFilters {
 
                     redirect(controller: 'auth', action: 'login')
                     return false
+                }
+                // Check if a user is logged to disabled location (location.active or organization.active is false) - if so, redirect to location chooser
+                Location currentLocation = AuthService.currentLocation.get()
+                if (currentLocation && (currentLocation.status != LocationStatus.ENABLED)) {
+                    flash.message = "Your location is disabled (either the associated organization or your location itself became inactive)"
+                    session.warehouse = null
                 }
 
                 // When a user has not selected a warehouse and they are requesting an action that requires one,

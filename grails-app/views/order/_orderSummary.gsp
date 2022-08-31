@@ -1,16 +1,42 @@
 <%@ page import="org.pih.warehouse.order.OrderItemStatusCode;" %>
 <%@ page import="org.pih.warehouse.order.OrderType;" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
+<%@ page import="org.pih.warehouse.core.Constants;" %>
+
+
+<script>
+  $(document).ready(function() {
+    $("#orderItemsFilter").keyup(function(event){
+      const filterCell = 2; // product name
+      const filterValue = $("#orderItemsFilter")
+        .val()
+        .toUpperCase();
+      const tableRows = $("#order-items tr.dataRow");
+      filterTableItems(filterCell, filterValue, tableRows)
+    });
+  });
+</script>
+
+
 <div class="box">
     <h2>
         <warehouse:message code="default.summary.label"/>
     </h2>
+    <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+        <input type="text" id="orderItemsFilter" class="text large" placeholder="Filter by product name"/>
+    </g:if>
     <g:if test="${orderInstance?.orderItems}">
         <g:set var="status" value="${0}"/>
         <g:set var="columnsNumber" value="5"/>
-        <table class="order-items">
+        <table class="order-items" id="order-items">
             <thead>
             <tr>
+                <g:if test="${orderInstance?.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                    <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}" />
+                    <th class="bottom">
+                        <warehouse:message code="default.status.label"/>
+                    </th>
+                </g:if>
                 <th class="bottom">
                     <warehouse:message code="product.productCode.label"/>
                 </th>
@@ -47,16 +73,24 @@
                 <th class="right bottom">
                     <warehouse:message code="orderItem.totalPrice.label" default="Total amount"/>
                 </th>
+                %{-- When adding/removing a column, make sure to check the filterCell in function for filtering above --}%
 
             </tr>
             </thead>
 
             <tbody>
 
+            <g:set var="orderItemsDerivedStatus" value="${orderInstance?.getOrderItemsDerivedStatus()}"/>
             <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
-                <g:set var="isItemCanceled" value="${orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED}"/>
-                <g:if test="${!isItemCanceled || orderInstance?.orderType==OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
-                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'}" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
+                <g:if test="${!orderItem?.canceled || orderInstance?.isPurchaseOrder}">
+                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
+                        <g:if test="${orderInstance?.isPurchaseOrder}">
+                            <td>
+                                <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
+                                    <format:metadata obj="${!orderItem?.canceled && orderItemsDerivedStatus[orderItem?.id] ? orderItemsDerivedStatus[orderItem?.id] : orderItem?.orderItemStatusCode?.name()}"/>
+                                </div>
+                            </td>
+                        </g:if>
                         <td style="color: ${orderItem?.product?.color}">
                             ${orderItem?.product?.productCode}
                         </td>
@@ -64,9 +98,10 @@
                             <g:link controller="inventoryItem" action="showStockCard"
                                     style="color: ${orderItem?.product?.color}"  params="['product.id':orderItem?.product?.id]">
                                 <format:product product="${orderItem?.product}"/>
+                                <g:renderHandlingIcons product="${orderItem?.product}" />
                             </g:link>
                         </td>
-                        <g:if test="${!isItemCanceled}">
+                        <g:if test="${!orderItem?.canceled}">
                             <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.supplierCode}
@@ -139,3 +174,4 @@
         <div class="fade center empty"><warehouse:message code="default.noItems.label" /></div>
     </g:else>
 </div>
+

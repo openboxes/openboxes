@@ -15,10 +15,16 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
 import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.invoice.InvoiceType
+import org.pih.warehouse.invoice.InvoiceTypeCode
+import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -823,5 +829,217 @@ class ReportService implements ApplicationContextAware {
         }
 
         return data
+    }
+
+    /**
+     * Report should show all order items or adjustments that are ordered, not cancelled, and not fully
+     * invoiced (Meaning qty ordered>qty invoiced. Prepayment invoices should not count as invoices.
+     * Exclude cancelled items and adjustments.
+     * */
+    def getAmountOutstandingOnOrders(String currentLocationId) {
+        Location currentLocation = Location.get(currentLocationId)
+        def additionalFilter = ""
+        def prepaymentInvoice = InvoiceType.findByCode(InvoiceTypeCode.PREPAYMENT_INVOICE)
+        def queryParams
+        if (currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)) {
+            /**
+             * In location with activity code enable_central_purchasing:
+             *  - Filter by buyer organization = org of the location you are currently in
+             *  - Do not filter by destination
+             */
+            additionalFilter = "AND o.destination_party_id = :buyerOrganizationId "
+            queryParams = [prepaymentInvoiceId: prepaymentInvoice?.id, buyerOrganizationId: currentLocation?.organization?.id]
+        } else {
+            /**
+             * In locations without that activity code:
+             *  - Filter by destination location = location you are currently in
+             *  - Do not filter by buyer org
+             * */
+            additionalFilter = "AND o.destination_id = :currentLocationId "
+            queryParams = [prepaymentInvoiceId: prepaymentInvoice?.id, currentLocationId: currentLocation?.id]
+        }
+
+        String orderItemsQuery = """
+            SELECT 
+                order_item_invoice_summary.id, 
+                order_item_invoice_summary.order_id,
+                order_item_invoice_summary.quantity_ordered,
+                SUM(order_item_invoice_summary.quantity_shipped) AS quantity_shipped, 
+                SUM(order_item_invoice_summary.quantity_invoiced) AS quantity_invoiced
+            FROM (
+                SELECT 
+                    order_item.id AS id,
+                    o.id AS order_id,
+                    order_item.quantity AS quantity_ordered,
+                    CASE
+                        WHEN shipment.current_status IN ('SHIPPED', 'PARTIALLY_RECEIVED', 'RECEIVED') THEN IFNULL(shipment_item.quantity / order_item.quantity_per_uom, 0)
+                        ELSE 0
+                    END AS quantity_shipped,
+                    CASE 
+                        WHEN invoice.date_posted IS NULL THEN 0
+                        ELSE IFNULL(SUM(invoice_item.quantity), 0) 
+                    END AS quantity_invoiced
+                FROM `order` o
+                    LEFT OUTER JOIN order_item ON o.id = order_item.order_id
+                    LEFT OUTER JOIN order_shipment ON order_item.id = order_shipment.order_item_id
+                    LEFT OUTER JOIN shipment_item ON shipment_item.id = order_shipment.shipment_item_id
+                    LEFT OUTER JOIN shipment ON shipment.id = shipment_item.shipment_id
+                    LEFT OUTER JOIN shipment_invoice ON shipment_invoice.shipment_item_id = shipment_item.id
+                    LEFT OUTER JOIN invoice_item ON invoice_item.id = shipment_invoice.invoice_item_id
+                    LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
+                WHERE o.order_type_id = 'PURCHASE_ORDER'
+                    AND order_item.order_item_status_code != 'CANCELED'
+                    AND (invoice.invoice_type_id != :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL)
+                    ${additionalFilter}
+                GROUP BY o.id, order_item.id, shipment_item.id, invoice_item.id
+            ) AS order_item_invoice_summary 
+            GROUP BY id
+            HAVING order_item_invoice_summary.quantity_ordered > SUM(order_item_invoice_summary.quantity_invoiced);
+        """
+
+        String orderAdjustmentsQuery = """
+            SELECT 
+                order_adjustment_invoice_summary.id,
+                order_adjustment_invoice_summary.order_id,
+                SUM(order_adjustment_invoice_summary.quantity_invoiced)
+            FROM (
+                SELECT 
+                    order_adjustment.id AS id,
+                    o.id AS order_id,
+                    CASE
+                        WHEN (invoice.invoice_type_id = :prepaymentInvoiceId OR invoice.invoice_type_id IS NULL OR invoice.date_posted IS NULL) THEN 0
+                        ELSE 1
+                    END as quantity_invoiced
+                FROM `order` o
+                    LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = o.id
+                    LEFT OUTER JOIN order_adjustment_invoice ON order_adjustment_invoice.order_adjustment_id = order_adjustment.id
+                    LEFT OUTER JOIN invoice_item ON invoice_item.id = order_adjustment_invoice.invoice_item_id
+                    LEFT OUTER JOIN invoice ON invoice_item.invoice_id = invoice.id
+                WHERE o.order_type_id = 'PURCHASE_ORDER'
+                    AND order_adjustment.canceled IS NOT TRUE
+                    ${additionalFilter}
+                GROUP BY o.id, order_adjustment.id, invoice_item.id
+            ) AS order_adjustment_invoice_summary
+            GROUP BY id
+            HAVING SUM(order_adjustment_invoice_summary.quantity_invoiced) = 0;
+        """
+
+        List orderItemResults = dataService.executeQuery(orderItemsQuery, queryParams)
+        List orderAdjustmentResults = dataService.executeQuery(orderAdjustmentsQuery, queryParams)
+
+        List rows = parseItemsForAmountOutstandingOnOrdersReport(orderItemResults) +
+            parseAdjustmentsForAmountOutstandingOnOrdersReport(orderAdjustmentResults)
+
+        if (rows.size() == 0) {
+            String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode ?: "USD"
+            return [["Supplier": "", "Destination Name": "", "PO Number": "", "Type": "", "Code": "", "Description": "",
+                 "UOM": "", "Cost per UOM (${currencyCode})": "", "Qty Ordered not shipped (UOM)": "",
+                 "Qty Ordered not shipped (Each)": "", "Value ordered not shipped": "", "Qty Shipped not Invoiced (UOM)": "",
+                 "Qty Shipped not Invoiced (Each)": "", "Value Shipped not invoiced": "", "Total Qty not Invoiced (UOM)": "",
+                 "Total Qty not Invoiced (Each)": "", "Total Value not invoiced": "", "Budget Code": "", "Recipient": "",
+                 "Estimated Ready Date": "", "Actual Ready Date": ""]]
+        }
+
+        return rows.sort { it["PO Number"] }
+    }
+
+    def parseItemsForAmountOutstandingOnOrdersReport(List results) {
+        def rows = []
+        results.collect { result ->
+            OrderItem orderItem = OrderItem.get(result["id"])
+            if (!orderItem) {
+                return
+            }
+            Organization organization = orderItem?.order?.origin?.organization
+
+            def quantityOrdered = result["quantity_ordered"] ? result["quantity_ordered"] : 0
+            def quantityShipped = result["quantity_shipped"] ? result["quantity_shipped"] : 0
+            def quantityInvoiced = result["quantity_invoiced"] ? result["quantity_invoiced"] : 0
+
+            def orderedNotShipped = quantityOrdered - quantityShipped > 0 ? quantityOrdered - quantityShipped : 0
+            def shippedNotInvoiced = quantityShipped - quantityInvoiced > 0 ? quantityShipped - quantityInvoiced : 0
+            def quantityNotInvoiced = quantityOrdered - quantityInvoiced > 0 ? quantityOrdered - quantityInvoiced : 0
+
+            NumberFormat currencyNumberFormat = getCurrencyNumberFormat()
+            NumberFormat integerFormat =  NumberFormat.getIntegerInstance()
+
+            def printRow = [
+                "Supplier"                                          : "${organization?.code} - ${organization?.name}",
+                "Destination Name"                                  : orderItem?.order?.destination?.name,
+                "PO Number"                                         : orderItem?.order?.orderNumber,
+                "Type"                                              : "Item",
+                "Code"                                              : orderItem?.product?.productCode,
+                "Description"                                       : orderItem?.product?.description,
+                "UOM"                                               : orderItem?.unitOfMeasure,
+                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice),
+                "Qty Ordered not shipped (UOM)"                     : integerFormat.format(orderedNotShipped),
+                "Qty Ordered not shipped (Each)"                    : integerFormat.format(orderedNotShipped * orderItem?.quantityPerUom),
+                "Value ordered not shipped"                         : currencyNumberFormat.format((orderedNotShipped * orderItem?.unitPrice) ?: 0),
+                "Qty Shipped not Invoiced (UOM)"                    : integerFormat.format(shippedNotInvoiced),
+                "Qty Shipped not Invoiced (Each)"                   : integerFormat.format(shippedNotInvoiced * orderItem?.quantityPerUom),
+                "Value Shipped not invoiced"                        : currencyNumberFormat.format((shippedNotInvoiced * orderItem?.unitPrice) ?: 0),
+                "Total Qty not Invoiced (UOM)"                      : integerFormat.format(quantityNotInvoiced),
+                "Total Qty not Invoiced (Each)"                     : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
+                "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.unitPrice) ?: 0),
+                "Budget Code"                                       : orderItem?.budgetCode?.code,
+                "Recipient"                                         : orderItem?.recipient?.name,
+                "Estimated Ready Date"                              : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
+                "Actual Ready Date"                                 : orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
+            ]
+
+            rows << printRow
+        }
+
+        return rows
+    }
+
+    def parseAdjustmentsForAmountOutstandingOnOrdersReport(List results) {
+        def rows = []
+        results.collect { result ->
+            OrderAdjustment orderAdjustment = OrderAdjustment.get(result["id"])
+            if (!orderAdjustment) {
+                return
+            }
+            Organization organization = orderAdjustment?.order?.origin?.organization
+
+            NumberFormat currencyNumberFormat = getCurrencyNumberFormat()
+
+            def printRow = [
+                "Supplier"                                          : "${organization?.code} - ${organization?.name}",
+                "Destination Name"                                  : orderAdjustment?.order?.destination?.name,
+                "PO Number"                                         : orderAdjustment?.order?.orderNumber,
+                "Type"                                              : "Adjustment",
+                "Code"                                              : orderAdjustment?.orderItem?.product?.productCode ?: "",
+                "Description"                                       : orderAdjustment?.description,
+                "UOM"                                               : "",
+                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
+                "Qty Ordered not shipped (UOM)"                     : "",
+                "Qty Ordered not shipped (Each)"                    : "",
+                "Value ordered not shipped"                         : "",
+                "Qty Shipped not Invoiced (UOM)"                    : "",
+                "Qty Shipped not Invoiced (Each)"                   : "",
+                "Value Shipped not invoiced"                        : "",
+                "Total Qty not Invoiced (UOM)"                      : "",
+                "Total Qty not Invoiced (Each)"                     : 1,
+                "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
+                "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
+                "Recipient"                                         : "",
+                "Estimated Ready Date"                              : "",
+                "Actual Ready Date"                                 : "",
+            ]
+
+            rows << printRow
+        }
+
+        return rows
+    }
+
+    def getCurrencyNumberFormat() {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance()
+        String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode ?: "USD"
+        numberFormat.currency = Currency.getInstance(currencyCode)
+        numberFormat.maximumFractionDigits = 2
+        numberFormat.minimumFractionDigits = 2
+        return numberFormat
     }
 }

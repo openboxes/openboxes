@@ -23,6 +23,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
 import org.springframework.web.multipart.MultipartFile
+import org.pih.warehouse.core.LocationStatus
 
 class LocationApiController extends BaseDomainApiController {
 
@@ -66,10 +67,10 @@ class LocationApiController extends BaseDomainApiController {
 
         if (params.locationChooser && isRequestor && !currentUser.locationRoles && !inRoleBrowser) {
             locations = locationService.getLocations(null, null)
-            locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) }
+            locations = locations.findAll { it.supportedActivities && it.supports(ActivityCode.SUBMIT_REQUEST) && it.status == LocationStatus.ENABLED }
         } else if (params.locationChooser && requestorInAnyLocation && inRoleBrowser) {
             locations = locationService.getRequestorLocations(currentUser)
-            locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+            locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser, true)
         } else {
             if (params.locationChooser && requestorInAnyLocation) {
                 locations += locationService.getRequestorLocations(currentUser)
@@ -82,7 +83,7 @@ class LocationApiController extends BaseDomainApiController {
                     }
                 }
             } else {
-                locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser)
+                locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser, params.locationChooser ? true : false)
             }
         }
         render ([data:locations] as JSON)
@@ -144,6 +145,11 @@ class LocationApiController extends BaseDomainApiController {
         boolean useDefaultActivities = Boolean.valueOf(params.useDefaultActivities ?: "false")
         if (useDefaultActivities && location?.supportedActivities) {
             location.supportedActivities.clear()
+        }
+
+        // If the organization chosen for the created location is inactive, throw an exception
+        if (location.organization && !location.organization?.active) {
+            throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
         }
 
         if (!location.validate() || !location.save(failOnError: true)) {
