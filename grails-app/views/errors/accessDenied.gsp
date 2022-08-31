@@ -20,7 +20,7 @@
 </div>
 	<div id="doc">
         <div class="triangle-isosceles">
-            <warehouse:message code="errors.accessDenied.message" default="Apologies, but you are not authorized to access this page."/>
+            <warehouse:message code="errors.accessDenied.message" default="Apologies, but you are not authorized to access this page or to perform this action."/>
         </div>
         <div class="left">
             <img src="${createLinkTo(dir:'images',file:'jgreenspan.png')}"/>

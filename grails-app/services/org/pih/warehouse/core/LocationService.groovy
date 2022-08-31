@@ -476,7 +476,7 @@ class LocationService {
                 throw new ValidationException("location.cannotImportBinLocationsWithoutParentLocation.message")
             }
 
-            LocationType defaultLocationType = LocationType.findByLocationTypeCode(LocationTypeCode.BIN_LOCATION)
+            LocationType defaultLocationType = LocationType.findAllByLocationTypeCode(LocationTypeCode.BIN_LOCATION).min{ it.dateCreated }
             if (!defaultLocationType) {
                 throw new ValidationException("locationType.noDefaultForBinLocation.message")
             }

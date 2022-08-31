@@ -48,10 +48,7 @@ class CombinedShipmentItemApiController {
         def destination = Location.get(params.destination)
         List<Order> orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         render([data: orders
-                .findAll{
-                    it.orderItems.any { item -> item.getQuantityRemainingToShip() > 0 } &&
-                    !it.orderItems.every { OrderItem item -> item.canceled}
-                }
+                .findAll{it.orderItems.any { item -> (item.getQuantityRemainingToShip() > 0) && !item.canceled }}
                 .collect {
                     [
                         id: it.id,
@@ -194,7 +191,7 @@ class CombinedShipmentItemApiController {
                 .findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }
                 .each {orderItem ->
                     String quantityUom = "${orderItem?.quantityUom?.code?:g.message(code:'default.ea.label')?.toUpperCase()}"
-                    String quantityPerUom = "${g.formatNumber(number: orderItem?.quantityPerUom?:1, maxFractionDigits: 0)}"
+                    Integer quantityPerUom = orderItem?.quantityPerUom?.toInteger() ?: 1
                     String unitOfMeasure = "${quantityUom}/${quantityPerUom}"
                     csv << [
                             orderNumber         : orderItem.order.orderNumber,

@@ -6,7 +6,7 @@
 <script>
   $(document).ready(function() {
     $("#orderItemsStatusFilter").keyup(function(event){
-      const filterCell = 1; // product name
+      const filterCell = 2; // product name
       const filterValue = $("#orderItemsStatusFilter")
         .val()
         .toUpperCase();
@@ -49,6 +49,7 @@
                     <th><warehouse:message code="orderItem.originBinLocation.label" /></th>
                     <th><warehouse:message code="orderItem.destinationBinLocation.label" /></th>
                 </g:elseif>
+                %{-- When adding/removing a column, make sure to check the filterCell in function for filtering above --}%
             </tr>
             </thead>
             <tbody>

@@ -58,7 +58,7 @@
                                         <label><warehouse:message code="default.status.label" /></label>
                                     </td>
                                     <td valign="top" id="status" class="value">
-                                        <format:metadata obj="${orderInstance?.displayStatus}"/>
+                                        <span class="${orderInstance?.id}">${g.message(code: 'default.loading.label')}</span>
                                     </td>
                                 </tr>
                                 <tr class="prop">

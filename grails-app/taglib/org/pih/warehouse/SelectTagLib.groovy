@@ -490,7 +490,7 @@ class SelectTagLib {
 
             // use sparingly - this is expensive since it requires multiple database queries
             if (activityCode) {
-                attrs.from = attrs.from.findAll { it.supports(activityCode) || (!it.supports(activityCode) && it.supports(ActivityCode.SUBMIT_REQUEST)) }
+                attrs.from = attrs.from.findAll { it.supports(activityCode) }
             }
         }
 
