@@ -313,14 +313,14 @@ class PutAwaySecondPage extends Component {
             putAway.putawayItems,
             val => ({
               ...val,
-              putawayLocation: {
+              putawayLocation: val.putawayLocation.id ? {
                 id: val.putawayLocation.id ? val.putawayLocation.id : val.preferredBin.id,
                 name: val.putawayLocation.name ? val.putawayLocation.name : val.preferredBin.name,
                 zoneId: val.putawayLocation.id ? val.putawayLocation.zoneId :
                   val.preferredBin.zoneId,
                 zoneName: val.putawayLocation.id ? val.putawayLocation.zoneName :
                   val.preferredBin.zoneName,
-              },
+              } : null,
             }),
           );
 
@@ -499,7 +499,7 @@ class PutAwaySecondPage extends Component {
    */
   generatePutAwayList() {
     this.props.showSpinner();
-    const url = '/openboxes/putAway/generatePdf/ff80818164ae89800164affcfe6e0001';
+    const url = '/openboxes/putAway/generatePdf';
     const { putawayNumber } = this.state.putAway;
 
     return apiClient.post(url, flattenRequest(this.state.putAway), { responseType: 'blob' })
@@ -542,13 +542,13 @@ class PutAwaySecondPage extends Component {
           parseResponse(response.data.data.putawayItems),
           val => ({
             ...val,
-            putawayLocation: {
+            putawayLocation: val.putawayLocation.id ? {
               id: val.putawayLocation.id ? val.putawayLocation.id : val.preferredBin.id,
               name: val.putawayLocation.name ? val.putawayLocation.name : val.preferredBin.name,
               zoneId: val.putawayLocation.id ? val.putawayLocation.zoneId : val.preferredBin.zoneId,
               zoneName: val.putawayLocation.id ? val.putawayLocation.zoneName :
                 val.preferredBin.zoneName,
-            },
+            } : null,
           }),
         );
         this.changePutAway({
@@ -593,7 +593,10 @@ class PutAwaySecondPage extends Component {
           <span className="buttons-container classic-form-buttons">
             <button
               type="button"
-              onClick={() => this.sortPutawayItems()}
+              onClick={() => this.savePutAways(
+                this.state.putAway,
+                () => this.sortPutawayItems(),
+              )}
               className="btn btn-outline-secondary btn-xs mr-3"
             >
               <span>
@@ -606,7 +609,10 @@ class PutAwaySecondPage extends Component {
             </button>
             <button
               className="btn btn-outline-secondary btn-xs mr-3"
-              onClick={() => this.generatePutAwayList()}
+              onClick={() => this.savePutAways(
+                this.state.putAway,
+                () => this.generatePutAwayList(),
+              )}
             >
               <span><i className="fa fa-print pr-2" /><Translate id="react.putAway.generateList.label" defaultMessage="Generate Putaway list" /></span>
             </button>
