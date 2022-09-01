@@ -144,7 +144,7 @@
                             </table>
 
                             <g:set var="pageParams"
-                                   value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q].findAll {it.value}}"/>
+                                   value="${['locationType.id': params?.locationType?.id, 'locationGroup.id': params?.locationGroup?.id, q: params.q, 'organization.id': params?.organization?.id].findAll {it.value}}"/>
                             <g:if test="${locationInstanceTotal >= params.max }">
                                 <div class="paginateButtons">
                                     <g:paginate total="${locationInstanceTotal}" max="${params.max}" offset="${params.offset}" params="${pageParams}"/>

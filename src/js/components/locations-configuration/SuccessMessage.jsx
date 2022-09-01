@@ -35,7 +35,7 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
             />
           </p>
           <div className="success-buttons-section d-flex flex-column">
-            <button type="button" className="btn btn-outline-primary" onClick={() => window.location.reload()}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = '/openboxes/locationsConfiguration/create'; }}>
               <Translate
                 id="react.locationsConfiguration.success.createAnother"
                 defaultMessage="Create another location"

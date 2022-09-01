@@ -41,6 +41,7 @@
                 <th class="center"><warehouse:message code="orderItem.estimatedReadyDate.label"/></th>
                 <th class="center"><warehouse:message code="orderItem.actualReadyDate.label"/></th>
                 <th class="center"><warehouse:message code="orderItem.budgetCode.label"/></th>
+                %{-- When adding/removing a column, make sure to check the filterCell in function for filtering above --}%
             </tr>
             </thead>
             <tbody>

@@ -1917,9 +1917,6 @@ class StockMovementService {
         if (requisition.hasErrors() || !requisition.save(flush: true)) {
             throw new ValidationException("Invalid requisition", requisition.errors)
         }
-
-        createMissingPicklistItems(stockMovement)
-        createMissingShipmentItems(stockMovement)
     }
 
     void substituteItem(StockMovementItem stockMovementItem) {
@@ -2043,6 +2040,9 @@ class StockMovementService {
 
         // Delete all shipment items
         shipmentItems.each { ShipmentItem shipmentItem ->
+            Shipment shipment = shipmentItem?.shipment
+            // Remove shipment item from shipment to avoid re-saving by cascade after deleting item
+            shipment?.removeFromShipmentItems(shipmentItem)
             shipmentItem.delete()
         }
     }

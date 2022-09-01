@@ -415,16 +415,10 @@ class UserService {
         ]
         def userConfig = user.deserializeDashboardConfig()
 
-        if (userConfig != null) {
-            if (id == mainDashboardId) {
-                int userConfigSize = userConfig.size()
-                int resultConfigSize = resultConfig.dashboard.size()
-                if (userConfigSize == resultConfigSize) {
-                    resultConfig = [
-                            dashboard          : userConfig,
-                            dashboardWidgets   : resultConfig.dashboardWidgets
-                    ]
-                }
+        if (userConfig && id == mainDashboardId) {
+            def personalDashboard = userConfig?.personal
+            if (personalDashboard && resultConfig.dashboard?.personal) {
+                resultConfig.dashboard.personal = personalDashboard
             }
         }
 

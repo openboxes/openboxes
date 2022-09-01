@@ -73,8 +73,13 @@ class OrderController {
 
         def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
 
-        if (params.format && orders) {
+        def ordersDerivedStatus
+        if (params.format || params.downloadOrders) {
+            def orderIds = orders?.collect { it?.id }
+            ordersDerivedStatus = orderService.getOrdersDerivedStatus(orderIds)
+        }
 
+        if (params.format && orders) {
             def csv = CSVUtils.getCSVPrinter()
             csv.printRecord(
                     "Supplier organization",
@@ -112,7 +117,7 @@ class OrderController {
                         orderItem?.order?.destination?.name,
                         orderItem?.order?.orderNumber,
                         orderItem?.order?.name,
-                        orderItem?.order?.displayStatus,
+                        (ordersDerivedStatus && orderItem?.order?.id ? ordersDerivedStatus[orderItem.order.id] : ''),
                         orderItem?.product?.productCode,
                         orderItem?.product?.name,
                         OrderItemStatusCode.CANCELED == orderItem?.orderItemStatusCode ? orderItem?.orderItemStatusCode?.name() : '',
@@ -167,7 +172,7 @@ class OrderController {
                 BigDecimal totalPrice = new BigDecimal(order?.total).setScale(2, RoundingMode.HALF_UP)
                 BigDecimal totalPriceNormalized = order?.totalNormalized.setScale(2, RoundingMode.HALF_UP)
                 csv.printRecord(
-                        order?.displayStatus,
+                        (ordersDerivedStatus && order.id ? ordersDerivedStatus[order.id] : ''),
                         order?.orderNumber,
                         order?.name,
                         "${order?.origin?.name} (${order?.origin?.organization?.code})",

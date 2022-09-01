@@ -105,9 +105,10 @@ class RoleFilters {
                     if (isAnonymous || (session.user && isMinimumRequiredRole && isUserInRole)) {
                         log.info "User has access to ${controllerName}.${actionName}"
                         return true
-                    } else {
-                        return false
                     }
+                    redirect(controller: "errors", action: "handleForbidden")
+                    return false
+
                 }
 
                 // Anonymous
