@@ -245,8 +245,14 @@ class IdentifierService {
     }
 
     String generateSequentialProductIdentifierFromCode(ProductType productType) {
-        if (!productType || !productType.code) {
-            throw new IllegalArgumentException("Missing product type or code")
+        if (!productType) {
+            throw new IllegalArgumentException("Missing product type")
+        }
+
+        def defaultProductTypeId = ConfigurationHolder.config.openboxes.identifier.defaultProductType.id
+        if (!productType.code && productType.id != defaultProductTypeId) {
+            throw new IllegalArgumentException("Can only generate sequential product code without specifed product type code " +
+                "for default product type with id: ${defaultProductTypeId}")
         }
 
         Integer sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
@@ -256,8 +262,13 @@ class IdentifierService {
         String delimiter = ConfigurationHolder.config.openboxes.identifier.productCode.delimiter
         Map properties = ConfigurationHolder.config.openboxes.identifier.productCode.properties
         Map model = dataService.transformObject(productType, properties)
+        // If no value present in the map (all are empty or null), then do not include delimiter
+        if (model?.any { key, value -> value }) {
+            model.put("delimiter", delimiter)
+        } else {
+            model.put("delimiter", "")
+        }
         model.put("sequenceNumber", sequenceNumberStr)
-        model.put("delimiter", delimiter)
         return renderTemplate(template, model)
     }
 
@@ -267,8 +278,8 @@ class IdentifierService {
             return generateProductIdentifier()
         }
 
-        // If the product type does not have a custom identifier but has code, then generate sequential product code
-        if (!productType.productIdentifierFormat && productType.code) {
+        // If the product type does not have a custom identifier but has sequence number, then generate sequential product code
+        if (!productType.productIdentifierFormat && productType.sequenceNumber != null) {
             return generateSequentialProductIdentifierFromCode(productType)
         }
 

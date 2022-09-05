@@ -282,7 +282,7 @@ class Product implements Comparable, Serializable {
         productCode(nullable: true, maxSize: 255, unique: true)
         unitOfMeasure(nullable: true, maxSize: 255)
         category(nullable: false)
-        productType(nullable: true)
+        productType(nullable: false)
         active(nullable: true)
         coldChain(nullable: true)
         reconditioned(nullable: true)
