@@ -9,10 +9,10 @@ import {
   fetchMenuConfig,
   fetchSessionInfo,
 } from 'actions';
-import LocationChooserButton from 'components/location/LocationChooserButton';
-import LocationChooserModal from 'components/location/LocationChooserModal';
 import apiClient from 'utils/apiClient';
 
+import LocationChooserButton from './LocationChooserButton/LocationChooserButton';
+import LocationChooserModal from './LocationChooserModal/LocationChooserModal';
 
 const LocationChooser = (props) => {
   const [isOpen, setIsOpen] = useState(false);

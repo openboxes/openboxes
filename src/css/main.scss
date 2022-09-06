@@ -833,12 +833,11 @@ div.crossed-out .table-inner-row:before {
   width: 7rem;
   height: 7rem;
   font-size: 1.5rem;
-  color: $blue-500;
+  color: var(--blue-500);
 }
 
 /* LOCATION CHOOSER
 ----------------------------*/
-@import '../js/components/location/LocationChooser';
 
 .main-container {
   min-height: calc(100vh - 110px - 3.5vh - 65px); // 110 = header + menu + breadcrumbs; 3.5vh = footer; 65 = marginY
@@ -996,10 +995,10 @@ div.crossed-out .table-inner-row:before {
   }
 
   &::-webkit-scrollbar-track {
-    background: $blue-200;
+    background: var(--blue-200);
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: $blue-300;
+    background-color: var(--blue-300);
   }
 }

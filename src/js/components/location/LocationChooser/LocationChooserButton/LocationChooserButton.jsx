@@ -5,6 +5,8 @@ import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
 
+import './LocationChooserButton.scss';
+
 const LocationChooserButton = ({ onToggle, location, envTag }) => {
   const buttonStyle = () => {
     if (!location.backgroundColor || ['FFFFFF', 'FFFF'].includes(location.backgroundColor)) {

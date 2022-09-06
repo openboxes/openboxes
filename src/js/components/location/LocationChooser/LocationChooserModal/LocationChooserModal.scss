@@ -5,7 +5,7 @@ $min-modal-width: 670px;
 .location-chooser {
   &__modal {
     &__header {
-      color: $blue-800;
+      color: var(--blue-800);
       margin-bottom: 24px;
 
       &__title {
@@ -28,7 +28,7 @@ $min-modal-width: 670px;
         transition: background-color ease-in-out 0.2s;
 
         &:hover {
-          background-color: $blue-100;
+          background-color: var(--blue-100);
         }
       }
     }
@@ -44,14 +44,14 @@ $min-modal-width: 670px;
 
         &__tab-list {
           overflow-y: auto;
-          background-color: $blue-201;
+          background-color: var(--blue-201);
         }
 
         &__tab {
           font-size: 14px;
           cursor: pointer;
-          color: $blue-800;
-          box-shadow: inset 0 0 0 0 $blue-primary;
+          color: var(--blue-800);
+          box-shadow: inset 0 0 0 0 var(--blue-primary);
           transition: box-shadow ease-in-out 0.2s;
 
           &:hover, &--selected {
@@ -59,7 +59,7 @@ $min-modal-width: 670px;
           }
 
           &--selected {
-            box-shadow: inset 4px 0 0 0 $blue-primary;
+            box-shadow: inset 4px 0 0 0 var(--blue-primary);
           }
         }
 
@@ -78,7 +78,7 @@ $min-modal-width: 670px;
 
     &__group {
       &-title {
-        color: $blue-700;
+        color: var(--blue-700);
         font-weight: 600;
         font-size: 14px;
       }
@@ -112,64 +112,23 @@ $min-modal-width: 670px;
     }
   }
 
-  &__button {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    border: 1px solid $gray-200;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 15px;
-    &:hover {
-      background-color: $blue-200;
-    }
-    &:focus {
-      outline: none;
-    }
-
-    &-title {
-      font-size: inherit;
-      color: $gray-600;
-      max-width: 200px;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-    }
-
-    &-tag {
-      padding: 2px 4px;
-      font-size: inherit;
-      color: white;
-      background-color: $red;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 18px;
-    }
-  }
-
   &__location-button {
     all: unset;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    background-color: $blue-201;
-    color: $blue-700;
+    background-color: var(--blue-201);
+    color: var(--blue-700);
     font-size: 14px;
     padding: 6px 8px;
-    border: 1px solid $blue-200;
+    border: 1px solid var(--blue-200);
     border-radius: 4px;
 
     &:hover {
-      background-color: $blue-700;
-      border: 1px solid $blue-700;
-      color: $blue-200;
+      background-color: var(--blue-700);
+      border: 1px solid var(--blue-700);
+      color: var(--blue-200);
     }
   }
 
