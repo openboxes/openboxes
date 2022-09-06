@@ -1,30 +1,8 @@
-$white-alpha: #EFECEC;
-
-$gray-alpha: #cccccc;
-$gray-beta: #999;
-$gray-gamma: #888888;
-$gray-delta: #777777;
-$gray-epsilon: #737373;
-$gray-zeta: #666;
-$gray-eta: #EEE;
-
-$red-alpha: #843534;
-$red-beta: #a94442;
-$red-gamma: #ce8483;
-$red-delta: #ffcccc;
-
-$blue-alpha: #163038;
-$blue-beta: #0c769e;
-$blue-gamma: #3bafda;
-$blue-delta: #4fc1e9;
-$blue-epsilon: #bce7f7;
-
-$black-alpha: #212529;
-
-$orange-alpha: #fca714;
+@import "./colors";
 
 body {
   overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
 }
 
 .brand-name {
@@ -851,61 +829,15 @@ div.crossed-out .table-inner-row:before {
   text-decoration: line-through;
 }
 
+.circle-spinner {
+  width: 7rem;
+  height: 7rem;
+  font-size: 1.5rem;
+  color: var(--blue-500);
+}
+
 /* LOCATION CHOOSER
 ----------------------------*/
-
-.react-tabs {
-  -webkit-tap-highlight-color: transparent;
-  margin: 0 0 10px;
-  display: flex;
-
-  &__tab-list {
-    margin: 0;
-    padding: 0;
-    background-color: $gray-gamma;
-    border: 1px solid $gray-gamma;
-    border-radius: 5px 0 0 5px;
-    border-right: none;
-    flex: 0 0 auto;
-  }
-
-  &__tab {
-    list-style: none;
-    color: black;
-    cursor: pointer;
-    border: 1px solid $gray-alpha;
-    border-radius: 5px 0 0 5px;
-    padding: 6px 12px;
-    margin: 6px 0 6px 6px;
-    background-color: $gray-alpha;
-
-    &--selected {
-      background-color: #ffffff;
-      border-color: white;
-    }
-
-    &--disabled {
-      color: $gray-delta;
-      cursor: default;
-    }
-  }
-
-  &__tab-panel {
-    display: none;
-
-    &--selected {
-      display: block;
-    }
-  }
-}
-
-.tabs-panel-container {
-  border: 1px solid $gray-gamma;
-  border-radius: 0 5px 5px 0;
-  border-left: none;
-  padding: 10px 12px;
-  flex: 1 1 auto;
-}
 
 .main-container {
   min-height: calc(100vh - 110px - 3.5vh - 65px); // 110 = header + menu + breadcrumbs; 3.5vh = footer; 65 = marginY
@@ -1054,4 +986,19 @@ div.crossed-out .table-inner-row:before {
   margin-left: .25rem;
   content: "*";
   color: red;
+}
+
+.scrollbar {
+  &::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--blue-200);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--blue-300);
+  }
 }

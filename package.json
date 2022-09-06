@@ -45,6 +45,7 @@
   },
   "homepage": "https://github.com/openboxes/openboxes#readme",
   "dependencies": {
+    "@fontsource/inter": "^4.5.12",
     "@fortawesome/fontawesome-free": "5.14.0",
     "@fortawesome/fontawesome-svg-core": "1.2.30",
     "@fortawesome/free-brands-svg-icons": "5.14.0",
@@ -76,6 +77,7 @@
     "react-final-form": "3.6.5",
     "react-final-form-arrays": "1.0.6",
     "react-html-parser": "2.0.2",
+    "react-icons": "^4.4.0",
     "react-live-chat-loader": "2.4.1",
     "react-loadable": "5.5.0",
     "react-loading": "2.0.3",

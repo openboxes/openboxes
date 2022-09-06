@@ -6,7 +6,6 @@ import {
   FETCH_BREADCRUMBS_CONFIG,
   FETCH_MENU_CONFIG,
   FETCH_SESSION_INFO,
-  TOGGLE_LOCATION_CHOOSER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_BREADCRUMBS_PARAMS,
@@ -63,7 +62,6 @@ const initialState = {
   isPaginated: false,
   logoLabel: '',
   menuItems: [],
-  locationChooser: false,
   userActionMenuOpen: false,
   highestRole: '',
   isOpen: false,
@@ -123,11 +121,6 @@ export default function (state = initialState, action) {
       return {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
-      };
-    case TOGGLE_LOCATION_CHOOSER:
-      return {
-        ...state,
-        locationChooser: action.payload,
       };
     case TOGGLE_USER_ACTION_MENU:
       return {

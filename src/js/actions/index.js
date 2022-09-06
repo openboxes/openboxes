@@ -22,7 +22,6 @@ import {
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
   SHOW_SPINNER,
-  TOGGLE_LOCATION_CHOOSER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_BREADCRUMBS_PARAMS,
@@ -43,24 +42,10 @@ export function hideSpinner() {
   };
 }
 
-export function showLocationChooser() {
-  return {
-    type: TOGGLE_LOCATION_CHOOSER,
-    payload: true,
-  };
-}
-
 export function showUserActions() {
   return {
     type: TOGGLE_USER_ACTION_MENU,
     payload: true,
-  };
-}
-
-export function hideLocationChooser() {
-  return {
-    type: TOGGLE_LOCATION_CHOOSER,
-    payload: false,
   };
 }
 
