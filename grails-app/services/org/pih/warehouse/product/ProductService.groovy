@@ -635,6 +635,8 @@ class ProductService {
                 if (!productType) {
                     throw new RuntimeException("Product type with name ${productTypeName} does not exist at row " + rowCount)
                 }
+            } else {
+                throw new RuntimeException("Product type name cannot be empty at row " + rowCount)
             }
 
             if (currentLocation?.accountingRequired && !glAccountCode) {

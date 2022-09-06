@@ -33,7 +33,7 @@ class DataServiceTests extends GroovyTestCase {
 
     @Test
     void findOrCreateProduct() {
-        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         assertNotNull product
         assertEquals "AB12", product.productCode
         assertEquals "New product", product.name
@@ -53,7 +53,7 @@ class DataServiceTests extends GroovyTestCase {
 
     @Test
     void findOrCreateProductPackage() {
-        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         def productPackage = dataService.findOrCreateProductPackage(product, "EA", 1, 1.50)
         assertNotNull productPackage
         assertEquals "EA/1", productPackage.name
@@ -66,7 +66,7 @@ class DataServiceTests extends GroovyTestCase {
     @Test
     void findOrCreateInventoryLevel() {
         def location = DbHelper.findOrCreateLocationWithInventory("Boston Headquarters");
-        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
+        def product = dataService.findOrCreateProduct([productCode: "AB12", productName: "New product", category: "New category", productTypeName: "Default", manufacturer: "Mfg", manufacturerCode: "Mfgcode", vendor: "Vendor", vendorCode: "Vendor code", unitOfMeasure: "each"])
         def row = [minQuantity: 0, reorderQuantity: 10, maxQuantity: 100, expectedLeadTimeDays: 120, replenishmentPeriodDays: 7, preferredForReorder: true]
         def inventoryLevel = dataService.findOrCreateInventoryLevel(product, location.inventory, null, row)
 
