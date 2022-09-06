@@ -5,12 +5,13 @@ import { RiCloseLine } from 'react-icons/ri';
 import Modal from 'react-modal';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
+import LocationButton
+  from 'components/location/LocationChooser/LocationChooserModal/LocationButton';
 import Spinner from 'components/spinner/Spinner';
 import Translate from 'utils/Translate';
 
-import LocationButton from './LocationButton';
+import 'components/location/LocationChooser/LocationChooserModal/LocationChooserModal.scss';
 
-import './LocationChooserModal.scss';
 
 Modal.setAppElement('#root');
 

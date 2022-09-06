@@ -5,7 +5,8 @@ import { Tooltip } from 'react-tippy';
 
 import Translate from 'utils/Translate';
 
-import './LocationChooserButton.scss';
+import 'components/location/LocationChooser/LocationChooserButton/LocationChooserButton.scss';
+
 
 const LocationChooserButton = ({ onToggle, location, envTag }) => {
   const buttonStyle = () => {
