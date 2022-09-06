@@ -1,0 +1,176 @@
+$modal-content-height: 600px;
+$max-modal-width: 1000px;
+$min-modal-width: 670px;
+
+.location-chooser {
+  &__modal {
+    &__header {
+      color: $blue-800;
+      margin-bottom: 24px;
+
+      &__title {
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 32px;
+      }
+
+      &__close-button {
+        all: unset;
+        font-size: 24px;
+        height: 32px;
+        width: 32px;
+        color: inherit;
+        background-color: transparent;
+        display: grid;
+        place-items: center;
+        border-radius: 4px;
+        transition: background-color ease-in-out 0.2s;
+
+        &:hover {
+          background-color: $blue-100;
+        }
+      }
+    }
+
+    &__content {
+      height: $modal-content-height;
+
+      .react-tabs {
+        display: grid;
+        grid-template-columns: 4fr 8fr;
+        gap: 24px;
+        flex: 1;
+
+        &__tab-list {
+          overflow-y: auto;
+          background-color: $blue-201;
+        }
+
+        &__tab {
+          font-size: 14px;
+          cursor: pointer;
+          color: $blue-800;
+          box-shadow: inset 0 0 0 0 $blue-primary;
+          transition: box-shadow ease-in-out 0.2s;
+
+          &:hover, &--selected {
+            background-color: white;
+          }
+
+          &--selected {
+            box-shadow: inset 4px 0 0 0 $blue-primary;
+          }
+        }
+
+        &__tab-panel {
+          height: $modal-content-height;
+          overflow-y: auto;
+          flex-grow: 1;
+          display: none;
+
+          &--selected {
+            display: block;
+          }
+        }
+      }
+    }
+
+    &__group {
+      &-title {
+        color: $blue-700;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      &-container {
+        gap: 12px;
+      }
+    }
+
+    .ReactModal {
+      &__Overlay--after-open {
+        z-index: 100 !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.15) !important;
+      }
+
+      &__Content--after-open {
+        position: relative !important;
+        min-width: $min-modal-width;
+        width: 70vw;
+        max-width: $max-modal-width;
+        display: flex;
+        flex-direction: column;
+        padding: 24px !important;
+        inset: 0 !important;
+        box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+      }
+    }
+  }
+
+  &__button {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid $gray-200;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 15px;
+    &:hover {
+      background-color: $blue-200;
+    }
+    &:focus {
+      outline: none;
+    }
+
+    &-title {
+      font-size: inherit;
+      color: $gray-600;
+      max-width: 200px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+    }
+
+    &-tag {
+      padding: 2px 4px;
+      font-size: inherit;
+      color: white;
+      background-color: $red;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 18px;
+    }
+  }
+
+  &__location-button {
+    all: unset;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: $blue-201;
+    color: $blue-700;
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid $blue-200;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: $blue-700;
+      border: 1px solid $blue-700;
+      color: $blue-200;
+    }
+  }
+
+}

@@ -5,19 +5,15 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { showLocationChooser } from 'actions';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
+// eslint-disable-next-line react/prefer-stateless-function
 class Breadcrumbs extends Component {
+  // eslint-disable-next-line no-useless-constructor
   constructor(props) {
     super(props);
-
-    this.openModal = this.openModal.bind(this);
   }
 
-  openModal() {
-    this.props.showLocationChooser();
-  }
 
   render() {
     const listToReturn = this.props.breadcrumbsParams.map((value, id) =>
@@ -37,7 +33,6 @@ class Breadcrumbs extends Component {
         <a
           role="button"
           href="#"
-          onClick={() => { this.openModal(); }}
           className="item-breadcrumbs"
         > {this.props.currentLocationName}
         </a>
@@ -54,12 +49,10 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, { showLocationChooser })(Breadcrumbs);
+export default connect(mapStateToProps, { })(Breadcrumbs);
 
 Breadcrumbs.propTypes = {
   currentLocationName: PropTypes.string.isRequired,
-  // Function called to show the location chooser modal
-  showLocationChooser: PropTypes.func.isRequired,
   breadcrumbsParams: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string.isRequired,
     defaultLabel: PropTypes.string,
