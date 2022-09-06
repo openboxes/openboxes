@@ -34,5 +34,6 @@ class ProductAttributeValueController {
         response.contentType = "application/vnd.ms-excel"
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
         documentService.generateExcel(response.outputStream, data)
+        response.outputStream.flush()
     }
 }
