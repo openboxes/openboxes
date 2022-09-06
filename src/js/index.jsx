@@ -12,6 +12,8 @@ import MainRouter from 'src/MainRouter';
 import store from 'store';
 
 import 'bootstrap/dist/js/bootstrap';
+// eslint-disable-next-line import/extensions
+import '@fontsource/inter';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.min.css';
