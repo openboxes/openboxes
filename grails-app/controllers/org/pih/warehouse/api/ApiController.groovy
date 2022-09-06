@@ -93,7 +93,8 @@ class ApiController {
             localizationMode = [
                 "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/world_delete.png",
-                "linkAction" : "${request.contextPath}/user/disableLocalizationMode"
+                "linkAction" : "${request.contextPath}/user/disableLocalizationMode",
+                "linkReactIcon" : "RiMapPinLine",
             ]
         }
         else {
@@ -101,7 +102,8 @@ class ApiController {
             localizationMode = [
                     "label"     : messageSource.getMessage('localization.enable.label', emptyArgs, 'Enable translation mode', locale),
                     "linkIcon"  : "${request.contextPath}/images/icons/silk/world_add.png",
-                    "linkAction": "${request.contextPath}/user/enableLocalizationMode"
+                    "linkAction": "${request.contextPath}/user/enableLocalizationMode",
+                    "linkReactIcon" : "RiMapPinLine",
             ]
         }
         List<Map> menuItems = [
@@ -111,17 +113,20 @@ class ApiController {
                         'Enable translation mode', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
                 "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
+                "linkReactIcon" : "RiUser3Line",
             ],
             localizationMode,
             [
                 "label"      : messageSource.getMessage('cache.flush.label', emptyArgs, 'Refresh caches', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/database_wrench.png",
                 "linkAction" : "${request.contextPath}/dashboard/flushCache",
+                "linkReactIcon" : "RiRefreshLine",
             ],
             [
                 "label"      : messageSource.getMessage('default.logout.label', emptyArgs, 'Logout', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/door.png",
                 "linkAction" : "${request.contextPath}/auth/logout",
+                "linkReactIcon" : "RiLoginBoxLine",
             ]
         ]
 
