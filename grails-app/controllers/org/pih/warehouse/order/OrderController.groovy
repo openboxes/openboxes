@@ -1068,6 +1068,13 @@ class OrderController {
 
     def createCombinedShipment = {
         def orderInstance = Order.get(params.orderId)
+        Location currentLocation = Location.get(session.warehouse.id)
+
+        if (!(orderInstance.destination.equals(currentLocation) || currentLocation.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING))) {
+            flash.message = "${warehouse.message(code:'order.cantShipFromDifferentLocation.label')}"
+            redirect(controller: 'order', action: "show", id: orderInstance.id)
+            return
+        }
         if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 && it.orderItemStatusCode != OrderItemStatusCode.CANCELED }) {
             flash.message = "${warehouse.message(code:'purchaseOrder.noItemsToShip.label')}"
             redirect(controller: 'order', action: "show", id: orderInstance.id, params: ['tab': 4])
