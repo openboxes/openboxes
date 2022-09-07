@@ -1002,3 +1002,21 @@ div.crossed-out .table-inner-row:before {
     background-color: var(--blue-300);
   }
 }
+
+// Tooltip style
+.custom-tooltip {
+  background-color: var(--blue-800);
+  border-radius: 2px;
+  padding: 4px 8px;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #FFFFFF;
+}
+
+
+// Overriding built-in tooltip-style (react-tippy)
+.tippy-tooltip {
+  padding: 0 !important;
+  border-radius: 0 !important;
+}

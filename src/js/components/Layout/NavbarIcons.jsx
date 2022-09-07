@@ -107,7 +107,7 @@ const NavbarIcons = ({
     const Icon = icon.component;
     return (
       <Tooltip
-        html={<div className="navbar-buttons-tooltip">{icon.tooltip}</div>}
+        html={<div className="custom-tooltip">{icon.tooltip}</div>}
         theme="transparent"
         key={idx}
         disabled={icon.isTooltipDisabled ? icon.isTooltipDisabled : false}

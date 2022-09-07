@@ -31,7 +31,7 @@ const LocationChooserButton = ({ onToggle, location, envTag }) => {
         location && location.name && location.name.length > 20
           ? (
             <Tooltip
-              title={location.name}
+              html={<div className="custom-tooltip">{location.name}</div>}
               delay="500"
               duration="250"
               hideDelay="50"
