@@ -5,11 +5,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { getMenuItemsComponent, getSectionComponent, getSubsectionComponent } from 'utils/MenuUtils';
+import MenuItem from 'components/Layout/menu/MenuItem';
+import MenuSection from 'components/Layout/menu/MenuSection';
+import MenuSubsection from 'components/Layout/menu/MenuSubsection';
 
 
 const Menu = ({ menuConfig, location }) => {
-  const sectionsToExclude = ['Analytics', 'Configuration'];
   const getAllMenuUrls = () => Object.entries(menuConfig).reduce((acc, [, section]) => {
     if (!acc[section.label]) {
       if (section.href) {
@@ -59,16 +60,19 @@ const Menu = ({ menuConfig, location }) => {
     <div className="menu-wrapper" id="navbarSupportedContent">
       <ul className="d-flex align-items-center navbar-nav mr-auto flex-wrap">
         { _.chain(menuConfig)
-          .filter(section => !sectionsToExclude.includes(section.label))
+          .filter(section => section.label !== 'Configuration')
           .map((section, key) => {
             if (section.href) {
-              return getSectionComponent(section, key, activeSection === section.label);
+              // eslint-disable-next-line max-len,react/no-array-index-key
+              return <MenuSection section={section} key={key} active={activeSection === section.label} />;
             }
             if (section.subsections) {
-              return getSubsectionComponent(section, key, activeSection === section.label);
+              // eslint-disable-next-line react/no-array-index-key,max-len
+              return <MenuSubsection section={section} key={key} active={activeSection === section.label} />;
             }
             if (section.menuItems) {
-              return getMenuItemsComponent(section, key, activeSection === section.label);
+              // eslint-disable-next-line react/no-array-index-key,max-len
+              return <MenuItem section={section} key={key} active={activeSection === section.label} />;
             }
             return null;
           })

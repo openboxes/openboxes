@@ -1400,7 +1400,7 @@ openboxes {
             href = "/${appName}/dashboard/index"
         }
         analytics {
-            enabled = true
+            enabled = false
             requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
             label = "analytics.label"
             defaultLabel = "Analytics"

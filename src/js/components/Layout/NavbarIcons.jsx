@@ -12,27 +12,29 @@ import {
 import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
+import MenuConfigurationSubsection from 'components/Layout/menu/MenuConfigurationSubsection';
 import HelpScout from 'components/support-button/HelpScout';
-import { getConfigurationSubsections } from 'utils/MenuUtils';
 
 const NavbarIcons = ({
   username, highestRole, menuItems, configurationMenuSection,
 }) => {
   const [disableProfileTooltip, setDisableProfileTooltip] = useState(false);
   const [disableConfigurationTooltip, setDisableConfigurationTooltip] = useState(false);
-
-  const profileIcons = [
-    <RiUser3Line />,
-    <RiRefreshLine />,
-    <RiLoginBoxLine />,
-    <RiMapPinLine />,
-  ];
-
-  const findIcon = (iconName) => {
-    const Icon = profileIcons.find(icon => icon.type.name === iconName);
-    return Icon || '';
+  const findIcon = (icon) => {
+    if (icon === 'RiUser3Line') {
+      return <RiUser3Line />;
+    }
+    if (icon === 'RiLoginBoxLine') {
+      return <RiLoginBoxLine />;
+    }
+    if (icon === 'RiMapPinLine') {
+      return <RiMapPinLine />;
+    }
+    if (icon === 'RiRefreshLine') {
+      return <RiRefreshLine />;
+    }
+    return '';
   };
-
   const iconsList = [
     {
       component: RiSearchLine,
@@ -62,7 +64,8 @@ const NavbarIcons = ({
             <div className="dropdown-menu-subsections conf-subsections">
               {/* eslint-disable-next-line max-len */}
               {configurationMenuSection && configurationMenuSection.subsections.map((subsection, key) => (
-               getConfigurationSubsections(subsection, key)
+                // eslint-disable-next-line react/no-array-index-key
+                <MenuConfigurationSubsection subsection={subsection} key={key} />
               ))}
             </div>
           </div>
@@ -88,7 +91,11 @@ const NavbarIcons = ({
           >
             <span className="subsection-title">{username && username} {highestRole && `(${highestRole})`}</span>
             {menuItems && menuItems.map(item => (
-              <a className="dropdown-item" key={item.label} href={item.linkAction}><span className="icon">{findIcon(item.linkReactIcon)}</span> {item.label}</a>
+              <a className="dropdown-item" key={item.label} href={item.linkAction}>
+                <span className="icon">
+                  {findIcon(item.linkReactIcon)}
+                </span> {item.label}
+              </a>
               ))}
           </div>
         </div>
