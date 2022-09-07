@@ -7,9 +7,10 @@
     justify-content: center;
     background-color: white;
     border: 1px solid var(--gray-200);
-    padding: 4px 8px;
+    padding: 0 8px;
     border-radius: 4px;
     font-size: 15px;
+    height: 40px;
     &:hover {
       background-color: var(--blue-200);
     }

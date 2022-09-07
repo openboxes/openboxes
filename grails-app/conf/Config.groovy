@@ -1400,7 +1400,7 @@ openboxes {
             href = "/${appName}/dashboard/index"
         }
         analytics {
-            enabled = true
+            enabled = false
             requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
             label = "analytics.label"
             defaultLabel = "Analytics"
@@ -1493,7 +1493,7 @@ openboxes {
                             defaultLabel: "Putaways",
                             requiredActivitiesAll: ActivityCode.binTrackingList(),
                             menuItems: [
-                                    [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
+                                    [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/create"],
                                     [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
                             ]
                     ]
