@@ -26,7 +26,7 @@
                     <td class="name middle"><label id="productTypeLabel" for="productType.id"><warehouse:message code="product.productType.label"/></label></td>
                     <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'productType', 'errors')}">
                         <g:select name="productType.id" id="productType" from="${ProductType.list() }" class="chzn-select-deselect"
-                                  optionKey="id" optionValue="name" value="${productInstance?.productType?.id ?: defaultProductType?.id}"/>
+                                  optionKey="id" optionValue="name" value="${productInstance?.productType?.id ?: ProductType.defaultProductType.list()?.first()?.id}"/>
                     </td>
                 </tr>
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRODUCT_CODE)}">

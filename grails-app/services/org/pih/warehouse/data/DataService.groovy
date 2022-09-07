@@ -389,11 +389,9 @@ class DataService {
     def findOrCreateProductType(String productTypeName) {
         def productType = ProductType.findByName(productTypeName)
         if (!productType) {
-            println("Could not find product type " + productTypeName)
             productType = new ProductType(name: productTypeName, productTypeCode: ProductTypeCode.GOOD)
             productType.save(failOnError: true)
         }
-        log.info "findOrCreateProductType: ${productType}"
         return productType
     }
 

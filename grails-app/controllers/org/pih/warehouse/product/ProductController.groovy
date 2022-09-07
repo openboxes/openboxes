@@ -38,7 +38,6 @@ class ProductController {
     def userService
     MailService mailService
     def productService
-    def productTypeService
     def documentService
     def inventoryService
     def barcodeService
@@ -249,13 +248,7 @@ class ProductController {
             if (!params.templateName) {
                 throw new IllegalArgumentException("Must provide templateName parameter")
             }
-            render(
-                template: params.templateName,
-                model: [
-                    productInstance: productInstance,
-                    defaultProductType: productTypeService.getDefaultProductType()
-                ]
-            )
+            render(template: params.templateName, model: [productInstance: productInstance])
         }
     }
 

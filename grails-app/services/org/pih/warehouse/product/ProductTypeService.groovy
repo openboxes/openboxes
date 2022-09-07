@@ -9,8 +9,6 @@
  **/
 package org.pih.warehouse.product
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
 class ProductTypeService {
 
     synchronized getAndSetNextSequenceNumber(ProductType productType) {
@@ -18,19 +16,5 @@ class ProductTypeService {
         productType.save()
 
         return productType.sequenceNumber
-    }
-
-    def getDefaultProductType() {
-        def defaultProductTypeId = ConfigurationHolder.config.openboxes.identifier.defaultProductType.id
-        if (!defaultProductTypeId) {
-            throw new IllegalArgumentException("Missing default product type configuration")
-        }
-
-        def defaultProductType = ProductType.get(defaultProductTypeId)
-        if (!defaultProductType) {
-            throw new Exception("Can not find product type with id: ${defaultProductTypeId}")
-        }
-
-        return defaultProductType
     }
 }
