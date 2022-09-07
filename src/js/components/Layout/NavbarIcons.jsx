@@ -21,19 +21,18 @@ const NavbarIcons = ({
   const [disableProfileTooltip, setDisableProfileTooltip] = useState(false);
   const [disableConfigurationTooltip, setDisableConfigurationTooltip] = useState(false);
   const findIcon = (icon) => {
-    if (icon === 'RiUser3Line') {
-      return <RiUser3Line />;
+    switch (icon) {
+      case 'localization-mode':
+        return <RiMapPinLine />;
+      case 'profile':
+        return <RiUser3Line />;
+      case 'flush-cache':
+        return <RiRefreshLine />;
+      case 'logout':
+        return <RiLoginBoxLine />;
+      default:
+        return '';
     }
-    if (icon === 'RiLoginBoxLine') {
-      return <RiLoginBoxLine />;
-    }
-    if (icon === 'RiMapPinLine') {
-      return <RiMapPinLine />;
-    }
-    if (icon === 'RiRefreshLine') {
-      return <RiRefreshLine />;
-    }
-    return '';
   };
   const iconsList = [
     {
@@ -62,10 +61,10 @@ const NavbarIcons = ({
             onMouseLeave={() => setDisableConfigurationTooltip(false)}
           >
             <div className="dropdown-menu-subsections conf-subsections">
-              {/* eslint-disable-next-line max-len */}
-              {configurationMenuSection && configurationMenuSection.subsections.map((subsection, key) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <MenuConfigurationSubsection subsection={subsection} key={key} />
+              {configurationMenuSection &&
+                configurationMenuSection.subsections
+                && configurationMenuSection.subsections.map(subsection => (
+                  <MenuConfigurationSubsection subsection={subsection} key={`${subsection.label}-subsection`} />
               ))}
             </div>
           </div>
@@ -109,8 +108,7 @@ const NavbarIcons = ({
     return (
       <Tooltip
         html={<div className="navbar-buttons-tooltip">{icon.tooltip}</div>}
-        theme="dark"
-        arrow
+        theme="transparent"
         key={idx}
         disabled={icon.isTooltipDisabled ? icon.isTooltipDisabled : false}
       >
@@ -155,6 +153,10 @@ NavbarIcons.propTypes = {
   configurationMenuSection: PropTypes.shape({
     label: PropTypes.string,
     subsections: PropTypes.array,
-  }).isRequired,
+  }),
+};
+
+NavbarIcons.defaultProps = {
+  configurationMenuSection: {},
 };
 

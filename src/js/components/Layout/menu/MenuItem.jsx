@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 const MenuItem = ({ section, key, active }) => (
   <li className={`nav-item dropdown d-flex justify-content-center align-items-center ${active && 'active-section'}`} key={key}>
-    <a className="nav-link dropdown-toggle" href="components/Layout/menu/MenuItem#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
+    <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
     </a>
     <div className="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -27,10 +27,11 @@ MenuItem.propTypes = {
     label: PropTypes.string,
     menuItems: PropTypes.shape([]),
   }).isRequired,
-  key: PropTypes.number.isRequired,
+  key: PropTypes.string,
   active: PropTypes.bool,
 };
 
 MenuItem.defaultProps = {
   active: false,
+  key: '',
 };

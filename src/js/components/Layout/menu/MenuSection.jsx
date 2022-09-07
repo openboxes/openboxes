@@ -17,10 +17,11 @@ MenuSection.propTypes = {
     label: PropTypes.string,
     href: PropTypes.string,
   }).isRequired,
-  key: PropTypes.number.isRequired,
+  key: PropTypes.string,
   active: PropTypes.bool,
 };
 
 MenuSection.defaultProps = {
   active: false,
+  key: '',
 };

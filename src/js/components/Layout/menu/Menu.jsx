@@ -61,18 +61,33 @@ const Menu = ({ menuConfig, location }) => {
       <ul className="d-flex align-items-center navbar-nav mr-auto flex-wrap">
         { _.chain(menuConfig)
           .filter(section => section.label !== 'Configuration')
-          .map((section, key) => {
+          .map((section) => {
             if (section.href) {
-              // eslint-disable-next-line max-len,react/no-array-index-key
-              return <MenuSection section={section} key={key} active={activeSection === section.label} />;
+              return (
+                <MenuSection
+                  section={section}
+                  key={`${section.label}-menu-section`}
+                  active={activeSection === section.label}
+                />
+              );
             }
             if (section.subsections) {
-              // eslint-disable-next-line react/no-array-index-key,max-len
-              return <MenuSubsection section={section} key={key} active={activeSection === section.label} />;
+              return (
+                <MenuSubsection
+                  section={section}
+                  key={`${section.label}-menu-subsection`}
+                  active={activeSection === section.label}
+                />
+              );
             }
             if (section.menuItems) {
-              // eslint-disable-next-line react/no-array-index-key,max-len
-              return <MenuItem section={section} key={key} active={activeSection === section.label} />;
+              return (
+                <MenuItem
+                  section={section}
+                  key={`${section.label}-menuItem`}
+                  active={activeSection === section.label}
+                />
+              );
             }
             return null;
           })
