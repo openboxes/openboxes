@@ -9,17 +9,15 @@
  **/
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
-import org.quartz.JobExecutionException
 
 @DisallowConcurrentExecution
 class RefreshInventorySnapshotJob {
 
-    def concurrent = false
+    def concurrent = false  // make `static` in Grails 3
     def inventorySnapshotService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
@@ -27,16 +25,13 @@ class RefreshInventorySnapshotJob {
 
     def execute(JobExecutionContext context) {
 
-        Boolean enabled = ConfigurationHolder.config.openboxes.jobs.refreshInventorySnapshotJob.enabled
-        log.info("Refreshing inventory snapshots with data (enabled=${enabled}): " + context.mergedJobDataMap)
-        if (enabled) {
-
+        if (JobUtils.shouldExecute(RefreshInventorySnapshotJob)) {
+            log.info("Refreshing inventory snapshots with data: ${context.mergedJobDataMap}")
             def startTime = System.currentTimeMillis()
             def userId = context.mergedJobDataMap.get('user')
             def date = context.mergedJobDataMap.get('date')
             def locationId = context.mergedJobDataMap.get('locationId')
             def productId = context.mergedJobDataMap.get('productId')
-            boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")
             try {
                 Product product = Product.load(productId)
                 Location location = Location.load(locationId)

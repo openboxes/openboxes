@@ -10,31 +10,30 @@
 package org.pih.warehouse.jobs
 
 import groovyx.gpars.GParsPool
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
+import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
+@DisallowConcurrentExecution
 class SendStockAlertsJob {
 
-    def concurrent = false
-    def grailsApplication
+    def concurrent = false  // make `static` in Grails 3
     def locationService
     def notificationService
 
     static triggers = {
-        cron name: 'sendStockAlertsCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.cronExpression
+        cron name: JobUtils.getCronName(SendStockAlertsJob),
+            cronExpression: JobUtils.getCronExpression(SendStockAlertsJob)
     }
 
     def execute(JobExecutionContext context) {
 
-        Boolean enabled = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.enabled)
-        Boolean skipOnEmpty = Boolean.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
-        Integer daysUntilExpiry = Integer.valueOf(grailsApplication.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry?:60)
+        Boolean skipOnEmpty = Boolean.valueOf(ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
+        Integer daysUntilExpiry = Integer.valueOf(ConfigurationHolder.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry ?: 60)
 
-        if (enabled) {
+        if (JobUtils.shouldExecute(SendStockAlertsJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Send stock alerts: " + context.mergedJobDataMap)
             GParsPool.withPool {
