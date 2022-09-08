@@ -56,7 +56,7 @@ const NavbarIcons = ({
             aria-expanded="false"
           />
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-17"
+            className="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18"
             onMouseEnter={() => setDisableConfigurationTooltip(true)}
             onMouseLeave={() => setDisableConfigurationTooltip(false)}
           >
@@ -84,7 +84,7 @@ const NavbarIcons = ({
             aria-expanded="false"
           />
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            className="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18"
             onMouseEnter={() => setDisableProfileTooltip(true)}
             onMouseLeave={() => setDisableProfileTooltip(false)}
           >
