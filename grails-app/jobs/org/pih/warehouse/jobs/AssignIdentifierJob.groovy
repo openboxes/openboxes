@@ -1,28 +1,20 @@
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
 import org.quartz.DisallowConcurrentExecution
-import util.LiquibaseUtil
 
 @DisallowConcurrentExecution
 class AssignIdentifierJob {
 
     def identifierService
 
+    def concurrent = false  // make `static` in Grails 3
     static triggers = {
-        cron name: 'assignIdentifierCronTrigger',
-                cronExpression: CH.config.openboxes.jobs.assignIdentifierJob.cronExpression
+        cron name: JobUtils.getCronName(AssignIdentifierJob),
+            cronExpression: JobUtils.getCronExpression(AssignIdentifierJob)
     }
 
     def execute() {
-
-        Boolean enabled = CH.config.openboxes.jobs.assignIdentifierJob.enabled
-        if (!enabled) {
-            return
-        }
-
-        if (LiquibaseUtil.isRunningMigrations()) {
-            log.info "Postponing job execution until liquibase migrations are complete"
+        if (!JobUtils.shouldExecute(AssignIdentifierJob)) {
             return
         }
 
@@ -33,6 +25,4 @@ class AssignIdentifierJob {
         identifierService.assignRequisitionIdentifiers()
         identifierService.assignTransactionIdentifiers()
     }
-
-
 }
