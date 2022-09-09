@@ -60,7 +60,7 @@ const Menu = ({ menuConfig, location }) => {
 
 
   return (
-    <div className="menu-wrapper px-2" id="navbarSupportedContent">
+    <div className="menu-wrapper" id="navbarSupportedContent">
       <ul className="d-flex align-items-center navbar-nav mr-auto flex-wrap">
         { _.chain(menuConfig)
           .filter(section => section.label !== 'Configuration')

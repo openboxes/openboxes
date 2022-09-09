@@ -20,12 +20,12 @@ const ValueContainer = ({ children, ...props }) => (
 );
 
 const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
-  const [isShow, setIsShow] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const searchTerm = debounceGlobalSearch(debounceTime, minSearchLength);
 
-  const showSearchbar = () => setIsShow(true);
+  const showSearchbar = () => setIsVisible(true);
 
-  const hideSearchbar = () => setIsShow(false);
+  const hideSearchbar = () => setIsVisible(false);
 
 
   const onKeyPressHandler = (event) => {
@@ -78,8 +78,8 @@ const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
 
   return (
     <div className="position-relative d-flex">
-      {renderButton({ isShow, showSearchbar })}
-      {isShow && (
+      {renderButton({ isVisible, showSearchbar })}
+      {isVisible && (
         <Async
           className="app-global-search"
           classNamePrefix="app-global-search"

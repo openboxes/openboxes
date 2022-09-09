@@ -9,7 +9,7 @@ import 'components/Layout/HeaderStyles.scss';
 
 const Header = () => (
   <nav className="navbar navbar-expand navbar-light bg-light navbar-inverse navbar-fixed-top flex-column w-100 p-0 bg-white">
-    <div className="main-wrapper px-4">
+    <div className="main-wrapper">
       <div className="d-flex align-items-center">
         <Logo />
         <LocationChooser />

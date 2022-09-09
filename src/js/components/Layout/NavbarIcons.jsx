@@ -38,8 +38,8 @@ const NavbarIcons = ({
       name: 'search',
       tooltip: 'Search',
       component: renderProps => (<GlobalSearch
-        renderButton={({ showSearchbar, isShow }) => {
-          renderProps.setIsTooltipDisabled(isShow);
+        renderButton={({ showSearchbar, isVisible }) => {
+          renderProps.setIsTooltipDisabled(isVisible);
           return (
             <button onClick={showSearchbar} className="menu-icon">
               <RiSearchLine />

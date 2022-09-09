@@ -7,6 +7,7 @@
   font-style: normal;
   color: var(--blue-700);
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15);
+  padding: 0 32px;
 
   .dropdown-menu {
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
@@ -50,6 +51,7 @@
 
 .logo-wrapper {
   font-weight: 400;
+  margin-right: 8px;
 
   .logo-square {
     width: 40px;
@@ -82,6 +84,7 @@
 .menu-wrapper {
   flex-grow: 1;
   min-height: 56px;
+  padding: 0 16px;
 
   ul {
     list-style-type: none;

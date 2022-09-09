@@ -10,7 +10,7 @@ import OpenboxesLogo from 'components/Layout/img/openboxes_logo.jpg';
 const Logo = ({
   logoUrl, history,
 }) => (
-  <div className="d-flex align-items-center logo-wrapper mx-2">
+  <div className="d-flex align-items-center logo-wrapper">
     <div className="logo-square">
       {logoUrl
           ? <img
