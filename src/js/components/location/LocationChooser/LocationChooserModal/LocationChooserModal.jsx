@@ -64,6 +64,8 @@ const LocationChooserModal = ({
   return (
     <Modal
       isOpen={isOpen}
+      shouldCloseOnOverlayClick
+      onRequestClose={onClose}
       portalClassName="location-chooser__modal"
     >
       <header

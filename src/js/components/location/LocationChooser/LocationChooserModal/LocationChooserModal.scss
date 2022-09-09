@@ -55,6 +55,7 @@ $min-modal-width: 670px;
           color: var(--blue-800);
           box-shadow: inset 0 0 0 0 var(--blue-primary);
           transition: box-shadow ease-in-out 0.2s;
+          word-break: break-word;
 
           &:hover, &--selected {
             background-color: white;
@@ -119,14 +120,24 @@ $min-modal-width: 670px;
     all: unset;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
     background-color: var(--blue-201);
     color: var(--blue-700);
     font-size: 14px;
     padding: 6px 8px;
     border: 1px solid var(--blue-200);
     border-radius: 4px;
+
+    &__icon {
+      margin-top: 4px;
+      margin-right: 4px;
+      min-width: 16px;
+    }
+
+    &__title {
+      max-width: 100%;
+      word-break: break-word;
+      line-height: 21px;
+    }
 
     &:hover {
       background-color: var(--blue-700);

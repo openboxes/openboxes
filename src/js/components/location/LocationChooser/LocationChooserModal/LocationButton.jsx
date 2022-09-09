@@ -36,8 +36,13 @@ const LocationButton = ({ location, onClick }) => {
       className="location-chooser__location-button"
       style={buttonStyle()}
     >
-      <RiMapPinLine style={iconStyle()} />
-      <span className="ml-1">{location.name}</span>
+      <RiMapPinLine
+        className="location-chooser__location-button__icon"
+        style={iconStyle()}
+      />
+      <span className="location-chooser__location-button__title">
+        {location.name}
+      </span>
     </button>);
 };
 
