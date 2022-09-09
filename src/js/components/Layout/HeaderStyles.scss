@@ -1,12 +1,13 @@
 .main-wrapper {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
+  display: flex;
+  flex-direction: row;
   min-height: 56px;
   width: 100%;
   font-family: 'Inter', sans-serif;
   font-style: normal;
   color: var(--blue-700);
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15);
+  padding: 0 32px;
 
   .dropdown-menu {
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
@@ -48,13 +49,9 @@
   }
 }
 
-.gap-8 {
-  gap: 8px;
-}
-
 .logo-wrapper {
   font-weight: 400;
-  padding: 8px 12px 8px 32px;
+  margin-right: 8px;
 
   .logo-square {
     width: 40px;
@@ -85,7 +82,9 @@
 }
 
 .menu-wrapper {
+  flex-grow: 1;
   min-height: 56px;
+  padding: 0 16px;
 
   ul {
     list-style-type: none;
@@ -130,8 +129,6 @@
 }
 
 .navbar-icons {
-  padding: 8px 16px 8px 16px;
-
   .menu-icon {
     display: flex;
     align-items: center;
@@ -139,6 +136,14 @@
     font-size: 22px;
     width: 40px;
     height: 40px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    color: inherit;
+
+    &:focus {
+      outline: none;
+    }
 
     &:hover {
       background: var(--blue-200);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -10,16 +10,15 @@ import {
   RiUser3Line,
 } from 'react-icons/ri';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
+import GlobalSearch from 'components/GlobalSearch/GlobalSearch';
 import MenuConfigurationSubsection from 'components/Layout/menu/MenuConfigurationSubsection';
+import NavbarIcon from 'components/Layout/NavbarIcon';
 import HelpScout from 'components/support-button/HelpScout';
 
 const NavbarIcons = ({
   username, highestRole, menuItems, configurationMenuSection,
 }) => {
-  const [disableProfileTooltip, setDisableProfileTooltip] = useState(false);
-  const [disableConfigurationTooltip, setDisableConfigurationTooltip] = useState(false);
   const findIcon = (icon) => {
     switch (icon) {
       case 'localization-mode':
@@ -36,19 +35,28 @@ const NavbarIcons = ({
   };
   const iconsList = [
     {
-      component: RiSearchLine,
+      name: 'search',
       tooltip: 'Search',
+      component: renderProps => (<GlobalSearch
+        renderButton={({ showSearchbar, isVisible }) => {
+          renderProps.setIsTooltipDisabled(isVisible);
+          return (
+            <button onClick={showSearchbar} className="menu-icon">
+              <RiSearchLine />
+            </button>);
+        }}
+      />),
     },
     {
-      component: HelpScout,
+      name: 'help',
       tooltip: 'Help',
+      component: () => (<div className="menu-icon"><HelpScout /></div>),
     },
     {
-      component: RiSettings5Line,
+      name: 'configuration',
       tooltip: 'Configuration',
-      isTooltipDisabled: disableConfigurationTooltip,
-      dropdown: (
-        <div className="btn-group">
+      component: renderProps => (
+        <div className="btn-group menu-icon">
           <RiSettings5Line
             className="dropdown-toggle"
             data-toggle="dropdown"
@@ -56,9 +64,9 @@ const NavbarIcons = ({
             aria-expanded="false"
           />
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18"
-            onMouseEnter={() => setDisableConfigurationTooltip(true)}
-            onMouseLeave={() => setDisableConfigurationTooltip(false)}
+            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
+            onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
             <div className="dropdown-menu-subsections conf-subsections">
               {configurationMenuSection &&
@@ -72,11 +80,10 @@ const NavbarIcons = ({
       ),
     },
     {
-      component: RiUser3Line,
+      name: 'profile',
       tooltip: 'Profile',
-      isTooltipDisabled: disableProfileTooltip,
-      dropdown: (
-        <div className="btn-group">
+      component: renderProps => (
+        <div className="btn-group menu-icon">
           <RiUser3Line
             className="dropdown-toggle"
             data-toggle="dropdown"
@@ -84,9 +91,9 @@ const NavbarIcons = ({
             aria-expanded="false"
           />
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18"
-            onMouseEnter={() => setDisableProfileTooltip(true)}
-            onMouseLeave={() => setDisableProfileTooltip(false)}
+            className="dropdown-menu dropdown-menu-right nav-item padding-8 mt-2"
+            onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
+            onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
             <span className="subsection-title">{username && username} {highestRole && `(${highestRole})`}</span>
             {menuItems && menuItems.map(item => (
@@ -102,28 +109,9 @@ const NavbarIcons = ({
     },
   ];
 
-
-  const renderIcon = (icon, idx) => {
-    const Icon = icon.component;
-    return (
-      <Tooltip
-        html={<div className="custom-tooltip">{icon.tooltip}</div>}
-        theme="transparent"
-        key={idx}
-        disabled={icon.isTooltipDisabled ? icon.isTooltipDisabled : false}
-      >
-        <React.Fragment>
-          <div className="menu-icon">
-            {icon.dropdown ? icon.dropdown : <Icon />}
-          </div>
-        </React.Fragment>
-      </Tooltip>
-    );
-  };
-
   return (
     <div className="d-flex align-items-center justify-content-end navbar-icons">
-      {iconsList.map((icon, idx) => renderIcon(icon, idx))}
+      {iconsList.map(({ name, ...restProps }) => (<NavbarIcon key={name} {...restProps} />))}
     </div>
   );
 };

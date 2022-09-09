@@ -5,18 +5,24 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import OpenboxesLogo from 'components/Layout/img/openboxes_logo.jpg';
-import LocationChooser from 'components/location/LocationChooser';
 
 
 const Logo = ({
   logoUrl, history,
 }) => (
-  <div className="d-flex align-items-center gap-8 logo-wrapper">
+  <div className="d-flex align-items-center logo-wrapper">
     <div className="logo-square">
-      {logoUrl ? <img src={logoUrl} alt="Openboxes" width="40" height="40" onClick={() => history.push('/openboxes')} role="presentation" />
-      : <img src={OpenboxesLogo} alt="Openboxes" />}
+      {logoUrl
+          ? <img
+            src={logoUrl}
+            alt="Openboxes"
+            width="40"
+            height="40"
+            role="presentation"
+            onClick={() => history.push('/openboxes')}
+          />
+          : <img src={OpenboxesLogo} alt="Openboxes" />}
     </div>
-    <LocationChooser />
   </div>
 );
 

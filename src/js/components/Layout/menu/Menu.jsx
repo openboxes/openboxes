@@ -31,13 +31,16 @@ const Menu = ({ menuConfig, location }) => {
   }, {});
 
   const checkActiveSection = (menuUrls, path) => {
-    // eslint-disable-next-line max-len
-    // Concat currentPath, because react-router recognizes params (?exampleParam) and it moves this part from pathname and moves it to search
-    // eslint-disable-next-line max-len
-    // e.g. /openboxes/stockMovement/createInbound?directon=INBOUND => pathname: /openboxes/stockMovement/createInbound/ search: ?direction=INBOUND
+    // Concat currentPath, because react-router recognizes params (?exampleParam)
+    // and it moves this part from pathname and moves it to search
+    // e.g.
+    // /openboxes/stockMovement/createInbound?directon=INBOUND
+    // =>
+    // pathname: /openboxes/stockMovement/createInbound/ search: ?direction=INBOUND
     const currentPath = path.pathname.concat('', path.search);
-    // eslint-disable-next-line max-len
-    // slice currentPath to max length of 4, so we look only at e.g. /openboxes/invoice/create/, so we don't need to check additional /invoicing/create/:id/:param1/:param2, etc.
+    // slice currentPath to max length of 4,
+    // so we look only at e.g. /openboxes/invoice/create/,
+    // so we don't need to check additional /invoicing/create/:id/:param1/:param2, etc.
     const splittedCurrentPath = currentPath.split('/').slice(0, 4);
     const matchedPath = Object.keys(menuUrls).find((section) => {
       const splittedSectionUrls = menuUrls[section].map(url => url.split('/').slice(0, 4));
@@ -109,5 +112,5 @@ Menu.propTypes = {
     pathname: PropTypes.string,
     search: PropTypes.string,
   }).isRequired,
-  menuConfig: PropTypes.shape([]).isRequired,
+  menuConfig: PropTypes.shape(PropTypes.arrayOf({})).isRequired,
 };
