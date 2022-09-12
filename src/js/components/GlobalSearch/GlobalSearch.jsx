@@ -21,12 +21,12 @@ const ValueContainer = ({ children, ...props }) => (
 
 const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const searchTerm = debounceGlobalSearch(debounceTime, minSearchLength);
+
+  const searchItems = debounceGlobalSearch(debounceTime, minSearchLength);
 
   const showSearchbar = () => setIsVisible(true);
 
   const hideSearchbar = () => setIsVisible(false);
-
 
   const onKeyPressHandler = (event) => {
     if (event.key === 'Enter') {
@@ -35,7 +35,9 @@ const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
   };
 
   const onOptionSelectedHandler = (data) => {
-    window.location = data.url;
+    if (data) {
+      window.location = data.url;
+    }
   };
 
   const splitMatchingStr = (data, str) => {
@@ -67,13 +69,27 @@ const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
   };
 
 
-  const DropdownIndicator = props => (
-    <components.IndicatorsContainer {...props}>
-      <button className="app-global-search__clear-btn" onClick={hideSearchbar}>
-        <RiCloseLine />
-      </button>
-    </components.IndicatorsContainer>
-  );
+  const DropdownIndicator = (props) => {
+    const clearOrHide = () => {
+      // eslint-disable-next-line react/prop-types
+      const { hasValue, setValue } = props;
+      if (hasValue) {
+        setValue('');
+        return;
+      }
+      hideSearchbar();
+    };
+    return (
+      <components.IndicatorsContainer {...props}>
+        <button
+          className="app-global-search__clear-btn"
+          onClick={clearOrHide}
+        >
+          <RiCloseLine />
+        </button>
+      </components.IndicatorsContainer>
+    );
+  };
 
 
   return (
@@ -85,9 +101,10 @@ const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
           classNamePrefix="app-global-search"
           autoFocus
           openMenuOnClick={false}
-          loadOptions={searchTerm}
+          loadOptions={searchItems}
           onKeyDown={onKeyPressHandler}
           onChange={onOptionSelectedHandler}
+          onBlur={hideSearchbar}
           components={{
             ValueContainer,
             DropdownIndicator,
