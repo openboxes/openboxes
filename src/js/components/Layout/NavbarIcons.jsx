@@ -56,13 +56,15 @@ const NavbarIcons = ({
       name: 'configuration',
       tooltip: 'Configuration',
       component: renderProps => (
-        <div className="btn-group menu-icon">
-          <RiSettings5Line
-            className="dropdown-toggle"
+        <div className="btn-group">
+          <div
+            className="dropdown-toggle menu-icon"
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
-          />
+          >
+            <RiSettings5Line />
+          </div>
           <div
             className="dropdown-menu dropdown-menu-right nav-item padding-8"
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
@@ -83,15 +85,17 @@ const NavbarIcons = ({
       name: 'profile',
       tooltip: 'Profile',
       component: renderProps => (
-        <div className="btn-group menu-icon">
-          <RiUser3Line
-            className="dropdown-toggle"
+        <div className="btn-group">
+          <div
+            className="dropdown-toggle menu-icon"
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
-          />
+          >
+            <RiUser3Line />
+          </div>
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8 mt-2"
+            className="dropdown-menu dropdown-menu-right nav-item padding-8"
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
