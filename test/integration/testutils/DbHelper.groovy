@@ -19,6 +19,8 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductType
+import org.pih.warehouse.product.ProductTypeCode
 
 class DbHelper {
 
@@ -60,11 +62,19 @@ class DbHelper {
         ).save(failOnError: true, flush: true)
     }
 
+    static ProductType findOrCreateProductType(String name) {
+        ProductType.findByName(name) ?: new ProductType(
+            name: name,
+            productTypeCode: ProductTypeCode.GOOD
+        ).save(failOnError: true, flush: true)
+    }
+
     static Product findOrCreateProduct(String productName, String categoryName = 'Medicines') {
         Product.findByName(productName) ?: new Product(
             category: findOrCreateCategory(categoryName),
             name: productName,
             productCode: productName,
+            productType: findOrCreateProductType("Default"),
         ).save(failOnError: true, flush: true)
     }
 

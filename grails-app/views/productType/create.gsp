@@ -61,6 +61,15 @@
 
 							<tr class="prop">
 								<td valign="top" class="name">
+									<label for="sequenceNumber"><warehouse:message code="productType.sequenceNumber.label" default="Sequence Number" /></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'sequenceNumber', 'errors')}">
+									<g:textField type="number" class="text" size="80" name="sequenceNumber" value="${productTypeInstance?.sequenceNumber}" />
+								</td>
+							</tr>
+
+							<tr class="prop">
+								<td valign="top" class="name">
 									<label for="code"><warehouse:message code="productType.code.label" default="Code" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productTypeInstance, field: 'code', 'errors')}">
