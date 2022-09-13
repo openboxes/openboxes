@@ -61,7 +61,7 @@ html * {
 .yui-gf .yui-u { margin-left:0px; width:75%; }
 
 body {
-    background: #fff;
+    background: var(--page-background, #fff);
     color: #333;
     /*font: 11px "lucida grande", verdana, arial, helvetica, sans-serif;*/
 }
@@ -3850,7 +3850,6 @@ table.pvtTable tr th { background-color: #ddd; }
      overflow-x: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
-    font-family: 'Inter', sans-serif;
  }
 
 .location-chooser__button-tag {
@@ -3865,3 +3864,62 @@ table.pvtTable tr th { background-color: #ddd; }
      line-height: 18px;
     margin-left: 4px;
  }
+
+/* LOCATION CHOSER ON LOGIN */
+
+.location-chooser__login {
+    width: clamp(670px, 70vw, 1000px);
+    background: white;
+}
+.location-chooser__login .location-chooser__header {
+    padding-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+.location-chooser__login .location-chooser__header h2 {
+    all: unset;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 32px;
+    color: var(--blue-800);
+}
+.location-chooser__login .location-chooser__footer {
+    padding-bottom: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.location-chooser__login .location-chooser__footer__last-signin {
+    color: var(--gray-600);
+}
+
+.location-chooser__login .location-chooser__footer__logout-user {
+    color: var(--gray-600);
+}
+.location-chooser__login .location-chooser__footer__logout-btn {
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    gap: 8px;
+    color: var(--blue-primary);
+    border: 1px solid var(--blue-primary);
+    border-radius: 4px;
+    text-decoration: none;
+    outline-style: outset;
+    outline-width: 0;
+    outline-color: rgba(1, 178, 237, 0.37);
+    transition: outline-width ease-in-out 0.2s;
+}
+
+.location-chooser__login .location-chooser__footer__logout-btn:active {
+    outline-width: 4px;
+}
+
+.location-chooser__login .location-chooser__footer__logout-btn:hover {
+    background: var(--blue-primary);
+    color: white;
+
+    /*color: rgba(1, 178, 237);*/
+}
