@@ -609,6 +609,8 @@
 <g:hiddenField id="currentLocation" name="currentLocation" value="${session?.warehouse?.id}"/>
 </ul>
 <!--MegaMenu Ends-->
+
+%{--Script for checking active state of menu items--}%
 <script type="text/javascript">
   $(document).ready(function() {
     const currentLocationId = $("#currentLocation").val();

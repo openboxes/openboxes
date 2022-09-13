@@ -10,6 +10,7 @@
     --blue-200: #F0F6FF;
     --blue-201: #F4F7FE;
     --blue-300: #E9EDF4;
+    --blue-301: #D0DAED;
     --blue-400: #7AA3F3;
     --blue-500: #2264E5;
     --blue-700: #2B3674;
@@ -20,6 +21,7 @@
     --gray-200: #D6D8DC;
     --gray-300: #CED4DA;
     --gray-400: #636D81;
+    --gray-401: #747C93;
     --gray-500: #636D81;
     --gray-600: #464F60;
 }
@@ -3633,4 +3635,10 @@ table.pvtTable tr th { background-color: #ddd; }
 
 .active-section a {
     color: var(--blue-primary) !important;
+}
+
+@media (max-width: 1440px) {
+    .nav-item > a {
+        padding: 0 8px !important;
+    }
 }
