@@ -8,8 +8,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
     <!-- YUI -->
     <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
+
     <!-- Remix icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -110,7 +112,37 @@
     <!-- Header "hd" includes includes logo, global navigation -->
     <g:if test="${session?.user && session?.warehouse}">
         <div id="main-wrapper">
-            <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
+            <div class="d-flex align-items-center">
+                <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
+                <g:if test="${session?.warehouse?.bgColor && session?.warehouse?.bgColor != 'FFFFFF' && session?.warehouse?.bgColor != 'FFFF'}">
+                    <g:set var="locationColor" value="--location-color: #${session?.warehouse?.bgColor}"/>
+                </g:if>
+                <g:else>
+                    <g:set var="locationColor" value="--location-color: unset"/>
+                </g:else>
+                <div class="tooltip2">
+                    <button
+                        class="btn-show-dialog location-chooser__button"
+                        style="${locationColor}"
+                        data-dialog-class="location-chooser"
+                        data-resizable="false"
+                        data-draggable="true"
+                        data-width="900"
+                        data-title="${g.message(code:'dashboard.chooseLocation.label')}" data-height="300"
+                        data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}"
+                    >
+                        <span class="location-chooser__button-title">${session?.warehouse?.name}</span>
+                        <g:if  test="${grailsApplication.config.openboxes.logo.label}">
+                            <span class="location-chooser__button-tag">
+                                ${grailsApplication.config.openboxes.logo.label}
+                            </span>
+                        </g:if>
+                    </button>
+                    <g:if test="${session?.warehouse?.name?.length() > 20}">
+                        <span class="tooltiptext2">${session?.warehouse?.name}</span>
+                    </g:if>
+                </div>
+            </div>
             <div id="menu-wrapper">
                 <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
                 <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
@@ -317,12 +349,13 @@
 
 <g:javascript>
 
-    function openModalDialog(target, title, width, height, url, reload) {
+    function openModalDialog(target, title, width, height, url, reload, resizable, draggable, dialogClass) {
 
         var position = {
-            my: "center center",
-            at: "center center",
-            of: window
+            my: "center",
+            at: "center",
+            of: window,
+            offset: "0 -100%"
         };
 
         $(target).attr("title", title);
@@ -332,16 +365,32 @@
             modal: true,
             width: width,
             autoResize:true,
-            resizable: true,
+            resizable: resizable,
             minHeight: height,
             position: position,
+            draggable: draggable,
+            dialogClass: dialogClass,
+            create: function(event, ui) {
+                var widget = $(this).dialog("widget");
+                $(".ui-dialog-titlebar-close span", widget)
+                        .removeClass("ui-icon-closethick")
+                        .removeClass("ui-icon")
+                        .addClass("ri-close-line")
+                        .empty();
+            },
             close: function(event, ui) {
               if (reload) {
                 location.reload();
               }
             },
             open: function(event, ui) {
-                $(this).html("<div class='loading'></div>");
+              const loadingElement =
+              "<div class='spinner-container'>" +
+              "<div class='spinner-border circle-spinner' role='status'>" +
+              "<span class='sr-only'>Loading...</span>" +
+              "</div>";
+              "</div>";
+                $(this).html(loadingElement);
                 $(this).load(url, function(response, status, xhr) {
                     if (xhr.status !== 200) {
                         $(this).text("");
@@ -373,7 +422,10 @@
             var width = $(this).data("width") || "800";
             var height = $(this).data("height") || "auto";
             var reload = $(this).data("reload") || false;
-            openModalDialog(target, title, width, height, url, reload);
+            var resizable = $(this).data("resizable");
+            var draggable = $(this).data("draggable");
+            var dialogClass = $(this).data("dialog-class") || "";
+            openModalDialog(target, title, width, height, url, reload, resizable, draggable, dialogClass);
         });
 
         $(".btn-close-dialog").live("click", function (event) {

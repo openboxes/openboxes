@@ -22,10 +22,4 @@
             <img src="${attrs?.logoUrl}" alt="Openboxes" width="40" height="40" />
         </div>
     </g:else>
-    <g:if test="${attrs?.logoLabel && attrs.showLabel}">
-        <span class="logo-label">${attrs?.logoLabel}</span>
-    </g:if>
-    <div id="location-name-wrapper" class="d-flex align-items-center gap-8">
-        <span id="location-name-span">${attrs?.locationName ?: 'Unnamed'}</span>
-    </div>
 </div>
