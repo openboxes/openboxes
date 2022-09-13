@@ -4,9 +4,14 @@
 <head>
     <!-- Include default page title -->
     <title><g:layoutTitle default="OpenBoxes" /></title>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <!-- YUI -->
     <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
+    <!-- Remix icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
     <!-- Include Favicon -->
     <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}?v2" type="image/x-icon" />
@@ -18,6 +23,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" type="text/css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
     <!-- Include javascript files -->
     <g:javascript library="application"/>
@@ -50,6 +56,7 @@
     <ga:trackPageview/>
     <r:layoutResources/>
 
+    <!-- TODO: replace fontawesowe by remix icons -->
     <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" data-auto-replace-svg="nest"></script>
 </head>
 
@@ -102,17 +109,17 @@
 
     <!-- Header "hd" includes includes logo, global navigation -->
     <g:if test="${session?.user && session?.warehouse}">
-        <div id="hd" role="banner">
-            <g:render template="/common/header"/>
-        </div>
-        <div id="megamenu">
-            <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
-            <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                ${g.message(code: 'default.loading.label')}
+        <div id="main-wrapper">
+            <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
+            <div id="menu-wrapper">
+                <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
+                <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
+                    ${g.message(code: 'default.loading.label')}
+                </div>
             </div>
-        </div>
-        <div id="breadcrumb">
-            <g:render template="/common/breadcrumb"/>
+            <div class="d-flex align-items-center justify-content-end navbar-icons">
+                <g:render template="/common/menuicons" model="[confMenu: grailsApplication.config.openboxes.megamenu.configuration]" />
+            </div>
         </div>
     </g:if>
 

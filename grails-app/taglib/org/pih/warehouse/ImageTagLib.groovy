@@ -32,6 +32,7 @@ class ImageTagLib {
         attrs.logoUrl = logoUrl
         attrs.logoLabel = logoLabel
         attrs.showLabel = (attrs.showLabel != null) ? attrs.showLabel : true
+        attrs.locationName = location?.name
 
         out << g.render(template: '/taglib/displayLogo', model: [attrs: attrs])
     }
