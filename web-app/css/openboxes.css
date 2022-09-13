@@ -1219,7 +1219,7 @@ h3.ui-state-active { background-color: #f7f7f7; }  /* #F8F7EF */
 body {
     text-align: left;
     padding-bottom: 50px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif !important;
 }
 
 
@@ -3826,11 +3826,6 @@ table.pvtTable tr th { background-color: #ddd; }
 
     /* LOCATION CHOOSER BUTTON */
 .location-chooser__button {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
     background: white;
     border: 1px solid var(--location-color, var(--blue-200));
     padding: 0 8px;
@@ -3850,6 +3845,7 @@ table.pvtTable tr th { background-color: #ddd; }
      overflow-x: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
+     display: inline-block;
  }
 
 .location-chooser__button-tag {
@@ -3858,11 +3854,9 @@ table.pvtTable tr th { background-color: #ddd; }
      color: white;
      background-color: var(--color-red);
      border-radius: 2px;
-     display: flex;
-     align-items: center;
-     justify-content: center;
+     display: inline;
      line-height: 18px;
-    margin-left: 4px;
+     margin-left: 4px;
  }
 
 /* LOCATION CHOSER ON LOGIN */
@@ -3922,4 +3916,8 @@ table.pvtTable tr th { background-color: #ddd; }
     color: white;
 
     /*color: rgba(1, 178, 237);*/
+}
+
+.ui-widget {
+    font-family: 'Inter', sans-serif !important;
 }

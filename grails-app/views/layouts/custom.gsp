@@ -395,7 +395,6 @@
             var resizable = $(this).data("resizable");
             var draggable = $(this).data("draggable");
             var dialogClass = $(this).data("dialog-class") || "";
-            console.log({ resizable, draggable })
             openModalDialog(target, title, width, height, url, reload, resizable, draggable, dialogClass);
         });
 
