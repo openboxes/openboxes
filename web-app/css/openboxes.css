@@ -1,3 +1,29 @@
+:root {
+    --page-background: #F0F1F4;
+    --color-red: #C71610;
+    --color-green: #13AD60;
+    --color-yellow: #F3A157;
+
+/* BLUE*/
+    --blue-primary: #0052CC;
+    --blue-100: #F7F9FD;
+    --blue-200: #F0F6FF;
+    --blue-201: #F4F7FE;
+    --blue-300: #E9EDF4;
+    --blue-400: #7AA3F3;
+    --blue-500: #2264E5;
+    --blue-700: #2B3674;
+    --blue-800: #202750;
+
+/* GRAY*/
+    --gray-100: #EAEAEA;
+    --gray-200: #D6D8DC;
+    --gray-300: #CED4DA;
+    --gray-400: #636D81;
+    --gray-500: #636D81;
+    --gray-600: #464F60;
+}
+
 html * {
     margin: 0;
     /*padding: 0; SELECT NOT DISPLAYED CORRECTLY IN FIREFOX */
@@ -1098,6 +1124,7 @@ button.action-btn, button.previous, button.next {
     -webkit-border-radius:20px;
     -moz-border-radius:20px;
     border-radius:20px;
+    box-sizing: revert;
 }
 .count.active {
     background-color: #f3961c;
@@ -3310,4 +3337,300 @@ table.pvtTable tr th { background-color: #ddd; }
     color: black !important;
     background-clip: padding-box;
     border-radius: 0.2em;
+}
+
+
+/* New menu redesign*/
+
+#main-wrapper {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    min-height: 56px;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    color: var(--blue-700);
+    box-shadow: 0 4px 4px rgba(0,0,0,.15);
+}
+
+
+#main-wrapper #logo-wrapper {
+    font-weight: 400;
+    padding: 8px 12px 8px 32px;
+}
+
+#main-wrapper #logo-wrapper > #logo-square {
+    width: 40px;
+    height: 40px;
+}
+
+#main-wrapper #logo-wrapper > #logo-square img {
+    border: 1px solid #E6E6E6;
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+}
+
+#main-wrapper #logo-wrapper > #logo-square img:active {
+     border: 0 !important;
+     border-radius: 4px;
+     box-shadow: 0 0 0 4px rgba(34, 100, 229, 0.36);
+}
+
+#main-wrapper #logo-wrapper > #logo-square img:hover {
+     border: 1px solid #C5C5C5;
+}
+
+.gap-8 {
+    gap: 8px;
+}
+
+#location-name-wrapper {
+    height: 40px;
+    padding: 0 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: 4px;
+}
+
+#location-name-wrapper > #location-name-span {
+    font-size: 15px;
+    line-height: 32px;
+    color: var(--gray-600);
+}
+
+#location-name-wrapper > #location-name-span > #location-label {
+    height: 25px;
+    background-color: var(--color-red);
+    border-radius: 2px;
+    padding: 4px;
+}
+
+#location-name-wrapper > #location-name-span > #location-label > span {
+    color: #FFFFFF;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.dropdown-menu-subsections {
+    max-height: 60vh;
+    max-width: 50vw;
+    overflow: hidden auto;
+    display: flex;
+    width: max-content;
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    padding: 7px 15px !important;
+    color: white !important;
+    font-size: 14px;
+}
+
+.dropdown:hover {
+    background-color: white;
+}
+
+.nav-link {
+    color: black !important;
+}
+
+.nav-link:hover {
+    background-color: white;
+    color: black !important;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    color: black !important;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.dropdown-menu {
+    margin: 1px 0 0 0 !important;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    position: absolute !important;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    border: 0 !important;
+}
+
+.dropdown-menu span {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--blue-700) !important;
+    padding: 8px 16px !important;
+    line-height: 30px;
+}
+
+
+.nav-item a {
+    line-height: 24px;
+    color: var(--blue-700) !important;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 0 16px !important;
+}
+
+.nav-item a:hover {
+    background-color: unset !important;
+    color: var(--blue-700) !important;
+}
+
+.dropdown-menu a {
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 32px;
+    padding: 0;
+}
+
+.dropdown-menu a:hover {
+    background-color: var(--blue-200) !important;
+    border-radius: 4px;
+}
+
+.dropdown-menu .dropdown-item .icon {
+    font-size: 20px;
+    padding: 4px !important;
+    vertical-align: middle;
+}
+
+.dropdown-menu-right {
+    right: 0 !important;
+    left: auto !important;
+}
+
+.dropdown-menu-right-conf {
+    right: auto !important;
+    left: auto !important;
+}
+
+.dropdown:hover > a:hover {
+    color: var(--blue-700) !important;
+}
+
+.dropdown-item {
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+}
+
+.dropdown-menu-subsections {
+    max-height: 60vh;
+    max-width: 50vw;
+    overflow: hidden auto;
+    display: flex;
+    width: max-content;
+    flex-wrap: wrap;
+}
+
+.subsection-title {
+    color: gray;
+    font-size: 1.1em;
+    vertical-align: middle;
+    padding: 5px 0 7px 0;
+    white-space: pre;
+}
+
+.padding-8 {
+    padding: 8px;
+}
+
+#menu-wrapper {
+    min-height: 56px;
+}
+
+#menu-wrapper > ul {
+    list-style-type: none;
+    min-height: 56px;
+}
+
+#menu-wrapper > ul li {
+    min-height: 56px;
+}
+
+#menu-wrapper > ul li:hover a {
+    color: var(--blue-700) !important;
+}
+
+.navbar-nav li:hover {
+    background-color: var(--blue-200);
+    color: var(--blue-700) !important;
+}
+
+.navbar-icons {
+    padding: 8px 32px 8px 16px;
+}
+
+.navbar-icons .menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+}
+
+.navbar-icons .menu-icon:hover {
+    background: var(--blue-200);
+    border-radius: 4px;
+}
+
+.custom-tooltip {
+    background-color: var(--blue-800);
+    border-radius: 2px;
+    padding: 4px 8px;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    color: #FFFFFF;
+}
+
+.dropdown-menu .conf-subsections {
+    max-width: 80vw;
+    max-height: 80vh;
+}
+
+.tooltip2 {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip2 .tooltiptext2 {
+    visibility: hidden;
+    border-radius: 2px;
+    padding: 4px 8px;
+    background-color: var(--blue-800);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    color: #FFFFFF;
+    text-align: center;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    top: 150%;
+    left: 50%;
+    margin-left: -25px;
+}
+
+.tooltip2:hover .tooltiptext2 {
+    visibility: visible;
+}
+
+.btn-group .margin-top-18 {
+    margin-top: 18px !important;
+}
+
+.active-section {
+    box-shadow: 0 -3px 0 var(--blue-primary) inset;
+}
+
+.active-section a {
+    color: var(--blue-primary) !important;
 }

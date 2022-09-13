@@ -9,7 +9,7 @@ const MenuItem = ({ section, key, active }) => (
       {section.label}
     </a>
     <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-      <div style={{ maxHeight: '60vh', overflow: 'auto' }} className="px-3 py-1">
+      <div className="padding-8">
         {_.map(section.menuItems, (menuItem, menuItemKey) => (
           <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
             {menuItem.label}
