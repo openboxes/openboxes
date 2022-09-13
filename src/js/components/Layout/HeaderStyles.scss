@@ -185,9 +185,7 @@
 }
 
 @media (max-width: 1440px) {
-  .nav-item {
-    a {
-      padding: 0 8px !important;
-    }
+  .nav-item > a {
+    padding: 0 8px !important;
   }
 }
