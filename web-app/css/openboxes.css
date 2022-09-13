@@ -3352,13 +3352,16 @@ table.pvtTable tr th { background-color: #ddd; }
     font-family: 'Inter', sans-serif;
     font-style: normal;
     color: var(--blue-700);
+    background: white;
     box-shadow: 0 4px 4px rgba(0,0,0,.15);
+    position: relative;
+    padding: 0 24px;
 }
 
 
 #main-wrapper #logo-wrapper {
     font-weight: 400;
-    padding: 8px 12px 8px 32px;
+    padding: 8px;
 }
 
 #main-wrapper #logo-wrapper > #logo-square {
@@ -3544,6 +3547,7 @@ table.pvtTable tr th { background-color: #ddd; }
 
 #menu-wrapper {
     min-height: 56px;
+    padding: 0 16px;
 }
 
 #menu-wrapper > ul {
@@ -3565,7 +3569,7 @@ table.pvtTable tr th { background-color: #ddd; }
 }
 
 .navbar-icons {
-    padding: 8px 32px 8px 16px;
+    padding: 8px 0;
 }
 
 .navbar-icons .menu-icon {
@@ -3824,10 +3828,10 @@ table.pvtTable tr th { background-color: #ddd; }
     background: var(--blue-100);
 }
 
-    /* LOCATION CHOOSER BUTTON */
+/* LOCATION CHOOSER BUTTON */
 .location-chooser__button {
     background: white;
-    border: 1px solid var(--location-color, var(--blue-200));
+    border: 1px solid var(--location-color, var(--gray-200));
     padding: 0 8px;
     border-radius: 4px;
     font-size: 15px;
@@ -3840,6 +3844,7 @@ table.pvtTable tr th { background-color: #ddd; }
 
 .location-chooser__button-title {
      font-size: inherit;
+     font-family: 'Inter', sans-serif;
      color: var(--gray-600);
      max-width: 200px;
      overflow-x: hidden;
