@@ -180,7 +180,7 @@ CREATE OR REPLACE VIEW order_item_summary AS (
 CREATE OR REPLACE VIEW order_summary AS (
     SELECT
         id,
-        order_number,
+        id as order_id,
         quantity_ordered,
         adjustments_count,
         quantity_shipped,
@@ -199,7 +199,6 @@ CREATE OR REPLACE VIEW order_summary AS (
     FROM (
         SELECT
             id,
-            order_number,
             order_status,
             SUM(items_and_adjustments_union.quantity_ordered)    AS quantity_ordered,
             SUM(items_and_adjustments_union.adjustments_count) 		AS adjustments_count,
@@ -231,7 +230,6 @@ CREATE OR REPLACE VIEW order_summary AS (
             -- to not get duplicated quantities and to get proper payment status for order summary
             SELECT
                 `order`.id                                  AS id,
-                `order`.order_number                        AS order_number,
                 `order`.status                              AS order_status,
                 SUM(order_item_summary.quantity_ordered)    AS quantity_ordered,
                 0									 		AS adjustments_count,
@@ -248,7 +246,6 @@ CREATE OR REPLACE VIEW order_summary AS (
             UNION
             SELECT
                 `order`.id                                  			AS id,
-                `order`.order_number                        			AS order_number,
                 `order`.status                              			AS order_status,
                 0    													AS quantity_ordered,
                 SUM(order_adjustment_payment_status.quantity_ordered)	AS adjustments_count,
@@ -262,6 +259,6 @@ CREATE OR REPLACE VIEW order_summary AS (
                 JOIN order_adjustment_payment_status ON order_adjustment_payment_status.adjustment_id = order_adjustment.id
             WHERE `order`.order_type_id = 'PURCHASE_ORDER' AND order_adjustment.canceled IS NOT TRUE
             GROUP BY `order`.id
-        ) AS items_and_adjustments_union GROUP BY id, order_number, order_status
+        ) AS items_and_adjustments_union GROUP BY id, order_status
     )
 AS order_summary);

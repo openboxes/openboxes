@@ -42,6 +42,7 @@ import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderSummary
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
@@ -60,6 +61,7 @@ import org.pih.warehouse.shipping.ShipmentType
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
+import java.math.RoundingMode
 
 class BootStrap {
 
@@ -178,6 +180,27 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(Order) { Order order ->
             return order.toJson()
+        }
+
+        JSON.registerObjectMarshaller(OrderSummary) { OrderSummary orderSummary ->
+            def defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+            def origOrgCode = orderSummary?.order?.origin?.organization?.code
+            def destOrgCode = orderSummary?.order?.destination?.organization?.code
+            return [
+                status: orderSummary?.derivedStatus,
+                id: orderSummary?.order?.id,
+                orderNumber: orderSummary?.order?.orderNumber,
+                name: orderSummary?.order?.name,
+                origin: orderSummary?.order?.origin?.name + (origOrgCode ? " (${origOrgCode})" : ""),
+                destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
+                orderedOn: orderSummary?.order?.dateOrdered,
+                orderedBy: orderSummary?.order?.orderedBy?.getName(),
+                orderItemsCount: orderSummary?.order?.orderedOrderItems?.size()?:0,
+                shippedItemsCount: orderSummary?.order?.shippedOrderItems?.size()?:0,
+                receivedItemsCount: orderSummary?.order?.receivedOrderItems?.size()?:0,
+                total: "${orderSummary?.order?.total?.setScale(2, RoundingMode.HALF_UP)} ${orderSummary?.order?.currencyCode ?: defaultCurrencyCode}",
+                totalNormalized: "${orderSummary?.order?.totalNormalized?.setScale(2, RoundingMode.HALF_UP)} ${defaultCurrencyCode}",
+            ]
         }
 
         JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->
