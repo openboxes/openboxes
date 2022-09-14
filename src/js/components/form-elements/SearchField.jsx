@@ -1,13 +1,11 @@
 import React from 'react';
 
 import BaseField from 'components/form-elements/BaseField';
-import Input from 'utils/Input';
+import SearchInput from 'utils/SearchInput';
 
-
-const TextField = (props) => {
+const SearchField = (props) => {
   const renderInput = attributes => (
-    <Input
-      isFormElement
+    <SearchInput
       {...attributes}
     />
   );
@@ -20,4 +18,4 @@ const TextField = (props) => {
   );
 };
 
-export default TextField;
+export default SearchField;
