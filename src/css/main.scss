@@ -474,138 +474,6 @@ a.disabled {
   }
 }
 
-/* = WIZARD STEPS CONTAINER
-----------------------------*/
-
-.wizard-box {
-  border-bottom: 1px solid $gray-alpha;
-  width: 100%;
-  overflow: hidden;
-}
-
-.wizard-steps {
-  height: 35px;
-  padding: 0;
-  line-height: 36px;
-  list-style: none;
-}
-
-/* = DEFAULT STEPS
-----------------------------*/
-.wizard-steps div {
-  padding-bottom: 2px;
-}
-
-.wizard-steps div,
-.wizard-steps div a,
-.wizard-steps div span {
-  display: inline-block;
-  vertical-align: top
-}
-
-.wizard-steps div a,
-.wizard-steps div:not(:first-child) span {
-  height: 35px;
-  padding: 0 20px 0 35px;
-  line-height: 36px;
-}
-
-.wizard-steps div:first-child a {
-  padding: 0 10px;
-}
-
-.wizard-steps div a {
-  position: relative;
-  text-decoration: none;
-  background-color: $blue-epsilon;
-  color: $blue-alpha;
-  border-left: none;
-  border-right: none;
-  font-size: 1.2em;
-  text-align: center;
-  overflow-wrap: break-word;
-}
-
-.wizard-steps div:first-child a {
-  padding-left: 10px
-}
-
-.wizard-steps div a:after,
-.wizard-steps div a:before {
-  position: absolute;
-  top: -1px;
-  width: 0;
-  height: 0;
-  content: '';
-  border-top: 17px solid transparent;
-  border-bottom: 20px solid transparent
-}
-
-.wizard-steps div a:before {
-  right: -10px;
-  z-index: 3;
-  border-left: 11px solid $blue-epsilon;
-}
-
-.wizard-steps div a:after {
-  right: -11px;
-  z-index: 2;
-  border-left: 11px solid $blue-beta
-}
-
-.wizard-steps div a:focus,
-.wizard-steps div a:hover {
-  background-color: $blue-delta;
-  border: 1px solid $blue-delta
-}
-
-.wizard-steps div a:focus:before,
-.wizard-steps div a:hover:before {
-  border-left-color: $blue-delta
-}
-
-/* = COMPLETED STEPS
-----------------------------*/
-
-.wizard-steps .completed-step a {
-  background-color: $blue-gamma;
-}
-
-.wizard-steps .completed-step a:before {
-  border-left-color: $blue-gamma;
-}
-
-.wizard-steps .completed-step a:after {
-  border-left-color: $blue-beta
-}
-
-/* = CURRENT STEP
-----------------------------*/
-
-.wizard-steps .active-step a {
-  background-color: $blue-alpha;
-  color: white;
-}
-
-.wizard-steps .active-step a:before {
-  border-left-color: $blue-alpha
-}
-
-.wizard-steps .active-step a:after {
-  border-left-color: $blue-beta
-}
-
-/* = DISABLED STEPS
-----------------------------*/
-
-.wizard-steps .disabled-step {
-  cursor: default;
-}
-
-.wizard-steps .disabled-step a {
-  pointer-events: none;
-}
-
 /* MODALS
 ----------------------------*/
 
@@ -1015,4 +883,56 @@ div.crossed-out .table-inner-row:before {
 .tippy-tooltip {
   padding: 0 !important;
   border-radius: 0 !important;
+}
+
+// Table Filters fields
+
+div.search-input {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 6px 12px;
+  gap: 8px;
+  position: absolute;
+  height: 36px;
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid var(--gray-300);
+  border-radius: 2px;
+
+  input {
+    flex: 1;
+    height: 34px !important;
+    border: none;
+    padding: 0;
+    &:focus, &:focus-visible {
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  svg {
+    height: 14px;
+    width: 14px;
+  }
+
+  button {
+    all: unset;
+    color: inherit;
+    font-size: 24px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+div.search-input:hover {
+  border: 1px solid var(--blue-primary);
+}
+
+div.search-input:focus-within {
+  border: 1px solid var(--blue-primary);
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.06), 0px 0px 0px 1px rgba(104, 113, 130, 0.16), 0px 0px 0px 4px rgba(34, 100, 229, 0.15);
 }
