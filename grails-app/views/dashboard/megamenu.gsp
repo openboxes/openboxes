@@ -311,7 +311,6 @@
                         </g:if>
                     </div>
                 </li>
-            </a>
 
             </g:supports>
             </g:hasHigherRoleThanAuthenticated>
