@@ -124,13 +124,14 @@ $min-modal-width: 670px;
     color: var(--blue-700);
     font-size: 14px;
     padding: 6px 8px;
-    border: 1px solid var(--blue-200);
+    border: 1px solid var(--location-color, var(--blue-200));
     border-radius: 4px;
 
     &__icon {
       margin-top: 4px;
       margin-right: 4px;
       min-width: 16px;
+      color: var(--location-color, var(--blue-700));
     }
 
     &__title {
@@ -140,8 +141,11 @@ $min-modal-width: 670px;
     }
 
     &:hover {
-      background-color: var(--blue-700);
-      border: 1px solid var(--blue-700);
+      background-color: var(--location-color, var(--blue-700));
+      border: 1px solid var(--location-color, var(--blue-700));
+      color: var(--blue-200);
+    }
+    &:hover &__icon {
       color: var(--blue-200);
     }
   }

@@ -1,45 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { RiMapPinLine } from 'react-icons/ri';
 
 const LocationButton = ({ location, onClick }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   const buttonStyle = () => {
-    if (!location.backgroundColor || ['FFFFFF', 'FFFF'].includes(location.backgroundColor)) {
-      return {};
-    }
-    const style = {
-      borderColor: location.backgroundColor,
-    };
-    if (isHovered) {
-      style.backgroundColor = location.backgroundColor;
-    }
-    return style;
-  };
+    if (!location.backgroundColor) return { '--location-color': 'unset' };
 
-  const iconStyle = () => {
-    if (!location.backgroundColor || ['FFFFFF', 'FFFF'].includes(location.backgroundColor)) {
-      return {};
-    }
-    return {
-      color: isHovered ? '#FFFFFF' : location.backgroundColor,
-    };
+    const normalizeColor = location.backgroundColor.replace('#', '').toUpperCase();
+    if (['FFFFFF', 'FFFF'].includes(normalizeColor)) return { '--location-color': 'unset' };
+
+    return { '--location-color': `#${normalizeColor}` };
   };
 
   return (
     <button
       onClick={() => onClick(location)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className="location-chooser__location-button"
       style={buttonStyle()}
     >
-      <RiMapPinLine
-        className="location-chooser__location-button__icon"
-        style={iconStyle()}
-      />
+      <RiMapPinLine className="location-chooser__location-button__icon" />
       <span className="location-chooser__location-button__title">
         {location.name}
       </span>

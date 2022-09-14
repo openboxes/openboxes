@@ -6,7 +6,7 @@
     align-items: center;
     justify-content: center;
     background-color: white;
-    border: 1px solid var(--gray-200);
+    border: 1px solid var(--location-color, var(--gray-200));
     padding: 0 8px;
     border-radius: 4px;
     font-size: 15px;
