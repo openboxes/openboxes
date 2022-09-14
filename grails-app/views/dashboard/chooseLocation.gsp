@@ -14,7 +14,7 @@
                     <g:render template="loginLocations"/>
                     <div class="d-flex justify-content-between location-chooser__footer">
                         <div class="location-chooser__footer__last-signin d-flex align-items-center justify-content-center">
-                            <g:message code="dashboard.youLastLoggednHereOn.message"
+                            <g:message code="dashboard.youLastLoggedInHereOn.message"
                                        args="[g.prettyDateFormat(date: session?.user?.lastLoginDate), g.formatDate(date: session?.user?.lastLoginDate, format: 'MMM dd yyyy hh:mm:ss a z')]"/>
                         </div>
                         <div class="d-flex justify-content-center align-items-center">

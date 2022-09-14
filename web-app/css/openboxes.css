@@ -3890,6 +3890,7 @@ table.pvtTable tr th { background-color: #ddd; }
 
 .location-chooser__login .location-chooser__footer__last-signin {
     color: var(--gray-600);
+    gap: 3px;
 }
 
 .location-chooser__login .location-chooser__footer__logout-user {
