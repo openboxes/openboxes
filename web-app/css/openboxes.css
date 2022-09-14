@@ -3579,6 +3579,7 @@ table.pvtTable tr th { background-color: #ddd; }
     font-size: 22px;
     width: 40px;
     height: 40px;
+    cursor: pointer;
 }
 
 .navbar-icons .menu-icon:hover {
@@ -3657,7 +3658,7 @@ table.pvtTable tr th { background-color: #ddd; }
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--blue-300);
+    background-color: var(--blue-301);
 }
 
 /* SPINNER */
@@ -3683,10 +3684,11 @@ table.pvtTable tr th { background-color: #ddd; }
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     border: none;
     border-radius: 4px;
+    padding: 24px;
 }
 .location-chooser .tabs {
     background-color: white;
-    padding: 24px;
+    padding: 0;
     display: flex;
     flex-direction: row;
     gap: 24px;
@@ -3793,10 +3795,8 @@ table.pvtTable tr th { background-color: #ddd; }
     color: var(--blue-800);
     background: white;
     border: none;
-    padding-top: 24px;
-    padding-right: 32px;
-    padding-left: 32px;
-    margin: 0;
+    padding: 0;
+    margin: 0 0 24px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -3871,9 +3871,7 @@ table.pvtTable tr th { background-color: #ddd; }
     background: white;
 }
 .location-chooser__login .location-chooser__header {
-    padding-top: 24px;
-    padding-left: 24px;
-    padding-right: 24px;
+    margin-bottom: 24px;
 }
 .location-chooser__login .location-chooser__header h2 {
     all: unset;
@@ -3883,13 +3881,12 @@ table.pvtTable tr th { background-color: #ddd; }
     color: var(--blue-800);
 }
 .location-chooser__login .location-chooser__footer {
-    padding-bottom: 24px;
-    padding-left: 24px;
-    padding-right: 24px;
+    margin-top: 24px;
 }
 
 .location-chooser__login .location-chooser__footer__last-signin {
     color: var(--gray-600);
+    gap: 3px;
 }
 
 .location-chooser__login .location-chooser__footer__logout-user {

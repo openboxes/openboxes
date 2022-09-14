@@ -24,7 +24,13 @@ const LocationChooserModal = ({
       className="location-chooser__modal__group d-flex flex-column mb-4"
     >
       <h3 className="location-chooser__modal__group-title mb-3">
-        {groupedLocations.group !== 'null' ? groupedLocations.group : 'No location group'}
+        {groupedLocations.group !== 'NO_GROUP'
+          ? groupedLocations.group
+          : (
+            <Translate
+              id="react.dashboard.noLocationGroup.label"
+              defaultMessage="No location group"
+            />)}
       </h3>
       <div className="location-chooser__modal__group-container d-flex flex-wrap flex-row">
         {groupedLocations.locations.map(location =>
@@ -44,7 +50,13 @@ const LocationChooserModal = ({
             key={`${organization}-org-tab`}
             className="react-tabs__tab border-0 rounded-0 px-3 py-2"
           >
-            {organization}
+            {organization !== 'NO_ORGANIZATION'
+              ? organization
+              : (
+                <Translate
+                  id="react.dashboard.noOrganization.label"
+                  defaultMessage="No organization"
+                />)}
           </Tab>))}
       </TabList>
       <div>

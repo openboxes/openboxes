@@ -114,16 +114,17 @@
         <div id="main-wrapper">
             <div class="d-flex align-items-center">
                 <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
-                <g:if test="${session?.warehouse?.bgColor && session?.warehouse?.bgColor != 'FFFFFF' && session?.warehouse?.bgColor != 'FFFF'}">
-                    <g:set var="locationColor" value="--location-color: #${session?.warehouse?.bgColor}"/>
+                <g:set var="locationColor" value="${session?.warehouse?.bgColor?.replace('#', '')?.toUpperCase()}"/>
+                <g:if test="${locationColor && ['FFFFFF', 'FFFF'].any{ it == locationColor }}">
+                    <g:set var="locationColorVariable" value="--location-color: unset"/>
                 </g:if>
                 <g:else>
-                    <g:set var="locationColor" value="--location-color: unset"/>
+                    <g:set var="locationColorVariable" value="--location-color: #${locationColor}"/>
                 </g:else>
                 <div class="tooltip2">
                     <button
                         class="btn-show-dialog location-chooser__button"
-                        style="${locationColor}"
+                        style="${locationColorVariable}"
                         data-dialog-class="location-chooser"
                         data-resizable="false"
                         data-draggable="true"

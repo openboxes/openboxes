@@ -10,15 +10,12 @@ import 'components/location/LocationChooser/LocationChooserButton/LocationChoose
 
 const LocationChooserButton = ({ onToggle, location, envTag }) => {
   const buttonStyle = () => {
-    if (!location.backgroundColor || ['FFFFFF', 'FFFF'].includes(location.backgroundColor)) {
-      return {
-        borderColor: '#D6D8DC',
-      };
-    }
-    return {
-      outlineColor: location.backgroundColor,
-      borderColor: location.backgroundColor,
-    };
+    if (!location.backgroundColor) return { '--location-color': 'unset' };
+
+    const normalizeColor = location.backgroundColor.replace('#', '').toUpperCase();
+    if (['FFFFFF', 'FFFF'].includes(normalizeColor)) return { '--location-color': 'unset' };
+
+    return { '--location-color': `#${normalizeColor}` };
   };
   return (
     <button
