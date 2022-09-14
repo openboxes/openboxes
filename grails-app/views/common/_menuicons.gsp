@@ -26,148 +26,148 @@
             </i>
             <div class="dropdown-menu dropdown-menu-right dropdown-menu-right-conf nav-item padding-8 margin-top-18">
                 <div class="dropdown-menu-subsections conf-subsections">
-                    <div class="padding-8">
                     <g:if test="${grailsApplication.config.openboxes.megamenu.configuration.enabled}">
                         <g:isUserAdmin>
-                            <span class="subsection-title"><warehouse:message code="admin.label" default="Admin" /></span>
-                            <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
-                                <g:link controller="admin" action="showSettings" class="list dropdown-item">
-                                    <g:message code="default.settings.label"/>
+                            <div class="padding-8">
+                                <span class="subsection-title"><warehouse:message code="admin.label" default="Admin" /></span>
+                                <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
+                                    <g:link controller="admin" action="showSettings" class="list dropdown-item">
+                                        <g:message code="default.settings.label"/>
+                                    </g:link>
+                                </g:supports>
+
+                                <g:link controller="admin" action="cache" class="list dropdown-item">
+                                    <g:message code="default.cache.label" default="Cache" />
                                 </g:link>
-                            </g:supports>
 
-                            <g:link controller="admin" action="cache" class="list dropdown-item">
-                                <g:message code="default.cache.label" default="Cache" />
-                            </g:link>
+                                <g:link controller="console" action="index" class="list dropdown-item">
+                                    <g:message code="default.console.label" default="Console" />
+                                </g:link>
 
-                            <g:link controller="console" action="index" class="list dropdown-item">
-                                <g:message code="default.console.label" default="Console" />
-                            </g:link>
+                                <g:link controller="batch" action="importData" class="dropdown-item">
+                                    <warehouse:message code="default.import.label"
+                                                       args="[warehouse.message(code:'default.data.label', default: 'Data')]"
+                                    />
+                                </g:link>
 
-                            <g:link controller="batch" action="importData" class="dropdown-item">
-                                <warehouse:message code="default.import.label"
-                                                   args="[warehouse.message(code:'default.data.label', default: 'Data')]"
-                                />
-                            </g:link>
+                                <g:link controller="migration" action="index" class="list dropdown-item">
+                                    <g:message code="default.dataMigration.label" default="Data Migration" />
+                                </g:link>
 
-                            <g:link controller="migration" action="index" class="list dropdown-item">
-                                <g:message code="default.dataMigration.label" default="Data Migration" />
-                            </g:link>
+                                <g:link controller="admin" action="sendMail" class="list dropdown-item">
+                                    <g:message code="config.sendMail.label" default="Email"/>
+                                </g:link>
 
-                            <g:link controller="admin" action="sendMail" class="list dropdown-item">
-                                <g:message code="config.sendMail.label" default="Email"/>
-                            </g:link>
-
-                            <g:link controller="localization" action="list" class="list">
-                                <g:message code="localization.label" default="Localization"/>
-                            </g:link>
-                        </div>
-                        <div class="padding-8">
-                            <span class="subsection-title"><warehouse:message code="parties.label" default="Parties" /></span>
-                            <g:link controller="location" action="list" class="location dropdown-item">
-                                <warehouse:message code="locations.label" />
-                            </g:link>
-                            <g:link controller="locationGroup" action="list" class="site dropdown-item">
-                                <warehouse:message code="locationGroups.label" default="Location Groups" />
-                            </g:link>
-                            <g:link controller="locationType" action="list"
-                                    class="locationType dropdown-item">
-                                <warehouse:message code="location.locationTypes.label" default="Location Types" />
-                            </g:link>
-                            <g:link controller="organization" action="list" class="dropdown-item">
-                                <warehouse:message code="organizations.label" default="Organizations" />
-                            </g:link>
-                            <g:link controller="partyRole" action="list" class="dropdown-item">
-                                <warehouse:message code="partyRoles.label" default="Party Roles" />
-                            </g:link>
-                            <g:link controller="partyType" action="list" class="dropdown-item">
-                                <warehouse:message code="partyTypes.label" default="Party Types" />
-                            </g:link>
-                            <g:link controller="person" action="list" class="people dropdown-item">
-                                <warehouse:message code="person.list.label" />
-                            </g:link>
-                            <g:link controller="role" action="list" class="role dropdown-item">
-                                <warehouse:message code="roles.label" />
-                            </g:link>
-                            <g:link controller="user" action="list" class="user dropdown-item">
-                                <warehouse:message code="users.label" />
-                            </g:link>
-                        </div>
-                        <div class="padding-8">
-                            <span class="subsection-title"><warehouse:message code="transactions.label" default="Transasctions" /></span>
-                            <g:link controller="transactionType" class="dropdown-item">
-                                <warehouse:message code="transactionTypes.label" default="Transaction Types"/>
-                            </g:link>
-                            <g:link controller="inventory" action="listAllTransactions" class="dropdown-item">
-                                <warehouse:message code="transactions.label"/>
-                            </g:link>
-                            <g:link controller="inventory" action="editTransaction" class="create dropdown-item">
-                                <warehouse:message code="transaction.add.label"/>
-                            </g:link>
-                            <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory dropdown-item">
-                                <warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label', default: 'Inventory')]"/>
-                            </g:link>
-                            <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory dropdown-item">
-                                <warehouse:message code="default.import.label" args="[warehouse.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/>
-                            </g:link>
-                        </div>
+                                <g:link controller="localization" action="list" class="list">
+                                    <g:message code="localization.label" default="Localization"/>
+                                </g:link>
+                            </div>
+                            <div class="padding-8">
+                                <span class="subsection-title"><warehouse:message code="parties.label" default="Parties" /></span>
+                                <g:link controller="location" action="list" class="location dropdown-item">
+                                    <warehouse:message code="locations.label" />
+                                </g:link>
+                                <g:link controller="locationGroup" action="list" class="site dropdown-item">
+                                    <warehouse:message code="locationGroups.label" default="Location Groups" />
+                                </g:link>
+                                <g:link controller="locationType" action="list"
+                                        class="locationType dropdown-item">
+                                    <warehouse:message code="location.locationTypes.label" default="Location Types" />
+                                </g:link>
+                                <g:link controller="organization" action="list" class="dropdown-item">
+                                    <warehouse:message code="organizations.label" default="Organizations" />
+                                </g:link>
+                                <g:link controller="partyRole" action="list" class="dropdown-item">
+                                    <warehouse:message code="partyRoles.label" default="Party Roles" />
+                                </g:link>
+                                <g:link controller="partyType" action="list" class="dropdown-item">
+                                    <warehouse:message code="partyTypes.label" default="Party Types" />
+                                </g:link>
+                                <g:link controller="person" action="list" class="people dropdown-item">
+                                    <warehouse:message code="person.list.label" />
+                                </g:link>
+                                <g:link controller="role" action="list" class="role dropdown-item">
+                                    <warehouse:message code="roles.label" />
+                                </g:link>
+                                <g:link controller="user" action="list" class="user dropdown-item">
+                                    <warehouse:message code="users.label" />
+                                </g:link>
+                            </div>
+                            <div class="padding-8">
+                                <span class="subsection-title"><warehouse:message code="transactions.label" default="Transasctions" /></span>
+                                <g:link controller="transactionType" class="dropdown-item">
+                                    <warehouse:message code="transactionTypes.label" default="Transaction Types"/>
+                                </g:link>
+                                <g:link controller="inventory" action="listAllTransactions" class="dropdown-item">
+                                    <warehouse:message code="transactions.label"/>
+                                </g:link>
+                                <g:link controller="inventory" action="editTransaction" class="create dropdown-item">
+                                    <warehouse:message code="transaction.add.label"/>
+                                </g:link>
+                                <g:link controller="batch" action="importData" params="[type:'inventory']" class="inventory dropdown-item">
+                                    <warehouse:message code="default.import.label" args="[warehouse.message(code:'inventory.label', default: 'Inventory')]"/>
+                                </g:link>
+                                <g:link controller="batch" action="importData" params="[type:'inventoryLevel']" class="inventory dropdown-item">
+                                    <warehouse:message code="default.import.label" args="[warehouse.message(code:'inventoryLevel.label', default: 'Inventory levels')]"/>
+                                </g:link>
+                            </div>
 
 
-                        <div class="padding-8">
-                            <span class="subsection-title"><warehouse:message code="other.label" default="Other" /></span>
-                            <g:link controller="budgetCode" action="list" class="dropdown-item">
-                                <warehouse:message code="budgetCode.label" default="Budget Codes"/>
-                            </g:link>
-                            <g:link controller="containerType" action="list" class="dropdown-item">
-                                <warehouse:message code="containerTypes.label" default="Container Types"/>
-                            </g:link>
-                            <g:link controller="document" action="list" class="dropdown-item">
-                                <warehouse:message code="documents.label" default="Documents" />
-                            </g:link>
-                            <g:link controller="documentType" action="list" class="dropdown-item">
-                                <warehouse:message code="documentTypes.label" default="Document Types"/>
-                            </g:link>
-                            <g:link controller="eventType" action="list"
-                                    class="eventType dropdown-item">
-                                <warehouse:message code="location.eventTypes.label" default="Event Types" />
-                            </g:link>
-                            <g:link controller="glAccountType" action="list" class="dropdown-item">
-                                <warehouse:message code="glAccountType.label" default="GL Account Type"/>
-                            </g:link>
-                            <g:link controller="glAccount" action="list" class="dropdown-item">
-                                <warehouse:message code="glAccount.label" default="GL Account"/>
-                            </g:link>
-                            <g:link controller="orderAdjustmentType" action="list" class="dropdown-item">
-                                <warehouse:message code="orderAdjustmentType.label" default="Order Adjustment Type"/>
-                            </g:link>
-                            <g:link controller="paymentMethodType" action="list" class="dropdown-item">
-                                <warehouse:message code="paymentMethodTypes.label" />
-                            </g:link>
-                            <g:link controller="paymentTerm" action="list" class="dropdown-item">
-                                <warehouse:message code="paymentTerms.label" />
-                            </g:link>
-                            <g:link controller="preferenceType" action="list" class="dropdown-item">
-                                <warehouse:message code="preferenceType.label" />
-                            </g:link>
-                            <g:link controller="shipper" action="list" class="shipper dropdown-item">
-                                <warehouse:message code="location.shippers.label" />
-                            </g:link>
-                            <g:link controller="shipmentWorkflow" action="list" class="dropdown-item">
-                                <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
-                            </g:link>
-                            <g:link controller="productsConfiguration" action="index" class="dropdown-item">
-                                <warehouse:message code="productsConfiguration.label" default="Categories and Products Configuration" />
-                            </g:link>
-                            <g:link controller="locationsConfiguration" action="index" class="dropdown-item" >
-                                <warehouse:message code="locationsConfiguration.label" default="Locations Configuration" />
-                            </g:link>
-                            <g:link controller="loadData" action="index" class="dropdown-item">
-                                <warehouse:message code="loadData.label" default="Load Data" />
-                            </g:link>
-                            <g:link controller="resettingInstanceInfo" action="index" class="dropdown-item">
-                                <warehouse:message code="resetInstance.label" default="Reset your instance" />
-                            </g:link>
-                        </div>
+                            <div class="padding-8">
+                                <span class="subsection-title"><warehouse:message code="other.label" default="Other" /></span>
+                                <g:link controller="budgetCode" action="list" class="dropdown-item">
+                                    <warehouse:message code="budgetCode.label" default="Budget Codes"/>
+                                </g:link>
+                                <g:link controller="containerType" action="list" class="dropdown-item">
+                                    <warehouse:message code="containerTypes.label" default="Container Types"/>
+                                </g:link>
+                                <g:link controller="document" action="list" class="dropdown-item">
+                                    <warehouse:message code="documents.label" default="Documents" />
+                                </g:link>
+                                <g:link controller="documentType" action="list" class="dropdown-item">
+                                    <warehouse:message code="documentTypes.label" default="Document Types"/>
+                                </g:link>
+                                <g:link controller="eventType" action="list"
+                                        class="eventType dropdown-item">
+                                    <warehouse:message code="location.eventTypes.label" default="Event Types" />
+                                </g:link>
+                                <g:link controller="glAccountType" action="list" class="dropdown-item">
+                                    <warehouse:message code="glAccountType.label" default="GL Account Type"/>
+                                </g:link>
+                                <g:link controller="glAccount" action="list" class="dropdown-item">
+                                    <warehouse:message code="glAccount.label" default="GL Account"/>
+                                </g:link>
+                                <g:link controller="orderAdjustmentType" action="list" class="dropdown-item">
+                                    <warehouse:message code="orderAdjustmentType.label" default="Order Adjustment Type"/>
+                                </g:link>
+                                <g:link controller="paymentMethodType" action="list" class="dropdown-item">
+                                    <warehouse:message code="paymentMethodTypes.label" />
+                                </g:link>
+                                <g:link controller="paymentTerm" action="list" class="dropdown-item">
+                                    <warehouse:message code="paymentTerms.label" />
+                                </g:link>
+                                <g:link controller="preferenceType" action="list" class="dropdown-item">
+                                    <warehouse:message code="preferenceType.label" />
+                                </g:link>
+                                <g:link controller="shipper" action="list" class="shipper dropdown-item">
+                                    <warehouse:message code="location.shippers.label" />
+                                </g:link>
+                                <g:link controller="shipmentWorkflow" action="list" class="dropdown-item">
+                                    <warehouse:message code="shipmentWorkflows.label" default="Shipment Workflows" />
+                                </g:link>
+                                <g:link controller="productsConfiguration" action="index" class="dropdown-item">
+                                    <warehouse:message code="productsConfiguration.label" default="Categories and Products Configuration" />
+                                </g:link>
+                                <g:link controller="locationsConfiguration" action="index" class="dropdown-item" >
+                                    <warehouse:message code="locationsConfiguration.label" default="Locations Configuration" />
+                                </g:link>
+                                <g:link controller="loadData" action="index" class="dropdown-item">
+                                    <warehouse:message code="loadData.label" default="Load Data" />
+                                </g:link>
+                                <g:link controller="resettingInstanceInfo" action="index" class="dropdown-item">
+                                    <warehouse:message code="resetInstance.label" default="Reset your instance" />
+                                </g:link>
+                            </div>
                         </g:isUserAdmin>
                     </g:if>
                 </div>
