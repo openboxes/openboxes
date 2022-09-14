@@ -24,17 +24,31 @@ const LocationChooser = (props) => {
     /*
     * Transforms a simple Array of locations into an Array of objects like:
     * { organization: String, groups: [ { group: String, locations: [Array(location)] } ] }
+    * sort by organization name and group name
+    * null organizations and location groups are sorted as last
     * */
-    const locationsGroupedByOrganization = _.groupBy(data, location => _.get(location, 'organizationName'));
+    const noOrganizationTag = 'NO_ORGANIZATION';
+    const noGroupTag = 'NO_GROUP';
+    const locationsGroupedByOrganization = _.groupBy(data, location =>
+      _.get(location, 'organizationName', noOrganizationTag) || noOrganizationTag);
     return Object.entries(locationsGroupedByOrganization)
       .map(([organization, locations]) => {
-        const locationsGroupedByGroup = _.groupBy(locations, location => _.get(location, 'locationGroup.name', null));
+        const locationsGroupedByGroup = _.groupBy(locations, location =>
+          _.get(location, 'locationGroup.name', noGroupTag) || noGroupTag);
         const groups = Object.entries(locationsGroupedByGroup)
           .map(([group, locationList]) => ({ group, locations: locationList }))
-          .sort((a, b) => (a.group > b.group ? 1 : -1));
+          .sort((a, b) => {
+            if (a.group === noGroupTag) return 1;
+            if (b.group === noGroupTag) return -1;
+            return a.group > b.group ? 1 : -1;
+          });
         return { organization, groups };
       })
-      .sort((a, b) => (a.organization > b.organization ? 1 : -1));
+      .sort((a, b) => {
+        if (a.organization === noOrganizationTag) return 1;
+        if (b.organization === noOrganizationTag) return -1;
+        return a.organization > b.organization ? 1 : -1;
+      });
   };
 
   const fetchLocations = () => {
