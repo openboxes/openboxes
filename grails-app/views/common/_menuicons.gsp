@@ -1,9 +1,10 @@
 <%@page import="org.pih.warehouse.core.ActivityCode;"%>
-<div class="menu-icon">
+<div class="menu-icon position-relative">
     <div class="tooltip2">
-        <i class="ri-search-line"></i>
+        <i class="ri-search-line" id="global-search-button"></i>
         <span class="tooltiptext2">Search</span>
     </div>
+    <g:globalSearch jsonUrl="${request.contextPath}/json/globalSearch"/>
 </div>
 <div class="menu-icon">
     <div class="tooltip2">
