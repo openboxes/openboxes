@@ -14,7 +14,6 @@ class GlobalSearchTagLib {
 
     def globalSearch = { attrs, body ->
 
-        attrs.id = (attrs.id) ? attrs.id : "globalSearch_" + (new Random()).nextInt()
         attrs.name = (attrs.name) ? attrs.name : attrs.id
         attrs.value = (attrs.value) ?: ""
         attrs.width = (attrs.width) ?: ""

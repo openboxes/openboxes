@@ -2250,20 +2250,73 @@ img.photo_tiny {
     height: 30px;
 }
 
-/* Image in Text Box */
-.globalSearch,
-.globalSearch[type=text] {
-    vertical-align: middle;
-    background:#FFFFFF url(../images/icons/silk/magnifier.png) no-repeat 5px 5px;
-    padding:4px 4px 4px 24px;
+#global-search {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background:#FFFFFF;
     font-size: 16px;
-    border: 1px solid #d4d4d4;
-    /* visually match `button`'s 11px/0.2em border radius */
-    -moz-border-radius: 0.1375em;
-    -webkit-border-radius: 0.1375em;
-    border-radius: 0.1375em;
-    width: 400px;
+    width: 700px;
+    overflow: hidden;
+    border: solid 1px var(--blue-500);
+    outline: rgba(34, 100, 229, 0.15) outset 3px !important;
+    transition: outline-width ease-in-out 0.1s;
+    border-radius: 3px;
+    padding: 5px 12px;
 }
+#global-search.global-search--hidden {
+    display: none !important;
+}
+
+#global-search #global-search-input {
+    flex-grow: 1;
+    border: none;
+    margin: 0 4px;
+    font-family: 'Inter', sans-serif;
+}
+
+#global-search #global-search-input:focus {
+    outline: none;
+}
+#global-search #global-search-input::placeholder {
+    color: var(--gray-401);
+}
+
+#global-search #global-search-close {
+    font-size: 24px;
+}
+
+.global-search-results {
+    max-height: 300px;
+    width: 700px !important;
+    overflow-y: auto;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.15), 2px 2px 4px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 4px 4px;
+    margin: 0;
+    border: none;
+    padding: 12px;
+}
+
+.global-search-results .ui-menu-item {
+    font-weight: unset;
+}
+.global-search-results .ui-menu-item a {
+    padding: 8px 12px;
+    cursor: pointer;
+    margin: 0;
+    color: var(--blue-700);
+}
+
+.global-search-results .ui-menu-item a.ui-state-hover {
+    background: var(--blue-100);
+    margin: 0;
+    border: none;
+}
+
 
 .tag {
     border: 1px solid #a5d24a;
@@ -3661,7 +3714,7 @@ table.pvtTable tr th { background-color: #ddd; }
     background-color: var(--blue-301);
 }
 
-/* SPINNER */
+/* Spinner cricle */
 .spinner-container {
     display: flex;
     flex-direction: column;
@@ -3675,6 +3728,61 @@ table.pvtTable tr th { background-color: #ddd; }
     height: 7rem;
     font-size: 1.5rem;
     color: var(--blue-500);
+}
+
+/* Dot Flashing Spinner */
+.dot-flashing-wrapper {
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dot-flashing {
+    --dot-size: 5px;
+    position: relative;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 5px;
+    background-color: var(--blue-500);
+    animation: dotFlashing 0.5s infinite linear alternate;
+    animation-delay: .25s;
+}
+
+.dot-flashing::before, .dot-flashing::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+}
+
+.dot-flashing::before {
+    left: -12px;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 5px;
+    background-color: var(--blue-500);
+    animation: dotFlashing 0.5s infinite alternate;
+    animation-delay: 0s;
+}
+
+.dot-flashing::after {
+    left: 12px;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 5px;
+    background-color: var(--blue-500);
+    animation: dotFlashing 0.5s infinite alternate;
+    animation-delay: 0.25s;
+}
+
+@keyframes dotFlashing {
+    0% {
+        opacity: 1;
+    }
+    50%,
+    100% {
+        opacity: 0.2;
+    }
 }
 
 /* ======================================= */
