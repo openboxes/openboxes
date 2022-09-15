@@ -936,3 +936,56 @@ div.search-input:focus-within {
   border: 1px solid var(--blue-primary);
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.06), 0px 0px 0px 1px rgba(104, 113, 130, 0.16), 0px 0px 0px 4px rgba(34, 100, 229, 0.15);
 }
+
+// Custom buttons
+.primary-button {
+  border: none;
+  padding: 8px 16px;
+  background-color: var(--blue-primary);
+  border-radius: 4px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  height: 36px;
+
+  &:hover {
+    background-color: var(--blue-500);
+  }
+
+  &:active {
+    background-color: var(--blue-500);
+    box-shadow: 0 0 0 4px rgba(1, 178, 237, 0.36);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.primary-button-disabled {
+  background-color: var(--blue-400) !important;
+}
+
+.transparent-button {
+  height: 36px;
+  padding: 8px 16px;
+  background-color: transparent;
+  border: none;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  color: var(--blue-700);
+
+  &:hover {
+    background-color: var(--blue-200);
+    border-radius: 4px;
+    color: var(--blue-primary);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
