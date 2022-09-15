@@ -31,7 +31,7 @@
                             <a
                                 href='${createLink(action:"chooseLocation", id: location?.id)}'
                                 class="element"
-                                style="${locationColorStyle}"
+                                style="${locationColorVariable}"
                             >
                                 <i class="ri-map-pin-line"></i>
                                 <span><format:metadata obj="${location}"/></span>
