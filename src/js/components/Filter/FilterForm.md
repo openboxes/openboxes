@@ -88,22 +88,3 @@ const debouncedOriginLocationsFetch =
 |-------|--------|--------|----------|----------------------------------------|
 | count | number |        | yes      | Simple number to display inside circle | 
 
-
-
-<br><br>
-* `<ButtonPrimary>`
-#### Available props:
-| Name         | Type                      | Values           | Required | Description               |   
-|--------------|---------------------------|------------------|----------|---------------------------|
-| label        | translation code (string) |                  | yes      | Translation code          | 
-| defaultLabel | string                    |                  | yes      | Default label for button  | 
-| disabled     | boolean                   | false by default | no       | Boolean to disable button | 
-
-<br><br>
-* `<ButtonTransparent>`
-#### Available props:
-| Name          | Type                      | Values               | Required | Description                        |   
-|---------------|---------------------------|----------------------|----------|------------------------------------|
-| label         | translation code (string) |                      | yes      | Translation code                   | 
-| defaultLabel  | string                    |                      | yes      | Default label for button           | 
-| onClickAction | function                  | undefined by default | no       | onClick function passed from props | 

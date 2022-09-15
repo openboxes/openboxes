@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
-import ButtonPrimary from 'components/form-elements/ButtonPrimary';
-import ButtonTransparent from 'components/form-elements/ButtonTransparent';
+import Button from 'components/form-elements/Button';
 import TextField from 'components/form-elements/TextField';
 import { renderFormField } from 'utils/form-utils';
 import Translate from 'utils/Translate';
@@ -37,7 +36,7 @@ const FilterForm = ({
   const [amountFilled, setAmountFilled] = useState(0);
   const countFilled = (values) => {
     // Calculate which object's values are not empty
-    setAmountFilled(Object.keys(values).filter(key => values[key]).length);
+    setAmountFilled(Object.values(values).filter(value => value !== '').length);
   };
   const [filtersHidden, setFiltersHidden] = useState(true);
 
@@ -62,15 +61,19 @@ const FilterForm = ({
                     />
                   </div>
                   <div className="d-flex justify-content-end buttons">
-                    <ButtonTransparent
+                    <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
                       onClickAction={() => form.reset(initialValues)}
+                      variant="transparent"
+                      type="button"
                     />
-                    <ButtonPrimary
+                    <Button
                       defaultLabel="Search"
                       label="react.button.search.label"
                       disabled={_.every(values, value => !value)}
+                      variant="primary"
+                      type="submit"
                     />
                   </div>
                 </div>
@@ -79,16 +82,6 @@ const FilterForm = ({
                   {!filtersHidden && _.map(filterFields, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, formProps))}
                 </div>
-
-              </div>
-              <div className="submit-buttons">
-                <button
-                  type="button"
-                  onClick={() => onSubmit(values)}
-                  className="btn btn-outline-primary float-left btn-xs"
-                >
-                  <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
-                </button>
               </div>
             </form>
           );
