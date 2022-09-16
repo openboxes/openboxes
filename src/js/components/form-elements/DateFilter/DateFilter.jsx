@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
@@ -23,7 +24,7 @@ const CustomInput = React.forwardRef((props, ref) => {
       </span>
       <div className="date-picker__icon-wrapper">
         {
-          props.value
+          value
             ? <button className="date-picker__icon" onClick={onClear}><RiCloseLine /></button>
             : <div className="date-picker__icon"><RiCalendarLine /></div>
         }
@@ -34,11 +35,14 @@ const CustomInput = React.forwardRef((props, ref) => {
 
 
 const DateFilter = (props) => {
+  const {
+    value, onChange, dateFormat, placeholder, label, timeFormat,
+  } = props;
   const [isFocused, setIsFocused] = useState(false);
 
-  const onChange = (date) => {
-    const val = !date || typeof date === 'string' ? date : date.format(props.dateFormat);
-    props.onChange(val);
+  const onChangeHandler = (date) => {
+    const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
+    onChange(val);
   };
 
   const onClear = (e) => {
@@ -51,7 +55,9 @@ const DateFilter = (props) => {
   const onFocus = () => setIsFocused(true);
 
   const isFocusedClass = isFocused ? 'date-picker__wrapper--focused' : '';
-  const isValidClass = props.value ? 'date-picker__wrapper--valid' : '';
+  const isValidClass = value ? 'date-picker__wrapper--valid' : '';
+
+  const selectedDates = [value ? moment(value, dateFormat) : moment(new Date(), dateFormat)];
 
   return (
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`}>
@@ -59,9 +65,10 @@ const DateFilter = (props) => {
         {...props}
         customInput={<CustomInput onClear={onClear} />}
         className="date-picker__input"
-        placeholderText={props.placeholder}
-        title={props.label}
-        onChange={onChange}
+        placeholderText={placeholder}
+        title={label}
+        highlightDates={selectedDates}
+        onChange={onChangeHandler}
         onInputClick={onFocus}
         onSelect={onBlur}
         onClickOutside={onBlur}
@@ -69,8 +76,8 @@ const DateFilter = (props) => {
         popperClassName="force-on-top"
         showYearDropdown
         scrollableYearDropdown
-        dateFormat={props.dateFormat}
-        timeFormat={props.timeFormat}
+        dateFormat={dateFormat}
+        timeFormat={timeFormat}
         timeIntervals={15}
         yearDropdownItemNumber={3}
         utcOffset={0}
