@@ -590,6 +590,29 @@ class UrlMappings {
             action = [GET: "getOpenPurchaseOrdersCount"]
         }
 
+        /**
+        * Purchase Orders API endpoints
+        */
+
+        "/api/orderSummaryStatus"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [GET: "statusOptions"]
+        }
+
+        "/api/purchaseOrders"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/purchaseOrders/$id"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [GET: "read", DELETE: "delete"]
+        }
+
+        /**
+         * Products Configuration API endpoints
+         */
+
         "/api/productsConfiguration/importCategories"(parseRequest: true) {
             controller = { "productsConfigurationApi" }
             action = [POST: "importCategories"]

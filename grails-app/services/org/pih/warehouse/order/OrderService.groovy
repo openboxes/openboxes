@@ -9,7 +9,10 @@
  **/
 package org.pih.warehouse.order
 
+import grails.orm.PagedResultList
 import grails.validation.ValidationException
+import org.pih.warehouse.core.ActivityCode
+
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
@@ -54,6 +57,67 @@ class OrderService {
     def personDataService
     def stockMovementService
     def grailsApplication
+
+    def getPurchaseOrders(Location currentLocation, Map params) {
+        def max = params.max ? params.int("max") : null
+        def offset = params.offset ? params.int("offset") : null
+
+        // Parse destination and destination party parameters
+        def isCentralPurchasingEnabled = currentLocation.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
+        params.destination = params.destination == null && !isCentralPurchasingEnabled ? currentLocation?.id : params.destination
+        params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
+
+        // Parse date parameters
+        Date statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
+        Date statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+
+        // OrderSummery contains only Purchase Orders, hence no need to filter by orderType.
+        return OrderSummary.createCriteria().list(max: max, offset: offset) {
+            if (params.status) {
+                'in'("derivedStatus", params.list("status"))
+            }
+
+            order {
+                and {
+                    if (params.searchTerm) {
+                        or {
+                            ilike("name", "%" + params.searchTerm + "%")
+                            ilike("description", "%" + params.searchTerm + "%")
+                            ilike("orderNumber", "%" + params.searchTerm + "%")
+                        }
+                    }
+                    if (params.destination) {
+                        eq("destination.id", params.destination)
+                    }
+                    if (params.destinationParty) {
+                        destinationParty {
+                            eq("id", params.destinationParty)
+                        }
+                    }
+                    if (params.origin) {
+                        eq("origin.id", params.origin)
+                    }
+                    if (statusStartDate) {
+                        ge("dateOrdered", statusStartDate)
+                    }
+                    if (statusEndDate) {
+                        le("dateOrdered", statusEndDate)
+                    }
+                    if (params.orderedBy) {
+                        eq("orderedBy.id", params.orderedBy)
+                    }
+                }
+
+                if (params.sort && params.sort != 'status') {
+                    order(params.sort, params.order ?: 'asc')
+                }
+            }
+
+            if (params.sort && params.sort == 'status') {
+                order('derivedStatus', params.order ?: 'asc')
+            }
+        }
+    }
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
         def orders = Order.createCriteria().list(params) {
@@ -970,7 +1034,9 @@ class OrderService {
     def getOrderSummaryList(Map params) {
         return OrderSummary.createCriteria().list(params) {
             if (params.orderNumber) {
-                ilike("orderNumber", "%${params.orderNumber}%")
+                order {
+                    ilike("orderNumber", "%${params.orderNumber}%")
+                }
             }
             if (params.orderStatus) {
                 'in'("orderStatus", params.orderStatus)
