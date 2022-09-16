@@ -1,6 +1,6 @@
-/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 
+import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
 
@@ -35,11 +35,9 @@ const CustomInput = React.forwardRef((props, ref) => {
 
 const DateFilter = (props) => {
   const [isFocused, setIsFocused] = useState(false);
-  const dateFormat = 'MM/DD/YYYY';
-  const timeFormat = 'HH:mm';
 
   const onChange = (date) => {
-    const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
+    const val = !date || typeof date === 'string' ? date : date.format(props.dateFormat);
     props.onChange(val);
   };
 
@@ -71,14 +69,32 @@ const DateFilter = (props) => {
         popperClassName="force-on-top"
         showYearDropdown
         scrollableYearDropdown
-        dateFormat={dateFormat}
-        timeFormat={timeFormat}
+        dateFormat={props.dateFormat}
+        timeFormat={props.timeFormat}
         timeIntervals={15}
         yearDropdownItemNumber={3}
         utcOffset={0}
       />
     </div>
   );
+};
+
+DateFilter.defaultProps = {
+  onChange: undefined,
+  label: '',
+  placeholder: '',
+  dateFormat: 'MM/DD/YYYY',
+  timeFormat: 'HH:mm',
+};
+
+DateFilter.propTypes = {
+  onChange: PropTypes.func,
+  value: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  placeholder: PropTypes.string,
+  dateFormat: PropTypes.string,
+  timeFormat: PropTypes.string,
+
 };
 
 export default DateFilter;
