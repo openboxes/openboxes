@@ -12,11 +12,19 @@ const CustomInput = React.forwardRef((props, ref) => {
   const {
     onClick, title, value, placeholder, onClear,
   } = props;
+
+  const onKeypressHandler = (event) => {
+    if (event.key === 'Enter') onClick();
+  };
+
   return (
-    <button
+    <div
       ref={ref}
+      tabIndex="0"
+      role="button"
       className="d-flex flex-row date-picker__input-wrapper"
       onClick={onClick}
+      onKeyDown={onKeypressHandler}
     >
       <span className="flex-grow-1 date-picker__input">
         <span>{title}</span>
@@ -29,7 +37,7 @@ const CustomInput = React.forwardRef((props, ref) => {
             : <div className="date-picker__icon"><RiCalendarLine /></div>
         }
       </div>
-    </button>
+    </div>
   );
 });
 
@@ -40,10 +48,7 @@ const DateFilter = (props) => {
   } = props;
   const [isFocused, setIsFocused] = useState(false);
 
-  const onChangeHandler = (date) => {
-    const val = !date || typeof date === 'string' ? date : date.format(dateFormat);
-    onChange(val);
-  };
+  const onChangeHandler = date => onChange(date.format(dateFormat));
 
   const onClear = (e) => {
     e.stopPropagation();
@@ -57,7 +62,8 @@ const DateFilter = (props) => {
   const isFocusedClass = isFocused ? 'date-picker__wrapper--focused' : '';
   const isValidClass = value ? 'date-picker__wrapper--valid' : '';
 
-  const selectedDates = [value ? moment(value, dateFormat) : moment(new Date(), dateFormat)];
+  const selectedDate = value ? moment(value, dateFormat) : null;
+  const highlightedDates = [selectedDate || moment(new Date(), dateFormat)];
 
   return (
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`}>
@@ -67,7 +73,8 @@ const DateFilter = (props) => {
         className="date-picker__input"
         placeholderText={placeholder}
         title={label}
-        highlightDates={selectedDates}
+        highlightDates={highlightedDates}
+        selected={selectedDate}
         onChange={onChangeHandler}
         onInputClick={onFocus}
         onSelect={onBlur}
@@ -92,11 +99,12 @@ DateFilter.defaultProps = {
   placeholder: '',
   dateFormat: 'MM/DD/YYYY',
   timeFormat: 'HH:mm',
+  value: null,
 };
 
 DateFilter.propTypes = {
   onChange: PropTypes.func,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   label: PropTypes.string,
   placeholder: PropTypes.string,
   dateFormat: PropTypes.string,
