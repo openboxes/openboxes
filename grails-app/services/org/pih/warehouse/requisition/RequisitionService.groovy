@@ -246,7 +246,7 @@ class RequisitionService {
                 } else {
                     eq("isTemplate", requisition.isTemplate)
                 }
-                if (requisition.isPublished) {
+                if (requisition.isPublished != null) {
                     eq("isPublished", requisition.isPublished)
                 }
                 if (params?.commodityClassIsNull) {

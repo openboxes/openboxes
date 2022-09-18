@@ -25,9 +25,12 @@ class StocklistApiController {
     def list = {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
-        requisition.isPublished = true
-        List<Requisition> requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
-        render([data: requisitions] as JSON)
+        requisition.isPublished = params.isPublished ? params.boolean("isPublished") : true
+        def requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
+        render([
+            data: requisitions.collect { Requisition req -> req.toStocklistJson() },
+            totalCount: requisitions.totalCount,
+        ] as JSON)
     }
 
     def read = {
