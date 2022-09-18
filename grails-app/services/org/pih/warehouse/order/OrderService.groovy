@@ -59,6 +59,7 @@ class OrderService {
     def grailsApplication
 
     def getPurchaseOrders(Location currentLocation, Map params) {
+        // Parse pagination parameters
         def max = params.max ? params.int("max") : null
         def offset = params.offset ? params.int("offset") : null
 
