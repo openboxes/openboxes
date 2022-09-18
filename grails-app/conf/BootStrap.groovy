@@ -37,6 +37,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceItemCandidate
+import org.pih.warehouse.invoice.InvoiceList
 import org.pih.warehouse.jobs.RefreshDemandDataJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
@@ -448,6 +449,20 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(StocklistItem) { StocklistItem stocklistItem ->
             return stocklistItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InvoiceList) { InvoiceList invoiceListItem ->
+            [
+                id: invoiceListItem?.invoice?.id,
+                invoiceNumber: invoiceListItem?.invoiceNumber,
+                invoiceType: invoiceListItem?.invoiceTypeCode?.name(),
+                status: invoiceListItem?.status?.name(),
+                vendor: "${invoiceListItem?.partyCode} ${invoiceListItem?.partyName}",
+                vendorInvoiceNumber: invoiceListItem?.vendorInvoiceNumber,
+                totalValue: invoiceListItem?.invoice?.totalValue,
+                currency: invoiceListItem?.currency,
+                itemCount: invoiceListItem?.itemCount,
+            ]
         }
 
         JSON.registerObjectMarshaller(InvoiceItem) { InvoiceItem invoiceItem ->
