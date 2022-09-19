@@ -9,6 +9,12 @@ import rootReducer from 'reducers';
 const persistConfig = {
   key: 'reducer',
   storage,
+  // The indicators payload has some weird and complex structure,
+  // that is causing "Error: createPersistoid: error serializing state"
+  // (see reference in the comments section in the: OBPIH-4735),
+  // hence there is need to temporarily disable the indicator reducer
+  // from the persisted reducers.
+  blacklist: ['indicators'],
 };
 
 const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);
