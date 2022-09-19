@@ -58,15 +58,10 @@ class OrderService {
     def stockMovementService
     def grailsApplication
 
-    def getPurchaseOrders(Location currentLocation, Map params) {
+    def getPurchaseOrders(Map params) {
         // Parse pagination parameters
         def max = params.max ? params.int("max") : null
         def offset = params.offset ? params.int("offset") : null
-
-        // Parse destination and destination party parameters
-        def isCentralPurchasingEnabled = currentLocation.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
-        params.destination = params.destination == null && !isCentralPurchasingEnabled ? currentLocation?.id : params.destination
-        params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
 
         // Parse date parameters
         Date statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null

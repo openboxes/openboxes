@@ -25,8 +25,7 @@ class PurchaseOrderApiController {
     def orderService
 
     def list = {
-        Location currentLocation = Location.get(session.warehouse.id)
-        def purchaseOrders = orderService.getPurchaseOrders(currentLocation, params)
+        def purchaseOrders = orderService.getPurchaseOrders(params)
 
         if (params.format == 'csv') {
             def csv = params.boolean("orderItems") ? getOrderItemsCsv(purchaseOrders) : getOrdersCsv(purchaseOrders)
