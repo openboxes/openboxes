@@ -335,7 +335,7 @@ class Order implements Serializable {
     }
 
     def getTotal() {
-        return (subtotal + totalAdjustments)?:0
+        return (subtotal + totalAdjustments)?:0.0
     }
 
     def getTotalNormalized() {
