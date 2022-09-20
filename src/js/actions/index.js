@@ -467,7 +467,6 @@ export function fetchSuppliers(active = false) {
 }
 
 export function fetchBuyers(active = false) {
-  console.log('fetching buyers');
   return (dispatch) => {
     apiClient.get(`/openboxes/api/organizations?roleType=ROLE_BUYER&active=${active}`)
       .then((res) => {
