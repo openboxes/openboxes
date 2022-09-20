@@ -27,64 +27,27 @@ import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
+import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
 
-// Custom function to parse date to show like: May, 23, 2022
-const dateParser = (date) => {
-  const parsedDate = new Date(date);
-  const day = parsedDate.getDay();
-  const month = parsedDate.getMonth();
-  const year = parsedDate.getFullYear();
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ];
-  return `${monthNames[month]} ${day}, ${year}`;
-};
-
-
 const PurchaseOrderListTable = ({
-  filterParams, supportedActivities, highestRole, showTheSpinner, hideTheSpinner, translate,
+  filterParams,
+  supportedActivities,
+  highestRole,
+  showTheSpinner,
+  hideTheSpinner,
+  translate,
+  currencyCode,
 }) => {
-  // Temporary 'hard-coded' checking for role to display an action in dropdown or not
-  const hasMinimumRequiredRole = (role) => {
-    // TODO: Figure out better way to check roles
-    const roles = ['Superuser', 'Admin', 'Manager', 'Assistant', 'Browser', 'Authenticated', 'Anonymous'];
-    return roles.indexOf(highestRole) <= roles.indexOf(role);
-  };
-
-  // Determine list of actions for each row individually
-  const findActions = (actionList, row) => {
-    // Firstly filter out by status if any provided
-    const filteredByStatus = actionList.filter((action) => {
-      if (action.statuses) {
-        return action.statuses.includes(row.original.status);
-      }
-      return true;
-    });
-    // Secondly filter by activity code if any provided
-    const filteredByActivityCode = filteredByStatus.filter(action =>
-      (action.activityCode ?
-        action.activityCode.every(code => supportedActivities.some(activity => activity === code))
-        : true
-      ));
-    // Lastly filter by required user's role if provided
-    return filteredByActivityCode.filter((action) => {
-      if (action.minimumRequiredRole) {
-        return hasMinimumRequiredRole(action.minimumRequiredRole);
-      }
-      return true;
-    });
-  };
-
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState(-1);
   const [totalPrice, setTotalPrice] = useState(0.0);
   // Stored searching params for export case
-  const [currParams, setCurrParams] = useState({});
+  const [currentParams, setCurrentParams] = useState({});
 
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
@@ -99,7 +62,7 @@ const PurchaseOrderListTable = ({
   const downloadOrders = (orderItems) => {
     apiClient.get('/openboxes/api/purchaseOrders', {
       params: {
-        ..._.omit(currParams, 'offset', 'max'),
+        ..._.omit(currentParams, 'offset', 'max'),
         format: 'csv',
         orderItems,
       },
@@ -220,7 +183,10 @@ const PurchaseOrderListTable = ({
       style: { overflow: 'visible' },
       Cell: row => (
         <div className="d-flex gap-8">
-          <ActionDots actions={findActions(actions, row)} id={row.original.id} />
+          <ActionDots
+            actions={findActions(actions, row, supportedActivities, highestRole)}
+            id={row.original.id}
+          />
           <PurchaseOrderStatus status={row.original.status} />
         </div>
       ),
@@ -255,11 +221,11 @@ const PurchaseOrderListTable = ({
       className: 'cell',
       headerClassName: 'header text-align-left',
       Cell: row => (
-        <span>{dateParser(row.original.dateOrdered)}</span>
+        <span>{row.original.dateOrdered}</span>
       ),
       Footer: (
         <span>
-          <Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} USD
+          <Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode}
         </span>
       ),
       footerClassName: 'border-0',
@@ -273,7 +239,7 @@ const PurchaseOrderListTable = ({
         <span>
           <Translate id="react.purchaseOrder.listOrders.label" defaultMessage="List Orders" />
           &nbsp;
-          (<Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} USD)
+          (<Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode})
         </span>
         <div className="btn-group">
           <Button
@@ -319,7 +285,11 @@ const PurchaseOrderListTable = ({
             {
               sort: state.sorted[0].id,
               order: state.sorted[0].desc ? 'desc' : 'asc',
-            } : '';
+            } :
+            {
+              sort: 'dateOrdered',
+              order: 'desc',
+            };
           const statusParam = filterParams.status &&
             filterParams.status.map(status => status.value);
 
@@ -346,7 +316,7 @@ const PurchaseOrderListTable = ({
               setOrdersData(res.data.data);
               setTotalPrice(res.data.totalPrice);
               // Store currently used params for export case
-              setCurrParams({
+              setCurrentParams({
                 offset: `${offset}`,
                 max: `${state.pageSize}`,
                 ...sortingParams,
@@ -365,6 +335,7 @@ const mapStateToProps = state => ({
   supportedActivities: state.session.supportedActivities,
   highestRole: state.session.highestRole,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  currencyCode: state.session.currencyCode,
 });
 
 const mapDispatchToProps = {
@@ -382,4 +353,5 @@ PurchaseOrderListTable.propTypes = {
   showTheSpinner: PropTypes.func.isRequired,
   hideTheSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  currencyCode: PropTypes.string.isRequired,
 };

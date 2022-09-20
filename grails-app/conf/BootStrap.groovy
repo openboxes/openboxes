@@ -194,13 +194,13 @@ class BootStrap {
                 name: orderSummary?.order?.name,
                 origin: orderSummary?.order?.origin?.name + (origOrgCode ? " (${origOrgCode})" : ""),
                 destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
-                dateOrdered: orderSummary?.order?.dateOrdered,
+                dateOrdered: orderSummary?.order?.dateOrdered?.format("MMM dd, yyyy"),
                 orderedBy: orderSummary?.order?.orderedBy?.getName(),
                 orderItemsCount: orderSummary?.order?.activeOrderItems?.size()?:0,
                 orderedOrderItemsCount: orderSummary?.order?.orderedOrderItems?.size()?:0,
                 shippedItemsCount: orderSummary?.order?.shippedOrderItems?.size()?:0,
                 receivedItemsCount: orderSummary?.order?.receivedOrderItems?.size()?:0,
-                total: "${orderSummary?.order?.total ? orderSummary?.order?.total?.setScale(2, RoundingMode.HALF_UP) : 0} ${orderSummary?.order?.currencyCode ?: defaultCurrencyCode}",
+                total: "${orderSummary?.order?.total?.setScale(2, RoundingMode.HALF_UP)} ${orderSummary?.order?.currencyCode ?: defaultCurrencyCode}",
                 totalNormalized: "${orderSummary?.order?.totalNormalized?.setScale(2, RoundingMode.HALF_UP)} ${defaultCurrencyCode}",
             ]
         }

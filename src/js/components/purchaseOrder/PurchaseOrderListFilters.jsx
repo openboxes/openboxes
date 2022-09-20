@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
+import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import FilterForm from 'components/Filter/FilterForm';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
-import apiClient from 'utils/apiClient';
-import { debounceLocationsFetch, debounceUsersFetch, organizationsFetch } from 'utils/option-utils';
+import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 
 const filterFields = {
   status: {
@@ -90,8 +90,8 @@ const filterFields = {
       valueKey: 'id',
       filterElement: true,
     },
-    getDynamicAttr: ({ purchasingOrganizations, isCentralPurchasingEnabled }) => ({
-      options: purchasingOrganizations,
+    getDynamicAttr: ({ buyers, isCentralPurchasingEnabled }) => ({
+      options: buyers,
       disabled: isCentralPurchasingEnabled,
     }),
   },
@@ -119,37 +119,46 @@ const filterFields = {
 };
 
 const PurchaseOrderListFilters = ({
-  setFilterParams, debounceTime, minSearchLength, supportedActivities, currentLocation,
+  setFilterParams,
+  debounceTime,
+  minSearchLength,
+  supportedActivities,
+  currentLocation,
+  statuses,
+  fetchStatuses,
+  buyers,
+  fetchBuyerOrganizations,
 }) => {
-  // All possible PO statuses fetched from api
-  const [statuses, setStatuses] = useState([]);
   // Purchasing organizations (organizations with ROLE_BUYER)
-  const [purchasingOrganizations, setPurchasingOrganizations] = useState([]);
   const [defaultValues, setDefaultValues] = useState({});
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
 
-  useEffect(() => {
-    apiClient.get('/openboxes/api/orderSummaryStatus')
-      .then((res) => {
-        setStatuses(res.data.data);
+  const determineDefaultValues = () => {
+    // If central purchasing is enabled, set default purchasing org as currentLocation's org
+    if (isCentralPurchasingEnabled) {
+      setDefaultValues({
+        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
       });
+      return;
+    }
+    // If central purchasing is not enabled, set default destination as currentLocation
+    setDefaultValues({
+      destination: currentLocation,
+    });
+  };
 
-    organizationsFetch(['ROLE_BUYER'])
-      .then((organizations) => {
-        setPurchasingOrganizations(organizations);
-        // If central purchasing is enabled, set default purchasing org as currentLocation's org
-        if (isCentralPurchasingEnabled) {
-          setDefaultValues({
-            destinationParty: organizations.find(org => org.id === currentLocation.organization.id),
-          });
-          return;
-        }
-        // If central purchasing is not enabled, set default destination as currentLocation
-        setDefaultValues({
-          destination: currentLocation,
-        });
-      });
-  }, []);
+  useEffect(() => {
+    // If statuses not yet in store, fetch them
+    if (statuses.length === 0) {
+      fetchStatuses();
+    }
+
+    if (buyers.length === 0) {
+      fetchBuyerOrganizations();
+      return;
+    }
+    determineDefaultValues();
+  }, [buyers]);
 
   const debouncedOriginLocationsFetch = debounceLocationsFetch(
     debounceTime,
@@ -173,7 +182,7 @@ const PurchaseOrderListFilters = ({
           debouncedOriginLocationsFetch,
           debouncedDestinationLocationsFetch,
           debouncedUsersFetch,
-          purchasingOrganizations,
+          buyers,
           isCentralPurchasingEnabled,
         }}
         defaultValues={defaultValues}
@@ -187,9 +196,17 @@ const mapStateToProps = state => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
   supportedActivities: state.session.supportedActivities,
   currentLocation: state.session.currentLocation,
+  // All possible PO statuses from store
+  statuses: state.purchaseOrder.statuses,
+  buyers: state.organizations.buyers,
 });
 
-export default connect(mapStateToProps)(PurchaseOrderListFilters);
+const mapDispatchToProps = {
+  fetchStatuses: fetchPurchaseOrderStatuses,
+  fetchBuyerOrganizations: fetchBuyers,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PurchaseOrderListFilters);
 
 PurchaseOrderListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
@@ -197,4 +214,18 @@ PurchaseOrderListFilters.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
   currentLocation: PropTypes.shape({}).isRequired,
+  statuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    variant: PropTypes.string.isRequired,
+  })).isRequired,
+  fetchStatuses: PropTypes.func.isRequired,
+  buyers: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    variant: PropTypes.string.isRequired,
+  })).isRequired,
+  fetchBuyerOrganizations: PropTypes.func.isRequired,
 };

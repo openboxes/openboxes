@@ -1,6 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { RiMoreLine } from 'react-icons/all';
 
 import Translate from 'utils/Translate';
 
@@ -12,7 +13,7 @@ const ActionDots = ({ actions, id }) => (
       aria-haspopup="true"
       aria-expanded="false"
     >
-        ...
+      <RiMoreLine />
     </div>
     <div className="dropdown-menu dropdown-menu-right nav-item padding-8">
       {actions && actions.map(action => (
