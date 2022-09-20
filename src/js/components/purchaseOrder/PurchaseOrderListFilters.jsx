@@ -6,12 +6,12 @@ import { connect } from 'react-redux';
 import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import FilterForm from 'components/Filter/FilterForm';
 import DateField from 'components/form-elements/DateField';
-import SelectField from 'components/form-elements/SelectField';
+import FilterSelectField from 'components/form-elements/FilterSelectField';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 
 const filterFields = {
   status: {
-    type: SelectField,
+    type: FilterSelectField,
     label: 'react.purchaseOrder.status.label',
     defaultMessage: 'Status',
     attributes: {
@@ -41,7 +41,7 @@ const filterFields = {
     },
   },
   origin: {
-    type: SelectField,
+    type: FilterSelectField,
     label: 'react.purchaseOrder.supplier.label',
     defaultMessage: 'Supplier',
     attributes: {
@@ -62,7 +62,7 @@ const filterFields = {
     }),
   },
   destination: {
-    type: SelectField,
+    type: FilterSelectField,
     label: 'react.purchaseOrder.destination.label',
     defaultMessage: 'Destination',
     attributes: {
@@ -83,7 +83,7 @@ const filterFields = {
     }),
   },
   destinationParty: {
-    type: SelectField,
+    type: FilterSelectField,
     label: 'react.purchaseOrder.purchasingOrganization.label',
     defaultMessage: 'Purchasing organization',
     attributes: {
@@ -96,7 +96,7 @@ const filterFields = {
     }),
   },
   orderedBy: {
-    type: SelectField,
+    type: FilterSelectField,
     label: 'react.purchaseOrder.orderedBy.label',
     defaultMessage: 'Ordered by',
     attributes: {

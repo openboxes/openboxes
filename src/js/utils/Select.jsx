@@ -2,22 +2,10 @@ import React, { Component } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Overlay } from 'react-overlays';
 import ReactSelect, { Async, components } from 'react-select';
 import { Tooltip } from 'react-tippy';
 
 import 'react-tippy/dist/tippy.css';
-
-// eslint-disable-next-line react/prop-types
-const Dropdown = ({ children, style, width }) => (
-  <div
-    style={{
-      ...style, position: 'absolute', zIndex: 9999, width, backgroundColor: 'white', border: '1px solid hsl(0deg 0% 80%)',
-    }}
-  >
-    {children}
-  </div>
-);
 
 class Select extends Component {
   constructor(props) {
@@ -45,7 +33,8 @@ class Select extends Component {
     const {
       options: selectOptions, value: selectValue = this.state.value,
       multi = false, delimiter = ';', async = false, showValueTooltip, clearable = true,
-      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
+      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress,
+      customSelectComponents, optionRenderer, classNamePrefix, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -92,45 +81,6 @@ class Select extends Component {
 
     const SelectType = async ? Async : ReactSelect;
 
-    const Menu = ({ children, innerProps }) => {
-      const target = document.getElementById(`${this.state.id}-container`);
-      return (
-        <Overlay
-          show
-          placement="bottom"
-          target={target}
-          container={document.getElementById('root')}
-        >
-          <Dropdown width={target.offsetWidth}>
-            <div className="custom-option" {...innerProps}>
-              {attributes.createNewFromModal &&
-                <div
-                  className="add-new-button"
-                  onClick={attributes.newOptionModalOpen}
-                  onKeyPress={attributes.newOptionModalOpen}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span><i className="fa fa-plus pr-2" />{attributes.createNewFromModalLabel}</span>
-                </div>
-              }
-              {children}
-            </div>
-          </Dropdown>
-        </Overlay>
-      );
-    };
-
-    const Option = props => (
-      <components.Option {...props}>
-        {this.props.optionRenderer ? (
-          this.props.optionRenderer(props.data)
-        ) : (
-          <div>{props.data.label}</div>
-        )}
-      </components.Option>
-    );
-
     const SingleValue = props => (
       <components.SingleValue {...props}>
         {this.props.valueRenderer ? (
@@ -176,7 +126,6 @@ class Select extends Component {
           classes=""
         >
           <SelectType
-            name={this.state.id}
             {...attributes}
             isDisabled={attributes.disabled}
             options={options}
@@ -186,9 +135,12 @@ class Select extends Component {
             delimiter={delimiter}
             value={value}
             onChange={this.handleChange}
-            components={{ Menu, Option, SingleValue }}
+            components={{
+              ...customSelectComponents,
+              SingleValue,
+            }}
             ref={fieldRef}
-            classNamePrefix="react-select"
+            classNamePrefix={classNamePrefix}
             noOptionsMessage={() => (async ? 'Type to search' : 'No results found')}
             onKeyDown={(event) => {
               switch (event.keyCode) {
@@ -233,6 +185,9 @@ class Select extends Component {
                 default:
               }
             }}
+            name={this.state.id}
+            id={this.state.id}
+            optionRenderer={optionRenderer}
           />
         </Tooltip>
       </div>
@@ -264,6 +219,8 @@ Select.propTypes = {
   onEnterPress: PropTypes.func,
   optionRenderer: PropTypes.func,
   valueRenderer: PropTypes.func,
+  customSelectComponents: PropTypes.shape({}),
+  classNamePrefix: PropTypes.string,
 };
 
 Select.defaultProps = {
@@ -284,4 +241,6 @@ Select.defaultProps = {
   onEnterPress: null,
   optionRenderer: null,
   valueRenderer: null,
+  customSelectComponents: {},
+  classNamePrefix: 'react-select',
 };

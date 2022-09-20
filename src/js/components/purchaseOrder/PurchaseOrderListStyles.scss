@@ -22,6 +22,16 @@
     background-color: #FFFFFF;
     border-radius: 4px;
     padding: 16px;
+
+    .filters-row {
+      .filter-group > div:first-child {
+        align-items: center;
+
+        label {
+          margin: 0;
+        }
+      }
+    }
   }
 
   .purchase-order-list-list-section {
