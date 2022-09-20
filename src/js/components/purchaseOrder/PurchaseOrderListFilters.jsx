@@ -22,19 +22,19 @@ const filterFields = {
       options: statuses,
     }),
   },
-  statusEndDate: {
+  statusStartDate: {
     type: DateField,
-    label: 'react.purchaseOrder.lastUpdateBefore.label',
-    defaultMessage: 'Last update before',
+    label: 'react.purchaseOrder.lastUpdateAfter.label',
+    defaultMessage: 'Last update after',
     attributes: {
       dateFormat: 'MM/DD/YYYY',
       filterElement: true,
     },
   },
-  statusStartDate: {
+  statusEndDate: {
     type: DateField,
-    label: 'react.purchaseOrder.lastUpdateAfter.label',
-    defaultMessage: 'Last update after',
+    label: 'react.purchaseOrder.lastUpdateBefore.label',
+    defaultMessage: 'Last update before',
     attributes: {
       dateFormat: 'MM/DD/YYYY',
       filterElement: true,
@@ -139,12 +139,20 @@ const PurchaseOrderListFilters = ({
       setDefaultValues({
         destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
       });
+      setFilterParams(prevState => ({
+        ...prevState,
+        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
+      }));
       return;
     }
     // If central purchasing is not enabled, set default destination as currentLocation
     setDefaultValues({
       destination: currentLocation,
     });
+    setFilterParams(prevState => ({
+      ...prevState,
+      destination: currentLocation,
+    }));
   };
 
   useEffect(() => {
@@ -153,7 +161,7 @@ const PurchaseOrderListFilters = ({
       fetchStatuses();
     }
 
-    if (buyers.length === 0) {
+    if (!buyers || buyers.length === 0) {
       fetchBuyerOrganizations();
       return;
     }

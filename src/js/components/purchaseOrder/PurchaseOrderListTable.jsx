@@ -196,12 +196,18 @@ const PurchaseOrderListTable = ({
       accessor: 'orderNumber',
       className: 'cell',
       headerClassName: 'header text-align-left',
+      Cell: row => (
+        <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.orderNumber}</a>
+      ),
     },
     {
       Header: 'Name',
       accessor: 'name',
       className: 'cell',
       headerClassName: 'header text-align-left',
+      Cell: row => (
+        <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.name}</a>
+      ),
     },
     {
       Header: 'Supplier',
@@ -223,12 +229,60 @@ const PurchaseOrderListTable = ({
       Cell: row => (
         <span>{row.original.dateOrdered}</span>
       ),
+    },
+    {
+      Header: 'Ordered By',
+      accessor: 'orderedBy',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
+    },
+    {
+      Header: 'Line Items',
+      accessor: 'orderItemsCount',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
+      sortable: false,
+    },
+    {
+      Header: 'Ordered',
+      accessor: 'orderedOrderItemsCount',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
+      sortable: false,
+    },
+    {
+      Header: 'Shipped',
+      accessor: 'shippedItemsCount',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
+      sortable: false,
+    },
+    {
+      Header: 'Received',
+      accessor: 'receivedItemsCount',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
+      sortable: false,
+    },
+    {
+      Header: 'Total amount (local currency)',
+      accessor: 'total',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
+      sortable: false,
+    },
+    {
+      Header: 'Total amount (default currency)',
+      accessor: 'totalNormalized',
+      className: 'cell',
+      headerClassName: 'header text-align-left',
       Footer: (
         <span>
           <Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode}
         </span>
       ),
       footerClassName: 'border-0',
+      sortable: false,
     },
   ];
 
