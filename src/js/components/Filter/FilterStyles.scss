@@ -17,6 +17,7 @@
     .badge-count {
       padding: 4px;
       background-color: var(--blue-500);
+      width: 24px;
       border-radius: 15px;
       font-size: 11px;
       line-height: 13px;
@@ -42,7 +43,6 @@
   }
 
   .filter-header {
-    height: 75px;
 
     .buttons {
       flex: 1;

@@ -38,7 +38,8 @@ export const renderFormFields = ({
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
-  const className = `form-group mb-0 mx-1 ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched || showError) && error ? 'has-error' : ''}`;
+  const { filterElement } = attr;
+  const className = `${!filterElement ? 'mb-0 mx-1 form-group' : 'filter-group'} ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched || showError) && error ? 'has-error' : ''}`;
 
   if (arrayField) {
     return (
@@ -58,11 +59,11 @@ export const renderFormFields = ({
   }
 
   return (
-    <div className={`mt-2 ${className}`}>
-      <div className="row">
+    <div className={`${!filterElement ? 'mt-2' : ''} ${className}`}>
+      <div className={`${filterElement ? 'd-flex flex-wrap' : 'row'}`}>
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">
+            <label htmlFor={attr.id} className={`${!filterElement ? 'col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right' : ''}`}>
               {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
               {attr.withTooltip &&
                 <Tooltip
@@ -83,7 +84,7 @@ export const renderFormFields = ({
             :
             <FieldLabel />
         }
-        <div className="col-md-4 col-7 form-element-container">
+        <div className={`form-element-container ${!filterElement ? 'col-md-4 col-7' : 'flex-1 filter-element-container'}`}>
           {renderInput(input, attr)}
         </div>
       </div>

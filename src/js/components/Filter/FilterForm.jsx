@@ -6,21 +6,21 @@ import { Form } from 'react-final-form';
 
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
 import Button from 'components/form-elements/Button';
-import TextField from 'components/form-elements/TextField';
+import SearchField from 'components/form-elements/SearchField';
 import { renderFormField } from 'utils/form-utils';
-import Translate from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
 
 
 const FilterForm = ({
-  filterFields, onSubmit, searchFieldPlaceholder, formProps,
+  filterFields, onSubmit, searchFieldPlaceholder, searchFieldId, formProps, defaultValues,
 }) => {
   // Replace with SearchField created in another ticket
   const searchField = {
-    type: TextField,
+    type: SearchField,
     attributes: {
       placeholder: searchFieldPlaceholder,
+      filterElement: true,
     },
   };
   // Create initialValues from filterFields as empty values
@@ -32,14 +32,13 @@ const FilterForm = ({
       };
     }
     return acc;
-  }, { name: '' });
+  }, { name: '', ...defaultValues });
   const [amountFilled, setAmountFilled] = useState(0);
   const countFilled = (values) => {
     // Calculate which object's values are not empty
-    setAmountFilled(Object.values(values).filter(value => value !== '').length);
+    setAmountFilled(Object.values(values).filter(value => !_.isEmpty(value)).length);
   };
   const [filtersHidden, setFiltersHidden] = useState(true);
-
 
   return (
     <div className="filter-form">
@@ -49,11 +48,11 @@ const FilterForm = ({
         render={({ values, handleSubmit, form }) => {
           countFilled(values);
           return (
-            <form onSubmit={handleSubmit} className="w-100">
-              <div className="classic-form align-items-center flex-wrap">
-                <div className="w-100 d-flex filter-header">
-                  <div className="d-flex w-50">
-                    {renderFormField(searchField, 'name')}
+            <form onSubmit={handleSubmit} className="w-100 m-0">
+              <div className="classic-form with-description align-items-center flex-wrap">
+                <div className="w-100 d-flex filter-header align-items-center">
+                  <div className="min-w-50 d-flex align-items-center gap-8">
+                    {renderFormField(searchField, searchFieldId)}
                     <FilterVisibilityToggler
                       amountFilled={amountFilled}
                       filtersHidden={filtersHidden}
@@ -66,7 +65,7 @@ const FilterForm = ({
                       label="react.button.clear.label"
                       onClickAction={() => form.reset(initialValues)}
                       variant="transparent"
-                      type="button"
+                      type="submit"
                     />
                     <Button
                       defaultLabel="Search"
@@ -78,7 +77,7 @@ const FilterForm = ({
                   </div>
                 </div>
 
-                <div className="d-flex">
+                <div className="d-flex pt-2 flex-wrap gap-8">
                   {!filtersHidden && _.map(filterFields, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, formProps))}
                 </div>
@@ -100,9 +99,13 @@ FilterForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   searchFieldPlaceholder: PropTypes.string,
   formProps: PropTypes.shape({}),
+  searchFieldId: PropTypes.string,
+  defaultValues: PropTypes.shape({}),
 };
 
 FilterForm.defaultProps = {
   searchFieldPlaceholder: 'Search',
+  searchFieldId: 'searchTerm',
   formProps: {},
+  defaultValues: {},
 };
