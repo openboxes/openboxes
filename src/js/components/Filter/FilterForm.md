@@ -1,12 +1,14 @@
 ## FilterForm documentation
 * `<FilterForm>`
 #### Available props:
-| Name                   | Type              | Values               | Required | Description                                                                                                 |   
-|------------------------|-------------------|----------------------|----------|-------------------------------------------------------------------------------------------------------------|
-| filterFields           | object of objects | check example below  | yes      | The same type as we use for<br/>normal forms (check below)                                                  | 
-| onSubmit               | function          |                      | yes      | Action to trigger after submiting filter form (e.g. fetching data with values from filter's form as params) | 
-| searchFieldPlaceholder | string            | by default: 'Search' | no       | All filter forms are supposed to have search field, so provide placeholder for that field as props          |
-| formProps              | object            | check example below  | no       | Form props for some fields' needs, e.g. **getDynamicAttr**                                                  | 
+| Name                   | Type              | Values                                            | Required | Description                                                                                                  |   
+|------------------------|-------------------|---------------------------------------------------|----------|--------------------------------------------------------------------------------------------------------------|
+| filterFields           | object of objects | check example below                               | yes      | The same type as we use for<br/>normal forms (check below)                                                   | 
+| onSubmit               | function          |                                                   | yes      | Action to trigger after submiting filter form (e.g. fetching data with values from filter's form as params)  | 
+| searchFieldPlaceholder | string            | by default: 'Search'                              | no       | All filter forms are supposed to have search field, so provide placeholder for that field as props           |
+| formProps              | object            | check example below                               | no       | Form props for some fields' needs, e.g. **getDynamicAttr**                                                   | 
+| searchFieldId          | string            | id of searchField input (by default 'searchTerm') | no       | Id of search field - check what backend expects for searchTerm checking (could be 'searchTerm', 'name' etc.) | 
+| defaultValues          | object            |                                                   | no       | Default values for filter form                                                                               | 
 
 #### Example:
 ````md

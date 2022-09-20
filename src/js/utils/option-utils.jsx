@@ -171,3 +171,20 @@ export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
       callback([]);
     }
   }, waitTime);
+
+export const organizationsFetch = (roleTypes = ['ROLE_SUPPLIER'], active = false) =>
+  apiClient.get(`/openboxes/api/organizations?${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}&active=${active}`)
+    .then((res) => {
+      if (res.data.data) {
+        return res.data.data.map(obj => (
+          {
+            id: obj.id,
+            value: obj.id,
+            name: obj.name,
+            label: `${obj.name}`,
+          }
+        ));
+      }
+      return null;
+    });
+

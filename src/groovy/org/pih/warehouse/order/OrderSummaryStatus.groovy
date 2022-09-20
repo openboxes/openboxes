@@ -11,18 +11,22 @@ package org.pih.warehouse.order
 
 enum OrderSummaryStatus {
 
-    PENDING,
-    APPROVED,
-    PLACED,
-    PARTIALLY_SHIPPED,
-    SHIPPED,
-    PARTIALLY_RECEIVED,
-    RECEIVED,
-    PARTIALLY_INVOICED,
-    INVOICED,
-    COMPLETED,
-    CANCELED,
-    REJECTED
+    PENDING('warning'),
+    APPROVED('primary'),
+    PLACED('primary'),
+    PARTIALLY_SHIPPED('primary'),
+    SHIPPED('primary'),
+    PARTIALLY_RECEIVED('primary'),
+    RECEIVED('primary'),
+    PARTIALLY_INVOICED('primary'),
+    INVOICED('primary'),
+    COMPLETED('success'),
+    CANCELED('danger'),
+    REJECTED('danger')
+
+    String variant
+
+    OrderSummaryStatus(String variant) { this.variant = variant }
 
     static orderStatuses() {
         [PENDING, PLACED, COMPLETED, CANCELED, REJECTED]

@@ -43,6 +43,10 @@ body {
   }
 }
 
+.min-w-50 {
+  min-width: 50% !important;
+}
+
 .menu-container {
   border-top: 1px solid $gray-gamma;
   border-bottom: 1px solid $gray-zeta;
@@ -190,6 +194,19 @@ body {
       color: red;
     }
   }
+}
+
+.filter-group {
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.gap-8 {
+  gap: 8px;
 }
 
 .create-form {
@@ -867,6 +884,10 @@ div.crossed-out .table-inner-row:before {
   }
 }
 
+.filter-element-container {
+  min-width: 150px;
+}
+
 // Tooltip style
 .custom-tooltip {
   background-color: var(--blue-800);
@@ -894,9 +915,8 @@ div.search-input {
   align-items: center;
   padding: 6px 12px;
   gap: 8px;
-  position: absolute;
   height: 36px;
-  width: 100%;
+  width: 520px;
   background: #FFFFFF;
   border: 1px solid var(--gray-300);
   border-radius: 2px;
@@ -989,3 +1009,87 @@ div.search-input:focus-within {
     outline: none;
   }
 }
+
+.dropdown-button {
+  padding: 4px 8px;
+  background-color: var(--blue-100);
+  height: 28px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  color: var(--gray-600);
+  border-radius: 2px;
+  border: none;
+
+  &:hover {
+    color: var(--blue-500);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:active {
+    outline: 1px solid var(--blue-primary);
+  }
+}
+
+
+// Status circles styling
+.status-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+}
+
+.warning-circle {
+  background-color: var(--yellow-ob);
+}
+
+.primary-circle {
+  background-color: var(--blue-500);
+}
+
+.success-circle {
+  background-color: var(--green-ob);
+}
+
+.gray-circle {
+  background-color: var(--gray-300);
+}
+
+.danger-circle {
+  background-color: var(--red-ob);
+}
+
+// Action dots box
+.action-dots {
+  .dropdown-menu {
+    a {
+      font-weight: 400;
+      font-size: 14px !important;
+      line-height: 20px !important;
+    }
+  }
+  width: 24px;
+  height: 24px;
+  background-color: var(--blue-200);
+  border-radius: 18px;
+  color: var(--blue-primary);
+
+  &:hover {
+    background-color: var(--blue-primary);
+    color: #FFFFFF;
+  }
+
+  .font-red-ob {
+    color: var(--red-ob) !important;
+
+    &:hover {
+      color: var(--red-ob) !important;
+    }
+  }
+}
+

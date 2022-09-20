@@ -6,6 +6,7 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   FETCH_BREADCRUMBS_CONFIG,
+  FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
   FETCH_CURRENCIES,
@@ -13,8 +14,10 @@ import {
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_ORGANIZATIONS,
+  FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
   FETCH_SESSION_INFO,
+  FETCH_SUPPLIERS,
   FETCH_USERS,
   HIDE_SPINNER,
   REMOVE_FROM_INDICATORS,
@@ -423,5 +426,70 @@ export function fetchBreadcrumbsConfig() {
         payload: res.data,
       });
     });
+  };
+}
+
+export function fetchPurchaseOrderStatuses() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/orderSummaryStatus').then((res) => {
+      dispatch({
+        type: FETCH_PURCHASE_ORDER_STATUSES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchSuppliers(active = false) {
+  return (dispatch) => {
+    apiClient.get(`/openboxes/api/organizations?roleType=ROLE_SUPPLIER&active=${active}`)
+      .then((res) => {
+        if (res.data.data) {
+          const suppliers = res.data.data.map(obj => (
+            {
+              id: obj.id,
+              value: obj.id,
+              name: obj.name,
+              label: `${obj.name}`,
+            }
+          ));
+          dispatch({
+            type: FETCH_SUPPLIERS,
+            payload: suppliers,
+          });
+        }
+        dispatch({
+          type: FETCH_SUPPLIERS,
+          payload: [],
+        });
+      });
+  };
+}
+
+export function fetchBuyers(active = false) {
+  console.log('fetching buyers');
+  return (dispatch) => {
+    apiClient.get(`/openboxes/api/organizations?roleType=ROLE_BUYER&active=${active}`)
+      .then((res) => {
+        if (res.data.data) {
+          const buyers = res.data.data.map(obj => (
+            {
+              id: obj.id,
+              value: obj.id,
+              name: obj.name,
+              label: `${obj.name}`,
+            }
+          ));
+          dispatch({
+            type: FETCH_BUYERS,
+            payload: buyers,
+          });
+          return;
+        }
+        dispatch({
+          type: FETCH_BUYERS,
+          payload: [],
+        });
+      });
   };
 }

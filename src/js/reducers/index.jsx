@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import currenciesReducer from 'reducers/currenciesReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
+import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
 import sessionReducer from 'reducers/sessionReducer';
 import spinnerReducer from 'reducers/spinnerReducer';
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   indicators: indicatorsReducer,
   currencies: currenciesReducer,
   organizations: organizationsReducer,
+  purchaseOrder: purchaseOrderReducer,
 });
 
 export default rootReducer;

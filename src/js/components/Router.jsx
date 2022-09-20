@@ -121,6 +121,11 @@ const AsyncResetInstancePage = Loadable({
   loading: Loading,
 });
 
+const AsyncPurchaseOrderList = Loadable({
+  loader: () => import('components/purchaseOrder/PurchaseOrderList'),
+  loading: Loading,
+});
+
 const Router = (props) => {
   const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
     ? AsyncStockRequestDashboard
@@ -154,6 +159,7 @@ const Router = (props) => {
           <Route path="/**/resettingInstanceInfo/index">
             <AsyncResetInstancePage />
           </Route>
+          <MainLayoutRoute path="/**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
           <MainLayoutRoute path="/**/dashboard/:configId?" component={Dashboard} />
           <MainLayoutRoute path="/**/" component={Dashboard} />
         </Switch>

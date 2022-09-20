@@ -169,7 +169,7 @@
                                     </g:link>
                             </g:supports>
 
-                            <g:link controller="order" action="list" params="[orderType:OrderTypeCode.PURCHASE_ORDER.name()]" class="list dropdown-item">
+                            <g:link controller="purchaseOrder" action="list" class="list dropdown-item">
                                 <warehouse:message code="order.listPurchase.label" default="List Purchase Orders" />
                             </g:link>
 
