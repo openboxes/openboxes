@@ -93,6 +93,7 @@
     "react-sortable-hoc": "1.11.0",
     "react-spinners": "0.3.3",
     "react-table": "6.8.6",
+    "react-table-hoc-fixed-columns": "^2.3.4",
     "react-tabs": "2.3.0",
     "react-tippy": "1.2.2",
     "react-virtualized": "9.21.2",
