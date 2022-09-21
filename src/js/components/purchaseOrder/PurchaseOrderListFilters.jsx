@@ -12,11 +12,11 @@ import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 const filterFields = {
   status: {
     type: FilterSelectField,
-    label: 'react.purchaseOrder.status.label',
-    defaultMessage: 'Status',
     attributes: {
       multi: true,
       filterElement: true,
+      placeholder: 'Status',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({ statuses }) => ({
       options: statuses,
@@ -42,8 +42,6 @@ const filterFields = {
   },
   origin: {
     type: FilterSelectField,
-    label: 'react.purchaseOrder.supplier.label',
-    defaultMessage: 'Supplier',
     attributes: {
       async: true,
       openOnClick: false,
@@ -54,6 +52,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
+      placeholder: 'Supplier',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({
       debouncedOriginLocationsFetch,
@@ -63,8 +63,6 @@ const filterFields = {
   },
   destination: {
     type: FilterSelectField,
-    label: 'react.purchaseOrder.destination.label',
-    defaultMessage: 'Destination',
     attributes: {
       async: true,
       openOnClick: false,
@@ -75,6 +73,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
+      placeholder: 'Destination',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({
       debouncedDestinationLocationsFetch,
@@ -84,11 +84,11 @@ const filterFields = {
   },
   destinationParty: {
     type: FilterSelectField,
-    label: 'react.purchaseOrder.purchasingOrganization.label',
-    defaultMessage: 'Purchasing organization',
     attributes: {
       valueKey: 'id',
       filterElement: true,
+      placeholder: 'Purchasing organization',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({ buyers, isCentralPurchasingEnabled }) => ({
       options: buyers,
@@ -97,8 +97,6 @@ const filterFields = {
   },
   orderedBy: {
     type: FilterSelectField,
-    label: 'react.purchaseOrder.orderedBy.label',
-    defaultMessage: 'Ordered by',
     attributes: {
       async: true,
       openOnClick: false,
@@ -109,6 +107,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
+      placeholder: 'Ordered by',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({
       debouncedUsersFetch,

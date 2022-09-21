@@ -17,6 +17,25 @@ class Select extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.getTooltipHtml = this.getTooltipHtml.bind(this);
+  }
+
+  getTooltipHtml() {
+    const {
+      multi, placeholder, showLabelTooltip, value,
+    } = this.props;
+
+    if (showLabelTooltip) {
+      const valueMapped = multi && value ? this.props.value.map(v => v && v.label) : [];
+      const valueLabel = multi ? valueMapped.join(', ') : (value.label || value.name);
+      return (
+        <div className="p-1">
+          {`${placeholder}${valueLabel ? `: ${valueLabel}` : ''}`}
+        </div>
+      );
+    }
+
+    return (value && <div className="p-1">{value.label}</div>);
   }
 
   handleChange(value) {
@@ -32,9 +51,9 @@ class Select extends Component {
   render() {
     const {
       options: selectOptions, value: selectValue = this.state.value,
-      multi = false, delimiter = ';', async = false, showValueTooltip, clearable = true,
-      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress,
-      customSelectComponents, optionRenderer, classNamePrefix, ...attributes
+      multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
+      clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
+      onEnterPress, customSelectComponents, optionRenderer, classNamePrefix, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -115,8 +134,8 @@ class Select extends Component {
     return (
       <div id={`${this.state.id}-container`}>
         <Tooltip
-          html={(this.props.value && <div>{this.props.value.label}</div>)}
-          disabled={!showValueTooltip || !this.props.value}
+          html={this.getTooltipHtml()}
+          disabled={!showLabelTooltip || (showValueTooltip && this.props.value)}
           theme="transparent"
           arrow="true"
           delay="150"
@@ -208,6 +227,8 @@ Select.propTypes = {
   async: PropTypes.bool,
   delimiter: PropTypes.string,
   showValueTooltip: PropTypes.bool,
+  showLabelTooltip: PropTypes.bool,
+  placeholder: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
   arrowLeft: PropTypes.func,
@@ -230,8 +251,10 @@ Select.defaultProps = {
   clearable: true,
   async: false,
   delimiter: ';',
+  placeholder: '',
   initialValue: null,
   showValueTooltip: false,
+  showLabelTooltip: false,
   arrowLeft: null,
   arrowUp: null,
   arrowRight: null,

@@ -958,7 +958,7 @@ div.search-input:focus-within {
 }
 
 .filter-select {
-  margin: 0 5px;
+  margin-right: 5px;
   height: 36px;
   min-width: 200px;
 
@@ -1052,6 +1052,10 @@ div.search-input:focus-within {
       cursor: pointer;
       background: var(--blue-200);
     }
+  }
+
+  &__placeholder {
+    white-space: nowrap;
   }
 }
 
