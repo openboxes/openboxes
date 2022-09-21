@@ -41,6 +41,8 @@ const PurchaseOrderListTable = ({
   hideTheSpinner,
   translate,
   currencyCode,
+  currentLocation,
+  buyers,
 }) => {
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,9 +56,10 @@ const PurchaseOrderListTable = ({
   const fireFetchData = () => {
     tableRef.current.fireFetchData();
   };
+  const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
 
   // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams]);
+  useEffect(() => fireFetchData(), [filterParams, currentLocation]);
 
   // If orderItems is true, download orders line items details, else download orders
   const downloadOrders = (orderItems) => {
@@ -347,6 +350,26 @@ const PurchaseOrderListTable = ({
           const statusParam = filterParams.status &&
             filterParams.status.map(status => status.value);
 
+          const destinationParam = () => {
+            if (filterParams.destination && filterParams.destination.id) {
+              return filterParams.destination.id;
+            }
+            if (!isCentralPurchasingEnabled) {
+              return currentLocation.id;
+            }
+            return '';
+          };
+
+          const destinationPartyParam = () => {
+            if (filterParams.destinationParty && filterParams.destinationParty.id) {
+              return filterParams.destinationParty.id;
+            }
+            if (isCentralPurchasingEnabled) {
+              return buyers && buyers.find(org => org.id === currentLocation.organization.id).id;
+            }
+            return '';
+          };
+
           const params = _.omitBy({
             offset: `${offset}`,
             max: `${state.pageSize}`,
@@ -354,9 +377,9 @@ const PurchaseOrderListTable = ({
             ..._.omit(filterParams, 'status'),
             status: statusParam,
             origin: filterParams.origin && filterParams.origin.id,
-            destination: filterParams.destination && filterParams.destination.id,
+            destination: destinationParam(),
             orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-            destinationParty: filterParams.destinationParty && filterParams.destinationParty.id,
+            destinationParty: destinationPartyParam(),
           }, _.isEmpty);
 
           // Fetch data
@@ -376,6 +399,8 @@ const PurchaseOrderListTable = ({
                 ...sortingParams,
                 ..._.omit(filterParams, 'status'),
                 status: statusParam,
+                destination: destinationParam(),
+                destinationParty: destinationPartyParam(),
               });
             })
             .catch(() => Promise.reject(new Error(this.props.translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
@@ -390,6 +415,8 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencyCode: state.session.currencyCode,
+  currentLocation: state.session.currentLocation,
+  buyers: state.organizations.buyers,
 });
 
 const mapDispatchToProps = {
@@ -408,4 +435,11 @@ PurchaseOrderListTable.propTypes = {
   hideTheSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   currencyCode: PropTypes.string.isRequired,
+  currentLocation: PropTypes.shape({}).isRequired,
+  buyers: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    variant: PropTypes.string.isRequired,
+  })).isRequired,
 };
