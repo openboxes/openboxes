@@ -137,11 +137,11 @@ const PurchaseOrderListFilters = ({
     // If central purchasing is enabled, set default purchasing org as currentLocation's org
     if (isCentralPurchasingEnabled) {
       setDefaultValues({
-        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
+        destinationParty: buyers.find(org => org.id === currentLocation.organization.id).id,
       });
       setFilterParams(prevState => ({
         ...prevState,
-        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
+        destinationParty: buyers.find(org => org.id === currentLocation.organization.id).id,
       }));
       return;
     }
@@ -166,7 +166,7 @@ const PurchaseOrderListFilters = ({
       return;
     }
     determineDefaultValues();
-  }, [buyers]);
+  }, [buyers, currentLocation]);
 
   const debouncedOriginLocationsFetch = debounceLocationsFetch(
     debounceTime,
