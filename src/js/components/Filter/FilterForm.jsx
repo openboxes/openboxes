@@ -77,7 +77,7 @@ const FilterForm = ({
                   </div>
                 </div>
 
-                <div className="d-flex pt-2 flex-wrap gap-8">
+                <div className="d-flex pt-2 flex-wrap gap-8 align-items-center filters-row">
                   {!filtersHidden && _.map(filterFields, (fieldConfig, fieldName) =>
                     renderFormField(fieldConfig, fieldName, formProps))}
                 </div>

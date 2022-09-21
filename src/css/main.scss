@@ -869,7 +869,7 @@ div.crossed-out .table-inner-row:before {
   color: red;
 }
 
-.scrollbar {
+.scrollbar, .filter-select__menu-list {
   &::-webkit-scrollbar {
     width: 0.5em;
     height: 0.5em;

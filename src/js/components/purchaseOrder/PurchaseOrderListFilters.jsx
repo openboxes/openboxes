@@ -6,17 +6,17 @@ import { connect } from 'react-redux';
 import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import FilterForm from 'components/Filter/FilterForm';
 import DateField from 'components/form-elements/DateField';
-import SelectField from 'components/form-elements/SelectField';
+import FilterSelectField from 'components/form-elements/FilterSelectField';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 
 const filterFields = {
   status: {
-    type: SelectField,
-    label: 'react.purchaseOrder.status.label',
-    defaultMessage: 'Status',
+    type: FilterSelectField,
     attributes: {
       multi: true,
       filterElement: true,
+      placeholder: 'Status',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({ statuses }) => ({
       options: statuses,
@@ -41,9 +41,7 @@ const filterFields = {
     },
   },
   origin: {
-    type: SelectField,
-    label: 'react.purchaseOrder.supplier.label',
-    defaultMessage: 'Supplier',
+    type: FilterSelectField,
     attributes: {
       async: true,
       openOnClick: false,
@@ -54,6 +52,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
+      placeholder: 'Supplier',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({
       debouncedOriginLocationsFetch,
@@ -62,9 +62,7 @@ const filterFields = {
     }),
   },
   destination: {
-    type: SelectField,
-    label: 'react.purchaseOrder.destination.label',
-    defaultMessage: 'Destination',
+    type: FilterSelectField,
     attributes: {
       async: true,
       openOnClick: false,
@@ -75,6 +73,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
+      placeholder: 'Destination',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({
       debouncedDestinationLocationsFetch,
@@ -83,12 +83,12 @@ const filterFields = {
     }),
   },
   destinationParty: {
-    type: SelectField,
-    label: 'react.purchaseOrder.purchasingOrganization.label',
-    defaultMessage: 'Purchasing organization',
+    type: FilterSelectField,
     attributes: {
       valueKey: 'id',
       filterElement: true,
+      placeholder: 'Purchasing organization',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({ buyers, isCentralPurchasingEnabled }) => ({
       options: buyers,
@@ -96,9 +96,7 @@ const filterFields = {
     }),
   },
   orderedBy: {
-    type: SelectField,
-    label: 'react.purchaseOrder.orderedBy.label',
-    defaultMessage: 'Ordered by',
+    type: FilterSelectField,
     attributes: {
       async: true,
       openOnClick: false,
@@ -109,6 +107,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
+      placeholder: 'Ordered by',
+      showLabelTooltip: true,
     },
     getDynamicAttr: ({
       debouncedUsersFetch,
