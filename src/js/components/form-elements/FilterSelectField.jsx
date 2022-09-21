@@ -7,18 +7,13 @@ import { components } from 'react-select';
 import BaseField from 'components/form-elements/BaseField';
 import Select from 'utils/Select';
 
-const DROPDOWN_STYLE = {
-  background: '#FFFFFF',
-  'box-shadow': '0px 0px 0px 1px rgba(152, 161, 179, 0.1), 0px 15px 35px -5px rgba(17, 24, 38, 0.2), 0px 5px 15px rgba(0, 0, 0, 0.08)',
-  'border-radius': '4px',
-  position: 'absolute',
-  zIndex: 3,
-};
+import 'components/form-elements/FilterSelectField.scss';
 
 const Dropdown = ({ children, style, width }) => (
   <div
+    className="filter-select__dropdown"
     style={{
-      ...style, width, ...DROPDOWN_STYLE,
+      ...style, width,
     }}
   >
     {children}
