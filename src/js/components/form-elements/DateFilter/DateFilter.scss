@@ -34,6 +34,10 @@
     color: var(--blue-primary);
   }
 
+  &__day--outside-month {
+    color: var(--gray-300);
+  }
+
   &__day--highlighted, &__day--selected  {
     border-radius: 2px;
     color: white;
@@ -150,7 +154,7 @@
     outline-color: rgba(34, 100, 229, 0.15);
     border: 1px solid var(--gray-300);
     color: var(--gray-400);
-    border-radius: 4px;
+    border-radius: 2px;
     &--focused {
       outline-width: 3px;
       border-color: var(--blue-primary);

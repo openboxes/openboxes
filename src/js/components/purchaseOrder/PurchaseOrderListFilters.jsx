@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import FilterForm from 'components/Filter/FilterForm';
-import DateField from 'components/form-elements/DateField';
+import DateFilter from 'components/form-elements/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 
@@ -23,19 +23,19 @@ const filterFields = {
     }),
   },
   statusStartDate: {
-    type: DateField,
-    label: 'react.purchaseOrder.lastUpdateAfter.label',
-    defaultMessage: 'Last update after',
+    type: DateFilter,
     attributes: {
+      label: 'react.purchaseOrder.lastUpdateAfter.label',
+      defaultMessage: 'Last update after',
       dateFormat: 'MM/DD/YYYY',
       filterElement: true,
     },
   },
   statusEndDate: {
-    type: DateField,
-    label: 'react.purchaseOrder.lastUpdateBefore.label',
-    defaultMessage: 'Last update before',
+    type: DateFilter,
     attributes: {
+      label: 'react.purchaseOrder.lastUpdateBefore.label',
+      defaultMessage: 'Last update before',
       dateFormat: 'MM/DD/YYYY',
       filterElement: true,
     },

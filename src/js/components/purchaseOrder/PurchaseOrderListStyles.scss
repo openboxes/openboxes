@@ -23,6 +23,10 @@
     border-radius: 4px;
     padding: 16px;
 
+    .filter-group {
+      height: 38px;
+    }
+
     .filters-row {
       .filter-group > div:first-child {
         align-items: center;
