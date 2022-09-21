@@ -20,9 +20,9 @@ import { RiCloseLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
-import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
+import DataTable from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import ActionDots from 'utils/ActionDots';
@@ -179,26 +179,33 @@ const PurchaseOrderListTable = ({
   // Columns for react-table
   const columns = [
     {
+      Header: ' ',
+      width: 50,
+      fixed: 'left',
+      sortable: false,
+      style: { overflow: 'visible', zIndex: 1 },
+      Cell: row => (
+        <ActionDots
+          dropdownPlacement="right"
+          dropdownClasses="action-dropdown-offset"
+          actions={findActions(actions, row, supportedActivities, highestRole)}
+          id={row.original.id}
+        />),
+    },
+    {
       Header: 'Status',
       accessor: 'status',
       className: 'active-circle',
       headerClassName: 'header',
-      style: { overflow: 'visible' },
-      Cell: row => (
-        <div className="d-flex gap-8">
-          <ActionDots
-            actions={findActions(actions, row, supportedActivities, highestRole)}
-            id={row.original.id}
-          />
-          <PurchaseOrderStatus status={row.original.status} />
-        </div>
-      ),
+      fixed: 'left',
+      maxWidth: 100,
+      Cell: row => (<PurchaseOrderStatus status={row.original.status} />),
     },
     {
       Header: 'Order Number',
       accessor: 'orderNumber',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      fixed: 'left',
+      width: 150,
       Cell: row => (
         <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.orderNumber}</a>
       ),
@@ -206,8 +213,8 @@ const PurchaseOrderListTable = ({
     {
       Header: 'Name',
       accessor: 'name',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      fixed: 'left',
+      minWidth: 250,
       Cell: row => (
         <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.name}</a>
       ),
@@ -215,20 +222,17 @@ const PurchaseOrderListTable = ({
     {
       Header: 'Supplier',
       accessor: 'origin',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      minWidth: 300,
     },
     {
       Header: 'Destination',
       accessor: 'destination',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      minWidth: 300,
     },
     {
       Header: 'Ordered On',
       accessor: 'dateOrdered',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      minWidth: 120,
       Cell: row => (
         <span>{row.original.dateOrdered}</span>
       ),
@@ -236,63 +240,129 @@ const PurchaseOrderListTable = ({
     {
       Header: 'Ordered By',
       accessor: 'orderedBy',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      headerClassName: 'text-left',
+      minWidth: 120,
     },
     {
       Header: 'Line Items',
       accessor: 'orderItemsCount',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
       sortable: false,
     },
     {
       Header: 'Ordered',
       accessor: 'orderedOrderItemsCount',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
       sortable: false,
     },
     {
       Header: 'Shipped',
       accessor: 'shippedItemsCount',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
       sortable: false,
     },
     {
       Header: 'Received',
       accessor: 'receivedItemsCount',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
       sortable: false,
     },
     {
       Header: 'Total amount (local currency)',
       accessor: 'total',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
       sortable: false,
+      minWidth: 230,
     },
     {
       Header: 'Total amount (default currency)',
       accessor: 'totalNormalized',
-      className: 'cell',
-      headerClassName: 'header text-align-left',
-      Footer: (
-        <span>
-          <Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode}
-        </span>
-      ),
-      footerClassName: 'border-0',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
       sortable: false,
+      minWidth: 230,
     },
   ];
 
+  const destinationParam = () => {
+    if (filterParams.destination && filterParams.destination.id) {
+      return filterParams.destination.id;
+    }
+    if (!isCentralPurchasingEnabled) {
+      return currentLocation.id;
+    }
+    return '';
+  };
+
+  const destinationPartyParam = () => {
+    if (filterParams.destinationParty && filterParams.destinationParty.id) {
+      return filterParams.destinationParty.id;
+    }
+    if (isCentralPurchasingEnabled) {
+      return buyers && buyers.find(org => org.id === currentLocation.organization.id).id;
+    }
+    return '';
+  };
+
+  const onFetchHandler = (state) => {
+    const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
+    const sortingParams = state.sorted.length > 0 ?
+      {
+        sort: state.sorted[0].id,
+        order: state.sorted[0].desc ? 'desc' : 'asc',
+      } :
+      {
+        sort: 'dateOrdered',
+        order: 'desc',
+      };
+    const statusParam = filterParams.status &&
+      filterParams.status.map(status => status.value);
+
+    const params = _.omitBy({
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      ...sortingParams,
+      ..._.omit(filterParams, 'status'),
+      status: statusParam,
+      origin: filterParams.origin && filterParams.origin.id,
+      destination: destinationParam(),
+      orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
+      destinationParty: destinationPartyParam(),
+    }, _.isEmpty);
+
+    // Fetch data
+    setLoading(true);
+    apiClient.get('/openboxes/api/purchaseOrders', {
+      params,
+      paramsSerializer: parameters => queryString.stringify(parameters),
+    })
+      .then((res) => {
+        setLoading(false);
+        setPages(Math.ceil(res.data.totalCount / state.pageSize));
+        setOrdersData(res.data.data);
+        setTotalPrice(res.data.totalPrice);
+        // Store currently used params for export case
+        setCurrentParams({
+          offset: `${offset}`,
+          max: `${state.pageSize}`,
+          ...sortingParams,
+          ..._.omit(filterParams, 'status'),
+          status: statusParam,
+          destination: destinationParam(),
+          destinationParty: destinationPartyParam(),
+        });
+      })
+      .catch(() => Promise.reject(new Error(this.props.translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
+  };
 
   return (
     <div className="purchase-order-list-list-section">
-      <div className="title-box d-flex justify-content-between align-items-center">
+      <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <span>
           <Translate id="react.purchaseOrder.listOrders.label" defaultMessage="List Orders" />
           &nbsp;
@@ -321,90 +391,23 @@ const PurchaseOrderListTable = ({
           </div>
         </div>
       </div>
-      <ReactTable
-        data={ordersData}
+      <DataTable
+        manual
+        sortable
         ref={tableRef}
         columns={columns}
+        data={ordersData}
         loading={loading}
-        pages={pages}
         defaultPageSize={10}
-        manual
-        className="-striped -highlight zoneTable"
-        resizable={false}
-        sortable
-        collapseOnSortingChange={false}
-        previousText={<i className="fa fa-chevron-left" aria-hidden="true" />}
-        nextText={<i className="fa fa-chevron-right" aria-hidden="true" />}
-        pageText=""
-        onFetchData={(state) => {
-          const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-          const sortingParams = state.sorted.length > 0 ?
-            {
-              sort: state.sorted[0].id,
-              order: state.sorted[0].desc ? 'desc' : 'asc',
-            } :
-            {
-              sort: 'dateOrdered',
-              order: 'desc',
-            };
-          const statusParam = filterParams.status &&
-            filterParams.status.map(status => status.value);
-
-          const destinationParam = () => {
-            if (filterParams.destination && filterParams.destination.id) {
-              return filterParams.destination.id;
-            }
-            if (!isCentralPurchasingEnabled) {
-              return currentLocation.id;
-            }
-            return '';
-          };
-
-          const destinationPartyParam = () => {
-            if (filterParams.destinationParty && filterParams.destinationParty.id) {
-              return filterParams.destinationParty.id;
-            }
-            if (isCentralPurchasingEnabled) {
-              return buyers && buyers.find(org => org.id === currentLocation.organization.id).id;
-            }
-            return '';
-          };
-
-          const params = _.omitBy({
-            offset: `${offset}`,
-            max: `${state.pageSize}`,
-            ...sortingParams,
-            ..._.omit(filterParams, 'status'),
-            status: statusParam,
-            origin: filterParams.origin && filterParams.origin.id,
-            destination: destinationParam(),
-            orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-            destinationParty: destinationPartyParam(),
-          }, _.isEmpty);
-
-          // Fetch data
-          apiClient.get('/openboxes/api/purchaseOrders', {
-            params,
-            paramsSerializer: parameters => queryString.stringify(parameters),
-          })
-            .then((res) => {
-              setLoading(false);
-              setPages(Math.ceil(res.data.totalCount / state.pageSize));
-              setOrdersData(res.data.data);
-              setTotalPrice(res.data.totalPrice);
-              // Store currently used params for export case
-              setCurrentParams({
-                offset: `${offset}`,
-                max: `${state.pageSize}`,
-                ...sortingParams,
-                ..._.omit(filterParams, 'status'),
-                status: statusParam,
-                destination: destinationParam(),
-                destinationParty: destinationPartyParam(),
-              });
-            })
-            .catch(() => Promise.reject(new Error(this.props.translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
-        }}
+        pages={pages}
+        onFetchData={onFetchHandler}
+        className="mb-1"
+        noDataText="No orders match the given criteria"
+        footerComponent={() => (
+          <span className="title-text p-1 d-flex flex-1 justify-content-end">
+            <Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode}
+          </span>
+        )}
       />
     </div>
   );

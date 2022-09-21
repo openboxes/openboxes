@@ -34,23 +34,23 @@
     }
   }
 
+  .action-dropdown-offset {
+    left: 15px !important;
+  }
+
+  .title-text {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.02em;
+    color: var(--blue-700);
+  }
+
   .purchase-order-list-list-section {
     background-color: #FFFFFF;
-    border-radius: 4px 4px 0 0;
+    border-radius: 4px;
     margin-top: 32px;
-    padding: 12px 16px;
-
-    .title-box {
-      height: 44px;
-
-      span {
-        font-weight: 600;
-        font-size: 14px;
-        line-height: 20px;
-        letter-spacing: -0.02em;
-        color: var(--blue-700);
-      }
-    }
+    margin-bottom: 32px;
 
     .dropdown-menu {
       box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.15);
@@ -90,7 +90,6 @@
       }
     }
   }
-  // TODO: Delete this after table's restyling is ready
   .ReactTable .rt-tfoot .rt-td {
     border: 0 !important;
     font-weight: 600;
