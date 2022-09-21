@@ -1066,22 +1066,26 @@ div.search-input:focus-within {
 
 // Action dots box
 .action-dots {
+  width: 24px;
+  height: 24px;
+  background-color: var(--blue-200);
+  border-radius: 18px;
+  color: var(--blue-primary);
+  border: none;
+  &:focus {
+    outline: none;
+  }
+  &:hover {
+    background-color: var(--blue-primary);
+    color: #FFFFFF;
+  }
+
   .dropdown-menu {
     a {
       font-weight: 400;
       font-size: 14px !important;
       line-height: 20px !important;
     }
-  }
-  width: 24px;
-  height: 24px;
-  background-color: var(--blue-200);
-  border-radius: 18px;
-  color: var(--blue-primary);
-
-  &:hover {
-    background-color: var(--blue-primary);
-    color: #FFFFFF;
   }
 
   .font-red-ob {

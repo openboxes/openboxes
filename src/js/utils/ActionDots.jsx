@@ -23,14 +23,14 @@ const ActionDots = ({
 
   return (
     <div className={`btn-group ${getPositionClass()}`}>
-      <div
+      <button
         className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"
         data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
       >
         <RiMoreLine />
-      </div>
+      </button>
       <div className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
         {actions && actions.map(action => (
           <React.Fragment key={action.href ? action.href : action.label}>
