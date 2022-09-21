@@ -5,14 +5,16 @@ import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import { RiCalendarLine, RiCloseLine } from 'react-icons/ri';
 
+import BaseField from 'components/form-elements/BaseField';
+import Translate from 'utils/Translate';
+
 import 'react-datepicker/dist/react-datepicker.css';
 import 'components/form-elements/DateFilter/DateFilter.scss';
 
 const CustomInput = React.forwardRef((props, ref) => {
   const {
-    onClick, title, value, placeholder, onClear,
+    onClick, title, value, placeholder, onClear, defaultMessage,
   } = props;
-
   const onKeypressHandler = (event) => {
     if (event.key === 'Enter') onClick();
   };
@@ -27,7 +29,7 @@ const CustomInput = React.forwardRef((props, ref) => {
       onKeyDown={onKeypressHandler}
     >
       <span className="flex-grow-1 date-picker__input">
-        <span>{title}</span>
+        <Translate id={title} defaultMessage={defaultMessage} />
         <span>{value || placeholder}</span>
       </span>
       <div className="date-picker__icon-wrapper">
@@ -41,10 +43,9 @@ const CustomInput = React.forwardRef((props, ref) => {
   );
 });
 
-
 const DateFilter = (props) => {
   const {
-    value, onChange, dateFormat, placeholder, label, timeFormat,
+    value, onChange, dateFormat, placeholder, label, timeFormat, defaultMessage,
   } = props;
   const [isFocused, setIsFocused] = useState(false);
 
@@ -69,7 +70,7 @@ const DateFilter = (props) => {
     <div className={`date-picker__wrapper ${isFocusedClass} ${isValidClass}`}>
       <DatePicker
         {...props}
-        customInput={<CustomInput onClear={onClear} />}
+        customInput={<CustomInput onClear={onClear} defaultMessage={defaultMessage} />}
         className="date-picker__input"
         placeholderText={placeholder}
         title={label}
@@ -93,9 +94,16 @@ const DateFilter = (props) => {
   );
 };
 
+const DateFilterBaseInput = props => (
+  <BaseField
+    {...props}
+    renderInput={DateFilter}
+  />);
+
 DateFilter.defaultProps = {
   onChange: undefined,
   label: '',
+  defaultMessage: '',
   placeholder: '',
   dateFormat: 'MM/DD/YYYY',
   timeFormat: 'HH:mm',
@@ -106,10 +114,10 @@ DateFilter.propTypes = {
   onChange: PropTypes.func,
   value: PropTypes.string,
   label: PropTypes.string,
+  defaultMessage: PropTypes.string,
   placeholder: PropTypes.string,
   dateFormat: PropTypes.string,
   timeFormat: PropTypes.string,
-
 };
 
-export default DateFilter;
+export default DateFilterBaseInput;

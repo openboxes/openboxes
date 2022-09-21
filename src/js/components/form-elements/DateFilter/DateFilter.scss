@@ -34,6 +34,10 @@
     color: var(--blue-primary);
   }
 
+  &__day--outside-month {
+    color: var(--gray-300);
+  }
+
   &__day--highlighted, &__day--selected  {
     border-radius: 2px;
     color: white;
