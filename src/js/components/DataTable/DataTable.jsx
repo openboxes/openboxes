@@ -15,9 +15,9 @@ import 'components/DataTable/DataTable.scss';
 
 const ReactTableFixedColumns = withFixedColumns(ReactTable);
 
-const DataTable = (props) => {
+const DataTable = React.forwardRef((props, ref) => {
   const {
-    data, footerComponent, headerComponent, columns,
+    data, footerComponent, headerComponent, columns, className,
   } = props;
 
   const PaginationComponent = paginationProps => (
@@ -31,7 +31,7 @@ const DataTable = (props) => {
     </React.Fragment>);
 
   return (
-    <div className="app-react-table-wrapper" style={{ maxWidth: '1000px' }}>
+    <div className="app-react-table-wrapper">
       { headerComponent && (
         <div className="app-react-table-header d-flex p-2">
           {headerComponent()}
@@ -39,28 +39,32 @@ const DataTable = (props) => {
       )}
       <ReactTableFixedColumns
         {...props}
-        className="app-react-table"
+        innerRef={ref}
+        className={`app-react-table ${className} ${data.length === 0 ? 'hide-data' : ''}`}
         data={data}
-        sortable={false}
-        resizable={false}
         columns={columns}
-        defaultPageSize={data.length > 0 ? props.defaultPageSize : 0}
         PaginationComponent={PaginationComponent}
         ThComponent={TableHeaderCell}
       />
     </div>
   );
-};
+});
 
 DataTable.defaultProps = {
   footerComponent: undefined,
   headerComponent: undefined,
+  sortable: false,
+  resizable: false,
+  className: '',
 };
 
 DataTable.propTypes = {
   ...ReactTablePropTypes,
   footerComponent: PropTypes.func,
   headerComponent: PropTypes.func,
+  sortable: PropTypes.bool,
+  resizable: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 

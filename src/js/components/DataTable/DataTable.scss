@@ -13,6 +13,11 @@
 .app-react-table {
   border: none;
   border-radius: 4px;
+
+  &.hide-data .rt-tbody {
+    display: none;
+  }
+
   .rt-table {
     font-size: 14px;
 
@@ -108,7 +113,7 @@
         background-color: white;
         color: var(--gray-600);
         &:hover, &:hover .rt-td {
-          background-color: var(--blue-200);
+          background-color: #F8FAFF;
         }
       }
 
@@ -119,11 +124,6 @@
     $column-shadow-color: rgba(0, 0, 0, 0.13);
 
     .rthfc-td-fixed, .rthfc-td-fixed {
-      z-index: 1;
-    }
-
-    .rt-td.rthfc-td-fixed.rthfc-td-fixed-left.rthfc-td-fixed-left-last,
-    .rt-td.rthfc-td-fixed.rthfc-td-fixed-right.rthfc-td-fixed-right-first {
       z-index: 0;
     }
 
