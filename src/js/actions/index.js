@@ -498,7 +498,7 @@ export function fetchBuyers(active = false) {
 
 export function fetchInvoiceStatuses() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/invoices/getStatuses').then((res) => {
+    apiClient.get('/openboxes/api/invoiceStatuses').then((res) => {
       dispatch({
         type: FETCH_INVOICE_STATUSES,
         payload: res.data.data,
@@ -509,7 +509,7 @@ export function fetchInvoiceStatuses() {
 
 export function fetchInvoiceTypeCodes() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/invoices/getInvoiceTypeCodes').then((res) => {
+    apiClient.get('/openboxes/api/invoiceTypeCodes').then((res) => {
       dispatch({
         type: FETCH_INVOICE_TYPE_CODES,
         payload: res.data.data,

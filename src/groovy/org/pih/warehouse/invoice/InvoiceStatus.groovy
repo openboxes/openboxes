@@ -9,18 +9,20 @@
  **/
 package org.pih.warehouse.invoice
 
+import org.pih.warehouse.core.StatusType
+
 enum InvoiceStatus {
 
-    PENDING(0, 'warning'),  // Drafted
-    INVOICED(10, 'primary'), // Invoice has been issued / received
-    SUBMITTED(20, 'primary'), // Invoice has been submitted for approval
-    POSTED(30, 'success'),  // Invoice has been posted
-    PAID(40, 'primary') // Invoice has been paid
+    PENDING(0, StatusType.WARNING),  // Drafted
+    INVOICED(10, StatusType.PRIMARY), // Invoice has been issued / received
+    SUBMITTED(20, StatusType.PRIMARY), // Invoice has been submitted for approval
+    POSTED(30, StatusType.PRIMARY),  // Invoice has been posted
+    PAID(40, StatusType.PRIMARY) // Invoice has been paid
 
     int sortOrder
-    String variant
+    StatusType variant
 
-    InvoiceStatus(int sortOrder, String variant) {
+    InvoiceStatus(int sortOrder, StatusType variant) {
         this.sortOrder = sortOrder
         this.variant = variant
     }

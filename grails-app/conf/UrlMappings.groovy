@@ -372,12 +372,12 @@ class UrlMappings {
             action = [GET: "getPrepaymentItems"]
         }
 
-        "/api/invoices/getStatuses"(parseRequest: true) {
+        "/api/invoiceStatuses"(parseRequest: true) {
             controller = { "invoiceApi" }
             action = [GET: "statusOptions"]
         }
 
-        "/api/invoices/getInvoiceTypeCodes"(parseRequest: true) {
+        "/api/invoiceTypeCodes"(parseRequest: true) {
             controller = { "invoiceApi" }
             action = [GET: "invoiceTypeCodes"]
         }
