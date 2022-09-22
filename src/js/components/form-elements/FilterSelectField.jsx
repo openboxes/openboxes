@@ -104,7 +104,6 @@ const FilterSelectField = (props) => {
       {...attributes}
       className={`filter-select ${className}`}
       classNamePrefix="filter-select"
-      closeMenuOnSelect={false}
       hideSelectedOptions={false}
       controlShouldRenderValue={!attributes.multi}
       customSelectComponents={{

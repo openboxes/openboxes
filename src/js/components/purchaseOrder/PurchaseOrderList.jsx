@@ -4,13 +4,12 @@ import PurchaseOrderListFilters from 'components/purchaseOrder/PurchaseOrderList
 import PurchaseOrderListHeader from 'components/purchaseOrder/PurchaseOrderListHeader';
 import PurchaseOrderListTable from 'components/purchaseOrder/PurchaseOrderListTable';
 
-import 'components/purchaseOrder/PurchaseOrderListStyles.scss';
 
 const PurchaseOrderList = () => {
   // Filter params are stored here, to be able to pass them to table component
   const [filterParams, setFilterParams] = useState({});
   return (
-    <div className="d-flex flex-column purchase-order-list-main">
+    <div className="d-flex flex-column list-page-main">
       <PurchaseOrderListHeader />
       <PurchaseOrderListFilters setFilterParams={setFilterParams} />
       <PurchaseOrderListTable filterParams={filterParams} />

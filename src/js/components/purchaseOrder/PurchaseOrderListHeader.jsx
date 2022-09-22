@@ -7,7 +7,7 @@ import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
 const PurchaseOrderListHeader = ({ history }) => (
-  <div className="d-flex purchase-order-list-header">
+  <div className="d-flex list-page-header">
     <span className="d-flex align-self-center title">
       <Translate id="react.purchaseOrder.list.label" defaultMessage="Purchase Order List" />
     </span>
