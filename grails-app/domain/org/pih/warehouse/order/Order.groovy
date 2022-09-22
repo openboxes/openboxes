@@ -90,6 +90,7 @@ class Order implements Serializable {
             "invoices",
             "hasInvoice",
             "invoiceItems",
+            "invoicedOrderItems",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
             "hasActiveItemsOrAdjustments",
@@ -307,6 +308,10 @@ class Order implements Serializable {
 
     def getReceivedOrderItems() {
         return orderItems?.findAll { it.completelyReceived }
+    }
+
+    def getInvoicedOrderItems() {
+        return orderItems?.findAll { it.completelyInvoiced }
     }
 
     /**

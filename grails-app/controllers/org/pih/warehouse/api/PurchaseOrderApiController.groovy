@@ -56,13 +56,16 @@ class PurchaseOrderApiController {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             if (orderInstance.hasPrepaymentInvoice) {
-                render(status: 400, text: "${warehouse.message(code: 'order.errors.deletePrepaid.message')}")
+                def message = "${warehouse.message(code: 'order.errors.deletePrepaid.message')}"
+                response.status = 400
+                render([errorMessages: [message]] as JSON)
                 return
             }
 
             if (orderInstance.status != OrderStatus.PENDING || !orderInstance.isPurchaseOrder) {
                 def message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'order'), orderInstance.orderNumber])}"
-                render(status: 400, text: message)
+                response.status = 400
+                render([errorMessages: [message]] as JSON)
                 return
             }
             try {
@@ -70,11 +73,15 @@ class PurchaseOrderApiController {
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 def message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                render(status: 400, text: message)
+                response.status = 400
+                render([errorMessages: [message]] as JSON)
+                return
             }
         } else {
             def message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            render(status: 404, text: message)
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
         }
 
         render status: 204
