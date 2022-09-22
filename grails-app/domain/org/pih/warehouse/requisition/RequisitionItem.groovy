@@ -88,6 +88,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     // Picking
     String pickReasonCode
 
+    // Transient property to assist with product availability refresh
+    Boolean disableRefresh = Boolean.FALSE
 
     static transients = [
             "type",
@@ -101,7 +103,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             "substitution",
             "shipmentItems",
             "receiptItems",
-            "pickablePicklistItems"
+            "pickablePicklistItems",
+            "disableRefresh"
     ]
 
     static belongsTo = [requisition: Requisition]
@@ -218,12 +221,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             if (substitutionItem) {
                 removeFromRequisitionItems(substitutionItem)
                 requisition.removeFromRequisitionItems(substitutionItem)
+                modificationItem.disableRefresh = Boolean.TRUE
                 substitutionItem.delete()
             }
 
             if (modificationItem) {
                 removeFromRequisitionItems(modificationItem)
                 requisition.removeFromRequisitionItems(modificationItem)
+                modificationItem.disableRefresh = Boolean.TRUE
                 modificationItem.delete()
             }
 

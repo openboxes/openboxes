@@ -68,7 +68,9 @@ class PicklistItem implements Serializable {
     static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable']
 
     String getAssociatedLocation() {
-        return requisitionItem ? requisitionItem?.requisition?.origin?.id : orderItem?.order?.origin?.id
+        return binLocation?.parentLocation?.id ?:
+                requisitionItem?.requisition?.origin?.id ?:
+                        orderItem?.order?.origin?.id
     }
 
     List getAssociatedProducts() {

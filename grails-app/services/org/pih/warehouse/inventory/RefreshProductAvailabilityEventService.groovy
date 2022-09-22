@@ -17,13 +17,15 @@ class RefreshProductAvailabilityEventService implements ApplicationListener<Refr
     def productAvailabilityService
 
     void onApplicationEvent(RefreshProductAvailabilityEvent event) {
-        log.info "Application event $event has been published! " + event.properties
         // Some event publishers might want to trigger the events on their own
         // in order to allow the transaction to be saved to the database (e.g. Partial Receiving)
         if (event?.disableRefresh) {
-            log.warn "Product availability refresh has been disabled by event publisher"
+            log.info "Application event been disabled by event publisher"
+            log.info "Application event " + event.properties
             return
         }
+        log.info "Application event has been received!"
+        log.info "Application event " + event.properties
 
         if (event?.synchronousRequired) {
             productAvailabilityService.refreshProductsAvailability(event.locationId,

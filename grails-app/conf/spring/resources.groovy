@@ -8,13 +8,20 @@
  * You must not remove this notice, or any other, from this software.
  **/
 
-
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import org.pih.warehouse.jobs.PersistenceContextJobListener
 
 beans = {
 
     customPropertyEditorRegistrar(util.CustomPropertyEditorRegistrar)
+
+    /**
+     * See OBS-863
+     */
+    quartzPersistenceContextJobListener(PersistenceContextJobListener) {
+        persistenceInterceptor = ref('persistenceInterceptor')
+    }
 
     /**
      * c3P0 pooled data source that allows 'DB keepalive' queries
