@@ -16,7 +16,7 @@ enum InvoiceStatus {
     PENDING(0, StatusType.WARNING),  // Drafted
     INVOICED(10, StatusType.PRIMARY), // Invoice has been issued / received
     SUBMITTED(20, StatusType.PRIMARY), // Invoice has been submitted for approval
-    POSTED(30, StatusType.PRIMARY),  // Invoice has been posted
+    POSTED(30, StatusType.SUCCESS),  // Invoice has been posted
     PAID(40, StatusType.PRIMARY) // Invoice has been paid
 
     int sortOrder

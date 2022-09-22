@@ -82,7 +82,7 @@ class PurchaseOrderApiController {
 
     def statusOptions = {
         def options = OrderSummaryStatus.derivedStatuses()?.collect {
-            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderSummaryStatus.' + it.name())}", variant: "${g.message(code: 'enum.StatusType.' + it.variant)}"  ]
+            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderSummaryStatus.' + it.name())}", variant: it.variant?.name()  ]
         }
         render([data: options] as JSON)
     }
