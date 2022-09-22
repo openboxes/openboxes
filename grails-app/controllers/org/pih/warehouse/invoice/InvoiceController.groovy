@@ -29,13 +29,7 @@ class InvoiceController {
     }
 
     def list = {
-        def invoiceParams = params.clone()
-        def location = Location.get(session.warehouse.id)
-        invoiceParams.partyFromId = location?.organization?.id
-        params.partyFromId = location?.organization?.id
-        def invoices = invoiceService.getInvoices(invoiceParams)
-
-        [invoices: invoices]
+        render(template: "/common/react")
     }
 
     def show = {

@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 
 import currenciesReducer from 'reducers/currenciesReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
+import invoiceReducer from 'reducers/invoiceReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   currencies: currenciesReducer,
   organizations: organizationsReducer,
   purchaseOrder: purchaseOrderReducer,
+  invoices: invoiceReducer,
 });
 
 export default rootReducer;

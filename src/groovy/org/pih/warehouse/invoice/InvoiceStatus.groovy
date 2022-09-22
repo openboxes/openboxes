@@ -11,15 +11,19 @@ package org.pih.warehouse.invoice
 
 enum InvoiceStatus {
 
-    PENDING(0),  // Drafted
-    INVOICED(10), // Invoice has been issued / received
-    SUBMITTED(20), // Invoice has been submitted for approval
-    POSTED(30),  // Invoice has been posted
-    PAID(40) // Invoice has been paid
+    PENDING(0, 'warning'),  // Drafted
+    INVOICED(10, 'primary'), // Invoice has been issued / received
+    SUBMITTED(20, 'primary'), // Invoice has been submitted for approval
+    POSTED(30, 'success'),  // Invoice has been posted
+    PAID(40, 'primary') // Invoice has been paid
 
     int sortOrder
+    String variant
 
-    InvoiceStatus(int sortOrder) { [this.sortOrder = sortOrder] }
+    InvoiceStatus(int sortOrder, String variant) {
+        this.sortOrder = sortOrder
+        this.variant = variant
+    }
 
     static int compare(InvoiceStatus a, InvoiceStatus b) {
         return a.sortOrder <=> b.sortOrder

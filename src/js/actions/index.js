@@ -11,6 +11,8 @@ import {
   FETCH_CONFIG_AND_SET_ACTIVE,
   FETCH_CURRENCIES,
   FETCH_GRAPHS,
+  FETCH_INVOICE_STATUSES,
+  FETCH_INVOICE_TYPE_CODES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_ORGANIZATIONS,
@@ -457,6 +459,7 @@ export function fetchSuppliers(active = false) {
             type: FETCH_SUPPLIERS,
             payload: suppliers,
           });
+          return;
         }
         dispatch({
           type: FETCH_SUPPLIERS,
@@ -490,5 +493,27 @@ export function fetchBuyers(active = false) {
           payload: [],
         });
       });
+  };
+}
+
+export function fetchInvoiceStatuses() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/invoices/getStatuses').then((res) => {
+      dispatch({
+        type: FETCH_INVOICE_STATUSES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchInvoiceTypeCodes() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/invoices/getInvoiceTypeCodes').then((res) => {
+      dispatch({
+        type: FETCH_INVOICE_TYPE_CODES,
+        payload: res.data.data,
+      });
+    });
   };
 }

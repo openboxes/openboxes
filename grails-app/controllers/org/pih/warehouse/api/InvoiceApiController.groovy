@@ -19,6 +19,7 @@ import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
+import org.pih.warehouse.invoice.InvoiceStatus
 
 class InvoiceApiController {
 
@@ -78,6 +79,20 @@ class InvoiceApiController {
         }
 
         render([data: existingInvoice?.toJson()] as JSON)
+    }
+
+    def statusOptions = {
+        def options = InvoiceStatus.list().collect{
+            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.InvoiceStatus.' + it.name())}", variant: it.variant ]
+        }
+        render([data: options] as JSON)
+    }
+
+    def invoiceTypeCodes = {
+        def codes = InvoiceTypeCode.list().collect{
+            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.InvoiceTypeCode.' + it.name())}"]
+        }
+        render([data: codes] as JSON)
     }
 
     Invoice bindInvoiceData(Invoice invoice, Location currentLocation, JSONObject jsonObject) {
