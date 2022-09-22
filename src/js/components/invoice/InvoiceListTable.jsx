@@ -42,7 +42,7 @@ const InvoiceListTable = ({
   useEffect(() => fireFetchData(), [filterParams]);
 
 
-  // List of all actions for PO rows
+  // List of all actions for invoice rows
   const actions = [
     {
       label: 'react.invoice.viewDetails.label',

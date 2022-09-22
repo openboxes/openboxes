@@ -148,7 +148,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   currentLocation: state.session.currentLocation,
-  // All possible PO statuses from store
+  // All possible invoice statuses from store
   statuses: state.invoices.statuses,
   suppliers: state.organizations.suppliers,
   typeCodes: state.invoices.typeCodes,
