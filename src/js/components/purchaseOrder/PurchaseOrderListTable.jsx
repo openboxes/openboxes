@@ -361,7 +361,7 @@ const PurchaseOrderListTable = ({
   };
 
   return (
-    <div className="purchase-order-list-list-section">
+    <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <span>
           <Translate id="react.purchaseOrder.listOrders.label" defaultMessage="List Orders" />

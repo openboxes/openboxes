@@ -17,6 +17,7 @@ const filterFields = {
       filterElement: true,
       placeholder: 'Status',
       showLabelTooltip: true,
+      closeMenuOnSelect: false,
     },
     getDynamicAttr: ({ statuses }) => ({
       options: statuses,
@@ -157,7 +158,7 @@ const PurchaseOrderListFilters = ({
 
   useEffect(() => {
     // If statuses not yet in store, fetch them
-    if (statuses.length === 0) {
+    if (!statuses || statuses.length === 0) {
       fetchStatuses();
     }
 
@@ -181,7 +182,7 @@ const PurchaseOrderListFilters = ({
   const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
   return (
-    <div className="d-flex flex-column purchase-order-list-filters">
+    <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
         onSubmit={values => setFilterParams(values)}
