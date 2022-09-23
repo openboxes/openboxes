@@ -1,12 +1,13 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
-const PurchaseOrderListHeader = ({ history }) => (
+const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
   <div className="d-flex list-page-header">
     <span className="d-flex align-self-center title">
       <Translate id="react.purchaseOrder.list.label" defaultMessage="Purchase Order List" />
@@ -17,18 +18,27 @@ const PurchaseOrderListHeader = ({ history }) => (
         label="react.purchaseOrder.createShipmentFromPo.label"
         onClickAction={() => history.push('/openboxes/stockMovement/createCombinedShipments?direction=INBOUND')}
       />
-      <a href="/openboxes/order/create">
-        <Button
-          defaultLabel="Create Order"
-          label="react.purchaseOrder.createOrder.label"
-        />
-      </a>
+      {supportedActivities.includes('PLACE_ORDER') &&
+        <a href="/openboxes/order/create">
+          <Button
+            defaultLabel="Create Order"
+            label="react.purchaseOrder.createOrder.label"
+          />
+        </a>
+      }
+
     </div>
   </div>
 );
 
-export default withRouter(PurchaseOrderListHeader);
+const mapStateToProps = state => ({
+  supportedActivities: state.session.supportedActivities,
+});
+
+
+export default withRouter(connect(mapStateToProps)(PurchaseOrderListHeader));
 
 PurchaseOrderListHeader.propTypes = {
   history: PropTypes.func.isRequired,
+  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
