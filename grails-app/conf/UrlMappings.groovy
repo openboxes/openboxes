@@ -316,6 +316,11 @@ class UrlMappings {
             action = [POST: "sendMail"]
         }
 
+        "/api/stocklists/list/" {
+            controller = "stocklistApi"
+            action = [GET: "list"]
+        }
+
         // Putaway Item API
 
         "/api/putawayItems/$id"(parseRequest: true) {

@@ -393,8 +393,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
             requestedBy: requestedBy?.name,
             createdBy: createdBy?.name,
             updatedBy: updatedBy?.name,
-            dateCreated: dateCreated,
-            lastUpdated: lastUpdated,
+            dateCreated: dateCreated?.format("MMM dd, yyyy"),
+            lastUpdated: lastUpdated?.format("MMM dd, yyyy"),
             isPublished: isPublished,
         ]
     }
