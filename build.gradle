@@ -202,7 +202,7 @@ configurations {
                 }
 
                 if (details.requested.group == 'org.springframework') {
-                    if (VersionNumber.parse(details.requested.version).major == 4) {
+                    if (details.requested.name != 'springloaded') {
                         details.because 'enforce consistent Spring versioning'
                         details.useVersion(springframeworkVersion)
                     }
