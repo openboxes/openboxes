@@ -62,6 +62,12 @@ class PurchaseOrderApiController {
                 return
             }
 
+            if (orderInstance.status > OrderStatus.PENDING) {
+                def message = "${warehouse.message(code: 'order.errors.delete.message')}"
+                response.status = 400
+                render([errorMessages: [message]] as JSON)
+            }
+
             if (orderInstance.status != OrderStatus.PENDING || !orderInstance.isPurchaseOrder) {
                 def message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'order'), orderInstance.orderNumber])}"
                 response.status = 400
