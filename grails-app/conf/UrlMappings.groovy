@@ -46,6 +46,35 @@ class UrlMappings {
             controller = { "categoryApi" }
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]
         }
+
+        // Category options for filters on  product list page
+        "/api/categoryOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "categoryOptions"]
+        }
+
+        // Catalog options for filters on  product list page
+        "/api/catalogOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "catalogOptions"]
+        }
+
+        // Tag options for filters on  product list page
+        "/api/tagOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "tagOptions"]
+        }
+
+        "/api/products"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/products/search"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "search"]
+        }
+
         "/api/products/$id/$action" {
             controller = { "productApi" }
         }
