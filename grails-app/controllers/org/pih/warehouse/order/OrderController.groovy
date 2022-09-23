@@ -302,21 +302,21 @@ class OrderController {
             }
             if (orderInstance.status != OrderStatus.PENDING) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", id: params.id, params: [orderType: orderInstance.orderType])
+                redirect(controller: "purchaseOrder", action: "list")
                 return
             }
             try {
                 orderService.deleteOrder(orderInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", params: [orderType: orderInstance.orderType])
+                redirect(controller: "purchaseOrder", action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", id: params.id, params: [orderType: orderInstance.orderType])
+                redirect(controller: "purchaseOrder", action: "list")
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list", params: [orderType: orderInstance.orderType])
+            redirect(controller: "purchaseOrder", action: "list")
         }
     }
 
