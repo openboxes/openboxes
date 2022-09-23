@@ -6,26 +6,32 @@ export const hasMinimumRequiredRole = (role, highestUserRole) => {
 };
 
 
-export const findActions = (actionList, row, supportedActivities, highestUserRole) => {
-  // Firstly filter out by status if any provided
+export const findActions = (actionList, row, props) => {
+  const { supportedActivities = [], highestRole = [], customFilter } = props;
+  // Filter out by status if any provided
   const filteredByStatus = actionList.filter((action) => {
     if (action.statuses) {
       return action.statuses.includes(row.original.status);
     }
     return true;
   });
-  // Secondly filter by activity code if any provided
+  // Filter by activity code if any provided
   const filteredByActivityCode = filteredByStatus.filter(action =>
     (action.activityCode ?
       action.activityCode.every(code => supportedActivities.some(activity => activity === code))
       : true
     ));
-  // Lastly filter by required user's role if provided
-  return filteredByActivityCode.filter((action) => {
+  // Filter by required user's role if provided
+  const filteredByMinimumRequiredRole = filteredByActivityCode.filter((action) => {
     if (action.minimumRequiredRole) {
-      return hasMinimumRequiredRole(action.minimumRequiredRole, highestUserRole);
+      return hasMinimumRequiredRole(action.minimumRequiredRole, highestRole);
     }
     return true;
   });
+  // Use custom filter callback
+  if (customFilter && typeof customFilter === 'function') {
+    return filteredByMinimumRequiredRole.filter(action => customFilter(action, row));
+  }
+  return filteredByMinimumRequiredRole;
 };
 

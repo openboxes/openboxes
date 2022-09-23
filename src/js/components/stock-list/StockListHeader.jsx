@@ -7,7 +7,7 @@ import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
 const StockListHeader = ({ history }) => (
-  <div className="d-flex purchase-order-list-header">
+  <div className="d-flex list-page-header">
     <span className="d-flex align-self-center title">
       <Translate id="react.stockMovement.stocklistList.label" defaultMessage="Stocklist List" />
     </span>

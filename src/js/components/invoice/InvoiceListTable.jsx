@@ -77,7 +77,7 @@ const InvoiceListTable = ({
         <ActionDots
           dropdownPlacement="right"
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(actions, row, supportedActivities, highestRole)}
+          actions={findActions(actions, row, { supportedActivities, highestRole })}
           id={row.original.id}
         />),
     },

@@ -50,7 +50,7 @@ const filterFields = {
   },
   isPublished: {
     type: CheckboxField,
-    label: 'react.includeUnpublishedStocklist.label',
+    label: 'react.stocklists.includeUnpublished.label',
     defaultMessage: 'Include unpublished stocklists',
     attributes: {
       filterElement: true,
