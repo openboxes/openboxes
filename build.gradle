@@ -82,7 +82,7 @@ bootRun {
     addResources = true
     dependsOn = ['npmInstall', 'npm_run_bundle']
     jvmArgs = [
-        '-Dspring.output.ansi.enabled=always',
+        '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
@@ -91,12 +91,19 @@ bootRun {
 
 configurations {
     all {
-        // standardize on slf4j/logback
+
+        // log4j-over-slf4j exposes the same API as this fork of log4j 1.x does
+        exclude group: 'ch.qos.reload4j', module: 'reload4j'
+
+        // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
+
+        // log4j-over-slf4j exposes the same API as log4j 1.x
         exclude group: 'log4j', module: 'log4j'
+
+        // log4j-to-slf4j exposes the same API as log4j 2.x
         exclude group: 'org.apache.logging.log4j', module: 'log4j'
         exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-1.2-api'
 
         resolutionStrategy {
 
@@ -110,6 +117,11 @@ configurations {
                 if (details.requested.group == 'com.bertramlabs.plugins') {
                     details.because 'enforce consistent asset-pipeline versioning'
                     details.useVersion(assetPipelineVersion)
+                }
+
+                if (details.requested.group == 'ch.qos.logback') {
+                    details.because 'use a consistent logback version'
+                    details.useVersion(logbackVersion)
                 }
 
                 if (details.requested.group == 'com.h2database') {
@@ -224,7 +236,6 @@ configurations {
             force 'org.apache.commons:commons-lang3:3.12.0'  // security patch
             force 'org.apache.commons:commons-text:1.9'
             force 'org.dom4j:dom4j:2.1.3'  // security patch
-            force 'org.jboss.logging:jboss-logging:3.3.1.Final'  // security patch
             force 'org.quartz-scheduler:quartz:2.3.2'
             force 'org.reactivestreams:reactive-streams:1.0.4'
             force 'xalan:serializer:2.7.2'  // security patch
@@ -290,8 +301,8 @@ war {
 
 dependencies {
 
-    compile "ch.qos.logback:logback-classic:${logbackVersion}"
-    compile "ch.qos.logback:logback-core:${logbackVersion}"
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'ch.qos.logback:logback-core'
 
     /*
      * Manage static assets in the grails-app/assets/ directory.
@@ -333,6 +344,7 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
     compile "fr.opensagres.xdocreport:xdocreport:${xDocReportVersion}"
+
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
 
     // FIXME assess which, if any, of these sub-dependencies are still needed
@@ -367,6 +379,9 @@ dependencies {
     implementation 'org.apache.httpcomponents:fluent-hc'
     implementation 'org.apache.httpcomponents:httpclient'
 
+    // log4j2 -> slf4j; cf. log4j-to-slf4j
+    implementation "org.apache.logging.log4j:log4j-to-slf4j:${slf4jProvidedLog4j2Version}"
+
     implementation 'org.apache.poi:poi'
     implementation 'org.apache.poi:poi-scratchpad'
 
@@ -378,6 +393,9 @@ dependencies {
      * TODO do we need to specify an explicit version here?
      */
     runtime 'org.apache.tomcat:tomcat-jdbc'
+
+    // contents of this module are included in modern tomcat distributions
+    provided 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
 
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
@@ -558,10 +576,10 @@ dependencies {
     testRuntime 'org.seleniumhq.selenium:selenium-firefox-driver'
     testRuntime 'org.seleniumhq.selenium:selenium-safari-driver'
 
-    compile 'org.slf4j:jcl-over-slf4j'
-    compile 'org.slf4j:jul-to-slf4j'
-    compile 'org.slf4j:log4j-over-slf4j'
-    compile 'org.slf4j:slf4j-api'
+    implementation 'org.slf4j:jcl-over-slf4j'  // Apache/Jakarta Commons Logging -> slf4j
+    implementation 'org.slf4j:jul-to-slf4j'  // java.util.logging -> slf4j
+    implementation 'org.slf4j:log4j-over-slf4j'  // log4j1 -> slf4j; cf. log4j-to-slf4j
+    implementation 'org.slf4j:slf4j-api'  // slf4j itself
 
     // enable `import spock.lang.*`
     testCompile 'org.spockframework:spock-core:1.3-groovy-2.4'
@@ -573,8 +591,8 @@ dependencies {
     // may enable '/health' and '/info' endpoints
     compile 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // set up Spring log framework (logback under the hood)
-    compile 'org.springframework.boot:spring-boot-starter-logging'
+    // set up Spring log framework (slf4j under the hood)
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
 
     /*
      * Prevent 'Unable to start EmbeddedWebApplicationContext

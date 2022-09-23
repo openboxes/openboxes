@@ -169,6 +169,11 @@ endpoints:
     jmx:
         unique-names: true
 
+org.eclipse.jetty.util.log.class: org.eclipse.jetty.util.log.Slf4jLog
+org.jboss.logging.provider: slf4j
+server.tomcat.accesslog.enabled: true
+slf4j.detectLoggerNameMismatch: true
+
 ---
 hibernate:
     cache:
