@@ -100,6 +100,10 @@ configurations {
         // log4j-over-slf4j exposes the same API as this fork of log4j 1.x does
         exclude group: 'ch.qos.reload4j', module: 'reload4j'
 
+        // use tomcat-jdbc instead of com.mchange.c3p0 or com.zaxxer.hikariCP
+        exclude group: 'com.mchange'
+        exclude group: 'com.zaxxer'
+
         // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
 
@@ -346,10 +350,6 @@ dependencies {
 
     testImplementation 'com.icegreen:greenmail:1.6.10'
 
-    // see https://www.mchange.com/projects/c3p0/#quickstart
-    compile 'com.mchange:c3p0:0.9.5.5'
-    compile 'com.mchange:mchange-commons-java:0.2.20'
-
     // expose com.sun.mail.imap.IMAPStore to MailServiceTests
     testImplementation 'com.sun.mail:javax.mail:1.5.6'
 
@@ -415,14 +415,8 @@ dependencies {
     implementation 'org.apache.poi:poi'
     implementation 'org.apache.poi:poi-scratchpad'
 
-    /*
-     * Prevent java.sql.SQLException: No suitable driver found for jdbc:mysql://
-     *
-     * See https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html
-     *
-     * TODO do we need to specify an explicit version here?
-     */
-    runtime 'org.apache.tomcat:tomcat-jdbc'
+    // tomcat native connection pooling
+    provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
 
     // this library is provided by tomcat
     provided "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
@@ -472,12 +466,12 @@ dependencies {
     compile 'org.grails:grails-plugin-services'
 
     /*
-    * Deprecated: use https://github.com/grails/grails-testing-support
-    *
-    * FIXME Refactor instances of, e.g., `import grails.test.mixin`.
-    *
-    * See https://testing.grails.org/latest/guide/index.html#upgrading
-    */
+     * Deprecated: use https://github.com/grails/grails-testing-support
+     *
+     * FIXME Refactor instances of, e.g., `import grails.test.mixin`.
+     *
+     * See https://testing.grails.org/latest/guide/index.html#upgrading
+     */
     testCompile('org.grails:grails-test-mixins:3.3.0') {
         /*
          * Old; relocated to `org.ow2.asm:asm`, which we pull in
@@ -599,7 +593,6 @@ dependencies {
     profile 'org.grails.profiles:react-webpack'
 
     // enable `import org.hibernate.tool.schema.TargetType`, etc.
-    runtime "org.hibernate:hibernate-c3p0:${hibernateVersion}"
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     runtime "org.hibernate:hibernate-ehcache:${hibernateVersion}"
     testImplementation "org.hibernate:hibernate-testing:${hibernateVersion}"
