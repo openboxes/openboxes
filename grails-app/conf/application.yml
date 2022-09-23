@@ -173,7 +173,7 @@ endpoints:
 hibernate:
     cache:
         queries: false
-        provider_class: net.sf.ehcache.hibernate.EhCacheProvider
+        provider_class: org.hibernate.cache.EhCacheProvider
         region:
             factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
         use_query_cache: true

@@ -24,7 +24,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
-import org.springframework.orm.hibernate3.HibernateSystemException
+import org.springframework.orm.hibernate5.HibernateSystemException
 
 @Transactional
 class RequisitionController {
