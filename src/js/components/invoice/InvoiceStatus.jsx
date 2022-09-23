@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { fetchInvoiceStatuses } from 'actions';
+import StatusIndicator from 'utils/StatusIndicator';
 
 const InvoiceStatus = ({ status, allStatuses, fetchStatuses }) => {
   // Circle is by default set as primary (blue)
@@ -30,14 +31,7 @@ const InvoiceStatus = ({ status, allStatuses, fetchStatuses }) => {
     findStatusCircle(status);
   }, [allStatuses, status]);
 
-  return (
-    <div className="d-flex align-items-center justify-content-between">
-      <div className="d-flex justify-content-between align-items-center">
-        <span className={`${circle}-circle status-circle`} />
-        <span className="px-1">{status}</span>
-      </div>
-    </div>
-  );
+  return (<StatusIndicator status={status} variant={circle} />);
 };
 
 const mapStateToProps = state => ({

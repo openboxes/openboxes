@@ -4,7 +4,6 @@ import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiArrowGoBackLine,
   RiChat3Line,
@@ -31,7 +30,6 @@ import apiClient from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
