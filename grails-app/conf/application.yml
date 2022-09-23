@@ -190,43 +190,65 @@ dataSource:
     pooled: true
     jmxExport: true
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: 'openboxes'
-    password: 'openboxes'
+    dbCreate: none
     dialect: org.hibernate.dialect.MySQL57InnoDBDialect
-    logSql: false
-    formatSql: false
+    factory: org.apache.tomcat.jdbc.pool.DataSourceFactory
+    logger: com.mysql.cj.jdbc.log.StandardLogger
+    type: org.apache.tomcat.jdbc.pool.DataSource
     properties:
+        # from https://docs.grails.org/3.3.16/guide/conf.html#dataSource
         jmxEnabled: true
-        initialSize: 10
-        maxActive: 100
+        initialSize: 5
+        maxActive: 50
         minIdle: 5
         maxIdle: 25
         maxWait: 10000
-        maxAge: 14400
+        maxAge: 10 * 60000
         timeBetweenEvictionRunsMillis: 5000
         minEvictableIdleTimeMillis: 60000
         validationQuery: SELECT 1
         validationQueryTimeout: 3
         validationInterval: 15000
-        testOnBorrow: true
+        testOnBorrow: false
         testWhileIdle: true
         testOnReturn: false
-        jdbcInterceptors: ConnectionState
+        # https://tomcat.apache.org/tomcat-8.5-doc/jdbc-pool.html#JDBC_interceptors
+        jdbcInterceptors: "ConnectionState;StatementCache(max=200)"
         defaultTransactionIsolation: java.sql.Connection.TRANSACTION_READ_COMMITTED
 
 environments:
     development:
         dataSource:
-            dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false&createDatabaseIfNotExist=true
+            dumpQueriesOnException: true
+            formatSql: true
+            includeInnodbStatusInDeadlockExceptions: true
+            logAbandoned: true
+            logSql: false
+            logSlowQueries: true
+            username: "openboxes"
+            password: "openboxes"
+            url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
     test:
         dataSource:
-            dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false&createDatabaseIfNotExist=true
+            dumpQueriesOnException: true
+            formatSql: false
+            includeInnodbStatusInDeadlockExceptions: true
+            logAbandoned: true
+            logSql: false
+            logSlowQueries: false
+            username: "openboxes"
+            password: "openboxes"
+            url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
     production:
         dataSource:
-            dbCreate: none
-            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+            dumpQueriesOnException: false
+            formatSql: false
+            includeInnodbStatusInDeadlockExceptions: true
+            logSql: false
+            logSlowQueries: false
+            username: "openboxes"
+            password: "openboxes"
+            url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
 ---
 openboxes:
     ajaxRequest:
