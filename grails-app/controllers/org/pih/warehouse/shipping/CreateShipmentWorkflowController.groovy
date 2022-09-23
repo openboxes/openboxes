@@ -18,7 +18,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
-import org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 import org.springframework.web.multipart.MultipartFile
 
 @Transactional
