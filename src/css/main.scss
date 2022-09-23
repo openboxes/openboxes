@@ -1125,6 +1125,9 @@ div.search-input:focus-within {
 
     .filter-group {
       height: 38px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .filters-row {
@@ -1132,7 +1135,7 @@ div.search-input:focus-within {
         align-items: center;
 
         label {
-          margin: 0;
+          margin: 0 4px 0 0;
         }
       }
     }
