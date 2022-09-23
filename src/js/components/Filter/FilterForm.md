@@ -9,7 +9,8 @@
 | formProps              | object            | check example below                               | no       | Form props for some fields' needs, e.g. **getDynamicAttr**                                                   | 
 | searchFieldId          | string            | id of searchField input (by default 'searchTerm') | no       | Id of search field - check what backend expects for searchTerm checking (could be 'searchTerm', 'name' etc.) | 
 | defaultValues          | object            |                                                   | no       | Default values for filter form                                                                               | 
-
+| allowEmptySubmit       | boolean           | true/false (false by default)                     | no       | Prop to determine if Search button should be enabled/disabled when empty values only                         | 
+| hiddenByDefault        | boolean           | true/false (true by default)                      | no       | Hide filters by default                                                                                      | 
 #### Example:
 ````md
 const filterFields = {

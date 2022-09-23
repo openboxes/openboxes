@@ -13,7 +13,14 @@ import 'components/Filter/FilterStyles.scss';
 
 
 const FilterForm = ({
-  filterFields, onSubmit, searchFieldPlaceholder, searchFieldId, formProps, defaultValues,
+  filterFields,
+  onSubmit,
+  searchFieldPlaceholder,
+  searchFieldId,
+  formProps,
+  defaultValues,
+  allowEmptySubmit,
+  hiddenByDefault,
 }) => {
   // Replace with SearchField created in another ticket
   const searchField = {
@@ -32,13 +39,13 @@ const FilterForm = ({
       };
     }
     return acc;
-  }, { name: '', ...defaultValues });
+  }, { ...defaultValues });
   const [amountFilled, setAmountFilled] = useState(0);
   const countFilled = (values) => {
     // Calculate which object's values are not empty
     setAmountFilled(Object.values(values).filter(value => !_.isEmpty(value)).length);
   };
-  const [filtersHidden, setFiltersHidden] = useState(true);
+  const [filtersHidden, setFiltersHidden] = useState(hiddenByDefault);
 
   return (
     <div className="filter-form">
@@ -70,7 +77,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Search"
                       label="react.button.search.label"
-                      disabled={_.every(values, value => !value)}
+                      disabled={!allowEmptySubmit && _.every(values, value => !value)}
                       variant="primary"
                       type="submit"
                     />
@@ -101,6 +108,8 @@ FilterForm.propTypes = {
   formProps: PropTypes.shape({}),
   searchFieldId: PropTypes.string,
   defaultValues: PropTypes.shape({}),
+  allowEmptySubmit: PropTypes.bool,
+  hiddenByDefault: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -108,4 +117,6 @@ FilterForm.defaultProps = {
   searchFieldId: 'searchTerm',
   formProps: {},
   defaultValues: {},
+  allowEmptySubmit: false,
+  hiddenByDefault: true,
 };
