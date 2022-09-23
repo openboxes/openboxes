@@ -249,7 +249,20 @@ class BootStrap {
 
 
         JSON.registerObjectMarshaller(Product) { Product product ->
-            return product.toJson()
+            [
+                id                  : product.id,
+                productCode         : product.productCode,
+                name                : product.name,
+                description         : product.description,
+                category            : product.category?.name,
+                unitOfMeasure       : product.unitOfMeasure,
+                pricePerUnit        : product.pricePerUnit,
+                dateCreated         : product.dateCreated,
+                lastUpdated         : product.lastUpdated,
+                color               : product.color,
+                handlingIcons       : product.handlingIcons,
+                lotAndExpiryControl : product.lotAndExpiryControl,
+            ]
         }
 
         JSON.registerObjectMarshaller(ProductSearchDto) { ProductSearchDto productSearchDto ->

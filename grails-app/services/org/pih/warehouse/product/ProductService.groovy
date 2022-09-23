@@ -356,8 +356,7 @@ class ProductService {
                     if (params.vendorCodeIsNull) isNull("vendorCode")
                 }
             }
-            if (offset) firstResult(offset)
-            if (max) maxResults(max)
+
             if (sortColumn) order(sortColumn, sortOrder)
         }
 
