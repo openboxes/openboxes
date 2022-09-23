@@ -100,7 +100,7 @@ class PurchaseOrderApiController {
         render([data: options] as JSON)
     }
 
-    def rollbackOrderStatus = {
+    def rollback = {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             def message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"

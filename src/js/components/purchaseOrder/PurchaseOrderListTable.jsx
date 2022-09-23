@@ -118,7 +118,7 @@ const PurchaseOrderListTable = ({
   };
 
   const rollbackOrder = (id) => {
-    apiClient.post(`/openboxes/api/purchaseOrders/rollbackOrder/${id}`)
+    apiClient.post(`/openboxes/api/purchaseOrders/${id}/rollback`)
       .then((response) => {
         if (response.status === 200) {
           Alert.success(translate('react.purchaseOrder.rollback.success.label', 'Rollback of order status has been done successfully'));
