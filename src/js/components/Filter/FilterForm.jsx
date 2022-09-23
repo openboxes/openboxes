@@ -20,7 +20,7 @@ const FilterForm = ({
   formProps,
   defaultValues,
   allowEmptySubmit,
-  hiddenByDefault,
+  hidden,
 }) => {
   // Replace with SearchField created in another ticket
   const searchField = {
@@ -45,7 +45,7 @@ const FilterForm = ({
     // Calculate which object's values are not empty
     setAmountFilled(Object.values(values).filter(value => !_.isEmpty(value)).length);
   };
-  const [filtersHidden, setFiltersHidden] = useState(hiddenByDefault);
+  const [filtersHidden, setFiltersHidden] = useState(hidden);
 
   return (
     <div className="filter-form">
@@ -109,7 +109,7 @@ FilterForm.propTypes = {
   searchFieldId: PropTypes.string,
   defaultValues: PropTypes.shape({}),
   allowEmptySubmit: PropTypes.bool,
-  hiddenByDefault: PropTypes.bool,
+  hidden: PropTypes.bool,
 };
 
 FilterForm.defaultProps = {
@@ -118,5 +118,5 @@ FilterForm.defaultProps = {
   formProps: {},
   defaultValues: {},
   allowEmptySubmit: false,
-  hiddenByDefault: true,
+  hidden: true,
 };

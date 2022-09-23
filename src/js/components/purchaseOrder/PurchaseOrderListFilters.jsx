@@ -197,7 +197,7 @@ const PurchaseOrderListFilters = ({
         defaultValues={defaultValues}
         allowEmptySubmit
         searchFieldPlaceholder="Search by order number or name or supplier"
-        hiddenByDefault={false}
+        hidden={false}
       />
     </div>
   );

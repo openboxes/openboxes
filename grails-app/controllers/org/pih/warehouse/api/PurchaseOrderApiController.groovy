@@ -100,6 +100,20 @@ class PurchaseOrderApiController {
         render([data: options] as JSON)
     }
 
+    def rollbackOrderStatus = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            def message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        orderService.rollbackOrderStatus(params.id)
+
+        render status: 200
+    }
+
     def getOrdersCsv(List purchaseOrders) {
         def csv = CSVUtils.getCSVPrinter()
         csv.printRecord(

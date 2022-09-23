@@ -118,7 +118,13 @@ const PurchaseOrderListTable = ({
   };
 
   const rollbackOrder = (id) => {
-    window.location = `/openboxes/order/rollbackOrderStatus/${id}`;
+    apiClient.post(`/openboxes/api/purchaseOrders/rollbackOrder/${id}`)
+      .then((response) => {
+        if (response.status === 200) {
+          Alert.success(translate('react.purchaseOrder.rollback.success.label', 'Rollback of order status has been done successfully'));
+          fireFetchData();
+        }
+      });
   };
 
   const rollbackHandler = (id) => {
@@ -155,12 +161,11 @@ const PurchaseOrderListTable = ({
       Alert.error('Order must be placed in order to print');
       return;
     }
-    window.location = `/openboxes/order/print/${id}`;
+    window.open(`/openboxes/order/print/${id}`, '_blank');
   };
 
   const cancelOrder = () => {
     Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
-    // It will be implemented in the future
   };
 
 
@@ -215,14 +220,14 @@ const PurchaseOrderListTable = ({
       defaultLabel: 'Print order',
       leftIcon: <RiPrinterLine />,
       activityCode: ['PLACE_ORDER'],
-      onClickActionWithId: id => printOrder(id),
+      onClick: id => printOrder(id),
     },
     {
       label: 'react.purchaseOrder.cancelOrder.label',
       defaultLabel: 'Cancel order',
       leftIcon: <RiCloseLine />,
       activityCode: ['PLACE_ORDER'],
-      onClickActionWithId: () => cancelOrder(),
+      onClick: () => cancelOrder(),
     },
     {
       label: 'react.purchaseOrder.rollbackOrder.label',
@@ -232,7 +237,7 @@ const PurchaseOrderListTable = ({
       activityCode: ['PLACE_ORDER'],
       // Display for statuses > PENDING
       statuses: allStatuses.filter(stat => stat.id !== 'PENDING').map(status => status.id),
-      onClickActionWithId: id => rollbackHandler(id),
+      onClick: id => rollbackHandler(id),
     },
     {
       label: 'react.purchaseOrder.delete.label',
@@ -240,7 +245,7 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiDeleteBinLine />,
       minimumRequiredRole: 'Assistant',
       variant: 'danger',
-      onClickActionWithId: id => deleteHandler(id),
+      onClick: id => deleteHandler(id),
     },
   ];
 
