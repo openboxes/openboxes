@@ -135,6 +135,7 @@ class ApiController {
         String highestRole = user.getHighestRole(location)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
+        boolean isUserApprover = userService.hasRoleApprover(session?.user)
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = grailsApplication.metadata.'app.revisionNumber'
@@ -166,6 +167,7 @@ class ApiController {
                 location             : location,
                 isSuperuser          : isSuperuser,
                 isUserAdmin          : isUserAdmin,
+                isUserApprover       : isUserApprover,
                 supportedActivities  : supportedActivities,
                 isImpersonated       : isImpersonated,
                 grailsVersion        : grailsVersion,

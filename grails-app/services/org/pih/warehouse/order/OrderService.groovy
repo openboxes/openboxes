@@ -481,6 +481,9 @@ class OrderService {
         if (!orderInstance) {
             throw new RuntimeException("Unable to locate order with order ID ${orderId}")
         }
+        if (orderInstance.shipments?.size() > 0) {
+            throw new IllegalArgumentException("Cannot rollback order with associated shipments")
+        }
 
         try {
 

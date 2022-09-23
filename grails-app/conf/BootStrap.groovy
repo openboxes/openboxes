@@ -203,6 +203,7 @@ class BootStrap {
                 invoicedItemsCount: orderSummary?.order?.invoicedOrderItems?.size()?:0,
                 total: "${orderSummary?.order?.total?.setScale(2, RoundingMode.HALF_UP)} ${orderSummary?.order?.currencyCode ?: defaultCurrencyCode}",
                 totalNormalized: "${orderSummary?.order?.totalNormalized?.setScale(2, RoundingMode.HALF_UP)} ${defaultCurrencyCode}",
+                shipmentsCount: orderSummary?.order?.shipments?.size(),
             ]
         }
 

@@ -34,7 +34,7 @@ const ActionDots = ({
       <div className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
         {actions && actions.map(action => (
           <React.Fragment key={action.href ? action.href : action.label}>
-            {action.href && (
+            {(action.href && !action.onClick) && (
               <a
                 key={action.href}
                 href={`${action.href}/${id}`}
@@ -45,11 +45,11 @@ const ActionDots = ({
                 <Translate id={action.label} defaultMessage={action.defaultLabel} />}
               </a>
             )}
-            {action.onClickActionWithId && (
+            {action.onClick && (
               <a
                 key={action.label}
                 href="#"
-                onClick={() => action.onClickActionWithId(id)}
+                onClick={() => action.onClick(id)}
                 className={`d-flex align-items-center gap-8 dropdown-item ${action.variant === 'danger' ? 'font-red-ob' : ''}`}
               >
                 {action.leftIcon && action.leftIcon}
@@ -78,7 +78,7 @@ ActionDots.propTypes = {
     defaultLabel: PropTypes.string.isRequired,
     href: PropTypes.string,
     variant: PropTypes.string,
-    onClickActionWithId: PropTypes.func,
+    onClick: PropTypes.func,
   }]).isRequired,
   dropdownPlacement: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   id: PropTypes.string.isRequired,

@@ -4,6 +4,7 @@ import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
+import { confirmAlert } from 'react-confirm-alert';
 import {
   RiArrowGoBackLine,
   RiChat3Line,
@@ -31,6 +32,7 @@ import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
 const PurchaseOrderListTable = ({
@@ -43,6 +45,8 @@ const PurchaseOrderListTable = ({
   currencyCode,
   currentLocation,
   buyers,
+  allStatuses,
+  isUserApprover,
 }) => {
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +80,7 @@ const PurchaseOrderListTable = ({
       });
   };
 
+
   const deleteOrder = (id) => {
     showTheSpinner();
     apiClient.delete(`/openboxes/api/purchaseOrders/${id}`)
@@ -89,10 +94,78 @@ const PurchaseOrderListTable = ({
       })
       .catch(() => {
         hideTheSpinner();
-        const errorMessage = translate('react.purchaseOrder.delete.error.label', 'Error while deleting a purchase order');
-        Alert.error(errorMessage);
         fireFetchData();
       });
+  };
+
+  const deleteHandler = (id) => {
+    confirmAlert({
+      title: translate('react.default.areYouSure.label', 'Are you sure?'),
+      message: translate(
+        'react.purchaseOrder.delete.confim.title.label',
+        'Are you sure you want to delete this purchase order?',
+      ),
+      buttons: [
+        {
+          label: translate('react.default.yes.label', 'Yes'),
+          onClick: () => deleteOrder(id),
+        },
+        {
+          label: translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  };
+
+  const rollbackOrder = (id) => {
+    apiClient.post(`/openboxes/api/purchaseOrders/${id}/rollback`)
+      .then((response) => {
+        if (response.status === 200) {
+          Alert.success(translate('react.purchaseOrder.rollback.success.label', 'Rollback of order status has been done successfully'));
+          fireFetchData();
+        }
+      });
+  };
+
+  const rollbackHandler = (id) => {
+    if (!isUserApprover) {
+      Alert.error(translate('react.default.errors.noPermissions.label', 'You do not have permissions to perform this action'));
+      return;
+    }
+    const order = ordersData.find(ord => ord.id === id);
+    if (order && order.shipmentsCount > 0) {
+      Alert.error(translate('react.purchaseOrder.rollback.error.label', 'Cannot rollback order with associated shipments'));
+      return;
+    }
+    confirmAlert({
+      title: translate('react.default.areYouSure.label', 'Are you sure?'),
+      message: translate(
+        'react.purchaseOrder.rollback.confirm.title.label',
+        'Are you sure you want to rollback this order?',
+      ),
+      buttons: [
+        {
+          label: translate('react.default.yes.label', 'Yes'),
+          onClick: () => rollbackOrder(id),
+        },
+        {
+          label: translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  };
+
+  const printOrder = (id) => {
+    const order = ordersData.find(ord => ord.id === id);
+    if (order && order.status && order.status.toUpperCase() === 'PENDING') {
+      Alert.error('Order must be placed in order to print');
+      return;
+    }
+    window.open(`/openboxes/order/print/${id}`, '_blank');
+  };
+
+  const cancelOrder = () => {
+    Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
   };
 
 
@@ -147,15 +220,14 @@ const PurchaseOrderListTable = ({
       defaultLabel: 'Print order',
       leftIcon: <RiPrinterLine />,
       activityCode: ['PLACE_ORDER'],
-      href: '/openboxes/order/print',
+      onClick: id => printOrder(id),
     },
     {
       label: 'react.purchaseOrder.cancelOrder.label',
       defaultLabel: 'Cancel order',
       leftIcon: <RiCloseLine />,
       activityCode: ['PLACE_ORDER'],
-      statuses: ['PLACED'],
-      href: '/openboxes/order/withdraw',
+      onClick: () => cancelOrder(),
     },
     {
       label: 'react.purchaseOrder.rollbackOrder.label',
@@ -163,8 +235,9 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiArrowGoBackLine />,
       minimumRequiredRole: 'Superuser',
       activityCode: ['PLACE_ORDER'],
-      statuses: ['PLACED'],
-      href: '/openboxes/order/rollbackOrderStatus',
+      // Display for statuses > PENDING
+      statuses: allStatuses.filter(stat => stat.id !== 'PENDING').map(status => status.id),
+      onClick: id => rollbackHandler(id),
     },
     {
       label: 'react.purchaseOrder.delete.label',
@@ -172,7 +245,7 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiDeleteBinLine />,
       minimumRequiredRole: 'Assistant',
       variant: 'danger',
-      onClickActionWithId: id => deleteOrder(id),
+      onClick: id => deleteHandler(id),
     },
   ];
 
@@ -272,6 +345,13 @@ const PurchaseOrderListTable = ({
       sortable: false,
     },
     {
+      Header: 'Invoiced',
+      accessor: 'invoicedItemsCount',
+      className: 'text-right',
+      headerClassName: 'justify-content-end',
+      sortable: false,
+    },
+    {
       Header: 'Total amount (local currency)',
       accessor: 'total',
       className: 'text-right',
@@ -290,6 +370,9 @@ const PurchaseOrderListTable = ({
   ];
 
   const destinationParam = () => {
+    if (filterParams.destination === null) {
+      return '';
+    }
     if (filterParams.destination && filterParams.destination.id) {
       return filterParams.destination.id;
     }
@@ -322,18 +405,19 @@ const PurchaseOrderListTable = ({
       };
     const statusParam = filterParams.status &&
       filterParams.status.map(status => status.value);
-
-    const params = _.omitBy({
-      offset: `${offset}`,
-      max: `${state.pageSize}`,
-      ...sortingParams,
-      ..._.omit(filterParams, 'status'),
-      status: statusParam,
-      origin: filterParams.origin && filterParams.origin.id,
+    const params = {
+      ..._.omitBy({
+        offset: `${offset}`,
+        max: `${state.pageSize}`,
+        ...sortingParams,
+        ..._.omit(filterParams, 'status'),
+        status: statusParam,
+        origin: filterParams.origin && filterParams.origin.id,
+        orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
+        destinationParty: destinationPartyParam(),
+      }, _.isEmpty),
       destination: destinationParam(),
-      orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-      destinationParty: destinationPartyParam(),
-    }, _.isEmpty);
+    };
 
     // Fetch data
     setLoading(true);
@@ -420,6 +504,8 @@ const mapStateToProps = state => ({
   currencyCode: state.session.currencyCode,
   currentLocation: state.session.currentLocation,
   buyers: state.organizations.buyers,
+  allStatuses: state.purchaseOrder.statuses,
+  isUserApprover: state.session.isUserApprover,
 });
 
 const mapDispatchToProps = {
@@ -445,4 +531,15 @@ PurchaseOrderListTable.propTypes = {
     label: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
   })).isRequired,
+  allStatuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    variant: PropTypes.string.isRequired,
+  })).isRequired,
+  isUserApprover: PropTypes.bool,
+};
+
+PurchaseOrderListTable.defaultProps = {
+  isUserApprover: false,
 };

@@ -122,7 +122,7 @@
             <g:elseif test="${currentState}">
                 <%-- Show Order --%>
                 <g:if test="${currentState == 'showOrder'}">
-                    <g:link controller="order" action="list" class="button">
+                    <g:link controller="purchaseOrder" action="list" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
                         <warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
                     </g:link>

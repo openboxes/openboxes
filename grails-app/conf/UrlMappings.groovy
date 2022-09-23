@@ -638,6 +638,11 @@ class UrlMappings {
             action = [GET: "statusOptions"]
         }
 
+        "/api/purchaseOrders/$id/rollback"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [POST: "rollback"]
+        }
+
         "/api/purchaseOrders"(parseRequest: true) {
             controller = { "purchaseOrderApi" }
             action = [GET: "list"]

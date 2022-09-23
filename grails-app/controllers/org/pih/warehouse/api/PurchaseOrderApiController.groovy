@@ -62,6 +62,12 @@ class PurchaseOrderApiController {
                 return
             }
 
+            if (orderInstance.status > OrderStatus.PENDING) {
+                def message = "${warehouse.message(code: 'order.errors.delete.message')}"
+                response.status = 400
+                render([errorMessages: [message]] as JSON)
+            }
+
             if (orderInstance.status != OrderStatus.PENDING || !orderInstance.isPurchaseOrder) {
                 def message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'order'), orderInstance.orderNumber])}"
                 response.status = 400
@@ -92,6 +98,20 @@ class PurchaseOrderApiController {
             [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderSummaryStatus.' + it.name())}", variant: it.variant?.name()  ]
         }
         render([data: options] as JSON)
+    }
+
+    def rollback = {
+        def orderInstance = Order.get(params.id)
+        if (!orderInstance) {
+            def message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        orderService.rollbackOrderStatus(params.id)
+
+        render status: 200
     }
 
     def getOrdersCsv(List purchaseOrders) {
