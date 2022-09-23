@@ -34,7 +34,7 @@ const ActionDots = ({
       <div className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
         {actions && actions.map(action => (
           <React.Fragment key={action.href ? action.href : action.label}>
-            {action.href && (
+            {(action.href && !action.onClickActionWithId) && (
               <a
                 key={action.href}
                 href={`${action.href}/${id}`}
