@@ -1,0 +1,105 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %date{ISO8601} %5level [%-10.10thread] %-40.40logger{40}: %message%n%xException
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <!-- log levels for software we maintain -->
+
+    <logger name="openboxes" level="debug" />
+    <logger name="org.pih.warehouse" level="debug" />
+    <logger name="testutils" level="debug" />
+    <logger name="util" level="debug" />
+
+    <!-- log levels for dependencies -->
+
+    <logger name="asset.pipeline" level="debug" /><!-- use 'info' to hide asset-pipeline logs -->
+    <logger name="ch.qos.logback" level="warn" /><!-- hide logs about logging -->
+    <logger name="grails.artefact" level="info" />
+    <logger name="grails.boot" level="info" />
+    <logger name="grails.plugins" level="info" /><!-- use 'debug' to see plugin loading details -->
+    <logger name="grails.util" level="info" /><!-- use 'debug' to see CacheEntry logs -->
+    <logger name="grails.web" level="info" /><!-- use 'debug' to see redirects -->
+    <logger name="liquibase.changelog" level="info" />
+    <logger name="liquibase.database" level="info" /><!-- use 'debug' to see migration SQL -->
+    <logger name="liquibase.executor" level="warn" /><!-- use 'info' to see migration SQL -->
+    <logger name="liquibase.license" level="info" />
+    <logger name="liquibase.lockservice" level="warn" /><!-- use 'info' to see change log locks -->
+    <logger name="liquibase.parser" level="info" />
+    <logger name="liquibase.resource" level="info" />
+    <logger name="liquibase.servicelocator" level="info" />
+    <logger name="liquibase.util" level="info" />
+    <logger name="net.sf.ehcache" level="info" />
+    <logger name="org.apache.catalina.authenticator" level="info" />
+    <logger name="org.apache.catalina.connector" level="info" /><!-- use 'debug' to log cookie data -->
+    <logger name="org.apache.catalina.core" level="info" />
+    <logger name="org.apache.catalina.loader" level="info" />
+    <logger name="org.apache.catalina.realm" level="info" />
+    <logger name="org.apache.catalina.session" level="info" />
+    <logger name="org.apache.coyote" level="info" /><!-- use 'debug' to see header logs, socket info, GET calls -->
+    <logger name="org.apache.jasper" level="warn" />
+    <logger name="org.apache.tomcat.pool" level="debug" /><!-- use 'info' to hide logs about pool management -->
+    <logger name="org.apache.tomcat.util.digester" level="info" />
+    <logger name="org.apache.tomcat.util.http" level="info" />
+    <logger name="org.apache.tomcat.util.modeler" level="info" />
+    <logger name="org.apache.tomcat.util.net" level="info" /><!-- use 'debug' to see socket logs -->
+    <logger name="org.apache.tomcat.util.scan" level="info" />
+    <logger name="org.apache.tomcat.util.threads" level="info" />
+    <logger name="org.grails.config" level="info" />
+    <logger name="org.grails.core.io" level="info" /><!-- use 'debug' to see StaticResourceLoader logs -->
+    <logger name="org.grails.datastore" level="info" />
+    <logger name="org.grails.datastore.mapping.config" level="debug" /><!-- use 'info' to hide config at startup -->
+    <logger name="org.grails.gsp" level="info" />
+    <logger name="org.grails.orm.hibernate" level="info" />
+    <logger name="org.grails.orm.hibernate5" level="info" /><!-- use 'debug' to see session lifetime logs -->
+    <logger name="org.grails.plugins.web" level="info" />
+    <logger name="org.grails.spring" level="info" />
+    <logger name="org.grails.web" level="info" />
+    <logger name="org.hibernate.boot" level="info" />
+    <logger name="org.hibernate.cache" level="info" /><!-- use 'debug' to see ehcache access -->
+    <logger name="org.hibernate.cfg" level="debug" /><!-- use 'info' to hide config at startup -->
+    <logger name="org.hibernate.engine" level="info" /><!-- use 'debug' to begin/commit timestamps -->
+    <logger name="org.hibernate.event" level="info" />
+    <logger name="org.hibernate.hql" level="warn" /><!-- use 'debug' to see how Hibernate builds queries -->
+    <logger name="org.hibernate.id" level="info" />
+    <logger name="org.hibernate.integrator" level="info" />
+    <logger name="org.hibernate.internal" level="warn" />
+    <logger name="org.hibernate.loader" level="info" /><!-- use 'debug' to see every select call -->
+    <logger name="org.hibernate.mapping" level="info" />
+    <logger name="org.hibernate.persister" level="info" />
+    <logger name="org.hibernate.query" level="info" />
+    <logger name="org.hibernate.resource" level="info" />
+    <logger name="org.hibernate.secure" level="info" />
+    <logger name="org.hibernate.service" level="info" />
+    <logger name="org.hibernate.SQL" level="info" /><!-- use 'debug' to see generated SQL -->
+    <logger name="org.hibernate.stat" level="info" />
+    <logger name="org.hibernate.transform" level="info" />
+    <logger name="org.hibernate.tool" level="info" />
+    <logger name="org.hibernate.type" level="info" />
+    <logger name="org.hibernate.validator" level="info" />
+    <logger name="org.springframework.aop" level="info" />
+    <logger name="org.springframework.beans" level="info" />
+    <logger name="org.springframework.boot.actuate" level="warn" />
+    <logger name="org.springframework.boot.autoconfigure" level="info" />
+    <logger name="org.springframework.boot.context" level="warn" />
+    <logger name="org.springframework.boot.env" level="info" />
+    <logger name="org.springframework.boot.liquibase" level="info" />
+    <logger name="org.springframework.boot.logging" level="info" />
+    <logger name="org.springframework.boot.web" level="info" />
+    <logger name="org.springframework.context" level="warn" />
+    <logger name="org.springframework.core" level="info" />
+    <logger name="org.springframework.jdbc" level="info" />
+    <logger name="org.springframework.jmx" level="info" />
+    <logger name="org.springframework.jndi" level="info" />
+    <logger name="org.springframework.ui" level="info" />
+    <logger name="org.springframework.web" level="info" />
+    <logger name="quartz" level="debug" /><!-- use 'info' to hide quartz scheduler notifications -->
+
+</configuration>
