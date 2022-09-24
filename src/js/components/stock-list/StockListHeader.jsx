@@ -11,13 +11,13 @@ const StockListHeader = () => {
   return (
     <div className="d-flex list-page-header">
       <span className="d-flex align-self-center title">
-        <Translate id="react.stockMovement.stocklistList.label" defaultMessage="Stocklist List" />
+        <Translate id="react.stockMovement.stockList.label" defaultMessage="Stock List" />
       </span>
       <div className="d-flex justify-content-end buttons align-items-center">
         <Button
           defaultLabel="Add stocklist"
           label="react.stockListManagement.addStockList.label"
-          onClickAction={goToAddStockList}
+          onClick={goToAddStockList}
         />
       </div>
     </div>

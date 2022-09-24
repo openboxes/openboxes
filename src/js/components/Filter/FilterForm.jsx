@@ -69,7 +69,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
-                      onClickAction={() => form.reset(initialValues)}
+                      onClick={() => form.reset(initialValues)}
                       variant="transparent"
                       type="submit"
                     />

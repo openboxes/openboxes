@@ -44,6 +44,7 @@ const StockListTable = ({
   const [pages, setPages] = useState(-1);
   // Stored searching params for export case
   const [currentParams, setCurrentParams] = useState({});
+  const [totalData, setTotalData] = useState(0);
 
   const tableRef = useRef(null);
 
@@ -237,6 +238,7 @@ const StockListTable = ({
       .then((res) => {
         setLoading(false);
         setPages(Math.ceil(res.data.totalCount / state.pageSize));
+        setTotalData(res.data.totalCount);
         setTableData(res.data.data);
         // Store currently used params for export case
         setCurrentParams(params);
@@ -273,41 +275,41 @@ const StockListTable = ({
       defaultLabel: 'Export stock list items',
       label: 'react.stocklists.items.export.label',
       leftIcon: <RiDownloadLine />,
-      onClickActionWithId: exportStockListItems,
+      onClick: exportStockListItems,
     },
     {
       defaultLabel: 'Clone stock list',
       label: 'react.stocklists.clone.label',
       leftIcon: <RiFileCopyLine />,
-      onClickActionWithId: cloneStocklists,
+      onClick: cloneStocklists,
     },
     {
       defaultLabel: 'Publish stock list',
       label: 'react.stocklists.publish.label',
       leftIcon: <RiFile3Line />,
       isPublished: false,
-      onClickActionWithId: publishStocklists,
+      onClick: publishStocklists,
     },
     {
       defaultLabel: 'Unpublish stock list',
       label: 'react.stocklists.unpubish.label',
       leftIcon: <RiFileForbidLine />,
       isPublished: true,
-      onClickActionWithId: unpublishStocklists,
+      onClick: unpublishStocklists,
     },
     {
       defaultLabel: 'Clear stock list items',
       label: 'react.stocklists.items.clear.label',
       leftIcon: <RiEraserLine />,
       variant: 'danger',
-      onClickActionWithId: onClickClearStocklists,
+      onClick: onClickClearStocklists,
     },
     {
       defaultLabel: 'Delete stock list',
       label: 'react.stocklists.delete.label',
       leftIcon: <RiDeleteBinLine />,
       variant: 'danger',
-      onClickActionWithId: onClickDeleteStocklists,
+      onClick: onClickDeleteStocklists,
     },
   ];
 
@@ -343,6 +345,10 @@ const StockListTable = ({
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
+      Cell: row => (
+        <a href={`/openboxes/requisitionTemplate/show/${row.original.id}`} >
+          {row.original.name}
+        </a>),
     },
     {
       Header: 'Origin',
@@ -391,12 +397,16 @@ const StockListTable = ({
   return (
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
-        <Translate id="react.stocklists.label" defaultMessage="Stock Lists" />
+        <div>
+          <Translate id="react.stocklists.label" defaultMessage="Stock Lists" />
+          <span className="ml-1">{`(${totalData})`}</span>
+        </div>
         <Button
           label="react.default.button.export.label"
           defaultLabel="Export"
+          variant="secondary"
           EndIcon={<RiDownload2Line />}
-          onClickAction={exportStockList}
+          onClick={exportStockList}
         />
       </div>
       <DataTable
@@ -408,6 +418,7 @@ const StockListTable = ({
         loading={loading}
         defaultPageSize={10}
         pages={pages}
+        totalData={totalData}
         onFetchData={onFetchHandler}
         className="mb-1"
         noDataText={translate(

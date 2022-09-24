@@ -4,6 +4,7 @@ import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
+import { confirmAlert } from 'react-confirm-alert';
 import {
   RiArrowGoBackLine,
   RiChat3Line,
@@ -465,9 +466,10 @@ const PurchaseOrderListTable = ({
         </span>
         <div className="btn-group">
           <Button
+            isDropdown
             defaultLabel="Export"
             label="react.default.button.export.label"
-            variant="dropdown"
+            variant="secondary"
             EndIcon={<RiDownload2Line />}
           />
           <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">

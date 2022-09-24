@@ -982,10 +982,10 @@ div.search-input:focus-within {
   &:focus {
     outline: none;
   }
-}
 
-.primary-button-disabled {
-  background-color: var(--blue-400) !important;
+  &:disabled {
+    background-color: var(--blue-400) !important;
+  }
 }
 
 .transparent-button {
@@ -1010,7 +1010,7 @@ div.search-input:focus-within {
   }
 }
 
-.dropdown-button {
+.secondary-button {
   padding: 4px 8px;
   background-color: var(--blue-100);
   height: 28px;
