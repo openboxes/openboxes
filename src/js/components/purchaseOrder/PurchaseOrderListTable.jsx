@@ -466,7 +466,7 @@ const PurchaseOrderListTable = ({
         <div className="btn-group">
           <Button
             defaultLabel="Export"
-            label="react.purchaseOrder.export.button.label"
+            label="react.default.button.export.label"
             variant="dropdown"
             EndIcon={<RiDownload2Line />}
           />

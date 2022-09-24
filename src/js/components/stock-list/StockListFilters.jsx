@@ -64,6 +64,7 @@ const StockListFilters = ({ setFilterParams, debounceTime, minSearchLength }) =>
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
+        searchFieldId="q"
         filterFields={filterFields}
         onSubmit={values => setFilterParams(values)}
         formProps={{ debouncedLocationsFetch }}
