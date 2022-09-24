@@ -21,12 +21,26 @@ class StocklistApiController {
 
     def requisitionService
     def stocklistService
+    def userService
 
     def list = {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         requisition.isPublished = params.isPublished ? params.boolean("isPublished") : true
         def requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
+
+        if (params.format == 'csv') {
+            def hasRoleFinance = userService.hasRoleFinance(session?.user)
+
+            def sw = stocklistService.exportStocklistItems(requisitions, hasRoleFinance);
+
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"Stocklists-items-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            return
+        }
+
+
         render([
             data: requisitions.collect { Requisition req -> req.toStocklistJson() },
             totalCount: requisitions.totalCount,
@@ -38,6 +52,16 @@ class StocklistApiController {
 
         if (!stocklist) {
             throw new ObjectNotFoundException(params.id, Stocklist.class.toString())
+        }
+
+        if(params.format == 'csv') {
+            def hasRoleFinance = userService.hasRoleFinance(session?.user)
+            def csv = stocklistService.exportStockList(stocklist.requisition, hasRoleFinance);
+
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"Stocklists-items-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.writer.toString())
+            return
         }
 
         render([data: stocklist] as JSON)
@@ -83,4 +107,29 @@ class StocklistApiController {
 
         render status: 200
     }
+
+    def clear = {
+        stocklistService.clearStockListItems(params.id)
+
+        render status: 200
+    }
+
+    def clone = {
+        stocklistService.cloneStockList(params.id)
+
+        render status: 200
+    }
+
+    def publish = {
+        stocklistService.publishStockList(params.id, true);
+
+        render status: 200
+    }
+
+    def unpublish = {
+        stocklistService.publishStockList(params.id, false);
+
+        render status: 200
+    }
+
 }

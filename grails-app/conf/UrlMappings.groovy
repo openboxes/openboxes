@@ -316,9 +316,24 @@ class UrlMappings {
             action = [POST: "sendMail"]
         }
 
-        "/api/stocklists/list/" {
+        "/api/stocklists/$id/clone"(parseRequest: true) {
             controller = "stocklistApi"
-            action = [GET: "list"]
+            action = [POST: "clone"]
+        }
+
+        "/api/stocklists/$id/publish"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "publish"]
+        }
+
+        "/api/stocklists/$id/unpublish"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "unpublish"]
+        }
+
+        "/api/stocklists/$id/clear"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "clear"]
         }
 
         // Putaway Item API
