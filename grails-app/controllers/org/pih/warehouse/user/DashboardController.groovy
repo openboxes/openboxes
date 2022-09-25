@@ -198,9 +198,16 @@ class DashboardController {
             // Save the warehouse selection for "last logged into" information
             if (user) {
                 //userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
-                user.lastLoginDate = new Date()
-                user.save(flush: true)
-                session.user = user
+
+                /*
+                 * Band-aid for OBGM-355, to prevent the following exception at dashboard launch:
+                 * javax.persistence.TransactionRequiredException: no transaction is in progress
+                 */
+                user.withTransaction {
+                    user.lastLoginDate = new Date()
+                    user.save(flush: true)
+                    session.user = user
+                }
             }
 
             if (userService.hasHighestRole(session?.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
@@ -323,5 +330,3 @@ class DashboardController {
     }
 
 }
-
-
