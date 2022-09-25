@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import DataTable from 'components/DataTable';
+import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import ActionDots from 'utils/ActionDots';
@@ -51,6 +51,7 @@ const PurchaseOrderListTable = ({
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState(-1);
+  const [totalData, setTotalData] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0.0);
   // Stored searching params for export case
   const [currentParams, setCurrentParams] = useState({});
@@ -79,7 +80,6 @@ const PurchaseOrderListTable = ({
         fileDownload(res.data, orderItems ? 'OrdersLineDetails.csv' : 'Orders', 'text/csv');
       });
   };
-
 
   const deleteOrder = (id) => {
     showTheSpinner();
@@ -168,6 +168,47 @@ const PurchaseOrderListTable = ({
     Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
   };
 
+  const getStatusTooltip = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return translate(
+          'react.purchaseOrder.status.pending.description.label',
+          'This Purchase Order is in progress and has not been finalized.',
+        );
+      case 'PLACED':
+        return translate(
+          'react.purchaseOrder.status.placed.description.label',
+          'This Purchase Order has been finalized and submitted.',
+        );
+      case 'PARTIALLY_RECEIVED':
+        return translate(
+          'react.purchaseOrder.status.receiving.description.label',
+          'Part of this order has been received. Other shipments with items from this order are yet to be received.',
+        );
+      case 'SHIPPED':
+        return translate(
+          'react.purchaseOrder.status.shipped.description.label',
+          'At least one item on this PO has been shipped out.',
+        );
+      case 'PARTIALLY_SHIPPED':
+        return translate(
+          'react.purchaseOrder.status.shipped.description.label',
+          'At least one item on this PO has been shipped out.',
+        );
+      case 'RECEIVED':
+        return translate(
+          'react.purchaseOrder.status.received.description.label',
+          'This order has been received by the receiver.',
+        );
+      case 'COMPLETED':
+        return translate(
+          'react.purchaseOrder.status.completed.description.label',
+          'This order has been shipped and received. Related purchase invoices have been posted.',
+        );
+      default:
+        return status;
+    }
+  };
 
   // List of all actions for PO rows
   const actions = [
@@ -271,50 +312,55 @@ const PurchaseOrderListTable = ({
       className: 'active-circle',
       headerClassName: 'header',
       fixed: 'left',
-      maxWidth: 100,
-      Cell: row => (<PurchaseOrderStatus status={row.original.status} />),
+      width: 160,
+      tooltip: true,
+      Cell: row => (
+        <TableCell {...row} tooltipLabel={getStatusTooltip(row.original.status)}>
+          <PurchaseOrderStatus status={row.original.status} />
+        </TableCell>),
     },
     {
       Header: 'Order Number',
       accessor: 'orderNumber',
       fixed: 'left',
       width: 150,
-      Cell: row => (
-        <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.orderNumber}</a>
-      ),
+      link: '/openboxes/order/show/:id',
+      Cell: TableCell,
     },
     {
       Header: 'Name',
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => (
-        <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.name}</a>
-      ),
+      link: '/openboxes/order/show/:id',
+      Cell: TableCell,
     },
     {
       Header: 'Supplier',
       accessor: 'origin',
       minWidth: 300,
+      tooltip: true,
+      Cell: TableCell,
     },
     {
       Header: 'Destination',
       accessor: 'destination',
       minWidth: 300,
+      tooltip: true,
+      Cell: TableCell,
     },
     {
       Header: 'Ordered On',
       accessor: 'dateOrdered',
       minWidth: 120,
-      Cell: row => (
-        <span>{row.original.dateOrdered}</span>
-      ),
     },
     {
       Header: 'Ordered By',
       accessor: 'orderedBy',
       headerClassName: 'text-left',
-      minWidth: 120,
+      minWidth: 150,
+      tooltip: true,
+      Cell: TableCell,
     },
     {
       Header: 'Line Items',
@@ -428,6 +474,7 @@ const PurchaseOrderListTable = ({
       .then((res) => {
         setLoading(false);
         setPages(Math.ceil(res.data.totalCount / state.pageSize));
+        setTotalData(res.data.totalCount);
         setOrdersData(res.data.data);
         setTotalPrice(res.data.totalPrice);
         // Store currently used params for export case
@@ -484,8 +531,8 @@ const PurchaseOrderListTable = ({
         loading={loading}
         defaultPageSize={10}
         pages={pages}
+        totalData={totalData}
         onFetchData={onFetchHandler}
-        className="mb-1"
         noDataText="No orders match the given criteria"
         footerComponent={() => (
           <span className="title-text p-1 d-flex flex-1 justify-content-end">

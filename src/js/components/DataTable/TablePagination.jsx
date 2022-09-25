@@ -32,8 +32,7 @@ const TablePagination = (props) => {
     }
   };
 
-
-  const totalDataSize = props.resolvedData.length;
+  const totalDataSize = props.totalData || props.resolvedData.length;
   const rangeNumberFrom = (props.page * props.pageSize) + 1;
   let rangeNumberTo = (props.page * props.pageSize) + props.pageSize;
   if (totalDataSize < rangeNumberTo) {
@@ -98,6 +97,9 @@ const TablePagination = (props) => {
     </div>);
 };
 
+TablePagination.defaultProps = {
+  totalData: undefined,
+};
 
 TablePagination.propTypes = {
   page: PropTypes.number.isRequired,
@@ -109,6 +111,7 @@ TablePagination.propTypes = {
   onPageChange: PropTypes.func.isRequired,
   canNext: PropTypes.bool.isRequired,
   canPrevious: PropTypes.bool.isRequired,
+  totalData: PropTypes.number,
 };
 
 

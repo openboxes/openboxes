@@ -12,7 +12,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
-import DataTable from 'components/DataTable';
+import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
@@ -31,6 +31,7 @@ const InvoiceListTable = ({
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState(-1);
+  const [totalData, setTotalData] = useState(0);
   // Stored searching params for export case
 
   // Util ref for react-table to force the fetch of data
@@ -116,7 +117,8 @@ const InvoiceListTable = ({
     {
       Header: 'Invoice Number',
       accessor: 'invoiceNumber',
-      Cell: row => (<a href={`/openboxes/invoice/show/${row.original.id}`}>{row.original.invoiceNumber}</a>),
+      sortable: false,
+      Cell: row => (<TableCell link={`/openboxes/invoice/show/${row.original.id}`} />),
     },
     {
       Header: 'Vendor',
@@ -186,6 +188,7 @@ const InvoiceListTable = ({
       .then((res) => {
         setLoading(false);
         setPages(Math.ceil(res.data.totalCount / state.pageSize));
+        setTotalData(res.data.totalCount);
         setOrdersData(res.data.data);
       })
       .catch(() => Promise.reject(new Error(this.props.translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
@@ -206,10 +209,10 @@ const InvoiceListTable = ({
         columns={columns}
         data={ordersData}
         loading={loading}
+        totalData={totalData}
         defaultPageSize={10}
         pages={pages}
         onFetchData={onFetchHandler}
-        className="mb-1"
         noDataText="No invoices match the given criteria"
       />
     </div>
