@@ -221,8 +221,8 @@ const StockListTable = ({
       offset: `${offset}`,
       max: `${state.pageSize}`,
       includeUnpublished: isPublished,
-      origin: filterParams.origin && filterParams.origin.id,
-      destination: filterParams.destination && filterParams.destination.id,
+      origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
+      destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
       ...sortingParams,
     }, (value) => {
       if (typeof value === 'object' && _.isEmpty(value)) return true;
@@ -330,7 +330,7 @@ const StockListTable = ({
         />),
     },
     {
-      Header: 'Published',
+      Header: 'Status',
       accessor: 'isPublished',
       fixed: 'left',
       width: 150,
@@ -354,12 +354,13 @@ const StockListTable = ({
       Header: 'Origin',
       accessor: 'origin',
       minWidth: 250,
+      fixed: 'left',
     },
     {
       Header: 'Destination',
       accessor: 'destination',
       minWidth: 250,
-
+      fixed: 'left',
     },
     {
       Header: 'Requisition items',

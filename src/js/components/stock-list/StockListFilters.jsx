@@ -1,51 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
-import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import FilterForm from 'components/Filter/FilterForm';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
-import { debounceLocationsFetch } from 'utils/option-utils';
+import apiClient from 'utils/apiClient';
 
 const filterFields = {
   origin: {
     type: FilterSelectField,
     attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
+      className: 'location-select',
+      multi: true,
       filterElement: true,
       placeholder: 'Origin',
       showLabelTooltip: true,
+      closeMenuOnSelect: false,
+      valueKey: 'id',
+      labelKey: 'name',
     },
-    getDynamicAttr: ({ debouncedLocationsFetch }) => ({
-      loadOptions: debouncedLocationsFetch,
+    getDynamicAttr: ({ locations }) => ({
+      options: locations,
     }),
   },
   destination: {
     type: FilterSelectField,
     attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
+      className: 'location-select',
+      multi: true,
       filterElement: true,
       placeholder: 'Destination',
       showLabelTooltip: true,
+      closeMenuOnSelect: false,
+      valueKey: 'id',
+      labelKey: 'name',
     },
-    getDynamicAttr: ({ debouncedLocationsFetch }) => ({
-      loadOptions: debouncedLocationsFetch,
+    getDynamicAttr: ({ locations }) => ({
+      options: locations,
     }),
   },
   isPublished: {
@@ -58,8 +50,17 @@ const filterFields = {
   },
 };
 
-const StockListFilters = ({ setFilterParams, debounceTime, minSearchLength }) => {
-  const debouncedLocationsFetch = debounceLocationsFetch(debounceTime, minSearchLength);
+const StockListFilters = ({ setFilterParams }) => {
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    apiClient.get('/openboxes/api/locations')
+      .then((response) => {
+        const { data } = response.data;
+        setLocations(data);
+      });
+  }, []);
+
 
   return (
     <div className="d-flex flex-column list-page-filters">
@@ -67,26 +68,14 @@ const StockListFilters = ({ setFilterParams, debounceTime, minSearchLength }) =>
         searchFieldId="q"
         filterFields={filterFields}
         onSubmit={values => setFilterParams(values)}
-        formProps={{ debouncedLocationsFetch }}
+        formProps={{ locations }}
       />
     </div>
   );
 };
 
-const mapStateToProps = state => ({
-  debounceTime: state.session.searchConfig.debounceTime,
-  minSearchLength: state.session.searchConfig.minSearchLength,
-});
-
-const mapDispatchToProps = {
-  fetchStatuses: fetchPurchaseOrderStatuses,
-  fetchBuyerOrganizations: fetchBuyers,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockListFilters);
+export default StockListFilters;
 
 StockListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
-  debounceTime: PropTypes.number.isRequired,
-  minSearchLength: PropTypes.number.isRequired,
 };
