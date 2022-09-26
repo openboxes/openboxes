@@ -185,6 +185,7 @@ const InvoiceListTable = ({
       invoiceTypeCode: filterParams.invoiceTypeCode && filterParams.invoiceTypeCode.id,
       vendor: filterParams.vendor && filterParams.vendor.id,
       createdBy: filterParams.createdBy && filterParams.createdBy.id,
+      buyerOrganization: filterParams.buyerOrganization && filterParams.buyerOrganization.id,
     }, _.isEmpty);
 
     // Fetch data
