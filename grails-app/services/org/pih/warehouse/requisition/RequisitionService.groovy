@@ -210,29 +210,8 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Requisition requisition, Map params) {
-        List<Location> origins = [];
-        List<Location> destinations = [];
 
-        if (params.origin.getClass().isArray()) {
-
-            origins = Location.createCriteria().list() {
-                isNull("parentLocation")
-                if (params.origin) {
-                    'in'("id", params.origin)
-                }
-            }
-        }
-
-        if (params.destinations.getClass().isArray()) {
-            destinations = Location.createCriteria().list() {
-                isNull("parentLocation")
-                if (params.destination) {
-                    'in'("id", params.destination)
-                }
-            }
-        }
-
-        return getRequisitions(requisition, params, origins, destinations)
+        return getRequisitions(requisition, params, [], [])
     }
 
     /**

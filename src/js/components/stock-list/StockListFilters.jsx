@@ -67,7 +67,7 @@ const StockListFilters = ({ setFilterParams }) => {
       <FilterForm
         searchFieldId="q"
         filterFields={filterFields}
-        onSubmit={values => setFilterParams(values)}
+        onSubmit={values => setFilterParams({ ...values })}
         formProps={{ locations }}
       />
     </div>

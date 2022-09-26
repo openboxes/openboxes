@@ -10,9 +10,13 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.requisition.RequisitionItemSortByCode
+import org.grails.plugins.csv.CSVWriter
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
@@ -27,7 +31,11 @@ class StocklistApiController {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         requisition.isPublished = params.isPublished ? params.boolean("isPublished") : true
-        def requisitions = requisitionService.getAllRequisitionTemplates(requisition, params)
+
+        def origins = params.origin ? Location.findAllByIdInList(params.list("origin")) : []
+        def destinations = params.destination ? Location.findAllByIdInList(params.list("destination")) : []
+
+        def requisitions = requisitionService.getRequisitions(requisition, params, origins, destinations)
 
         if (params.format == 'csv') {
             def hasRoleFinance = userService.hasRoleFinance(session?.user)
@@ -144,7 +152,40 @@ class StocklistApiController {
             return 404
         }
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
-        def csv = stocklistService.exportStockList(requisition, hasRoleFinance);
+        def sw = new StringWriter()
+
+        def csv = new CSVWriter(sw, {
+            "Product Code" { it.productCode }
+            "Product Name" { it.productName }
+            "Quantity" { it.quantity }
+            "UOM" { it.unitOfMeasure }
+            hasRoleFinance ? "Unit cost" { it.unitCost } : null
+            hasRoleFinance ? "Total cost" { it.totalCost } : null
+        })
+
+        if (requisition.requisitionItems) {
+            RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+
+            requisition."${sortByCode.methodName}".each { requisitionItem ->
+                csv << [
+                        productCode  : requisitionItem.product.productCode,
+                        productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
+                        quantity     : requisitionItem.quantity,
+                        unitOfMeasure: "EA/1",
+                        unitCost     : hasRoleFinance ? formatNumber(number: requisitionItem.product.pricePerUnit ?: 0, format: '###,###,##0.00##') : null,
+                        totalCost    : hasRoleFinance ? formatNumber(number: requisitionItem.totalCost ?: 0, format: '###,###,##0.00##') : null
+                ]
+            }
+        } else {
+            csv << [
+                    productCode     : "",
+                    productName     : "",
+                    quantity        : "",
+                    unitOfMeasure   : "",
+                    unitCost        : "",
+                    totalCost       : ""
+            ]
+        }
 
         response.contentType = "text/csv"
         response.setHeader("Content-disposition", "attachment; filename=\"Stock List - ${requisition?.destination?.name} - ${new Date().format("yyyyMMdd-hhmmss")}.csv\"")

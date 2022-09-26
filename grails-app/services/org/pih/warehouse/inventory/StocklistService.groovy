@@ -9,16 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
-import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.core.Attachment
 import org.pih.warehouse.requisition.Requisition
-import org.grails.plugins.csv.CSVWriter
-import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import grails.validation.ValidationException
 import org.apache.commons.lang.StringEscapeUtils
 
-import java.text.DecimalFormat
 
 class StocklistService {
 
@@ -99,47 +95,6 @@ class StocklistService {
             throw new ValidationException("Unable to $publishLabel stocklist due to errors", requisition.errors)
         }
         requisition.save(flush: true)
-    }
-
-    def exportStockList(Requisition requisition, Boolean hasRoleFinance) {
-
-        def sw = new StringWriter()
-
-        def numberFormat = new DecimalFormat('###,###,##0.00##');
-
-        def csv = new CSVWriter(sw, {
-            "Product Code" { it.productCode }
-            "Product Name" { it.productName }
-            "Quantity" { it.quantity }
-            "UOM" { it.unitOfMeasure }
-            hasRoleFinance ? "Unit cost" { it.unitCost } : null
-            hasRoleFinance ? "Total cost" { it.totalCost } : null
-        })
-
-        if (requisition.requisitionItems) {
-            RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
-
-            requisition."${sortByCode.methodName}".each { requisitionItem ->
-                csv << [
-                        productCode  : requisitionItem.product.productCode,
-                        productName  : StringEscapeUtils.escapeCsv(requisitionItem.product.name),
-                        quantity     : requisitionItem.quantity,
-                        unitOfMeasure: "EA/1",
-                        unitCost     : hasRoleFinance ? numberFormat.format(requisitionItem.product.pricePerUnit ?: 0) : null,
-                        totalCost     : hasRoleFinance ? numberFormat.format(requisitionItem.totalCost ?: 0) : null
-                ]
-            }
-        } else {
-            csv << [
-                productCode     : "",
-                productName     : "",
-                quantity        : "",
-                unitOfMeasure   : "",
-                unitCost        : "",
-                totalCost       : ""
-            ]
-        }
-        return csv;
     }
 
     def exportStocklistItems(List<Requisition> requisitions, Boolean hasRoleFinance) {
