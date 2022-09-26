@@ -81,6 +81,8 @@ grails:
         minifyJs: false
         minifyCss: false
         bundle: false
+    cache:
+        clearAtStartup: true
     doc:
         title: "OpenBoxes"
         subtitle: ""
