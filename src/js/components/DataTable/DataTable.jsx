@@ -56,6 +56,7 @@ DataTable.defaultProps = {
   sortable: false,
   resizable: false,
   className: '',
+  multiSort: false,
   totalData: undefined,
 };
 
@@ -65,6 +66,7 @@ DataTable.propTypes = {
   headerComponent: PropTypes.func,
   sortable: PropTypes.bool,
   resizable: PropTypes.bool,
+  multiSort: PropTypes.bool,
   className: PropTypes.string,
   totalData: PropTypes.number,
 };

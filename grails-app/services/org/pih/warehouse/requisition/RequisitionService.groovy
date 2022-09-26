@@ -210,6 +210,7 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Requisition requisition, Map params) {
+
         return getRequisitions(requisition, params, [], [])
     }
 

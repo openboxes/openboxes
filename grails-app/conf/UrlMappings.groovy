@@ -316,6 +316,31 @@ class UrlMappings {
             action = [POST: "sendMail"]
         }
 
+        "/api/stocklists/$id/export"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [GET: "export"]
+        }
+
+        "/api/stocklists/$id/clone"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "clone"]
+        }
+
+        "/api/stocklists/$id/publish"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "publish"]
+        }
+
+        "/api/stocklists/$id/unpublish"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "unpublish"]
+        }
+
+        "/api/stocklists/$id/clear"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "clear"]
+        }
+
         // Putaway Item API
 
         "/api/putawayItems/$id"(parseRequest: true) {

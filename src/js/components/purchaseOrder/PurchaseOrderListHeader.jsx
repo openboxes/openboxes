@@ -16,7 +16,7 @@ const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
       <Button
         defaultLabel="Create Shipment from PO"
         label="react.purchaseOrder.createShipmentFromPo.label"
-        onClickAction={() => history.push('/openboxes/stockMovement/createCombinedShipments?direction=INBOUND')}
+        onClick={() => history.push('/openboxes/stockMovement/createCombinedShipments?direction=INBOUND')}
       />
       {supportedActivities.includes('PLACE_ORDER') &&
         <a href="/openboxes/order/create">

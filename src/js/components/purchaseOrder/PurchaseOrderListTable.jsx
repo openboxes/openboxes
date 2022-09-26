@@ -31,7 +31,6 @@ import apiClient from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
-import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
@@ -274,7 +273,7 @@ const PurchaseOrderListTable = ({
         <ActionDots
           dropdownPlacement="right"
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(actions, row, supportedActivities, highestRole)}
+          actions={findActions(actions, row, { supportedActivities, highestRole })}
           id={row.original.id}
         />),
     },
@@ -302,7 +301,7 @@ const PurchaseOrderListTable = ({
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
+      Cell: row => <TableCell {...row} tooltip link={`/openboxes/order/show/${row.original.id}`} />,
     },
     {
       Header: 'Supplier',
@@ -467,9 +466,10 @@ const PurchaseOrderListTable = ({
         </span>
         <div className="btn-group">
           <Button
+            isDropdown
             defaultLabel="Export"
-            label="react.purchaseOrder.export.button.label"
-            variant="dropdown"
+            label="react.default.button.export.label"
+            variant="secondary"
             EndIcon={<RiDownload2Line />}
           />
           <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">

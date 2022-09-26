@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { fetchPurchaseOrderStatuses } from 'actions';
+import StatusIndicator from 'utils/StatusIndicator';
 
 const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
   // Circle is by default set as primary (blue)
@@ -30,17 +31,7 @@ const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
     findStatusCircle(status);
   }, [allStatuses, status]);
 
-  // Capitalize only first letter of status
-  const statusToDisplay = status.charAt(0) + status.toLowerCase().slice(1);
-
-  return (
-    <div className="d-flex align-items-center justify-content-between">
-      <div className="d-flex justify-content-between align-items-center">
-        <span className={`${circle}-circle status-circle`} />
-        <span className="px-1">{statusToDisplay}</span>
-      </div>
-    </div>
-  );
+  return (<StatusIndicator status={status} variant={circle} />);
 };
 
 const mapStateToProps = state => ({

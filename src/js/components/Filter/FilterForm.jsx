@@ -22,7 +22,9 @@ const FilterForm = ({
   allowEmptySubmit,
   hidden,
 }) => {
-  // Replace with SearchField created in another ticket
+  const [amountFilled, setAmountFilled] = useState(0);
+  const [filtersHidden, setFiltersHidden] = useState(hidden);
+
   const searchField = {
     type: SearchField,
     attributes: {
@@ -31,21 +33,19 @@ const FilterForm = ({
     },
   };
   // Create initialValues from filterFields as empty values
-  const initialValues = Object.keys(filterFields).reduce((acc, curr) => {
-    if (!acc[curr]) {
-      return {
-        ...acc,
-        [curr]: '',
-      };
-    }
+  const initialValues = Object.keys(filterFields).reduce((acc, key) => {
+    if (!acc[key]) return { ...acc, [key]: '' };
     return acc;
   }, { ...defaultValues });
-  const [amountFilled, setAmountFilled] = useState(0);
+
+  // Calculate which object's values are not empty
   const countFilled = (values) => {
-    // Calculate which object's values are not empty
-    setAmountFilled(Object.values(values).filter(value => !_.isEmpty(value)).length);
+    setAmountFilled(Object.values(values)
+      .filter((value) => {
+        if (typeof value === 'object') return !_.isEmpty(value);
+        return !!value;
+      }).length);
   };
-  const [filtersHidden, setFiltersHidden] = useState(hidden);
 
   return (
     <div className="filter-form">
@@ -70,7 +70,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
-                      onClickAction={() => form.reset(initialValues)}
+                      onClick={() => form.reset(initialValues)}
                       variant="transparent"
                       type="submit"
                     />

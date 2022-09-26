@@ -77,7 +77,7 @@ const InvoiceListTable = ({
         <ActionDots
           dropdownPlacement="right"
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(actions, row, supportedActivities, highestRole)}
+          actions={findActions(actions, row, { supportedActivities, highestRole })}
           id={row.original.id}
         />),
     },
@@ -102,17 +102,7 @@ const InvoiceListTable = ({
     {
       Header: 'Invoice Type',
       accessor: 'invoiceTypeCode',
-      Cell: row => (
-        <Tooltip
-          theme="transparent"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          title={row.original.invoiceTypeCode}
-        >
-          {row.original.invoiceTypeCode}
-        </Tooltip>
-      ),
+      Cell: row => (<TableCell {...row} tooltip />),
     },
     {
       Header: 'Invoice Number',
@@ -128,17 +118,7 @@ const InvoiceListTable = ({
       Header: 'Vendor invoice number',
       accessor: 'vendorInvoiceNumber',
       minWidth: 200,
-      Cell: row => (
-        <Tooltip
-          theme="transparent"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-          title={row.original.vendorInvoiceNumber}
-        >
-          {row.original.vendorInvoiceNumber}
-        </Tooltip>
-      ),
+      Cell: row => (<TableCell {...row} tooltip />),
     },
     {
       Header: 'Total Value',

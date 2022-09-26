@@ -982,10 +982,10 @@ div.search-input:focus-within {
   &:focus {
     outline: none;
   }
-}
 
-.primary-button-disabled {
-  background-color: var(--blue-400) !important;
+  &:disabled {
+    background-color: var(--blue-400) !important;
+  }
 }
 
 .transparent-button {
@@ -1010,7 +1010,7 @@ div.search-input:focus-within {
   }
 }
 
-.dropdown-button {
+.secondary-button {
   padding: 4px 8px;
   background-color: var(--blue-100);
   height: 28px;
@@ -1125,6 +1125,9 @@ div.search-input:focus-within {
 
     .filter-group {
       height: 38px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .filters-row {
@@ -1132,7 +1135,7 @@ div.search-input:focus-within {
         align-items: center;
 
         label {
-          margin: 0;
+          margin: 0 4px 0 0;
         }
       }
     }
@@ -1210,4 +1213,12 @@ div.search-input:focus-within {
   }
 }
 
+.location-select {
+  min-width: 270px;
+}
+
+.text-overflow-ellipsis{
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 
