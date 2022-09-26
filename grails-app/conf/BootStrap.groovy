@@ -471,9 +471,9 @@ class BootStrap {
             [
                 id: invoiceListItem?.invoice?.id,
                 invoiceNumber: invoiceListItem?.invoiceNumber,
-                invoiceType: invoiceListItem?.invoiceTypeCode?.name(),
+                invoiceTypeCode: invoiceListItem?.invoiceTypeCode?.name(),
                 status: invoiceListItem?.status?.name(),
-                vendor: "${invoiceListItem?.partyCode} ${invoiceListItem?.partyName}",
+                partyCode: "${invoiceListItem?.partyCode} ${invoiceListItem?.partyName}",
                 vendorInvoiceNumber: invoiceListItem?.vendorInvoiceNumber,
                 totalValue: invoiceListItem?.invoice?.totalValue,
                 currency: invoiceListItem?.currency,

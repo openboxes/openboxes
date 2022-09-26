@@ -128,7 +128,7 @@ const InvoiceListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        onSubmit={values => setFilterParams(values)}
+        onSubmit={values => setFilterParams({ ...values })}
         formProps={{
           statuses,
           debouncedUsersFetch,
@@ -136,9 +136,17 @@ const InvoiceListFilters = ({
           typeCodes,
           organization: currentLocation.organization,
         }}
-        defaultValues={{ buyerOrganization: currentLocation.organization.id }}
+        defaultValues={{
+            buyerOrganization: {
+              id: currentLocation.organization.id,
+              value: currentLocation.organization.id,
+              name: currentLocation.organization.name,
+              label: currentLocation.organization.name,
+            },
+        }}
         searchFieldPlaceholder="Search by invoice number..."
         searchFieldId="invoiceNumber"
+        hidden={false}
       />
     </div>
   );

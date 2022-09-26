@@ -10,6 +10,7 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import DataTable from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
@@ -85,7 +86,6 @@ const InvoiceListTable = ({
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
       maxWidth: 100,
-      sortable: false,
       Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.itemCount}</span>),
     },
     {
@@ -97,28 +97,46 @@ const InvoiceListTable = ({
           invoiceStatuses.find(status => status.id === row.original.status).label;
         return (<InvoiceStatus status={label || row.original.status} />);
       },
-      sortable: false,
     },
     {
       Header: 'Invoice Type',
-      accessor: 'invoiceType',
-      sortable: false,
+      accessor: 'invoiceTypeCode',
+      Cell: row => (
+        <Tooltip
+          theme="transparent"
+          delay="150"
+          duration="250"
+          hideDelay="50"
+          title={row.original.invoiceTypeCode}
+        >
+          {row.original.invoiceTypeCode}
+        </Tooltip>
+      ),
     },
     {
       Header: 'Invoice Number',
       accessor: 'invoiceNumber',
-      sortable: false,
       Cell: row => (<a href={`/openboxes/invoice/show/${row.original.id}`}>{row.original.invoiceNumber}</a>),
     },
     {
       Header: 'Vendor',
-      accessor: 'vendor',
-      sortable: false,
+      accessor: 'partyCode',
     },
     {
       Header: 'Vendor invoice number',
       accessor: 'vendorInvoiceNumber',
-      sortable: false,
+      minWidth: 200,
+      Cell: row => (
+        <Tooltip
+          theme="transparent"
+          delay="150"
+          duration="250"
+          hideDelay="50"
+          title={row.original.vendorInvoiceNumber}
+        >
+          {row.original.vendorInvoiceNumber}
+        </Tooltip>
+      ),
     },
     {
       Header: 'Total Value',
@@ -130,7 +148,6 @@ const InvoiceListTable = ({
       Header: 'Currency',
       accessor: 'currency',
       className: 'text-left',
-      sortable: false,
     },
   ];
 
@@ -157,6 +174,7 @@ const InvoiceListTable = ({
       invoiceTypeCode: filterParams.invoiceTypeCode && filterParams.invoiceTypeCode.id,
       vendor: filterParams.vendor && filterParams.vendor.id,
       createdBy: filterParams.createdBy && filterParams.createdBy.id,
+      buyerOrganization: filterParams.buyerOrganization && filterParams.buyerOrganization.id,
     }, _.isEmpty);
 
     // Fetch data
@@ -192,7 +210,7 @@ const InvoiceListTable = ({
         pages={pages}
         onFetchData={onFetchHandler}
         className="mb-1"
-        noDataText="No orders match the given criteria"
+        noDataText="No invoices match the given criteria"
       />
     </div>
   );
