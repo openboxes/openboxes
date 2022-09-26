@@ -248,7 +248,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Boolean isCompletelyInvoiced() {
-        return quantityInvoiced >= quantity
+        return quantityInvoicedInStandardUom >= quantity
     }
 
     Boolean isPending() {
