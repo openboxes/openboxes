@@ -105,7 +105,21 @@ class OrderService {
                 }
 
                 if (params.sort && params.sort != 'status') {
-                    order(params.sort, params.order ?: 'asc')
+                    if (params.sort == 'origin') {
+                        origin {
+                            order("name", params.order ?: 'asc')
+                        }
+                    } else if (params.sort == 'destination') {
+                        destination {
+                            order("name", params.order ?: 'asc')
+                        }
+                    } else if (params.sort == 'orderedBy') {
+                        orderedBy {
+                            order("firstName", params.order ?: 'asc')
+                        }
+                    } else {
+                        order(params.sort, params.order ?: 'asc')
+                    }
                 }
             }
 

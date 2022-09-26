@@ -142,7 +142,7 @@ class ProductController {
 
 
         boolean includeInactive = params.boolean('includeInactive') ?: false
-        def category = params.categoryId ? Category.load(params.categoryId) : null
+        def categories = params.categoryId ? Category.findAllByIdInList(params.list("categoryId")) : null
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
         def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
         params.name = params.q
@@ -160,7 +160,7 @@ class ProductController {
             params.max = -1
         }
 
-        productInstanceList = productService.getProducts(category, catalogs, tags, includeInactive, params)
+        productInstanceList = productService.getProducts(categories, catalogs, tags, includeInactive, params)
 
         if (params.format) {
             def date = new Date()

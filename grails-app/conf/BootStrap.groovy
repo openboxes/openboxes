@@ -195,7 +195,7 @@ class BootStrap {
                 origin: orderSummary?.order?.origin?.name + (origOrgCode ? " (${origOrgCode})" : ""),
                 destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
                 dateOrdered: orderSummary?.order?.dateOrdered?.format("MMM dd, yyyy"),
-                orderedBy: orderSummary?.order?.orderedBy?.getName(),
+                orderedBy: orderSummary?.order?.orderedBy?.name,
                 orderItemsCount: orderSummary?.order?.activeOrderItems?.size()?:0,
                 orderedOrderItemsCount: orderSummary?.order?.orderedOrderItems?.size()?:0,
                 shippedItemsCount: orderSummary?.order?.shippedOrderItems?.size()?:0,
@@ -261,9 +261,11 @@ class BootStrap {
                 pricePerUnit        : product.pricePerUnit,
                 dateCreated         : product.dateCreated,
                 lastUpdated         : product.lastUpdated,
+                updatedBy           : product.updatedBy?.name,
                 color               : product.color,
                 handlingIcons       : product.handlingIcons,
                 lotAndExpiryControl : product.lotAndExpiryControl,
+                active              : product.active,
             ]
         }
 
