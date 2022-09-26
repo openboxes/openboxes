@@ -271,7 +271,9 @@ class ProductService {
      * @return
      */
     List<Product> getProducts(Category category, List<Tag> tags, boolean includeInactive, Map params) {
-        return getProducts(category, [], tags, includeInactive, params)
+        def categories = []
+        categories << category
+        return getProducts(categories, [], tags, includeInactive, params)
     }
 
     /**
@@ -283,9 +285,7 @@ class ProductService {
      * @param params
      * @return
      */
-    List<Product> getProducts(Category category, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
-        log.info "get products where category=" + category + ", catalogs=" + catalogsInput + ", tags=" + tagsInput + ", params=" + params
-
+    List<Product> getProducts(List<Category> categories, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
         int max = params.max ? params.int("max") : 10
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
@@ -306,19 +306,13 @@ class ProductService {
                 eq("active", true)
             }
             and {
-                if (category) {
+                if (categories) {
                     if (params.includeCategoryChildren) {
-                        def categories = category.children ?: []
-                        categories << category
-
-                        println "Categories to search in " + categories
-                        'in'("category", categories)
+                        'in'("category", categories + categories*.children?.flatten())
                     } else {
-                        println "Equality search " + category
-                        eq("category", category)
+                        'in'("category", categories)
                     }
                 }
-
 
                 or {
                     if (tagsInput) {
