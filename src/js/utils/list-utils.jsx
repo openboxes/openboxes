@@ -7,7 +7,7 @@ export const hasMinimumRequiredRole = (role, highestUserRole) => {
 
 
 export const findActions = (actionList, row, props) => {
-  const { supportedActivities = [], highestRole = [], customFilter } = props;
+  const { supportedActivities = [], highestRole, customFilter } = props;
   // Filter out by status if any provided
   const filteredByStatus = actionList.filter((action) => {
     if (action.statuses) {

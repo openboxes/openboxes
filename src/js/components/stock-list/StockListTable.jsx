@@ -70,11 +70,7 @@ const StockListTable = ({
   };
 
   const exportStockListItems = (id) => {
-    apiClient.get(`/openboxes/api/stocklists/${id}`, {
-      params: {
-        format: 'csv',
-      },
-    })
+    apiClient.get(`/openboxes/api/stocklists/${id}/export`)
       .then((res) => {
         const filename = res.headers['content-disposition'].split('filename="')[1].split('.')[0];
         fileDownload(res.data, filename, 'text/csv');
@@ -84,10 +80,8 @@ const StockListTable = ({
   const customActionFilter = ({ isPublished }, row) => {
     // skip actions that don't have isPublished property
     if (isPublished === undefined) return true;
-    // negate XOR
     // show actions that have same boolean value in row and in action
-    // eslint-disable-next-line no-bitwise
-    return !(row.original.isPublished ^ isPublished);
+    return row.original.isPublished === isPublished;
   };
 
   const deleteStocklists = (id) => {
@@ -245,7 +239,7 @@ const StockListTable = ({
       });
   };
 
-  // List of all actions for PO rows
+  // List of all actions for Stocklists rows
   const actions = [
     {
       defaultLabel: 'Show stock list',

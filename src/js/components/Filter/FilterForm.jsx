@@ -33,9 +33,10 @@ const FilterForm = ({
     },
   };
   // Create initialValues from filterFields as empty values
-  let initialValues = Object.keys(filterFields)
-    .reduce((acc, key) => ({ ...acc, [`${key}`]: null }), {});
-  initialValues = { ...initialValues, ...defaultValues };
+  const initialValues = Object.keys(filterFields).reduce((acc, key) => {
+    if (!acc[key]) return { ...acc, [key]: '' };
+    return acc;
+  }, { ...defaultValues });
 
   // Calculate which object's values are not empty
   const countFilled = (values) => {

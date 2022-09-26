@@ -54,16 +54,6 @@ class StocklistApiController {
             throw new ObjectNotFoundException(params.id, Stocklist.class.toString())
         }
 
-        if(params.format == 'csv') {
-            def hasRoleFinance = userService.hasRoleFinance(session?.user)
-            def csv = stocklistService.exportStockList(stocklist.requisition, hasRoleFinance);
-
-            response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"Stocklists-items-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: csv.writer.toString())
-            return
-        }
-
         render([data: stocklist] as JSON)
     }
 
@@ -109,25 +99,57 @@ class StocklistApiController {
     }
 
     def clear = {
-        stocklistService.clearStockListItems(params.id)
+        Requisition requisition = Requisition.get(params.id)
+        if (!requisition) {
+            return 404
+        }
+        requisitionService.clearRequisition(requisition)
 
         render status: 200
     }
 
     def clone = {
-        stocklistService.cloneStockList(params.id)
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            return 404
+        }
+        requisitionService.cloneRequisition(requisition)
 
         render status: 200
     }
 
     def publish = {
-        stocklistService.publishStockList(params.id, true);
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            return 404
+        }
+        stocklistService.publishStockList(requisition, true);
 
         render status: 200
     }
 
     def unpublish = {
-        stocklistService.publishStockList(params.id, false);
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            return 404
+        }
+        stocklistService.publishStockList(requisition, false);
+
+        render status: 200
+    }
+
+    def export = {
+        def requisition = Requisition.get(params.id)
+        if (!requisition) {
+            return 404
+        }
+        def hasRoleFinance = userService.hasRoleFinance(session?.user)
+        def csv = stocklistService.exportStockList(requisition, hasRoleFinance);
+
+        response.contentType = "text/csv"
+        response.setHeader("Content-disposition", "attachment; filename=\"Stock List - ${requisition?.destination?.name} - ${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+        render(contentType: "text/csv", text: csv.writer.toString())
+        return
 
         render status: 200
     }

@@ -316,6 +316,11 @@ class UrlMappings {
             action = [POST: "sendMail"]
         }
 
+        "/api/stocklists/$id/export"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [GET: "export"]
+        }
+
         "/api/stocklists/$id/clone"(parseRequest: true) {
             controller = "stocklistApi"
             action = [POST: "clone"]

@@ -92,27 +92,7 @@ class StocklistService {
         mailService.sendHtmlMailWithAttachment(to, subject, body, attachments)
     }
 
-    void clearStockListItems(String id) {
-        Requisition requisition = Requisition.get(id)
-        if (!requisition) {
-            throw new ObjectNotFoundException(id, Requisition.class.toString())
-        }
-        requisitionService.clearRequisition(requisition)
-    }
-
-    void cloneStockList(String id) {
-        def requisition = Requisition.get(id)
-        if (!requisition) {
-            throw new ObjectNotFoundException(id, Requisition.class.toString())
-        }
-        requisitionService.cloneRequisition(requisition)
-    }
-
-    void publishStockList(String id, Boolean publish) {
-        def requisition = Requisition.get(id)
-        if (!requisition) {
-            throw new ObjectNotFoundException(id, Requisition.class.toString())
-        }
+    void publishStockList(Requisition requisition, Boolean publish) {
         requisition.isPublished = publish
         if (requisition.hasErrors()) {
             String publishLabel = publish ? "publish" : "unpublish";
