@@ -70,7 +70,7 @@ module.exports = {
       },
       {
         test: /\.jsx$/,
-        use: ['cache-loader', 'babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1'],
+        use: ['cache-loader', 'babel-loader?presets[]=@babel/react&presets[]=@babel/env'],
         include: SRC,
         exclude: /node_modules/,
       },
