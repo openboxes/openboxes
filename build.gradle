@@ -140,12 +140,19 @@ configurations {
         // use com.github.librepdf:openpdf instead
         exclude group: 'com.lowagie', module: 'itext'
 
+        // use HikariCP instead of com.mchange.c3p0
+        exclude group: 'com.mchange'
+
         // these API's have moved to jakarta.activation:jakarta.activation-api
         exclude group: 'com.sun.activation', module: 'jakarta.activation'
         exclude group: 'javax.activation', module: 'activation'
 
         // superseded by com.sun.mail:jakarta.mail
         exclude group: 'com.sun.mail', module: 'javax.mail'
+
+        // superseded by com.zaxxer:HikariCP (Java 8+)
+        exclude group: 'com.zaxxer', module: 'HikariCP-java6'
+        exclude group: 'com.zaxxer', module: 'HikariCP-java7'
 
         // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
@@ -448,6 +455,9 @@ dependencies {
 
     implementation 'com.sun.mail:jakarta.mail:1.6.7'
 
+    // use HikariCP for JDBC pooling (instead of Tomcat or c3p0)
+    runtime "com.zaxxer:HikariCP:${hikariVersion}"
+
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
     compile 'commons-codec:commons-codec:1.15'
@@ -669,6 +679,7 @@ dependencies {
     // enable `import org.hibernate.tool.schema.TargetType`, etc.
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     runtime "org.hibernate:hibernate-ehcache:${hibernateVersion}"
+    runtime "org.hibernate:hibernate-hikaricp:${hibernateVersion}"
     testImplementation "org.hibernate:hibernate-testing:${hibernateVersion}"
 
     // joda-time support for hibernate

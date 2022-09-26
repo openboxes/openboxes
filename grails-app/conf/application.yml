@@ -216,31 +216,19 @@ hibernate:
         use_second_level_cache: false
 
 dataSource:
-    pooled: true
-    jmxExport: true
-    driverClassName: com.mysql.cj.jdbc.Driver
     dbCreate: none
     dialect: org.hibernate.dialect.MySQL57InnoDBDialect
-    factory: org.apache.tomcat.jdbc.pool.DataSourceFactory
+    driverClassName: com.mysql.cj.jdbc.Driver
+    factory: com.zaxxer.hikari.HikariJNDIFactory
+    jmxExport: true
     logger: com.mysql.cj.jdbc.log.StandardLogger
-    type: org.apache.tomcat.jdbc.pool.DataSource
+    pooled: true
+    type: com.zaxxer.hikari.HikariDataSource
     properties:
-        # from https://docs.grails.org/3.3.16/guide/conf.html#dataSource
-        jmxEnabled: true
-        initialSize: 5
-        maxActive: 50
-        minIdle: 5
-        maxIdle: 25
-        maxWait: 10000
-        maxAge: 10 * 60000
-        timeBetweenEvictionRunsMillis: 5000
-        minEvictableIdleTimeMillis: 60000
-        validationQuery: SELECT 1
-        validationQueryTimeout: 3
-        validationInterval: 15000
-        testOnBorrow: false
-        testWhileIdle: true
-        testOnReturn: false
+        connectionTimeout: 10000  # wait up to 10 seconds for a connection
+        keepaliveTime: 30000  # 'ping' idle connections every 30 seconds
+        maxLifetime: 900000  # retire and replace connections after 15 minutes
+        poolName: 'openboxes-hikari'
         # https://tomcat.apache.org/tomcat-8.5-doc/jdbc-pool.html#JDBC_interceptors
         jdbcInterceptors: "ConnectionState;StatementCache(max=200)"
         defaultTransactionIsolation: java.sql.Connection.TRANSACTION_READ_COMMITTED

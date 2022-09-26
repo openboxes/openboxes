@@ -37,6 +37,8 @@
 
     <logger name="asset.pipeline" level="debug" /><!-- use 'info' to hide asset-pipeline logs -->
     <logger name="ch.qos.logback" level="warn" /><!-- hide logs about logging -->
+    <logger name="com.zaxxer.hikari" level="debug" /><!-- use 'info' to hide config at startup -->
+    <logger name="com.zaxxer.hikari.pool" level="info" /><!-- use 'debug' to see jdbc pool logs -->
     <logger name="grails.app.services" level="info" /><!-- use `debug` to see service/plugin logs -->
     <logger name="grails.artefact" level="info" />
     <logger name="grails.boot" level="info" />
