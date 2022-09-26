@@ -6,10 +6,10 @@ import { Tooltip } from 'react-tippy';
 const TableCell = ({
   value, children, tooltip, tooltipLabel, link,
 }) => {
-  let cellElement = <div>{ children || value}</div>;
+  let cellElement = <div className="text-overflow-ellipsis">{ children || value}</div>;
 
   if (link && typeof link === 'string') {
-    cellElement = <a href={link}>{ children || value}</a>;
+    cellElement = <a className="text-overflow-ellipsis" href={link}>{ children || value}</a>;
   }
 
   if (tooltip) {

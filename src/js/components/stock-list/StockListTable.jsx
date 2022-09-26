@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import DataTable from 'components/DataTable';
+import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
@@ -340,21 +340,24 @@ const StockListTable = ({
       fixed: 'left',
       minWidth: 250,
       Cell: row => (
-        <a href={`/openboxes/requisitionTemplate/show/${row.original.id}`} >
-          {row.original.name}
-        </a>),
+        <TableCell
+          {...row}
+          link={`/openboxes/requisitionTemplate/show/${row.original.id}`}
+        />),
     },
     {
       Header: 'Origin',
       accessor: 'origin',
       minWidth: 250,
       fixed: 'left',
+      Cell: row => (<TableCell {...row} tooltip />),
     },
     {
       Header: 'Destination',
       accessor: 'destination',
       minWidth: 250,
       fixed: 'left',
+      Cell: row => (<TableCell {...row} tooltip />),
     },
     {
       Header: 'Requisition items',
@@ -415,7 +418,6 @@ const StockListTable = ({
         pages={pages}
         totalData={totalData}
         onFetchData={onFetchHandler}
-        className="mb-1"
         noDataText={translate(
           'react.stocklists.empty.label',
           'No stock lists match the given criteria',

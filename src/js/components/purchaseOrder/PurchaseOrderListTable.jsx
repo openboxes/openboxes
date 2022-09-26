@@ -301,7 +301,7 @@ const PurchaseOrderListTable = ({
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
+      Cell: row => <TableCell {...row} tooltip link={`/openboxes/order/show/${row.original.id}`} />,
     },
     {
       Header: 'Supplier',

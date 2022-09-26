@@ -1217,4 +1217,8 @@ div.search-input:focus-within {
   min-width: 270px;
 }
 
+.text-overflow-ellipsis{
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 
