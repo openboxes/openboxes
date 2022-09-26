@@ -100,16 +100,16 @@ const InvoiceListTable = ({
     },
     {
       Header: 'Invoice Type',
-      accessor: 'invoiceType',
+      accessor: 'invoiceTypeCode',
       Cell: row => (
         <Tooltip
           theme="transparent"
           delay="150"
           duration="250"
           hideDelay="50"
-          title={row.original.invoiceType}
+          title={row.original.invoiceTypeCode}
         >
-          {row.original.invoiceType}
+          {row.original.invoiceTypeCode}
         </Tooltip>
       ),
     },
@@ -120,7 +120,7 @@ const InvoiceListTable = ({
     },
     {
       Header: 'Vendor',
-      accessor: 'vendor',
+      accessor: 'partyCode',
     },
     {
       Header: 'Vendor invoice number',
@@ -154,20 +154,9 @@ const InvoiceListTable = ({
 
   const onFetchHandler = (state) => {
     const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-    const sortKeyParser = (key) => {
-      // Property is named invoiceTypeCode, but in marshaller was renamed to invoiceType
-      // so to sort it, we need to parse it again to invoiceTypeCode,
-      // as it is property of InvoiceList
-      const keyMap = {
-        invoiceType: 'invoiceTypeCode',
-        vendor: 'partyCode',
-      };
-      // TODO: Replace with ?? as soon as it is added
-      return keyMap[key] ? keyMap[key] : key;
-    };
     const sortingParams = state.sorted.length > 0 ?
       {
-        sort: sortKeyParser(state.sorted[0].id),
+        sort: state.sorted[0].id,
         order: state.sorted[0].desc ? 'desc' : 'asc',
       } :
       {
