@@ -118,7 +118,7 @@ const InvoiceListTable = ({
       Header: 'Invoice Number',
       accessor: 'invoiceNumber',
       sortable: false,
-      Cell: row => (<TableCell link={`/openboxes/invoice/show/${row.original.id}`} />),
+      Cell: row => <TableCell {...row} link={`/openboxes/invoice/show/${row.original.id}`} />,
     },
     {
       Header: 'Vendor',

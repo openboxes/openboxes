@@ -102,7 +102,7 @@ const PurchaseOrderListTable = ({
     confirmAlert({
       title: translate('react.default.areYouSure.label', 'Are you sure?'),
       message: translate(
-        'react.purchaseOrder.delete.confim.title.label',
+        'react.purchaseOrder.delete.confirm.title.label',
         'Are you sure you want to delete this purchase order?',
       ),
       buttons: [
@@ -121,7 +121,10 @@ const PurchaseOrderListTable = ({
     apiClient.post(`/openboxes/api/purchaseOrders/${id}/rollback`)
       .then((response) => {
         if (response.status === 200) {
-          Alert.success(translate('react.purchaseOrder.rollback.success.label', 'Rollback of order status has been done successfully'));
+          Alert.success(translate(
+            'react.purchaseOrder.rollback.success.label',
+            'Rollback of order status has been done successfully',
+          ));
           fireFetchData();
         }
       });
@@ -129,12 +132,18 @@ const PurchaseOrderListTable = ({
 
   const rollbackHandler = (id) => {
     if (!isUserApprover) {
-      Alert.error(translate('react.default.errors.noPermissions.label', 'You do not have permissions to perform this action'));
+      Alert.error(translate(
+        'react.default.errors.noPermissions.label',
+        'You do not have permissions to perform this action',
+      ));
       return;
     }
     const order = ordersData.find(ord => ord.id === id);
     if (order && order.shipmentsCount > 0) {
-      Alert.error(translate('react.purchaseOrder.rollback.error.label', 'Cannot rollback order with associated shipments'));
+      Alert.error(translate(
+        'react.purchaseOrder.rollback.error.label',
+        'Cannot rollback order with associated shipments',
+      ));
       return;
     }
     confirmAlert({
@@ -168,47 +177,10 @@ const PurchaseOrderListTable = ({
     Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
   };
 
-  const getStatusTooltip = (status) => {
-    switch (status) {
-      case 'PENDING':
-        return translate(
-          'react.purchaseOrder.status.pending.description.label',
-          'This Purchase Order is in progress and has not been finalized.',
-        );
-      case 'PLACED':
-        return translate(
-          'react.purchaseOrder.status.placed.description.label',
-          'This Purchase Order has been finalized and submitted.',
-        );
-      case 'PARTIALLY_RECEIVED':
-        return translate(
-          'react.purchaseOrder.status.receiving.description.label',
-          'Part of this order has been received. Other shipments with items from this order are yet to be received.',
-        );
-      case 'SHIPPED':
-        return translate(
-          'react.purchaseOrder.status.shipped.description.label',
-          'At least one item on this PO has been shipped out.',
-        );
-      case 'PARTIALLY_SHIPPED':
-        return translate(
-          'react.purchaseOrder.status.shipped.description.label',
-          'At least one item on this PO has been shipped out.',
-        );
-      case 'RECEIVED':
-        return translate(
-          'react.purchaseOrder.status.received.description.label',
-          'This order has been received by the receiver.',
-        );
-      case 'COMPLETED':
-        return translate(
-          'react.purchaseOrder.status.completed.description.label',
-          'This order has been shipped and received. Related purchase invoices have been posted.',
-        );
-      default:
-        return status;
-    }
-  };
+  const getStatusTooltip = status => translate(
+    `react.purchaseOrder.status.${status.toLowerCase()}.description.label`,
+    status.toLowerCase(),
+  );
 
   // List of all actions for PO rows
   const actions = [
@@ -313,9 +285,8 @@ const PurchaseOrderListTable = ({
       headerClassName: 'header',
       fixed: 'left',
       width: 160,
-      tooltip: true,
       Cell: row => (
-        <TableCell {...row} tooltipLabel={getStatusTooltip(row.original.status)}>
+        <TableCell {...row} tooltip tooltipLabel={getStatusTooltip(row.original.status)}>
           <PurchaseOrderStatus status={row.original.status} />
         </TableCell>),
     },
@@ -324,30 +295,26 @@ const PurchaseOrderListTable = ({
       accessor: 'orderNumber',
       fixed: 'left',
       width: 150,
-      link: '/openboxes/order/show/:id',
-      Cell: TableCell,
+      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
     },
     {
       Header: 'Name',
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      link: '/openboxes/order/show/:id',
-      Cell: TableCell,
+      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
     },
     {
       Header: 'Supplier',
       accessor: 'origin',
       minWidth: 300,
-      tooltip: true,
-      Cell: TableCell,
+      Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Destination',
       accessor: 'destination',
       minWidth: 300,
-      tooltip: true,
-      Cell: TableCell,
+      Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Ordered On',
@@ -359,8 +326,7 @@ const PurchaseOrderListTable = ({
       accessor: 'orderedBy',
       headerClassName: 'text-left',
       minWidth: 150,
-      tooltip: true,
-      Cell: TableCell,
+      Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Line Items',
