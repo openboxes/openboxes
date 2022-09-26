@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import DataTable from 'components/DataTable';
+import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import ActionDots from 'utils/ActionDots';
@@ -51,6 +51,7 @@ const PurchaseOrderListTable = ({
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState(-1);
+  const [totalData, setTotalData] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0.0);
   // Stored searching params for export case
   const [currentParams, setCurrentParams] = useState({});
@@ -80,7 +81,6 @@ const PurchaseOrderListTable = ({
       });
   };
 
-
   const deleteOrder = (id) => {
     showTheSpinner();
     apiClient.delete(`/openboxes/api/purchaseOrders/${id}`)
@@ -102,7 +102,7 @@ const PurchaseOrderListTable = ({
     confirmAlert({
       title: translate('react.default.areYouSure.label', 'Are you sure?'),
       message: translate(
-        'react.purchaseOrder.delete.confim.title.label',
+        'react.purchaseOrder.delete.confirm.title.label',
         'Are you sure you want to delete this purchase order?',
       ),
       buttons: [
@@ -121,7 +121,10 @@ const PurchaseOrderListTable = ({
     apiClient.post(`/openboxes/api/purchaseOrders/${id}/rollback`)
       .then((response) => {
         if (response.status === 200) {
-          Alert.success(translate('react.purchaseOrder.rollback.success.label', 'Rollback of order status has been done successfully'));
+          Alert.success(translate(
+            'react.purchaseOrder.rollback.success.label',
+            'Rollback of order status has been done successfully',
+          ));
           fireFetchData();
         }
       });
@@ -129,12 +132,18 @@ const PurchaseOrderListTable = ({
 
   const rollbackHandler = (id) => {
     if (!isUserApprover) {
-      Alert.error(translate('react.default.errors.noPermissions.label', 'You do not have permissions to perform this action'));
+      Alert.error(translate(
+        'react.default.errors.noPermissions.label',
+        'You do not have permissions to perform this action',
+      ));
       return;
     }
     const order = ordersData.find(ord => ord.id === id);
     if (order && order.shipmentsCount > 0) {
-      Alert.error(translate('react.purchaseOrder.rollback.error.label', 'Cannot rollback order with associated shipments'));
+      Alert.error(translate(
+        'react.purchaseOrder.rollback.error.label',
+        'Cannot rollback order with associated shipments',
+      ));
       return;
     }
     confirmAlert({
@@ -168,6 +177,10 @@ const PurchaseOrderListTable = ({
     Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
   };
 
+  const getStatusTooltip = status => translate(
+    `react.purchaseOrder.status.${status.toLowerCase()}.description.label`,
+    status.toLowerCase(),
+  );
 
   // List of all actions for PO rows
   const actions = [
@@ -271,50 +284,49 @@ const PurchaseOrderListTable = ({
       className: 'active-circle',
       headerClassName: 'header',
       fixed: 'left',
-      maxWidth: 100,
-      Cell: row => (<PurchaseOrderStatus status={row.original.status} />),
+      width: 160,
+      Cell: row => (
+        <TableCell {...row} tooltip tooltipLabel={getStatusTooltip(row.original.status)}>
+          <PurchaseOrderStatus status={row.original.status} />
+        </TableCell>),
     },
     {
       Header: 'Order Number',
       accessor: 'orderNumber',
       fixed: 'left',
       width: 150,
-      Cell: row => (
-        <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.orderNumber}</a>
-      ),
+      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
     },
     {
       Header: 'Name',
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => (
-        <a href={`/openboxes/order/show/${row.original.id}`}>{row.original.name}</a>
-      ),
+      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
     },
     {
       Header: 'Supplier',
       accessor: 'origin',
       minWidth: 300,
+      Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Destination',
       accessor: 'destination',
       minWidth: 300,
+      Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Ordered On',
       accessor: 'dateOrdered',
       minWidth: 120,
-      Cell: row => (
-        <span>{row.original.dateOrdered}</span>
-      ),
     },
     {
       Header: 'Ordered By',
       accessor: 'orderedBy',
       headerClassName: 'text-left',
-      minWidth: 120,
+      minWidth: 150,
+      Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Line Items',
@@ -428,6 +440,7 @@ const PurchaseOrderListTable = ({
       .then((res) => {
         setLoading(false);
         setPages(Math.ceil(res.data.totalCount / state.pageSize));
+        setTotalData(res.data.totalCount);
         setOrdersData(res.data.data);
         setTotalPrice(res.data.totalPrice);
         // Store currently used params for export case
@@ -484,8 +497,8 @@ const PurchaseOrderListTable = ({
         loading={loading}
         defaultPageSize={10}
         pages={pages}
+        totalData={totalData}
         onFetchData={onFetchHandler}
-        className="mb-1"
         noDataText="No orders match the given criteria"
         footerComponent={() => (
           <span className="title-text p-1 d-flex flex-1 justify-content-end">

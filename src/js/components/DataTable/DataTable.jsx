@@ -17,7 +17,7 @@ const ReactTableFixedColumns = withFixedColumns(ReactTable);
 
 const DataTable = React.forwardRef((props, ref) => {
   const {
-    data, footerComponent, headerComponent, columns, className,
+    data, footerComponent, headerComponent, columns, className, totalData,
   } = props;
 
   const PaginationComponent = paginationProps => (
@@ -27,7 +27,7 @@ const DataTable = React.forwardRef((props, ref) => {
         {footerComponent()}
       </div>
       )}
-      {data.length > 0 && <TablePagination {...paginationProps} /> }
+      {data.length > 0 && <TablePagination{...paginationProps} totalData={totalData} /> }
     </React.Fragment>);
 
   return (
@@ -56,6 +56,7 @@ DataTable.defaultProps = {
   sortable: false,
   resizable: false,
   className: '',
+  totalData: undefined,
 };
 
 DataTable.propTypes = {
@@ -65,6 +66,7 @@ DataTable.propTypes = {
   sortable: PropTypes.bool,
   resizable: PropTypes.bool,
   className: PropTypes.string,
+  totalData: PropTypes.number,
 };
 
 
