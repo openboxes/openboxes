@@ -955,17 +955,32 @@ div.search-input:focus-within {
 }
 
 // Custom buttons
-.primary-button {
-  border: none;
+%btn {
+
+
+  &:focus {
+
+  }
+}
+%button-base {
+  height: 36px;
   padding: 8px 16px;
-  background-color: var(--blue-primary);
-  border-radius: 4px;
-  color: #FFFFFF;
-  font-size: 14px;
   font-weight: 500;
+  font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.02em;
-  height: 36px;
+  border-radius: 4px;
+  border: none;
+  &:focus {
+    outline: none;
+  }
+}
+
+.primary-button {
+  @extend %button-base;
+
+  background-color: var(--blue-primary);
+  color: #FFFFFF;
 
   &:hover {
     background-color: var(--blue-500);
@@ -976,55 +991,32 @@ div.search-input:focus-within {
     box-shadow: 0 0 0 4px rgba(1, 178, 237, 0.36);
   }
 
-  &:focus {
-    outline: none;
-  }
-
   &:disabled {
     background-color: var(--blue-400) !important;
   }
 }
 
 .transparent-button {
-  height: 36px;
-  padding: 8px 16px;
+  @extend %button-base;
+
   background-color: transparent;
   border: none;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0.02em;
   color: var(--blue-700);
 
   &:hover {
     background-color: var(--blue-200);
-    border-radius: 4px;
     color: var(--blue-primary);
-  }
-
-  &:focus {
-    outline: none;
   }
 }
 
 .secondary-button {
-  padding: 4px 8px;
+  @extend %button-base;
+
   background-color: var(--blue-100);
-  height: 28px;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0.02em;
   color: var(--gray-600);
-  border-radius: 2px;
-  border: none;
 
   &:hover {
     color: var(--blue-500);
-  }
-
-  &:focus {
-    outline: none;
   }
 
   &:active {
@@ -1033,16 +1025,11 @@ div.search-input:focus-within {
 }
 
 .primary-outline-button {
-  padding: 8px 16px;
+  @extend %button-base;
+
   background-color: white;
-  border-radius: 4px;
   color: var(--blue-primary);
   border: solid 1px var(--blue-primary);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  letter-spacing: 0.02em;
-  height: 36px;
 
   &:hover, &:active  {
     color: var(--blue-primary);
@@ -1053,15 +1040,11 @@ div.search-input:focus-within {
     box-shadow: 0 0 0 4px rgba(1, 178, 237, 0.36);
   }
 
-  &:focus {
-    outline: none;
-  }
-
   &:disabled {
-    background-color: var(--blue-400) !important;
+    background-color: var(--blue-300) !important;
+    color: var(--blue-400) !important;
   }
 }
-
 
 // Status circles styling
 .status-circle {
