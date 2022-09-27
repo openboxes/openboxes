@@ -162,13 +162,6 @@ configurations {
                     details.useVersion(logbackVersion)
                 }
 
-                if (details.requested.group == 'com.h2database') {
-                    if (details.requested.name == 'h2') {
-                        details.because 'ensure security patches are consistently applied'
-                        details.useVersion(h2DatabaseVersion)
-                    }
-                }
-
                 if (details.requested.group.startsWith('com.fasterxml.jackson')) {
                     details.because 'enforce consistent Jackson versioning'
                     if (details.requested.name == 'jackson-databind') {
@@ -255,8 +248,6 @@ configurations {
             force 'commons-validator:commons-validator:1.7'  // security patch
             force 'jline:jline:2.14.6'  // use consistent version
             force 'org.antlr:antlr-runtime:3.5.3'  // use consistent version
-            force 'org.apache.ant:ant:1.10.12'  // security patch
-            force 'org.apache.ant:ant-launcher:1.10.12'  // security patch
             force 'org.apache.commons:commons-lang3:3.12.0'  // security patch
             force 'org.apache.commons:commons-text:1.9'  // use consistent version
             force 'org.apache.xmlbeans:xmlbeans:3.1.0'  // security patch, build fixes
@@ -505,6 +496,16 @@ dependencies {
     // prevent java.lang.ClassNotFoundException for a few classes we don't directly consume
     implementation 'org.grails.plugins:async'
 
+    // FIXME replace with com.google.zxing
+    implementation('org.grails.plugins:barcode4j:0.3') {
+        /*
+         * Old; relocated to `org.apache.avalon.framework`, which we
+         * pull in transitively via `org.apache.xmlgraphics:fop`.
+         */
+        exclude group: 'avalon-framework'
+        exclude group: 'org.apache.ant'  // not needed for gradle builds
+    }
+
     /*
      * Enable userAgentIdentService.isMobile() and <browser:is*> tags.
      *
@@ -516,13 +517,17 @@ dependencies {
     implementation 'org.grails.plugins:cache'
 
     // enable `grails test-app -coverage`
-    testImplementation 'org.grails.plugins:code-coverage:2.0.3-3'
+    testImplementation('org.grails.plugins:code-coverage:2.0.3-3') {
+        exclude group: 'org.apache.ant'  // not needed for gradle builds
+    }
 
     // FIXME use commons-csv instead
     implementation 'org.grails.plugins:csv:1.0.1'
 
     // enable liquibase migrations
-    compile "org.grails.plugins:database-migration:${databaseMigrationVersion}"
+    compile("org.grails.plugins:database-migration:${databaseMigrationVersion}") {
+        exclude group: 'com.h2database', module: 'h2'
+    }
 
     // FIXME use commons-csv instead
     implementation 'org.grails.plugins:excel-import:3.0.2'
@@ -540,7 +545,9 @@ dependencies {
     compile 'org.grails.plugins:gsp'
 
     // prevent `No GORM implementations configured. Ensure GORM has been initialized correctly`
-    compile "org.grails.plugins:hibernate5:${gormVersion-'.RELEASE'}"
+    compile("org.grails.plugins:hibernate5:${gormVersion-'.RELEASE'}") {
+        exclude group: 'com.h2database', module: 'h2'
+    }
 
     // use a release optimized for Grails 3.3.x for this `excel-import` sub-dependency
     implementation 'org.grails.plugins:joda-time:2.1.0'
