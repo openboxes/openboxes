@@ -443,17 +443,9 @@ const PurchaseOrderListTable = ({
         setOrdersData(res.data.data);
         setTotalPrice(res.data.totalPrice);
         // Store currently used params for export case
-        setCurrentParams({
-          offset: `${offset}`,
-          max: `${state.pageSize}`,
-          ...sortingParams,
-          ..._.omit(filterParams, 'status'),
-          status: statusParam,
-          destination: destinationParam(),
-          destinationParty: destinationPartyParam(),
-        });
+        setCurrentParams(params);
       })
-      .catch(() => Promise.reject(new Error(this.props.translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
+      .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
   };
 
   return (
