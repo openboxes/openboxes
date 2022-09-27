@@ -297,6 +297,7 @@ springBoot {
 
 war {
     archiveName = 'openboxes.war'
+    zip64 = true
 }
 
 dependencies {
