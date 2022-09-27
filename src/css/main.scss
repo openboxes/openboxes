@@ -884,9 +884,6 @@ div.crossed-out .table-inner-row:before {
   }
 }
 
-.filter-element-container {
-  min-width: 150px;
-}
 
 // Tooltip style
 .custom-tooltip {
@@ -1035,6 +1032,36 @@ div.search-input:focus-within {
   }
 }
 
+.primary-outline-button {
+  padding: 8px 16px;
+  background-color: white;
+  border-radius: 4px;
+  color: var(--blue-primary);
+  border: solid 1px var(--blue-primary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  height: 36px;
+
+  &:hover, &:active  {
+    color: var(--blue-primary);
+    background: var(--blue-100);
+  }
+
+  &:active {
+    box-shadow: 0 0 0 4px rgba(1, 178, 237, 0.36);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: var(--blue-400) !important;
+  }
+}
+
 
 // Status circles styling
 .status-circle {
@@ -1115,6 +1142,10 @@ div.search-input:focus-within {
       font-size: 18px;
       line-height: 22px;
       color: var(--blue-800);
+    }
+
+    a:hover {
+      text-decoration: none;
     }
   }
 

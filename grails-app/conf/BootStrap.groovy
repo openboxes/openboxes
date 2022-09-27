@@ -260,7 +260,7 @@ class BootStrap {
                 unitOfMeasure       : product.unitOfMeasure,
                 pricePerUnit        : product.pricePerUnit,
                 dateCreated         : product.dateCreated,
-                lastUpdated         : product.lastUpdated,
+                lastUpdated         : product.lastUpdated.format("MMM dd, yyyy"),
                 updatedBy           : product.updatedBy?.name,
                 color               : product.color,
                 handlingIcons       : product.handlingIcons,

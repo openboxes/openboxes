@@ -10,7 +10,6 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
@@ -27,8 +26,9 @@ const InvoiceListTable = ({
   supportedActivities,
   highestRole,
   invoiceStatuses,
+  translate,
 }) => {
-  const [ordersData, setOrdersData] = useState([]);
+  const [invoiceData, setInvoiceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState(-1);
   const [totalData, setTotalData] = useState(0);
@@ -169,9 +169,9 @@ const InvoiceListTable = ({
         setLoading(false);
         setPages(Math.ceil(res.data.totalCount / state.pageSize));
         setTotalData(res.data.totalCount);
-        setOrdersData(res.data.data);
+        setInvoiceData(res.data.data);
       })
-      .catch(() => Promise.reject(new Error(this.props.translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
+      .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Could not fetch list of invoices'))));
   };
 
 
@@ -187,7 +187,7 @@ const InvoiceListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={ordersData}
+        data={invoiceData}
         loading={loading}
         totalData={totalData}
         defaultPageSize={10}
@@ -221,4 +221,5 @@ InvoiceListTable.propTypes = {
     label: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
   })).isRequired,
+  translate: PropTypes.func.isRequired,
 };

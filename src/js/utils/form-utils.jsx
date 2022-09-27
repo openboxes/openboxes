@@ -60,7 +60,7 @@ export const renderFormFields = ({
 
   return (
     <div className={`${!filterElement ? 'mt-2' : ''} ${className}`}>
-      <div className={`${filterElement ? 'd-flex flex-wrap' : 'row'}`}>
+      <div className={`${filterElement ? 'd-flex flex-wrap flex-1' : 'row'}`}>
         {
           typeof FieldLabel === 'string' ?
             <label htmlFor={attr.id} className={`${!filterElement ? 'col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right' : ''}`}>

@@ -131,8 +131,14 @@ const AsyncPurchaseOrderList = Loadable({
   loading: Loading,
 });
 
+
 const AsyncStockList = Loadable({
   loader: () => import('components/stock-list/StockList'),
+  loading: Loading,
+})
+
+const AsyncProductsList = Loadable({
+  loader: () => import('components/products/ProductsList'),
   loading: Loading,
 });
 
@@ -172,6 +178,7 @@ const Router = (props) => {
           </Route>
           <MainLayoutRoute path="/**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
           <MainLayoutRoute path="/**/requisitionTemplate/list" component={AsyncStockList} />
+          <MainLayoutRoute path="/**/product/list" component={AsyncProductsList} />
           <MainLayoutRoute path="/**/dashboard/:configId?" component={Dashboard} />
           <MainLayoutRoute path="/**/" component={Dashboard} />
         </Switch>
