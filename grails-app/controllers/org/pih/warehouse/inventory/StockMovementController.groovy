@@ -129,9 +129,8 @@ class StockMovementController {
     }
 
     def list = {
-
-        def max = params.max ? params.max as int : 10
-        def offset = params.offset ? params.offset as int : 0
+        params.max = params.max ? params.max as int : 10
+        params.offset = params.offset ? params.offset as int : 0
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         Location currentLocation = Location.get(session?.warehouse?.id)
@@ -162,8 +161,8 @@ class StockMovementController {
         }
 
         if (params.format) {
-            max = null
-            offset = null
+            params.max = null
+            params.offset = null
         }
 
         // Discard the requisition so it does not get saved at the end of the request
@@ -193,7 +192,7 @@ class StockMovementController {
         def stockMovements
 
         try {
-            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, createdAfter: createdAfter, createdBefore: createdBefore])
+            stockMovements = stockMovementService.getStockMovements(stockMovement, params)
         } catch(Exception e) {
             flash.message = "${e.message}"
         }
@@ -483,6 +482,7 @@ class StockMovementController {
         render([data: "Data will be imported successfully"] as JSON)
     }
 
+    // TODO: Remove after implementing inbound sm list on the react side
     def exportItems = {
         def shipmentItems = []
         def shipments = shipmentService.getShipmentsByDestination(session.warehouse)
@@ -546,6 +546,7 @@ class StockMovementController {
         }
     }
 
+    // TODO: Remove after implementing outbound sm list on the react side
     def exportPendingRequisitionItems = {
         Location currentLocation = Location.get(session?.warehouse?.id)
 

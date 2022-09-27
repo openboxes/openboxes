@@ -31,6 +31,8 @@ class StocklistApiController {
         Requisition requisition = new Requisition(params)
         requisition.isTemplate = true
         requisition.isPublished = params.isPublished ? params.boolean("isPublished") : true
+        requisition.origin = null // set null to filter with multiple origins
+        requisition.destination = null // set null to filter with multiple destinations
 
         def origins = params.origin ? Location.findAllByIdInList(params.list("origin")) : []
         def destinations = params.destination ? Location.findAllByIdInList(params.list("destination")) : []

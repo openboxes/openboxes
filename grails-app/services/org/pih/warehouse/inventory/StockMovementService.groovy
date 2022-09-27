@@ -365,17 +365,17 @@ class StockMovementService {
             case StockMovementDirection.INBOUND:
                 return getInboundStockMovements(criteria, params)
             default:
-                throw new IllegalArgumentException("Origin and destination cannot be the same")
+                throw new IllegalArgumentException("Missing stock movement direction parameter")
         }
     }
 
-
-    def getInboundStockMovements(Map params = [:]) {
-        return getInboundStockMovements(new StockMovement(), params)
-    }
-
     def getInboundStockMovements(StockMovement criteria, Map params) {
-        def shipments = Shipment.createCriteria().list(max: params.max, offset: params.offset) {
+        def max = params.max ? params.int("max") : null
+        def offset = params.offset ? params.int("offset") : null
+        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+
+        def shipments = Shipment.createCriteria().list(max: max, offset: offset) {
 
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
@@ -410,9 +410,29 @@ class StockMovementService {
             if(params.createdBefore) {
                 le("dateCreated", params.createdBefore)
             }
-            if (params.orderBy == "requisition.dateRequested") {
-                requisition {
-                    order("dateRequested", "desc")
+
+            if (params.sort) {
+                if (params.sort == "destination") {
+                    destination {
+                        order("name", params.order ?: "desc")
+                    }
+                } else if (params.sort == "origin") {
+                    origin {
+                        order("name", params.order ?: "desc")
+                    }
+                } else if (params.sort == "requestedBy") {
+                    requisition {
+                        requestedBy {
+                            order("firstName", params.order ?: "desc")
+                            order("lastName", params.order ?: "desc")
+                        }
+                    }
+                } else if (params.sort == "dateRequested") {
+                    requisition {
+                        order("dateRequested", params.order ?: "desc")
+                    }
+                } else {
+                    order(params.sort, params.order ?: "desc")
                 }
             } else {
                 order("dateCreated", "desc")
