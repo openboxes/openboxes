@@ -14,7 +14,7 @@ const ProductsList = (props) => {
   const [filterParams, setFilterParams] = useState({});
 
   useEffect(() => {
-    props.fetchTranslations(props.locale, 'purchaseOrder');
+    props.fetchTranslations(props.locale, 'productsList');
   }, [props.locale]);
 
   return (

@@ -1,6 +1,5 @@
 import React, { useEffect, useReducer, useRef } from 'react';
 
-import axios from 'axios';
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -36,14 +35,9 @@ const ProductsListTable = ({
   const fireFetchData = () => {
     tableRef.current.fireFetchData();
   };
-  const { CancelToken } = axios;
-  const source = CancelToken.source();
   // If filterParams change, refetch the data with applied filters
   useEffect(() => {
     fireFetchData();
-    return () => {
-      source.cancel('Fetching canceled');
-    };
   }, [filterParams, currentLocation]);
 
   const [state, dispatch] = useReducer(productsListReducer, INITIAL_STATE);
@@ -128,7 +122,6 @@ const ProductsListTable = ({
     apiClient.get('/openboxes/api/products', {
       params,
       paramsSerializer: parameters => queryString.stringify(parameters),
-      cancelToken: source.token,
     })
       .then((res) => {
         dispatch({
