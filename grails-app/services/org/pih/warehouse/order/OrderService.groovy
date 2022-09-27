@@ -116,6 +116,7 @@ class OrderService {
                     } else if (params.sort == 'orderedBy') {
                         orderedBy {
                             order("firstName", params.order ?: 'asc')
+                            order("lastName", params.order ?: 'asc')
                         }
                     } else {
                         order(params.sort, params.order ?: 'asc')

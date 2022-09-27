@@ -247,9 +247,19 @@ class UrlMappings {
             action = [GET: "getPendingRequisitionDetails"]
         }
 
-        "/api/stockMovements/list"{
+        "/api/stockMovements"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [GET: "list"]
+        }
+
+        "/api/stockMovements/shippedItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "shippedItems"]
+        }
+
+        "/api/stockMovements/pendingRequisitionItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "pendingRequisitionItems"]
         }
 
         "/api/stockMovements/$id/updateAdjustedItems"(parseRequest: true) {

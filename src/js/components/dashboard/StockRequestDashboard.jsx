@@ -84,12 +84,13 @@ class StockRequestDashboard extends Component {
   }
 
   fetchStockMovementItems(page, pageSize) {
-    const url = '/openboxes/api/stockMovements/list';
+    const url = '/openboxes/api/stockMovements';
     const params = {
       destination: this.props.currentLocation.id,
       direction: 'INBOUND',
       offset: page * pageSize,
       max: pageSize,
+      sort: 'dateRequested',
     };
 
     this.setState({ isLoading: true });
