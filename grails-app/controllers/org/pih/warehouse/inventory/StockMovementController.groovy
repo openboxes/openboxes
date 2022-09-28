@@ -141,8 +141,8 @@ class StockMovementController {
             params.origin = params.origin ?: currentLocation
             params.destination = params.destination ?: null
         } else if (stockMovementDirection == StockMovementDirection.INBOUND) {
-            params.origin = params.origin ?: null
-            params.destination = params.destination ?: currentLocation
+            render(template: "/common/react", params: params)
+            return
         } else {
             // This is necessary because sometimes we need to infer the direction from the parameters
             if (params.origin?.id == currentLocation?.id && params.destination?.id == currentLocation?.id) {

@@ -273,6 +273,11 @@ class UrlMappings {
             action = [POST: "createCombinedShipments"]
         }
 
+        "/api/stockMovements/shipmentStatusCodes" {
+            controller = "stockMovementApi"
+            action = [GET: "shipmentStatusCodes"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

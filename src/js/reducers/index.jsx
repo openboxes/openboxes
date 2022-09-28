@@ -8,6 +8,7 @@ import organizationsReducer from 'reducers/organizationsReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
 import sessionReducer from 'reducers/sessionReducer';
+import shipmentStatusCodes from 'reducers/shipmentStatusCodes';
 import spinnerReducer from 'reducers/spinnerReducer';
 import usersReducer from 'reducers/usersReducer';
 
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   organizations: organizationsReducer,
   purchaseOrder: purchaseOrderReducer,
   invoices: invoiceReducer,
+  shipmentStatuses: shipmentStatusCodes,
 });
 
 export default rootReducer;

@@ -131,6 +131,7 @@ class StockMovement {
                 locationGroup       : origin?.locationGroup,
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
+                isDepot             : origin?.isDepot(),
             ],
             destination         : [
                 id                  : destination?.id,
@@ -141,6 +142,11 @@ class StockMovement {
                 organizationName    : destination?.organization?.name,
                 organizationCode    : destination?.organization?.code,
             ],
+            order                : [
+                id                  : shipment?.returnOrder?.id,
+                name                : shipment?.returnOrder?.name,
+                orderNumber         : shipment?.returnOrder?.orderNumber
+            ],
             hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
             stocklist           : [
                 id  : stocklist?.id,
@@ -148,10 +154,12 @@ class StockMovement {
             ],
             replenishmentType   : stocklist?.replenishmentTypeCode,
             dateRequested       : dateRequested?.format("MM/dd/yyyy"),
+            dateCreated         : dateCreated?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
             expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
             shipmentType        : shipmentType,
-            shipmentStatus      : currentStatus,
+            currentStatus       : currentStatus,
+            shipmentStatus      : shipment?.status?.name,
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
@@ -170,6 +178,8 @@ class StockMovement {
             isReturn            : isReturn,
             isShipped           : isShipped,
             isReceived          : isReceived,
+            isElectronicType    : electronicType,
+            isPending           : pending,
             shipped             : isShipped,
             received            : isReceived,
             requestType         : requestType,

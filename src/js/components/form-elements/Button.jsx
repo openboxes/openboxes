@@ -36,7 +36,12 @@ Button.propTypes = {
   defaultLabel: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   type: PropTypes.string,
-  variant: PropTypes.string,
+  variant: PropTypes.oneOf([
+    'primary',
+    'secondary',
+    'transparent',
+    'primary-outline',
+  ]),
   onClick: PropTypes.func,
   EndIcon: PropTypes.element,
   isDropdown: PropTypes.bool,
