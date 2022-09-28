@@ -1,9 +1,10 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { ClimbingBoxLoader } from 'react-spinners';
 
@@ -142,6 +143,21 @@ const AsyncProductsList = Loadable({
   loading: Loading,
 });
 
+const AsyncStockMovementInboundList = Loadable({
+  loader: () => import('components/stock-movement/inbound/StockMovementInboundList'),
+  loading: Loading,
+});
+
+const StockMovementList = (props) => {
+  const parsedSearchQuery = queryString.parse(props?.location?.search);
+  switch (parsedSearchQuery?.direction) {
+    case 'INBOUND':
+      return <AsyncStockMovementInboundList {...props} />;
+    default:
+      return <Redirect to="/openboxes/" />;
+  }
+};
+
 const Router = (props) => {
   const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
     ? AsyncStockRequestDashboard
@@ -152,6 +168,7 @@ const Router = (props) => {
       <BrowserRouter>
         <Switch>
           <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
+          <MainLayoutRoute path="/**/stockMovement/list" component={StockMovementList} />
           <MainLayoutRoute path="/**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
           <MainLayoutRoute path="/**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
           <MainLayoutRoute path="/**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />

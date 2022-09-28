@@ -21,6 +21,7 @@ const FilterForm = ({
   defaultValues,
   allowEmptySubmit,
   hidden,
+  onClear,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -47,6 +48,14 @@ const FilterForm = ({
       }).length);
   };
 
+  const onClearHandler = (form) => {
+    if (onClear && typeof onClear === 'function') {
+      onClear(form);
+      return;
+    }
+    form.reset(initialValues);
+  };
+
   return (
     <div className="filter-form">
       <Form
@@ -70,7 +79,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
-                      onClick={() => form.reset(initialValues)}
+                      onClick={() => onClearHandler(form)}
                       variant="transparent"
                       type="submit"
                     />
@@ -104,6 +113,7 @@ export default FilterForm;
 FilterForm.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onClear: PropTypes.func,
   searchFieldPlaceholder: PropTypes.string,
   formProps: PropTypes.shape({}),
   searchFieldId: PropTypes.string,
@@ -117,6 +127,7 @@ FilterForm.defaultProps = {
   searchFieldId: 'searchTerm',
   formProps: {},
   defaultValues: {},
+  onClear: undefined,
   allowEmptySubmit: false,
   hidden: true,
 };
