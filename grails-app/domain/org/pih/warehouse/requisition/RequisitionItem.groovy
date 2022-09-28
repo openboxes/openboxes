@@ -21,6 +21,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.shipping.ShipmentItem
 
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
@@ -217,6 +218,15 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             quantityCanceled = 0
             cancelComments = null
             cancelReasonCode = null
+
+            // remove any dangling references from ShipmentItem, OBS-1269
+            requisitionItems.each {
+                it.shipmentItems.each { ShipmentItem si ->
+                    if (si.requisitionItem) {
+                        si.requisitionItem = null
+                    }
+                }
+            }
 
             if (substitutionItem) {
                 removeFromRequisitionItems(substitutionItem)
@@ -680,7 +690,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         }
     }
 
-    def getShipmentItems() {
+    Collection<ShipmentItem> getShipmentItems() {
         return requisition?.shipment?.shipmentItems?.findAll { it.requisitionItem?.id == id }?.flatten()
     }
 
