@@ -448,6 +448,11 @@ class UrlMappings {
 
         // Stock Transfer API
 
+        "/api/stockTransfers/statusOptions"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [GET: "statusOptions"]
+        }
+
         "/api/stockTransfers/candidates"(parseRequest: true) {
             controller = { "stockTransferApi" }
             action = [GET: "stockTransferCandidates", POST: "returnCandidates"]

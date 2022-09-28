@@ -41,9 +41,22 @@ class StockTransferService {
 
     boolean transactional = true
 
-    def getStockTransfers(Order orderTemplate, Date lastUpdatedStartDate, Date lastUpdatedEndDate, Map params) {
-        def orders = Order.createCriteria().list(params) {
+    /**
+     * Gets paginated list of stock transfers (Orders with TRANSFER_ORDER type)
+     * */
+    def getStockTransfers(Map params) {
+        // Parse date parameters
+        Date lastUpdatedStartDate = params.lastUpdatedStartDate ? Date.parse("MM/dd/yyyy", params.lastUpdatedStartDate) : null
+        Date lastUpdatedEndDate = params.lastUpdatedEndDate ? Date.parse("MM/dd/yyyy", params.lastUpdatedEndDate) : null
+
+        // Parse pagination parameters
+        def max = params.max ? params.int("max") : 10
+        def offset = params.offset ? params.int("offset") : 0
+
+        def orders = Order.createCriteria().list(max: max, offset: offset) {
             and {
+                eq("orderType", OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
+
                 if (params.q) {
                     or {
                         ilike("name", "%" + params.q + "%")
@@ -51,17 +64,12 @@ class StockTransferService {
                         ilike("orderNumber", "%" + params.q + "%")
                     }
                 }
-                if (orderTemplate.orderType) {
-                    eq("orderType", orderTemplate.orderType)
+                if (params.location) {
+                    eq("origin.id", params.location)
+                    eq("destination.id", params.location)
                 }
-                if (orderTemplate.destination) {
-                    eq("destination", orderTemplate.destination)
-                }
-                if (orderTemplate.origin) {
-                    eq("origin", orderTemplate.origin)
-                }
-                if (orderTemplate.status) {
-                    eq("status", orderTemplate.status)
+                if (params.status) {
+                    'in'("status", params.list("status") as OrderStatus[])
                 }
                 if (lastUpdatedStartDate) {
                     ge("lastUpdated", lastUpdatedStartDate)
@@ -69,14 +77,26 @@ class StockTransferService {
                 if (lastUpdatedEndDate) {
                     le("lastUpdated", lastUpdatedEndDate)
                 }
-                if (orderTemplate.orderedBy) {
-                    eq("orderedBy", orderTemplate.orderedBy)
+                if (params.orderedBy) {
+                    eq("orderedBy.id", params.orderedBy)
                 }
-                if (orderTemplate.createdBy) {
-                    eq("createdBy", orderTemplate.createdBy)
+                if (params.createdBy) {
+                    eq("createdBy.id", params.createdBy)
                 }
             }
-            order("dateCreated", "desc")
+
+            if (params.sort) {
+                if (params.sort == "createdBy") {
+                    createdBy {
+                        order("firstName", params.order ?: "desc")
+                        order("lastName", params.order ?: "desc")
+                    }
+                } else {
+                    order(params.sort, params.order ?: "desc")
+                }
+            } else {
+                order("dateCreated", "desc")
+            }
         }
         return orders
     }
