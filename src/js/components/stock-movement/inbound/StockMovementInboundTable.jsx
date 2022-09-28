@@ -47,8 +47,8 @@ const StockMovementInboundTable = ({
     if (!isShipmentStatusesFetched) fetchStatuses();
   }, [filterParams]);
 
-  const exportStockList = () => {
-    apiClient.get('/openboxes/api/stocklists', {
+  const exportStockMovements = () => {
+    apiClient.get('/openboxes/api/stockMovements', {
       params: {
         ...currentParams,
         format: 'csv',
@@ -60,6 +60,21 @@ const StockMovementInboundTable = ({
         fileDownload(res.data, filename, 'text/csv');
       });
   };
+
+  const exportAllIncomingItems = () => {
+    apiClient.get('/openboxes/api/stockMovements/shippedItems', {
+      params: {
+        ...currentParams,
+        format: 'csv',
+      },
+      paramsSerializer: params => queryString.stringify(params),
+    })
+      .then((res) => {
+        const filename = res.headers['content-disposition'].split('filename="')[1].split('.')[0];
+        fileDownload(res.data, filename, 'text/csv');
+      });
+  };
+
 
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
@@ -183,12 +198,14 @@ const StockMovementInboundTable = ({
       className: 'text-right',
       headerClassName: 'justify-content-end',
       width: 80,
+      sortable: false,
     },
     {
       Header: 'Status',
       accessor: 'shipmentStatus',
       fixed: 'left',
       width: 150,
+      sortable: false,
       Cell: row => (
         <TableCell
           {...row}
@@ -206,6 +223,7 @@ const StockMovementInboundTable = ({
       accessor: 'identifier',
       fixed: 'left',
       minWidth: 100,
+      sortable: false,
       Cell: row => (
         <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
     },
@@ -220,6 +238,7 @@ const StockMovementInboundTable = ({
       Header: 'Origin',
       accessor: 'origin.name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
@@ -233,18 +252,21 @@ const StockMovementInboundTable = ({
       Header: 'Requested by',
       accessor: 'requestedBy.name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (<TableCell {...row} value={row.value || 'None'} />),
     },
     {
       Header: 'Date Created',
       accessor: 'dateCreated',
       width: 150,
+      sortable: false,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
       Header: 'Expected Receipt Date',
       accessor: 'expectedDeliveryDate',
       width: 200,
+      sortable: false,
       Cell: row =>
         (<TableCell
           {...row}
@@ -269,13 +291,13 @@ const StockMovementInboundTable = ({
           EndIcon={<RiDownload2Line />}
         />
         <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={() => exportStockList(true)} role="button" tabIndex={0}>
+          <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
             <Translate
               id="react.stockMovement.export.label"
               defaultMessage="Export Stock Movements"
             />
           </a>
-          <a className="dropdown-item" onClick={() => exportStockList(false)} href="#">
+          <a className="dropdown-item" onClick={exportAllIncomingItems} href="#">
             <Translate
               id="react.stockMovement.export.allIncomingItems.label"
               defaultMessage="Export all incoming items"
