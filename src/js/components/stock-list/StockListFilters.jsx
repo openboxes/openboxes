@@ -69,6 +69,9 @@ const StockListFilters = ({ setFilterParams }) => {
         filterFields={filterFields}
         onSubmit={values => setFilterParams({ ...values })}
         formProps={{ locations }}
+        allowEmptySubmit
+        searchFieldPlaceholder="Search by stocklist name"
+        hidden={false}
       />
     </div>
   );
