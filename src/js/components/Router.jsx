@@ -135,7 +135,7 @@ const AsyncPurchaseOrderList = Loadable({
 const AsyncStockList = Loadable({
   loader: () => import('components/stock-list/StockList'),
   loading: Loading,
-})
+});
 
 const AsyncProductsList = Loadable({
   loader: () => import('components/products/ProductsList'),
