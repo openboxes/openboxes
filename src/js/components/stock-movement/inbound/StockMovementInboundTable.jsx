@@ -14,13 +14,13 @@ import {
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import Alert from 'react-s-alert';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
-import { hasMinimumRequiredRole } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -29,12 +29,13 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const StockMovementInboundTable = ({
   filterParams,
   translate,
-  highestRole,
   fetchStatuses,
   shipmentStatuses,
   isShipmentStatusesFetched,
   currentLocation,
   history,
+  showTheSpinner,
+  hideTheSpinner,
 }) => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,10 +132,20 @@ const StockMovementInboundTable = ({
   };
 
   const deleteReturnStockMovement = (id) => {
-    apiClient.delete(`/openboxes/stockTransfers/${id}`)
-      .then(res => console.log(res));
+    showTheSpinner();
+    apiClient.delete(`/openboxes/stockMovements/${id}`)
+      .then((res) => {
+        if (res.status === 204) {
+          const successMessage = translate(
+            'react.stockMovement.deleted.success.message.label',
+            'Stock Movement has been deleted successfully',
+          );
+          Alert.success(successMessage);
+          fireFetchData();
+        }
+      })
+      .finally(() => hideTheSpinner());
   };
-
 
   const deleteConfirmAlert = (id) => {
     const confirmButton = {
@@ -147,7 +158,7 @@ const StockMovementInboundTable = ({
     confirmAlert({
       title: translate('react.default.areYouSure.label', 'Are you sure?'),
       message: translate(
-        'react.stockMovement.status.areYouSure.label',
+        'react.stockMovement.areYouSure.label',
         'Are you sure you want to delete this Stock Movement?',
       ),
       buttons: [confirmButton, cancelButton],
@@ -163,7 +174,7 @@ const StockMovementInboundTable = ({
       defaultLabel: 'Show Stock Movement',
       label: 'react.stockMovement.action.show.label',
       leftIcon: <RiInformationLine />,
-      href: '/openboxes/stockMovement/show/',
+      href: '/openboxes/stockMovement/show',
     };
 
     // Edit
@@ -179,7 +190,6 @@ const StockMovementInboundTable = ({
     }
 
     const isSameOrigin = currentLocation.id === row.original.origin?.id;
-    const isAdmin = hasMinimumRequiredRole('Admin', highestRole);
     // Delete
     if (row.original.isPending && (isSameOrigin || !row.original.origin?.isDepot)) {
       actions[2] = {
@@ -187,15 +197,8 @@ const StockMovementInboundTable = ({
         label: 'react.stockMovement.action.delete.label',
         leftIcon: <RiDeleteBinLine />,
         variant: 'danger',
+        onClick: deleteConfirmAlert,
       };
-
-      if (row.original.isReturn && isAdmin) {
-        actions[2].onClick = deleteConfirmAlert;
-      } else if (row.original?.isElectronicType) {
-        actions[2].onClick = () => console.log('remove for electronic type request');
-      } else {
-        actions[2].onClick = () => console.log('remove for others');
-      }
     }
     return actions;
   };
@@ -357,7 +360,6 @@ const StockMovementInboundTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  highestRole: state.session.highestRole,
   shipmentStatuses: state.shipmentStatuses.data,
   isShipmentStatusesFetched: state.shipmentStatuses.fetched,
   currentLocation: state.session.currentLocation,
@@ -367,6 +369,8 @@ const mapDispatchToProps = {
   showSpinner,
   hideSpinner,
   fetchStatuses: fetchShipmentStatusCodes,
+  showTheSpinner: showSpinner,
+  hideTheSpinner: hideSpinner,
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable));
@@ -376,7 +380,8 @@ StockMovementInboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
   fetchStatuses: PropTypes.func.isRequired,
-  highestRole: PropTypes.string.isRequired,
+  showTheSpinner: PropTypes.func.isRequired,
+  hideTheSpinner: PropTypes.func.isRequired,
   isShipmentStatusesFetched: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
