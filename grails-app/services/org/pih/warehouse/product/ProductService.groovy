@@ -271,9 +271,7 @@ class ProductService {
      * @return
      */
     List<Product> getProducts(Category category, List<Tag> tags, boolean includeInactive, Map params) {
-        def categories = []
-        categories << category
-        return getProducts(categories, [], tags, includeInactive, params)
+        return getProducts([category], [], tags, includeInactive, params)
     }
 
     /**
@@ -351,7 +349,20 @@ class ProductService {
                 }
             }
 
-            if (sortColumn) order(sortColumn, sortOrder)
+            if (sortColumn) {
+                if (sortColumn == "category") {
+                    category {
+                        order("name", sortOrder)
+                    }
+                } else if (sortColumn == "updatedBy") {
+                    updatedBy {
+                        order("firstName", sortOrder)
+                        order("lastName", sortOrder)
+                    }
+                } else {
+                    order(sortColumn, sortOrder)
+                }
+            }
         }
 
         return results.unique()
