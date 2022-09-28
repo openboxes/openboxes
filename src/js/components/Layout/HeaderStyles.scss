@@ -116,7 +116,7 @@
 }
 
 .nav-item {
-  a {
+  a, button {
     line-height: 24px;
     color: var(--blue-700) !important;
     font-weight: 500;
@@ -126,6 +126,10 @@
     &:hover {
       background-color: unset !important;
       color: var(--blue-700) !important;
+    }
+
+    &:active, &:focus {
+      outline: none;
     }
   }
 }

@@ -969,6 +969,7 @@ div.search-input:focus-within {
 
   &:hover {
     background-color: var(--blue-500);
+    color: #FFFFFF;
   }
 
   &:active {
@@ -1108,7 +1109,7 @@ div.search-input:focus-within {
   }
 
   .dropdown-menu {
-    a {
+    a, button {
       font-weight: 400;
       font-size: 14px !important;
       line-height: 20px !important;
@@ -1209,22 +1210,22 @@ div.search-input:focus-within {
       border-radius: 4px;
       border: 0 !important;
 
-      a {
+      a, button {
         font-weight: 400;
         font-size: 15px;
         line-height: 32px;
         padding: 0 8px !important;
-      }
 
-      a:hover {
-        background-color: var(--blue-200) !important;
-        border-radius: 4px;
+        &:hover {
+          background-color: var(--blue-200) !important;
+          border-radius: 4px;
+        }
       }
     }
 
     .btn-group {
       .dropdown-menu {
-        a {
+        a, button {
           font-weight: 400;
           font-size: 14px !important;
           line-height: 20px !important;

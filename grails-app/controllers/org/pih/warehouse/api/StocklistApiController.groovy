@@ -94,8 +94,14 @@ class StocklistApiController {
     }
 
     def delete = {
-        stocklistService.deleteStocklist(params.id)
-
+        try {
+            stocklistService.deleteStocklist(params.id)
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            def message = "Requisition $params.id could not be deleted"
+            response.status = 400
+            render([errorMessages: [message]] as JSON)
+            return
+        }
         render status: 204
     }
 

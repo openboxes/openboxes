@@ -46,16 +46,15 @@ const ActionDots = ({
               </a>
             )}
             {action.onClick && (
-              <a
+              <button
                 key={action.label}
-                href="#"
                 onClick={() => action.onClick(id)}
                 className={`d-flex align-items-center gap-8 dropdown-item ${action.variant === 'danger' ? 'font-red-ob' : ''}`}
               >
                 {action.leftIcon && action.leftIcon}
                 {action.label &&
                 <Translate id={action.label} defaultMessage={action.defaultLabel} />}
-              </a>
+              </button>
             )}
           </React.Fragment>
         ))}
