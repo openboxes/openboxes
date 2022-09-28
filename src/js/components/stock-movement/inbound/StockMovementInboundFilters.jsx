@@ -147,7 +147,7 @@ const StockMovementInboundFilters = ({
   isShipmentStatusesFetched,
 }) => {
   const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
-  const fetchLocations = debounceLocationsFetch(debounceTime, minSearchLength);
+  const fetchLocations = debounceLocationsFetch(debounceTime, minSearchLength, [], true);
 
 
   useEffect(() => {

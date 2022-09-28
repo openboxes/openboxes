@@ -5,6 +5,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
+import { confirmAlert } from 'react-confirm-alert';
 import {
   RiDeleteBinLine,
   RiDownload2Line,
@@ -12,12 +13,14 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
+import { hasMinimumRequiredRole } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -26,9 +29,12 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const StockMovementInboundTable = ({
   filterParams,
   translate,
+  highestRole,
   fetchStatuses,
   shipmentStatuses,
   isShipmentStatusesFetched,
+  currentLocation,
+  history,
 }) => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +130,31 @@ const StockMovementInboundTable = ({
       });
   };
 
-  // List of all actions for Stocklists rows
+  const deleteReturnStockMovement = (id) => {
+    apiClient.delete(`/openboxes/stockTransfers/${id}`)
+      .then(res => console.log(res));
+  };
+
+
+  const deleteConfirmAlert = (id) => {
+    const confirmButton = {
+      label: translate('react.default.yes.label', 'Yes'),
+      onClick: () => deleteReturnStockMovement(id),
+    };
+    const cancelButton = {
+      label: translate('react.default.no.label', 'No'),
+    };
+    confirmAlert({
+      title: translate('react.default.areYouSure.label', 'Are you sure?'),
+      message: translate(
+        'react.stockMovement.status.areYouSure.label',
+        'Are you sure you want to delete this Stock Movement?',
+      ),
+      buttons: [confirmButton, cancelButton],
+    });
+  };
+
+  // List of all actions for inbound Stock Movement rows
   const getActions = (row) => {
     const actions = [];
 
@@ -133,12 +163,8 @@ const StockMovementInboundTable = ({
       defaultLabel: 'Show Stock Movement',
       label: 'react.stockMovement.action.show.label',
       leftIcon: <RiInformationLine />,
+      href: '/openboxes/stockMovement/show/',
     };
-    if (row.original.isReturn) {
-      actions[0].href = `/openboxes/return/${row.original.id}}`;
-    } else {
-      actions[0].href = `/openboxes/return/${row.original.id}}`;
-    }
 
     // Edit
     actions[1] = {
@@ -147,26 +173,25 @@ const StockMovementInboundTable = ({
       leftIcon: <RiPencilLine />,
     };
     if (row.original.isReturn) {
-      actions[1].href = `/openboxes/return/${row.original.id}}`;
+      actions[1].onClick = () => history.push(`/openboxes/stockTransfer/createInboundReturn/${row.original.order?.id}`);
     } else {
-      actions[1].href = `/openboxes/return/${row.original.id}}`;
+      actions[1].onClick = () => history.push(`/openboxes/stockMovement/createCombinedShipments/${row.original?.id}`);
     }
 
-    const isPending = true;
-    const isAdmin = true;
-    const isSameOrigin = true;
-    const isDepot = true;
+    const isSameOrigin = currentLocation.id === row.original.origin?.id;
+    const isAdmin = hasMinimumRequiredRole('Admin', highestRole);
     // Delete
-    if (isPending && (isSameOrigin || isDepot)) {
+    if (row.original.isPending && (isSameOrigin || !row.original.origin?.isDepot)) {
       actions[2] = {
         defaultLabel: 'Delete Stock Movement',
         label: 'react.stockMovement.action.delete.label',
         leftIcon: <RiDeleteBinLine />,
         variant: 'danger',
       };
+
       if (row.original.isReturn && isAdmin) {
-        actions[2].onClick = () => console.log('remove for return order');
-      } else if (row.original?.electronicType) {
+        actions[2].onClick = deleteConfirmAlert;
+      } else if (row.original?.isElectronicType) {
         actions[2].onClick = () => console.log('remove for electronic type request');
       } else {
         actions[2].onClick = () => console.log('remove for others');
@@ -232,7 +257,12 @@ const StockMovementInboundTable = ({
       accessor: 'name',
       minWidth: 250,
       Cell: row => (
-        <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} tooltip />),
+        <TableCell
+          {...row}
+          tooltip
+          link={`/openboxes/stockMovement/show/${row.original.id}`}
+          value={row.original.description || row.original.name}
+        />),
     },
     {
       Header: 'Origin',
@@ -327,8 +357,10 @@ const StockMovementInboundTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  highestRole: state.session.highestRole,
   shipmentStatuses: state.shipmentStatuses.data,
   isShipmentStatusesFetched: state.shipmentStatuses.fetched,
+  currentLocation: state.session.currentLocation,
 });
 
 const mapDispatchToProps = {
@@ -337,18 +369,26 @@ const mapDispatchToProps = {
   fetchStatuses: fetchShipmentStatusCodes,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable));
 
 
 StockMovementInboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
   fetchStatuses: PropTypes.func.isRequired,
+  highestRole: PropTypes.string.isRequired,
   isShipmentStatusesFetched: PropTypes.bool.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
   shipmentStatuses: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
+  }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
   }).isRequired,
 };

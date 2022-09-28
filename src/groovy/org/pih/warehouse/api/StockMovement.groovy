@@ -131,6 +131,7 @@ class StockMovement {
                 locationGroup       : origin?.locationGroup,
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
+                isDepot             : origin?.isDepot(),
             ],
             destination         : [
                 id                  : destination?.id,
@@ -140,6 +141,11 @@ class StockMovement {
                 locationGroup       : destination?.locationGroup,
                 organizationName    : destination?.organization?.name,
                 organizationCode    : destination?.organization?.code,
+            ],
+            order                : [
+                id                  : shipment?.returnOrder?.id,
+                name                : shipment?.returnOrder?.name,
+                orderNumber         : shipment?.returnOrder?.orderNumber
             ],
             hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
             stocklist           : [
@@ -172,6 +178,8 @@ class StockMovement {
             isReturn            : isReturn,
             isShipped           : isShipped,
             isReceived          : isReceived,
+            isElectronicType    : electronicType,
+            isPending           : pending,
             shipped             : isShipped,
             received            : isReceived,
             requestType         : requestType,
