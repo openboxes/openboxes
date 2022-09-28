@@ -496,4 +496,22 @@ class Order implements Serializable {
         ]
     }
 
+    Map toJson(OrderTypeCode orderTypeCode) {
+        switch (orderTypeCode) {
+            case OrderTypeCode.TRANSFER_ORDER:
+                return [
+                    id              : id,
+                    status          : status?.name(),
+                    orderNumber     : orderNumber,
+                    name            : name,
+                    createdBy       : createdBy?.name,
+                    dateCreated     : dateCreated?.format("dd/MMM/yyyy"),
+                    origin          : origin?.name,
+                    destination     : destination?.name,
+                    orderItemsCount : orderItems?.size(),
+                ]
+            default:
+                return toJson()
+        }
+    }
 }
