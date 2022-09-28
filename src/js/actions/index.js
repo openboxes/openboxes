@@ -18,7 +18,7 @@ import {
   FETCH_ORGANIZATIONS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
-  FETCH_SESSION_INFO,
+  FETCH_SESSION_INFO, FETCH_SHIPMENT_STATUS_CODES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
   HIDE_SPINNER,
@@ -512,6 +512,17 @@ export function fetchInvoiceTypeCodes() {
     apiClient.get('/openboxes/api/invoiceTypeCodes').then((res) => {
       dispatch({
         type: FETCH_INVOICE_TYPE_CODES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchShipmentStatusCodes() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes').then((res) => {
+      dispatch({
+        type: FETCH_SHIPMENT_STATUS_CODES,
         payload: res.data.data,
       });
     });

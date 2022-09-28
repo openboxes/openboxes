@@ -38,8 +38,12 @@ export const renderFormFields = ({
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
-  const { filterElement } = attr;
-  const className = `${!filterElement ? 'mb-0 mx-1 form-group' : 'filter-group'} ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched || showError) && error ? 'has-error' : ''}`;
+  const { filterElement, className: supplementClass } = attr;
+  const filterElementClass = filterElement ? 'filter-group' : 'mb-0 mx-1 form-group';
+  const requiredClass = required ? 'required' : '';
+  const hiddenClass = hidden ? 'd-none' : '';
+  const hasErrorClass = (touched || fieldTouched || showError) && error ? 'has-error' : '';
+  const className = [supplementClass, filterElementClass, requiredClass, hiddenClass, hasErrorClass].join(' ');
 
   if (arrayField) {
     return (
