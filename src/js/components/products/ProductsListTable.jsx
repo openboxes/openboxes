@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
@@ -10,15 +10,12 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
-import { FETCH_PRODUCTS_FAIL, FETCH_PRODUCTS_START, FETCH_PRODUCTS_SUCCESS } from 'components/products/actions/types';
-import productsListReducer from 'components/products/reducers/productsListReducer';
 import apiClient from 'utils/apiClient';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 const INITIAL_STATE = {
   productsData: [],
-  loading: false,
   pages: -1,
   totalCount: 0,
   currentParams: {},
@@ -40,7 +37,8 @@ const ProductsListTable = ({
     fireFetchData();
   }, [filterParams, currentLocation]);
 
-  const [state, dispatch] = useReducer(productsListReducer, INITIAL_STATE);
+  const [loading, setLoading] = useState(false);
+  const [tableData, setTableData] = useState(INITIAL_STATE);
 
 
   // Columns for react-table
@@ -68,8 +66,8 @@ const ProductsListTable = ({
     {
       Header: 'Name',
       accessor: 'name',
-      className: 'active-circle d-flex justify-content-center',
-      headerClassName: 'header justify-content-center',
+      className: 'active-circle',
+      headerClassName: 'header',
       Cell: row => <TableCell {...row} tooltip link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`} />,
       minWidth: 200,
     },
@@ -118,24 +116,22 @@ const ProductsListTable = ({
     });
 
     // Fetch data
-    dispatch({ type: FETCH_PRODUCTS_START });
+    setLoading(true);
     apiClient.get('/openboxes/api/products', {
       params,
       paramsSerializer: parameters => queryString.stringify(parameters),
     })
       .then((res) => {
-        dispatch({
-          type: FETCH_PRODUCTS_SUCCESS,
-          payload: {
-            productsData: res.data.data,
-            totalCount: res.data.totalCount,
-            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-            currentParams: params,
-          },
+        setTableData({
+          productsData: res.data.data,
+          totalCount: res.data.totalCount,
+          pages: Math.ceil(res.data.totalCount / tableState.pageSize),
+          currentParams: params,
         });
+        setLoading(false);
       })
       .catch(() => {
-        dispatch({ type: FETCH_PRODUCTS_FAIL });
+        setLoading(false);
         return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Could not fetch list of products')));
       });
   };
@@ -149,7 +145,7 @@ const ProductsListTable = ({
         return { format: 'csv', includeAttributes: true };
       }
       return {
-        ..._.omit(state.currentParams, ['offset', 'max']),
+        ..._.omit(tableData.currentParams, ['offset', 'max']),
         format: 'csv',
       };
     };
@@ -173,7 +169,7 @@ const ProductsListTable = ({
         <span>
           <Translate id="react.productsList.header.label" defaultMessage="Product list" />
           &nbsp;
-          ({state.totalCount})
+          ({tableData.totalCount})
         </span>
         <div className="btn-group">
           <Button
@@ -210,11 +206,11 @@ const ProductsListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={state.productsData}
-        loading={state.loading}
+        data={tableData.productsData}
+        loading={loading}
         defaultPageSize={10}
-        pages={state.pages}
-        totalData={state.totalCount}
+        pages={tableData.pages}
+        totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
         className="mb-1"
         noDataText="No products match the given criteria"
@@ -224,10 +220,7 @@ const ProductsListTable = ({
 };
 
 const mapStateToProps = state => ({
-  supportedActivities: state.session.supportedActivities,
-  highestRole: state.session.highestRole,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  currencyCode: state.session.currencyCode,
   currentLocation: state.session.currentLocation,
 });
 
