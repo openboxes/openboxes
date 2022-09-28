@@ -4,16 +4,12 @@ import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
 const TableCell = ({
-  value, children, tooltip, tooltipLabel, link,
+  value, children, tooltip, tooltipLabel, link, defaultValue,
 }) => {
-  let cellElement = <div className="text-overflow-ellipsis">{ children || value}</div>;
-
-  if (link && typeof link === 'string') {
-    cellElement = <a className="text-overflow-ellipsis" href={link}>{ children || value}</a>;
-  }
+  let cellValue = children || value || defaultValue;
 
   if (tooltip) {
-    return (
+    cellValue = (
       <Tooltip
         arrow="true"
         delay="150"
@@ -21,12 +17,22 @@ const TableCell = ({
         hideDelay="50"
         html={tooltipLabel || value}
       >
-        {cellElement}
+        {cellValue}
       </Tooltip>
     );
   }
 
+  let cellElement = <div className="text-overflow-ellipsis">{cellValue}</div>;
+
+  if (link && typeof link === 'string') {
+    cellElement = <a className="text-overflow-ellipsis" href={link}>{ cellValue }</a>;
+  }
+
   return cellElement;
+};
+
+TableCell.defaultProps = {
+  defaultValue: undefined,
 };
 
 TableCell.propTypes = {
@@ -34,6 +40,7 @@ TableCell.propTypes = {
   tooltip: PropTypes.bool,
   tooltipLabel: PropTypes.string,
   children: PropTypes.element,
+  defaultValue: PropTypes.string,
 };
 
 
