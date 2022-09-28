@@ -1,12 +1,11 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
 import FilterForm from 'components/Filter/FilterForm';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
-import { fetchProductsCatalogs, fetchProductsCategories, fetchProductsTags } from 'components/products/actions';
-import productsFiltersReducer from 'components/products/reducers/productsFiltersReducer';
+import apiClient from 'utils/apiClient';
 
 const filterFields = {
   categoryId: {
@@ -17,6 +16,7 @@ const filterFields = {
       placeholder: 'Category',
       showLabelTooltip: true,
       multi: true,
+      closeMenuOnSelect: false,
     },
     getDynamicAttr: ({ categories }) => ({
       options: categories,
@@ -38,6 +38,7 @@ const filterFields = {
       placeholder: 'Formulary',
       showLabelTooltip: true,
       multi: true,
+      closeMenuOnSelect: false,
     },
     getDynamicAttr: ({ catalogs }) => ({
       options: catalogs,
@@ -51,6 +52,7 @@ const filterFields = {
       placeholder: 'Tags',
       showLabelTooltip: true,
       multi: true,
+      closeMenuOnSelect: false,
     },
     getDynamicAttr: ({ tags }) => ({
       options: tags,
@@ -66,26 +68,40 @@ const filterFields = {
   },
 };
 
-const INITIAL_STATE = {
-  categories: [],
-  catalogs: [],
-  tags: [],
-};
-
 const ProductsListFilters = ({
   setFilterParams,
 }) => {
-  const [state, dispatch] = useReducer(productsFiltersReducer, INITIAL_STATE);
+  const [categories, setCategories] = useState([]);
+  const [catalogs, setCatalogs] = useState([]);
+  const [tags, setTags] = useState([]);
+
+  const fetchProductsCategories = () => {
+    apiClient.get('/openboxes/api/categoryOptions').then((res) => {
+      setCategories(res.data.data);
+    });
+  };
+
+  const fetchProductsCatalogs = () => {
+    apiClient.get('/openboxes/api/catalogOptions').then((res) => {
+      setCatalogs(res.data.data);
+    });
+  };
+
+  const fetchProductsTags = () => {
+    apiClient.get('/openboxes/api/tagOptions').then((res) => {
+      setTags(res.data.data);
+    });
+  };
 
   useEffect(() => {
-    if (!state.categories || state.categories.length === 0) {
-      fetchProductsCategories(dispatch);
+    if (!categories || categories.length === 0) {
+      fetchProductsCategories();
     }
-    if (!state.catalogs || state.catalogs.length === 0) {
-      fetchProductsCatalogs(dispatch);
+    if (!catalogs || catalogs.length === 0) {
+      fetchProductsCatalogs();
     }
-    if (!state.tags || state.tags.length === 0) {
-      fetchProductsTags(dispatch);
+    if (!tags || tags.length === 0) {
+      fetchProductsTags();
     }
   }, []);
 
@@ -95,13 +111,14 @@ const ProductsListFilters = ({
         filterFields={filterFields}
         onSubmit={values => setFilterParams({ ...values })}
         formProps={{
-          categories: state.categories,
-          catalogs: state.catalogs,
-          tags: state.tags,
+          categories,
+          catalogs,
+          tags,
         }}
-        searchFieldPlaceholder="Search by name"
+        searchFieldPlaceholder="Search by product name"
         searchFieldId="q"
         allowEmptySubmit
+        hidden={false}
       />
     </div>
   );
