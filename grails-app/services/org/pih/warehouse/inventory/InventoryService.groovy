@@ -2468,7 +2468,7 @@ class InventoryService implements ApplicationContextAware {
         def ids = productIds.collect { "'${it}'" }.join(",")
         def result = [:]
         if (ids) {
-            def sql = "select te from TransactionEntry as te where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in :productIds)"
+            def sql = "select te from TransactionEntry as te where te.transaction.inventory.id=:inventoryId and te.inventoryItem.product.id in (:productIds)"
             log.debug "SQL: " + sql
             def transactionEntries = TransactionEntry.executeQuery(sql, [inventoryId:inventory.id, productIds:productIds])
             log.debug "transactionEntries " + transactionEntries
