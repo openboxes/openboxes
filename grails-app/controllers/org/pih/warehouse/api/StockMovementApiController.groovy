@@ -34,7 +34,9 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 class StockMovementApiController {
 
     def dataService
-    StockMovementService stockMovementService
+    def outboundStockMovementService
+    def stockMovementService
+    def stockTransferService
 
     def list = {
         Location destination = params.destination ? Location.get(params.destination) : null
@@ -145,8 +147,74 @@ class StockMovementApiController {
         render status: 200
     }
 
+    /**
+     * Deleting Stock Movements (Inbound and Outbound). Because there are 3 options (requisition based, shipment
+     * based and order based we have to create a proper StockMovement object. First try to fetch it as outbound type,
+     * then if not found as inbound type.
+     * */
     def delete = {
-        stockMovementService.deleteStockMovement(params.id)
+        // Pull Outbound Stock movement (Requisition based) or Outbound or Inbound Return (Order based)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        // For inbound stockMovement only
+        if (!stockMovement) {
+            stockMovement = stockMovementService.getStockMovement(params.id)
+        }
+
+        // If still no StockMovement found, then throw 404
+        if (!stockMovement) {
+            def message = "Stockmovement with id ${params.id} does not exist"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        if (stockMovement?.order) {
+            /**
+             * If stock movement has an Order, then treat it as a Return Order
+             * and remove it through stockTransferService
+             * */
+            try {
+                stockTransferService.deleteStockTransfer(params.id)
+            } catch (Exception e) {
+                def message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                response.status = 400
+                render([errorMessage: message] as JSON)
+                return
+            }
+
+            render status: 204
+            return
+        } else {
+            /**
+             * Otherwise treat it as a regular Stock Movement or as a Stock Request
+             * */
+            // TODO: Tech huddle around this area (if looking into currentLocation in API like that is ok)
+            def currentLocation = Location.get(session?.warehouse?.id)
+            if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
+                if (stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) {
+                    try {
+                        stockMovementService.deleteStockMovement(params.id)
+                    } catch (Exception e) {
+                        def message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                        response.status = 400
+                        render([errorMessage: message] as JSON)
+                        return
+                    }
+                } else {
+                    def message = "You cannot delete a shipment with status ${stockMovement?.shipment?.currentStatus}"
+                    response.status = 400
+                    render([errorMessage: message] as JSON)
+                    return
+                }
+            }
+            else {
+                def message = "You are not able to delete stock movement from your location."
+                response.status = 400
+                render([errorMessage: message] as JSON)
+                return
+            }
+        }
+
         render status: 204
     }
 
