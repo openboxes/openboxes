@@ -80,8 +80,8 @@ const StockMovementInboundTable = ({
       offset: `${offset}`,
       max: `${state.pageSize}`,
       direction: 'INBOUND',
-      receiptStatusCodes: filterParams.receiptStatusCodes &&
-        filterParams.receiptStatusCodes?.map(({ id }) => id),
+      receiptStatusCode: filterParams.receiptStatusCode &&
+        filterParams.receiptStatusCode?.map(({ id }) => id),
       origin: filterParams?.origin?.id,
       destination: filterParams?.destination?.id,
       requestedBy: filterParams.requestedBy?.id,
@@ -239,7 +239,7 @@ const StockMovementInboundTable = ({
       Header: 'Date Created',
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM dd, yyyy')} />),
+      Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
       Header: 'Expected Receipt Date',
@@ -249,7 +249,7 @@ const StockMovementInboundTable = ({
         (<TableCell
           {...row}
           defaultValue="-"
-          value={row.value && moment(row.value).format('MMM dd, yyyy')}
+          value={row.value && moment(row.value).format('MMM DD, yyyy')}
         />),
     },
   ];

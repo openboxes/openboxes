@@ -404,11 +404,11 @@ class StockMovementService {
             if (criteria.updatedBy) {
                 eq("updatedBy", criteria.updatedBy)
             }
-            if(params.createdAfter) {
-                ge("dateCreated", params.createdAfter)
+            if(createdAfter) {
+                ge("dateCreated", createdAfter)
             }
-            if(params.createdBefore) {
-                le("dateCreated", params.createdBefore)
+            if(createdBefore) {
+                le("dateCreated", createdBefore)
             }
 
             if (params.sort) {

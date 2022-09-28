@@ -10,7 +10,7 @@ import FilterSelectField from 'components/form-elements/FilterSelectField';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 
 const filterFields = {
-  receiptStatusCodes: {
+  receiptStatusCode: {
     type: FilterSelectField,
     attributes: {
       multi: true,
