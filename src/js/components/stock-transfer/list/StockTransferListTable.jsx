@@ -112,6 +112,7 @@ const StockTransferListTable = ({
       Header: ' ',
       width: 50,
       sortable: false,
+      className: 'active-circle d-flex align-items-center',
       style: { overflow: 'visible', zIndex: 1 },
       Cell: row => (
         <ActionDots
@@ -132,25 +133,28 @@ const StockTransferListTable = ({
     {
       Header: 'Transfer number',
       accessor: 'orderNumber',
-      className: 'active-circle d-flex',
+      className: 'active-circle d-flex align-items-center',
       headerClassName: 'header',
       Cell: row => <TableCell {...row} link={`/openboxes/stockTransfer/show/${row.original.id}`} />,
     },
     {
       Header: 'Created by',
       accessor: 'createdBy',
-      className: 'active-circle d-flex',
+      className: 'active-circle d-flex align-items-center',
       headerClassName: 'header',
     },
     {
       Header: 'Date created',
       accessor: 'dateCreated',
+      className: 'd-flex align-items-center',
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: 'Line items',
       accessor: 'orderItemsCount',
+      className: 'd-flex align-items-center',
       sortable: false,
+      Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.orderItemsCount}</span>),
     },
   ];
 
@@ -217,7 +221,6 @@ const StockTransferListTable = ({
         pages={tableData.pages}
         totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
-        className="mb-1"
         noDataText="No stock transfers match the given criteria"
       />
     </div>
