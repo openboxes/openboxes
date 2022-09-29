@@ -158,6 +158,13 @@ const StockMovementList = (props) => {
   }
 };
 
+
+const AsyncStockTransferList = Loadable({
+  loader: () => import('components/stock-transfer/list/StockTransferList'),
+  loading: Loading,
+});
+
+
 const Router = (props) => {
   const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
     ? AsyncStockRequestDashboard
@@ -196,6 +203,7 @@ const Router = (props) => {
           <MainLayoutRoute path="/**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
           <MainLayoutRoute path="/**/requisitionTemplate/list" component={AsyncStockList} />
           <MainLayoutRoute path="/**/product/list" component={AsyncProductsList} />
+          <MainLayoutRoute path="/**/stockTransfer/list" component={AsyncStockTransferList} />
           <MainLayoutRoute path="/**/dashboard/:configId?" component={Dashboard} />
           <MainLayoutRoute path="/**/" component={Dashboard} />
         </Switch>

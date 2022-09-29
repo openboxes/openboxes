@@ -505,7 +505,7 @@ class Order implements Serializable {
                     orderNumber     : orderNumber,
                     name            : name,
                     createdBy       : createdBy?.name,
-                    dateCreated     : dateCreated?.format("dd/MMM/yyyy"),
+                    dateCreated     : dateCreated?.format("MMM dd, yyyy"),
                     origin          : origin?.name,
                     destination     : destination?.name,
                     orderItemsCount : orderItems?.size(),

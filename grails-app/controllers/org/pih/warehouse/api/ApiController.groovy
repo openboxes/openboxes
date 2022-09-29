@@ -136,6 +136,9 @@ class ApiController {
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         boolean isUserApprover = userService.hasRoleApprover(session?.user)
+        // TODO: investigate why in isUserManager method in userService there is Assistant role included
+        ArrayList<RoleType> managerRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
+        boolean isUserManager = userService.getEffectiveRoles(user).any { managerRoles.contains(it.roleType) }
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = grailsApplication.metadata.'app.revisionNumber'
@@ -168,6 +171,7 @@ class ApiController {
                 isSuperuser          : isSuperuser,
                 isUserAdmin          : isUserAdmin,
                 isUserApprover       : isUserApprover,
+                isUserManager        : isUserManager,
                 supportedActivities  : supportedActivities,
                 isImpersonated       : isImpersonated,
                 grailsVersion        : grailsVersion,

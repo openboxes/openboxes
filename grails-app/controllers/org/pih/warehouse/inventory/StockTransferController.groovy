@@ -59,10 +59,7 @@ class StockTransferController {
     }
 
     def list = {
-        params.location = session.warehouse?.id
-        def orders = stockTransferService.getStockTransfers(params)
-
-        [orders : orders ]
+        render(template: "/common/react")
     }
 
     def show = {
