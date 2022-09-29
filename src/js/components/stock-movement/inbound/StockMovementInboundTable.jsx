@@ -37,12 +37,13 @@ const StockMovementInboundTable = ({
   showTheSpinner,
   hideTheSpinner,
 }) => {
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState({
+    data: [],
+    pages: -1,
+    totalCount: 0,
+    currentParams: {},
+  });
   const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  // Stored searching params for export case
-  const [currentParams, setCurrentParams] = useState({});
-  const [totalData, setTotalData] = useState(0);
 
   const tableRef = useRef(null);
 
@@ -51,13 +52,18 @@ const StockMovementInboundTable = ({
   // If filterParams change, refetch the data with applied filters
   useEffect(() => {
     fireFetchData();
-    if (!isShipmentStatusesFetched) fetchStatuses();
   }, [filterParams]);
+
+  useEffect(() => {
+    if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {
+      fetchStatuses();
+    }
+  }, []);
 
   const exportStockMovements = () => {
     apiClient.get('/openboxes/api/stockMovements', {
       params: {
-        ...currentParams,
+        ...tableData.currentParams,
         format: 'csv',
       },
       paramsSerializer: params => queryString.stringify(params),
@@ -71,7 +77,7 @@ const StockMovementInboundTable = ({
   const exportAllIncomingItems = () => {
     apiClient.get('/openboxes/api/stockMovements/shippedItems', {
       params: {
-        ...currentParams,
+        ...tableData.currentParams,
         format: 'csv',
       },
       paramsSerializer: params => queryString.stringify(params),
@@ -82,12 +88,10 @@ const StockMovementInboundTable = ({
       });
   };
 
-
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
-
 
   const onFetchHandler = (state) => {
     if (!_.isEmpty(filterParams)) {
@@ -124,11 +128,12 @@ const StockMovementInboundTable = ({
       })
         .then((res) => {
           setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setTableData(res.data.data);
-          // Store currently used params for export case
-          setCurrentParams(params);
+          setTableData({
+            data: res.data.data,
+            pages: Math.ceil(res.data.totalCount / state.pageSize),
+            totalCount: res.data.totalCount,
+            currentParams: params,
+          });
         });
     }
   };
@@ -278,14 +283,14 @@ const StockMovementInboundTable = ({
       Header: 'Stocklist',
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} value={row.value || 'None'} />),
+      Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
       Header: 'Requested by',
       accessor: 'requestedBy.name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (<TableCell {...row} value={row.value || 'None'} />),
+      Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
       Header: 'Date Created',
@@ -311,7 +316,7 @@ const StockMovementInboundTable = ({
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <div>
           <Translate id="react.stockMovement.inbound.label" defaultMessage="Inbound" />
-          <span className="ml-1">{`(${totalData})`}</span>
+          <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
         <Button
           isDropdown
@@ -340,11 +345,11 @@ const StockMovementInboundTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
-        pages={pages}
-        totalData={totalData}
+        pages={tableData.pages}
+        totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
         noDataText={translate(
           'react.stockMovement.empty.list.label',

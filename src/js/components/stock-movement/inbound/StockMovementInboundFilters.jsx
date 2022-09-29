@@ -22,7 +22,9 @@ const StockMovementInboundFilters = ({
 
 
   useEffect(() => {
-    if (!isShipmentStatusesFetched) fetchStatuses();
+    if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {
+      fetchStatuses();
+    }
   }, []);
 
 
