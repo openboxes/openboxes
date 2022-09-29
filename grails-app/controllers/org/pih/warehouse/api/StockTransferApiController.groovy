@@ -283,7 +283,7 @@ class StockTransferApiController {
 
     def statusOptions = {
         def statusOptions = OrderStatus.listStockTransfer().collect{
-            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderStatus.' + it.name())}"]
+            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderStatus.' + it.name())}", variant: it.variant?.name()]
         }
         render([data: statusOptions] as JSON)
     }

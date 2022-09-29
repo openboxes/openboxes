@@ -18,7 +18,9 @@ import {
   FETCH_ORGANIZATIONS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
-  FETCH_SESSION_INFO, FETCH_SHIPMENT_STATUS_CODES,
+  FETCH_SESSION_INFO,
+  FETCH_SHIPMENT_STATUS_CODES,
+  FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
   HIDE_SPINNER,
@@ -523,6 +525,17 @@ export function fetchShipmentStatusCodes() {
     apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes').then((res) => {
       dispatch({
         type: FETCH_SHIPMENT_STATUS_CODES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchStockTransferStatuses() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/stockTransfers/statusOptions').then((res) => {
+      dispatch({
+        type: FETCH_STOCK_TRANSFER_STATUSES,
         payload: res.data.data,
       });
     });

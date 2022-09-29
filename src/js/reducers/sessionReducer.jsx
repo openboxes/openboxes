@@ -85,6 +85,7 @@ export default function (state = initialState, action) {
         isSuperuser: _.get(action, 'payload.data.data.isSuperuser'),
         isUserAdmin: _.get(action, 'payload.data.data.isUserAdmin'),
         isUserApprover: _.get(action, 'payload.data.data.isUserApprover', false),
+        isUserManager: _.get(action, 'payload.data.data.isUserManager', false),
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
         user: _.get(action, 'payload.data.data.user'),
