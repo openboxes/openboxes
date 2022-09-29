@@ -278,6 +278,11 @@ class UrlMappings {
             action = [GET: "shipmentStatusCodes"]
         }
 
+        "/api/stockMovements/requisitionsStatusCodes" {
+            controller = "stockMovementApi"
+            action = [GET: "requisitionStatusCodes"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {
