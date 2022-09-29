@@ -6,10 +6,20 @@ import { Link } from 'react-router-dom';
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
-const StockMovementInboundHeader = ({ showMyStockMovements }) => (
+const StockMovementOutboundHeader = ({ showMyStockMovements, isRequestsOpen }) => (
   <div className="d-flex list-page-header">
     <span className="d-flex align-self-center title">
-      <Translate id="react.stockMovement.inbound.list.label" defaultMessage="Inbound Movement List" />
+      {
+        isRequestsOpen
+          ? (<Translate
+            id="react.stockMovement.request.list.label"
+            defaultMessage="Request List"
+          />)
+          : (<Translate
+            id="react.stockMovement.Outbound.list.label"
+            defaultMessage="Outbound Movement List"
+          />)
+      }
     </span>
     <div className="d-flex justify-content-end buttons align-items-center">
       <Button
@@ -19,17 +29,17 @@ const StockMovementInboundHeader = ({ showMyStockMovements }) => (
         onClick={showMyStockMovements}
       />
       <Link
-        className="primary-button"
-        to="/openboxes/stockMovement/createCombinedShipments?direction=INBOUND"
+        className="primary-outline-button"
+        to="/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
       >
         <Translate
-          id="react.stockMovement.createShipmentFromPO.label"
-          defaultMessage="Create Shipment from PO"
+          id="react.stockMovement.outbound.openRequests.label"
+          defaultMessage="Open Requests"
         />
       </Link>
       <Link
         className="primary-button"
-        to="/openboxes/stockMovement/createInbound"
+        to="/openboxes/stockMovement/createOutbound"
       >
         <Translate
           id="react.stockMovement.createStockMovement.label"
@@ -40,8 +50,9 @@ const StockMovementInboundHeader = ({ showMyStockMovements }) => (
   </div>
 );
 
-StockMovementInboundHeader.propTypes = {
+StockMovementOutboundHeader.propTypes = {
   showMyStockMovements: PropTypes.func.isRequired,
+  isRequestsOpen: PropTypes.bool.isRequired,
 };
 
-export default StockMovementInboundHeader;
+export default StockMovementOutboundHeader;
