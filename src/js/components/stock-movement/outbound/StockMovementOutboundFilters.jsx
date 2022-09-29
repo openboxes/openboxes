@@ -158,6 +158,7 @@ const StockMovementOutboundFilters = ({
   fetchStatuses,
   requisitionStatuses,
   isRequisitionStatusesFetched,
+  isRequestsOpen,
 }) => {
   const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
   const fetchLocations = debounceLocationsFetch(debounceTime, minSearchLength, [], true);
@@ -178,7 +179,10 @@ const StockMovementOutboundFilters = ({
         defaultValues={{
           ...filterParams,
         }}
-        onClear={form => form.reset({ origin: filterParams.origin })}
+        onClear={form => form.reset({
+          origin: filterParams.origin,
+          sourceType: isRequestsOpen ? filterParams.sourceType : null,
+        })}
         onSubmit={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
@@ -215,6 +219,7 @@ StockMovementOutboundFilters.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   filterParams: PropTypes.arrayOf({}),
   isRequisitionStatusesFetched: PropTypes.bool.isRequired,
+  isRequestsOpen: PropTypes.bool.isRequired,
   requisitionStatuses: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,

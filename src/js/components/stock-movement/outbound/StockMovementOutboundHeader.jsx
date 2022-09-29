@@ -29,15 +29,6 @@ const StockMovementOutboundHeader = ({ showMyStockMovements, isRequestsOpen }) =
         onClick={showMyStockMovements}
       />
       <Link
-        className="primary-outline-button"
-        to="/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
-      >
-        <Translate
-          id="react.stockMovement.outbound.openRequests.label"
-          defaultMessage="Open Requests"
-        />
-      </Link>
-      <Link
         className="primary-button"
         to="/openboxes/stockMovement/createOutbound"
       >

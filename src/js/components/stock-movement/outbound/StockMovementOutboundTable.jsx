@@ -38,6 +38,7 @@ const StockMovementOutboundTable = ({
   history,
   showTheSpinner,
   hideTheSpinner,
+  isRequestsOpen,
 }) => {
   const [tableData, setTableData] = useState({
     data: [],
@@ -229,13 +230,17 @@ const StockMovementOutboundTable = ({
         />),
     },
     {
-      Header: 'Items',
+      Header: '# items',
       accessor: 'lineItemCount',
       fixed: 'left',
-      className: 'text-right',
-      headerClassName: 'justify-content-end',
+      className: 'active-circle d-flex justify-content-center',
+      headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
+      Cell: row => (
+        <span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">
+          {row.value}
+        </span>),
     },
     {
       Header: 'Status',
@@ -260,7 +265,6 @@ const StockMovementOutboundTable = ({
       accessor: 'identifier',
       fixed: 'left',
       minWidth: 100,
-      sortable: false,
       Cell: row => (
         <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
     },
@@ -289,13 +293,11 @@ const StockMovementOutboundTable = ({
       Header: 'Destination',
       accessor: 'destination.name',
       minWidth: 250,
-      sortable: false,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
       Header: 'Stocklist',
       accessor: 'stocklist.name',
-      sortable: false,
       minWidth: 150,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
@@ -303,14 +305,12 @@ const StockMovementOutboundTable = ({
       Header: 'Requested by',
       accessor: 'requestedBy.name',
       minWidth: 250,
-      sortable: false,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
       Header: 'Date Created',
       accessor: 'dateCreated',
       width: 150,
-      sortable: false,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
   ];
@@ -319,7 +319,11 @@ const StockMovementOutboundTable = ({
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <div>
-          <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
+          {
+            isRequestsOpen
+            ? <Translate id="react.stockMovement.requests.label" defaultMessage="Requests" />
+            : <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
+          }
           <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
         <Button
@@ -389,6 +393,7 @@ StockMovementOutboundTable.propTypes = {
   showTheSpinner: PropTypes.func.isRequired,
   hideTheSpinner: PropTypes.func.isRequired,
   isRequisitionStatusesFetched: PropTypes.bool.isRequired,
+  isRequestsOpen: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,

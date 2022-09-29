@@ -227,13 +227,17 @@ const StockMovementInboundTable = ({
         />),
     },
     {
-      Header: 'Items',
+      Header: '# items',
       accessor: 'lineItemCount',
       fixed: 'left',
-      className: 'text-right',
-      headerClassName: 'justify-content-end',
+      className: 'active-circle d-flex justify-content-center',
+      headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
+      Cell: row => (
+        <span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">
+          {row.value}
+        </span>),
     },
     {
       Header: 'Status',

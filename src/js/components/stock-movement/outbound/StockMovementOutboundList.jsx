@@ -16,21 +16,13 @@ const StockMovementOutboundList = (props) => {
       name: props.currentLocation.name,
       label: props.currentLocation.name,
     },
+    sourceType: props.isRequestsList ? 'ELECTRONIC' : null,
   });
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
     props.fetchTranslations(props.locale, 'StockMovementType');
   }, [props.locale]);
-
-  useEffect(() => {
-    if (props.isRequestsList) {
-      setFilterParams(filters => ({
-        ...filters,
-        sourceType: 'ELECTRONIC',
-      }));
-    }
-  }, [props.isRequestsList]);
 
 
   const selectFiltersForMyStockMovements = () => {
@@ -53,8 +45,15 @@ const StockMovementOutboundList = (props) => {
         isRequestsOpen={props.isRequestsList}
         showMyStockMovements={selectFiltersForMyStockMovements}
       />
-      <StockMovementOutboundFilters filterParams={filterParams} setFilterParams={setFilterParams} />
-      <StockMovementOutboundTable filterParams={filterParams} />
+      <StockMovementOutboundFilters
+        isRequestsOpen={props.isRequestsList}
+        filterParams={filterParams}
+        setFilterParams={setFilterParams}
+      />
+      <StockMovementOutboundTable
+        isRequestsOpen={props.isRequestsList}
+        filterParams={filterParams}
+      />
     </div>
   );
 };
