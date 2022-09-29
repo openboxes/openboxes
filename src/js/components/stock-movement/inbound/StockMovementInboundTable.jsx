@@ -23,6 +23,7 @@ import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import exportFileFromAPI from 'utils/file-download-util';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -61,31 +62,17 @@ const StockMovementInboundTable = ({
   }, []);
 
   const exportStockMovements = () => {
-    apiClient.get('/openboxes/api/stockMovements', {
-      params: {
-        ...tableData.currentParams,
-        format: 'csv',
-      },
-      paramsSerializer: params => queryString.stringify(params),
-    })
-      .then((res) => {
-        const filename = res.headers['content-disposition'].split('filename="')[1].split('.')[0];
-        fileDownload(res.data, filename, 'text/csv');
-      });
+    exportFileFromAPI({
+      url: '/openboxes/api/stockMovements',
+      params: tableData.currentParams,
+    });
   };
 
   const exportAllIncomingItems = () => {
-    apiClient.get('/openboxes/api/stockMovements/shippedItems', {
-      params: {
-        ...tableData.currentParams,
-        format: 'csv',
-      },
-      paramsSerializer: params => queryString.stringify(params),
-    })
-      .then((res) => {
-        const filename = res.headers['content-disposition'].split('filename="')[1].split('.')[0];
-        fileDownload(res.data, filename, 'text/csv');
-      });
+    exportFileFromAPI({
+      url: '/openboxes/api/stockMovements/shippedItems',
+      params: tableData.currentParams,
+    });
   };
 
   const getStatusTooltip = status => translate(

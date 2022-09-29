@@ -18,8 +18,8 @@ const StockMovementInboundFilters = ({
   defaultValues,
 }) => {
   const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
-  const fetchLocations = debounceLocationsFetch(debounceTime, minSearchLength, [], true);
-
+  // eslint-disable-next-line max-len
+  const fetchLocations = debounceLocationsFetch(debounceTime, minSearchLength, [], true, false, false);
 
   useEffect(() => {
     if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {

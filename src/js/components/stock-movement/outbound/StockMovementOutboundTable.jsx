@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -23,6 +22,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
+import exportFileFromAPI from 'utils/file-download-util';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -64,31 +64,17 @@ const StockMovementOutboundTable = ({
   }, []);
 
   const exportStockMovements = () => {
-    apiClient.get('/openboxes/api/stockMovements', {
-      params: {
-        ...tableData.currentParams,
-        format: 'csv',
-      },
-      paramsSerializer: params => queryString.stringify(params),
-    })
-      .then((res) => {
-        const filename = res.headers['content-disposition'].split('filename="')[1].split('.')[0];
-        fileDownload(res.data, filename, 'text/csv');
-      });
+    exportFileFromAPI({
+      url: '/openboxes/api/stockMovements',
+      params: tableData.currentParams,
+    });
   };
 
   const exportPendingShipmentItems = () => {
-    apiClient.get('/openboxes/api/stockMovements/pendingRequisitionItems', {
-      params: {
-        ...tableData.currentParams,
-        format: 'csv',
-      },
-      paramsSerializer: params => queryString.stringify(params),
-    })
-      .then((res) => {
-        const filename = res.headers['content-disposition'].split('filename="')[1].split('.')[0];
-        fileDownload(res.data, filename, 'text/csv');
-      });
+    exportFileFromAPI({
+      url: '/openboxes/api/stockMovements/pendingRequisitionItems',
+      params: tableData.currentParams,
+    });
   };
 
   const getStatusTooltip = status => translate(
