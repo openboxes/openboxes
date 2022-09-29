@@ -14,7 +14,8 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import groovy.text.Template
-//import groovyx.net.http.HTTPBuilder
+import org.apache.http.client.fluent.Request
+import org.apache.http.entity.ContentType
 import org.grails.gsp.GroovyPagesTemplateEngine
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.invoice.Invoice
@@ -25,7 +26,6 @@ import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.springframework.web.multipart.MultipartFile
 import util.FileUtil
-import org.pih.warehouse.core.Constants
 
 import static org.springframework.util.StringUtils.stripFilenameExtension
 
@@ -533,15 +533,13 @@ class DocumentController {
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String body = renderTemplate(document, model)
-        String contentType = "image/png"
 
-        // FIXME Fix HTTPBuilder dependency
-        //def http = new HTTPBuilder("http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/".toString())
-        //def html = http.post(body: body)
-
-        response.contentType = contentType
-        response.outputStream << html
-        response.flush()
+        response.contentType = 'image/png'
+        response.outputStream << Request.Post('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
+            .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
+            .execute()
+            .returnContent()
+            .asStream()
     }
 
 
@@ -606,4 +604,3 @@ class BulkDocumentCommand extends DocumentCommand {
         filesContents(nullable: false)
     }
 }
-

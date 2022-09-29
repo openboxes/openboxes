@@ -364,6 +364,8 @@ dependencies {
 
     implementation 'org.apache.commons:commons-csv:1.9.0'
     compile 'org.apache.commons:commons-email:1.5'
+
+    implementation 'org.apache.httpcomponents:fluent-hc'
     implementation 'org.apache.httpcomponents:httpclient'
 
     implementation 'org.apache.poi:poi'
