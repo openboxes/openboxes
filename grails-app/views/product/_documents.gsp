@@ -1,3 +1,16 @@
+<style>
+/* add a thin border around document thumbnails */
+.nailthumb-document .nailthumb-image {
+    border: 1px solid lightgrey;
+    margin: 2px;
+    padding: 2px !important;
+}
+
+/* prevent nailthumb's CSS from truncating document thumbnail borders */
+.nailthumb-document .nailthumb-container {
+    overflow: visible !important;
+}
+</style>
 
 <div class="box">
     <h2>
@@ -30,10 +43,13 @@
             <g:each var="document" in="${productInstance?.documents.findAll { !it.fileUri } }" status="i">
                 <tr class="prop ${i%2?'even':'odd' }" >
                     <td>
-                        <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
-                            <img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}"
-                                 class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />
-                        </g:link>
+                        <div class="nailthumb-document">
+                            <g:link controller="product" action="downloadDocument" id="${document?.id}"
+                                    params="['product.id': productInstance?.id]" target="_blank">
+                                <img src="${createLink(controller: 'product', action: 'viewThumbnail', id: document.id)}"
+                                     class="middle" />
+                            </g:link>
+                        </div>
                     </td>
                     <td>
                         <g:link controller="product" action="downloadDocument" id="${document?.id}" params="['product.id':productInstance?.id]" target="_blank">
@@ -74,8 +90,10 @@
                 <g:each var="document" in="${productInstance?.documents.findAll { it.fileUri } }" status="i">
                     <tr class="prop ${i%2?'even':'odd' }" >
                         <td>
-                            <img src="${createLink(controller:'product', action:'viewThumbnail', id:document.id)}"
-                                 class="middle" style="padding: 2px; margin: 2px; border: 1px solid lightgrey;" />
+                            <div class="nailthumb-document">
+                                <img src="${createLink(controller: 'product', action: 'viewThumbnail', id: document.id)}"
+                                    class="middle" />
+                            </div>
                         </td>
                         <td>
                             <a href="${document.fileUri}" target="_blank">
@@ -160,3 +178,14 @@
         </table>
     </g:uploadForm>
 </div>
+<script>
+  $(function () {
+    $('.nailthumb-document img').hide();
+    $('.nailthumb-document img').nailthumb({
+        width: 100,
+        height: 100,
+        method: 'resize',
+        replaceAnimation: null
+    });
+  });
+</script>
