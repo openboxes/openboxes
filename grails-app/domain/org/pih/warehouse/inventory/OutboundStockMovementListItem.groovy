@@ -133,6 +133,7 @@ class OutboundStockMovementListItem implements Serializable {
                 ],
                 replenishmentType   : stocklist?.replenishmentTypeCode?.name(),
                 dateRequested       : dateRequested?.format("MM/dd/yyyy"),
+                dateCreated         : dateCreated?.format("MM/dd/yyyy"),
                 requestedBy         : requestedBy,
                 lineItemCount       : lineItemCount,
                 requestType         : requestType?.name(),

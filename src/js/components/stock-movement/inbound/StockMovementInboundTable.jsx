@@ -251,7 +251,6 @@ const StockMovementInboundTable = ({
       accessor: 'identifier',
       fixed: 'left',
       minWidth: 100,
-      sortable: false,
       Cell: row => (
         <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
     },
@@ -271,13 +270,11 @@ const StockMovementInboundTable = ({
       Header: 'Origin',
       accessor: 'origin.name',
       minWidth: 250,
-      sortable: false,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
       Header: 'Stocklist',
       accessor: 'stocklist.name',
-      sortable: false,
       minWidth: 150,
       Cell: row => (<TableCell {...row} value={row.value || 'None'} />),
     },
@@ -292,14 +289,12 @@ const StockMovementInboundTable = ({
       Header: 'Date Created',
       accessor: 'dateCreated',
       width: 150,
-      sortable: false,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
       Header: 'Expected Receipt Date',
       accessor: 'expectedDeliveryDate',
       width: 200,
-      sortable: false,
       Cell: row =>
         (<TableCell
           {...row}

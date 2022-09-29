@@ -106,15 +106,15 @@ class OutboundStockMovementService {
             }
 
             if (params.sort) {
-                if (params.sort == "destination") {
+                if (params.sort == "destination.name") {
                     destination {
                         order("name", params.order ?: "desc")
                     }
-                } else if (params.sort == "origin") {
+                } else if (params.sort == "origin.name") {
                     origin {
                         order("name", params.order ?: "desc")
                     }
-                } else if (params.sort == "requestedBy") {
+                } else if (params.sort == "requestedBy.name") {
                     requestedBy {
                         order("firstName", params.order ?: "desc")
                         order("lastName", params.order ?: "desc")
@@ -122,6 +122,12 @@ class OutboundStockMovementService {
                 } else if (params.sort == "dateRequested") {
                     requisition {
                         order("dateRequested", params.order ?: "desc")
+                    }
+                } else if (params.sort == "stocklist.name") {
+                    requisition {
+                        requisitionTemplate {
+                            order("name", params.order ?: "desc")
+                        }
                     }
                 } else {
                     order(params.sort, params.order ?: "desc")
