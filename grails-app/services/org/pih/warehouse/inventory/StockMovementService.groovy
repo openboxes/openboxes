@@ -397,8 +397,14 @@ class StockMovementService {
                 eq("createdBy", criteria?.createdBy)
             }
             if (criteria.requestedBy) {
-                requisition {
-                    eq("requestedBy", criteria?.requestedBy)
+                or {
+                    requisition {
+                        eq("requestedBy", criteria?.requestedBy)
+                    }
+                    and {
+                        isNull("requisition")
+                        eq("createdBy", criteria?.requestedBy)
+                    }
                 }
             }
             if (criteria.updatedBy) {
@@ -412,25 +418,26 @@ class StockMovementService {
             }
 
             if (params.sort) {
-                if (params.sort == "destination") {
+                if (params.sort == "destination.name") {
                     destination {
                         order("name", params.order ?: "desc")
                     }
-                } else if (params.sort == "origin") {
+                } else if (params.sort == "origin.name") {
                     origin {
                         order("name", params.order ?: "desc")
-                    }
-                } else if (params.sort == "requestedBy") {
-                    requisition {
-                        requestedBy {
-                            order("firstName", params.order ?: "desc")
-                            order("lastName", params.order ?: "desc")
-                        }
                     }
                 } else if (params.sort == "dateRequested") {
                     requisition {
                         order("dateRequested", params.order ?: "desc")
                     }
+                } else if (params.sort == "stocklist.name") {
+                    requisition {
+                        requisitionTemplate {
+                            order("name", params.order ?: "desc")
+                        }
+                    }
+                } else if (params.sort == "identifier") {
+                    order("shipmentNumber", params.order ?: "desc")
                 } else {
                     order(params.sort, params.order ?: "desc")
                 }
