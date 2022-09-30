@@ -109,7 +109,7 @@ const ProductsListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
           categories,
           catalogs,

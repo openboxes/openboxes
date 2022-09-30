@@ -67,7 +67,7 @@ const StockListFilters = ({ setFilterParams }) => {
       <FilterForm
         searchFieldId="q"
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{ locations }}
         allowEmptySubmit
         searchFieldPlaceholder="Search by stocklist name"

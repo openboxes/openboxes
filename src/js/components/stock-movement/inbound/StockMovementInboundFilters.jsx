@@ -18,7 +18,6 @@ const StockMovementInboundFilters = ({
   defaultValues,
 }) => {
   const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
-  // eslint-disable-next-line max-len
   const fetchLocations = debounceLocationsFetch(
     debounceTime,
     minSearchLength,
