@@ -14,7 +14,6 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
@@ -35,7 +34,6 @@ const StockMovementOutboundTable = ({
   requisitionStatuses,
   isRequisitionStatusesFetched,
   currentLocation,
-  history,
   showTheSpinner,
   hideTheSpinner,
   isRequestsOpen,
@@ -161,7 +159,6 @@ const StockMovementOutboundTable = ({
   };
 
   // List of all actions for outbound Stock Movement rows
-  // eslint-disable-next-line no-unused-vars
   const getActions = (row) => {
     const actions = [];
 
@@ -180,9 +177,11 @@ const StockMovementOutboundTable = ({
       leftIcon: <RiPencilLine />,
     };
     if (row.original.isReturn) {
-      actions[1].onClick = () => history.push(`/openboxes/stockTransfer/createOutboundReturn/${row.original.order?.id}`);
+      actions[1].href = `/openboxes/stockTransfer/createOutboundReturn/${row.original.order?.id}`;
+      actions[1].reactLink = true;
+      actions[1].appendId = false;
     } else {
-      actions[1].onClick = () => history.push(`/openboxes/stockMovement/createOutbound/${row.original?.id}`);
+      actions[1].href = '/openboxes/stockMovement/createOutbound';
     }
 
     const isSameOrigin = currentLocation.id === row.original.origin?.id;
@@ -224,9 +223,7 @@ const StockMovementOutboundTable = ({
       width: 80,
       sortable: false,
       Cell: row => (
-        <span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">
-          {row.value}
-        </span>),
+        <TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
       Header: 'Status',
@@ -369,7 +366,7 @@ const mapDispatchToProps = {
   hideTheSpinner: hideSpinner,
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboundTable));
+export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboundTable);
 
 
 StockMovementOutboundTable.propTypes = {
@@ -389,8 +386,5 @@ StockMovementOutboundTable.propTypes = {
     name: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
-  }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
   }).isRequired,
 };

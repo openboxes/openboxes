@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -13,7 +12,6 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
@@ -21,9 +19,9 @@ import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
+import exportFileFromAPI from 'utils/file-download-util';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-import exportFileFromAPI from 'utils/file-download-util';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
@@ -34,7 +32,6 @@ const StockMovementInboundTable = ({
   shipmentStatuses,
   isShipmentStatusesFetched,
   currentLocation,
-  history,
   showTheSpinner,
   hideTheSpinner,
 }) => {
@@ -178,9 +175,11 @@ const StockMovementInboundTable = ({
       leftIcon: <RiPencilLine />,
     };
     if (row.original.isReturn) {
-      actions[1].onClick = () => history.push(`/openboxes/stockTransfer/createInboundReturn/${row.original.order?.id}`);
+      actions[1].href = `/openboxes/stockTransfer/createInboundReturn/${row.original.order?.id}`;
+      actions[1].reactLink = true;
+      actions[1].appendId = false;
     } else {
-      actions[1].onClick = () => history.push(`/openboxes/stockMovement/createCombinedShipments/${row.original?.id}`);
+      actions[1].href = '/openboxes/stockMovement/createCombinedShipments';
     }
 
     const isSameOrigin = currentLocation.id === row.original.origin?.id;
@@ -221,16 +220,13 @@ const StockMovementInboundTable = ({
       headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
-      Cell: row => (
-        <span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">
-          {row.value}
-        </span>),
+      Cell: row => (<TableCell defaultValue={0} {...row} className="items-count-circle" />),
     },
     {
       Header: 'Status',
       accessor: 'shipmentStatus',
       fixed: 'left',
-      width: 150,
+      width: 170,
       sortable: false,
       Cell: row => (
         <TableCell
@@ -256,6 +252,7 @@ const StockMovementInboundTable = ({
       Header: 'Name',
       accessor: 'name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (
         <TableCell
           {...row}
@@ -366,7 +363,7 @@ const mapDispatchToProps = {
   hideTheSpinner: hideSpinner,
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable));
+export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable);
 
 
 StockMovementInboundTable.propTypes = {
@@ -385,8 +382,5 @@ StockMovementInboundTable.propTypes = {
     name: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
-  }).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
   }).isRequired,
 };

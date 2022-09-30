@@ -9,8 +9,8 @@ const exportFileFromAPI = ({
   filename: customFilename,
 }) => apiClient.get(url, {
   params: {
-    ...params,
     format: 'csv',
+    ...params,
   },
   paramsSerializer: queryString.stringify,
 })

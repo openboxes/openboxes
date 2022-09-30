@@ -171,11 +171,17 @@ const PurchaseOrderListFilters = ({
     debounceTime,
     minSearchLength,
     ['FULFILL_ORDER'],
+    true,
+    false,
+    false,
   );
   const debouncedDestinationLocationsFetch = debounceLocationsFetch(
     debounceTime,
     minSearchLength,
     ['RECEIVE_STOCK'],
+    true,
+    false,
+    false,
   );
   const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
