@@ -181,7 +181,7 @@ const StockMovementOutboundTable = ({
       actions[1].reactLink = true;
       actions[1].appendId = false;
     } else {
-      actions[1].href = '/openboxes/stockMovement/createOutbound';
+      actions[1].href = '/openboxes/stockMovement/verifyRequest';
     }
 
     const isSameOrigin = currentLocation.id === row.original.origin?.id;
