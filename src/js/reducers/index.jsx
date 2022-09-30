@@ -7,6 +7,7 @@ import invoiceReducer from 'reducers/invoiceReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
+import requisitionStatusCodes from 'reducers/requisitionStatusCodes';
 import sessionReducer from 'reducers/sessionReducer';
 import shipmentStatusCodes from 'reducers/shipmentStatusCodes';
 import spinnerReducer from 'reducers/spinnerReducer';
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   purchaseOrder: purchaseOrderReducer,
   invoices: invoiceReducer,
   shipmentStatuses: shipmentStatusCodes,
+  requisitionStatuses: requisitionStatusCodes,
   stockTransfer: stockTransferReducer,
 });
 

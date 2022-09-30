@@ -52,7 +52,12 @@
         </g:if>
 
         <div class="button-group">
-            <g:link controller="stockMovement" action="list" class="button">
+            <g:link
+                controller="stockMovement"
+                action="list"
+                class="button"
+                params="[direction: stockMovement?.destination == currentLocation ? 'INBOUND' : 'OUTBOUND']"
+            >
                 <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
                 <warehouse:message code="default.button.list.label" />
             </g:link>

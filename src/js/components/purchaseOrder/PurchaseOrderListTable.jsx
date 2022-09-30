@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -28,6 +27,7 @@ import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import ActionDots from 'utils/ActionDots';
 import apiClient from 'utils/apiClient';
+import exportFileFromAPI from 'utils/file-download-util';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -67,17 +67,14 @@ const PurchaseOrderListTable = ({
 
   // If orderItems is true, download orders line items details, else download orders
   const downloadOrders = (orderItems) => {
-    apiClient.get('/openboxes/api/purchaseOrders', {
+    exportFileFromAPI({
+      url: '/openboxes/api/purchaseOrders',
+      filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
       params: {
         ..._.omit(currentParams, 'offset', 'max'),
-        format: 'csv',
         orderItems,
       },
-      paramsSerializer: params => queryString.stringify(params),
-    })
-      .then((res) => {
-        fileDownload(res.data, orderItems ? 'OrdersLineDetails.csv' : 'Orders', 'text/csv');
-      });
+    });
   };
 
   const deleteOrder = (id) => {

@@ -6,15 +6,17 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import { confirmAlert } from 'react-confirm-alert';
 import {
+  RiArrowRightSLine,
   RiDeleteBinLine,
   RiDownload2Line,
-  RiInformationLine, RiPencilLine,
+  RiInformationLine,
+  RiPencilLine,
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
+import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
@@ -25,15 +27,16 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const StockMovementInboundTable = ({
+const StockMovementOutboundTable = ({
   filterParams,
   translate,
   fetchStatuses,
-  shipmentStatuses,
-  isShipmentStatusesFetched,
+  requisitionStatuses,
+  isRequisitionStatusesFetched,
   currentLocation,
   showTheSpinner,
   hideTheSpinner,
+  isRequestsOpen,
 }) => {
   const [tableData, setTableData] = useState({
     data: [],
@@ -53,7 +56,7 @@ const StockMovementInboundTable = ({
   }, [filterParams]);
 
   useEffect(() => {
-    if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {
+    if (!isRequisitionStatusesFetched || requisitionStatuses.length === 0) {
       fetchStatuses();
     }
   }, []);
@@ -65,9 +68,9 @@ const StockMovementInboundTable = ({
     });
   };
 
-  const exportAllIncomingItems = () => {
+  const exportPendingShipmentItems = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements/shippedItems',
+      url: '/openboxes/api/stockMovements/pendingRequisitionItems',
       params: tableData.currentParams,
     });
   };
@@ -90,9 +93,10 @@ const StockMovementInboundTable = ({
         ...filterParams,
         offset: `${offset}`,
         max: `${state.pageSize}`,
-        direction: 'INBOUND',
-        receiptStatusCode: filterParams.receiptStatusCode &&
-          filterParams.receiptStatusCode?.map(({ id }) => id),
+        direction: 'OUTBOUND',
+        requisitionStatusCode: filterParams.requisitionStatusCode &&
+          filterParams.requisitionStatusCode?.map(({ id }) => id),
+        requestType: filterParams?.requestType?.value,
         origin: filterParams?.origin?.id,
         destination: filterParams?.destination?.id,
         requestedBy: filterParams.requestedBy?.id,
@@ -124,7 +128,7 @@ const StockMovementInboundTable = ({
 
   const deleteReturnStockMovement = (id) => {
     showTheSpinner();
-    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
+    apiClient.delete(`/api/openboxes/stockMovements/${id}`)
       .then((res) => {
         if (res.status === 204) {
           const successMessage = translate(
@@ -156,7 +160,7 @@ const StockMovementInboundTable = ({
     });
   };
 
-  // List of all actions for inbound Stock Movement rows
+  // List of all actions for outbound Stock Movement rows
   const getActions = (row) => {
     const actions = [];
 
@@ -175,11 +179,11 @@ const StockMovementInboundTable = ({
       leftIcon: <RiPencilLine />,
     };
     if (row.original.isReturn) {
-      actions[1].href = `/openboxes/stockTransfer/createInboundReturn/${row.original.order?.id}`;
+      actions[1].href = `/openboxes/stockTransfer/createOutboundReturn/${row.original.order?.id}`;
       actions[1].reactLink = true;
       actions[1].appendId = false;
     } else {
-      actions[1].href = '/openboxes/stockMovement/createCombinedShipments';
+      actions[1].href = '/openboxes/stockMovement/verifyRequest';
     }
 
     const isSameOrigin = currentLocation.id === row.original.origin?.id;
@@ -220,25 +224,26 @@ const StockMovementInboundTable = ({
       headerClassName: 'header justify-content-center',
       width: 80,
       sortable: false,
-      Cell: row => (<TableCell defaultValue={0} {...row} className="items-count-circle" />),
+      Cell: row => (
+        <TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
       Header: 'Status',
-      accessor: 'shipmentStatus',
+      accessor: 'status',
       fixed: 'left',
-      width: 170,
+      width: 150,
       sortable: false,
-      Cell: row => (
-        <TableCell
-          {...row}
-          tooltip
-          tooltipLabel={getStatusTooltip(row.value)}
-        >
-          <StatusIndicator
-            status={row.value}
-            variant={_.find(shipmentStatuses, _.matchesProperty('id', row.value))?.variant}
-          />
-        </TableCell>),
+      Cell: (row) => {
+        const status = _.find(requisitionStatuses, _.matchesProperty('id', row.value));
+        return (
+          <TableCell
+            {...row}
+            tooltip
+            tooltipLabel={getStatusTooltip(row.value)}
+          >
+            <StatusIndicator variant={status?.variant} status={status?.label} />
+          </TableCell>);
+      },
     },
     {
       Header: 'Identifier',
@@ -252,18 +257,26 @@ const StockMovementInboundTable = ({
       Header: 'Name',
       accessor: 'name',
       minWidth: 250,
-      sortable: false,
       Cell: row => (
         <TableCell
           {...row}
           tooltip
+          tooltipLabel={row.original.description || row.original.name}
           link={`/openboxes/stockMovement/show/${row.original.id}`}
-          value={row.original.description || row.original.name}
-        />),
+        >
+          <span className="mx-1">
+            {translate(
+              `react.StockMovementType.enum.${row.original.stockMovementType}`,
+              row.original.stockMovementType,
+            )}
+          </span>
+          <RiArrowRightSLine />
+          <span>{row.original.description || row.original.name}</span>
+        </TableCell>),
     },
     {
-      Header: 'Origin',
-      accessor: 'origin.name',
+      Header: 'Destination',
+      accessor: 'destination.name',
       minWidth: 250,
       Cell: row => (<TableCell {...row} tooltip />),
     },
@@ -277,7 +290,6 @@ const StockMovementInboundTable = ({
       Header: 'Requested by',
       accessor: 'requestedBy.name',
       minWidth: 250,
-      sortable: false,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
@@ -286,24 +298,17 @@ const StockMovementInboundTable = ({
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
-    {
-      Header: 'Expected Receipt Date',
-      accessor: 'expectedDeliveryDate',
-      width: 200,
-      Cell: row =>
-        (<TableCell
-          {...row}
-          defaultValue="-"
-          value={row.value && moment(row.value).format('MMM DD, yyyy')}
-        />),
-    },
   ];
 
   return (
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <div>
-          <Translate id="react.stockMovement.inbound.label" defaultMessage="Inbound" />
+          {
+            isRequestsOpen
+            ? <Translate id="react.stockMovement.requests.label" defaultMessage="Requests" />
+            : <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
+          }
           <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
         <Button
@@ -320,10 +325,10 @@ const StockMovementInboundTable = ({
               defaultMessage="Export Stock Movements"
             />
           </a>
-          <a className="dropdown-item" onClick={exportAllIncomingItems} href="#">
+          <a className="dropdown-item" onClick={exportPendingShipmentItems} href="#">
             <Translate
-              id="react.stockMovement.export.allIncomingItems.label"
-              defaultMessage="Export all incoming items"
+              id="react.stockMovement.export.pendingShipmentItems.label"
+              defaultMessage="Export pending shipment items"
             />
           </a>
         </div>
@@ -350,34 +355,35 @@ const StockMovementInboundTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  shipmentStatuses: state.shipmentStatuses.data,
-  isShipmentStatusesFetched: state.shipmentStatuses.fetched,
+  requisitionStatuses: state.requisitionStatuses.data,
+  isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
   currentLocation: state.session.currentLocation,
 });
 
 const mapDispatchToProps = {
   showSpinner,
   hideSpinner,
-  fetchStatuses: fetchShipmentStatusCodes,
+  fetchStatuses: fetchRequisitionStatusCodes,
   showTheSpinner: showSpinner,
   hideTheSpinner: hideSpinner,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable);
+export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboundTable);
 
 
-StockMovementInboundTable.propTypes = {
+StockMovementOutboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
   fetchStatuses: PropTypes.func.isRequired,
   showTheSpinner: PropTypes.func.isRequired,
   hideTheSpinner: PropTypes.func.isRequired,
-  isShipmentStatusesFetched: PropTypes.bool.isRequired,
+  isRequisitionStatusesFetched: PropTypes.bool.isRequired,
+  isRequestsOpen: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
-  shipmentStatuses: PropTypes.shape({
+  requisitionStatuses: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,

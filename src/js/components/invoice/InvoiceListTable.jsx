@@ -87,7 +87,7 @@ const InvoiceListTable = ({
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
       maxWidth: 100,
-      Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.itemCount}</span>),
+      Cell: row => (<TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
       Header: 'Status',

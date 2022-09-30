@@ -803,4 +803,16 @@ class StockMovementApiController {
         }
         render([data: options] as JSON)
     }
+
+    def requisitionStatusCodes = {
+        def options = RequisitionStatus.listOutboundOptions()?.collect {
+            [
+                    id: it.name(),
+                    value: it.name(),
+                    label: "${g.message(code: 'enum.RequisitionStatus.' + it.name())}",
+                    variant: it.variant.name
+            ]
+        }
+        render([data: options] as JSON)
+    }
 }

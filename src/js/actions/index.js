@@ -18,6 +18,7 @@ import {
   FETCH_ORGANIZATIONS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
+  FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
   FETCH_SHIPMENT_STATUS_CODES,
   FETCH_STOCK_TRANSFER_STATUSES,
@@ -522,12 +523,26 @@ export function fetchInvoiceTypeCodes() {
 
 export function fetchShipmentStatusCodes() {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes').then((res) => {
-      dispatch({
-        type: FETCH_SHIPMENT_STATUS_CODES,
-        payload: res.data.data,
+    apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes')
+      .then((res) => {
+        dispatch({
+          type: FETCH_SHIPMENT_STATUS_CODES,
+          payload: res.data.data,
+        });
       });
-    });
+  };
+}
+
+
+export function fetchRequisitionStatusCodes() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/stockMovements/requisitionsStatusCodes')
+      .then((res) => {
+        dispatch({
+          type: FETCH_REQUISITION_STATUS_CODES,
+          payload: res.data.data,
+        });
+      });
   };
 }
 

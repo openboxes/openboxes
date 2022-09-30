@@ -147,12 +147,22 @@ const AsyncStockMovementInboundList = Loadable({
   loader: () => import('components/stock-movement/inbound/StockMovementInboundList'),
   loading: Loading,
 });
+const AsyncStockMovementOutboundList = Loadable({
+  loader: () => import('components/stock-movement/outbound/StockMovementOutboundList'),
+  loading: Loading,
+});
+
 
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
-  switch (parsedSearchQuery?.direction) {
+  const direction = parsedSearchQuery?.direction?.toUpperCase();
+  switch (direction) {
     case 'INBOUND':
       return <AsyncStockMovementInboundList {...props} />;
+    case 'OUTBOUND': {
+      const isRequestsList = parsedSearchQuery?.sourceType?.toUpperCase() === 'ELECTRONIC';
+      return <AsyncStockMovementOutboundList {...props} isRequestsList={isRequestsList} />;
+    }
     default:
       return <Redirect to="/openboxes/" />;
   }

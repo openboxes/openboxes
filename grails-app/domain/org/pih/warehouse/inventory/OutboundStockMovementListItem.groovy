@@ -65,7 +65,8 @@ class OutboundStockMovementListItem implements Serializable {
             "totalValue",
             "pending",
             "electronicType",
-            "lineItemCount"
+            "lineItemCount",
+            "fromReturnOrder"
     ]
 
     static mapping = {
@@ -107,7 +108,9 @@ class OutboundStockMovementListItem implements Serializable {
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
+                status              : status.toString(),
                 identifier          : identifier,
+                stockMovementType   : stockMovementType.name(),
                 origin              : [
                     id                  : origin?.id,
                     name                : origin?.name,
@@ -116,6 +119,7 @@ class OutboundStockMovementListItem implements Serializable {
                     locationGroup       : origin?.locationGroup,
                     organizationName    : origin?.organization?.name,
                     organizationCode    : origin?.organization?.code,
+                    isDepot             : origin?.isDepot(),
                 ],
                 destination         : [
                     id                  : destination?.id,
@@ -131,6 +135,11 @@ class OutboundStockMovementListItem implements Serializable {
                         id  : stocklist?.id,
                         name: stocklist?.name
                 ],
+                order                : [
+                        id                  : shipment?.returnOrder?.id,
+                        name                : shipment?.returnOrder?.name,
+                        orderNumber         : shipment?.returnOrder?.orderNumber
+                ],
                 replenishmentType   : stocklist?.replenishmentTypeCode?.name(),
                 dateRequested       : dateRequested?.format("MM/dd/yyyy"),
                 dateCreated         : dateCreated?.format("MM/dd/yyyy"),
@@ -138,6 +147,9 @@ class OutboundStockMovementListItem implements Serializable {
                 lineItemCount       : lineItemCount,
                 requestType         : requestType?.name(),
                 sourceType          : sourceType?.name(),
+                isPending           : pending,
+                isReturn            : fromReturnOrder,
+                isElectronicType    : electronicType,
         ]
     }
 
@@ -152,6 +164,10 @@ class OutboundStockMovementListItem implements Serializable {
             return OrderItem.countByOrder(order)
         }
         return 0
+    }
+
+    Boolean isFromReturnOrder() {
+        return shipment?.isFromReturnOrder
     }
 
     Boolean isPending() {

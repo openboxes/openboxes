@@ -1177,7 +1177,9 @@ div.search-input:focus-within {
       height: 30px;
       border-radius: 50%;
       border: 2px solid var(--gray-400);
-      display: block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
 
