@@ -123,6 +123,14 @@ const StockTransferListTable = ({
         />),
     },
     {
+      Header: 'Line items',
+      accessor: 'orderItemsCount',
+      className: 'd-flex align-items-center justify-content-center',
+      sortable: false,
+      maxWidth: 100,
+      Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.orderItemsCount}</span>),
+    },
+    {
       Header: 'Status',
       accessor: 'status',
       className: 'active-circle d-flex',
@@ -148,13 +156,6 @@ const StockTransferListTable = ({
       accessor: 'dateCreated',
       className: 'd-flex align-items-center',
       Cell: row => <TableCell {...row} tooltip />,
-    },
-    {
-      Header: 'Line items',
-      accessor: 'orderItemsCount',
-      className: 'd-flex align-items-center',
-      sortable: false,
-      Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.orderItemsCount}</span>),
     },
   ];
 
