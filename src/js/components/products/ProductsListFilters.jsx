@@ -74,6 +74,17 @@ const ProductsListFilters = ({
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
+  const [defaultValues, setDefaultValues] = useState({});
+
+  useEffect(() => {
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
+    setDefaultValues({
+      ...initialEmptyValues,
+    });
+  }, []);
 
   const fetchProductsCategories = () => {
     apiClient.get('/openboxes/api/categoryOptions').then((res) => {
@@ -109,7 +120,7 @@ const ProductsListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
           categories,
           catalogs,
@@ -119,6 +130,7 @@ const ProductsListFilters = ({
         searchFieldId="q"
         allowEmptySubmit
         hidden={false}
+        defaultValues={defaultValues}
       />
     </div>
   );
