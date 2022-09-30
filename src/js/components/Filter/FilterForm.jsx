@@ -21,6 +21,7 @@ const FilterForm = ({
   defaultValues,
   allowEmptySubmit,
   hidden,
+  onClear,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -33,6 +34,8 @@ const FilterForm = ({
     },
   };
 
+  // Default values can change based on currentLocation
+  // or any async data defaultValues are waiting for
   useEffect(() => {
     updateFilterParams(defaultValues);
   }, [defaultValues]);
@@ -44,6 +47,14 @@ const FilterForm = ({
         if (typeof value === 'object') return !_.isEmpty(value);
         return !!value;
       }).length);
+  };
+
+  const onClearHandler = (form) => {
+    if (onClear && typeof onClear === 'function') {
+      onClear(form);
+      return;
+    }
+    form.reset(defaultValues);
   };
 
   return (
@@ -69,7 +80,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
-                      onClick={() => form.reset(defaultValues)}
+                      onClick={() => onClearHandler(form)}
                       variant="transparent"
                       type="submit"
                     />
@@ -103,6 +114,7 @@ export default FilterForm;
 FilterForm.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
   updateFilterParams: PropTypes.func.isRequired,
+  onClear: PropTypes.func,
   searchFieldPlaceholder: PropTypes.string,
   formProps: PropTypes.shape({}),
   searchFieldId: PropTypes.string,
@@ -118,4 +130,5 @@ FilterForm.defaultProps = {
   defaultValues: {},
   allowEmptySubmit: false,
   hidden: true,
+  onClear: undefined,
 };
