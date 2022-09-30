@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -108,6 +108,24 @@ const InvoiceListFilters = ({
   typeCodes,
   fetchTypeCodes,
 }) => {
+  const [defaultValues, setDefaultValues] = useState({});
+
+  useEffect(() => {
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
+    setDefaultValues({
+      ...initialEmptyValues,
+      buyerOrganization: {
+        id: currentLocation?.organization?.id,
+        value: currentLocation?.organization?.id,
+        name: currentLocation?.organization?.name,
+        label: currentLocation?.organization?.name,
+      },
+    });
+  }, [currentLocation]);
+
   useEffect(() => {
     // If statuses or invoice type codes not yet in store, fetch them
     if (!statuses || statuses.length === 0) {
@@ -128,7 +146,7 @@ const InvoiceListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
           statuses,
           debouncedUsersFetch,
@@ -136,14 +154,7 @@ const InvoiceListFilters = ({
           typeCodes,
           organization: currentLocation.organization,
         }}
-        defaultValues={{
-            buyerOrganization: {
-              id: currentLocation.organization.id,
-              value: currentLocation.organization.id,
-              name: currentLocation.organization.name,
-              label: currentLocation.organization.name,
-            },
-        }}
+        defaultValues={defaultValues}
         searchFieldPlaceholder="Search by invoice number..."
         searchFieldId="invoiceNumber"
         hidden={false}

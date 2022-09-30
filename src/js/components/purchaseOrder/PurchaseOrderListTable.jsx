@@ -404,48 +404,50 @@ const PurchaseOrderListTable = ({
   };
 
   const onFetchHandler = (state) => {
-    const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-    const sortingParams = state.sorted.length > 0 ?
-      {
-        sort: state.sorted[0].id,
-        order: state.sorted[0].desc ? 'desc' : 'asc',
-      } :
-      {
-        sort: 'dateOrdered',
-        order: 'desc',
+    if (!_.isEmpty(filterParams)) {
+      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
+      const sortingParams = state.sorted.length > 0 ?
+        {
+          sort: state.sorted[0].id,
+          order: state.sorted[0].desc ? 'desc' : 'asc',
+        } :
+        {
+          sort: 'dateOrdered',
+          order: 'desc',
+        };
+      const statusParam = filterParams.status &&
+        filterParams.status.map(status => status.value);
+      const params = {
+        ..._.omitBy({
+          offset: `${offset}`,
+          max: `${state.pageSize}`,
+          ...sortingParams,
+          ..._.omit(filterParams, 'status'),
+          status: statusParam,
+          origin: filterParams.origin && filterParams.origin.id,
+          orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
+          destinationParty: destinationPartyParam(),
+        }, _.isEmpty),
+        destination: destinationParam(),
       };
-    const statusParam = filterParams.status &&
-      filterParams.status.map(status => status.value);
-    const params = {
-      ..._.omitBy({
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        ...sortingParams,
-        ..._.omit(filterParams, 'status'),
-        status: statusParam,
-        origin: filterParams.origin && filterParams.origin.id,
-        orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-        destinationParty: destinationPartyParam(),
-      }, _.isEmpty),
-      destination: destinationParam(),
-    };
 
-    // Fetch data
-    setLoading(true);
-    apiClient.get('/openboxes/api/purchaseOrders', {
-      params,
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        setLoading(false);
-        setPages(Math.ceil(res.data.totalCount / state.pageSize));
-        setTotalData(res.data.totalCount);
-        setOrdersData(res.data.data);
-        setTotalPrice(res.data.totalPrice);
-        // Store currently used params for export case
-        setCurrentParams(params);
+      // Fetch data
+      setLoading(true);
+      apiClient.get('/openboxes/api/purchaseOrders', {
+        params,
+        paramsSerializer: parameters => queryString.stringify(parameters),
       })
-      .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
+        .then((res) => {
+          setLoading(false);
+          setPages(Math.ceil(res.data.totalCount / state.pageSize));
+          setTotalData(res.data.totalCount);
+          setOrdersData(res.data.data);
+          setTotalPrice(res.data.totalPrice);
+          // Store currently used params for export case
+          setCurrentParams(params);
+        })
+        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
+    }
   };
 
   return (

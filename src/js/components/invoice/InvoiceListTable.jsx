@@ -135,43 +135,45 @@ const InvoiceListTable = ({
 
 
   const onFetchHandler = (state) => {
-    const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-    const sortingParams = state.sorted.length > 0 ?
-      {
-        sort: state.sorted[0].id,
-        order: state.sorted[0].desc ? 'desc' : 'asc',
-      } :
-      {
-        sort: 'dateInvoiced',
-        order: 'desc',
-      };
+    if (!_.isEmpty(filterParams)) {
+      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
+      const sortingParams = state.sorted.length > 0 ?
+        {
+          sort: state.sorted[0].id,
+          order: state.sorted[0].desc ? 'desc' : 'asc',
+        } :
+        {
+          sort: 'dateInvoiced',
+          order: 'desc',
+        };
 
 
-    const params = _.omitBy({
-      offset: `${offset}`,
-      max: `${state.pageSize}`,
-      ...sortingParams,
-      ...filterParams,
-      status: filterParams.status && filterParams.status.value,
-      invoiceTypeCode: filterParams.invoiceTypeCode && filterParams.invoiceTypeCode.id,
-      vendor: filterParams.vendor && filterParams.vendor.id,
-      createdBy: filterParams.createdBy && filterParams.createdBy.id,
-      buyerOrganization: filterParams.buyerOrganization && filterParams.buyerOrganization.id,
-    }, _.isEmpty);
+      const params = _.omitBy({
+        offset: `${offset}`,
+        max: `${state.pageSize}`,
+        ...sortingParams,
+        ...filterParams,
+        status: filterParams.status && filterParams.status.value,
+        invoiceTypeCode: filterParams.invoiceTypeCode && filterParams.invoiceTypeCode.id,
+        vendor: filterParams.vendor && filterParams.vendor.id,
+        createdBy: filterParams.createdBy && filterParams.createdBy.id,
+        buyerOrganization: filterParams.buyerOrganization && filterParams.buyerOrganization.id,
+      }, _.isEmpty);
 
-    // Fetch data
-    setLoading(true);
-    apiClient.get('/openboxes/api/invoices', {
-      params,
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        setLoading(false);
-        setPages(Math.ceil(res.data.totalCount / state.pageSize));
-        setTotalData(res.data.totalCount);
-        setInvoiceData(res.data.data);
+      // Fetch data
+      setLoading(true);
+      apiClient.get('/openboxes/api/invoices', {
+        params,
+        paramsSerializer: parameters => queryString.stringify(parameters),
       })
-      .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Could not fetch list of invoices'))));
+        .then((res) => {
+          setLoading(false);
+          setPages(Math.ceil(res.data.totalCount / state.pageSize));
+          setTotalData(res.data.totalCount);
+          setInvoiceData(res.data.data);
+        })
+        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Could not fetch list of invoices'))));
+    }
   };
 
 

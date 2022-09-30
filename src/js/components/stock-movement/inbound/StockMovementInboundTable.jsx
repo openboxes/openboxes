@@ -90,45 +90,47 @@ const StockMovementInboundTable = ({
 
 
   const onFetchHandler = (state) => {
-    const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-    const sortingParams = state.sorted.length > 0 ?
-      {
-        sort: state.sorted[0].id,
-        order: state.sorted[0].desc ? 'desc' : 'asc',
-      } : undefined;
+    if (!_.isEmpty(filterParams)) {
+      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
+      const sortingParams = state.sorted.length > 0 ?
+        {
+          sort: state.sorted[0].id,
+          order: state.sorted[0].desc ? 'desc' : 'asc',
+        } : undefined;
 
-    const params = _.omitBy({
-      ...filterParams,
-      offset: `${offset}`,
-      max: `${state.pageSize}`,
-      direction: 'INBOUND',
-      receiptStatusCode: filterParams.receiptStatusCode &&
-        filterParams.receiptStatusCode?.map(({ id }) => id),
-      origin: filterParams?.origin?.id,
-      destination: filterParams?.destination?.id,
-      requestedBy: filterParams.requestedBy?.id,
-      createdBy: filterParams.createdBy?.id,
-      updatedBy: filterParams.updatedBy?.id,
-      ...sortingParams,
-    }, (value) => {
-      if (typeof value === 'object' && _.isEmpty(value)) return true;
-      return !value;
-    });
-
-    // Fetch data
-    setLoading(true);
-    apiClient.get('/openboxes/api/stockMovements', {
-      paramsSerializer: parameters => queryString.stringify(parameters),
-      params,
-    })
-      .then((res) => {
-        setLoading(false);
-        setPages(Math.ceil(res.data.totalCount / state.pageSize));
-        setTotalData(res.data.totalCount);
-        setTableData(res.data.data);
-        // Store currently used params for export case
-        setCurrentParams(params);
+      const params = _.omitBy({
+        ...filterParams,
+        offset: `${offset}`,
+        max: `${state.pageSize}`,
+        direction: 'INBOUND',
+        receiptStatusCode: filterParams.receiptStatusCode &&
+          filterParams.receiptStatusCode?.map(({ id }) => id),
+        origin: filterParams?.origin?.id,
+        destination: filterParams?.destination?.id,
+        requestedBy: filterParams.requestedBy?.id,
+        createdBy: filterParams.createdBy?.id,
+        updatedBy: filterParams.updatedBy?.id,
+        ...sortingParams,
+      }, (value) => {
+        if (typeof value === 'object' && _.isEmpty(value)) return true;
+        return !value;
       });
+
+      // Fetch data
+      setLoading(true);
+      apiClient.get('/openboxes/api/stockMovements', {
+        paramsSerializer: parameters => queryString.stringify(parameters),
+        params,
+      })
+        .then((res) => {
+          setLoading(false);
+          setPages(Math.ceil(res.data.totalCount / state.pageSize));
+          setTotalData(res.data.totalCount);
+          setTableData(res.data.data);
+          // Store currently used params for export case
+          setCurrentParams(params);
+        });
+    }
   };
 
   const deleteReturnStockMovement = (id) => {
