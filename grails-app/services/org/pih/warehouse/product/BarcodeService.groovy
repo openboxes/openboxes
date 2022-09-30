@@ -15,6 +15,9 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.BitMatrix
 
+import javax.servlet.http.HttpServletResponse
+import java.nio.charset.StandardCharsets
+
 /**
  * @author Michael Astreiko
  */
@@ -22,16 +25,17 @@ class BarcodeService {
 
     MultiFormatWriter barCodeWriter = new MultiFormatWriter()
 
-    void renderImage(response, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE) {
-        Hashtable hints = [(EncodeHintType.CHARACTER_SET): 'UTF8']
-        BitMatrix bitMatrix = barCodeWriter.encode(data, format, width, height, hints)
-        MatrixToImageWriter.writeToStream(bitMatrix, "png", response.outputStream)
+    void renderImage(OutputStream outputStream, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE, String imageFormat = 'png') {
+        final hints = [
+            (EncodeHintType.CHARACTER_SET): StandardCharsets.UTF_8.toString()
+        ]
+        BitMatrix rawBarcode = barCodeWriter.encode(data, format, width, height, hints)
+        MatrixToImageWriter.writeToStream(rawBarcode, imageFormat, outputStream)
     }
 
-    void renderImageToFile(File file, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE) {
-        Hashtable hints = [(EncodeHintType.CHARACTER_SET): 'UTF8']
-        BitMatrix bitMatrix = barCodeWriter.encode(data, format, width, height, hints)
-        MatrixToImageWriter.writeToFile(bitMatrix, "png", file)
+    void renderImage(HttpServletResponse response, String data, int width, int height, BarcodeFormat format = BarcodeFormat.QR_CODE) {
+        response.contentType = 'image/png'
+        renderImage(response.outputStream, data, width, height, format, 'png')
+        response.outputStream.flush()
     }
-
 }
