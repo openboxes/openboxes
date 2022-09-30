@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -14,14 +14,13 @@ import 'components/Filter/FilterStyles.scss';
 
 const FilterForm = ({
   filterFields,
-  onSubmit,
+  updateFilterParams,
   searchFieldPlaceholder,
   searchFieldId,
   formProps,
   defaultValues,
   allowEmptySubmit,
   hidden,
-  onClear,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -33,11 +32,10 @@ const FilterForm = ({
       filterElement: true,
     },
   };
-  // Create initialValues from filterFields as empty values
-  const initialValues = Object.keys(filterFields).reduce((acc, key) => {
-    if (!acc[key]) return { ...acc, [key]: '' };
-    return acc;
-  }, { ...defaultValues });
+
+  useEffect(() => {
+    updateFilterParams(defaultValues);
+  }, [defaultValues]);
 
   // Calculate which object's values are not empty
   const countFilled = (values) => {
@@ -48,19 +46,11 @@ const FilterForm = ({
       }).length);
   };
 
-  const onClearHandler = (form) => {
-    if (onClear && typeof onClear === 'function') {
-      onClear(form);
-      return;
-    }
-    form.reset(initialValues);
-  };
-
   return (
     <div className="filter-form">
       <Form
-        onSubmit={onSubmit}
-        initialValues={initialValues}
+        onSubmit={updateFilterParams}
+        initialValues={defaultValues}
         render={({ values, handleSubmit, form }) => {
           countFilled(values);
           return (
@@ -79,7 +69,7 @@ const FilterForm = ({
                     <Button
                       defaultLabel="Clear"
                       label="react.button.clear.label"
-                      onClick={() => onClearHandler(form)}
+                      onClick={() => form.reset(defaultValues)}
                       variant="transparent"
                       type="submit"
                     />
@@ -112,8 +102,7 @@ export default FilterForm;
 
 FilterForm.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  onClear: PropTypes.func,
+  updateFilterParams: PropTypes.func.isRequired,
   searchFieldPlaceholder: PropTypes.string,
   formProps: PropTypes.shape({}),
   searchFieldId: PropTypes.string,
@@ -127,7 +116,6 @@ FilterForm.defaultProps = {
   searchFieldId: 'searchTerm',
   formProps: {},
   defaultValues: {},
-  onClear: undefined,
   allowEmptySubmit: false,
   hidden: true,
 };

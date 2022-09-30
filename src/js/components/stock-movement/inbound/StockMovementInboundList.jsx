@@ -9,14 +9,7 @@ import StockMovementInboundHeader from 'components/stock-movement/inbound/StockM
 import StockMovementInboundTable from 'components/stock-movement/inbound/StockMovementInboundTable';
 
 const StockMovementInboundList = (props) => {
-  const [filterParams, setFilterParams] = useState({
-    destination: {
-      id: props.currentLocation.id,
-      value: props.currentLocation.id,
-      name: props.currentLocation.name,
-      label: props.currentLocation.name,
-    },
-  });
+  const [filterParams, setFilterParams] = useState({});
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
@@ -39,7 +32,7 @@ const StockMovementInboundList = (props) => {
   return (
     <div className="d-flex flex-column list-page-main">
       <StockMovementInboundHeader showMyStockMovements={selectFiltersForMyStockMovements} />
-      <StockMovementInboundFilters filterParams={filterParams} setFilterParams={setFilterParams} />
+      <StockMovementInboundFilters setFilterParams={setFilterParams} />
       <StockMovementInboundTable filterParams={filterParams} />
     </div>
   );
@@ -48,7 +41,6 @@ const StockMovementInboundList = (props) => {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   currentUser: state.session.user,
-  currentLocation: state.session.currentLocation,
 });
 
 export default connect(mapStateToProps, { fetchTranslations })(StockMovementInboundList);
@@ -56,10 +48,6 @@ export default connect(mapStateToProps, { fetchTranslations })(StockMovementInbo
 StockMovementInboundList.propTypes = {
   locale: PropTypes.string.isRequired,
   currentUser: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
-  currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,

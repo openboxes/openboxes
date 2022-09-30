@@ -160,46 +160,48 @@ const StockTransferListTable = ({
 
 
   const onFetchHandler = (tableState) => {
-    const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-    const sortingParams = tableState.sorted.length > 0 ?
-      {
-        sort: tableState.sorted[0].id,
-        order: tableState.sorted[0].desc ? 'desc' : 'asc',
-      } :
-      {
-        sort: 'dateCreated',
-        order: 'desc',
-      };
+    if (!_.isEmpty(filterParams)) {
+      const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
+      const sortingParams = tableState.sorted.length > 0 ?
+        {
+          sort: tableState.sorted[0].id,
+          order: tableState.sorted[0].desc ? 'desc' : 'asc',
+        } :
+        {
+          sort: 'dateCreated',
+          order: 'desc',
+        };
 
-    const params = _.omitBy({
-      location: currentLocation?.id,
-      offset: `${offset}`,
-      max: `${tableState.pageSize}`,
-      ...sortingParams,
-      ...filterParams,
-      createdBy: filterParams.createdBy?.id,
-      status: filterParams.status && filterParams.status.map(({ value }) => value),
-    }, _.isEmpty);
+      const params = _.omitBy({
+        location: currentLocation?.id,
+        offset: `${offset}`,
+        max: `${tableState.pageSize}`,
+        ...sortingParams,
+        ...filterParams,
+        createdBy: filterParams.createdBy?.id,
+        status: filterParams.status && filterParams.status.map(({ value }) => value),
+      }, _.isEmpty);
 
-    // Fetch data
-    setLoading(true);
-    apiClient.get('/openboxes/api/stockTransfers', {
-      params,
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        setTableData({
-          stockTransfersData: res.data.data,
-          totalCount: res.data.totalCount,
-          pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-          currentParams: params,
-        });
-        setLoading(false);
+      // Fetch data
+      setLoading(true);
+      apiClient.get('/openboxes/api/stockTransfers', {
+        params,
+        paramsSerializer: parameters => queryString.stringify(parameters),
       })
-      .catch(() => {
-        setLoading(false);
-        return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Could not fetch list of stock transfers')));
-      });
+        .then((res) => {
+          setTableData({
+            stockTransfersData: res.data.data,
+            totalCount: res.data.totalCount,
+            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
+            currentParams: params,
+          });
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Could not fetch list of stock transfers')));
+        });
+    }
   };
 
 

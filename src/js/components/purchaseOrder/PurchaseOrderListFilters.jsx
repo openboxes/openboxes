@@ -135,25 +135,23 @@ const PurchaseOrderListFilters = ({
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
 
   const determineDefaultValues = () => {
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
     // If central purchasing is enabled, set default purchasing org as currentLocation's org
     if (isCentralPurchasingEnabled) {
       setDefaultValues({
+        ...initialEmptyValues,
         destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
       });
-      setFilterParams(prevState => ({
-        ...prevState,
-        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
-      }));
       return;
     }
     // If central purchasing is not enabled, set default destination as currentLocation
     setDefaultValues({
+      ...initialEmptyValues,
       destination: currentLocation,
     });
-    setFilterParams(prevState => ({
-      ...prevState,
-      destination: currentLocation,
-    }));
   };
 
   useEffect(() => {
@@ -185,7 +183,7 @@ const PurchaseOrderListFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
           statuses,
           debouncedOriginLocationsFetch,

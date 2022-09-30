@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -141,18 +141,35 @@ const StockMovementInboundFilters = ({
   setFilterParams,
   debounceTime,
   minSearchLength,
-  filterParams,
   fetchStatuses,
   shipmentStatuses,
   isShipmentStatusesFetched,
+  currentLocation,
 }) => {
   const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
   const fetchLocations = debounceLocationsFetch(debounceTime, minSearchLength, [], true);
+  const [defaultValues, setDefaultValues] = useState({});
 
 
   useEffect(() => {
     if (!isShipmentStatusesFetched) fetchStatuses();
   }, []);
+
+  useEffect(() => {
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
+    setDefaultValues({
+      ...initialEmptyValues,
+      destination: {
+        id: currentLocation?.id,
+        value: currentLocation?.id,
+        name: currentLocation?.name,
+        label: currentLocation?.name,
+      },
+    });
+  }, [currentLocation]);
 
   return (
     <div className="d-flex flex-column list-page-filters">
@@ -160,11 +177,8 @@ const StockMovementInboundFilters = ({
         searchFieldId="q"
         searchFieldPlaceholder="Search by order number of description"
         filterFields={filterFields}
-        defaultValues={{
-          ...filterParams,
-        }}
-        onClear={form => form.reset({ destination: filterParams.destination })}
-        onSubmit={values => setFilterParams({ ...values })}
+        defaultValues={defaultValues}
+        updateFilterParams={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
           shipmentStatuses,
@@ -181,6 +195,7 @@ const mapStateToProps = state => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
   shipmentStatuses: state.shipmentStatuses.data,
   isShipmentStatusesFetched: state.shipmentStatuses.fetched,
+  currentLocation: state.session.currentLocation,
 });
 
 const mapDispatchToProps = {
@@ -189,9 +204,6 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundFilters);
 
-StockMovementInboundFilters.defaultProps = {
-  filterParams: {},
-};
 
 StockMovementInboundFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
@@ -199,11 +211,14 @@ StockMovementInboundFilters.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   isShipmentStatusesFetched: PropTypes.bool.isRequired,
   minSearchLength: PropTypes.number.isRequired,
-  filterParams: PropTypes.arrayOf({}),
   shipmentStatuses: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
+  }).isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
   }).isRequired,
 };

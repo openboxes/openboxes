@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -71,17 +71,29 @@ const StockTransferListFilters = ({
   minSearchLength,
   statuses,
 }) => {
+  const [defaultValues, setDefaultValues] = useState({});
+
+  useEffect(() => {
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
+    setDefaultValues({
+      ...initialEmptyValues,
+    });
+  }, []);
   const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
           debouncedUsersFetch,
           statuses,
         }}
+        defaultValues={defaultValues}
         searchFieldPlaceholder="Search by transfer number"
         searchFieldId="q"
         allowEmptySubmit
