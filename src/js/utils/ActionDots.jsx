@@ -65,9 +65,12 @@ const ActionDots = ({
           }
 
           return (
-            <React.Fragment key={`action-item-${id}`}>
+            <React.Fragment key={action.href ? action.href : action.label}>
               { elementType === actionItemType.BUTTON && (
-                <button onClick={() => action.onClick(id)} className={itemClasses}>
+                <button
+                  onClick={() => action.onClick(id)}
+                  className={itemClasses}
+                >
                   {itemValue}
                 </button>)}
               { elementType === actionItemType.LINK && (
