@@ -124,7 +124,7 @@ const StockMovementInboundTable = ({
 
   const deleteReturnStockMovement = (id) => {
     showTheSpinner();
-    apiClient.delete(`/openboxes/stockMovements/${id}`)
+    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
       .then((res) => {
         if (res.status === 204) {
           const successMessage = translate(

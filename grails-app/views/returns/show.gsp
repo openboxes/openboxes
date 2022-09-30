@@ -55,9 +55,9 @@
             <g:if test="${stockMovement?.destination == currentLocation}">
                 <g:set var="direction" value="INBOUND"/>
             </g:if>
-            <g:elseif test="${stockMovement?.origin == currentLocation}">
+            <g:else>
                 <g:set var="direction" value="OUTBOUND"/>
-            </g:elseif>
+            </g:else>
             <g:link controller="stockMovement" action="list" class="button" params="[direction: direction]">
                 <img src="${resource(dir: 'images/icons/silk', file: 'text_list_bullets.png')}" />&nbsp;
                 <warehouse:message code="default.button.list.label" />
