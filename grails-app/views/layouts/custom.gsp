@@ -73,11 +73,19 @@
         </div>
     </g:if>
     <g:if test="${session.impersonateUserId}">
-        <div class="notice">
-            <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user {0}."/>
-            <g:link controller="auth" action="logout">
-                ${g.message(code:'default.logout.label', default: "Logout")}
-            </g:link>
+        <div class="impersonate-box d-flex justify-content-between align-items-center">
+            <div class="info d-flex align-items-center">
+                <i class="ri-shield-user-line"></i>
+                <span>
+                    <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user"/>
+                    <span class="font-weight-bold">${session?.user?.username}</span>
+                </span>
+            </div>
+            <a href="/openboxes/auth/logout">
+                <button class="primary-button">
+                    ${g.message(code:'default.logout.label', default: "Logout")}
+                </button>
+            </a>
         </div>
     </g:if>
     <g:if test="${session.useDebugLocale}">
