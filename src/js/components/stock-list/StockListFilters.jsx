@@ -61,17 +61,30 @@ const StockListFilters = ({ setFilterParams }) => {
       });
   }, []);
 
+  const [defaultValues, setDefaultValues] = useState({});
+
+  useEffect(() => {
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
+    setDefaultValues({
+      ...initialEmptyValues,
+    });
+  }, []);
+
 
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         searchFieldId="q"
         filterFields={filterFields}
-        onSubmit={values => setFilterParams({ ...values })}
+        updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{ locations }}
         allowEmptySubmit
         searchFieldPlaceholder="Search by stocklist name"
         hidden={false}
+        defaultValues={defaultValues}
       />
     </div>
   );

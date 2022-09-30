@@ -89,51 +89,53 @@ const ProductsListTable = ({
 
 
   const onFetchHandler = (tableState) => {
-    const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-    const sortingParams = tableState.sorted.length > 0 ?
-      {
-        sort: tableState.sorted[0].id,
-        order: tableState.sorted[0].desc ? 'desc' : 'asc',
-      } :
-      {
-        sort: 'lastUpdated',
-        order: 'desc',
-      };
+    if (!_.isEmpty(filterParams)) {
+      const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
+      const sortingParams = tableState.sorted.length > 0 ?
+        {
+          sort: tableState.sorted[0].id,
+          order: tableState.sorted[0].desc ? 'desc' : 'asc',
+        } :
+        {
+          sort: 'lastUpdated',
+          order: 'desc',
+        };
 
-    const params = _.omitBy({
-      offset: `${offset}`,
-      max: `${tableState.pageSize}`,
-      ...sortingParams,
-      ...filterParams,
-      catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
-      categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
-      tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
-    }, (val) => {
-      if (typeof val === 'boolean') {
-        return !val;
-      }
-      return _.isEmpty(val);
-    });
-
-    // Fetch data
-    setLoading(true);
-    apiClient.get('/openboxes/api/products', {
-      params,
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        setTableData({
-          productsData: res.data.data,
-          totalCount: res.data.totalCount,
-          pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-          currentParams: params,
-        });
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-        return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Could not fetch list of products')));
+      const params = _.omitBy({
+        offset: `${offset}`,
+        max: `${tableState.pageSize}`,
+        ...sortingParams,
+        ...filterParams,
+        catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
+        categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
+        tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
+      }, (val) => {
+        if (typeof val === 'boolean') {
+          return !val;
+        }
+        return _.isEmpty(val);
       });
+
+      // Fetch data
+      setLoading(true);
+      apiClient.get('/openboxes/api/products', {
+        params,
+        paramsSerializer: parameters => queryString.stringify(parameters),
+      })
+        .then((res) => {
+          setTableData({
+            productsData: res.data.data,
+            totalCount: res.data.totalCount,
+            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
+            currentParams: params,
+          });
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+          return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Could not fetch list of products')));
+        });
+    }
   };
 
   const exportProducts = (allProducts = false, withAttributes = false) => {

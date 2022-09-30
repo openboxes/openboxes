@@ -202,41 +202,43 @@ const StockListTable = ({
   };
 
   const onFetchHandler = (state) => {
-    const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-    const sortingParams = state.sorted.length > 0 ?
-      {
-        sort: state.sorted[0].id,
-        order: state.sorted[0].desc ? 'desc' : 'asc',
-      } : undefined;
+    if (!_.isEmpty(filterParams)) {
+      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
+      const sortingParams = state.sorted.length > 0 ?
+        {
+          sort: state.sorted[0].id,
+          order: state.sorted[0].desc ? 'desc' : 'asc',
+        } : undefined;
 
-    const { isPublished, ...otherFilterParams } = filterParams;
-    const params = _.omitBy({
-      ...otherFilterParams,
-      offset: `${offset}`,
-      max: `${state.pageSize}`,
-      includeUnpublished: isPublished,
-      origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
-      destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
-      ...sortingParams,
-    }, (value) => {
-      if (typeof value === 'object' && _.isEmpty(value)) return true;
-      return !value;
-    });
-
-    // Fetch data
-    setLoading(true);
-    apiClient.get('/openboxes/api/stocklists', {
-      params,
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        setLoading(false);
-        setPages(Math.ceil(res.data.totalCount / state.pageSize));
-        setTotalData(res.data.totalCount);
-        setTableData(res.data.data);
-        // Store currently used params for export case
-        setCurrentParams(params);
+      const { isPublished, ...otherFilterParams } = filterParams;
+      const params = _.omitBy({
+        ...otherFilterParams,
+        offset: `${offset}`,
+        max: `${state.pageSize}`,
+        includeUnpublished: isPublished,
+        origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
+        destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
+        ...sortingParams,
+      }, (value) => {
+        if (typeof value === 'object' && _.isEmpty(value)) return true;
+        return !value;
       });
+
+      // Fetch data
+      setLoading(true);
+      apiClient.get('/openboxes/api/stocklists', {
+        params,
+        paramsSerializer: parameters => queryString.stringify(parameters),
+      })
+        .then((res) => {
+          setLoading(false);
+          setPages(Math.ceil(res.data.totalCount / state.pageSize));
+          setTotalData(res.data.totalCount);
+          setTableData(res.data.data);
+          // Store currently used params for export case
+          setCurrentParams(params);
+        });
+    }
   };
 
   // List of all actions for Stocklists rows
