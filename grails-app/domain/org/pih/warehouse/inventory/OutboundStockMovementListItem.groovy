@@ -137,9 +137,9 @@ class OutboundStockMovementListItem implements Serializable {
                         name: stocklist?.name
                 ],
                 order                : [
-                        id                  : shipment?.returnOrder?.id,
-                        name                : shipment?.returnOrder?.name,
-                        orderNumber         : shipment?.returnOrder?.orderNumber
+                        id                  : order?.id,
+                        name                : order?.name,
+                        orderNumber         : order?.orderNumber
                 ],
                 replenishmentType   : stocklist?.replenishmentTypeCode?.name(),
                 dateRequested       : dateRequested?.format("MM/dd/yyyy"),
@@ -168,7 +168,7 @@ class OutboundStockMovementListItem implements Serializable {
     }
 
     Boolean isFromReturnOrder() {
-        return shipment?.isFromReturnOrder
+        return order?.isReturnOrder
     }
 
     Boolean isPending() {
