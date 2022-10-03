@@ -38,7 +38,7 @@ const StockMovementInboundFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         searchFieldId="q"
-        searchFieldPlaceholder="Search by order number of description"
+        searchFieldPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
         onClear={form => form.reset({ destination: defaultValues.destination })}

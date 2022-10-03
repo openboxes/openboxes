@@ -126,9 +126,9 @@ const StockMovementOutboundTable = ({
     }
   };
 
-  const deleteReturnStockMovement = (id) => {
+  const deleteStockMovement = (id) => {
     showTheSpinner();
-    apiClient.delete(`/api/openboxes/stockMovements/${id}`)
+    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
       .then((res) => {
         if (res.status === 204) {
           const successMessage = translate(
@@ -145,7 +145,7 @@ const StockMovementOutboundTable = ({
   const deleteConfirmAlert = (id) => {
     const confirmButton = {
       label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => deleteReturnStockMovement(id),
+      onClick: () => deleteStockMovement(id),
     };
     const cancelButton = {
       label: translate('react.default.no.label', 'No'),
@@ -163,7 +163,7 @@ const StockMovementOutboundTable = ({
   // List of all actions for outbound Stock Movement rows
   const getActions = (row) => {
     const {
-      isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
+      isPending, isReturn, order, origin, isReceived, isPartiallyReceived, currentStatus,
     } = row.original;
     const actions = [];
 
@@ -194,7 +194,7 @@ const StockMovementOutboundTable = ({
 
     const isSameOrigin = currentLocation.id === origin?.id;
     // Delete
-    if (isPending && (isSameOrigin || !origin?.isDepot)) {
+    if ((isPending || !currentStatus) && (isSameOrigin || !origin?.isDepot)) {
       const deleteAction = {
         defaultLabel: 'Delete Stock Movement',
         label: 'react.stockMovement.action.delete.label',
@@ -264,6 +264,7 @@ const StockMovementOutboundTable = ({
       Header: 'Name',
       accessor: 'name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (
         <TableCell
           {...row}
@@ -291,13 +292,20 @@ const StockMovementOutboundTable = ({
       Header: 'Stocklist',
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} defaultValue="None" />),
+      Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
       Header: 'Requested by',
       accessor: 'requestedBy.name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
+    },
+    {
+      Header: 'Date Requested',
+      accessor: 'dateRequested',
+      width: 150,
+      Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
       Header: 'Date Created',

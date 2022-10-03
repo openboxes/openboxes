@@ -278,7 +278,7 @@ const StockMovementInboundTable = ({
       Header: 'Stocklist',
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} defaultValue="None" />),
+      Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
       Header: 'Requested by',
