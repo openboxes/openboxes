@@ -178,6 +178,7 @@ class StockMovement {
             isReturn            : isReturn,
             isShipped           : isShipped,
             isReceived          : isReceived,
+            isPartiallyReceived : hasBeenPartiallyReceived(),
             isElectronicType    : electronicType,
             isPending           : pending,
             shipped             : isShipped,

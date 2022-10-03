@@ -158,40 +158,47 @@ const StockMovementInboundTable = ({
 
   // List of all actions for inbound Stock Movement rows
   const getActions = (row) => {
+    const {
+      isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
+    } = row.original;
     const actions = [];
 
     // Show
-    actions[0] = {
+    const showAction = {
       defaultLabel: 'Show Stock Movement',
       label: 'react.stockMovement.action.show.label',
       leftIcon: <RiInformationLine />,
       href: '/openboxes/stockMovement/show',
     };
+    actions.push(showAction);
 
     // Edit
-    actions[1] = {
-      defaultLabel: 'Edit Stock Movement',
-      label: 'react.stockMovement.action.edit.label',
-      leftIcon: <RiPencilLine />,
-    };
-    if (row.original.isReturn) {
-      actions[1].href = `/openboxes/stockTransfer/createInboundReturn/${row.original.order?.id}`;
-      actions[1].reactLink = true;
-      actions[1].appendId = false;
-    } else {
-      actions[1].href = '/openboxes/stockMovement/createCombinedShipments';
+    if (!isReceived && !isPartiallyReceived) {
+      const editAction = {
+        defaultLabel: 'Edit Stock Movement',
+        label: 'react.stockMovement.action.edit.label',
+        leftIcon: <RiPencilLine />,
+      };
+      if (isReturn) {
+        editAction.href = `/openboxes/stockTransfer/edit/${order?.id}`;
+        editAction.appendId = false;
+      } else {
+        editAction.href = '/openboxes/stockMovement/edit';
+      }
+      actions.push(editAction);
     }
 
-    const isSameOrigin = currentLocation.id === row.original.origin?.id;
+    const isSameOrigin = currentLocation.id === origin?.id;
     // Delete
-    if (row.original.isPending && (isSameOrigin || !row.original.origin?.isDepot)) {
-      actions[2] = {
+    if (isPending && (isSameOrigin || !origin?.isDepot)) {
+      const deleteAction = {
         defaultLabel: 'Delete Stock Movement',
         label: 'react.stockMovement.action.delete.label',
         leftIcon: <RiDeleteBinLine />,
         variant: 'danger',
         onClick: deleteConfirmAlert,
       };
+      actions.push(deleteAction);
     }
     return actions;
   };
