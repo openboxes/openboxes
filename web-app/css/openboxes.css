@@ -1263,6 +1263,9 @@ a:hover {
 .fade {
     color: #aaa;
 }
+.fade:not(.show) {
+    opacity: 1;
+}
 .empty {
     line-height: 100px;
     color: #aaa;
