@@ -120,9 +120,7 @@ class OutboundStockMovementService {
                         order("lastName", params.order ?: "desc")
                     }
                 } else if (params.sort == "dateRequested") {
-                    requisition {
-                        order("dateRequested", params.order ?: "desc")
-                    }
+                    order("dateRequested", params.order ?: "desc")
                 } else if (params.sort == "stocklist.name") {
                     requisition {
                         requisitionTemplate {
