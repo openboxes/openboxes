@@ -126,9 +126,9 @@ const StockMovementOutboundTable = ({
     }
   };
 
-  const deleteReturnStockMovement = (id) => {
+  const deleteStockMovement = (id) => {
     showTheSpinner();
-    apiClient.delete(`/api/openboxes/stockMovements/${id}`)
+    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
       .then((res) => {
         if (res.status === 204) {
           const successMessage = translate(
@@ -145,7 +145,7 @@ const StockMovementOutboundTable = ({
   const deleteConfirmAlert = (id) => {
     const confirmButton = {
       label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => deleteReturnStockMovement(id),
+      onClick: () => deleteStockMovement(id),
     };
     const cancelButton = {
       label: translate('react.default.no.label', 'No'),
@@ -162,40 +162,47 @@ const StockMovementOutboundTable = ({
 
   // List of all actions for outbound Stock Movement rows
   const getActions = (row) => {
+    const {
+      isPending, isReturn, order, origin, isReceived, isPartiallyReceived, currentStatus,
+    } = row.original;
     const actions = [];
 
     // Show
-    actions[0] = {
+    const showAction = {
       defaultLabel: 'Show Stock Movement',
       label: 'react.stockMovement.action.show.label',
       leftIcon: <RiInformationLine />,
       href: '/openboxes/stockMovement/show',
     };
+    actions.push(showAction);
 
     // Edit
-    actions[1] = {
-      defaultLabel: 'Edit Stock Movement',
-      label: 'react.stockMovement.action.edit.label',
-      leftIcon: <RiPencilLine />,
-    };
-    if (row.original.isReturn) {
-      actions[1].href = `/openboxes/stockTransfer/createOutboundReturn/${row.original.order?.id}`;
-      actions[1].reactLink = true;
-      actions[1].appendId = false;
-    } else {
-      actions[1].href = '/openboxes/stockMovement/verifyRequest';
+    if (!isReceived && !isPartiallyReceived) {
+      const editAction = {
+        defaultLabel: 'Edit Stock Movement',
+        label: 'react.stockMovement.action.edit.label',
+        leftIcon: <RiPencilLine />,
+      };
+      if (isReturn) {
+        editAction.href = `/openboxes/stockTransfer/edit/${order?.id}`;
+        editAction.appendId = false;
+      } else {
+        editAction.href = '/openboxes/stockMovement/edit';
+      }
+      actions.push(editAction);
     }
 
-    const isSameOrigin = currentLocation.id === row.original.origin?.id;
+    const isSameOrigin = currentLocation.id === origin?.id;
     // Delete
-    if (row.original.isPending && (isSameOrigin || !row.original.origin?.isDepot)) {
-      actions[2] = {
+    if ((isPending || !currentStatus) && (isSameOrigin || !origin?.isDepot)) {
+      const deleteAction = {
         defaultLabel: 'Delete Stock Movement',
         label: 'react.stockMovement.action.delete.label',
         leftIcon: <RiDeleteBinLine />,
         variant: 'danger',
         onClick: deleteConfirmAlert,
       };
+      actions.push(deleteAction);
     }
     return actions;
   };
@@ -257,6 +264,7 @@ const StockMovementOutboundTable = ({
       Header: 'Name',
       accessor: 'name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (
         <TableCell
           {...row}
@@ -284,13 +292,20 @@ const StockMovementOutboundTable = ({
       Header: 'Stocklist',
       accessor: 'stocklist.name',
       minWidth: 150,
-      Cell: row => (<TableCell {...row} defaultValue="None" />),
+      Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
       Header: 'Requested by',
       accessor: 'requestedBy.name',
       minWidth: 250,
+      sortable: false,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
+    },
+    {
+      Header: 'Date Requested',
+      accessor: 'dateRequested',
+      width: 150,
+      Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
       Header: 'Date Created',
