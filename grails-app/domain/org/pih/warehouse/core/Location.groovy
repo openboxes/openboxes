@@ -237,7 +237,16 @@ class Location implements Comparable<Location>, java.io.Serializable {
 
     Boolean hasBinLocationSupport() {
         ActivityCode[] requiredActivities = [ActivityCode.PICK_STOCK, ActivityCode.PUTAWAY_STOCK]
-        return supportsAny(requiredActivities) && !binLocations?.empty
+        return supportsAny(requiredActivities)
+    }
+
+    def countBinLocations = { Location location ->
+        Location.createCriteria().count {
+            eq("parentLocation", location)
+            locationType {
+                eq("locationTypeCode", LocationTypeCode.BIN_LOCATION)
+            }
+        }
     }
 
     Boolean isInternalLocation() {
@@ -311,6 +320,74 @@ class Location implements Comparable<Location>, java.io.Serializable {
             return (active && organization.active) ? LocationStatus.ENABLED : LocationStatus.DISABLED
         }
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
+    }
+
+    Map toJson() {
+        return [
+                id                         : id,
+                name                       : name,
+                description                : description,
+                locationNumber             : locationNumber,
+                locationGroup              : locationGroup,
+                parentLocation             : parentLocation,
+                locationType               : locationType,
+                sortOrder                  : sortOrder,
+                hasBinLocationSupport      : hasBinLocationSupport(),
+                hasPackingSupport          : supports(ActivityCode.PACK_SHIPMENT),
+                hasPartialReceivingSupport : supports(ActivityCode.PARTIAL_RECEIVING),
+                hasCentralPurchasingEnabled: supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
+                organizationName           : organization?.name,
+                organizationCode           : organization?.code,
+                backgroundColor            : bgColor,
+                zoneName                   : zone?.name,
+                zoneId                     : zone?.id,
+                active                     : active,
+                organization               : organization,
+                manager                    : manager,
+                address                    : address,
+                supportedActivities        : supportedActivities ?: locationType?.supportedActivities,
+        ]
+    }
+
+    Map toJson(LocationTypeCode locationTypeCode) {
+        switch (locationTypeCode) {
+            case LocationTypeCode.DEPOT:
+                return [
+                        id: id,
+                        name: name,
+                        locationNumber: locationNumber,
+                        locationType: locationType,
+                        locationTypeCode: locationType?.locationTypeCode?.name(),
+                        active: active
+                ]
+            case LocationTypeCode.INTERNAL:
+            case LocationTypeCode.BIN_LOCATION:
+                return [
+                        id: id,
+                        name: name,
+                        locationNumber: locationNumber,
+                        locationType: locationType?.name,
+                        locationTypeCode: locationType?.locationTypeCode?.name(),
+                        zoneId: zone?.id,
+                        zoneName: zone?.name,
+                        active: active
+                ]
+            case LocationTypeCode.ZONE:
+                return [
+                        id: id,
+                        name: name,
+                        locationNumber: locationNumber,
+                        locationType: locationType?.name,
+                        locationTypeCode: locationType?.locationTypeCode?.name(),
+                        active: active
+                ]
+            default:
+                return toJson()
+        }
+    }
+
+    static Map toJson(Location location) {
+        return location ? location.toJson(location?.locationType?.locationTypeCode) : null
     }
 
     static PROPERTIES = [

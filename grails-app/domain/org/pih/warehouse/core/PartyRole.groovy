@@ -33,4 +33,13 @@ class PartyRole implements Serializable {
         return roleType?.name
     }
 
+    Map toJson() {
+        return [
+                id: id,
+                roleType: roleType?.name(),
+                startDate: startDate,
+                endDate: endDate
+        ]
+    }
+
 }
