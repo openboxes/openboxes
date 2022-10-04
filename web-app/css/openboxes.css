@@ -24,15 +24,6 @@
     --gray-401: #747C93;
     --gray-500: #636D81;
     --gray-600: #464F60;
-
-/* YELLOW */
-    --yellow-ob: #F3A157;
-
-/* GREEN */
-    --green-ob: #13AD60;
-
-/* RED */
-    --red-ob: #C71610;
 }
 
 html * {
@@ -4042,10 +4033,9 @@ table.pvtTable tr th { background-color: #ddd; }
 }
 
 .impersonate-box {
-    font
     width: 100%;
     height: 54px;
-    background-color: var(--yellow-ob);
+    background-color: var(--color-yellow);
     padding: 11px 30px;
     font-weight: 400;
     font-size: 16px;
