@@ -33,6 +33,9 @@ const NavbarIcons = ({
         return '';
     }
   };
+
+  const configurationMenuSubsections = _.get(configurationMenuSection, 'subsections', []);
+
   const iconsList = [
     {
       name: 'search',
@@ -55,6 +58,7 @@ const NavbarIcons = ({
     {
       name: 'configuration',
       tooltip: 'Configuration',
+      hide: configurationMenuSubsections.length === 0,
       component: renderProps => (
         <div className="btn-group">
           <div
@@ -71,11 +75,12 @@ const NavbarIcons = ({
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
             <div className="dropdown-menu-subsections conf-subsections">
-              {configurationMenuSection &&
-                configurationMenuSection.subsections
-                && configurationMenuSection.subsections.map(subsection => (
-                  <MenuConfigurationSubsection subsection={subsection} key={`${subsection.label}-subsection`} />
-              ))}
+              {configurationMenuSubsections
+                .map(subsection =>
+                  (<MenuConfigurationSubsection
+                    key={`${subsection.label}-subsection`}
+                    subsection={subsection}
+                  />))}
             </div>
           </div>
         </div>
@@ -99,7 +104,9 @@ const NavbarIcons = ({
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
-            <span className="subsection-title">{username && username} {highestRole && `(${highestRole})`}</span>
+            <span className="subsection-title">
+              {username && username} {highestRole && `(${highestRole})`}
+            </span>
             {menuItems && menuItems.map(item => (
               <a className="dropdown-item" key={item.label} href={item.linkAction}>
                 <span className="icon">
@@ -115,7 +122,10 @@ const NavbarIcons = ({
 
   return (
     <div className="d-flex align-items-center justify-content-end navbar-icons">
-      {iconsList.map(({ name, ...restProps }) => (<NavbarIcon key={name} {...restProps} />))}
+      {iconsList
+        .filter(({ hide }) => !hide)
+        .map(({ name, ...restProps }) =>
+        (<NavbarIcon key={name} {...restProps} />))}
     </div>
   );
 };

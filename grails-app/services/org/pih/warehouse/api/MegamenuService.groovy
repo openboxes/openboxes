@@ -50,6 +50,10 @@ class MegamenuService {
     List buildAndTranslateSubsections(List subsections, User user, Location location) {
         def builtSubsections = []
         subsections.each {
+            def minRole = it.minimumRequiredRole
+            if (minRole && !userService.isUserInRole(user, minRole)) {
+                return
+            }
             def roles = it.requiredRole
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
@@ -75,6 +79,10 @@ class MegamenuService {
     List buildAndTranslateMenuItems(List menuItems, User user, Location location) {
         def builtMenuItems = []
         menuItems.each {
+            def minRole = it.minimumRequiredRole
+            if (minRole && !userService.isUserInRole(user, minRole)) {
+                return
+            }
             def roles = it.requiredRole
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
@@ -107,6 +115,10 @@ class MegamenuService {
     ArrayList buildAndTranslateMenu(Map menuConfig, User user, Location location) {
         def parsedMenuConfig = []
         menuConfig.each { key, value ->
+            def minRole = value.minimumRequiredRole
+            if (minRole && !userService.isUserInRole(user, minRole)) {
+                return
+            }
             def roles = value.requiredRole
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
