@@ -96,7 +96,7 @@
 
                                         <td><g:link action="edit" id="${productAssociationInstance.id}">${fieldValue(bean: productAssociationInstance, field: "id")}</g:link></td>
 
-                                        <td>${fieldValue(bean: productAssociationInstance, field: "code")}</td>
+                                        <td><format:metadata obj="${productAssociationInstance.code}" /></td>
 
                                         <td>
                                             <g:link controller="product" action="edit" id="${productAssociationInstance?.product?.id}">

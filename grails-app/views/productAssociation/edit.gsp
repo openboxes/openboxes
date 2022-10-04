@@ -1,5 +1,5 @@
-
 <%@ page import="org.pih.warehouse.product.ProductAssociation" %>
+<%@ page import="org.pih.warehouse.product.ProductAssociationTypeCode" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -36,7 +36,12 @@
 								  <label for="code"><warehouse:message code="productAssociation.code.label" default="Code" /></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: productAssociationInstance, field: 'code', 'errors')}">
-									<g:select class="chzn-select-deselect" name="code" from="${org.pih.warehouse.product.ProductAssociationTypeCode?.values()}" value="${productAssociationInstance?.code}"  />
+									<g:select class="chzn-select-deselect"
+											  name="code"
+											  from="${ProductAssociationTypeCode?.values()}"
+											  value="${productAssociationInstance?.code}"
+											  optionValue="${{ format.metadata(obj: it) }}"
+									/>
 								</td>
 							</tr>
 
