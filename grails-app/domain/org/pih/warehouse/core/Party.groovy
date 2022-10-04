@@ -38,4 +38,13 @@ class Party implements Serializable, Comparable<Party> {
                         id <=> party.id
     }
 
+    Map toJson() {
+        return [
+                id: id,
+                partyType: partyType,
+                roles: roles
+        ]
+    }
+
+
 }

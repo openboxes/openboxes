@@ -32,6 +32,10 @@ import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.Party
+import org.pih.warehouse.core.PartyRole
+import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -150,30 +154,7 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Location) { Location location ->
-            [
-                    id                   : location.id,
-                    name                 : location.name,
-                    description          : location.description,
-                    locationNumber       : location.locationNumber,
-                    locationGroup        : location.locationGroup,
-                    parentLocation       : location.parentLocation,
-                    locationType         : location.locationType,
-                    sortOrder            : location.sortOrder,
-                    hasBinLocationSupport: location.hasBinLocationSupport(),
-                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT),
-                    hasPartialReceivingSupport : location.supports(ActivityCode.PARTIAL_RECEIVING),
-                    hasCentralPurchasingEnabled : location.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
-                    organizationName     : location?.organization?.name,
-                    organizationCode     : location?.organization?.code,
-                    backgroundColor : location?.bgColor,
-                    zoneName : location?.zone?.name,
-                    zoneId : location?.zone?.id,
-                    active : location?.active,
-                    organization : location?.organization,
-                    manager: location?.manager,
-                    address: location?.address,
-                    supportedActivities: location.supportedActivities ?: location.locationType?.supportedActivities,
-            ]
+            return location.toJson()
         }
 
         JSON.registerObjectMarshaller(Order) { Order order ->
@@ -184,10 +165,25 @@ class BootStrap {
             return orderItem.toJson()
         }
 
+        JSON.registerObjectMarshaller(Organization) { Organization organization ->
+            return organization.toJson()
+        }
+
+        JSON.registerObjectMarshaller(Party) { Party party ->
+            return party.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PartyRole) { PartyRole partyRole ->
+            return partyRole.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PartyType) { PartyType partyType ->
+            return partyType.toJson()
+        }
+
         JSON.registerObjectMarshaller(Person) { Person person ->
             return person.toJson()
         }
-
 
         JSON.registerObjectMarshaller(Picklist) { Picklist picklist ->
             [
