@@ -58,7 +58,6 @@ const Menu = ({ menuConfig, location }) => {
   const activeSection = useMemo(() =>
     checkActiveSection(allMenuUrls, location), [allMenuUrls, location]);
 
-
   return (
     <div className="menu-wrapper" id="navbarSupportedContent">
       <ul className="d-flex align-items-center navbar-nav mr-auto flex-wrap">
@@ -107,10 +106,27 @@ const mapStateToProps = state => ({
 
 export default withRouter(connect(mapStateToProps)(Menu));
 
+const menuItemPropType = PropTypes.shape({
+  label: PropTypes.string,
+  href: PropTypes.string,
+});
+
+const subsectionPropTypes = PropTypes.shape({
+  label: PropTypes.string,
+  menuItems: PropTypes.arrayOf(menuItemPropType),
+});
+
+const sectionPropTypes = PropTypes.shape({
+  label: PropTypes.string,
+  href: PropTypes.string,
+  subsections: PropTypes.arrayOf(subsectionPropTypes),
+  menuItems: PropTypes.arrayOf(menuItemPropType),
+});
+
 Menu.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string,
     search: PropTypes.string,
   }).isRequired,
-  menuConfig: PropTypes.shape(PropTypes.arrayOf({})).isRequired,
+  menuConfig: PropTypes.arrayOf(sectionPropTypes).isRequired,
 };

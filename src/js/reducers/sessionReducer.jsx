@@ -25,7 +25,7 @@ const initialState = {
   isUserAdmin: false,
   isUserApprover: false,
   supportedActivities: [],
-  menuConfig: {},
+  menuConfig: [],
   activeLanguage: '',
   fetchedTranslations: {
     default: false,

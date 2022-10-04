@@ -2,8 +2,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const MenuSection = ({ section, key, active }) => (
-  <li className={`nav-item d-flex justify-content-center align-items-center ${active && 'active-section'}`} key={key}>
+const MenuSection = ({ section, active }) => (
+  <li className={`nav-item d-flex justify-content-center align-items-center ${active && 'active-section'}`} >
     <a className="nav-link" href={section.href}>
       {section.label}
     </a>
@@ -17,11 +17,9 @@ MenuSection.propTypes = {
     label: PropTypes.string,
     href: PropTypes.string,
   }).isRequired,
-  key: PropTypes.string,
   active: PropTypes.bool,
 };
 
 MenuSection.defaultProps = {
   active: false,
-  key: '',
 };
