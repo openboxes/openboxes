@@ -3805,7 +3805,8 @@ table.pvtTable tr th { background-color: #ddd; }
     gap: 24px;
 }
 
-.location-chooser .tabs > .ui-tabs-nav, .tabs > .ui-tabs-panel {
+.location-chooser .tabs > .ui-tabs-nav,
+.location-chooser .tabs > .ui-tabs-panel {
     height: 500px;
     overflow: auto;
 }
