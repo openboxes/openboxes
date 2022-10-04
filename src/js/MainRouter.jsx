@@ -19,18 +19,17 @@ const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'prod
 
 class MainRouter extends React.Component {
   componentDidMount() {
-    this.props.fetchSessionInfo().then(() => {
-      this.props.initialize({
-        languages: this.props.supportedLocales,
-        options: {
-          renderToStaticMarkup,
-          onMissingTranslation,
-        },
-      });
-      this.props.setActiveLanguage(this.props.locale);
-      this.props.fetchMenuConfig();
-      TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
+    this.props.fetchSessionInfo();
+    this.props.initialize({
+      languages: this.props.supportedLocales,
+      options: {
+        renderToStaticMarkup,
+        onMissingTranslation,
+      },
     });
+    this.props.setActiveLanguage(this.props.locale);
+    this.props.fetchMenuConfig();
+    TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
   }
 
   componentWillReceiveProps(nextProps) {

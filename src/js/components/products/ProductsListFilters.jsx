@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
+import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
 import CheckboxField from 'components/form-elements/CheckboxField';
@@ -70,21 +72,30 @@ const filterFields = {
 
 const ProductsListFilters = ({
   setFilterParams,
+  currentLocation,
 }) => {
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
   const [defaultValues, setDefaultValues] = useState({});
+  const prevLocation = usePrevious(currentLocation);
+  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   useEffect(() => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    setDefaultValues({
-      ...initialEmptyValues,
-    });
-  }, []);
+    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
+    // but currentLocation doesn't change
+    // eslint-disable-next-line max-len
+    if ((!initiallyFetched && currentLocation?.id) || (prevLocation && prevLocation.id !== currentLocation?.id)) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      setDefaultValues({
+        ...initialEmptyValues,
+      });
+      setInitiallyFetched(true);
+    }
+  }, [currentLocation]);
 
   const fetchProductsCategories = () => {
     apiClient.get('/openboxes/api/categoryOptions').then((res) => {
@@ -136,9 +147,15 @@ const ProductsListFilters = ({
   );
 };
 
+const mapStateToProps = state => ({
+  currentLocation: state.session.currentLocation,
+});
 
-export default ProductsListFilters;
+export default connect(mapStateToProps)(ProductsListFilters);
 
 ProductsListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };

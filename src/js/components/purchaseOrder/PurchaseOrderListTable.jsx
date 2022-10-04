@@ -63,7 +63,7 @@ const PurchaseOrderListTable = ({
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
 
   // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams, currentLocation]);
+  useEffect(() => fireFetchData(), [filterParams]);
 
   // If orderItems is true, download orders line items details, else download orders
   const downloadOrders = (orderItems) => {

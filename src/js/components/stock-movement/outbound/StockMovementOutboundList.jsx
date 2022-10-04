@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -154,6 +155,8 @@ const filterFields = {
 const StockMovementOutboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
+  const prevLocation = usePrevious(props.currentLocation);
+  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
@@ -161,20 +164,26 @@ const StockMovementOutboundList = (props) => {
   }, [props.locale]);
 
   useEffect(() => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    setDefaultFilterValues({
-      ...initialEmptyValues,
-      origin: {
-        id: props.currentLocation.id,
-        value: props.currentLocation.id,
-        name: props.currentLocation.name,
-        label: props.currentLocation.name,
-      },
-      sourceType: props.isRequestsList ? 'ELECTRONIC' : null,
-    });
+    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
+    // but currentLocation doesn't change
+    // eslint-disable-next-line max-len
+    if ((!initiallyFetched && props.currentLocation?.id) || (prevLocation && prevLocation.id !== props.currentLocation?.id)) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      setDefaultFilterValues({
+        ...initialEmptyValues,
+        origin: {
+          id: props.currentLocation.id,
+          value: props.currentLocation.id,
+          name: props.currentLocation.name,
+          label: props.currentLocation.name,
+        },
+        sourceType: props.isRequestsList ? 'ELECTRONIC' : null,
+      });
+      setInitiallyFetched(true);
+    }
   }, [props.currentLocation]);
 
 

@@ -120,6 +120,7 @@ module.exports = {
       templates: path.resolve(SRC, 'templates'),
       store: path.resolve(SRC, 'store'),
       css: path.resolve(ROOT, 'css'),
+      hooks: path.resolve(SRC, 'hooks'),
     },
     extensions: ['.js', '.jsx'],
   },

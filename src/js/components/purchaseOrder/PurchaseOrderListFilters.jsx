@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -133,25 +134,34 @@ const PurchaseOrderListFilters = ({
   // Purchasing organizations (organizations with ROLE_BUYER)
   const [defaultValues, setDefaultValues] = useState({});
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
+  const prevLocation = usePrevious(currentLocation);
+  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   const determineDefaultValues = () => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    // If central purchasing is enabled, set default purchasing org as currentLocation's org
-    if (isCentralPurchasingEnabled) {
+    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
+    // but currentLocation doesn't change
+    // eslint-disable-next-line max-len
+    if ((!initiallyFetched && currentLocation?.id) || (prevLocation && prevLocation.id !== currentLocation?.id)) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      // If central purchasing is enabled, set default purchasing org as currentLocation's org
+      if (isCentralPurchasingEnabled) {
+        setDefaultValues({
+          ...initialEmptyValues,
+          destinationParty: buyers.find(org => org.id === currentLocation?.organization?.id),
+        });
+        setInitiallyFetched(true);
+        return;
+      }
+      // If central purchasing is not enabled, set default destination as currentLocation
       setDefaultValues({
         ...initialEmptyValues,
-        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
+        destination: currentLocation,
       });
-      return;
+      setInitiallyFetched(true);
     }
-    // If central purchasing is not enabled, set default destination as currentLocation
-    setDefaultValues({
-      ...initialEmptyValues,
-      destination: currentLocation,
-    });
   };
 
   useEffect(() => {

@@ -24,7 +24,6 @@ const INITIAL_STATE = {
 
 const ProductsListTable = ({
   filterParams,
-  currentLocation,
   translate,
 }) => {
   // Util ref for react-table to force the fetch of data
@@ -35,7 +34,7 @@ const ProductsListTable = ({
   // If filterParams change, refetch the data with applied filters
   useEffect(() => {
     fireFetchData();
-  }, [filterParams, currentLocation]);
+  }, [filterParams]);
 
   const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState(INITIAL_STATE);
@@ -234,5 +233,4 @@ export default connect(mapStateToProps)(ProductsListTable);
 ProductsListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
-  currentLocation: PropTypes.shape({}).isRequired,
 };
