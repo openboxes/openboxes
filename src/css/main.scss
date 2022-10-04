@@ -1049,7 +1049,7 @@ div.search-input:focus-within {
 }
 
 .warning-circle {
-  background-color: var(--yellow-ob);
+  background-color: var(--color-yellow);
 }
 
 .primary-circle {
@@ -1057,7 +1057,7 @@ div.search-input:focus-within {
 }
 
 .success-circle {
-  background-color: var(--green-ob);
+  background-color: var(--color-green);
 }
 
 .gray-circle {
@@ -1065,7 +1065,7 @@ div.search-input:focus-within {
 }
 
 .danger-circle {
-  background-color: var(--red-ob);
+  background-color: var(--color-red);
 }
 
 // Action dots box
@@ -1093,10 +1093,10 @@ div.search-input:focus-within {
   }
 
   .font-red-ob {
-    color: var(--red-ob) !important;
+    color: var(--color-red) !important;
 
     &:hover {
-      color: var(--red-ob) !important;
+      color: var(--color-red) !important;
     }
   }
 }
@@ -1213,10 +1213,10 @@ div.search-input:focus-within {
       }
 
       .font-red-ob {
-        color: var(--red-ob) !important;
+        color: var(--color-red) !important;
 
         &:hover {
-          color: var(--red-ob) !important;
+          color: var(--color-red) !important;
         }
       }
     }
