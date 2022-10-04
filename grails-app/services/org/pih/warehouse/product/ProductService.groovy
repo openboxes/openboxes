@@ -303,51 +303,47 @@ class ProductService {
             if (!includeInactive) {
                 eq("active", true)
             }
-            and {
-                if (categories) {
-                    if (params.includeCategoryChildren) {
-                        'in'("category", categories + categories*.children?.flatten())
-                    } else {
-                        'in'("category", categories)
-                    }
-                }
 
-                or {
-                    if (tagsInput) {
-                        tags {
-                            'in'("id", tagsInput.collect { it.id })
-                        }
-                    }
-
-                    if (catalogsInput) {
-                        productCatalogItems {
-                            "in"("productCatalog", catalogsInput)
-                        }
-                    }
-                }
-
-                or {
-                    if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
-                    if (params.description) ilike("description", params.description + "%")
-                    if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
-                    if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
-                    if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
-                    if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
-                    if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
-                    if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
-                    if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
-                    if (params.createdById) eq("createdBy.id", params.createdById)
-                    if (params.updatedById) eq("updatedBy.id", params.updatedById)
-
-                    if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
-                    if (params.productCodeIsNull) isNull("productCode")
-                    if (params.brandNameIsNull) isNull("brandName")
-                    if (params.manufacturerIsNull) isNull("manufacturer")
-                    if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
-                    if (params.vendorIsNull) isNull("vendor")
-                    if (params.vendorCodeIsNull) isNull("vendorCode")
+            if (categories) {
+                if (params.includeCategoryChildren) {
+                    'in'("category", categories + categories*.children?.flatten())
+                } else {
+                    'in'("category", categories)
                 }
             }
+
+
+            if (tagsInput) {
+                tags {
+                    'in'("id", tagsInput.collect { it.id })
+                }
+            }
+
+            if (catalogsInput) {
+                productCatalogItems {
+                    "in"("productCatalog", catalogsInput)
+                }
+            }
+
+            if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+            if (params.description) ilike("description", params.description + "%")
+            if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
+            if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
+            if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
+            if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
+            if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
+            if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
+            if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
+            if (params.createdById) eq("createdBy.id", params.createdById)
+            if (params.updatedById) eq("updatedBy.id", params.updatedById)
+
+            if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
+            if (params.productCodeIsNull) isNull("productCode")
+            if (params.brandNameIsNull) isNull("brandName")
+            if (params.manufacturerIsNull) isNull("manufacturer")
+            if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
+            if (params.vendorIsNull) isNull("vendor")
+            if (params.vendorCodeIsNull) isNull("vendorCode")
 
             if (sortColumn) {
                 if (sortColumn == "category") {
@@ -365,7 +361,7 @@ class ProductService {
             }
         }
 
-        return results.unique()
+        return results
     }
 
     /**
