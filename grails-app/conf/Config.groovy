@@ -1404,7 +1404,7 @@ openboxes {
         }
         analytics {
             enabled = false
-            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
+            minimumRequiredRole = RoleType.ROLE_ADMIN
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
