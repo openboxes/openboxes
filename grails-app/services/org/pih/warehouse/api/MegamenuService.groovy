@@ -54,7 +54,7 @@ class MegamenuService {
             if (minRole && !userService.isUserInRole(user, minRole)) {
                 return
             }
-            def roles = it.requiredRole
+            def roles = it.supplementalRoles
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
@@ -83,7 +83,7 @@ class MegamenuService {
             if (minRole && !userService.isUserInRole(user, minRole)) {
                 return
             }
-            def roles = it.requiredRole
+            def roles = it.supplementalRoles
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
@@ -119,7 +119,7 @@ class MegamenuService {
             if (minRole && !userService.isUserInRole(user, minRole)) {
                 return
             }
-            def roles = value.requiredRole
+            def roles = value.supplementalRoles
             if (roles && !userService.hasAnyRoles(user, roles)) {
                 return
             }
