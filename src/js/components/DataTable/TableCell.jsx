@@ -49,8 +49,14 @@ TableCell.propTypes = {
   className: PropTypes.string,
   tooltip: PropTypes.bool,
   tooltipLabel: PropTypes.string,
-  children: PropTypes.element,
-  defaultValue: PropTypes.string,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]),
+  defaultValue: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
 };
 
 

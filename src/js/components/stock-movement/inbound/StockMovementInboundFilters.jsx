@@ -67,19 +67,18 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundFilters);
 
-
 StockMovementInboundFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
   fetchStatuses: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   isShipmentStatusesFetched: PropTypes.bool.isRequired,
   minSearchLength: PropTypes.number.isRequired,
-  shipmentStatuses: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    variant: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  }).isRequired,
+  shipmentStatuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    variant: PropTypes.string,
+    label: PropTypes.string,
+  })).isRequired,
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
 };

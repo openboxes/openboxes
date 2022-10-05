@@ -17,6 +17,7 @@ const filterFields = {
       multi: true,
       filterElement: true,
       placeholder: 'Receipt Status',
+      options: [],
       showLabelTooltip: true,
       closeMenuOnSelect: false,
     },
@@ -50,6 +51,7 @@ const filterFields = {
     attributes: {
       valueKey: 'id',
       filterElement: true,
+      options: [],
       placeholder: 'Destination',
       showLabelTooltip: true,
       disabled: true,

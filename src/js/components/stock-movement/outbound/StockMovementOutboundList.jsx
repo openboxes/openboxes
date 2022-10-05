@@ -30,6 +30,7 @@ const filterFields = {
       valueKey: 'id',
       filterElement: true,
       placeholder: 'Origin',
+      options: [],
       showLabelTooltip: true,
       disabled: true,
     },

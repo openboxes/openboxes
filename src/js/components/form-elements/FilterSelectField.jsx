@@ -88,13 +88,23 @@ const IndicatorsContainer = ({ children, ...props }) => (
   </components.IndicatorsContainer>
 );
 
+IndicatorsContainer.defaultProps = {
+  width: undefined,
+};
+
 IndicatorsContainer.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
   selectProps: PropTypes.shape({
     isMulti: PropTypes.bool.isRequired,
-    value: PropTypes.array.isRequired,
+    value: PropTypes.oneOfType([
+      PropTypes.array,
+      PropTypes.shape({}),
+    ]),
   }).isRequired,
-  width: PropTypes.string.isRequired,
+  width: PropTypes.string,
 };
 
 const FilterSelectField = (props) => {

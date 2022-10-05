@@ -78,12 +78,12 @@ StockMovementOutboundFilters.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   isRequisitionStatusesFetched: PropTypes.bool.isRequired,
   isRequestsOpen: PropTypes.bool.isRequired,
-  requisitionStatuses: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    variant: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  }).isRequired,
+  requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    variant: PropTypes.string,
+    label: PropTypes.string,
+  })).isRequired,
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
 };
