@@ -271,7 +271,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def changeQuantity(Integer newQuantity, ProductPackage newProductPackage, String reasonCode, String comments) {
 
-        println "Change quantity: " + newQuantity + " " + reasonCode + " " + comments
+        log.info "Change quantity: ${newQuantity} ${reasonCode} ${comments}"
         // And then create a new requisition item for the remaining quantity (if not 0)
         if (newQuantity == 0) {
             cancelQuantity(reasonCode, comments)
