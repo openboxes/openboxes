@@ -90,7 +90,6 @@ const StockMovementInboundTable = ({
         ...filterParams,
         offset: `${offset}`,
         max: `${state.pageSize}`,
-        direction: 'INBOUND',
         receiptStatusCode: filterParams.receiptStatusCode &&
           filterParams.receiptStatusCode?.map(({ id }) => id),
         origin: filterParams?.origin?.id,

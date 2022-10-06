@@ -703,6 +703,13 @@ class UrlMappings {
             action = [GET: "read", DELETE: "delete"]
         }
 
+        // Person
+
+        "/api/persons/$id"(parseRequest: true) {
+            controller = { "personApi" }
+            action = [GET: "read"]
+        }
+
         /**
          * Products Configuration API endpoints
          */

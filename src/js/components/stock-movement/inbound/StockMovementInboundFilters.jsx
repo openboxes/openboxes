@@ -33,6 +33,10 @@ const StockMovementInboundFilters = ({
     }
   }, []);
 
+  const onClearHandler = (form) => {
+    const { destination, direction } = defaultValues;
+    form.reset({ destination, direction });
+  };
 
   return (
     <div className="d-flex flex-column list-page-filters">
@@ -41,7 +45,7 @@ const StockMovementInboundFilters = ({
         searchFieldPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
-        onClear={form => form.reset({ destination: defaultValues.destination })}
+        onClear={onClearHandler}
         updateFilterParams={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{

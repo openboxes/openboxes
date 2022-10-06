@@ -1,3 +1,4 @@
+import _ from 'lodash';
 // Temporary 'hard-coded' checking for role to display an action in dropdown or not
 export const hasMinimumRequiredRole = (role, highestUserRole) => {
   // TODO: Figure out better way to check roles
@@ -34,4 +35,21 @@ export const findActions = (actionList, row, props) => {
   }
   return filteredByMinimumRequiredRole;
 };
+
+export const transformFilterParams = (filterValues, filterAccessors) => Object.keys(filterValues)
+  .filter(key => (filterAccessors[key] && !!filterValues[key]))
+  .reduce((acc, key) => {
+    const { name, accessor } = filterAccessors[key];
+    const theValue = filterValues[name];
+
+    let value = '';
+    if (!accessor) {
+      value = theValue;
+    } else if (Array.isArray(theValue)) {
+      value = _.map(theValue, accessor);
+    } else {
+      value = _.get(theValue, accessor);
+    }
+    return { ...acc, [key]: value };
+  }, {});
 
