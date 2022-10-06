@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -78,14 +77,12 @@ const ProductsListFilters = ({
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
   const [defaultValues, setDefaultValues] = useState({});
-  const prevLocation = usePrevious(currentLocation);
-  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   useEffect(() => {
     // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
     // but currentLocation doesn't change
     // eslint-disable-next-line max-len
-    if ((!initiallyFetched && currentLocation?.id) || (prevLocation && prevLocation.id !== currentLocation?.id)) {
+    if (currentLocation?.id) {
       const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
         if (!acc[key]) return { ...acc, [key]: '' };
         return acc;
@@ -93,9 +90,8 @@ const ProductsListFilters = ({
       setDefaultValues({
         ...initialEmptyValues,
       });
-      setInitiallyFetched(true);
     }
-  }, [currentLocation]);
+  }, [currentLocation?.id]);
 
   const fetchProductsCategories = () => {
     apiClient.get('/openboxes/api/categoryOptions').then((res) => {

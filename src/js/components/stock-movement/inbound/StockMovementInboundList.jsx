@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -142,8 +141,6 @@ const filterFields = {
 const StockMovementInboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
-  const prevLocation = usePrevious(props.currentLocation);
-  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
@@ -153,7 +150,7 @@ const StockMovementInboundList = (props) => {
     // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
     // but currentLocation doesn't change
     // eslint-disable-next-line max-len
-    if ((!initiallyFetched && props.currentLocation?.id) || (prevLocation && prevLocation.id !== props.currentLocation?.id)) {
+    if (props.currentLocation?.id) {
       const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
         if (!acc[key]) return { ...acc, [key]: '' };
         return acc;
@@ -167,9 +164,8 @@ const StockMovementInboundList = (props) => {
           label: props.currentLocation?.name,
         },
       });
-      setInitiallyFetched(true);
     }
-  }, [props.currentLocation]);
+  }, [props.currentLocation?.id]);
 
   const selectFiltersForMyStockMovements = () => {
     const currentUserValue = {

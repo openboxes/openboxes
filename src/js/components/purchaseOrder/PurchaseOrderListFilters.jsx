@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -134,14 +133,9 @@ const PurchaseOrderListFilters = ({
   // Purchasing organizations (organizations with ROLE_BUYER)
   const [defaultValues, setDefaultValues] = useState({});
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
-  const prevLocation = usePrevious(currentLocation);
-  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   const determineDefaultValues = () => {
-    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
-    // but currentLocation doesn't change
-    // eslint-disable-next-line max-len
-    if ((!initiallyFetched && currentLocation?.id) || (prevLocation && prevLocation.id !== currentLocation?.id)) {
+    if (currentLocation?.id && buyers) {
       const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
         if (!acc[key]) return { ...acc, [key]: '' };
         return acc;
@@ -152,7 +146,6 @@ const PurchaseOrderListFilters = ({
           ...initialEmptyValues,
           destinationParty: buyers.find(org => org.id === currentLocation?.organization?.id),
         });
-        setInitiallyFetched(true);
         return;
       }
       // If central purchasing is not enabled, set default destination as currentLocation
@@ -160,7 +153,6 @@ const PurchaseOrderListFilters = ({
         ...initialEmptyValues,
         destination: currentLocation,
       });
-      setInitiallyFetched(true);
     }
   };
 
@@ -170,12 +162,12 @@ const PurchaseOrderListFilters = ({
       fetchStatuses();
     }
 
-    if (!buyers || buyers.length === 0) {
+    if (!buyers) {
       fetchBuyerOrganizations();
       return;
     }
     determineDefaultValues();
-  }, [buyers, currentLocation]);
+  }, [buyers, currentLocation?.id]);
 
   const debouncedOriginLocationsFetch = debounceLocationsFetch(
     debounceTime,

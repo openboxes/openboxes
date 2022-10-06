@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import usePrevious from 'hooks/usePrevious';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -110,14 +109,12 @@ const InvoiceListFilters = ({
   fetchTypeCodes,
 }) => {
   const [defaultValues, setDefaultValues] = useState({});
-  const prevLocation = usePrevious(currentLocation);
-  const [initiallyFetched, setInitiallyFetched] = useState(false);
 
   useEffect(() => {
     // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
     // but currentLocation doesn't change
     // eslint-disable-next-line max-len
-    if ((!initiallyFetched && currentLocation?.id) || (prevLocation && prevLocation.id !== currentLocation?.id)) {
+    if (currentLocation?.id) {
       const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
         if (!acc[key]) return { ...acc, [key]: '' };
         return acc;
@@ -131,9 +128,8 @@ const InvoiceListFilters = ({
           label: currentLocation?.organization?.name,
         },
       });
-      setInitiallyFetched(true);
     }
-  }, [currentLocation]);
+  }, [currentLocation?.id]);
 
   useEffect(() => {
     // If statuses or invoice type codes not yet in store, fetch them
