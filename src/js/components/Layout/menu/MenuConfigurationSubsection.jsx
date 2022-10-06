@@ -2,9 +2,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-
-const MenuConfigurationSubsection = ({ subsection, key }) => (
-  <div className="padding-8" key={key}>
+const MenuConfigurationSubsection = ({ subsection }) => (
+  <div className="padding-8" >
     <span className="subsection-title">{subsection.label && subsection.label}</span>
     {subsection.menuItems && subsection.menuItems.map(menuItem => (
       <a className="dropdown-item" key={`${menuItem.label}-menuItem`} href={menuItem.href} target={menuItem.target}>
@@ -17,15 +16,15 @@ const MenuConfigurationSubsection = ({ subsection, key }) => (
 
 export default MenuConfigurationSubsection;
 
+const menuItemPropType = PropTypes.shape({
+  label: PropTypes.string,
+  href: PropTypes.string,
+});
 
 MenuConfigurationSubsection.propTypes = {
   subsection: PropTypes.shape({
-    menuItems: PropTypes.shape([]),
+    label: PropTypes.string,
+    menuItems: PropTypes.arrayOf(menuItemPropType),
   }).isRequired,
-  key: PropTypes.string,
-};
-
-MenuConfigurationSubsection.defaultProps = {
-  key: '',
 };
 

@@ -3,8 +3,8 @@ import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-const MenuSubsection = ({ section, key, active }) => (
-  <li className={`nav-item dropdown d-flex justify-content-center align-items-center ${active && 'active-section'}`} key={key}>
+const MenuSubsection = ({ section, active }) => (
+  <li className={`nav-item dropdown d-flex justify-content-center align-items-center ${active && 'active-section'}`} >
     <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
     </a>
@@ -27,17 +27,26 @@ const MenuSubsection = ({ section, key, active }) => (
 
 export default MenuSubsection;
 
+const menuItemPropType = PropTypes.shape({
+  label: PropTypes.string,
+  href: PropTypes.string,
+});
+
+const subsectionsPropTypes = PropTypes.shape({
+  label: PropTypes.string,
+  menuItems: PropTypes.arrayOf(menuItemPropType),
+});
+
+
 MenuSubsection.propTypes = {
   section: PropTypes.shape({
     label: PropTypes.string,
-    menuItems: PropTypes.shape([]),
-    subsections: PropTypes.shape([]),
+    menuItems: PropTypes.arrayOf(menuItemPropType),
+    subsections: PropTypes.arrayOf(subsectionsPropTypes),
   }).isRequired,
-  key: PropTypes.string,
   active: PropTypes.bool,
 };
 
 MenuSubsection.defaultProps = {
   active: false,
-  key: '',
 };
