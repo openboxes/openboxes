@@ -21,8 +21,12 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
+
+    private static final transient Logger log = LoggerFactory.getLogger(RequisitionItem)
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
