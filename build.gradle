@@ -100,10 +100,6 @@ configurations {
         // log4j-over-slf4j exposes the same API as this fork of log4j 1.x does
         exclude group: 'ch.qos.reload4j', module: 'reload4j'
 
-        // use tomcat-jdbc instead of com.mchange.c3p0 or com.zaxxer.hikariCP
-        exclude group: 'com.mchange'
-        exclude group: 'com.zaxxer'
-
         // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
 
@@ -428,9 +424,6 @@ dependencies {
      * to not use org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer.
      */
     compile 'org.docx4j:docx4j:2.8.1'  // FIXME update to 8.3.x
-
-    // required for GORM/hibernate validators
-    compile 'org.glassfish.web:javax.el:2.2.6'
 
     // enable grails console web ui
     console 'org.grails:grails-console'
