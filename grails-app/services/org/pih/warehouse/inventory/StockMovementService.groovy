@@ -1889,7 +1889,7 @@ class StockMovementService {
                 }
 
                 if (!requisitionItem) {
-                    throw new IllegalArgumentException("Could not find requisition item for stock movement item with ID ${stockMovementItem.id}")
+                    throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
                 log.info 'Removing previous changes, picklists and shipments, if present'
