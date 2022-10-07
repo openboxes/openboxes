@@ -227,6 +227,7 @@ environments:
             logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
+            # FIXME change to `openboxes` once external config works reliably. OBGM-20
             url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
     test:
         dataSource:
@@ -238,6 +239,7 @@ environments:
             logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
+            # FIXME change to `openboxes` once external config works reliably. OBGM-20
             url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
     production:
         dataSource:
@@ -248,6 +250,7 @@ environments:
             logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
+            # FIXME change to `openboxes` once external config works reliably. OBGM-20
             url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
 ---
 openboxes:
