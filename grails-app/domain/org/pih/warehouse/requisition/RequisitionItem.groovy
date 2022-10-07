@@ -225,7 +225,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             if (substitutionItem) {
                 removeFromRequisitionItems(substitutionItem)
                 requisition.removeFromRequisitionItems(substitutionItem)
-                modificationItem.disableRefresh = Boolean.TRUE
+                substitutionItem.disableRefresh = Boolean.TRUE
                 substitutionItem.delete()
             }
 
