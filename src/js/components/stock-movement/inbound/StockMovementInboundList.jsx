@@ -24,7 +24,7 @@ const StockMovementInboundList = (props) => {
 
 
   const fetchUserById = async (id) => {
-    const response = await apiClient(`/openboxes/api/persons/${id}`);
+    const response = await apiClient(`/openboxes/api/generic/person/${id}`);
     return response.data?.data;
   };
 

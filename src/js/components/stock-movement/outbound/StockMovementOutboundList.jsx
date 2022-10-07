@@ -148,7 +148,6 @@ const StockMovementOutboundList = (props) => {
         showMyStockMovements={selectFiltersForMyStockMovements}
       />
       <StockMovementOutboundFilters
-        isRequestsOpen={props.isRequestsList}
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}

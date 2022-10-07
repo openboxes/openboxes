@@ -14,7 +14,6 @@ const StockMovementOutboundFilters = ({
   fetchStatuses,
   requisitionStatuses,
   isRequisitionStatusesFetched,
-  isRequestsOpen,
   filterFields,
   defaultValues,
 }) => {
@@ -35,15 +34,6 @@ const StockMovementOutboundFilters = ({
     }
   }, []);
 
-  const onClearHandler = (form) => {
-    const { origin, direction, sourceType } = defaultValues;
-    form.reset({
-      origin,
-      direction,
-      sourceType: isRequestsOpen ? sourceType : null,
-    });
-  };
-
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
@@ -51,7 +41,7 @@ const StockMovementOutboundFilters = ({
         searchFieldPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
-        onClear={onClearHandler}
+        ignoreClearFilters={['origin', 'direction', 'sourceType']}
         updateFilterParams={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
@@ -83,7 +73,6 @@ StockMovementOutboundFilters.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   isRequisitionStatusesFetched: PropTypes.bool.isRequired,
-  isRequestsOpen: PropTypes.bool.isRequired,
   requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
