@@ -11,8 +11,8 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
-import grails.util.Holders
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -182,6 +182,7 @@ class DashboardController {
         redirect(controller: 'dashboard', action: 'index')
     }
 
+    @Transactional
     def chooseLocation() {
 
         // If the user has selected a new location from the topnav bar, we need
@@ -198,16 +199,9 @@ class DashboardController {
             // Save the warehouse selection for "last logged into" information
             if (user) {
                 //userInstance.rememberLastLocation = Boolean.valueOf(params.rememberLastLocation)
-
-                /*
-                 * Band-aid for OBGM-355, to prevent the following exception at dashboard launch:
-                 * javax.persistence.TransactionRequiredException: no transaction is in progress
-                 */
-                user.withTransaction {
-                    user.lastLoginDate = new Date()
-                    user.save(flush: true)
-                    session.user = user
-                }
+                user.lastLoginDate = new Date()
+                user.save(flush: true)
+                session.user = user
             }
 
             if (userService.hasHighestRole(session?.user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
