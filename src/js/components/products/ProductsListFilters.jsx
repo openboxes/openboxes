@@ -81,7 +81,6 @@ const ProductsListFilters = ({
   useEffect(() => {
     // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
     // but currentLocation doesn't change
-    // eslint-disable-next-line max-len
     if (currentLocation?.id) {
       const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
         if (!acc[key]) return { ...acc, [key]: '' };
