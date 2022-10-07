@@ -1881,7 +1881,6 @@ class StockMovementService {
 
     void reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
-        def revisedItems = []
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -1893,17 +1892,11 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                if (requisitionItem.shipmentItems || requisitionItem.picklistItems) {
-                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
-                }
+                log.info 'Removing previous changes, picklists and shipments, if present'
+                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                requisitionItem.undoChanges()
 
-                log.info "Item revised " + requisitionItem.id
-
-                // Cannot cancel quantity if it has already been canceled
-                if (requisitionItem.quantityCanceled) {
-                    requisitionItem.undoChanges()
-                }
-
+                log.info "Revising quantity for ${requisitionItem.id}"
                 requisitionItem.changeQuantity(
                         stockMovementItem?.quantityRevised?.intValueExact(),
                         stockMovementItem.reasonCode,
