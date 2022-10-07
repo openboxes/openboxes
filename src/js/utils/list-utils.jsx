@@ -40,16 +40,13 @@ export const transformFilterParams = (filterValues, filterAccessors) => Object.k
   .filter(key => (filterAccessors[key] && !!filterValues[key]))
   .reduce((acc, key) => {
     const { name, accessor } = filterAccessors[key];
-    const theValue = filterValues[name];
 
-    let value = '';
     if (!accessor) {
-      value = theValue;
-    } else if (Array.isArray(theValue)) {
-      value = _.map(theValue, accessor);
-    } else {
-      value = _.get(theValue, accessor);
+      return { ...acc, [key]: filterValues[name] };
     }
-    return { ...acc, [key]: value };
+    if (Array.isArray(filterValues[name])) {
+      return { ...acc, [key]: _.map(filterValues[name], accessor) };
+    }
+    return { ...acc, [key]: _.get(filterValues[name], accessor) };
   }, {});
 

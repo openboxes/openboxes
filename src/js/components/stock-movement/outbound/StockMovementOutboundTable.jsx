@@ -93,7 +93,6 @@ const StockMovementOutboundTable = ({
         ...filterParams,
         offset: `${offset}`,
         max: `${state.pageSize}`,
-        direction: 'OUTBOUND',
         requisitionStatusCode: filterParams.requisitionStatusCode &&
           filterParams.requisitionStatusCode?.map(({ id }) => id),
         requestType: filterParams?.requestType?.value,

@@ -1,156 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import { fetchTranslations } from 'actions';
-import DateFilter from 'components/form-elements/DateFilter/DateFilter';
-import FilterSelectField from 'components/form-elements/FilterSelectField';
+import filterFields from 'components/stock-movement/outbound/FilterFields';
 import StockMovementOutboundFilters from 'components/stock-movement/outbound/StockMovementOutboundFilters';
 import StockMovementOutboundHeader from 'components/stock-movement/outbound/StockMovementOutboundHeader';
 import StockMovementOutboundTable from 'components/stock-movement/outbound/StockMovementOutboundTable';
-
-const filterFields = {
-  requisitionStatusCode: {
-    type: FilterSelectField,
-    attributes: {
-      multi: true,
-      filterElement: true,
-      placeholder: 'Requisition Status',
-      showLabelTooltip: true,
-      closeMenuOnSelect: false,
-    },
-    getDynamicAttr: ({ requisitionStatuses }) => ({
-      options: requisitionStatuses,
-    }),
-  },
-  origin: {
-    type: FilterSelectField,
-    attributes: {
-      valueKey: 'id',
-      filterElement: true,
-      placeholder: 'Origin',
-      options: [],
-      showLabelTooltip: true,
-      disabled: true,
-    },
-  },
-  destination: {
-    type: FilterSelectField,
-    attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
-      filterElement: true,
-      placeholder: 'Destination',
-      showLabelTooltip: true,
-    },
-    getDynamicAttr: ({
-      fetchLocations,
-    }) => ({
-      loadOptions: fetchLocations,
-    }),
-  },
-  requestedBy: {
-    type: FilterSelectField,
-    attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
-      filterElement: true,
-      placeholder: 'Requested By',
-      showLabelTooltip: true,
-    },
-    getDynamicAttr: ({
-      fetchUsers,
-    }) => ({
-      loadOptions: fetchUsers,
-    }),
-  },
-  createdBy: {
-    type: FilterSelectField,
-    attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
-      filterElement: true,
-      placeholder: 'Created By',
-      showLabelTooltip: true,
-    },
-    getDynamicAttr: ({
-      fetchUsers,
-    }) => ({
-      loadOptions: fetchUsers,
-    }),
-  },
-  updatedBy: {
-    type: FilterSelectField,
-    attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
-      filterElement: true,
-      placeholder: 'Updated By',
-      showLabelTooltip: true,
-    },
-    getDynamicAttr: ({
-      fetchUsers,
-    }) => ({
-      loadOptions: fetchUsers,
-    }),
-  },
-  requestType: {
-    type: FilterSelectField,
-    attributes: {
-      openOnClick: false,
-      options: [
-        { label: 'STOCK', value: 'STOCK' },
-        { label: 'ADHOC', value: 'ADHOC' },
-      ],
-      filterElement: true,
-      placeholder: 'Request type',
-      showLabelTooltip: true,
-    },
-  },
-  createdAfter: {
-    type: DateFilter,
-    attributes: {
-      label: 'react.stockMovement.filter.createdAfter.label',
-      defaultMessage: 'Created after',
-      dateFormat: 'MM/DD/YYYY',
-      filterElement: true,
-    },
-  },
-  createdBefore: {
-    type: DateFilter,
-    attributes: {
-      label: 'react.stockMovement.filter.createdBefore.label',
-      defaultMessage: 'Created before',
-      dateFormat: 'MM/DD/YYYY',
-      filterElement: true,
-    },
-  },
-};
+import apiClient from 'utils/apiClient';
+import { transformFilterParams } from 'utils/list-utils';
 
 const StockMovementOutboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
@@ -161,26 +22,76 @@ const StockMovementOutboundList = (props) => {
     props.fetchTranslations(props.locale, 'StockMovementType');
   }, [props.locale]);
 
+  const fetchUserById = async (id) => {
+    const response = await apiClient(`/openboxes/api/persons/${id}`);
+    return response.data?.data;
+  };
+
+  const fetchLocationById = async (id) => {
+    const response = await apiClient(`/openboxes/api/locations/${id}`);
+    return response.data?.data;
+  };
+
+  const initializeDefaultFilterValues = async () => {
+    // INITIALIZE EMPTY FILTER OBJECT
+    const defaultValues = Object.keys(filterFields)
+      .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
+
+    // SET STATIC DEFAULT VALUES
+    defaultValues.origin = {
+      id: props.currentLocation?.id,
+      value: props.currentLocation?.id,
+      name: props.currentLocation?.name,
+      label: props.currentLocation?.name,
+    };
+
+    defaultValues.direction = 'OUTBOUND';
+
+    if (props.isRequestsList) {
+      defaultValues.sourceType = 'ELECTRONIC';
+    }
+
+    const queryProps = queryString.parse(props.history.location.search);
+    // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
+    if (queryProps.requisitionStatusCode) {
+      defaultValues.requisitionStatusCode = props.requisitionStatuses
+        .filter(({ value }) => queryProps.requisitionStatusCode.includes(value));
+    }
+    if (queryProps.destination) {
+      defaultValues.destination = await fetchLocationById(queryProps.destination);
+    }
+    if (queryProps.requestedBy) {
+      defaultValues.requestedBy = queryProps.requestedBy === props.currentUser.id
+        ? props.currentUser
+        : await fetchUserById(queryProps.requestedBy);
+    }
+    if (queryProps.createdBy) {
+      defaultValues.createdBy = queryProps.createdBy === props.currentUser.id
+        ? props.currentUser
+        : await fetchUserById(queryProps.createdBy);
+    }
+    if (queryProps.updatedBy) {
+      defaultValues.updatedBy = queryProps.updatedBy === props.currentUser.id
+        ? props.currentUser
+        : await fetchUserById(queryProps.updatedBy);
+    }
+    if (queryProps.createdAfter) {
+      defaultValues.createdAfter = queryProps.createdAfter;
+    }
+    if (queryProps.createdBefore) {
+      defaultValues.createdBefore = queryProps.createdBefore;
+    }
+
+    setDefaultFilterValues(defaultValues);
+  };
+
   useEffect(() => {
     // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
     // but currentLocation doesn't change
     if (props.currentLocation?.id) {
-      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-        if (!acc[key]) return { ...acc, [key]: '' };
-        return acc;
-      }, {});
-      setDefaultFilterValues({
-        ...initialEmptyValues,
-        origin: {
-          id: props.currentLocation.id,
-          value: props.currentLocation.id,
-          name: props.currentLocation.name,
-          label: props.currentLocation.name,
-        },
-        sourceType: props.isRequestsList ? 'ELECTRONIC' : null,
-      });
+      initializeDefaultFilterValues();
     }
-  }, [props.currentLocation?.id]);
+  }, [props.currentLocation.id]);
 
 
   const selectFiltersForMyStockMovements = () => {
@@ -190,11 +101,44 @@ const StockMovementOutboundList = (props) => {
       label: props.currentUser.name,
       name: props.currentUser.name,
     };
+
+    const searchQuery = {
+      direction: 'OUTBOUND',
+      requestedBy: currentUserValue.id,
+      createdBy: currentUserValue.id,
+    };
+    props.history.push({
+      pathname: '/openboxes/stockMovement/list',
+      search: queryString.stringify(searchQuery),
+    });
+
     setDefaultFilterValues(values => ({
       ...values,
       requestedBy: currentUserValue,
       createdBy: currentUserValue,
     }));
+  };
+
+  const setFilterValues = (values) => {
+    const filterAccessors = {
+      direction: { name: 'direction' },
+      sourceType: { name: 'sourceType' },
+      destination: { name: 'destination', accessor: 'id' },
+      requestedBy: { name: 'requestedBy', accessor: 'id' },
+      createdBy: { name: 'createdBy', accessor: 'id' },
+      updatedBy: { name: 'updatedBy', accessor: 'id' },
+      createdAfter: { name: 'createdAfter' },
+      createdBefore: { name: 'createdBefore' },
+      requisitionStatusCode: { name: 'requisitionStatusCode', accessor: 'id' },
+    };
+
+    const transformedParams = transformFilterParams(values, filterAccessors);
+    const queryFilterParams = queryString.stringify(transformedParams);
+    const { pathname } = props.history.location;
+    if (queryFilterParams) {
+      props.history.push({ pathname, search: queryFilterParams });
+    }
+    setFilterParams(values);
   };
 
   return (
@@ -206,7 +150,7 @@ const StockMovementOutboundList = (props) => {
       <StockMovementOutboundFilters
         isRequestsOpen={props.isRequestsList}
         defaultValues={defaultFilterValues}
-        setFilterParams={setFilterParams}
+        setFilterParams={setFilterValues}
         filterFields={filterFields}
       />
       <StockMovementOutboundTable
@@ -221,9 +165,12 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   currentUser: state.session.user,
   currentLocation: state.session.currentLocation,
+  requisitionStatuses: state.requisitionStatuses.data,
 });
 
-export default connect(mapStateToProps, { fetchTranslations })(StockMovementOutboundList);
+export default withRouter(connect(mapStateToProps, {
+  fetchTranslations,
+})(StockMovementOutboundList));
 
 StockMovementOutboundList.propTypes = {
   locale: PropTypes.string.isRequired,
@@ -236,5 +183,18 @@ StockMovementOutboundList.propTypes = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
+  requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    variant: PropTypes.string,
+    label: PropTypes.string,
+  })).isRequired,
   fetchTranslations: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+    replace: PropTypes.func,
+    location: PropTypes.shape({
+      search: PropTypes.string,
+    }),
+  }).isRequired,
 };

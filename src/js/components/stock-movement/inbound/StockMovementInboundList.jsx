@@ -17,7 +17,6 @@ const StockMovementInboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
 
-  const queryProps = queryString.parse(props.history.location.search);
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
@@ -48,7 +47,7 @@ const StockMovementInboundList = (props) => {
     };
     defaultValues.direction = 'INBOUND';
 
-
+    const queryProps = queryString.parse(props.history.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.receiptStatusCode) {
       defaultValues.receiptStatusCode = props.shipmentStatuses
@@ -103,7 +102,10 @@ const StockMovementInboundList = (props) => {
       requestedBy: currentUserValue.id,
       createdBy: currentUserValue.id,
     };
-    props.history.push(`/openboxes/stockMovement/list?${queryString.stringify(searchQuery)}`);
+    props.history.push({
+      pathname: '/openboxes/stockMovement/list',
+      search: queryString.stringify(searchQuery),
+    });
 
     setDefaultFilterValues(values => ({
       ...values,
@@ -128,7 +130,7 @@ const StockMovementInboundList = (props) => {
     const queryFilterParams = queryString.stringify(transformedParams);
     const { pathname } = props.history.location;
     if (queryFilterParams) {
-      props.history.push(`${pathname}?${queryFilterParams}`);
+      props.history.push({ pathname, search: queryFilterParams });
     }
     setFilterParams(values);
   };
@@ -141,7 +143,6 @@ const StockMovementInboundList = (props) => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
-        queryProps={queryProps}
       />
       <StockMovementInboundTable filterParams={filterParams} />
     </div>

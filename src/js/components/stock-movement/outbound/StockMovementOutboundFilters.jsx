@@ -35,6 +35,15 @@ const StockMovementOutboundFilters = ({
     }
   }, []);
 
+  const onClearHandler = (form) => {
+    const { origin, direction, sourceType } = defaultValues;
+    form.reset({
+      origin,
+      direction,
+      sourceType: isRequestsOpen ? sourceType : null,
+    });
+  };
+
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
@@ -42,10 +51,7 @@ const StockMovementOutboundFilters = ({
         searchFieldPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
-        onClear={form => form.reset({
-          origin: defaultValues.origin,
-          sourceType: isRequestsOpen ? defaultValues.sourceType : null,
-        })}
+        onClear={onClearHandler}
         updateFilterParams={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
