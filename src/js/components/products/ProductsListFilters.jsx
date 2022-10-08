@@ -4,93 +4,17 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
-import CheckboxField from 'components/form-elements/CheckboxField';
-import FilterSelectField from 'components/form-elements/FilterSelectField';
 import apiClient from 'utils/apiClient';
 
-const filterFields = {
-  categoryId: {
-    type: FilterSelectField,
-    attributes: {
-      valueKey: 'id',
-      filterElement: true,
-      placeholder: 'Category',
-      showLabelTooltip: true,
-      multi: true,
-      closeMenuOnSelect: false,
-    },
-    getDynamicAttr: ({ categories }) => ({
-      options: categories,
-    }),
-  },
-  includeCategoryChildren: {
-    type: CheckboxField,
-    label: 'react.productsList.includeSubcategories.label',
-    defaultMessage: 'Include all products in all subcategories',
-    attributes: {
-      filterElement: true,
-    },
-  },
-  catalogId: {
-    type: FilterSelectField,
-    attributes: {
-      valueKey: 'id',
-      filterElement: true,
-      placeholder: 'Formulary',
-      showLabelTooltip: true,
-      multi: true,
-      closeMenuOnSelect: false,
-    },
-    getDynamicAttr: ({ catalogs }) => ({
-      options: catalogs,
-    }),
-  },
-  tagId: {
-    type: FilterSelectField,
-    attributes: {
-      valueKey: 'id',
-      filterElement: true,
-      placeholder: 'Tags',
-      showLabelTooltip: true,
-      multi: true,
-      closeMenuOnSelect: false,
-    },
-    getDynamicAttr: ({ tags }) => ({
-      options: tags,
-    }),
-  },
-  includeInactive: {
-    type: CheckboxField,
-    label: 'react.productsList.includeInactive.label',
-    defaultMessage: 'Include inactive',
-    attributes: {
-      filterElement: true,
-    },
-  },
-};
 
 const ProductsListFilters = ({
   setFilterParams,
-  currentLocation,
+  filterFields,
+  defaultValues,
 }) => {
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
-  const [defaultValues, setDefaultValues] = useState({});
-
-  useEffect(() => {
-    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
-    // but currentLocation doesn't change
-    if (currentLocation?.id) {
-      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-        if (!acc[key]) return { ...acc, [key]: '' };
-        return acc;
-      }, {});
-      setDefaultValues({
-        ...initialEmptyValues,
-      });
-    }
-  }, [currentLocation?.id]);
 
   const fetchProductsCategories = () => {
     apiClient.get('/openboxes/api/categoryOptions').then((res) => {
@@ -150,7 +74,6 @@ export default connect(mapStateToProps)(ProductsListFilters);
 
 ProductsListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }).isRequired,
+  filterFields: PropTypes.shape({}).isRequired,
+  defaultValues: PropTypes.shape({}).isRequired,
 };
