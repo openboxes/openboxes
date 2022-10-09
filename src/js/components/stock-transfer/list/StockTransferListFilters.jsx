@@ -1,68 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
-import DateFilter from 'components/form-elements/DateFilter/DateFilter';
-import FilterSelectField from 'components/form-elements/FilterSelectField';
 import { debounceUsersFetch } from 'utils/option-utils';
-
-const filterFields = {
-  status: {
-    type: FilterSelectField,
-    attributes: {
-      valueKey: 'id',
-      filterElement: true,
-      placeholder: 'Status',
-      showLabelTooltip: true,
-      multi: true,
-      closeMenuOnSelect: false,
-    },
-    getDynamicAttr: ({ statuses }) => ({
-      options: statuses,
-    }),
-  },
-  createdBy: {
-    type: FilterSelectField,
-    attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
-      filterElement: true,
-      placeholder: 'Created by',
-      showLabelTooltip: true,
-    },
-    getDynamicAttr: ({
-      debouncedUsersFetch,
-    }) => ({
-      loadOptions: debouncedUsersFetch,
-    }),
-  },
-  lastUpdatedStartDate: {
-    type: DateFilter,
-    attributes: {
-      label: 'react.stockTransfer.lastUpdateAfter.label',
-      defaultMessage: 'Last update after',
-      dateFormat: 'MM/DD/YYYY',
-      filterElement: true,
-    },
-  },
-  lastUpdatedEndDate: {
-    type: DateFilter,
-    attributes: {
-      label: 'react.stockTransfer.lastUpdateBefore.label',
-      defaultMessage: 'Last update before',
-      dateFormat: 'MM/DD/YYYY',
-      filterElement: true,
-    },
-  },
-};
 
 
 const StockTransferListFilters = ({
@@ -70,21 +12,9 @@ const StockTransferListFilters = ({
   debounceTime,
   minSearchLength,
   statuses,
-  currentLocation,
+  filterFields,
+  defaultValues,
 }) => {
-  const [defaultValues, setDefaultValues] = useState({});
-
-  useEffect(() => {
-    if (currentLocation?.id) {
-      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-        if (!acc[key]) return { ...acc, [key]: '' };
-        return acc;
-      }, {});
-      setDefaultValues({
-        ...initialEmptyValues,
-      });
-    }
-  }, [currentLocation?.id]);
   const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
   return (
@@ -126,5 +56,6 @@ StockTransferListFilters.propTypes = {
     label: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
   })).isRequired,
-  currentLocation: PropTypes.shape({}).isRequired,
+  defaultValues: PropTypes.shape({}).isRequired,
+  filterFields: PropTypes.shape({}).isRequired,
 };
