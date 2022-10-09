@@ -102,7 +102,7 @@ module.exports = {
         },
         {
           test: /\.jsx$/,
-          loader: 'babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1',
+          use: ['cache-loader', 'babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1'],
           include: SRC,
           exclude: /node_modules/,
         },

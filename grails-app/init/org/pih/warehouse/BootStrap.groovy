@@ -12,10 +12,13 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import liquibase.Contexts
+import liquibase.LabelExpression
 import liquibase.Liquibase
+import liquibase.changelog.ChangeSet
+import liquibase.changelog.DatabaseChangeLog
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
-import liquibase.resource.FileSystemResourceAccessor
+import liquibase.resource.ClassLoaderResourceAccessor
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.EditPageItem
 import org.pih.warehouse.api.PackPageItem
@@ -467,43 +470,62 @@ class BootStrap {
                 throw new RuntimeException("Connection could not be created.")
             }
 
-            /*
-             * FIXME This patch is unlikely to work in production. OBGM-333
-             *
-             * Previously, we used org.liquibase.grails.GrailsFileOpener here
-             * (from a plugin, https://github.com/liquibase/grails-liquibase/,
-             * that ceased development at Grails 1.3.6).
-             *
-             * The path manipulation here is probably dependent on a local install.
-             */
-            def fileOpener = new FileSystemResourceAccessor(
-                "${servletContext.getRealPath('/')}../../../grails-app/migrations/"
-            )
-
-            def database = DatabaseFactory.getInstance()
-                .findCorrectDatabaseImplementation(connection)
-            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
-            log.info("Liquibase running: " + isRunningMigrations)
-            log.info("Setting default schema to " + connection.catalog)
-            log.info("Product Version: " + database.databaseProductVersion)
-            log.info("Database Version: " + database.databaseMajorVersion + "." + database.databaseMinorVersion)
-            def ranChangeSets = database.getRanChangeSetList()
+            def database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection)
             database.setDefaultSchemaName(connection.catalog)
+            boolean isRunningMigrations = LiquibaseUtil.isRunningMigrations()
+            log.info("Liquibase running: ${isRunningMigrations}")
+            log.info("Setting default schema to ${connection.catalog}")
+            log.info("Product Version: ${database.databaseProductVersion}")
+            log.info("Database Version: ${database.databaseMajorVersion}.${database.databaseMinorVersion} (${database.databaseProductName} ${database.databaseProductVersion})")
 
+            // Ensure the databasechangelog up-to-date in order to handle
+            // DatabaseException: Error executing SQL SELECT * FROM obnav.DATABASECHANGELOG
+            // ORDER BY DATEEXECUTED ASC, ORDEREXECUTED ASC: Unknown column 'ORDEREXECUTED' in 'order clause'
+            liquibase = new Liquibase(null as DatabaseChangeLog, new ClassLoaderResourceAccessor(), database)
+            liquibase.checkLiquibaseTables(false, null, new Contexts(), new LabelExpression())
+
+            def executedChangelogVersions = LiquibaseUtil.getExecutedChangelogVersions()
+            log.info("executedChangelogVersions: " + executedChangelogVersions)
+
+            log.info 'Dropping all views (will rebuild after migrations complete)...'
+            liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
+            liquibase.update(null as Contexts, new LabelExpression());
+
+            // FIXME Not good that we'll need to update this on subsequent versions so this needs some more thought
+            List previousChangelogVersions = ["0.5.x", "0.6.x", "0.7.x", "0.8.x"]
+
+            // Check if the executed changelog versions include one of the previous versions
+            // and if so, then we need to keep running the old updates to catch up to 0.9.x
+            boolean hasExecutedAnyPreviousChangesets =
+                executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
+
+            // FIXME Remove !hasExecutedAnyPreviousChangesets once this goes to production
             //If nothing has been created yet, let's create all new database objects with the install scripts
-            if (!ranChangeSets) {
-                liquibase = new Liquibase("install/changelog.xml", fileOpener, database)
-                liquibase.update(null as Contexts)
+            List<ChangeSet> hasExecutedAnyChangesets = database.getRanChangeSetList()
+            if (!hasExecutedAnyChangesets || !hasExecutedAnyPreviousChangesets) {
+                log.info("Running install changelog ...")
+                liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
+                liquibase.update(null as Contexts, new LabelExpression());
             }
 
-            // Run through the updates in the master changelog
-            liquibase = new Liquibase("upgrade/changelog.xml", fileOpener, database)
-            liquibase.update(null as Contexts)
-        }
-        finally {
-            if (liquibase && liquibase.database) {
-                liquibase.database.close()
+            if (hasExecutedAnyPreviousChangesets) {
+                log.info("Running upgrade changelog ...")
+                liquibase = new Liquibase("upgrade/changelog.xml", new ClassLoaderResourceAccessor(), database)
+                liquibase.update(null as Contexts, new LabelExpression())
             }
+
+            // And now we need to run changelogs from 0.9.x and beyond
+            log.info("Running latest updates")
+            liquibase = new Liquibase("changelog.groovy", new ClassLoaderResourceAccessor(), database)
+            liquibase.update(null as Contexts, new LabelExpression())
+
+            log.info 'Rebuilding views ...'
+            liquibase = new Liquibase('views/changelog.xml', new ClassLoaderResourceAccessor(), database)
+            liquibase.update(null as Contexts, new LabelExpression());
+
+        } finally {
+            log.info('Safely closing database')
+            liquibase?.database?.close()
         }
         log.info("Finished running liquibase changelog(s)!")
 

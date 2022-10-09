@@ -11,8 +11,8 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
-import grails.util.Holders
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -182,6 +182,7 @@ class DashboardController {
         redirect(controller: 'dashboard', action: 'index')
     }
 
+    @Transactional
     def chooseLocation() {
 
         // If the user has selected a new location from the topnav bar, we need
@@ -323,5 +324,3 @@ class DashboardController {
     }
 
 }
-
-
