@@ -1,7 +1,6 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
 
@@ -25,7 +24,7 @@ const ProductsListFilters = ({
   </div>
 );
 
-export default connect(mapStateToProps)(ProductsListFilters);
+export default ProductsListFilters;
 
 ProductsListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,

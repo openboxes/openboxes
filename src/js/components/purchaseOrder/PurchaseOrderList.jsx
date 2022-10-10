@@ -99,7 +99,9 @@ const PurchaseOrderList = (props) => {
   };
 
   useEffect(() => {
-    initializeDefaultFilterValues();
+    if (props.currentLocation?.id && props.buyers) {
+      initializeDefaultFilterValues();
+    }
   }, [props.currentLocation.id, props.buyers]);
 
   const setFilterValues = (values) => {
