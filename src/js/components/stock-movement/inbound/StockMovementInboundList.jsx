@@ -147,20 +147,24 @@ const StockMovementInboundList = (props) => {
   }, [props.locale]);
 
   useEffect(() => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    setDefaultFilterValues({
-      ...initialEmptyValues,
-      destination: {
-        id: props.currentLocation?.id,
-        value: props.currentLocation?.id,
-        name: props.currentLocation?.name,
-        label: props.currentLocation?.name,
-      },
-    });
-  }, [props.currentLocation]);
+    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
+    // but currentLocation doesn't change
+    if (props.currentLocation?.id) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      setDefaultFilterValues({
+        ...initialEmptyValues,
+        destination: {
+          id: props.currentLocation?.id,
+          value: props.currentLocation?.id,
+          name: props.currentLocation?.name,
+          label: props.currentLocation?.name,
+        },
+      });
+    }
+  }, [props.currentLocation?.id]);
 
   const selectFiltersForMyStockMovements = () => {
     const currentUserValue = {

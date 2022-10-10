@@ -111,20 +111,24 @@ const InvoiceListFilters = ({
   const [defaultValues, setDefaultValues] = useState({});
 
   useEffect(() => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    setDefaultValues({
-      ...initialEmptyValues,
-      buyerOrganization: {
-        id: currentLocation?.organization?.id,
-        value: currentLocation?.organization?.id,
-        name: currentLocation?.organization?.name,
-        label: currentLocation?.organization?.name,
-      },
-    });
-  }, [currentLocation]);
+    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
+    // but currentLocation doesn't change
+    if (currentLocation?.id) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      setDefaultValues({
+        ...initialEmptyValues,
+        buyerOrganization: {
+          id: currentLocation?.organization?.id,
+          value: currentLocation?.organization?.id,
+          name: currentLocation?.organization?.name,
+          label: currentLocation?.organization?.name,
+        },
+      });
+    }
+  }, [currentLocation?.id]);
 
   useEffect(() => {
     // If statuses or invoice type codes not yet in store, fetch them

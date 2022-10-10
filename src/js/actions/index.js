@@ -64,6 +64,7 @@ export function hideUserActions() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchReasonCodes() {
   const url = '/openboxes/api/reasonCodes';
   const request = apiClient.get(url);
@@ -74,6 +75,7 @@ export function fetchReasonCodes() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchCurrencies() {
   const url = '/openboxes/api/unitOfMeasure/currencies';
   const request = apiClient.get(url);
@@ -84,6 +86,7 @@ export function fetchCurrencies() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchOrganizations() {
   const url = '/openboxes/api/organizations';
   const request = apiClient.get(url);
@@ -94,6 +97,7 @@ export function fetchOrganizations() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchUsers() {
   const url = '/openboxes/api/persons';
   const request = apiClient.get(url, { params: { status: true } });
@@ -103,16 +107,19 @@ export function fetchUsers() {
   };
 }
 
-export function fetchSessionInfo() {
+export async function fetchSessionInfo() {
   const url = '/openboxes/api/getAppContext';
-  const request = apiClient.get(url);
+  const res = await apiClient.get(url);
 
-  return {
-    type: FETCH_SESSION_INFO,
-    payload: request,
+  return (dispatch) => {
+    dispatch({
+      type: FETCH_SESSION_INFO,
+      payload: res,
+    });
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchMenuConfig() {
   const url = '/openboxes/api/getMenuConfig';
   const request = apiClient.get(url);

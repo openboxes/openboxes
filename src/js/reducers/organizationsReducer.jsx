@@ -6,7 +6,7 @@ const initialState = {
   data: [],
   fetched: false,
   suppliers: [],
-  buyers: [],
+  buyers: null,
 };
 
 export default function (state = initialState, action) {

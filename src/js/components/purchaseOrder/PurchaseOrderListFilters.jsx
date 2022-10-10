@@ -135,23 +135,25 @@ const PurchaseOrderListFilters = ({
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
 
   const determineDefaultValues = () => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    // If central purchasing is enabled, set default purchasing org as currentLocation's org
-    if (isCentralPurchasingEnabled) {
+    if (currentLocation?.id && buyers) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      // If central purchasing is enabled, set default purchasing org as currentLocation's org
+      if (isCentralPurchasingEnabled) {
+        setDefaultValues({
+          ...initialEmptyValues,
+          destinationParty: buyers.find(org => org.id === currentLocation?.organization?.id),
+        });
+        return;
+      }
+      // If central purchasing is not enabled, set default destination as currentLocation
       setDefaultValues({
         ...initialEmptyValues,
-        destinationParty: buyers.find(org => org.id === currentLocation.organization.id),
+        destination: currentLocation,
       });
-      return;
     }
-    // If central purchasing is not enabled, set default destination as currentLocation
-    setDefaultValues({
-      ...initialEmptyValues,
-      destination: currentLocation,
-    });
   };
 
   useEffect(() => {
@@ -160,12 +162,12 @@ const PurchaseOrderListFilters = ({
       fetchStatuses();
     }
 
-    if (!buyers || buyers.length === 0) {
+    if (!buyers) {
       fetchBuyerOrganizations();
       return;
     }
     determineDefaultValues();
-  }, [buyers, currentLocation]);
+  }, [buyers, currentLocation?.id]);
 
   const debouncedOriginLocationsFetch = debounceLocationsFetch(
     debounceTime,

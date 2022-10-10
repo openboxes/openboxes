@@ -49,7 +49,7 @@ const StockTransferListTable = ({
   // If filterParams change, refetch the data with applied filters
   useEffect(() => {
     fireFetchData();
-  }, [filterParams, currentLocation]);
+  }, [filterParams]);
 
   const deleteStockTransfer = (id) => {
     showTheSpinner();

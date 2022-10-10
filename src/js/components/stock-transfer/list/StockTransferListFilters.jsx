@@ -70,18 +70,21 @@ const StockTransferListFilters = ({
   debounceTime,
   minSearchLength,
   statuses,
+  currentLocation,
 }) => {
   const [defaultValues, setDefaultValues] = useState({});
 
   useEffect(() => {
-    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-      if (!acc[key]) return { ...acc, [key]: '' };
-      return acc;
-    }, {});
-    setDefaultValues({
-      ...initialEmptyValues,
-    });
-  }, []);
+    if (currentLocation?.id) {
+      const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+        if (!acc[key]) return { ...acc, [key]: '' };
+        return acc;
+      }, {});
+      setDefaultValues({
+        ...initialEmptyValues,
+      });
+    }
+  }, [currentLocation?.id]);
   const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
   return (
@@ -107,6 +110,7 @@ const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
   statuses: state.stockTransfer.statuses,
+  currentLocation: state.session.currentLocation,
 });
 
 
@@ -122,4 +126,5 @@ StockTransferListFilters.propTypes = {
     label: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
   })).isRequired,
+  currentLocation: PropTypes.shape({}).isRequired,
 };
