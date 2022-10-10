@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -11,9 +11,7 @@ const StockMovementOutboundFilters = ({
   setFilterParams,
   debounceTime,
   minSearchLength,
-  fetchStatuses,
-  requisitionStatuses,
-  isRequisitionStatusesFetched,
+  formProps,
   filterFields,
   defaultValues,
 }) => {
@@ -28,12 +26,6 @@ const StockMovementOutboundFilters = ({
     false,
   );
 
-  useEffect(() => {
-    if (!isRequisitionStatusesFetched || requisitionStatuses.length === 0) {
-      fetchStatuses();
-    }
-  }, []);
-
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
@@ -45,7 +37,7 @@ const StockMovementOutboundFilters = ({
         updateFilterParams={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
-          requisitionStatuses,
+          ...formProps,
           fetchUsers,
           fetchLocations,
         }}
@@ -57,8 +49,6 @@ const StockMovementOutboundFilters = ({
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
-  requisitionStatuses: state.requisitionStatuses.data,
-  isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
 });
 
 const mapDispatchToProps = {
@@ -69,16 +59,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboun
 
 StockMovementOutboundFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
-  fetchStatuses: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
-  isRequisitionStatusesFetched: PropTypes.bool.isRequired,
-  requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    variant: PropTypes.string,
-    label: PropTypes.string,
-  })).isRequired,
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
+  formProps: PropTypes.shape({}).isRequired,
 };

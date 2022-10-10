@@ -133,6 +133,7 @@ const ProductsList = (props) => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
+        formProps={{ categories, catalogs, tags }}
       />
       <ProductsListTable filterParams={filterParams} />
     </div>

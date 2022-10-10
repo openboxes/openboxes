@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchTranslations } from 'actions';
+import { fetchRequisitionStatusCodes, fetchTranslations } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import StockMovementOutboundFilters from 'components/stock-movement/outbound/StockMovementOutboundFilters';
 import StockMovementOutboundHeader from 'components/stock-movement/outbound/StockMovementOutboundHeader';
@@ -22,8 +22,14 @@ const StockMovementOutboundList = (props) => {
     props.fetchTranslations(props.locale, 'StockMovementType');
   }, [props.locale]);
 
+  useEffect(() => {
+    if (!props.isRequisitionStatusesFetched || props.requisitionStatuses.length === 0) {
+      props.fetchStatuses();
+    }
+  }, []);
+
   const fetchUserById = async (id) => {
-    const response = await apiClient(`/openboxes/api/persons/${id}`);
+    const response = await apiClient(`/openboxes/api/generic/person/${id}`);
     return response.data?.data;
   };
 
@@ -151,6 +157,7 @@ const StockMovementOutboundList = (props) => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
+        formProps={{ requisitionStatuses: props.requisitionStatuses }}
       />
       <StockMovementOutboundTable
         isRequestsOpen={props.isRequestsList}
@@ -165,15 +172,20 @@ const mapStateToProps = state => ({
   currentUser: state.session.user,
   currentLocation: state.session.currentLocation,
   requisitionStatuses: state.requisitionStatuses.data,
+  isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
 });
 
 export default withRouter(connect(mapStateToProps, {
   fetchTranslations,
+  fetchStatuses: fetchRequisitionStatusCodes,
 })(StockMovementOutboundList));
 
 StockMovementOutboundList.propTypes = {
   locale: PropTypes.string.isRequired,
   isRequestsList: PropTypes.bool.isRequired,
+  fetchTranslations: PropTypes.func.isRequired,
+  fetchStatuses: PropTypes.func.isRequired,
+  isRequisitionStatusesFetched: PropTypes.bool.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -188,7 +200,6 @@ StockMovementOutboundList.propTypes = {
     variant: PropTypes.string,
     label: PropTypes.string,
   })).isRequired,
-  fetchTranslations: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
     replace: PropTypes.func,

@@ -128,6 +128,11 @@ const PurchaseOrderList = (props) => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
+        formProps={{
+          statuses: props.statuses,
+          buyers: props.buyers,
+          isCentralPurchasingEnabled,
+        }}
       />
       <PurchaseOrderListTable filterParams={filterParams} />
     </div>

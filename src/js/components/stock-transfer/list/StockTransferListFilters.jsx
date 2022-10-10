@@ -11,7 +11,7 @@ const StockTransferListFilters = ({
   setFilterParams,
   debounceTime,
   minSearchLength,
-  statuses,
+  formProps,
   filterFields,
   defaultValues,
 }) => {
@@ -23,8 +23,8 @@ const StockTransferListFilters = ({
         filterFields={filterFields}
         updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
+          ...formProps,
           debouncedUsersFetch,
-          statuses,
         }}
         defaultValues={defaultValues}
         searchFieldPlaceholder="Search by transfer number"
@@ -39,8 +39,6 @@ const StockTransferListFilters = ({
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
-  statuses: state.stockTransfer.statuses,
-  currentLocation: state.session.currentLocation,
 });
 
 
@@ -50,12 +48,7 @@ StockTransferListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
-  statuses: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    variant: PropTypes.string.isRequired,
-  })).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
   filterFields: PropTypes.shape({}).isRequired,
+  formProps: PropTypes.shape({}).isRequired,
 };

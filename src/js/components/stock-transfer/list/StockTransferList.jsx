@@ -83,6 +83,7 @@ const StockTransferList = (props) => {
         filterFields={filterFields}
         setFilterParams={setFilterValues}
         defaultValues={defaultFilterValues}
+        formProps={{ statuses: props.statuses }}
       />
       <StockTransferListTable filterParams={filterParams} />
     </div>

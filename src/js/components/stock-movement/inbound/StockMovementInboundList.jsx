@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchTranslations } from 'actions';
+import { fetchShipmentStatusCodes, fetchTranslations } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
 import StockMovementInboundFilters from 'components/stock-movement/inbound/StockMovementInboundFilters';
 import StockMovementInboundHeader from 'components/stock-movement/inbound/StockMovementInboundHeader';
@@ -17,11 +17,15 @@ const StockMovementInboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
 
-
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
   }, [props.locale]);
 
+  useEffect(() => {
+    if (!props.isShipmentStatusesFetched || props.shipmentStatuses.length === 0) {
+      props.fetchStatuses();
+    }
+  }, []);
 
   const fetchUserById = async (id) => {
     const response = await apiClient(`/openboxes/api/generic/person/${id}`);
@@ -143,6 +147,7 @@ const StockMovementInboundList = (props) => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
+        formProps={{ shipmentStatuses: props.shipmentStatuses }}
       />
       <StockMovementInboundTable filterParams={filterParams} />
     </div>
@@ -154,19 +159,24 @@ const mapStateToProps = state => ({
   currentUser: state.session.user,
   currentLocation: state.session.currentLocation,
   shipmentStatuses: state.shipmentStatuses.data,
+  isShipmentStatusesFetched: state.shipmentStatuses.fetched,
+
 });
 
 export default withRouter(connect(mapStateToProps, {
   fetchTranslations,
+  fetchStatuses: fetchShipmentStatusCodes,
 })(StockMovementInboundList));
 
 StockMovementInboundList.propTypes = {
   locale: PropTypes.string.isRequired,
+  fetchTranslations: PropTypes.func.isRequired,
+  fetchStatuses: PropTypes.func.isRequired,
+  isShipmentStatusesFetched: PropTypes.bool.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
-  fetchTranslations: PropTypes.func.isRequired,
   shipmentStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
