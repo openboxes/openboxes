@@ -22,6 +22,7 @@ const FilterForm = ({
   allowEmptySubmit,
   hidden,
   onClear,
+  ignoreClearFilters,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -54,7 +55,14 @@ const FilterForm = ({
       onClear(form);
       return;
     }
-    form.reset(defaultValues);
+    const clearedFilterList = Object.keys(defaultValues)
+      .reduce((acc, key) => {
+        if (ignoreClearFilters.includes(key)) {
+          return { ...acc, [key]: defaultValues[key] };
+        }
+        return { ...acc, [key]: '' };
+      }, {});
+    form.reset(clearedFilterList);
   };
 
   return (
@@ -121,6 +129,7 @@ FilterForm.propTypes = {
   defaultValues: PropTypes.shape({}),
   allowEmptySubmit: PropTypes.bool,
   hidden: PropTypes.bool,
+  ignoreClearFilters: PropTypes.arrayOf(PropTypes.string),
 };
 
 FilterForm.defaultProps = {
@@ -131,4 +140,5 @@ FilterForm.defaultProps = {
   allowEmptySubmit: false,
   hidden: true,
   onClear: undefined,
+  ignoreClearFilters: [],
 };

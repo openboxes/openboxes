@@ -27,7 +27,10 @@ TableHeaderCell.defaultProps = {
 };
 
 TableHeaderCell.propTypes = {
-  children: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
   className: PropTypes.string,
   style: PropTypes.shape({}),
   toggleSort: PropTypes.func.isRequired,

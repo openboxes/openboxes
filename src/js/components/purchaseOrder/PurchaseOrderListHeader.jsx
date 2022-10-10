@@ -39,6 +39,8 @@ const mapStateToProps = state => ({
 export default withRouter(connect(mapStateToProps)(PurchaseOrderListHeader));
 
 PurchaseOrderListHeader.propTypes = {
-  history: PropTypes.func.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

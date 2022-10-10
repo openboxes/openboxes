@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -11,10 +11,7 @@ const StockMovementOutboundFilters = ({
   setFilterParams,
   debounceTime,
   minSearchLength,
-  fetchStatuses,
-  requisitionStatuses,
-  isRequisitionStatusesFetched,
-  isRequestsOpen,
+  formProps,
   filterFields,
   defaultValues,
 }) => {
@@ -29,12 +26,6 @@ const StockMovementOutboundFilters = ({
     false,
   );
 
-  useEffect(() => {
-    if (!isRequisitionStatusesFetched || requisitionStatuses.length === 0) {
-      fetchStatuses();
-    }
-  }, []);
-
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
@@ -42,14 +33,11 @@ const StockMovementOutboundFilters = ({
         searchFieldPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
-        onClear={form => form.reset({
-          origin: defaultValues.origin,
-          sourceType: isRequestsOpen ? defaultValues.sourceType : null,
-        })}
+        ignoreClearFilters={['origin', 'direction', 'sourceType']}
         updateFilterParams={values => setFilterParams({ ...values })}
         hidden={false}
         formProps={{
-          requisitionStatuses,
+          ...formProps,
           fetchUsers,
           fetchLocations,
         }}
@@ -61,8 +49,6 @@ const StockMovementOutboundFilters = ({
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
-  requisitionStatuses: state.requisitionStatuses.data,
-  isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
 });
 
 const mapDispatchToProps = {
@@ -73,17 +59,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboun
 
 StockMovementOutboundFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
-  fetchStatuses: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
-  isRequisitionStatusesFetched: PropTypes.bool.isRequired,
-  isRequestsOpen: PropTypes.bool.isRequired,
-  requisitionStatuses: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    variant: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  }).isRequired,
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
+  formProps: PropTypes.shape({}).isRequired,
 };

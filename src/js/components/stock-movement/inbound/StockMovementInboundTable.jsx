@@ -90,7 +90,6 @@ const StockMovementInboundTable = ({
         ...filterParams,
         offset: `${offset}`,
         max: `${state.pageSize}`,
-        direction: 'INBOUND',
         receiptStatusCode: filterParams.receiptStatusCode &&
           filterParams.receiptStatusCode?.map(({ id }) => id),
         origin: filterParams?.origin?.id,
@@ -384,10 +383,10 @@ StockMovementInboundTable.propTypes = {
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
-  shipmentStatuses: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    variant: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  }).isRequired,
+  shipmentStatuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    variant: PropTypes.string,
+    label: PropTypes.string,
+  })).isRequired,
 };

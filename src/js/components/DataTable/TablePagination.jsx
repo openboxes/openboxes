@@ -105,7 +105,7 @@ TablePagination.propTypes = {
   page: PropTypes.number.isRequired,
   pages: PropTypes.number.isRequired,
   pageSize: PropTypes.number.isRequired,
-  resolvedData: PropTypes.arrayOf({}).isRequired,
+  resolvedData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   pageSizeOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
   onPageSizeChange: PropTypes.func.isRequired,
   onPageChange: PropTypes.func.isRequired,

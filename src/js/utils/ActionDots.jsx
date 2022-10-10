@@ -97,7 +97,7 @@ ActionDots.defaultProps = {
 };
 
 ActionDots.propTypes = {
-  actions: PropTypes.shape([{
+  actions: PropTypes.arrayOf(PropTypes.shape({
     leftIcon: PropTypes.element.isRequired,
     label: PropTypes.string.isRequired,
     defaultLabel: PropTypes.string.isRequired,
@@ -106,7 +106,7 @@ ActionDots.propTypes = {
     appendId: PropTypes.bool,
     variant: PropTypes.string,
     onClick: PropTypes.func,
-  }]).isRequired,
+  })).isRequired,
   dropdownPlacement: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   id: PropTypes.string.isRequired,
   dropdownClasses: PropTypes.string,
