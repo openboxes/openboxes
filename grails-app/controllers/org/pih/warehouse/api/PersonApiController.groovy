@@ -10,16 +10,10 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.core.User
 
 class PersonApiController extends BaseDomainApiController {
 
     def userService
-
-    def read = {
-        User user = userService.getUser(params.id)
-        render([data: user] as JSON)
-    }
 
     def list = {
         String[] terms = params?.name?.split(",| ")?.findAll { it }
