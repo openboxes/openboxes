@@ -107,16 +107,15 @@ export function fetchUsers() {
   };
 }
 
-export function fetchSessionInfo() {
+export async function fetchSessionInfo() {
   const url = '/openboxes/api/getAppContext';
+  const res = await apiClient.get(url);
+
   return (dispatch) => {
-    apiClient.get(url)
-      .then((res) => {
-        dispatch({
-          type: FETCH_SESSION_INFO,
-          payload: res,
-        });
-      });
+    dispatch({
+      type: FETCH_SESSION_INFO,
+      payload: res,
+    });
   };
 }
 

@@ -27,10 +27,10 @@ class MainRouter extends React.Component {
           onMissingTranslation,
         },
       });
+      this.props.setActiveLanguage(this.props.locale);
+      this.props.fetchMenuConfig();
+      TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
     });
-    this.props.setActiveLanguage(this.props.locale);
-    this.props.fetchMenuConfig();
-    TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
   }
 
   componentWillReceiveProps(nextProps) {
