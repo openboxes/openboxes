@@ -419,10 +419,6 @@ th.desc a {
 
 /* DIALOG */
 
-.dialog table {
-    padding: 5px 0;
-}
-
 .prop {
     padding: 5px;
 }
@@ -3258,6 +3254,14 @@ table.dataTable tbody tr.even td.sorting_1 { background-color: #fff; }
 
 table.dataTable tbody tr.odd td.sorting_2 { background-color: #f7f7f7;; }
 table.dataTable tbody tr.even td.sorting_2 { background-color: #fff; }
+
+table.dataTable td,
+table.dataTable th {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
 #dataTable_processing { height: 60px; }
 
 input {
