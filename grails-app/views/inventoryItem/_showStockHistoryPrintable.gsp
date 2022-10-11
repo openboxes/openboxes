@@ -20,7 +20,7 @@
             <td class="noBorder">
                 <div id="product-header" class="divHeader">
                     <div id="product-title" class="title">
-                        <small>${commandInstance?.product?.productCode }</small>
+                        <small class="font-weight-bold">${commandInstance?.product?.productCode }</small>
                         <g:link controller="inventoryItem" action="showStockCard" params="['product.id': commandInstance?.product?.id]">
                             ${commandInstance?.product?.name }
                         </g:link>

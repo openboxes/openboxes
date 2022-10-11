@@ -14,7 +14,9 @@
 
     </div>
 
-    <h1 class="title">Current Stock <small>${session.warehouse.name}</small> <small>${params?.date}</small></h1>
+    <h1 class="title">
+        Current Stock <small class="font-weight-bold">${session.warehouse.name}</small> <small>${params?.date}</small>
+    </h1>
 
 
     <table id="dataTable">
