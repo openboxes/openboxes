@@ -21,7 +21,7 @@
                     </td>
 					<td>
                         <div class="title">
-                            <small>${orderInstance?.orderNumber}</small>
+                            <small class="font-weight-bold">${orderInstance?.orderNumber}</small>
                             <g:link controller="order" action="show" id="${orderInstance?.id}">
                                 ${orderInstance?.name}</g:link>
 						</div>

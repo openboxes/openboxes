@@ -22,7 +22,7 @@
 				<td class="middle">
 					<div id="product-header" style="float: left;">
 			            <div id="product-title" class="title">
-			            	<small>${productInstance?.productCode }</small>
+			            	<small class="font-weight-bold">${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
 			                	${productInstance?.name }
 			                </g:link>

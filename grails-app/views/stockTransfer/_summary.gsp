@@ -8,7 +8,7 @@
         <tr class="odd">
             <td>
                 <div class="title">
-                    ${orderInstance?.orderNumber} <small><format:date obj="${orderInstance?.dateCreated}"/></small>
+                    ${orderInstance?.orderNumber} <small class="font-weight-bold"><format:date obj="${orderInstance?.dateCreated}"/></small>
                 </div>
             </td>
             <td class="top right" width="1%">
