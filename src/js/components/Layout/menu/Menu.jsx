@@ -31,27 +31,23 @@ const Menu = ({ menuConfig, location }) => {
   }, {});
 
   const checkActiveSection = (menuUrls, path) => {
-    // Concat currentPath, because react-router recognizes params (?exampleParam)
-    // and it moves this part from pathname and moves it to search
-    // e.g.
-    // /openboxes/stockMovement/createInbound?directon=INBOUND
-    // =>
-    // pathname: /openboxes/stockMovement/createInbound/ search: ?direction=INBOUND
-    const currentPath = path.pathname.concat('', path.search);
-    // slice currentPath to max length of 4,
-    // so we look only at e.g. /openboxes/invoice/create/,
-    // so we don't need to check additional /invoicing/create/:id/:param1/:param2, etc.
-    const splittedCurrentPath = currentPath.split('/').slice(0, 4);
-    const matchedPath = Object.keys(menuUrls).find((section) => {
-      const splittedSectionUrls = menuUrls[section].map(url => url.split('/').slice(0, 4));
-      // Check if any of section's spllited url matches currentPath
-      return splittedSectionUrls.some((url) => {
-        if (splittedCurrentPath.length === url.length) {
-          return !!splittedCurrentPath.every((el, idx) => el === url[idx]);
-        }
-        return false;
+    const { pathname, search } = path;
+    const matchedPath = Object.keys(menuUrls)
+      .find((section) => {
+        // find matching URL from sections
+        const foundURL = menuUrls[section].find((url) => {
+          const [sectionPath, sectionSearch] = url.split('?');
+          if (sectionPath !== pathname) return false;
+          // if found matching pathname
+          // then check if all parameters of section path match with current path parameters
+          if (sectionSearch) {
+            const searchParams = sectionSearch.split('&');
+            return search && searchParams.every(param => search.includes(param));
+          }
+          return true;
+        });
+        return !!foundURL;
       });
-    });
     return matchedPath || 'Dashboard';
   };
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);

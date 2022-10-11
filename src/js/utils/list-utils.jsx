@@ -50,3 +50,5 @@ export const transformFilterParams = (filterValues, filterAccessors) => Object.k
     return { ...acc, [key]: _.get(filterValues[name], accessor) };
   }, {});
 
+// Transforms value into an Array
+export const getParamList = value => [].concat(value);

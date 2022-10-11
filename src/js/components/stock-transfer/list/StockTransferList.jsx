@@ -11,7 +11,7 @@ import StockTransferListFilters from 'components/stock-transfer/list/StockTransf
 import StockTransferListHeader from 'components/stock-transfer/list/StockTransferListHeader';
 import StockTransferListTable from 'components/stock-transfer/list/StockTransferListTable';
 import apiClient from 'utils/apiClient';
-import { transformFilterParams } from 'utils/list-utils';
+import { getParamList, transformFilterParams } from 'utils/list-utils';
 
 const StockTransferList = (props) => {
   // Filter params are stored here, to be able to pass them to table component
@@ -36,10 +36,8 @@ const StockTransferList = (props) => {
 
     // SET STATIC DEFAULT VALUES
     if (queryProps.status) {
-      const statusList = Array.isArray(queryProps.status)
-        ? queryProps.status
-        : [queryProps.status];
-      defaultValues.status = props.statuses.filter(({ id }) => statusList.includes(id));
+      const statuses = getParamList(queryProps.status);
+      defaultValues.status = props.statuses.filter(({ id }) => statuses.includes(id));
     }
     if (queryProps.createdBy) {
       defaultValues.createdBy = queryProps.createdBy === props.currentUser.id

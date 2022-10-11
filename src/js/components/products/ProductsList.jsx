@@ -11,7 +11,7 @@ import ProductsListFilters from 'components/products/ProductsListFilters';
 import ProductsListHeader from 'components/products/ProductsListHeader';
 import ProductsListTable from 'components/products/ProductsListTable';
 import apiClient from 'utils/apiClient';
-import { transformFilterParams } from 'utils/list-utils';
+import { getParamList, transformFilterParams } from 'utils/list-utils';
 
 
 const ProductsList = (props) => {
@@ -70,9 +70,7 @@ const ProductsList = (props) => {
     setTags(tagList);
 
     if (queryProps.catalogId) {
-      const catalogIdList = Array.isArray(queryProps.catalogId)
-        ? queryProps.catalogId
-        : [queryProps.catalogId];
+      const catalogIdList = getParamList(queryProps.catalogId);
       defaultValues.catalogId = catalogList
         .filter(({ id }) => catalogIdList.includes(id))
         .map(({ id, label }) => ({
@@ -80,9 +78,7 @@ const ProductsList = (props) => {
         }));
     }
     if (queryProps.tagId) {
-      const tagIdList = Array.isArray(queryProps.tagId)
-        ? queryProps.tagId
-        : [queryProps.tagId];
+      const tagIdList = getParamList(queryProps.tagId);
       defaultValues.tagId = tagList
         .filter(({ id }) => tagIdList.includes(id))
         .map(({ id, label }) => ({
@@ -90,9 +86,7 @@ const ProductsList = (props) => {
         }));
     }
     if (queryProps.categoryId) {
-      const categoryIdList = Array.isArray(queryProps.categoryId)
-        ? queryProps.categoryId
-        : [queryProps.categoryId];
+      const categoryIdList = getParamList(queryProps.categoryId);
       defaultValues.categoryId = categoryList
         .filter(({ id }) => categoryIdList.includes(id))
         .map(({ id, label }) => ({

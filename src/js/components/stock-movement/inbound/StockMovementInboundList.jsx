@@ -11,7 +11,7 @@ import StockMovementInboundFilters from 'components/stock-movement/inbound/Stock
 import StockMovementInboundHeader from 'components/stock-movement/inbound/StockMovementInboundHeader';
 import StockMovementInboundTable from 'components/stock-movement/inbound/StockMovementInboundTable';
 import apiClient from 'utils/apiClient';
-import { transformFilterParams } from 'utils/list-utils';
+import { getParamList, transformFilterParams } from 'utils/list-utils';
 
 const StockMovementInboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
@@ -54,8 +54,9 @@ const StockMovementInboundList = (props) => {
     const queryProps = queryString.parse(props.history.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.receiptStatusCode) {
+      const statuses = getParamList(queryProps.receiptStatusCode);
       defaultValues.receiptStatusCode = props.shipmentStatuses
-        .filter(({ value }) => queryProps.receiptStatusCode.includes(value));
+        .filter(({ value }) => statuses.includes(value));
     }
     if (queryProps.origin) {
       defaultValues.origin = await fetchLocationById(queryProps.origin);
