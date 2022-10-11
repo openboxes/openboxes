@@ -17,6 +17,16 @@ import org.pih.warehouse.invoice.InvoiceTypeCode
 
 class OrderAdjustment implements Serializable {
 
+    def publishRefreshEvent = {
+        publishEvent(new RefreshOrderSummaryEvent(this))
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
+
+    def beforeDelete = publishRefreshEvent
+
     String id
     BigDecimal amount
     BigDecimal percentage

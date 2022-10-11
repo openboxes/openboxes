@@ -12,11 +12,22 @@ package org.pih.warehouse.receiving
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.ShipmentItem
 
 
 class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
+
+    def publishRefreshEvent = {
+        publishEvent(new RefreshOrderSummaryEvent(this))
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
+
+    def beforeDelete = publishRefreshEvent
 
     String id
     Product product                        // Specific product that we're tracking

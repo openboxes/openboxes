@@ -40,6 +40,7 @@ import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceList
 import org.pih.warehouse.jobs.RefreshDemandDataJob
+import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
 import org.pih.warehouse.order.Order
@@ -566,6 +567,8 @@ class BootStrap {
             // Refresh inventory snapshot data
             RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE]);
         }
+
+        RefreshOrderSummaryJob.triggerNow()
     }
 
 

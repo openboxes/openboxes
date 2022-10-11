@@ -18,11 +18,22 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceItem implements Serializable {
+
+    def publishRefreshEvent = {
+        publishEvent(new RefreshOrderSummaryEvent(this))
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
+
+    def beforeDelete = publishRefreshEvent
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()

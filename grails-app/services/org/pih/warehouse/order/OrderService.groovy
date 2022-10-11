@@ -1208,4 +1208,28 @@ class OrderService {
 
         return results
     }
+
+    /**
+     * Refreshing entire Order Summary materialized view, should be only triggered from time to time
+     * */
+    def refreshOrderSummary() {
+        List statements = [
+            "DROP TABLE IF EXISTS mv_order_summary;",
+            "CREATE TABLE mv_order_summary AS SELECT * FROM order_summary;",
+            "ALTER TABLE mv_order_summary ADD INDEX (id);",
+        ]
+        dataService.executeStatements(statements)
+    }
+
+    /**
+     * Refreshing the Order Summary materialized view for a specific Order
+     * */
+    def refreshOrderSummary(String orderId, Boolean isDelete) {
+        List statements = ["DELETE FROM mv_order_summary WHERE id = '${orderId}';"]
+        if (!isDelete) {
+            statements << "INSERT INTO mv_order_summary (SELECT * FROM order_summary WHERE id = '${orderId}');"
+        }
+
+        dataService.executeStatements(statements)
+    }
 }

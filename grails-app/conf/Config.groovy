@@ -1314,6 +1314,10 @@ openboxes.jobs.refreshStockoutDataJob.cronExpression = "0 0 1 * * ?" // at 01:00
 openboxes.jobs.refreshDemandDataJob.enabled = true
 openboxes.jobs.refreshDemandDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day
 
+// Refresh order summary snapshots
+openboxes.jobs.refreshOrderSummaryJob.enabled = true
+openboxes.jobs.refreshOrderSummaryJob.cronExpression = "0 0 2 * * ?" // at 02:00:00am every day
+
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
 openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every minute
