@@ -46,11 +46,14 @@ class ProductTypeController {
         def productTypeInstance = new ProductType(params)
         productTypeInstance.productTypeCode = ProductTypeCode.GOOD
         productTypeInstance.requiredFields = [ProductField.PRODUCT_CODE, ProductField.NAME, ProductField.CATEGORY, ProductField.GL_ACCOUNT]
-        if (productTypeInstance.save(flush: true)) {
+        if (!params.code && !params.productIdentifierFormat) {
+            productTypeInstance.errors.rejectValue("productIdentifierFormat","productType.codeOrIdentifierRequired.message")
+            productTypeInstance.errors.rejectValue("code", "")
+        }
+        if (!productTypeInstance.hasErrors() && productTypeInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), productTypeInstance.id])}"
             redirect(action: "list", id: productTypeInstance.id)
-        }
-        else {
+        } else {
             render(view: "create", model: [productTypeInstance: productTypeInstance])
         }
     }
