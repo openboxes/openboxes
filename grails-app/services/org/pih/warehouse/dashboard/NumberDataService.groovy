@@ -54,7 +54,7 @@ class NumberDataService {
 
         return new NumberData(
                 requisitionShipmentCount + returnOrderShipmentCount,
-                "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=PENDING&origin=" + location.id + "&createdBy=" + user.id
+                "/openboxes/stockMovement/list?direction=OUTBOUND&receiptStatusCode=PENDING&origin=" + location.id + "&createdBy=" + user.id
         )
     }
     NumberData getInProgressPutaways(def user, def location) {

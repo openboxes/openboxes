@@ -10,7 +10,7 @@ import PurchaseOrderListFilters from 'components/purchaseOrder/PurchaseOrderList
 import PurchaseOrderListHeader from 'components/purchaseOrder/PurchaseOrderListHeader';
 import PurchaseOrderListTable from 'components/purchaseOrder/PurchaseOrderListTable';
 import apiClient from 'utils/apiClient';
-import { transformFilterParams } from 'utils/list-utils';
+import { getParamList, transformFilterParams } from 'utils/list-utils';
 
 
 const PurchaseOrderList = (props) => {
@@ -66,8 +66,9 @@ const PurchaseOrderList = (props) => {
     const queryProps = queryString.parse(props.history.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.status) {
+      const statuses = getParamList(queryProps.status);
       defaultValues.status = props.statuses
-        .filter(({ value }) => queryProps.status.includes(value));
+        .filter(({ value }) => statuses.includes(value));
     }
     if (queryProps.statusStartDate) {
       defaultValues.statusStartDate = queryProps.statusStartDate;

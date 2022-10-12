@@ -11,7 +11,7 @@ import StockMovementOutboundFilters from 'components/stock-movement/outbound/Sto
 import StockMovementOutboundHeader from 'components/stock-movement/outbound/StockMovementOutboundHeader';
 import StockMovementOutboundTable from 'components/stock-movement/outbound/StockMovementOutboundTable';
 import apiClient from 'utils/apiClient';
-import { transformFilterParams } from 'utils/list-utils';
+import { getParamList, transformFilterParams } from 'utils/list-utils';
 
 const StockMovementOutboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
@@ -60,8 +60,12 @@ const StockMovementOutboundList = (props) => {
     const queryProps = queryString.parse(props.history.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.requisitionStatusCode) {
+      const statuses = getParamList(queryProps.requisitionStatusCode);
       defaultValues.requisitionStatusCode = props.requisitionStatuses
-        .filter(({ value }) => queryProps.requisitionStatusCode.includes(value));
+        .filter(({ value }) => statuses.includes(value));
+    }
+    if (queryProps.receiptStatusCode) {
+      defaultValues.receiptStatusCode = getParamList(queryProps.receiptStatusCode);
     }
     if (queryProps.destination) {
       defaultValues.destination = await fetchLocationById(queryProps.destination);
@@ -136,6 +140,7 @@ const StockMovementOutboundList = (props) => {
       createdAfter: { name: 'createdAfter' },
       createdBefore: { name: 'createdBefore' },
       requisitionStatusCode: { name: 'requisitionStatusCode', accessor: 'id' },
+      receiptStatusCode: { name: 'receiptStatusCode' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
