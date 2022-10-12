@@ -232,7 +232,7 @@ class StockMovement {
         if (electronicType) {
             User user = AuthService.currentUser.get()
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
-            def userService = ApplicationHolder.getApplication().getMainContext().getBean("userService")
+            def userService = ApplicationHolder.application.mainContext.getBean("userService")
             if (!userService.isUserInRole(user, accessRule?.accessRules?.minimumRequiredRole)) {
                 throw new IllegalAccessException("You don't have minimum required role to perform this action")
             }
