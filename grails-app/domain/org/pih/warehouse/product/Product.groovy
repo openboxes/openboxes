@@ -591,11 +591,6 @@ class Product implements Comparable, Serializable {
 
         def isValid = true
 
-        if (!productType.code && !productType.productIdentifierFormat) {
-            isValid = false
-            errors.reject("product.productType.emptyCodeAndIdentifier.error.message")
-        }
-
         productType.requiredFields.each {
             if (!this."$it.fieldName") {
                 isValid = false

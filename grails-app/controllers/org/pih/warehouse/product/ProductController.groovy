@@ -196,6 +196,14 @@ class ProductController {
 
         updateTags(productInstance, params)
 
+        ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
+        // Throw an error for product type with empty code and product identifier that is not a default product type
+        if (productInstance.productType != defaultProductType && !productInstance.productType?.code && !productInstance.productType?.productIdentifierFormat) {
+            productInstance.errors.reject("product.productType.emptyCodeAndIdentifier.error.message")
+            render(view: "edit", model: [productInstance: productInstance, locationInstance: location])
+            return
+        }
+
         // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
