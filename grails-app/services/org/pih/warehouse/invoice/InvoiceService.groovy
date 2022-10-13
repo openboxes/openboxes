@@ -95,12 +95,7 @@ class InvoiceService {
                 }
 
                 order {
-                    or {
-                        eq("destinationParty", currentLocation.organization)
-                        destination {
-                            eq("organization", currentLocation.organization)
-                        }
-                    }
+                    eq("destinationParty", currentLocation.organization)
                 }
             }
 
