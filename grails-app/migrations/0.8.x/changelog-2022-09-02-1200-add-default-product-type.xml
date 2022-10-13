@@ -31,4 +31,25 @@
       UPDATE product SET product_type_id = (SELECT id FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT" LIMIT 1) WHERE product_type_id IS NULL;
     </sql>
   </changeSet>
+  <changeSet author="awalkowiak" id="0209202212000-2">
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <not>
+          <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT"
+          </sqlCheck>
+        </not>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM product_type_supported_activities
+          WHERE product_type_id = (SELECT id FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT" LIMIT 1)
+          AND
+          product_activity_code = "SEARCHABLE"
+        </sqlCheck>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO product_type_supported_activities (product_type_id, product_activity_code) VALUES
+      ((SELECT id FROM product_type WHERE id like 'DEFAULT' OR code like 'DEFAULT' OR name like 'DEFAULT' LIMIT 1), 'SEARCHABLE');
+    </sql>
+  </changeSet>
 </databaseChangeLog>
