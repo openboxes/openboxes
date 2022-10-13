@@ -20,7 +20,7 @@
 			<a class="${selected?'selected':''}" href="${createLink(controller: 'user', action: 'updateAuthUserLocale',
 				params: ['locale':locale,'targetUri':targetUri,'lang':locale?.language])}">
 				<!-- fetch the display for locale based on the current locale -->
-				${locale?.getDisplayName(locale ?: defaultLocale)}
+				${locale?.getDisplayName(locale ?: defaultLocale)} (${locale})
 			</a>
 		</g:each>
 		<g:isUserInRole roles="[RoleType.ROLE_ADMIN]">

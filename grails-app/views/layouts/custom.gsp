@@ -19,6 +19,14 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
 
+    <g:if test="${session.useDebugLocale}">
+    <script type="text/javascript">
+        var _jipt = [];
+        _jipt.push(['project', 'openboxes']);
+    </script>
+    <script type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>
+    </g:if>
+
     <!-- Include javascript files -->
     <g:javascript library="application"/>
 
@@ -87,6 +95,7 @@
                 </g:link>
             </div>
             <div id="localizations">
+                ${flash?.messages?.size()}
             <!--
                         At some point we may want to display all translations for the page in a single div.
                         For the time being, flash.localizations is empty.
