@@ -318,7 +318,7 @@ class ProductSupplierController {
                         property("productCode", "productCode")
                         property("name", "productName")
                     }
-                    property("code", "legacyProductCode")
+                    property("productCode", "legacyProductCode")
                     supplier {
                         property("name", "supplier.name")
                     }
@@ -374,6 +374,8 @@ class ProductSupplierController {
         // Now, let's take the data we've gathered and build the model to use for
         productSuppliers.collect { Map entry ->
             ProductSupplier productSupplier = ProductSupplier.load(entry.id)
+            entry["product"] = ["productCode": entry["productCode"], "name": entry["productName"]]
+            entry["productCode"] = entry["legacyProductCode"]
             entry["defaultProductPackage"] = defaultProductPackages[productSupplier?.id]
             entry["globalProductSupplierPreference"] = globalPreferencesByProductSupplier[productSupplier?.id]
         }

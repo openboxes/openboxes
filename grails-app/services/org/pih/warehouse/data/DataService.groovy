@@ -691,7 +691,7 @@ class DataService {
         includeFields.each { fieldName, element ->
             def value = null
             if (element instanceof LinkedHashMap) {
-                value = object[element.property] ?: element.property.tokenize('.').inject(object) { v, k -> v?."$k" }
+                value = element.property.tokenize('.').inject(object) { v, k -> v?."$k" }
                 if (element.defaultValue && element.dateFormat && !value) {
                     value = element.defaultValue.format(element.dateFormat)
                 } else if (element.dateFormat && value) {
@@ -701,7 +701,7 @@ class DataService {
                 }
                 properties[fieldName] = value ?: ""
             } else {
-                value = object[element] ?: element.tokenize('.').inject(object) { v, k -> v?."$k" }
+                value = element.tokenize('.').inject(object) { v, k -> v?."$k" }
                 properties[fieldName] = value ?: ""
             }
         }
