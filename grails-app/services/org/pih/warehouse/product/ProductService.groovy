@@ -733,7 +733,7 @@ class ProductService {
 
             ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
             // Throw an error for product type with empty code and product identifier that is not a default product type
-            if (product.productType != defaultProductType && !product.productType?.code && !product.productType?.productIdentifierFormat) {
+            if (product.productType?.id != defaultProductType?.id && !product.productType?.code && !product.productType?.productIdentifierFormat) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
             }
 
@@ -1053,7 +1053,7 @@ class ProductService {
         def productCode
 
         try {
-             productCode = identifierService.generateProductIdentifier(productType)
+            productCode = identifierService.generateProductIdentifier(productType)
             if (validateProductIdentifier(productCode)) {
                 return productCode
             }
