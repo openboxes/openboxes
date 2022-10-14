@@ -938,7 +938,7 @@ class ProductController {
                 flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
                 redirect(controller: "product", action: "importAsCsv", params: [tag: tags[0]])
             } catch (ValidationException e) {
-                command.errors.reject(e.message)
+                command.errors = e.errors
             }
 
         }

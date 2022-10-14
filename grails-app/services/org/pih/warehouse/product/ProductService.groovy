@@ -590,6 +590,7 @@ class ProductService {
         int rowCount = 1
 
         Location currentLocation = AuthService?.currentLocation?.get()
+        ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
 
         // Iterate over each line and either update an existing product or create a new product
         csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
@@ -634,6 +635,10 @@ class ProductService {
                 productType = ProductType.findByName(productTypeName)
                 if (!productType) {
                     throw new RuntimeException("Product type with name ${productTypeName} does not exist at row " + rowCount)
+                }
+                // Throw an error for product type with empty code and product identifier that is not a default product type
+                if (productType?.id != defaultProductType?.id && !productType?.code && !productType?.productIdentifierFormat) {
+                    throw new RuntimeException("Product type '${productTypeName}' at row ${rowCount} has empty code and empty product identifier format")
                 }
             } else {
                 throw new RuntimeException("Product type name cannot be empty at row " + rowCount)
@@ -730,12 +735,6 @@ class ProductService {
 
             addTagsToProduct(product, tags)
             addTagsToProduct(product, productProperties.tags)
-
-            ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
-            // Throw an error for product type with empty code and product identifier that is not a default product type
-            if (product.productType?.id != defaultProductType?.id && !product.productType?.code && !product.productType?.productIdentifierFormat) {
-                throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
-            }
 
             if (!product?.id || product.validate()) {
                 if (!product.productCode) {
