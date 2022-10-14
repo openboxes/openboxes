@@ -1298,7 +1298,7 @@ openboxes.jobs.refreshProductAvailabilityJob.cronExpression = "0 0 0/2 * * ?" //
 
 // Use delay when transactions are persisted to avoid missing data
 openboxes.jobs.refreshProductAvailabilityJob.delayStart = true
-openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 0
+openboxes.jobs.refreshProductAvailabilityJob.delayInMilliseconds = 5000
 
 // Refresh transaction fact table
 openboxes.jobs.refreshTransactionFactJob.enabled = true
