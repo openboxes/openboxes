@@ -23,10 +23,6 @@
 			</g:if>
 
 			<div class="buttonBar">
-				<g:link controller="order" action="list" class="button">
-					<img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
-					<warehouse:message code="default.list.label" args="[g.message(code: 'orders.label')]" default="List purchase order"/>
-				</g:link>
 				<g:supports activityCode="${ActivityCode.PLACE_ORDER}">
 					<g:link controller="order" action="create" class="button">
 						<img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;

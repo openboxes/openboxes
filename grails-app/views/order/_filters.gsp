@@ -22,6 +22,7 @@
                           class="select2"
                           optionValue="name"
                           optionKey="code"
+                          disabled="true"
                           value="${params?.orderType}"
                           noSelection="['': '']"/>
             </div>
