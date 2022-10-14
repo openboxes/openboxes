@@ -12,12 +12,20 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		<div class="actions" style="min-width: 200px;">
-			<g:if test="${!request.request.requestURL.toString().contains('order/list')}">
+			<g:if test="${!request.request.requestURL.toString().contains('order/list') && orderInstance?.orderType != PUTAWAY_ORDER}">
 				<div class="action-menu-item">
-					<g:link controller="order" action="list">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
-						&nbsp;${warehouse.message(code: 'order.list.label')}
-					</g:link>
+					<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
+						<g:link controller="purchaseOrder" action="list">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
+							&nbsp;${warehouse.message(code: 'order.list.label')}
+						</g:link>
+					</g:if>
+					<g:else>
+						<g:link controller="order" action="list">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
+							&nbsp;${warehouse.message(code: 'order.list.label')}
+						</g:link>
+					</g:else>
 				</div>
 			</g:if>
 			<div class="action-menu-item">
