@@ -323,11 +323,8 @@ dependencies {
      * See https://github.com/bertramdev/asset-pipeline#documentation-1
      */
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
-    assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipelineVersion}"
-    assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipelineVersion}"
 
     // security patch
-    assets 'com.google.code.gson:gson:2.8.9'
     compile 'com.google.code.gson:gson:2.8.9'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
@@ -340,7 +337,6 @@ dependencies {
     // expose com.sun.mail.imap.IMAPStore to MailServiceTests
     testImplementation 'com.sun.mail:javax.mail:1.5.6'
 
-    assets 'commons-beanutils:commons-beanutils:1.9.4'
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
     compile 'commons-codec:commons-codec:1.15'
@@ -383,7 +379,6 @@ dependencies {
     provided "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
     provided "javax.websocket:javax.websocket-api:${websocketVersion}"
 
-    assets 'junit:junit:4.13.2'
     testCompile 'junit:junit:4.13.2'
 
     compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
