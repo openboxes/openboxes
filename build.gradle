@@ -70,7 +70,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version '0.9.0-SNAPSHOT'
 
-assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
+assetCompile.dependsOn 'npm_run_bundle'
 assets {
     excludes = [
         '**/bundle.*.css',
@@ -85,7 +85,7 @@ assets {
 
 bootRun {
     addResources = true
-    dependsOn = ['npmInstall', 'npm_run_bundle']
+    dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -257,7 +257,7 @@ configurations {
     }
 }
 
-dependencyCheckAnalyze.dependsOn(['npmInstall', 'npm_run_bundle'])
+dependencyCheckAnalyze.dependsOn 'npm_run_bundle'
 dependencyCheck {
     analyzers {
         assemblyEnabled = false
