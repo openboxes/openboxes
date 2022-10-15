@@ -27,7 +27,7 @@ module.exports = {
       chunkFilename: 'bundle.[hash].[name].js',
     },
     stats: {
-      colors: true,
+      colors: false,
     },
     plugins: [
       new FileManagerPlugin({
