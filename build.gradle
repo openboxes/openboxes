@@ -83,16 +83,23 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version '0.9.0-SNAPSHOT'
 
+/*
+ * From the asset-pipeline manual: "If you want settings to apply to
+ * both development runtime and build time the properties have to be
+ * duplicated in your application's application.yml [and build.gradle]."
+ *
+ * http://www.asset-pipeline.com/manual/index.html#configuration
+ * http://www.asset-pipeline.com/manual/index.html#configuration-2
+ */
 assetCompile.dependsOn 'npm_run_bundle'
 assets {
-    excludes = [
-        '**/bundle.*.css',
-        '**/bundle.*.js',
-    ]
+    enableDigests = false
+    enableGzip = false
+    maxThreads = 1
+    minifyJs = false  // defer to webpack
+    minifyCss = false  // defer to webpack
     minifyOptions = [
-        languageMode: 'ES6',
-        optimizationLevel: 'SIMPLE',
-        targetLanguage: 'ES5',
+        languageMode: 'ES6'
     ]
 }
 
