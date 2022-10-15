@@ -374,7 +374,6 @@ dependencies {
      * https://tomcat.apache.org/tomcat-8.5-doc/RELEASE-NOTES.txt
      */
     provided 'javax.annotation:javax.annotation-api:1.3.2'
-    provided 'javax.el:javax.el-api:2.2.5'
     provided "javax.servlet:javax.servlet-api:${servletVersion}"
     provided "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
     provided "javax.websocket:javax.websocket-api:${websocketVersion}"
@@ -396,6 +395,8 @@ dependencies {
 
     implementation 'org.apache.poi:poi'
     implementation 'org.apache.poi:poi-scratchpad'
+
+    provided "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
 
     // tomcat native connection pooling
     provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
