@@ -83,6 +83,17 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version '0.9.0-SNAPSHOT'
 
+assetCompile {
+    dependsOn 'npm_run_bundle'
+    /*
+     * Webpack's FileManagerPlugin modifies asset-pipeline's working
+     * directory every time we build, but Gradle's "up-to-date" checks do
+     * not reliably detect those changes. This directive instructs gradle
+     * to always (re)run this task, which only takes a few seconds anyway.
+     */
+    outputs.upToDateWhen { false }
+}
+
 /*
  * From the asset-pipeline manual: "If you want settings to apply to
  * both development runtime and build time the properties have to be
@@ -91,7 +102,6 @@ version '0.9.0-SNAPSHOT'
  * http://www.asset-pipeline.com/manual/index.html#configuration
  * http://www.asset-pipeline.com/manual/index.html#configuration-2
  */
-assetCompile.dependsOn 'npm_run_bundle'
 assets {
     enableDigests = false
     enableGzip = false
