@@ -827,7 +827,7 @@ class ProductAvailabilityService {
         products.each { Product product ->
             def quantity = quantityMap[product] ?: 0
 
-            if (product.productType) {
+            if (product.productType && !product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE_NO_STOCK)) {
                 if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
                     return
                 } else if (quantity == 0) {
