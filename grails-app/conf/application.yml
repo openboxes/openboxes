@@ -85,7 +85,10 @@ grails:
     # http://www.asset-pipeline.com/manual/index.html#configuration
     # http://www.asset-pipeline.com/manual/index.html#configuration-2
     #
+    # Every field except `bundle` should also be set in build.gradle.
+    #
     assets:
+        bundle: false  # defer to webpack
         enableDigests: false
         enableGzip: false
         maxThreads: 1

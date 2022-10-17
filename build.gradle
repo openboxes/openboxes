@@ -709,6 +709,9 @@ buildProperties.doLast {
     }
 }
 
+/*
+ * This lightweight task logs release info for node, npm and friends.
+ */
 task nodeVersionInfo(type: NpmTask) {
     dependsOn npmSetup
     args = ['version']
