@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import axios from 'axios';
+import { CancelToken } from 'axios';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -40,15 +40,11 @@ const InvoiceListTable = ({
   const tableRef = useRef(null);
 
   // Cancel token/signal for fetching data
-  const { CancelToken } = axios;
   const sourceRef = useRef(CancelToken.source());
 
-  // eslint-disable-next-line consistent-return
-  useEffect(() => {
+  useEffect(() => () => {
     if (currentLocation?.id) {
-      return () => {
-        sourceRef.current.cancel('Fetching canceled');
-      };
+      sourceRef.current.cancel('Fetching canceled');
     }
   }, [currentLocation?.id]);
 

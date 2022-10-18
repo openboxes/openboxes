@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import axios from 'axios';
+import { CancelToken } from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -47,7 +47,6 @@ const StockMovementInboundTable = ({
   const tableRef = useRef(null);
 
   // Cancel token/signal for fetching data
-  const { CancelToken } = axios;
   const sourceRef = useRef(CancelToken.source());
 
   const fireFetchData = () => {
@@ -55,12 +54,9 @@ const StockMovementInboundTable = ({
     tableRef.current.fireFetchData();
   };
 
-  // eslint-disable-next-line consistent-return
-  useEffect(() => {
+  useEffect(() => () => {
     if (currentLocation?.id) {
-      return () => {
-        sourceRef.current.cancel('Fetching canceled');
-      };
+      sourceRef.current.cancel('Fetching canceled');
     }
   }, [currentLocation?.id]);
 
