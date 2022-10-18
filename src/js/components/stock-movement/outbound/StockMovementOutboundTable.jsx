@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import axios from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -48,7 +49,23 @@ const StockMovementOutboundTable = ({
 
   const tableRef = useRef(null);
 
-  const fireFetchData = () => tableRef.current.fireFetchData();
+  // Cancel token/signal for fetching data
+  const { CancelToken } = axios;
+  const sourceRef = useRef(CancelToken.source());
+
+  const fireFetchData = () => {
+    sourceRef.current = CancelToken.source();
+    tableRef.current.fireFetchData();
+  };
+
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    if (currentLocation?.id) {
+      return () => {
+        sourceRef.current.cancel('Fetching canceled');
+      };
+    }
+  }, [currentLocation?.id]);
 
   // If filterParams change, refetch the data with applied filters
   useEffect(() => {
@@ -112,6 +129,7 @@ const StockMovementOutboundTable = ({
       apiClient.get('/openboxes/api/stockMovements', {
         paramsSerializer: parameters => queryString.stringify(parameters),
         params,
+        cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
           setLoading(false);
@@ -121,7 +139,8 @@ const StockMovementOutboundTable = ({
             totalCount: res.data.totalCount,
             currentParams: params,
           });
-        });
+        })
+        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Could not fetch outbound movements (most probably due to abort while changing location)'))));
     }
   };
 

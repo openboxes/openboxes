@@ -223,7 +223,6 @@ const ProductsListTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  currentLocation: state.session.currentLocation,
 });
 
 

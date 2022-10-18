@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import axios from 'axios';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -57,10 +58,26 @@ const PurchaseOrderListTable = ({
 
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
+
+  // Cancel token/signal for fetching data
+  const { CancelToken } = axios;
+  const sourceRef = useRef(CancelToken.source());
+
   const fireFetchData = () => {
+    // Each time we fetch, we want to 'reset' the token/signal
+    sourceRef.current = CancelToken.source();
     tableRef.current.fireFetchData();
   };
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
+
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    if (currentLocation?.id) {
+      return () => {
+        sourceRef.current.cancel('Fetching canceled');
+      };
+    }
+  }, [currentLocation?.id]);
 
   // If filterParams change, refetch the data with applied filters
   useEffect(() => fireFetchData(), [filterParams]);
@@ -395,7 +412,7 @@ const PurchaseOrderListTable = ({
       return filterParams.destinationParty.id;
     }
     if (isCentralPurchasingEnabled) {
-      return buyers && buyers.find(org => org.id === currentLocation.organization.id).id;
+      return buyers && buyers.find(org => org.id === currentLocation.organization.id)?.id;
     }
     return '';
   };
@@ -433,6 +450,7 @@ const PurchaseOrderListTable = ({
       apiClient.get('/openboxes/api/purchaseOrders', {
         params,
         paramsSerializer: parameters => queryString.stringify(parameters),
+        cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
           setLoading(false);
