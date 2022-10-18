@@ -25,14 +25,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceItem implements Serializable {
 
-    def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
-    }
-
-    def afterInsert = publishRefreshEvent
-
-    def afterUpdate = publishRefreshEvent
-
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
         if (currentUser) {

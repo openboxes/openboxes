@@ -16,7 +16,6 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -25,16 +24,6 @@ import org.pih.warehouse.requisition.RequisitionItem
 
 
 class ShipmentItem implements Comparable, Serializable {
-
-    def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
-    }
-
-    def afterInsert = publishRefreshEvent
-
-    def afterUpdate = publishRefreshEvent
-
-    def beforeDelete = publishRefreshEvent
 
     String id
     String lotNumber            // Loose coupling to the inventory lot

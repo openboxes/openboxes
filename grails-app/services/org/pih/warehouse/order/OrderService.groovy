@@ -1224,7 +1224,7 @@ class OrderService {
             "CREATE TABLE IF NOT EXISTS mv_order_summary LIKE mv_order_summary_temp;",
             "TRUNCATE mv_order_summary;",
             "INSERT INTO mv_order_summary SELECT * FROM mv_order_summary_temp;",
-            "ALTER TABLE mv_order_summary ADD INDEX (id);",
+            "ALTER TABLE mv_order_summary ADD UNIQUE INDEX (id);",
             // Cleanup
             "DROP TABLE IF EXISTS mv_order_summary_temp;",
         ]
@@ -1235,13 +1235,11 @@ class OrderService {
      * Refreshing the Order Summary materialized view for a specific Order (PASS ONLY A PO ID)
      * */
     def refreshOrderSummary(String orderId, Boolean isDelete) {
-        List statements = ["DELETE FROM mv_order_summary WHERE id = '${orderId}';"]
-        if (!isDelete) {
-            /**
-             * INSERT IGNORE - ignore row if it already exists, because it was not deleted or already re-added after
-             * previous delete statement (by some other action)
-             * */
-            statements << "INSERT IGNORE INTO mv_order_summary (SELECT * FROM order_summary WHERE id = '${orderId}');"
+        List statements = []
+        if (isDelete) {
+            statements << "DELETE FROM mv_order_summary WHERE id = '${orderId}';"
+        } else {
+            statements << "REPLACE INTO mv_order_summary (SELECT * FROM order_summary WHERE id = '${orderId}');"
         }
 
         dataService.executeStatements(statements)

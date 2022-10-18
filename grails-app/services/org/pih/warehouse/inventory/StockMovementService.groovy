@@ -1624,6 +1624,9 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
+        // Save shipment before adding the items to avoid dead locks
+        shipment.save()
+
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
 
             if (!stockMovementItem.inventoryItem) {
@@ -1645,8 +1648,8 @@ class StockMovementService {
             if (stockMovementItem.orderItemId) {
                 OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
                 shipmentItem.addToOrderItems(orderItem)
-                shipment.save()
             }
+            shipmentItem.save()
             shipment.addToShipmentItems(shipmentItem)
         }
 

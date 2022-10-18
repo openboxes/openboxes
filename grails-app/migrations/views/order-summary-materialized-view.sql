@@ -7,6 +7,6 @@ DROP TABLE IF EXISTS mv_order_summary;
 CREATE TABLE IF NOT EXISTS mv_order_summary LIKE mv_order_summary_temp;
 TRUNCATE mv_order_summary;
 INSERT INTO mv_order_summary SELECT * FROM mv_order_summary_temp;
-ALTER TABLE mv_order_summary ADD INDEX (id);
+ALTER TABLE mv_order_summary ADD UNIQUE INDEX (id);
 -- Cleanup
 DROP TABLE IF EXISTS mv_order_summary_temp;

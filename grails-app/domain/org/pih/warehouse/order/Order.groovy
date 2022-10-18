@@ -37,11 +37,15 @@ class Order implements Serializable {
     }
 
     def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
+        if (isPurchaseOrder) {
+            publishEvent(new RefreshOrderSummaryEvent(this))
+        }
     }
 
     def publishRefreshEvenBeforeDelete = {
-        publishEvent(new RefreshOrderSummaryEvent(this, true))
+        if (isPurchaseOrder) {
+            publishEvent(new RefreshOrderSummaryEvent(this, true))
+        }
     }
 
     def afterInsert = publishRefreshEvent

@@ -33,16 +33,6 @@ import java.text.DecimalFormat
 
 class OrderItem implements Serializable, Comparable<OrderItem> {
 
-    def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
-    }
-
-    def afterInsert = publishRefreshEvent
-
-    def afterUpdate = publishRefreshEvent
-
-    def beforeDelete = publishRefreshEvent
-
     String id
     String description
     Category category
