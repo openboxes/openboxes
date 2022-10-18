@@ -77,10 +77,25 @@ server:
         timeout: 3600
 ---
 grails:
+    #
+    # From the asset-pipeline manual: "If you want settings to apply to
+    # both development runtime and build time the properties have to be
+    # duplicated in your application's application.yml [and build.gradle]."
+    #
+    # http://www.asset-pipeline.com/manual/index.html#configuration
+    # http://www.asset-pipeline.com/manual/index.html#configuration-2
+    #
+    # Every field except `bundle` should also be set in build.gradle.
+    #
     assets:
-        minifyJs: false
-        minifyCss: false
-        bundle: false
+        bundle: false  # defer to webpack
+        enableDigests: false
+        enableGzip: false
+        maxThreads: 1
+        minifyCss: false  # defer to webpack
+        minifyJs: false  # defer to webpack
+        minifyOptions:
+            - languageMode: 'ES6'
     cache:
         clearAtStartup: true
     doc:

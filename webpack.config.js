@@ -27,38 +27,51 @@ module.exports = {
       chunkFilename: 'bundle.[hash].[name].js',
     },
     stats: {
-      colors: true,
+      colors: false,
     },
     plugins: [
       new FileManagerPlugin({
-        onStart: {
-          delete: [
-            `${JS_DEST}/bundle.**`,
-            `${CSS_DEST}/bundle.**`,
-            `${BUILD_ASSETS}/bundle.**`
-          ]
-        },
-        onEnd: {
-          copy: [
-            { source: `${DEST}/bundle.*.js`, destination: JS_DEST },
-            { source: `${DEST}/bundle.*.css`, destination: CSS_DEST },
-            { source: `${DEST}/*.eot`, destination: IMAGES_DEST },
-            { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
-            { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
-            { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
-            { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
-            { source: `${JS_DEST}/bundle.*.js`, destination: BUILD_ASSETS },
-            { source: `${CSS_DEST}/bundle.*.css`, destination: BUILD_ASSETS }
+        events: {
+          onStart: {
+            delete: [
+              // remove previous webpack output
+              `${JS_DEST}/bundle.*`,
+              `${CSS_DEST}/bundle.*`,
+              // remove previous asset-pipeline output
+              BUILD_ASSETS,
+            ],
+          },
+          onEnd: [
+            /*
+             * By providing a list of maps here (instead of a single map,
+             * like we do for `onStart`, above, we guarantee that the
+             * copy commands will complete before the delete commands
+             * begin. However, FileManagerPlugin is multithreaded and
+             * operations within each map will run in arbitrary order.
+             */
+            {
+              copy: [
+                { source: `${DEST}/bundle*.js`, destination: JS_DEST },
+                { source: `${DEST}/bundle*.css`, destination: CSS_DEST },
+                { source: `${DEST}/*.eot`, destination: IMAGES_DEST },
+                { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
+                { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
+                { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
+                { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
+              ],
+            },
+            {
+              delete: [
+                `${DEST}/bundle.*`,
+                `${DEST}/*.eot`,
+                `${DEST}/*.svg`,
+                `${DEST}/*.woff2`,
+                `${DEST}/*.ttf`,
+                `${DEST}/*.woff`
+              ],
+            },
           ],
-          delete: [
-            `${DEST}/bundle.**`,
-            `${DEST}/*.eot`,
-            `${DEST}/*.svg`,
-            `${DEST}/*.woff2`,
-            `${DEST}/*.ttf`,
-            `${DEST}/*.woff`
-          ]
-        }
+        },
       }),
       new MiniCssExtractPlugin({
         filename: 'stylesheets/bundle.[hash].css',
