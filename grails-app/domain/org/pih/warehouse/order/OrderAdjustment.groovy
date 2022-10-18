@@ -25,8 +25,6 @@ class OrderAdjustment implements Serializable {
 
     def afterUpdate = publishRefreshEvent
 
-    def beforeDelete = publishRefreshEvent
-
     String id
     BigDecimal amount
     BigDecimal percentage

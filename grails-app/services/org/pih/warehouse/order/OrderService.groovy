@@ -1211,23 +1211,37 @@ class OrderService {
 
     /**
      * Refreshing entire Order Summary materialized view, should be only triggered from time to time
+     * (same statements as in the order-summary-materialized-view.sql)
      * */
     def refreshOrderSummary() {
         List statements = [
+            // Drop mv temp table if somehow it still exists
+            "DROP TABLE IF EXISTS mv_order_summary_temp;",
+            // Create temp mv table from sql view (to shorten the time when MV is unavailable)
+            "CREATE TABLE mv_order_summary_temp AS SELECT * FROM order_summary;",
             "DROP TABLE IF EXISTS mv_order_summary;",
-            "CREATE TABLE mv_order_summary AS SELECT * FROM order_summary;",
+            // Copy data from temp mv table into mv table
+            "CREATE TABLE IF NOT EXISTS mv_order_summary LIKE mv_order_summary_temp;",
+            "TRUNCATE mv_order_summary;",
+            "INSERT INTO mv_order_summary SELECT * FROM mv_order_summary_temp;",
             "ALTER TABLE mv_order_summary ADD INDEX (id);",
+            // Cleanup
+            "DROP TABLE IF EXISTS mv_order_summary_temp;",
         ]
         dataService.executeStatements(statements)
     }
 
     /**
-     * Refreshing the Order Summary materialized view for a specific Order
+     * Refreshing the Order Summary materialized view for a specific Order (PASS ONLY A PO ID)
      * */
     def refreshOrderSummary(String orderId, Boolean isDelete) {
         List statements = ["DELETE FROM mv_order_summary WHERE id = '${orderId}';"]
         if (!isDelete) {
-            statements << "INSERT INTO mv_order_summary (SELECT * FROM order_summary WHERE id = '${orderId}');"
+            /**
+             * INSERT IGNORE - ignore row if it already exists, because it was not deleted or already re-added after
+             * previous delete statement (by some other action)
+             * */
+            statements << "INSERT IGNORE INTO mv_order_summary (SELECT * FROM order_summary WHERE id = '${orderId}');"
         }
 
         dataService.executeStatements(statements)

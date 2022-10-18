@@ -565,10 +565,11 @@ class BootStrap {
             RefreshDemandDataJob.triggerNow()
 
             // Refresh inventory snapshot data
-            RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE]);
-        }
+            RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE])
 
-        RefreshOrderSummaryJob.triggerNow()
+            // Refresh order summary materialized view
+            RefreshOrderSummaryJob.triggerNow()
+        }
     }
 
 

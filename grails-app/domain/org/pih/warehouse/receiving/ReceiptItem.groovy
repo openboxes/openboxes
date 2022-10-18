@@ -27,8 +27,6 @@ class ReceiptItem implements Comparable<ReceiptItem>, Serializable {
 
     def afterUpdate = publishRefreshEvent
 
-    def beforeDelete = publishRefreshEvent
-
     String id
     Product product                        // Specific product that we're tracking
     String lotNumber                    // Loose coupling to the inventory lot

@@ -33,8 +33,6 @@ class InvoiceItem implements Serializable {
 
     def afterUpdate = publishRefreshEvent
 
-    def beforeDelete = publishRefreshEvent
-
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
         if (currentUser) {
