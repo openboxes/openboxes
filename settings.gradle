@@ -1,0 +1,11 @@
+/*
+ * By default, gradle's build cache lives in $HOME, meaning that neither
+ * `git clean -dxf` nor Bamboo's 'Force Clean Build' actually do what
+ * they say on the tin. Here, we put the cache in the project root.
+ */
+buildCache {
+    local(DirectoryBuildCache) {
+        directory = new File(rootDir, '.gradle/caches/build')
+        removeUnusedEntriesAfterDays = 30
+    }
+}
