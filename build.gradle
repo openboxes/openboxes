@@ -25,8 +25,8 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
         classpath "org.grails:grails-gradle-plugin:${grailsVersion}"
         classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
-        classpath 'org.grails.plugins:views-gradle:1.3.0'
-        classpath 'org.owasp:dependency-check-gradle:7.2.1'
+        classpath "org.grails.plugins:views-gradle:${grailsViewsVersion}"
+        classpath "org.owasp:dependency-check-gradle:${owaspVersion}"
     }
     repositories {
         mavenCentral()
@@ -35,19 +35,25 @@ buildscript {
 }
 
 plugins {
-
+    // enable the top-level `mainClassName` field
     id 'application'
+
     id 'eclipse'
     id 'groovy'
     id 'idea'
+
+    // expose `pom` object, https://docs.gradle.org/4.10.3/userguide/maven_plugin.html
     id 'maven'
+
+    // enable `grails gradle dependencyReport`, etc.
     id 'project-report'
+
     id 'war'
 
     // git magic, but releases past v2.3.0 require Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
-    // enable `npmInstall` target, as well as the `node` block below
+    // enable `npmInstall` and `npm_run_*` targets, and the `node` block below
     id 'com.moowork.node' version '1.3.1'
 
     // resolve a Windows-specific build issue
@@ -58,11 +64,18 @@ plugins {
 apply plugin: 'org.grails.grails-web'
 
 apply plugin: 'asset-pipeline'  // enable `assets` block, but see deps below
-apply plugin: 'org.grails.plugins.views-json'  // .gson support
-apply plugin: 'org.owasp.dependencycheck'  // enable dependencyCheckAnalyze task
 
 // prevent warfile issues by applying this after `asset-pipeline`. OBGM-353
 apply plugin: 'org.grails.grails-gsp'
+
+/*
+ * This plugin must load *after* the core grails/gradle plugins.
+ * http://views.grails.org/latest/#_installation
+ */
+apply plugin: 'org.grails.plugins.views-json'
+
+// enable `grails gradle dependencyCheckAnalyze` (security checker)
+apply plugin: 'org.owasp.dependencycheck'
 
 group 'com.openboxes'
 mainClassName = 'org.pih.warehouse.Application'
@@ -70,22 +83,39 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version '0.9.0-SNAPSHOT'
 
-assetCompile.dependsOn(['npmInstall', 'npm_run_bundle'])
+assetCompile {
+    dependsOn 'npm_run_bundle'
+    /*
+     * Webpack's FileManagerPlugin modifies asset-pipeline's working
+     * directory every time we build, but Gradle's "up-to-date" checks do
+     * not reliably detect those changes. This directive instructs gradle
+     * to always (re)run this task, which only takes a few seconds anyway.
+     */
+    outputs.upToDateWhen { false }
+}
+
+/*
+ * From the asset-pipeline manual: "If you want settings to apply to
+ * both development runtime and build time the properties have to be
+ * duplicated in your application's application.yml [and build.gradle]."
+ *
+ * http://www.asset-pipeline.com/manual/index.html#configuration
+ * http://www.asset-pipeline.com/manual/index.html#configuration-2
+ */
 assets {
-    excludes = [
-        '**/bundle.*.css',
-        '**/bundle.*.js',
-    ]
+    enableDigests = false
+    enableGzip = false
+    maxThreads = 1
+    minifyJs = false  // defer to webpack
+    minifyCss = false  // defer to webpack
     minifyOptions = [
-        languageMode: 'ES6',
-        optimizationLevel: 'SIMPLE',
-        targetLanguage: 'ES5',
+        languageMode: 'ES6'
     ]
 }
 
 bootRun {
     addResources = true
-    dependsOn = ['npmInstall', 'npm_run_bundle']
+    dependsOn 'npm_run_bundle'
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -257,7 +287,7 @@ configurations {
     }
 }
 
-dependencyCheckAnalyze.dependsOn(['npmInstall', 'npm_run_bundle'])
+dependencyCheckAnalyze.dependsOn 'npm_run_bundle'
 dependencyCheck {
     analyzers {
         assemblyEnabled = false
@@ -280,7 +310,7 @@ node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
     npmVersion = '6.14.17'
-    version = '14.20.0'
+    version = '14.20.1'
 }
 
 repositories {
@@ -323,11 +353,8 @@ dependencies {
      * See https://github.com/bertramdev/asset-pipeline#documentation-1
      */
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
-    assets "com.bertramlabs.plugins:less-asset-pipeline:${assetPipelineVersion}"
-    assets "com.bertramlabs.plugins:sass-asset-pipeline:${assetPipelineVersion}"
 
     // security patch
-    assets 'com.google.code.gson:gson:2.8.9'
     compile 'com.google.code.gson:gson:2.8.9'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
@@ -340,7 +367,6 @@ dependencies {
     // expose com.sun.mail.imap.IMAPStore to MailServiceTests
     testImplementation 'com.sun.mail:javax.mail:1.5.6'
 
-    assets 'commons-beanutils:commons-beanutils:1.9.4'
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
     compile 'commons-codec:commons-codec:1.15'
@@ -378,12 +404,10 @@ dependencies {
      * https://tomcat.apache.org/tomcat-8.5-doc/RELEASE-NOTES.txt
      */
     provided 'javax.annotation:javax.annotation-api:1.3.2'
-    provided 'javax.el:javax.el-api:2.2.5'
     provided "javax.servlet:javax.servlet-api:${servletVersion}"
     provided "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
     provided "javax.websocket:javax.websocket-api:${websocketVersion}"
 
-    assets 'junit:junit:4.13.2'
     testCompile 'junit:junit:4.13.2'
 
     compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
@@ -401,6 +425,8 @@ dependencies {
 
     implementation 'org.apache.poi:poi'
     implementation 'org.apache.poi:poi-scratchpad'
+
+    provided "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
 
     // tomcat native connection pooling
     provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
@@ -682,6 +708,16 @@ buildProperties.doLast {
         properties.store(it, null)
     }
 }
+
+/*
+ * This lightweight task logs release info for node, npm and friends.
+ */
+task nodeVersionInfo(type: NpmTask) {
+    dependsOn npmSetup
+    args = ['version']
+}
+
+npm_run_bundle.dependsOn nodeVersionInfo
 
 task prepareDocker(type: Copy, dependsOn: assemble) {
     description = 'Copy files from ./docker and openboxes.war to build directory'
