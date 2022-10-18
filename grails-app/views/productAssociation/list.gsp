@@ -13,7 +13,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div>
-            
+
 				<div class="button-bar">
                     <g:link class="button" action="list">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
@@ -26,6 +26,10 @@
                     <g:link class="button" action="export">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="default.export.label" args="[g.message(code:'productAssociations.label')]"/>
+                    </g:link>
+                    <g:link class="button" controller="batch" action="importData" params="[type: 'productAssociation']" >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}" />&nbsp;
+                        <warehouse:message code="default.import.label" args="[g.message(code:'productAssociations.label')]"/>
                     </g:link>
 	        	</div>
 
