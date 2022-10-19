@@ -20,20 +20,20 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
             columnMap: [
                     'A': 'id',
                     'B': 'code',
-                    'C': 'product.id',
-                    'D': 'associatedProduct.id',
+                    'C': 'product.productCode',
+                    'D': 'associatedProduct.productCode',
                     'E': 'quantity',
                     'F': 'comments',
             ]
     ]
 
     static Map propertyMap = [
-            "id"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "code"                    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "product.id"              : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "associatedProduct.id"    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "quantity"                : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
-            "comments"                : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "id"                            : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "code"                          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "product.productCode"           : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "associatedProduct.productCode" : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "quantity"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
+            "comments"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
 

@@ -25,43 +25,37 @@ class ProductAssociationDataService {
 
         command.data.eachWithIndex { params, index ->
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
+            productAssociationInstance.product = Product.findByProductCode(params['product.productCode'])
+            productAssociationInstance.associatedProduct = Product.findByProductCode(params['associatedProduct.productCode'])
+            params['product.id'] =  productAssociationInstance.product?.id
+            params['associatedProduct.id'] =  productAssociationInstance.associatedProduct?.id
 
             // disable update product association on import
             if (productAssociationInstance?.id) {
                 command.errors.reject("Row ${index + 1}: Cannot edit existing associations via import")
-                return
             }
-
-            Product product = Product.get(productAssociationInstance.product?.id)
-            Product associatedProduct = Product.get(productAssociationInstance.associatedProduct?.id)
-
-            if (!product) {
+            if (!productAssociationInstance.product) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${productAssociationInstance.product?.id}' does not exist"
+                    "Row ${index + 1}: Product with code '${params['product.productCode']}' does not exist"
                 )
-                return
             }
-            if (!associatedProduct) {
+            if (!productAssociationInstance.associatedProduct) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${productAssociationInstance.associatedProduct?.id}' does not exist"
+                    "Row ${index + 1}: Product with code '${params['associatedProduct.productCode']}' does not exist"
                 )
-                return
             }
-            if (!product.active) {
+            if (productAssociationInstance.product && !productAssociationInstance.product.active) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${productAssociationInstance.product?.id}' is inactive"
+                    "Row ${index + 1}: Product with code '${productAssociationInstance.product?.productCode}' is inactive"
                 )
-                return
             }
-            if (!associatedProduct.active) {
+            if (productAssociationInstance.associatedProduct && !productAssociationInstance.associatedProduct.active) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${productAssociationInstance.associatedProduct?.id}' is inactive"
+                    "Row ${index + 1}: Product with code '${productAssociationInstance.associatedProduct?.productCode}' is inactive"
                 )
-                return
             }
-            if (product == associatedProduct) {
+            if (productAssociationInstance.product?.id == productAssociationInstance.associatedProduct?.id) {
                 command.errors.reject("Cannot associate a product with itself")
-                return
             }
 
             // Check for association duplicates
@@ -72,35 +66,40 @@ class ProductAssociationDataService {
             ])
             if (foundProductAssociations && foundProductAssociations.size() > 0) {
                 command.errors.reject("Row ${index + 1}: Association already exists")
-                return
             }
 
 
-            // find two-way association pairs
-            def twoWayAssociationPair = command.data.find {
-                it['product.id'] == params['associatedProduct.id'] &&
-                it['associatedProduct.id'] == params['product.id'] &&
+            // find another product association that matches current associationInstance
+            // for two-way association relationship, where:
+            // - association.product = otherAssociation.associatedProduct
+            // - association.associatedProduct = otherAssociation.product
+            // - association.code = otherAssociation.code
+            def otherMatchingTwoWayAssociation = command.data.find {
+                it['product.productCode'] == params['associatedProduct.productCode'] &&
+                it['associatedProduct.productCode'] == params['product.productCode'] &&
                 it['code'] == params['code']
             }
 
-            if (twoWayAssociationPair) {
-                // mark this association as two-way association
+            if (otherMatchingTwoWayAssociation) {
+                // if such a product association exists then
+                // mark current association as two-way association
+                // and validate quantity on both product associations
                 params.hasMutualAssociation = true
-                if (twoWayAssociationPair['quantity'] * productAssociationInstance.quantity != 1) {
+                if (otherMatchingTwoWayAssociation['quantity'] * productAssociationInstance.quantity != 1) {
                     command.errors.reject(
                             "Row ${index + 1}: Quantity of Product association for Products with codes " +
-                            "'${productAssociationInstance.product?.id}' and " +
-                            "'${twoWayAssociationPair['associatedProduct.id']}' does not match"
+                            "'${productAssociationInstance.product?.productCode}' and " +
+                            "'${otherMatchingTwoWayAssociation['associatedProduct.productCode']}' does not match"
                     )
-                    return
                 }
             }
 
             if (!productAssociationInstance.validate()) {
                 productAssociationInstance.errors.each { BeanPropertyBindingResult error ->
                     command.errors.reject(
-                            "Row ${index + 1}: Product Association with Product code " +
-                            "'${productAssociationInstance.product?.id}': ${error.getFieldError()}"
+                            "Row ${index + 1}: Product Association with Product codes " +
+                            "'${productAssociationInstance.product?.productCode}' and " +
+                            "'${productAssociationInstance.associatedProduct?.productCode}': ${error.getFieldError()}"
                     )
                 }
             }
@@ -111,20 +110,25 @@ class ProductAssociationDataService {
         log.info "Import data " + command.filename
 
         def individualAssociations = command.data.findAll{ !it.hasMutualAssociation }
+        // map of two-way product associations grouped by a product and associatedProduct pairs
         def twoWayAssociations = command.data
                 .findAll{ it.hasMutualAssociation }
-                .groupBy { [it['product.id'], it['associatedProduct.id']] as Set<String> }
-
+                .groupBy { [it['product.productCode'], it['associatedProduct.productCode']] as Set<String> }
+        // create individual associations that are not bound by two-way association relationship
         individualAssociations.each { params ->
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             productAssociationInstance.save(failOnError: true)
         }
-
+        // two way association is a pair of two associations where:
+        // - association1.product == association2.associatedProduct
+        // - association1.associatedProduct == association2.product
+        // - association1.code == association2.code
+        // - association1.quantity == 1 / association2.quantity
         twoWayAssociations.each { key, paramList ->
-            def firstProductParams = paramList[0]
-            def secondProductParams = paramList[1]
-            ProductAssociation firstProductAssociationInstance = new ProductAssociation(firstProductParams)
-            ProductAssociation secondProductAssociationInstance = new ProductAssociation(secondProductParams)
+            def firstAssociationParams = paramList[0]
+            def secondAssociationParams = paramList[1]
+            ProductAssociation firstProductAssociationInstance = new ProductAssociation(firstAssociationParams)
+            ProductAssociation secondProductAssociationInstance = new ProductAssociation(secondAssociationParams)
 
             firstProductAssociationInstance.mutualAssociation = secondProductAssociationInstance
             secondProductAssociationInstance.mutualAssociation = firstProductAssociationInstance
