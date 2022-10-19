@@ -29,6 +29,7 @@ class OrderSummary {
     static mapping = {
         version false
         cache usage: "read-only"
+        table "order_summary_mv"
     }
 
     static constraints = {

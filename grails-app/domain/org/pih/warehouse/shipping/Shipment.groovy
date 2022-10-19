@@ -24,10 +24,19 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
 class Shipment implements Comparable, Serializable {
+
+    def publishRefreshEvent = {
+        orders?.each { Order o ->
+            if (o?.isPurchaseOrder) {
+                publishEvent(new RefreshOrderSummaryEvent(o))
+            }
+        }
+    }
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
@@ -46,9 +55,12 @@ class Shipment implements Comparable, Serializable {
         }
     }
 
+    def afterInsert = publishRefreshEvent
+
     def afterUpdate = {
         currentEvent = mostRecentEvent
         currentStatus = status.code
+        publishRefreshEvent()
     }
 
     String id

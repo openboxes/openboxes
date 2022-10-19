@@ -75,7 +75,15 @@
     <sqlFile path="views/stocklist-item-list.sql"/>
   </changeSet>
   <changeSet id="1580848680306-23" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/order-summary-view.sql"/>
+    <sqlFile path="views/order-summary-helper-views.sql"/>
+  </changeSet>
+  <changeSet id="1580848680306-23b" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="order_summary_mv" />
+      </not>
+    </preConditions>
+    <sqlFile path="views/order-summary-materialized-view.sql"/>
   </changeSet>
   <changeSet id="1580848680306-24" author="pmuchowski" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/substitution-item.sql"/>

@@ -36,6 +36,24 @@ class Order implements Serializable {
         }
     }
 
+    def publishRefreshEvent = {
+        if (isPurchaseOrder) {
+            publishEvent(new RefreshOrderSummaryEvent(this))
+        }
+    }
+
+    def publishRefreshEvenBeforeDelete = {
+        if (isPurchaseOrder) {
+            publishEvent(new RefreshOrderSummaryEvent(this, true))
+        }
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
+
+    def beforeDelete = publishRefreshEvenBeforeDelete
+
     String id
     OrderStatus status = OrderStatus.PENDING
     OrderType orderType

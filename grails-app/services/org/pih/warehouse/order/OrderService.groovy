@@ -1208,4 +1208,40 @@ class OrderService {
 
         return results
     }
+
+    /**
+     * Refreshing entire Order Summary materialized view, should be only triggered from time to time
+     * (same statements as in the order-summary-materialized-view.sql)
+     * */
+    def refreshOrderSummary() {
+        List statements = [
+            // Drop mv temp table if somehow it still exists
+            "DROP TABLE IF EXISTS order_summary_mv_temp;",
+            // Create temp mv table from sql view (to shorten the time when MV is unavailable)
+            "CREATE TABLE order_summary_mv_temp AS SELECT * FROM order_summary;",
+            "DROP TABLE IF EXISTS order_summary_mv;",
+            // Copy data from temp mv table into mv table
+            "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
+            "TRUNCATE order_summary_mv;",
+            "INSERT INTO order_summary_mv SELECT * FROM order_summary_mv_temp;",
+            "ALTER TABLE order_summary_mv ADD UNIQUE INDEX (id);",
+            // Cleanup
+            "DROP TABLE IF EXISTS order_summary_mv_temp;",
+        ]
+        dataService.executeStatements(statements)
+    }
+
+    /**
+     * Refreshing the Order Summary materialized view for a specific Order (PASS ONLY A PO ID)
+     * */
+    def refreshOrderSummary(String orderId, Boolean isDelete) {
+        List statements = []
+        if (isDelete) {
+            statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
+        } else {
+            statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
+        }
+
+        dataService.executeStatements(statements)
+    }
 }
