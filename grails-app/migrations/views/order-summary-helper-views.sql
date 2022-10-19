@@ -2,7 +2,9 @@ CREATE OR REPLACE VIEW order_item_status AS
     SELECT
         order_id,
         order_number,
-        IFNULL(SUM(quantity_ordered), 0)    AS quantity_ordered,
+        -- Using MAX as a required replacement for aggregate function. We cannot use SUM on quantity ordered, because
+        -- on the multiple shipment case, the quantity ordered value would be multiplied by the amount of rows
+        IFNULL(MAX(quantity_ordered), 0)    AS quantity_ordered,
         IFNULL(SUM(quantity_shipped), 0)    AS quantity_shipped,
         order_item_id
     FROM (
