@@ -1,4 +1,3 @@
-package org.pih.warehouse
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -9,6 +8,9 @@ package org.pih.warehouse
  * You must not remove this notice, or any other, from this software.
  **/
 
+package org.pih.warehouse
+
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
@@ -32,9 +34,11 @@ class SecurityInterceptor {
         AuthService.currentUser.set(null)
         AuthService.currentLocation.set(null)
     }
+
+    @Transactional
     boolean before() {
 
-        // Set the current user (if there's on in the session)
+        // Set the current user (if there's one in the session)
         if (session.user) {
             if (!AuthService.currentUser) {
                 AuthService.currentUser = new ThreadLocal<User>()
