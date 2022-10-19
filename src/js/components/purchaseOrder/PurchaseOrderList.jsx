@@ -84,7 +84,7 @@ const PurchaseOrderList = (props) => {
     if (queryProps.destination) {
       defaultValues.destination = props.currentLocation.id === queryProps.destination
         ? currentLocationOption
-        : await fetchLocationById(queryProps.destination);
+        : await fetchLocationById(props.currentLocation?.id);
     }
     if (queryProps.destinationParty) {
       defaultValues.destinationParty = props.buyers

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import { CancelToken } from 'axios';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -27,6 +28,7 @@ const InvoiceListTable = ({
   highestRole,
   invoiceStatuses,
   translate,
+  currentLocation,
 }) => {
   const [invoiceData, setInvoiceData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,18 @@ const InvoiceListTable = ({
 
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
+
+  // Cancel token/signal for fetching data
+  const sourceRef = useRef(CancelToken.source());
+
+  useEffect(() => () => {
+    if (currentLocation?.id) {
+      sourceRef.current.cancel('Fetching canceled');
+    }
+  }, [currentLocation?.id]);
+
   const fireFetchData = () => {
+    sourceRef.current = CancelToken.source();
     tableRef.current.fireFetchData();
   };
 
@@ -165,6 +178,7 @@ const InvoiceListTable = ({
       apiClient.get('/openboxes/api/invoices', {
         params,
         paramsSerializer: parameters => queryString.stringify(parameters),
+        cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
           setLoading(false);
@@ -172,7 +186,7 @@ const InvoiceListTable = ({
           setTotalData(res.data.totalCount);
           setInvoiceData(res.data.data);
         })
-        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Could not fetch list of invoices'))));
+        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
     }
   };
 
@@ -207,6 +221,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencyCode: state.session.currencyCode,
   invoiceStatuses: state.invoices.statuses,
+  currentLocation: state.session.currentLocation,
 });
 
 
@@ -224,4 +239,7 @@ InvoiceListTable.propTypes = {
     variant: PropTypes.string.isRequired,
   })).isRequired,
   translate: PropTypes.func.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };

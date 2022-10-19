@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+import { CancelToken } from 'axios';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -43,7 +44,18 @@ const StockTransferListTable = ({
   const [tableData, setTableData] = useState(INITIAL_STATE);
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
+
+  // Cancel token/signal for fetching data
+  const sourceRef = useRef(CancelToken.source());
+
+  useEffect(() => () => {
+    if (currentLocation?.id) {
+      sourceRef.current.cancel('Fetching canceled');
+    }
+  }, [currentLocation?.id]);
+
   const fireFetchData = () => {
+    sourceRef.current = CancelToken.source();
     tableRef.current.fireFetchData();
   };
   // If filterParams change, refetch the data with applied filters
@@ -188,6 +200,7 @@ const StockTransferListTable = ({
       apiClient.get('/openboxes/api/stockTransfers', {
         params,
         paramsSerializer: parameters => queryString.stringify(parameters),
+        cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
           setTableData({
@@ -200,7 +213,7 @@ const StockTransferListTable = ({
         })
         .catch(() => {
           setLoading(false);
-          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Could not fetch list of stock transfers')));
+          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
         });
     }
   };
