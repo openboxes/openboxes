@@ -290,6 +290,24 @@
                             <td>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <label>
+                                    <g:radio name="type" value="productAssociation" checked="${params.type=='productAssociation'}"/>
+                                    <warehouse:message code="productAssociations.label" default="Product Associations"/>
+                                </label>
+                            </td>
+                            <td>
+                                <g:link controller="batch" action="downloadTemplate" params="[template:'productAssociations.xls']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                                </g:link>
+                            </td>
+                            <td>
+                                <g:link controller="productAssociation" action="export">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
+                            </td>
+                        </tr>
                     </table>
                 </td>
             </tr>
