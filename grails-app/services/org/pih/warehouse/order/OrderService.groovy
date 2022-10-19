@@ -1216,17 +1216,17 @@ class OrderService {
     def refreshOrderSummary() {
         List statements = [
             // Drop mv temp table if somehow it still exists
-            "DROP TABLE IF EXISTS mv_order_summary_temp;",
+            "DROP TABLE IF EXISTS order_summary_mv_temp;",
             // Create temp mv table from sql view (to shorten the time when MV is unavailable)
-            "CREATE TABLE mv_order_summary_temp AS SELECT * FROM order_summary;",
-            "DROP TABLE IF EXISTS mv_order_summary;",
+            "CREATE TABLE order_summary_mv_temp AS SELECT * FROM order_summary;",
+            "DROP TABLE IF EXISTS order_summary_mv;",
             // Copy data from temp mv table into mv table
-            "CREATE TABLE IF NOT EXISTS mv_order_summary LIKE mv_order_summary_temp;",
-            "TRUNCATE mv_order_summary;",
-            "INSERT INTO mv_order_summary SELECT * FROM mv_order_summary_temp;",
-            "ALTER TABLE mv_order_summary ADD UNIQUE INDEX (id);",
+            "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
+            "TRUNCATE order_summary_mv;",
+            "INSERT INTO order_summary_mv SELECT * FROM order_summary_mv_temp;",
+            "ALTER TABLE order_summary_mv ADD UNIQUE INDEX (id);",
             // Cleanup
-            "DROP TABLE IF EXISTS mv_order_summary_temp;",
+            "DROP TABLE IF EXISTS order_summary_mv_temp;",
         ]
         dataService.executeStatements(statements)
     }
@@ -1237,9 +1237,9 @@ class OrderService {
     def refreshOrderSummary(String orderId, Boolean isDelete) {
         List statements = []
         if (isDelete) {
-            statements << "DELETE FROM mv_order_summary WHERE id = '${orderId}';"
+            statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
         } else {
-            statements << "REPLACE INTO mv_order_summary (SELECT * FROM order_summary WHERE id = '${orderId}');"
+            statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
         }
 
         dataService.executeStatements(statements)

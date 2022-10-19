@@ -1624,7 +1624,7 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
-        // Save shipment before adding the items to avoid dead locks
+        // Save shipment before adding the items to avoid referencing an unsaved transient instance
         shipment.save()
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->

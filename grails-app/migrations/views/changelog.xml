@@ -80,7 +80,7 @@
   <changeSet id="1580848680306-23b" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <preConditions onFail="MARK_RAN">
       <not>
-        <tableExists tableName="mv_order_summary" />
+        <tableExists tableName="order_summary_mv" />
       </not>
     </preConditions>
     <sqlFile path="views/order-summary-materialized-view.sql"/>
