@@ -35,7 +35,7 @@ const Menu = (props) => {
       target={target}
       container={document.getElementById('root')}
     >
-      <Dropdown width={target.offsetWidth - 10}>
+      <Dropdown width={(target.offsetWidth - 10).toString()}>
         <div className="filter-select__custom-option" {...props.innerProps}>
           {props.children}
         </div>
