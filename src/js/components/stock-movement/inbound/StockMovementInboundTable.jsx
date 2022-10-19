@@ -132,7 +132,7 @@ const StockMovementInboundTable = ({
             currentParams: params,
           });
         })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Could not fetch inbound movements (most probably due to abort while changing location)'))));
+        .catch(() => Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements'))));
     }
   };
 

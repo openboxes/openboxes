@@ -213,7 +213,7 @@ const StockTransferListTable = ({
         })
         .catch(() => {
           setLoading(false);
-          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Could not fetch list of stock transfers (most probably due to abort while changing location)')));
+          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
         });
     }
   };

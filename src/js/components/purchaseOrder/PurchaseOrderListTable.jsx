@@ -457,7 +457,7 @@ const PurchaseOrderListTable = ({
           // Store currently used params for export case
           setCurrentParams(params);
         })
-        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Could not fetch purchase order list'))));
+        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))));
     }
   };
 

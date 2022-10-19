@@ -133,7 +133,7 @@ const ProductsListTable = ({
         })
         .catch(() => {
           setLoading(false);
-          return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Could not fetch list of products')));
+          return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
         });
     }
   };

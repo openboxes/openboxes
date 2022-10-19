@@ -186,7 +186,7 @@ const InvoiceListTable = ({
           setTotalData(res.data.totalCount);
           setInvoiceData(res.data.data);
         })
-        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Could not fetch list of invoices (most probably due to abort while changing location)'))));
+        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
     }
   };
 

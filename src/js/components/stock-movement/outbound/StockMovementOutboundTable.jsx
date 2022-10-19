@@ -136,7 +136,7 @@ const StockMovementOutboundTable = ({
             currentParams: params,
           });
         })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Could not fetch outbound movements (most probably due to abort while changing location)'))));
+        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements'))));
     }
   };
 
