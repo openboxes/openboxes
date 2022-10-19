@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
@@ -10,6 +11,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -257,8 +259,8 @@ class StockMovement {
         if (electronicType) {
             User user = AuthService.currentUser.get()
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
-            def userRoles = user.getEffectiveRoles(currentLocation)
-            if (!userRoles.any { Role role -> role.roleType == accessRule?.accessRules?.minimumRequiredRole }) {
+            def userService = ApplicationHolder.application.mainContext.getBean("userService")
+            if (!userService.isUserInRole(user, accessRule?.accessRules?.minimumRequiredRole)) {
                 throw new IllegalAccessException("You don't have minimum required role to perform this action")
             }
         }
@@ -272,7 +274,7 @@ class StockMovement {
         boolean isDepot = origin?.isDepot()
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
-        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || !isPending() || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
+        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || (!isFromOrder && !isPending()) || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
     }
 
     Boolean isReceivingAuthorized(Location currentLocation) {

@@ -26,6 +26,8 @@ import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
+import org.pih.warehouse.product.ProductType
+import org.pih.warehouse.product.ProductTypeCode
 
 import java.text.SimpleDateFormat
 
@@ -363,11 +365,13 @@ class DataService {
      */
     def findOrCreateProduct(row) {
         def category = findOrCreateCategory(row.category)
+        def productType = findOrCreateProductType(row.productTypeName)
         def product = Product.findByProductCode(row.productCode)
         if (!product) {
             println("Could not find product with product code " + row.productCode)
             product = new Product()
             product.category = category
+            product.productType = productType
             product.productCode = row.productCode
             product.name = row.productName
             product.manufacturer = row.manufacturer
@@ -380,6 +384,15 @@ class DataService {
         product = product.merge()
         log.info "findOrCreateProduct: ${product}"
         return product
+    }
+
+    def findOrCreateProductType(String productTypeName) {
+        def productType = ProductType.findByName(productTypeName)
+        if (!productType) {
+            productType = new ProductType(name: productTypeName, productTypeCode: ProductTypeCode.GOOD)
+            productType.save(failOnError: true)
+        }
+        return productType
     }
 
     def findProduct(row) {

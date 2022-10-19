@@ -1081,6 +1081,7 @@ openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQ
 openboxes.identifier.productCode.delimiter = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.productCode.format = "\${productTypeCode}\${delimiter}\${sequenceNumber}"
 openboxes.identifier.productCode.properties = ["productTypeCode": "code"]
+openboxes.identifier.defaultProductType.id = "DEFAULT"
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"

@@ -21,8 +21,12 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
+
+    private static final transient Logger log = LoggerFactory.getLogger(RequisitionItem)
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
@@ -88,6 +92,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     // Picking
     String pickReasonCode
 
+    // Transient property to assist with product availability refresh
+    Boolean disableRefresh = Boolean.FALSE
 
     static transients = [
             "type",
@@ -101,7 +107,8 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             "substitution",
             "shipmentItems",
             "receiptItems",
-            "pickablePicklistItems"
+            "pickablePicklistItems",
+            "disableRefresh"
     ]
 
     static belongsTo = [requisition: Requisition]
@@ -218,12 +225,14 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
             if (substitutionItem) {
                 removeFromRequisitionItems(substitutionItem)
                 requisition.removeFromRequisitionItems(substitutionItem)
+                substitutionItem.disableRefresh = Boolean.TRUE
                 substitutionItem.delete()
             }
 
             if (modificationItem) {
                 removeFromRequisitionItems(modificationItem)
                 requisition.removeFromRequisitionItems(modificationItem)
+                modificationItem.disableRefresh = Boolean.TRUE
                 modificationItem.delete()
             }
 
@@ -266,7 +275,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
      */
     def changeQuantity(Integer newQuantity, ProductPackage newProductPackage, String reasonCode, String comments) {
 
-        println "Change quantity: " + newQuantity + " " + reasonCode + " " + comments
+        log.info "Change quantity: ${newQuantity} ${reasonCode} ${comments}"
         // And then create a new requisition item for the remaining quantity (if not 0)
         if (newQuantity == 0) {
             cancelQuantity(reasonCode, comments)

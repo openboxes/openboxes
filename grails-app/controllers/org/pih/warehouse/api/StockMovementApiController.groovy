@@ -490,7 +490,7 @@ class StockMovementApiController {
 
         // Bind all line items
         if (lineItems) {
-            log.info "lineItems: " + lineItems
+            log.info "binding lineItems: ${lineItems}"
             bindLineItems(stockMovement, lineItems)
         }
 

@@ -10,6 +10,8 @@
 package org.pih.warehouse.product
 
 import grails.validation.ValidationException
+import org.hibernate.FetchMode
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
 import java.math.RoundingMode
@@ -298,8 +300,86 @@ class ProductSupplierController {
     }
 
     def export = {
-        def productSuppliers = params.list("productSupplier.id") ?
-                ProductSupplier.findAllByIdInList(params.list("productSupplier.id")) : ProductSupplier.list()
+
+        def productSuppliers = []
+
+        if (params.hasProperty("productSupplier.id")) {
+            productSuppliers = ProductSupplier.findAllByIdInList(params.list("productSupplier.id"))
+        }
+        else {
+            productSuppliers = ProductSupplier.createCriteria().list {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                projections {
+                    property("active", "active")
+                    property("id", "id")
+                    property("name", "name")
+                    property("code", "code")
+                    product {
+                        property("productCode", "productCode")
+                        property("name", "productName")
+                    }
+                    property("productCode", "legacyProductCode")
+                    supplier {
+                        property("name", "supplier.name")
+                    }
+                    property("supplierCode", "supplierCode")
+                    manufacturer {
+                        property("name", "manufacturer.name")
+                    }
+                    property("manufacturerCode", "manufacturerCode")
+                    property("minOrderQuantity", "minOrderQuantity")
+                    contractPrice {
+                        property("price", "contractPrice.price")
+                        property("toDate", "contractPrice.toDate")
+                    }
+                    property("ratingTypeCode", "ratingTypeCode")
+                    property("dateCreated", "dateCreated")
+                    property("lastUpdated", "lastUpdated")
+                }
+            }
+        }
+
+        // Fetch all product packages with a product supplier (sorted by last updated ascending).
+        // FIXME I couldn't figure out a good way to limit the product package to one per product
+        //  supplier as group by was not working as expected (someone else can give that a shot).
+        def productPackages = ProductPackage.createCriteria().list {
+            fetchMode("uom", FetchMode.JOIN)
+            fetchMode("productPrice", FetchMode.JOIN)
+            fetchMode("productPrice.productSupplier", FetchMode.JOIN)
+            fetchMode("productPrice.productPackage", FetchMode.JOIN)
+            isNotNull("productSupplier")
+            order("lastUpdated", "asc")
+        }
+
+        // Here we are iterating over the product packages to reduce to a map of one product package
+        // per product supplier. This is inefficient because we have to iterate through all of them.
+        Map defaultProductPackages = productPackages.inject([:]) { result, productPackage ->
+            result[productPackage?.productSupplier?.id] = productPackage
+            return result
+        }
+
+        // Fetch all global product supplier preferences
+        List<ProductSupplierPreference> globalPreferences = ProductSupplierPreference.withCriteria() {
+            fetchMode("preferenceType", FetchMode.JOIN)
+            fetchMode("productSupplier", FetchMode.JOIN)
+            isNull("destinationParty")
+        }
+
+        // Need to reduce the list of global product supplier preferences to a map indexed by product supplier
+        Map globalPreferencesByProductSupplier = globalPreferences.inject([:]) { result, productSupplierPreference ->
+            result[productSupplierPreference?.productSupplier?.id] = productSupplierPreference
+            return result
+        }
+
+        // Now, let's take the data we've gathered and build the model to use for
+        productSuppliers.collect { Map entry ->
+            ProductSupplier productSupplier = ProductSupplier.load(entry.id)
+            entry["product"] = ["productCode": entry["productCode"], "name": entry["productName"]]
+            entry["productCode"] = entry["legacyProductCode"]
+            entry["defaultProductPackage"] = defaultProductPackages[productSupplier?.id]
+            entry["globalProductSupplierPreference"] = globalPreferencesByProductSupplier[productSupplier?.id]
+        }
+
         def data = productSuppliers ? dataService.transformObjects(productSuppliers, ProductSupplier.PROPERTIES) : [[:]]
 
         switch(params.format) {

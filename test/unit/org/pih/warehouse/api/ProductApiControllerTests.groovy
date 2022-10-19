@@ -20,6 +20,8 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductType
+import org.pih.warehouse.product.ProductTypeCode
 
 class ProductApiControllerTests extends ControllerUnitTestCase {
     def product
@@ -31,7 +33,10 @@ class ProductApiControllerTests extends ControllerUnitTestCase {
         controller.grailsApplication = new DefaultGrailsApplication()
         controller.grailsApplication.config.openboxes.typeahead.minLength = 3
 
-        product = new Product(id: "1", name: "Product")
+        def productType = new ProductType(id: "DEAFULT", name: "Default", productTypeCode: ProductTypeCode.GOOD)
+        mockDomain(ProductType, [productType])
+
+        product = new Product(id: "1", name: "Product", productType: productType)
         mockDomain(Product, [product])
 
         LocationType depotType = new LocationType(id: "depot", name: "Depot")

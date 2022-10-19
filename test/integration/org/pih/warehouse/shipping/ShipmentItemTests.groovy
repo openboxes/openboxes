@@ -7,7 +7,7 @@
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
 **/ 
-package org.pih.warehouse.shipping;
+package org.pih.warehouse.shipping
 
 import static org.junit.Assert.*
 import grails.test.*
@@ -17,6 +17,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import testutils.DbHelper
 
 class ShipmentItemTests extends GroovyTestCase {
 	
@@ -30,28 +31,29 @@ class ShipmentItemTests extends GroovyTestCase {
 	protected void setUp() {
 		super.setUp()
 		
-		new Category(name: "Medicines").save(flush:true);
-		new Product(name: "Ibuprofen", category: Category.findByName("Medicines")).save(flush:true);
-		new Product(name: "Tylenol", category: Category.findByName("Medicines")).save(flush:true);
+		new Category(name: "Medicines").save(flush:true)
+		def productType = DbHelper.findOrCreateProductType("Default")
+		new Product(name: "Ibuprofen", category: Category.findByName("Medicines"), productType: productType).save(flush:true)
+		new Product(name: "Tylenol", category: Category.findByName("Medicines"), productType: productType).save(flush:true)
 		new ShipmentType(name: "Air").save(flush:true)
 		def locationType = new LocationType(name: "Depot").save(flush:true)
 		new Location(name: "Boston", locationType: locationType).save(flush:true)
 		new Location(name: "Miami", locationType: locationType).save(flush:true)
-		new ContainerType(name: "Pallet").save(flush:true);
+		new ContainerType(name: "Pallet").save(flush:true)
 		new Container(name: "Pallet 1", containerType: ContainerType.findByName("Pallet")).save(flush:true)
 		new InventoryItem(lotNumber: "ABC121", expirationDate: new Date()+180).save(flush:true)
 		new InventoryItem(lotNumber: "ABC122", expirationDate: new Date()+360).save(flush:true)
 		new InventoryItem(lotNumber: "ABC123", expirationDate: new Date()+540).save(flush:true)
 		new InventoryItem(lotNumber: "ABC124", expirationDate: new Date()+720).save(flush:true)
 		
-		def shipment1 = new Shipment();
+		def shipment1 = new Shipment()
 		shipment1.name = "New Shipment 1"
-		shipment1.expectedDeliveryDate = new Date();
-		shipment1.expectedShippingDate = new Date();
-		shipment1.shipmentType = ShipmentType.findByName("Air");
+		shipment1.expectedDeliveryDate = new Date()
+		shipment1.expectedShippingDate = new Date()
+		shipment1.shipmentType = ShipmentType.findByName("Air")
 		shipment1.origin = Location.findByName("Boston")
 		shipment1.destination = Location.findByName("Miami")
-		shipment1.save(flush:true);
+		shipment1.save(flush:true)
 		
 		shipmentItem1 = new ShipmentItem()
 		shipmentItem1.id = "1"
