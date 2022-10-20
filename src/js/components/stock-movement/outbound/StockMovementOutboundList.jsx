@@ -16,6 +16,7 @@ import { getParamList, transformFilterParams } from 'utils/list-utils';
 const StockMovementOutboundList = (props) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
@@ -36,6 +37,17 @@ const StockMovementOutboundList = (props) => {
   const fetchLocationById = async (id) => {
     const response = await apiClient(`/openboxes/api/locations/${id}`);
     return response.data?.data;
+  };
+
+  const clearFilterValues = () => {
+    const defaultValues = Object.keys(filterFields)
+      .reduce((acc, key) => ({ ...acc, [key]: '' }), { direction: 'OUTBOUND' });
+    const transformedParams = transformFilterParams(defaultValues, { direction: { name: 'direction' } });
+    const queryFilterParams = queryString.stringify(transformedParams);
+    const { pathname } = props.history.location;
+    if (queryFilterParams) {
+      props.history.push({ pathname, search: queryFilterParams });
+    }
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -93,7 +105,16 @@ const StockMovementOutboundList = (props) => {
     }
 
     setDefaultFilterValues(defaultValues);
+    setFiltersInitialized(true);
   };
+
+  useEffect(() => {
+    // Don't clear the query params while doing first filter initialization
+    // clear the filters only when changing location, but not refreshing page
+    if (filtersInitialized) {
+      clearFilterValues();
+    }
+  }, [props.currentLocation?.id]);
 
   useEffect(() => {
     // Avoid unnecessary re-fetches if getAppContext triggers fetching session info

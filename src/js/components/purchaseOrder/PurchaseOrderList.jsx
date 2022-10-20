@@ -17,6 +17,7 @@ const PurchaseOrderList = (props) => {
   // Filter params are stored here, to be able to pass them to table component
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'purchaseOrder');
@@ -44,6 +45,11 @@ const PurchaseOrderList = (props) => {
     return response.data?.data;
   };
 
+  const clearFilterValues = () => {
+    const { pathname } = props.history.location;
+    props.history.push({ pathname });
+  };
+
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
     const defaultValues = Object.keys(filterFields)
@@ -56,8 +62,9 @@ const PurchaseOrderList = (props) => {
       name: props.currentLocation?.name,
       label: props.currentLocation?.name,
     };
-
-    defaultValues.destination = currentLocationOption;
+    if (!isCentralPurchasingEnabled) {
+      defaultValues.destination = currentLocationOption;
+    }
     if (isCentralPurchasingEnabled) {
       defaultValues.destinationParty = props.buyers
         .find(org => org.id === props.currentLocation.organization.id);
@@ -86,10 +93,6 @@ const PurchaseOrderList = (props) => {
         ? currentLocationOption
         : await fetchLocationById(props.currentLocation?.id);
     }
-    if (queryProps.destinationParty) {
-      defaultValues.destinationParty = props.buyers
-        .find(({ id }) => id === queryProps.destinationParty);
-    }
     if (queryProps.orderedBy) {
       defaultValues.orderedBy = queryProps.orderedBy === props.currentUser.id
         ? props.currentUser
@@ -97,13 +100,22 @@ const PurchaseOrderList = (props) => {
     }
 
     setDefaultFilterValues(defaultValues);
+    setFiltersInitialized(true);
   };
 
   useEffect(() => {
-    if (props.currentLocation?.id && props.buyers) {
+    // Don't clear the query params while doing first filter initialization
+    // clear the filters only when changing location, but not refreshing page
+    if (filtersInitialized) {
+      clearFilterValues();
+    }
+  }, [props.currentLocation?.id]);
+
+  useEffect(() => {
+    if (props.currentLocation?.id && props.buyers && !props.loading) {
       initializeDefaultFilterValues();
     }
-  }, [props.currentLocation.id, props.buyers]);
+  }, [props.currentLocation.id, props.buyers, props.loading]);
 
   const setFilterValues = (values) => {
     const filterAccessors = {
@@ -149,6 +161,7 @@ const mapStateToProps = state => ({
   currentUser: state.session.user,
   buyers: state.organizations.buyers,
   statuses: state.purchaseOrder.statuses,
+  loading: state.session.loading,
 });
 
 export default connect(mapStateToProps, {
@@ -191,5 +204,6 @@ PurchaseOrderList.propTypes = {
     label: PropTypes.string,
     variant: PropTypes.string,
   })).isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 

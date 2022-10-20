@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { connect } from 'react-redux';
 
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
 import Button from 'components/form-elements/Button';
@@ -23,6 +24,7 @@ const FilterForm = ({
   hidden,
   onClear,
   ignoreClearFilters,
+  currentLocation,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -38,7 +40,7 @@ const FilterForm = ({
   // Default values can change based on currentLocation
   // or any async data defaultValues are waiting for
   useEffect(() => {
-    updateFilterParams(defaultValues);
+    updateFilterParams({ ...defaultValues });
   }, [defaultValues]);
 
   // Calculate which object's values are not empty
@@ -65,12 +67,21 @@ const FilterForm = ({
     form.reset(clearedFilterList);
   };
 
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    if (formRef.current) {
+      onClearHandler(formRef.current);
+    }
+  }, [currentLocation?.id]);
+
   return (
     <div className="filter-form">
       <Form
         onSubmit={updateFilterParams}
-        initialValues={defaultValues}
+        initialValues={{ ...defaultValues }}
         render={({ values, handleSubmit, form }) => {
+          formRef.current = form;
           countFilled(values);
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
@@ -116,7 +127,11 @@ const FilterForm = ({
   );
 };
 
-export default FilterForm;
+const mapStateToProps = state => ({
+  currentLocation: state.session.currentLocation,
+});
+
+export default connect(mapStateToProps)(FilterForm);
 
 
 FilterForm.propTypes = {
@@ -130,6 +145,9 @@ FilterForm.propTypes = {
   allowEmptySubmit: PropTypes.bool,
   hidden: PropTypes.bool,
   ignoreClearFilters: PropTypes.arrayOf(PropTypes.string),
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 FilterForm.defaultProps = {
