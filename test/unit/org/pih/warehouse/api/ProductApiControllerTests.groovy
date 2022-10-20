@@ -10,13 +10,16 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.orm.PagedResultList
 import grails.test.ControllerUnitTestCase
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.product.ProductTypeCode
 
@@ -107,13 +110,32 @@ class ProductApiControllerTests extends ControllerUnitTestCase {
 
     void testList() {
         // GIVEN
+        controller.params.q = "Product"
+        controller.productService = [
+            getProducts: { List<Category> categories, List< ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params ->
+                def results = [product]
+                return new PagedResultList(results, results.size())
+            }
+        ]
+        // WHEN
+        controller.list()
+        // THEN
+        def response = controller.response.contentAsString
+        assert response && response.size() > 0
+        def jsonResponse = JSON.parse(response)
+        assertEquals(jsonResponse.data.get(0).name, "Product")
+        assertEquals(jsonResponse.totalCount, 1)
+    }
+
+    void testSearch() {
+        // GIVEN
         controller.params.name = "Product"
         controller.productService = [
                 searchProducts: { String[] terms, List<Category> categories -> return [product] },
                 searchProductDtos: { String[] terms -> return [product] }
         ]
         // WHEN
-        controller.list()
+        controller.search()
         // THEN
         def response = controller.response.contentAsString
         assert response && response.size() > 0

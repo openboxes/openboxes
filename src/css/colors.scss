@@ -1,0 +1,54 @@
+$white-alpha: #EFECEC;
+
+$gray-alpha: #cccccc;
+$gray-beta: #999;
+$gray-gamma: #888888;
+$gray-delta: #777777;
+$gray-epsilon: #737373;
+$gray-zeta: #666;
+$gray-eta: #EEE;
+
+$red-alpha: #843534;
+$red-beta: #a94442;
+$red-gamma: #ce8483;
+$red-delta: #ffcccc;
+
+$blue-alpha: #163038;
+$blue-beta: #0c769e;
+$blue-gamma: #3bafda;
+$blue-delta: #4fc1e9;
+$blue-epsilon: #bce7f7;
+
+$black-alpha: #212529;
+
+$orange-alpha: #fca714;
+
+// New design colors
+
+:root {
+  --page-background: #F0F1F4;
+  --color-red: #C71610;
+  --color-green: #13AD60;
+  --color-yellow: #F3A157;
+
+  // BLUE
+  --blue-primary: #0052CC;
+  --blue-100: #F7F9FD;
+  --blue-200: #F0F6FF;
+  --blue-201: #F4F7FE;
+  --blue-300: #E9EDF4;
+  --blue-301: #D0DAED;
+  --blue-400: #7AA3F3;
+  --blue-500: #2264E5;
+  --blue-700: #2B3674;
+  --blue-800: #202750;
+
+  // GRAY
+  --gray-100: #EAEAEA;
+  --gray-200: #D6D8DC;
+  --gray-300: #CED4DA;
+  --gray-400: #636D81;
+  --gray-401: #747C93;
+  --gray-500: #636D81;
+  --gray-600: #464F60;
+}

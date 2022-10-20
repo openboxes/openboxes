@@ -93,7 +93,8 @@ class ApiController {
             localizationMode = [
                 "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/world_delete.png",
-                "linkAction" : "${request.contextPath}/user/disableLocalizationMode"
+                "linkAction" : "${request.contextPath}/user/disableLocalizationMode",
+                "linkReactIcon" : "localization-mode",
             ]
         }
         else {
@@ -101,7 +102,8 @@ class ApiController {
             localizationMode = [
                     "label"     : messageSource.getMessage('localization.enable.label', emptyArgs, 'Enable translation mode', locale),
                     "linkIcon"  : "${request.contextPath}/images/icons/silk/world_add.png",
-                    "linkAction": "${request.contextPath}/user/enableLocalizationMode"
+                    "linkAction": "${request.contextPath}/user/enableLocalizationMode",
+                    "linkReactIcon" : "localization-mode",
             ]
         }
         List<Map> menuItems = [
@@ -111,17 +113,20 @@ class ApiController {
                         'Enable translation mode', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/user.png",
                 "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
+                "linkReactIcon" : "profile",
             ],
             localizationMode,
             [
                 "label"      : messageSource.getMessage('cache.flush.label', emptyArgs, 'Refresh caches', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/database_wrench.png",
                 "linkAction" : "${request.contextPath}/dashboard/flushCache",
+                "linkReactIcon" : "flush-cache",
             ],
             [
                 "label"      : messageSource.getMessage('default.logout.label', emptyArgs, 'Logout', locale),
                 "linkIcon"   : "${request.contextPath}/images/icons/silk/door.png",
                 "linkAction" : "${request.contextPath}/auth/logout",
+                "linkReactIcon" : "logout",
             ]
         ]
 
@@ -130,6 +135,10 @@ class ApiController {
         String highestRole = user.getHighestRole(location)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
+        boolean isUserApprover = userService.hasRoleApprover(session?.user)
+        // TODO: investigate why in isUserManager method in userService there is Assistant role included
+        ArrayList<RoleType> managerRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
+        boolean isUserManager = userService.getEffectiveRoles(user).any { managerRoles.contains(it.roleType) }
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
         def buildNumber = grailsApplication.metadata.'app.revisionNumber'
@@ -161,6 +170,8 @@ class ApiController {
                 location             : location,
                 isSuperuser          : isSuperuser,
                 isUserAdmin          : isUserAdmin,
+                isUserApprover       : isUserApprover,
+                isUserManager        : isUserManager,
                 supportedActivities  : supportedActivities,
                 isImpersonated       : isImpersonated,
                 grailsVersion        : grailsVersion,

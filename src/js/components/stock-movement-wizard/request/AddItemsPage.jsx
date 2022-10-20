@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchUsers, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -1393,13 +1393,18 @@ class AddItemsPage extends Component {
     if (this.state.values.statusCode === 'CREATED') {
       return apiClient.post(url, payload)
         .then(() => {
+          const translatedSubmitMessage = this.props.translate(
+            'react.stockMovement.request.submitMessage.label',
+            'Thank you for submitting your request. You can check the status of your request using stock movement number',
+          );
+          let redirectToURL = '';
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            Alert.success(`${this.props.translate('react.stockMovement.request.submitMessage.label', 'Thank you for submitting your request. You can check the status of your request using stock movement number')} ${movementNumber}`);
-            this.props.history.push('/openboxes/');
-            this.props.updateBreadcrumbs([]);
+            redirectToURL = '/openboxes/';
           } else {
-            window.location = `/openboxes/stockMovement/list?direction=INBOUND&movementNumber=${movementNumber}&submitted=true`;
+            redirectToURL = '/openboxes/stockMovement/list?direction=INBOUND';
           }
+          Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
+          this.props.history.push(redirectToURL);
         });
     }
     return Promise.resolve();
@@ -1641,7 +1646,6 @@ const mapDispatchToProps = {
   showSpinner,
   hideSpinner,
   fetchUsers,
-  updateBreadcrumbs,
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
@@ -1678,5 +1682,4 @@ AddItemsPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
-  updateBreadcrumbs: PropTypes.func.isRequired,
 };

@@ -10,6 +10,13 @@ import Router from 'components/Router';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
+const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'productsConfiguration',
+  'locationsConfiguration', 'loadData'];
+
+// TODO: Refactor fetching app context (fetchSessionInfo)
+// TODO: Refactor fetching menu config
+// TODO: Refactor fetching localizations (react-localize-redux)
+
 class MainRouter extends React.Component {
   componentDidMount() {
     this.props.fetchSessionInfo().then(() => {
@@ -22,12 +29,7 @@ class MainRouter extends React.Component {
       });
       this.props.setActiveLanguage(this.props.locale);
       this.props.fetchMenuConfig();
-      this.props.fetchTranslations('', 'default');
-      this.props.fetchTranslations('', 'dashboard');
-      this.props.fetchTranslations('', 'combinedShipments');
-      this.props.fetchTranslations('', 'productsConfiguration');
-      this.props.fetchTranslations('', 'locationsConfiguration');
-      this.props.fetchTranslations('', 'loadData');
+      TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
     });
   }
 
@@ -36,14 +38,10 @@ class MainRouter extends React.Component {
       this.props.setActiveLanguage(nextProps.locale);
 
       if (this.props.locale) {
-        this.props.fetchMenuConfig();
-        this.props.fetchTranslations(nextProps.locale, 'default');
-        this.props.fetchTranslations(nextProps.locale, 'dashboard');
-        this.props.fetchTranslations(nextProps.locale, 'combinedShipments');
-        this.props.fetchTranslations(nextProps.locale, 'productsConfiguration');
-        this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
-        this.props.fetchTranslations(nextProps.locale, 'loadData');
+        TRANSLATION_PREFIXES.forEach(prefix => this.props.fetchTranslations('', prefix));
       }
+
+      this.props.fetchMenuConfig();
     }
   }
 

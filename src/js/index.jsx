@@ -12,11 +12,14 @@ import MainRouter from 'src/MainRouter';
 import store from 'store';
 
 import 'bootstrap/dist/js/bootstrap';
+// eslint-disable-next-line import/extensions
+import '@fontsource/inter';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.min.css';
 // eslint-disable-next-line import/no-unresolved
 import 'css/main.scss';
+import 'react-tippy/dist/tippy.css';
 
 library.add(fab, fas);
 

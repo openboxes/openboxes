@@ -135,44 +135,7 @@ class ProductController {
     }
 
     def list = {
-        def productInstanceList = []
-        def productInstanceTotal = 0
-
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-
-        boolean includeInactive = params.boolean('includeInactive') ?: false
-        def category = params.categoryId ? Category.load(params.categoryId) : null
-        def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
-        def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
-        params.name = params.q
-        params.description = params.q
-        params.brandName = params.q
-        params.manufacturer = params.q
-        params.manufacturerCode = params.q
-        params.vendor = params.q
-        params.vendorCode = params.q
-        params.productCode = params.q
-        params.unitOfMeasure = params.q
-
-        // If we specify a format (e.g. csv) we probably want to download everything
-        if (params.format) {
-            params.max = -1
-        }
-
-        productInstanceList = productService.getProducts(category, catalogs, tags, includeInactive, params)
-
-        if (params.format) {
-            def date = new Date()
-            response.setHeader("Content-disposition",
-                    "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
-            response.contentType = "text/csv"
-            def csv = productService.exportProducts(productInstanceList)
-            render csv
-            return
-        }
-
-        [productInstanceList: productInstanceList, productInstanceTotal: productInstanceList.totalCount]
+        render(template: "/common/react")
     }
 
 

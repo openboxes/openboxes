@@ -6,7 +6,6 @@ import {
   FETCH_BREADCRUMBS_CONFIG,
   FETCH_MENU_CONFIG,
   FETCH_SESSION_INFO,
-  TOGGLE_LOCATION_CHOOSER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_BREADCRUMBS_PARAMS,
@@ -24,8 +23,9 @@ const initialState = {
   },
   isSuperuser: false,
   isUserAdmin: false,
+  isUserApprover: false,
   supportedActivities: [],
-  menuConfig: {},
+  menuConfig: [],
   activeLanguage: '',
   fetchedTranslations: {
     default: false,
@@ -63,7 +63,6 @@ const initialState = {
   isPaginated: false,
   logoLabel: '',
   menuItems: [],
-  locationChooser: false,
   userActionMenuOpen: false,
   highestRole: '',
   isOpen: false,
@@ -75,6 +74,7 @@ const initialState = {
   currencyCode: '',
   localizedHelpScoutKey: '',
   isHelpScoutEnabled: false,
+  loading: false,
 };
 
 export default function (state = initialState, action) {
@@ -85,6 +85,8 @@ export default function (state = initialState, action) {
         currentLocation: _.get(action, 'payload.data.data.location'),
         isSuperuser: _.get(action, 'payload.data.data.isSuperuser'),
         isUserAdmin: _.get(action, 'payload.data.data.isUserAdmin'),
+        isUserApprover: _.get(action, 'payload.data.data.isUserApprover', false),
+        isUserManager: _.get(action, 'payload.data.data.isUserManager', false),
         supportedActivities: _.get(action, 'payload.data.data.supportedActivities'),
         activeLanguage: _.get(action, 'payload.data.data.activeLanguage'),
         user: _.get(action, 'payload.data.data.user'),
@@ -109,6 +111,7 @@ export default function (state = initialState, action) {
         currencyCode: _.get(action, 'payload.data.data.currencyCode'),
         localizedHelpScoutKey: _.get(action, 'payload.data.data.localizedHelpScoutKey'),
         isHelpScoutEnabled: _.get(action, 'payload.data.data.isHelpScoutEnabled'),
+        loading: false,
       };
     case FETCH_MENU_CONFIG:
       return {
@@ -116,18 +119,13 @@ export default function (state = initialState, action) {
         menuConfig: _.get(action, 'payload.data.data.menuConfig'),
       };
     case CHANGE_CURRENT_LOCATION:
-      return { ...state, currentLocation: action.payload };
+      return { ...state, currentLocation: action.payload, loading: true };
     case CHANGE_CURRENT_LOCALE:
       return { ...state, activeLanguage: action.payload };
     case TRANSLATIONS_FETCHED:
       return {
         ...state,
         fetchedTranslations: { ...state.fetchedTranslations, [action.payload]: true },
-      };
-    case TOGGLE_LOCATION_CHOOSER:
-      return {
-        ...state,
-        locationChooser: action.payload,
       };
     case TOGGLE_USER_ACTION_MENU:
       return {

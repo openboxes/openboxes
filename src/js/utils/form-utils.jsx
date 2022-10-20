@@ -38,7 +38,12 @@ export const renderFormFields = ({
   meta: { touched, error },
 }) => {
   const attr = { id: input.name, ...otherAttributes };
-  const className = `form-group mb-0 mx-1 ${required ? 'required' : ''} ${hidden ? 'd-none' : ''} ${(touched || fieldTouched || showError) && error ? 'has-error' : ''}`;
+  const { filterElement, className: supplementClass, ...otherAttr } = attr;
+  const filterElementClass = filterElement ? 'filter-group' : 'mb-0 mx-1 form-group';
+  const requiredClass = required ? 'required' : '';
+  const hiddenClass = hidden ? 'd-none' : '';
+  const hasErrorClass = (touched || fieldTouched || showError) && error ? 'has-error' : '';
+  const className = [supplementClass, filterElementClass, requiredClass, hiddenClass, hasErrorClass].join(' ');
 
   if (arrayField) {
     return (
@@ -51,20 +56,20 @@ export const renderFormFields = ({
         hideDelay="50"
       >
         <div className={className}>
-          {renderInput(input, attr)}
+          {renderInput(input, otherAttr)}
         </div>
       </Tooltip>
     );
   }
 
   return (
-    <div className={`mt-2 ${className}`}>
-      <div className="row">
+    <div className={`${!filterElement ? 'mt-2' : ''} ${className}`}>
+      <div className={`${filterElement ? 'd-flex flex-wrap flex-1' : 'row'}`}>
         {
           typeof FieldLabel === 'string' ?
-            <label htmlFor={attr.id} className="col-md-2 col-7 col-form-label col-form-label-xs text-center text-md-right">
+            <label htmlFor={otherAttr.id} className={`${!filterElement ? 'col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right' : ''}`}>
               {FieldLabel && <Translate id={FieldLabel} defaultMessage={defaultMessage} />}
-              {attr.withTooltip &&
+              {otherAttr.withTooltip &&
                 <Tooltip
                   interactive="true"
                   arrow="true"
@@ -83,8 +88,8 @@ export const renderFormFields = ({
             :
             <FieldLabel />
         }
-        <div className="col-md-4 col-7 form-element-container">
-          {renderInput(input, attr)}
+        <div className={`form-element-container ${!filterElement ? 'col-md-4 col-7' : 'flex-1 filter-element-container'}`}>
+          {renderInput(input, otherAttr)}
         </div>
       </div>
       <div className="row">

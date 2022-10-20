@@ -64,7 +64,7 @@
                 <g:hiddenField name="product.id" value="${entry?.product?.id }"/>
                 <g:hiddenField name="transactionEntries[${status }].binLocation.id" value="${entry?.binLocation?.id }" />
                 <g:hiddenField name="transactionEntries[${status }].inventoryItem.id" value="${entry?.inventoryItem?.id }"/>
-                <tr class="row ${status%2==0?'odd':'even'}">
+                <tr class="${status%2==0?'odd':'even'}">
                     <td class="middle">
                         <format:product product="${entry?.product }"/>
                     </td>

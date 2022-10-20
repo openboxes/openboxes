@@ -361,7 +361,7 @@ class UserService {
         return users
     }
 
-    private def getEffectiveRoles(User user) {
+    public def getEffectiveRoles(User user) {
         def currentLocation = AuthService.currentLocation?.get()
         return user.getEffectiveRoles(currentLocation)
     }

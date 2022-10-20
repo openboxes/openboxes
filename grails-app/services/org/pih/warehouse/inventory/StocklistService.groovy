@@ -12,6 +12,9 @@ package org.pih.warehouse.inventory
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.core.Attachment
 import org.pih.warehouse.requisition.Requisition
+import grails.validation.ValidationException
+import org.apache.commons.lang.StringEscapeUtils
+
 
 class StocklistService {
 
@@ -20,6 +23,7 @@ class StocklistService {
     def mailService
     def pdfRenderingService
     def documentService
+    def grailsApplication
 
     boolean transactional = true
 
@@ -83,4 +87,79 @@ class StocklistService {
         }
         mailService.sendHtmlMailWithAttachment(to, subject, body, attachments)
     }
+
+    void publishStockList(Requisition requisition, Boolean publish) {
+        requisition.isPublished = publish
+        if (requisition.hasErrors()) {
+            String publishLabel = publish ? "publish" : "unpublish";
+            throw new ValidationException("Unable to $publishLabel stocklist due to errors", requisition.errors)
+        }
+        requisition.save(flush: true)
+    }
+
+    def exportStocklistItems(List<Requisition> requisitions, Boolean hasRoleFinance) {
+
+        def requisitionItems = []
+
+        requisitionService.getRequisitionTemplatesItems(requisitions)
+                .groupBy {it.product}
+                .collect { product, value ->
+                    def totalCost = 0
+                    if (hasRoleFinance) {
+                        requisitions.each { requisition ->
+                            totalCost = product?.pricePerUnit ? totalCost + (requisition.getQuantityByProduct(product) * product?.pricePerUnit) : ""
+                        }
+                    }
+                    requisitionItems << [
+                            product     : product,
+                            productCode : product.productCode ?: "",
+                            productName : product.name ?: "",
+                            category    : product?.category?.name ?: "",
+                            pricePerUnit: hasRoleFinance ? product?.pricePerUnit ?: "" : "",
+                            totalCost   : hasRoleFinance ? totalCost : "",
+                    ]
+                }
+
+        def sw = new StringWriter()
+
+        if (requisitionItems) {
+            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+
+            sw.append(g.message(code: 'product.code.label')).append(",")
+            sw.append(g.message(code: 'product.description.label')).append(",")
+            sw.append(g.message(code: 'product.primaryCategory.label')).append(",")
+
+            requisitions.each { requisition ->
+                String stocklistName = StringEscapeUtils.escapeCsv(requisition?.name)
+                sw.append(stocklistName).append(" [").append(requisition?.isPublished ? "Published" : "Draft").append("]").append(",")
+            }
+
+            if (hasRoleFinance) {
+                sw.append(g.message(code: 'product.unitCost.label')).append(",")
+                sw.append(g.message(code: 'product.totalValue.label'))
+            }
+
+            sw.append("\n")
+            requisitionItems.each { requisitionItem ->
+
+                sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.productCode)).append(",")
+                sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.productName)).append(",")
+                sw.append(StringEscapeUtils.escapeCsv(requisitionItem?.category)).append(",")
+
+
+                requisitions?.each { requisition ->
+                    sw.append((requisition?.getQuantityByProduct(requisitionItem.product) ?: "").toString()).append(",")
+                }
+
+                if (hasRoleFinance) {
+                    sw.append(requisitionItem?.pricePerUnit.toString()).append(",")
+                    sw.append(requisitionItem?.totalCost.toString()).append(",")
+                }
+
+                sw.append("\n")
+            }
+        }
+        return sw;
+    }
+
 }

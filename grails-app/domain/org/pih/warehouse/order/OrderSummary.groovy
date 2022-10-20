@@ -12,7 +12,7 @@ package org.pih.warehouse.order
 class OrderSummary {
 
     String id
-    String orderNumber
+    Order order
 
     Integer quantityOrdered
     Integer quantityShipped
@@ -29,10 +29,12 @@ class OrderSummary {
     static mapping = {
         version false
         cache usage: "read-only"
+        table "order_summary_mv"
     }
 
     static constraints = {
-        orderNumber(nullable:false)
+        id(nullable:false)
+        order(nullable:false)
 
         quantityOrdered(nullable: true)
         quantityShipped(nullable: true)
@@ -50,7 +52,8 @@ class OrderSummary {
     Map toJson() {
         return [
             id: id,
-            orderNumber: orderNumber,
+            order: order,
+            orderNumber: order?.orderNumber,
             quantityOrdered: quantityOrdered,
             quantityShipped: quantityShipped,
             quantityReceived: quantityReceived,

@@ -173,7 +173,7 @@ class Filter extends Component {
       this.state.filterAvailable ?
         <div className="category-filter">
           {
-              this.state.listFilterSelected.map((value, key) => (
+              this.state.listFilterSelected.map((value, key) => (value &&
                 <div
                   key={`${value.id} - ${value.name}`}
                   className="category-item"

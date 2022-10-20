@@ -583,7 +583,7 @@ class IndicatorDataService {
 
 
         String baseUrl = '/openboxes/stockMovement/list?direction=OUTBOUND'
-        String statusQuery = RequisitionStatus.listPending().collect { "&status=$it" }.join('')
+        String statusQuery = RequisitionStatus.listPending().collect { "&requisitionStatusCode=$it" }.join('')
         String dateFormat = "MM/dd/yyyy"
 
         String createdAfterQuery = "&createdAfter=${fourDaysAgo.format(dateFormat)}"

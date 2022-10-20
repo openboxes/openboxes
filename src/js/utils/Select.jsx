@@ -8,7 +8,6 @@ import { Tooltip } from 'react-tippy';
 
 import 'react-tippy/dist/tippy.css';
 
-// eslint-disable-next-line react/prop-types
 const Dropdown = ({ children, style, width }) => (
   <div
     style={{
@@ -18,6 +17,72 @@ const Dropdown = ({ children, style, width }) => (
     {children}
   </div>
 );
+
+Dropdown.propTypes = {
+  children: PropTypes.element.isRequired,
+  style: PropTypes.shape({}).isRequired,
+  width: PropTypes.string.isRequired,
+};
+
+const Menu = (props) => {
+  const target = document.getElementById(`${props.selectProps.id}-container`);
+  return (
+    <Overlay
+      show
+      placement="bottom"
+      target={target}
+      container={document.getElementById('root')}
+    >
+      <Dropdown width={target.offsetWidth.toString()}>
+        <div className="custom-option" {...props.innerProps}>
+          {props.selectProps.createNewFromModal &&
+            <div
+              className="add-new-button"
+              onClick={props.selectProps.newOptionModalOpen}
+              onKeyPress={props.selectProps.newOptionModalOpen}
+              role="button"
+              tabIndex={0}
+            >
+              <span><i className="fa fa-plus pr-2" />{props.selectProps.createNewFromModalLabel}</span>
+            </div>
+          }
+          {props.children}
+        </div>
+      </Dropdown>
+    </Overlay>
+  );
+};
+
+Menu.propTypes = {
+  children: PropTypes.element.isRequired,
+  innerProps: PropTypes.shape({}).isRequired,
+  selectProps: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    createNewFromModal: PropTypes.bool.isRequired,
+    newOptionModalOpen: PropTypes.func.isRequired,
+    createNewFromModalLabel: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
+
+const Option = props => (
+  <components.Option {...props}>
+    {props.selectProps.optionRenderer ? (
+      props.selectProps.optionRenderer(props.data)
+    ) : (
+      <div>{props.data.label}</div>
+    )}
+  </components.Option>
+);
+
+Option.propTypes = {
+  data: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+  }).isRequired,
+  selectProps: PropTypes.shape({
+    optionRenderer: PropTypes.func,
+  }).isRequired,
+};
 
 class Select extends Component {
   constructor(props) {
@@ -29,6 +94,25 @@ class Select extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.getTooltipHtml = this.getTooltipHtml.bind(this);
+  }
+
+  getTooltipHtml() {
+    const {
+      multi, placeholder, showLabelTooltip, value,
+    } = this.props;
+
+    if (showLabelTooltip) {
+      const valueMapped = multi && value ? this.props.value.map(v => v && v.label) : [];
+      const valueLabel = multi ? valueMapped.join(', ') : (value.label || value.name);
+      return (
+        <div className="p-1">
+          {`${placeholder}${valueLabel ? `: ${valueLabel}` : ''}`}
+        </div>
+      );
+    }
+
+    return (value && <div className="p-1">{value.label}</div>);
   }
 
   handleChange(value) {
@@ -44,8 +128,9 @@ class Select extends Component {
   render() {
     const {
       options: selectOptions, value: selectValue = this.state.value,
-      multi = false, delimiter = ';', async = false, showValueTooltip, clearable = true,
-      arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress, onEnterPress, ...attributes
+      multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
+      clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
+      onEnterPress, customSelectComponents, optionRenderer, classNamePrefix, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -92,45 +177,6 @@ class Select extends Component {
 
     const SelectType = async ? Async : ReactSelect;
 
-    const Menu = ({ children, innerProps }) => {
-      const target = document.getElementById(`${this.state.id}-container`);
-      return (
-        <Overlay
-          show
-          placement="bottom"
-          target={target}
-          container={document.getElementById('root')}
-        >
-          <Dropdown width={target.offsetWidth}>
-            <div className="custom-option" {...innerProps}>
-              {attributes.createNewFromModal &&
-                <div
-                  className="add-new-button"
-                  onClick={attributes.newOptionModalOpen}
-                  onKeyPress={attributes.newOptionModalOpen}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span><i className="fa fa-plus pr-2" />{attributes.createNewFromModalLabel}</span>
-                </div>
-              }
-              {children}
-            </div>
-          </Dropdown>
-        </Overlay>
-      );
-    };
-
-    const Option = props => (
-      <components.Option {...props}>
-        {this.props.optionRenderer ? (
-          this.props.optionRenderer(props.data)
-        ) : (
-          <div>{props.data.label}</div>
-        )}
-      </components.Option>
-    );
-
     const SingleValue = props => (
       <components.SingleValue {...props}>
         {this.props.valueRenderer ? (
@@ -165,8 +211,8 @@ class Select extends Component {
     return (
       <div id={`${this.state.id}-container`}>
         <Tooltip
-          html={(this.props.value && <div>{this.props.value.label}</div>)}
-          disabled={!showValueTooltip || !this.props.value}
+          html={this.getTooltipHtml()}
+          disabled={!showLabelTooltip || (showValueTooltip && this.props.value)}
           theme="transparent"
           arrow="true"
           delay="150"
@@ -176,7 +222,6 @@ class Select extends Component {
           classes=""
         >
           <SelectType
-            name={this.state.id}
             {...attributes}
             isDisabled={attributes.disabled}
             options={options}
@@ -186,9 +231,14 @@ class Select extends Component {
             delimiter={delimiter}
             value={value}
             onChange={this.handleChange}
-            components={{ Menu, Option, SingleValue }}
+            components={{
+              ...customSelectComponents,
+              Menu: customSelectComponents.Menu ?? Menu,
+              Option: customSelectComponents.Option ?? Option,
+              SingleValue,
+            }}
             ref={fieldRef}
-            classNamePrefix="react-select"
+            classNamePrefix={classNamePrefix}
             noOptionsMessage={() => (async ? 'Type to search' : 'No results found')}
             onKeyDown={(event) => {
               switch (event.keyCode) {
@@ -233,6 +283,9 @@ class Select extends Component {
                 default:
               }
             }}
+            name={this.state.id}
+            id={this.state.id}
+            optionRenderer={optionRenderer}
           />
         </Tooltip>
       </div>
@@ -253,6 +306,8 @@ Select.propTypes = {
   async: PropTypes.bool,
   delimiter: PropTypes.string,
   showValueTooltip: PropTypes.bool,
+  showLabelTooltip: PropTypes.bool,
+  placeholder: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
   arrowLeft: PropTypes.func,
@@ -264,6 +319,8 @@ Select.propTypes = {
   onEnterPress: PropTypes.func,
   optionRenderer: PropTypes.func,
   valueRenderer: PropTypes.func,
+  customSelectComponents: PropTypes.shape({}),
+  classNamePrefix: PropTypes.string,
 };
 
 Select.defaultProps = {
@@ -273,8 +330,10 @@ Select.defaultProps = {
   clearable: true,
   async: false,
   delimiter: ';',
+  placeholder: '',
   initialValue: null,
   showValueTooltip: false,
+  showLabelTooltip: false,
   arrowLeft: null,
   arrowUp: null,
   arrowRight: null,
@@ -284,4 +343,6 @@ Select.defaultProps = {
   onEnterPress: null,
   optionRenderer: null,
   valueRenderer: null,
+  customSelectComponents: {},
+  classNamePrefix: 'react-select',
 };

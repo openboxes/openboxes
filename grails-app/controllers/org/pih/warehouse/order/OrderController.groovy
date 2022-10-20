@@ -300,23 +300,27 @@ class OrderController {
                 redirect(action: "show", id: orderInstance?.id)
                 return
             }
-            if (orderInstance.status != OrderStatus.PENDING) {
+
+            if (orderInstance.status == OrderStatus.PENDING) {
+                try {
+                    orderService.deleteOrder(orderInstance)
+                    flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                }
+                catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                }
+            } else {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", id: params.id, params: [orderType: orderInstance.orderType])
-                return
-            }
-            try {
-                orderService.deleteOrder(orderInstance)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", params: [orderType: orderInstance.orderType])
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", id: params.id, params: [orderType: orderInstance.orderType])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list", params: [orderType: orderInstance.orderType])
+        }
+        if (orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()) {
+            redirect(controller: "purchaseOrder", action: "list")
+        } else if (orderInstance.orderType.code == Constants.PUTAWAY_ORDER) {
+            redirect(controller: "order", action: "list", params: [orderType: Constants.PUTAWAY_ORDER, status: OrderStatus.PENDING])
+        } else {
+            redirect(controller: "order", action: "list")
         }
     }
 

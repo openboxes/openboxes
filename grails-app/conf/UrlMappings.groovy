@@ -46,6 +46,35 @@ class UrlMappings {
             controller = { "categoryApi" }
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]
         }
+
+        // Category options for filters on  product list page
+        "/api/categoryOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "categoryOptions"]
+        }
+
+        // Catalog options for filters on  product list page
+        "/api/catalogOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "catalogOptions"]
+        }
+
+        // Tag options for filters on  product list page
+        "/api/tagOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "tagOptions"]
+        }
+
+        "/api/products"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/products/search"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "search"]
+        }
+
         "/api/products/$id/$action" {
             controller = { "productApi" }
         }
@@ -218,9 +247,19 @@ class UrlMappings {
             action = [GET: "getPendingRequisitionDetails"]
         }
 
-        "/api/stockMovements/list"{
+        "/api/stockMovements"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [GET: "list"]
+        }
+
+        "/api/stockMovements/shippedItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "shippedItems"]
+        }
+
+        "/api/stockMovements/pendingRequisitionItems"(parseRequest: true) {
+            controller = "stockMovementApi"
+            action = [GET: "pendingRequisitionItems"]
         }
 
         "/api/stockMovements/$id/updateAdjustedItems"(parseRequest: true) {
@@ -232,6 +271,16 @@ class UrlMappings {
         "/api/stockMovements/createCombinedShipments"(parseRequest: true) {
             controller = "stockMovementApi"
             action = [POST: "createCombinedShipments"]
+        }
+
+        "/api/stockMovements/shipmentStatusCodes" {
+            controller = "stockMovementApi"
+            action = [GET: "shipmentStatusCodes"]
+        }
+
+        "/api/stockMovements/requisitionsStatusCodes" {
+            controller = "stockMovementApi"
+            action = [GET: "requisitionStatusCodes"]
         }
 
         // Partial Receiving API
@@ -285,6 +334,31 @@ class UrlMappings {
         "/api/stocklists/sendMail/$id"(parseRequest: true) {
             controller = "stocklistApi"
             action = [POST: "sendMail"]
+        }
+
+        "/api/stocklists/$id/export"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [GET: "export"]
+        }
+
+        "/api/stocklists/$id/clone"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "clone"]
+        }
+
+        "/api/stocklists/$id/publish"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "publish"]
+        }
+
+        "/api/stocklists/$id/unpublish"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "unpublish"]
+        }
+
+        "/api/stocklists/$id/clear"(parseRequest: true) {
+            controller = "stocklistApi"
+            action = [POST: "clear"]
         }
 
         // Putaway Item API
@@ -372,7 +446,22 @@ class UrlMappings {
             action = [GET: "getPrepaymentItems"]
         }
 
+        "/api/invoiceStatuses"(parseRequest: true) {
+            controller = { "invoiceApi" }
+            action = [GET: "statusOptions"]
+        }
+
+        "/api/invoiceTypeCodes"(parseRequest: true) {
+            controller = { "invoiceApi" }
+            action = [GET: "invoiceTypeCodes"]
+        }
+
         // Stock Transfer API
+
+        "/api/stockTransfers/statusOptions"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [GET: "statusOptions"]
+        }
 
         "/api/stockTransfers/candidates"(parseRequest: true) {
             controller = { "stockTransferApi" }
@@ -589,6 +678,34 @@ class UrlMappings {
             controller = { "dashboardApi" }
             action = [GET: "getOpenPurchaseOrdersCount"]
         }
+
+        /**
+        * Purchase Orders API endpoints
+        */
+
+        "/api/orderSummaryStatus"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [GET: "statusOptions"]
+        }
+
+        "/api/purchaseOrders/$id/rollback"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [POST: "rollback"]
+        }
+
+        "/api/purchaseOrders"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/purchaseOrders/$id"(parseRequest: true) {
+            controller = { "purchaseOrderApi" }
+            action = [GET: "read", DELETE: "delete"]
+        }
+
+        /**
+         * Products Configuration API endpoints
+         */
 
         "/api/productsConfiguration/importCategories"(parseRequest: true) {
             controller = { "productsConfigurationApi" }

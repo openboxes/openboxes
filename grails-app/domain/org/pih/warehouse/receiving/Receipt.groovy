@@ -11,9 +11,23 @@ package org.pih.warehouse.receiving
 
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.shipping.Shipment
 
 class Receipt implements Serializable, Comparable<Receipt> {
+
+    def publishRefreshEvent = {
+        shipment?.orders?.each { Order o ->
+            if (o?.isPurchaseOrder) {
+                publishEvent(new RefreshOrderSummaryEvent(o))
+            }
+        }
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
 
     String id
     String receiptNumber

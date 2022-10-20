@@ -10,6 +10,7 @@ const SelectField = (props) => {
       name={attributes.id}
       {...attributes}
       className={`select-xs ${className}`}
+      classNamePrefix="react-select"
     />
   );
 

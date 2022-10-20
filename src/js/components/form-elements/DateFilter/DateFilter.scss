@@ -1,0 +1,212 @@
+.react-datepicker {
+  border: none;
+  border-radius: 2px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  // popup dialog
+
+  &__triangle {
+    display: none;
+  }
+  &__month-container {
+    background-color: white;
+  }
+  &__header {
+    background-color: var(--blue-100);
+    color: black;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  &__day-names {
+    color: var(--blue-800);
+    font-size: 12px;
+    font-weight: bold;
+  }
+  &__day-name, &__day{
+    color: inherit;
+  }
+  &__day:hover {
+    border-radius: 2px;
+    background-color: var(--blue-100);
+    color: var(--blue-primary);
+  }
+
+  &__day--outside-month {
+    color: var(--gray-300);
+  }
+
+  &__day--highlighted, &__day--selected  {
+    border-radius: 2px;
+    color: white;
+    background-color: var(--blue-primary);
+  }
+
+  &__month {
+    color: var(--blue-700);
+  }
+  &__year-dropdown {
+    border: 1px solid var(--gray-300);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    background-color: white;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+    }
+  }
+  &__navigation {
+    border: solid var(--blue-700);
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+    &:hover {
+      border-color: var(--blue-700);
+    }
+    &:focus {
+      outline: none;
+    }
+    &--next {
+      transform: rotate(-45deg) translate(-9px, -3px);
+      -webkit-transform: rotate(-45deg) translate(-9px, -3px);
+    }
+    &--previous {
+      transform: rotate(135deg) translate(-3px, -9px);
+      -webkit-transform: rotate(135deg) translate(-3px, -9px);
+    }
+  }
+  &__year-read-view {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    &--down-arrow {
+      all: unset;
+      border: solid var(--blue-700);
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 2px;
+      width: 3px;
+      height: 3px;
+      transform: rotate(45deg) translateY(-2px);
+      -webkit-transform: rotate(45deg) translateY(-2px);
+      &:before {
+        all: unset;
+      }
+    }
+  }
+
+  &__year-option {
+    padding: 4px;
+    color: var(--gray-600);
+    &:hover {
+      background-color: var(--blue-200);
+      .react-datepicker__navigation--years-upcoming,
+      .react-datepicker__navigation--years-previous {
+        border-color: var(--blue-primary);
+      }
+    }
+    &:first-child, &:last-child {
+      background-color: var(--blue-100);
+    }
+    .react-datepicker__navigation {
+      border-color: var(--blue-primary);
+      &--years-upcoming {
+        transform: rotate(-135deg) translate(-4px, -4px);
+        -webkit-transform: rotate(-135deg) translate(-4px, -4px);
+      }
+      &--years-previous {
+        transform: rotate(45deg) translate(-4px, -4px);
+        -webkit-transform: rotate(45deg) translate(-4px, -4px);
+      }
+    }
+
+    &--selected-year {
+      color: white;
+      background-color: var(--blue-primary);
+    }
+    &--selected {
+      display: none;
+    }
+  }
+}
+
+// input
+.date-picker {
+  &__wrapper{
+    display: flex;
+    flex-direction: row;
+    background: white;
+    outline-style: solid;
+    outline-width: 0;
+    outline-color: rgba(34, 100, 229, 0.15);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-400);
+    border-radius: 2px;
+    &--focused {
+      outline-width: 3px;
+      border-color: var(--blue-primary);
+      color: var(--gray-600);
+      .date-picker__icon {
+        color: var(--gray-600);
+      }
+    }
+    &--valid {
+      color: var(--gray-600);
+      border-color: var(--blue-primary);
+      .date-picker__icon {
+        color: var(--blue-primary);
+      }
+    }
+    & > div,
+    .react-datepicker-wrapper,
+    .react-datepicker__input-container {
+      display: flex;
+      flex: 1;
+    }
+  }
+  &__input {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    flex: 1;
+  }
+  &__input-wrapper {
+    all: unset;
+    padding: 8px 12px;
+    align-items: center;
+    &:focus {
+      outline: none;
+    }
+  }
+  &__input, &__input-wrapper {
+    display: flex;
+    flex: 1;
+  }
+  &__icon-wrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  &__icon {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--gray-400);
+  }
+}
