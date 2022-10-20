@@ -13,9 +13,6 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.Product
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 class ProductAssociationDataService {
 
     /**
@@ -25,10 +22,6 @@ class ProductAssociationDataService {
         log.info "Validate data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss")
-            if (params['dateCreated']) params['dateCreated'] = dateFormat.parse(params['dateCreated'])
-            if (params['lastUpdated']) params['lastUpdated'] = dateFormat.parse(params['lastUpdated'])
-
             params['code'] = params['code']?.toUpperCase()
 
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
@@ -42,13 +35,12 @@ class ProductAssociationDataService {
                 command.errors.reject("Row ${index + 1}: Cannot edit existing associations via import")
             }
 
-            if (!productAssociationInstance?.code) {
-                if (params['code']) {
-                    command.errors.reject("Row ${index + 1}: Association Type code '${params['code']}' does not exist")
-                } else {
-                    command.errors.reject("Row ${index + 1}: Association Type field can not be empty")
-                }
+            if (!params['code']) {
+                command.errors.reject("Row ${index + 1}: Association Type field can not be empty")
+            } else if (!productAssociationInstance?.code) {
+                command.errors.reject("Row ${index + 1}: Association Type code '${params['code']}' does not exist")
             }
+
             if (!productAssociationInstance.product) {
                 command.errors.reject(
                     "Row ${index + 1}: Product with code '${params['product.productCode']}' does not exist"

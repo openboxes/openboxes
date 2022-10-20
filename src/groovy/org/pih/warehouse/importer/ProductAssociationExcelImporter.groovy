@@ -26,8 +26,6 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
                     'F': 'associatedProduct.name',
                     'G': 'quantity',
                     'H': 'comments',
-                    'I': 'dateCreated',
-                    'J': 'lastUpdated',
             ]
     ]
 
@@ -40,8 +38,6 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
             "associatedProduct.name"        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "quantity"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
             "comments"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "dateCreated"                   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "lastUpdated"                   : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
 
