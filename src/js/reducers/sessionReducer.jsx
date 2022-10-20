@@ -74,6 +74,7 @@ const initialState = {
   currencyCode: '',
   localizedHelpScoutKey: '',
   isHelpScoutEnabled: false,
+  loading: false,
 };
 
 export default function (state = initialState, action) {
@@ -110,6 +111,7 @@ export default function (state = initialState, action) {
         currencyCode: _.get(action, 'payload.data.data.currencyCode'),
         localizedHelpScoutKey: _.get(action, 'payload.data.data.localizedHelpScoutKey'),
         isHelpScoutEnabled: _.get(action, 'payload.data.data.isHelpScoutEnabled'),
+        loading: false,
       };
     case FETCH_MENU_CONFIG:
       return {
@@ -117,7 +119,7 @@ export default function (state = initialState, action) {
         menuConfig: _.get(action, 'payload.data.data.menuConfig'),
       };
     case CHANGE_CURRENT_LOCATION:
-      return { ...state, currentLocation: action.payload };
+      return { ...state, currentLocation: action.payload, loading: true };
     case CHANGE_CURRENT_LOCALE:
       return { ...state, activeLanguage: action.payload };
     case TRANSLATIONS_FETCHED:

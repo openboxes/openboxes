@@ -17,6 +17,7 @@ const StockTransferList = (props) => {
   // Filter params are stored here, to be able to pass them to table component
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockTransfer');
@@ -25,6 +26,11 @@ const StockTransferList = (props) => {
   const fetchUserById = async (id) => {
     const response = await apiClient(`/openboxes/api/generic/person/${id}`);
     return response.data?.data;
+  };
+
+  const clearFilterValues = () => {
+    const { pathname } = props.history.location;
+    props.history.push({ pathname });
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -50,12 +56,23 @@ const StockTransferList = (props) => {
     if (queryProps.lastUpdatedEndDate) {
       defaultValues.lastUpdatedEndDate = queryProps.lastUpdatedEndDate;
     }
-    setDefaultFilterValues(defaultValues);
+    setDefaultFilterValues({ ...defaultValues });
+    setFiltersInitialized(true);
   };
 
   useEffect(() => {
-    initializeDefaultFilterValues();
-  }, []);
+    // Don't clear the query params while doing first filter initialization
+    // clear the filters only when changing location, but not refreshing page
+    if (filtersInitialized) {
+      clearFilterValues();
+    }
+  }, [props.currentLocation?.id]);
+
+  useEffect(() => {
+    if (props.currentLocation?.id) {
+      initializeDefaultFilterValues();
+    }
+  }, [props.currentLocation?.id]);
 
   const setFilterValues = (values) => {
     const filterAccessors = {
@@ -71,7 +88,7 @@ const StockTransferList = (props) => {
     if (Object.keys(values).length > 0) {
       props.history.push({ pathname, search: queryFilterParams });
     }
-    setFilterParams(values);
+    setFilterParams({ ...values });
   };
 
   return (
@@ -92,6 +109,7 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   currentUser: state.session.user,
   statuses: state.stockTransfer.statuses,
+  currentLocation: state.session.currentLocation,
 });
 
 const mapDispatchToProps = {
@@ -120,4 +138,7 @@ StockTransferList.propTypes = {
     label: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
   })).isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };

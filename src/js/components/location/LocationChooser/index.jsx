@@ -75,8 +75,8 @@ const LocationChooser = (props) => {
   const selectLocation = (location) => {
     props.changeCurrentLocation(location).then(() => {
       props.fetchMenuConfig();
+      props.fetchSessionInfo();
     });
-    props.fetchSessionInfo();
     setIsOpen(false);
   };
 

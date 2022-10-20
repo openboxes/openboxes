@@ -162,6 +162,7 @@ const InvoiceListFilters = ({
         searchFieldPlaceholder="Search by invoice number..."
         searchFieldId="invoiceNumber"
         hidden={false}
+        ignoreClearFilters={['buyerOrganization']}
       />
     </div>
   );

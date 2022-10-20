@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import filterFields from 'components/stock-list/FilterFields';
@@ -14,6 +15,7 @@ import { transformFilterParams } from 'utils/list-utils';
 const StockList = (props) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const [locations, setLocations] = useState([]);
 
@@ -30,6 +32,11 @@ const StockList = (props) => {
       });
   }, []);
 
+
+  const clearFilterValues = () => {
+    const { pathname } = props.history.location;
+    props.history.push({ pathname });
+  };
 
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
@@ -63,11 +70,22 @@ const StockList = (props) => {
       defaultValues.isPublished = queryProps.isPublished === 'true';
     }
     setDefaultFilterValues(defaultValues);
+    setFiltersInitialized(true);
   };
 
   useEffect(() => {
-    initializeDefaultFilterValues();
-  }, []);
+    // Don't clear the query params while doing first filter initialization
+    // clear the filters only when changing location, but not refreshing page
+    if (filtersInitialized) {
+      clearFilterValues();
+    }
+  }, [props.currentLocation?.id]);
+
+  useEffect(() => {
+    if (props.currentLocation?.id) {
+      initializeDefaultFilterValues();
+    }
+  }, [props.currentLocation?.id]);
 
   const setFilterValues = (values) => {
     const filterAccessors = {
@@ -99,6 +117,10 @@ const StockList = (props) => {
   );
 };
 
+const mapStateToProps = state => ({
+  currentLocation: state.session.currentLocation,
+});
+
 StockList.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
@@ -107,6 +129,9 @@ StockList.propTypes = {
       search: PropTypes.string,
     }),
   }).isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
-export default withRouter(StockList);
+export default withRouter(connect(mapStateToProps)(StockList));

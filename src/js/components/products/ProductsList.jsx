@@ -21,6 +21,7 @@ const ProductsList = (props) => {
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const fetchProductsCategories = async () => {
     const response = await apiClient.get('/openboxes/api/categoryOptions');
@@ -40,6 +41,12 @@ const ProductsList = (props) => {
   useEffect(() => {
     props.fetchTranslations(props.locale, 'productsList');
   }, [props.locale]);
+
+
+  const clearFilterValues = () => {
+    const { pathname } = props.history.location;
+    props.history.push({ pathname });
+  };
 
 
   const initializeDefaultFilterValues = async () => {
@@ -97,11 +104,22 @@ const ProductsList = (props) => {
     if (queryProps.catalogId || queryProps.tagId || queryProps.categoryId) {
       setDefaultFilterValues(defaultValues);
     }
+    setFiltersInitialized(true);
   };
 
   useEffect(() => {
-    initializeDefaultFilterValues();
-  }, []);
+    // Don't clear the query params while doing first filter initialization
+    // clear the filters only when changing location, but not refreshing page
+    if (filtersInitialized) {
+      clearFilterValues();
+    }
+  }, [props.currentLocation?.id]);
+
+  useEffect(() => {
+    if (props.currentLocation?.id) {
+      initializeDefaultFilterValues();
+    }
+  }, [props.currentLocation?.id]);
 
   const setFilterValues = (values) => {
     const filterAccessors = {
@@ -136,6 +154,7 @@ const ProductsList = (props) => {
 
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
+  currentLocation: state.session.currentLocation,
 });
 
 const mapDispatchToProps = {
@@ -154,5 +173,8 @@ ProductsList.propTypes = {
     location: PropTypes.shape({
       search: PropTypes.string,
     }),
+  }).isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
   }).isRequired,
 };

@@ -14,6 +14,7 @@ const PurchaseOrderListFilters = ({
   filterFields,
   defaultValues,
   formProps,
+  supportedActivities,
 }) => {
   const debouncedOriginLocationsFetch = debounceLocationsFetch(
     debounceTime,
@@ -33,6 +34,8 @@ const PurchaseOrderListFilters = ({
   );
   const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
+  const filtersToIgnore = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING') ? ['destinationParty'] : ['destination'];
+
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
@@ -44,7 +47,7 @@ const PurchaseOrderListFilters = ({
           debouncedDestinationLocationsFetch,
           debouncedUsersFetch,
         }}
-        ignoreClearFilters={['destination']}
+        ignoreClearFilters={filtersToIgnore}
         defaultValues={defaultValues}
         allowEmptySubmit
         searchFieldPlaceholder="Search by order number or name or supplier"
@@ -57,6 +60,7 @@ const PurchaseOrderListFilters = ({
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  supportedActivities: state.session.supportedActivities,
 });
 
 export default connect(mapStateToProps)(PurchaseOrderListFilters);
@@ -68,4 +72,5 @@ PurchaseOrderListFilters.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
   formProps: PropTypes.shape({}).isRequired,
+  supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
