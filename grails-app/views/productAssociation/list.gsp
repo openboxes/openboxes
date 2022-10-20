@@ -23,7 +23,7 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                         <warehouse:message code="default.add.label" args="[g.message(code:'productAssociation.label')]"/>
                     </g:link>
-                    <g:link class="button" action="export">
+                    <g:link class="button" controller="batch" action="downloadExcel" params="[type:'ProductAssociation']">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="default.export.label" args="[g.message(code:'productAssociations.label')]"/>
                     </g:link>
@@ -62,7 +62,7 @@
                                         <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />&nbsp;
                                     ${g.message(code: 'default.button.search.label')}
                                     </button>
-                                    <button name="format" value="csv" class="button">
+                                    <button name="format" value="xls" class="button">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                                     <warehouse:message code="default.button.download.label" default="Download"/>
                                     </button>
