@@ -12,8 +12,9 @@ package org.pih.warehouse.data
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.Product
-import org.springframework.validation.BeanPropertyBindingResult
 
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class ProductAssociationDataService {
 
@@ -24,6 +25,12 @@ class ProductAssociationDataService {
         log.info "Validate data " + command.filename
 
         command.data.eachWithIndex { params, index ->
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss")
+            if (params['dateCreated']) params['dateCreated'] = dateFormat.parse(params['dateCreated'])
+            if (params['lastUpdated']) params['lastUpdated'] = dateFormat.parse(params['lastUpdated'])
+
+            params['code'] = params['code']?.toUpperCase()
+
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             productAssociationInstance.product = Product.findByProductCode(params['product.productCode'])
             productAssociationInstance.associatedProduct = Product.findByProductCode(params['associatedProduct.productCode'])
@@ -31,8 +38,16 @@ class ProductAssociationDataService {
             params['associatedProduct.id'] =  productAssociationInstance.associatedProduct?.id
 
             // disable update product association on import
-            if (productAssociationInstance?.id) {
+            if (params['id']) {
                 command.errors.reject("Row ${index + 1}: Cannot edit existing associations via import")
+            }
+
+            if (!productAssociationInstance?.code) {
+                if (params['code']) {
+                    command.errors.reject("Row ${index + 1}: Association Type code '${params['code']}' does not exist")
+                } else {
+                    command.errors.reject("Row ${index + 1}: Association Type field can not be empty")
+                }
             }
             if (!productAssociationInstance.product) {
                 command.errors.reject(
@@ -64,7 +79,7 @@ class ProductAssociationDataService {
                     associatedProduct   : productAssociationInstance.associatedProduct,
                     code                : productAssociationInstance.code,
             ])
-            if (foundProductAssociations && foundProductAssociations.size() > 0) {
+            if (!params['id'] && foundProductAssociations && foundProductAssociations.size() > 0) {
                 command.errors.reject("Row ${index + 1}: Association already exists")
             }
 
@@ -93,16 +108,6 @@ class ProductAssociationDataService {
                     )
                 }
             }
-
-            if (!productAssociationInstance.validate()) {
-                productAssociationInstance.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject(
-                            "Row ${index + 1}: Product Association with Product codes " +
-                            "'${productAssociationInstance.product?.productCode}' and " +
-                            "'${productAssociationInstance.associatedProduct?.productCode}': ${error.getFieldError()}"
-                    )
-                }
-            }
         }
     }
 
@@ -117,7 +122,9 @@ class ProductAssociationDataService {
         // create individual associations that are not bound by two-way association relationship
         individualAssociations.each { params ->
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
-            productAssociationInstance.save(failOnError: true)
+            if (productAssociationInstance.validate()) {
+                productAssociationInstance.save(failOnError: true)
+            }
         }
         // two way association is a pair of two associations where:
         // - association1.product == association2.associatedProduct
@@ -133,8 +140,10 @@ class ProductAssociationDataService {
             firstProductAssociationInstance.mutualAssociation = secondProductAssociationInstance
             secondProductAssociationInstance.mutualAssociation = firstProductAssociationInstance
 
-            firstProductAssociationInstance.save(failOnError: true)
-            secondProductAssociationInstance.save(failOnError: true)
+            if (firstProductAssociationInstance.validate() && secondProductAssociationInstance.validate()) {
+                firstProductAssociationInstance.save(failOnError: true)
+                secondProductAssociationInstance.save(failOnError: true)
+            }
         }
     }
 

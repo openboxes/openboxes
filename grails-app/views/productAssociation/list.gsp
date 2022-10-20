@@ -23,7 +23,7 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                         <warehouse:message code="default.add.label" args="[g.message(code:'productAssociation.label')]"/>
                     </g:link>
-                    <g:link class="button" action="export">
+                    <g:link class="button" controller="batch" action="downloadExcel" params="[type:'ProductAssociation']">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="default.export.label" args="[g.message(code:'productAssociations.label')]"/>
                     </g:link>
