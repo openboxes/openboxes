@@ -14,6 +14,7 @@ import grails.orm.PagedResultList
 class ProductAssociationController {
 
     def dataService
+    def documentService
     def productService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -53,12 +54,23 @@ class ProductAssociationController {
         }
 
         if (params.format && productAssociations) {
-            def filename = "productAssociations.csv"
-            def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
-            def text = dataService.generateCsv(data)
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: text)
-            return
+            String filename = "productAssociations"
+            def data = dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES)
+
+            if (params.format == 'csv') {
+                filename = "${filename}.csv"
+                def text = dataService.generateCsv(data)
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                render(contentType: "text/csv", text: text)
+                return
+            } else if (params.format == 'xls') {
+                filename = "${filename}.xls"
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                documentService.generateExcel(response.outputStream, data)
+                response.outputStream.flush()
+            }
+
         }
 
         [productAssociationInstanceList: productAssociations, productAssociationInstanceTotal: productAssociations.totalCount, selectedTypes: selectedTypes]
