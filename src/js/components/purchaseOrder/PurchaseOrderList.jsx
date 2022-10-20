@@ -91,7 +91,11 @@ const PurchaseOrderList = (props) => {
     if (queryProps.destination) {
       defaultValues.destination = props.currentLocation.id === queryProps.destination
         ? currentLocationOption
-        : await fetchLocationById(props.currentLocation?.id);
+        : await fetchLocationById(queryProps.destination);
+    }
+    if (queryProps.destinationParty) {
+      defaultValues.destinationParty = props.buyers
+        .find(({ id }) => id === queryProps.destinationParty);
     }
     if (queryProps.orderedBy) {
       defaultValues.orderedBy = queryProps.orderedBy === props.currentUser.id
