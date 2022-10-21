@@ -355,6 +355,9 @@ class IndicatorDataService {
         Map listRes = [:]
         List listLabel = fillLabels(querySize)
 
+        if (queryData.size() == 0) {
+            listRes.put(null, new IndicatorDatasets(null, [0] * (querySize + 1)))
+        }
         for (item in queryData) {
             // item[0]: item total counted
             // item[1]: item destination
@@ -476,6 +479,9 @@ class IndicatorDataService {
         Map listRes = [:]
         List listLabel = fillLabels(querySize)
 
+        if (queryData.size() == 0) {
+            listRes.put(null, new IndicatorDatasets(null, [0] * (querySize + 1)))
+        }
         for (item in queryData) {
             // item[0]: item total counted
             // item[1]: item origin
