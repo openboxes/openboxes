@@ -26,6 +26,12 @@ const Menu = ({ menuConfig, location }) => {
           [section.label]: section.subsections.flatMap(subsection => subsection.menuItems.map(item => item.href)),
         };
       }
+      if (section.menuItems) {
+        return {
+          ...acc,
+          [section.label]: section.menuItems.flatMap(({ href }) => href),
+        };
+      }
     }
     return acc;
   }, {});

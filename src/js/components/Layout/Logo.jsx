@@ -35,8 +35,12 @@ export default withRouter(connect(mapStateToProps)(Logo));
 
 
 Logo.propTypes = {
-  logoUrl: PropTypes.string.isRequired,
+  logoUrl: PropTypes.string,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+};
+
+Logo.defaultProps = {
+  logoUrl: null,
 };
