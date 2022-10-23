@@ -31,8 +31,6 @@ class LocalizationApiController {
         // Get the default message properties as well as the message properties for the selected locale
         Properties defaultMessageProperties = localizationService.getMessagesProperties(defaultLocale)
         Properties selectedMessageProperties = localizationService.getMessagesProperties(selectedLocale)
-//        Properties defaultMessageProperties = localizationService.getMessagesPropertiesWithPrefix(prefix, defaultLocale)
-//        Properties selectedMessageProperties = localizationService.getMessagesPropertiesWithPrefix(prefix, selectedLocale)
 
         // Get all translations for the given prefix and locale from the database
         List<Localization> localizedMessages = prefix ? Localization.findAllByCodeIlikeAndLocale("${prefix}%", selectedLocale.language) :

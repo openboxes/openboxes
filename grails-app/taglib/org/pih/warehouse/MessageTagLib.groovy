@@ -47,22 +47,6 @@ class MessageTagLib {
 
                 if (session.useDebugLocale) {
                     def resolvedMessage = MessageFormat.format(localization.text, attrs?.args?.toArray())
-//                    out << """${attrs.code}"""
-//                    out << """
-//								<span
-//                                    class='open-localization-dialog'
-//									data-id="${localization.id}"
-//									data-code="${localization.code}"
-//									data-locale="${localization.locale}"
-//									data-message="${message}"
-//									data-resolved-message="${resolvedMessage}"
-//									data-message="${localization.text}"
-//									data-args="${attrs.args}"
-//									data-localized=""
-//									src="${
-//                        createLinkTo(dir: 'images/icons/silk', file: 'database.png')
-//                    }">${resolvedMessage}</span>
-//							"""
                     out << """${resolvedMessage}"""
                     return
                 } else {
@@ -93,22 +77,6 @@ class MessageTagLib {
 
             message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
             def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
-            if (!flash.messages) { flash.messages = [] as Set; flash.localizations = [] as Set; }
-            //flash.messages << message
-            //flash.localizations << [code: attrs.code, text: resolvedMessage]
-//            out << """
-//					<span class='open-localization-dialog'
-//						data-code="${attrs.code}"
-//						data-locale="${attrs.locale}"
-//						data-args="${attrs?.args?.join(',')}"
-//						data-resolved-message="${resolvedMessage}"
-//						data-message="${message}"
-//						data-localized="${localized}"
-//						src="${
-//                createLinkTo(dir: 'images/icons/silk', file: image + '.png')
-//            }" title="${attrs.code} = ${localized}">${resolvedMessage}</span>
-//				"""
-            //out << """${attrs.code}"""
             out << """${resolvedMessage}"""
         }
         // Display message normally
