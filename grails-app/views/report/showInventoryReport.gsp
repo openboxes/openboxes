@@ -1,6 +1,6 @@
 <%@ page defaultCodec="html" %>
+<%@ page import="util.ConfigHelper" %>
 <html>
-
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title><warehouse:message code="report.showInventoryReport.label" default="Inventory report" /></title>
@@ -158,8 +158,8 @@
                                 </g:link>
                             </li>
                             <li>
-                                <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" target="_blank">
-                                    <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
+                                <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${ConfigHelper.getAppVersion()}" target="_blank">
+                                    <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${ConfigHelper.getAppVersion()})
                                 </g:link>
                             </li>
                             <li class="divider"></li>
