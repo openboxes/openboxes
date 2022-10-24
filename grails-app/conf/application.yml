@@ -21,13 +21,18 @@ grails:
         failOnError: false
     config:
         locations:
-            - ~/.grails/openboxes.yml
-            - ~/.grails/openboxes.groovy
-            - ~/.grails/openboxes.properties
-            - file:${catalina.base}/.grails/openboxes.groovy
-            - file:${catalina.base}/.grails/openboxes.yml
-            - file:${catalina.base}/.grails/openboxes.properties
+            #
+            # The first config file has the lowest priority. Its contents can
+            # be overwritten by any file following it that sets the same config
+            # key. The *last* config file has the final word (highest priority).
+            #
             - classpath:META-INF/grails.build.info
+            - file:${catalina.base}/.grails/openboxes-config.properties
+            - file:${catalina.base}/.grails/openboxes-config.groovy
+            - file:${catalina.base}/.grails/openboxes.yml
+            - ~/.grails/openboxes-config.properties
+            - ~/.grails/openboxes-config.groovy
+            - ~/.grails/openboxes.yml
     plugin:
         sentry:
             active: false
@@ -243,8 +248,7 @@ environments:
             logSlowQueries: true
             username: "openboxes"
             password: "openboxes"
-            # FIXME change to `openboxes` once external config works reliably. OBGM-20
-            url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
     test:
         dataSource:
             dumpQueriesOnException: true
@@ -255,8 +259,7 @@ environments:
             logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
-            # FIXME change to `openboxes` once external config works reliably. OBGM-20
-            url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
     production:
         dataSource:
             dumpQueriesOnException: false
@@ -266,8 +269,7 @@ environments:
             logSlowQueries: false
             username: "openboxes"
             password: "openboxes"
-            # FIXME change to `openboxes` once external config works reliably. OBGM-20
-            url: jdbc:mysql://localhost:3306/openboxes3?serverTimezone=UTC&useSSL=false
+            url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
 ---
 openboxes:
     ajaxRequest:
