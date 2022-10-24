@@ -11,15 +11,36 @@ package util
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import grails.util.Holders
+import org.springframework.boot.info.GitProperties
 
 // See http://jira.codehaus.org/browse/GRAILS-6515
 class ConfigHelper {
+
+    /**
+     * Return the version of the application, as specified in build.gradle.
+     */
+    static String getAppVersion() {
+        // build.app.version is readable by war files, app.version by local builds
+        return Holders.grailsApplication.metadata.getProperty(
+            'build.app.version',
+            String,
+            Holders.grailsApplication.config.getProperty('app.version')
+        )
+    }
+
+    static String getBranchName(GitProperties gitProperties) {
+        // build.git.branch is set by bamboo; gitProperties.branch from git
+        return Holders.grailsApplication.metadata.getProperty(
+            'build.git.branch',
+            String,
+            gitProperties.branch
+        )
+    }
 
     static getContextPath() {
         String contextPath = Holders.grailsApplication.config.server.contextPath
         return (contextPath != '/') ? contextPath : ''
     }
-
 
     static booleanValue(def value) {
         if (value.class == java.lang.Boolean) {
