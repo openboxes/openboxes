@@ -27,6 +27,7 @@ grails:
             - file:${catalina.base}/.grails/openboxes.groovy
             - file:${catalina.base}/.grails/openboxes.yml
             - file:${catalina.base}/.grails/openboxes.properties
+            - classpath:META-INF/grails.build.info
     plugin:
         sentry:
             active: false

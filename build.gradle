@@ -334,6 +334,7 @@ sourceSets {
 }
 
 springBoot {
+    buildInfo()
     mainClass = 'org.pih.warehouse.Application'
 }
 
@@ -551,6 +552,9 @@ dependencies {
     // FIXME use commons-csv instead
     implementation 'org.grails.plugins:excel-import:3.0.2'
 
+    // load config via files listed in application.yml::grails.config.locations
+    implementation 'org.grails.plugins:external-config:1.4.0'
+
     // enable `import geb.*`
     testCompile 'org.grails.plugins:geb'
 
@@ -676,20 +680,25 @@ dependencies {
 }
 
 /*
- * Update `.../META-INF/grails.build.info` after any successful build.
+ * Create a grails.build.info file after every successful build, whose
+ * contents can be retrieved via <g:meta name='property.name' /> or
+ * grailsApplication.metadata.getProperty('property.name').
+ *
+ * https://grails.org/blog/2017-04-02.html
  */
 buildProperties.doLast {
     File grailsBuildInfoFile = it.outputs.files.files.find {
         it.name == 'grails.build.info'
     }
-    if (!grailsBuildInfoFile) {
-        return  // nothing to do
-    }
 
     Map<String, String> env = System.getenv()
     Properties properties = new Properties()
-    grailsBuildInfoFile.withInputStream {
-        properties.load(it)
+
+    // load any information created by the build itself
+    if (grailsBuildInfoFile?.canRead()) {
+        grailsBuildInfoFile?.withInputStream {
+            properties.load(it)
+        }
     }
 
     properties.setProperty('build.host', InetAddress.localHost.hostName)
