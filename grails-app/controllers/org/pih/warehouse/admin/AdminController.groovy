@@ -10,10 +10,10 @@
 package org.pih.warehouse.admin
 
 import grails.core.GrailsApplication
-import grails.util.Environment
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.MailService
+import org.springframework.boot.info.GitProperties
 import org.springframework.web.multipart.MultipartFile
 
 import javax.print.*
@@ -28,6 +28,7 @@ class AdminController {
     def config = Holders.getConfig()
     def quartzScheduler
     def dataService
+    GitProperties gitProperties
 
     def index() {}
 
@@ -193,6 +194,7 @@ class AdminController {
 
 
         [
+                gitProperties           : gitProperties,
                 quartzScheduler         : quartzScheduler,
                 printServices           : printServices,
                 caches                  : null, //caches,
