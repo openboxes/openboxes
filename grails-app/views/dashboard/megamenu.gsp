@@ -19,31 +19,25 @@
 
         <g:if test="${megamenuConfig.analytics.enabled}">
             <g:isUserAdmin>
-                <li class="mm-item" id="analytics">
-                    <a href="javascript:void(0)" class="mm-item-link">
+                <li class="nav-item dropdown d-flex justify-content-center align-items-center" id="analytics">
+                    <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="analytics.label" default="Analytics"/>
                     </a>
-                    <div class="mm-content-base">
-                        <div class="mm-menu-item">
-                            <g:link controller="inventoryBrowser" action="index" class="list">
-                                <warehouse:message code="inventory.browse.label" default="Inventory browser" />
-                                <span class="beta">Beta</span>
-                            </g:link>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-menu-subsections">
+                            <div class="padding-8">
+                                <g:link controller="inventoryBrowser" action="index" class="dropdown-item">
+                                    <warehouse:message code="inventory.browse.label" default="Inventory browser" />
+                                </g:link>
 
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="inventorySnapshot" action="list" class="list">
-                                <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
-                                <span class="beta">Beta</span>
-                            </g:link>
+                                <g:link controller="inventorySnapshot" action="list" class="dropdown-item">
+                                    <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
+                                </g:link>
 
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="consumption" action="list" class="list">
-                                <warehouse:message code="consumption.report.label" default="Consumption Report" />
-                                <span class="beta">Beta</span>
-                            </g:link>
-
+                                <g:link controller="consumption" action="list" class="dropdown-item">
+                                    <warehouse:message code="consumption.report.label" default="Consumption Report" />
+                                </g:link>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -578,18 +572,20 @@
 
         <g:if test="${megamenuConfig.customLinks.enabled && megamenuConfig.customLinks.menuItems}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-            <li class="mm-item">
-                <a href="javascript:void(0)" class="mm-item-link">
+            <li class="nav-item dropdown d-flex justify-content-center align-items-center" id="customLinks">
+                <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="customLinks.label" default="Custom Links" />
                 </a>
-                <div class="mm-item-content">
-                    <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
-                        <div class="mm-menu-item">
-                            <a href="${item.href}" target="${item.target}">
-                                <warehouse:message code="${item.label}" default="${item.defaultLabel}" />
-                            </a>
+                <div class="dropdown-menu">
+                    <div class="dropdown-menu-subsections">
+                        <div class="padding-8">
+                            <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
+                                    <a href="${item.href}" target="${item.target}" class="dropdown-item">
+                                        <warehouse:message code="${item.label}" default="${item.defaultLabel}" />
+                                    </a>
+                            </g:each>
                         </div>
-                    </g:each>
+                    </div>
                 </div>
             </li>
             </g:isUserInRole>
