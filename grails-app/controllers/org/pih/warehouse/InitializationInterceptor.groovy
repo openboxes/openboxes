@@ -11,8 +11,8 @@ package org.pih.warehouse
 import org.pih.warehouse.core.User
 
 class InitializationInterceptor {
-    def locationService
-    def productService
+
+    int order = HIGHEST_PRECEDENCE
 
     public InitializationInterceptor() {
         matchAll()

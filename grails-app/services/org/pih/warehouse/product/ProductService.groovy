@@ -15,7 +15,6 @@ import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
@@ -35,6 +34,7 @@ class ProductService {
 
     def sessionFactory
     GrailsApplication grailsApplication
+    def authService
     def identifierService
     def userService
     def dataService
@@ -595,7 +595,7 @@ class ProductService {
 
         int rowCount = 1
 
-        Location currentLocation = AuthService?.currentLocation?.get()
+        Location currentLocation = authService.currentLocation
         ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
 
         // Iterate over each line and either update an existing product or create a new product

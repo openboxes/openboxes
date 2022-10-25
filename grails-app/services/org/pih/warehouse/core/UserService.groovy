@@ -19,6 +19,7 @@ import org.pih.warehouse.auth.AuthService
 @Transactional
 class UserService {
 
+    def authService
     def dataSource
     GrailsApplication grailsApplication
 
@@ -233,7 +234,7 @@ class UserService {
     }
 
     Boolean canEditUserRoles(User currentUser, User otherUser) {
-        def location = AuthService.currentLocation.get()
+        def location = authService.currentLocation
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
     }
 
@@ -256,12 +257,12 @@ class UserService {
     }
 
     boolean hasRoleFinance() {
-        User user = AuthService.currentUser.get()
+        User user = authService.currentUser
         return hasRoleFinance(user)
     }
 
     void assertCurrentUserHasRoleFinance() {
-        User user = AuthService.currentUser.get()
+        User user = authService.currentUser
         if (!hasRoleFinance(user)) {
             throw new IllegalStateException("User ${user.username} must have ROLE_FINANCE role")
         }
@@ -371,7 +372,7 @@ class UserService {
     }
 
     public def getEffectiveRoles(User user) {
-        def currentLocation = AuthService.currentLocation?.get()
+        def currentLocation = authService.currentLocation
         return user.getEffectiveRoles(currentLocation)
     }
 

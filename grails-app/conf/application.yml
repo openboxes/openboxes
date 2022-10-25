@@ -34,11 +34,6 @@ grails:
             - ~/.grails/openboxes-config.groovy
             - ~/.grails/openboxes.yml
     plugin:
-        sentry:
-            active: false
-            dsn: https://{PUBLIC_KEY}@sentry.io/{PROJECT_ID}
-            logClassName: true
-            logHttpRequest: true
         databasemigration:
             updateOnStart: false
             updateOnStartFileName: changelog.groovy

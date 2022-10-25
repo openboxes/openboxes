@@ -9,10 +9,6 @@ package org.pih.warehouse
  * You must not remove this notice, or any other, from this software.
  **/
 
-import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.User
-
 class SecurityInterceptor {
 
     static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
@@ -29,25 +25,14 @@ class SecurityInterceptor {
 
     void afterView() {
         // Clear out current user after rendering the view
-        AuthService.currentUser.set(null)
-        AuthService.currentLocation.set(null)
+        authService.currentUser = null
+        authService.currentLocation = null
     }
     boolean before() {
 
-        // Set the current user (if there's on in the session)
-        if (session.user) {
-            if (!AuthService.currentUser) {
-                AuthService.currentUser = new ThreadLocal<User>()
-            }
-            AuthService.currentUser.set(User.get(session.user.id))
-        }
-
-        if (session.warehouse) {
-            if (!AuthService.currentLocation) {
-                AuthService.currentLocation = new ThreadLocal<Location>()
-            }
-            AuthService.currentLocation.set(Location.get(session.warehouse.id))
-        }
+        // set user/warehouse, if present, or clear them if not
+        authService.currentUser = session.user ?: null
+        authService.currentLocation = session.warehouse ?: null
 
         // This allows requests for the health monitoring endpoint to pass through without a user
         if (controllerName.equals("api") && actionName.equals("status")) {

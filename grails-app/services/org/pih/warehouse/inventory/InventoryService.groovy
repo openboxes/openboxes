@@ -18,14 +18,12 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
 import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.api.AvailableItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ImporterUtil
-import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
@@ -33,10 +31,10 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.DateUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
+
 import java.sql.Timestamp
 import java.text.NumberFormat
 import java.text.ParseException
@@ -49,8 +47,8 @@ class InventoryService implements ApplicationContextAware {
     def persistenceInterceptor
     GrailsApplication grailsApplication
 
+    def authService
     def dataService
-    def productService
     def identifierService
     def messageService
     def locationService
@@ -1018,7 +1016,7 @@ class InventoryService implements ApplicationContextAware {
      * @return current location from thread local
      */
     Location getCurrentLocation() {
-        def currentLocation = AuthService?.currentLocation?.get()
+        def currentLocation = authService?.currentLocation
         if (!currentLocation?.inventory)
             throw new Exception("Inventory not found")
         return currentLocation

@@ -9,12 +9,41 @@
  **/
 package org.pih.warehouse.auth
 
+import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
+@CompileStatic
+@Transactional(readOnly = true)
 class AuthService {
 
-    static ThreadLocal<User> currentUser = new ThreadLocal<User>()
-    static ThreadLocal<Location> currentLocation = new ThreadLocal<Location>()
+    private static ThreadLocal<User> threadLocalUser
+    private static ThreadLocal<Location> threadLocalLocation
 
+    void setCurrentUser(User user) {
+        if (!threadLocalUser) {
+            threadLocalUser = new ThreadLocal<User>()
+        }
+
+        // misuse get() to prevent javax.persistence.EntityExistsException
+        threadLocalUser.set(user?.id ? User.get(user.id) : null)
+    }
+
+    static User getCurrentUser() {
+        return threadLocalUser?.get()
+    }
+
+    void setCurrentLocation(Location location) {
+        if (!threadLocalLocation) {
+            threadLocalLocation = new ThreadLocal<Location>()
+        }
+
+        // misuse get() to prevent javax.persistence.EntityExistsException
+        threadLocalLocation.set(location?.id ? Location.get(location.id) : null)
+    }
+
+    static Location getCurrentLocation() {
+        return threadLocalLocation?.get()
+    }
 }
