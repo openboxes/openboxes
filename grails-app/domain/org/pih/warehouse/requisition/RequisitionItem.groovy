@@ -21,24 +21,15 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductPackage
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Product
 
 class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
 
     def beforeInsert = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            createdBy = currentUser
-            updatedBy = currentUser
-        }
+        createdBy = AuthService.currentUser
     }
+
     def beforeUpdate = {
-        def currentUser = AuthService.currentUser.get()
-        if (currentUser) {
-            updatedBy = currentUser
-        }
+        updatedBy = AuthService.currentUser
     }
 
     String id

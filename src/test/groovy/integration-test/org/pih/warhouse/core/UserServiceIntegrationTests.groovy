@@ -5,8 +5,6 @@ import org.junit.Ignore
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 
-// import AuthService
-
 import testutils.DbHelper;
 
 @Ignore

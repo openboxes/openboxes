@@ -11,8 +11,8 @@ package org.pih.warehouse.receiving
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import grails.validation.ValidationException
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.api.PartialReceiptContainer
 import org.pih.warehouse.api.PartialReceiptItem
@@ -22,19 +22,19 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
-import grails.util.Holders
 
 @Transactional
 class ReceiptService {
 
+    def authService
     def shipmentService
     def inventoryService
     def locationService
@@ -73,7 +73,7 @@ class ReceiptService {
      * @return
      */
     PartialReceipt getPartialReceiptFromShipment(Shipment shipment) {
-        def currentUser = AuthService.currentUser.get()
+        def currentUser = authService.currentUser
         PartialReceipt partialReceipt = new PartialReceipt()
         partialReceipt.shipment = shipment
         partialReceipt.recipient = currentUser
