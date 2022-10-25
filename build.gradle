@@ -146,7 +146,6 @@ configurations {
 
         // log4j-to-slf4j exposes the same API as log4j 2.x
         exclude group: 'org.apache.logging.log4j', module: 'log4j'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
 
         /*
          * The `asset-pipeline` has moved to com.bertramlabs.plugins.
@@ -362,23 +361,24 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
 
     // security patch
-    compile 'com.google.code.gson:gson:2.8.9'
+    compile 'com.google.code.gson:gson:2.10'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:31.1-jre'
 
     compile 'com.google.zxing:javase:3.5.0'  // barcode support
 
-    testImplementation 'com.icegreen:greenmail:1.6.10'
+    testImplementation 'com.icegreen:greenmail:1.6.11'
 
     // expose com.sun.mail.imap.IMAPStore to MailServiceTests
-    testImplementation 'com.sun.mail:javax.mail:1.5.6'
+    testImplementation 'com.sun.mail:javax.mail:1.6.2'
 
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
     compile 'commons-codec:commons-codec:1.15'
 
-    // FIXME migrate to commons-collections4
+    // FIXME migrate code under our control to commons-collections4
+    implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'commons-collections:commons-collections:3.2.2'
 
     implementation 'commons-fileupload:commons-fileupload:1.4'
@@ -404,7 +404,11 @@ dependencies {
      * FIXME Used in only one place: ApiControllerFunctionalSpec.groovy.
      * FIXME Use apache's httpclient instead.
      */
-    testCompile 'io.micronaut:micronaut-http-client:1.0.0.RC3'
+    testCompile 'io.micronaut:micronaut-http-client:1.2.11'
+
+    implementation "io.sentry:sentry:${sentryVersion}"
+    implementation "io.sentry:sentry-logback:${sentryVersion}"
+    implementation "io.sentry:sentry-servlet:${sentryVersion}"
 
     /*
      * Tomcat provides these libraries out of the box.
@@ -428,6 +432,7 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient'
 
     // log4j2 -> slf4j; cf. log4j-to-slf4j
+    implementation "org.apache.logging.log4j:log4j-api:${slf4jProvidedLog4j2Version}"
     implementation "org.apache.logging.log4j:log4j-to-slf4j:${slf4jProvidedLog4j2Version}"
 
     implementation 'org.apache.poi:poi'
@@ -522,16 +527,6 @@ dependencies {
     // prevent java.lang.ClassNotFoundException for a few classes we don't directly consume
     implementation 'org.grails.plugins:async'
 
-    // FIXME replace with com.google.zxing
-    implementation('org.grails.plugins:barcode4j:0.3') {
-        /*
-         * Old; relocated to `org.apache.avalon.framework`, which we
-         * pull in transitively via `org.apache.xmlgraphics:fop`.
-         */
-        exclude group: 'avalon-framework'
-        exclude group: 'org.apache.ant'  // not needed for gradle builds
-    }
-
     /*
      * Enable userAgentIdentService.isMobile() and <browser:is*> tags.
      *
@@ -609,13 +604,6 @@ dependencies {
     compile 'org.grails.plugins:scaffolding'
 
     /*
-     * FIXME Configure this properly.
-     *
-     * See https://plugins.grails.org/plugin/agorapulse/sentry
-     */
-    compile 'org.grails.plugins:sentry:11.7.25'
-
-    /*
      * These plugins enable grails-app/views/*.gson files. I don't think
      * we use this functionality, but they are included by this command:
      *
@@ -681,8 +669,8 @@ dependencies {
     provided 'org.springframework.boot:spring-boot-starter-tomcat'
 
     // security patch
-    compile 'org.yaml:snakeyaml:1.32'
-    console 'org.yaml:snakeyaml:1.32'
+    compile 'org.yaml:snakeyaml:1.33'
+    console 'org.yaml:snakeyaml:1.33'
 }
 
 /*
