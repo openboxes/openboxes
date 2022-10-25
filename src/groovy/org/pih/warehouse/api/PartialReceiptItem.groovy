@@ -55,7 +55,7 @@ class PartialReceiptItem {
     }
 
     Set<ReceiptItem> getReceiptItemsByStatus(ReceiptStatusCode[] receiptStatusCodes) {
-        def receiptItems = ReceiptItem.findAllByShipmentItem(shipmentItem)
+        def receiptItems = shipmentItem?.receiptItems ?: []
         return receiptItems.findAll { ReceiptItem receiptItem ->
             shipmentItem?.product == receiptItem?.product && receiptItem?.receipt?.receiptStatusCode in receiptStatusCodes
         }
