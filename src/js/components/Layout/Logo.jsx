@@ -4,19 +4,29 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 
-import OpenboxesLogo from 'components/Layout/img/openboxes_logo.jpg';
-
 
 const Logo = ({
   logoUrl,
+  defaultLogoUrl,
 }) => {
-  const [imgSrc, setImgSrc] = useState(null);
+  const [imgSrc, setImgSrc] = useState('');
+  const [defaultLogo, setDefaultLogo] = useState('');
   useEffect(() => {
-    setImgSrc(logoUrl || OpenboxesLogo);
+    if (logoUrl) {
+      setImgSrc(logoUrl);
+    }
   }, [logoUrl]);
 
+  useEffect(() => {
+    if (defaultLogoUrl) {
+      setDefaultLogo(defaultLogoUrl);
+    }
+  }, [defaultLogoUrl]);
+
   const handleError = () => {
-    setImgSrc(OpenboxesLogo);
+    if (defaultLogo) {
+      setImgSrc(defaultLogo);
+    }
   };
   return (
     <div className="d-flex align-items-center logo-wrapper">
@@ -38,6 +48,7 @@ const Logo = ({
 
 const mapStateToProps = state => ({
   logoUrl: state.session.logoUrl,
+  defaultLogoUrl: state.session.defaultLogoUrl,
 });
 
 export default withRouter(connect(mapStateToProps)(Logo));
@@ -45,8 +56,10 @@ export default withRouter(connect(mapStateToProps)(Logo));
 
 Logo.propTypes = {
   logoUrl: PropTypes.string,
+  defaultLogoUrl: PropTypes.string,
 };
 
 Logo.defaultProps = {
-  logoUrl: null,
+  logoUrl: '',
+  defaultLogoUrl: '',
 };
