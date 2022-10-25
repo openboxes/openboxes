@@ -146,7 +146,6 @@ configurations {
 
         // log4j-to-slf4j exposes the same API as log4j 2.x
         exclude group: 'org.apache.logging.log4j', module: 'log4j'
-        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
 
         /*
          * The `asset-pipeline` has moved to com.bertramlabs.plugins.
@@ -378,7 +377,8 @@ dependencies {
 
     compile 'commons-codec:commons-codec:1.15'
 
-    // FIXME migrate to commons-collections4
+    // FIXME migrate code under our control to commons-collections4
+    implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'commons-collections:commons-collections:3.2.2'
 
     implementation 'commons-fileupload:commons-fileupload:1.4'
@@ -406,6 +406,10 @@ dependencies {
      */
     testCompile 'io.micronaut:micronaut-http-client:1.0.0.RC3'
 
+    implementation "io.sentry:sentry:${sentryVersion}"
+    implementation "io.sentry:sentry-logback:${sentryVersion}"
+    implementation "io.sentry:sentry-servlet:${sentryVersion}"
+
     /*
      * Tomcat provides these libraries out of the box.
      * https://tomcat.apache.org/tomcat-8.5-doc/RELEASE-NOTES.txt
@@ -428,6 +432,7 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient'
 
     // log4j2 -> slf4j; cf. log4j-to-slf4j
+    implementation "org.apache.logging.log4j:log4j-api:${slf4jProvidedLog4j2Version}"
     implementation "org.apache.logging.log4j:log4j-to-slf4j:${slf4jProvidedLog4j2Version}"
 
     implementation 'org.apache.poi:poi'
@@ -607,13 +612,6 @@ dependencies {
 
     // enable `static scaffold` declarations
     compile 'org.grails.plugins:scaffolding'
-
-    /*
-     * FIXME Configure this properly.
-     *
-     * See https://plugins.grails.org/plugin/agorapulse/sentry
-     */
-    compile 'org.grails.plugins:sentry:11.7.25'
 
     /*
      * These plugins enable grails-app/views/*.gson files. I don't think

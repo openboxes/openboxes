@@ -1,15 +1,24 @@
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+    <appender name="sentry" class="io.sentry.logback.SentryAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>info</level>
+        </filter>
+        <!--
+           - When we log an error or exception, send recent log entries
+           - at level 'info' or higher to Sentry for additional context.
+          -->
+        <minimumEventLevel>error</minimumEventLevel>
+        <minimumBreadcrumbLevel>info</minimumBreadcrumbLevel>
+    </appender>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
                 %date{ISO8601} %5level [%-10.10thread] %-40.40logger{40}: %message%n%xException
             </pattern>
         </encoder>
     </appender>
-
-    <root level="DEBUG">
-        <appender-ref ref="STDOUT" />
-    </root>
 
     <!-- log levels for software we maintain -->
 
@@ -101,5 +110,10 @@
     <logger name="org.springframework.ui" level="info" />
     <logger name="org.springframework.web" level="info" />
     <logger name="quartz" level="debug" /><!-- use 'info' to hide quartz scheduler notifications -->
+
+    <root level="debug">
+        <appender-ref ref="sentry" />
+        <appender-ref ref="stdout" />
+    </root>
 
 </configuration>

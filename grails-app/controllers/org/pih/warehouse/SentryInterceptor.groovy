@@ -9,42 +9,60 @@
  **/
 package org.pih.warehouse
 
-
 import grails.util.Environment
-import io.sentry.SentryClient
-import io.sentry.event.UserBuilder
+import groovy.transform.CompileStatic
+import io.sentry.Sentry
+import io.sentry.protocol.User as SentryUser
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
+@CompileStatic
 class SentryInterceptor {
-    SentryClient sentryClient
 
-    public SentryInterceptor() {
-        matchAll().except(uri: '/static/**').except(uri: "/info").except(uri: "/health")
+    SentryInterceptor() {
+        matchAll().except(uri: '/static/**').except(uri: '/info').except(uri: '/health')
     }
 
+    @Override
+    /**
+     * Update user/location data for Sentry at each page load.
+     *
+     * This method doesn't actually send any events to Sentry; rather,
+     * it attaches various data to the Sentry global for later use in
+     * case an error or logging event occurs.
+     *
+     * N.B. Sentry also loads some user-agent/url information by itself
+     * from Tomcat (see SentryServletContainerInitializer).
+     */
     boolean before() {
-        if (session.user && sentryClient) {
-            try {
-                def user = User.get(session.user.id)
-                def warehouse = Location.get(session.warehouse.id)
-                def data = [
-                        id         : user?.id,
-                        email      : user?.email,
-                        username   : user?.username,
-                        location   : warehouse?.name,
-                        environment: Environment.current,
-                        timezone   : user?.timezone,
-                        locale     : user?.locale?.toString(),
-                        sessionId  : session?.id
-                ]
-                def userBuilder = new UserBuilder().setData(data)
-                sentryClient.context.setUser(userBuilder.build())
+        def startTime = System.currentTimeMillis()
+        try {
+            String userId = (session.getAttribute('user') as User)?.id
 
-            } catch (Exception e) {
-                log.info("Unable to set the user data for ${request.requestURI} due to the following error: " + e.message)
+            if (userId) {
+                String locationId = (session.getAttribute('warehouse') as Location)?.id
+                User user = User.get(userId)
+                SentryUser sentryUser = new SentryUser()
+                sentryUser.with {
+                    email = user?.email
+                    id = userId
+                    username = user?.username
+                    data = [
+                        environment: Environment.current.name,
+                        locale: user?.locale?.toString() ?: 'unset',
+                        location: Location.get(locationId)?.name ?: 'unset',
+                        locationId: locationId ?: 'unset',
+                        sessionId: session?.id ?: 'unset',
+                        timezone: user.timezone ?: 'unset',
+                    ] as Map<String, String>
+                }
+                Sentry.user = sentryUser
             }
+        } catch (Exception e) {
+            log.warn("Error setting Sentry user data for ${request.requestURI}", e)
         }
+
+        log.debug "updated Sentry context for ${request.requestURI} in ${System.currentTimeMillis() - startTime} ms"
         return true
     }
 }
