@@ -155,7 +155,7 @@ class ApiController {
         String minimumExpirationDate = dateFormat.format(grailsApplication.config.openboxes.expirationDate.minValue)
         def logoLabel = grailsApplication.config.openboxes.logo.label
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
-        def logoUrl = location?.logo ? "/openboxes/location/viewLogo/${session.warehouse?.id}" : null
+        def logoUrl = location?.logo ? "${createLink(controller: 'location', action: 'viewLogo', id: location?.id)}" : grailsApplication.config.openboxes.logo.url
         def locales = grailsApplication.config.openboxes.locale.supportedLocales
         def supportedLocales = locales.collect {
             def name = new Locale(it).getDisplayName()
