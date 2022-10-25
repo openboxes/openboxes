@@ -16,6 +16,9 @@ package org.pih.warehouse
  */
 class UtilInterceptor {
 
+    // run this as early as we can to measure other interceptors' perf. impact
+    int order = HIGHEST_PRECEDENCE
+
     UtilInterceptor() {
         matchAll().except(uri: '/static/**')
     }

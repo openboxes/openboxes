@@ -3,7 +3,7 @@ package org.pih.warehouse.core
 import org.junit.Ignore
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
-import testutils.DbHelper
+import testutils.DbHelper;
 
 @Ignore
 class UserServiceIntegrationTests extends GroovyTestCase{

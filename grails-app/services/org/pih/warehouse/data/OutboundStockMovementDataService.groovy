@@ -17,9 +17,10 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.validation.BeanPropertyBindingResult
-import org.pih.warehouse.auth.AuthService
 
 class OutboundStockMovementDataService {
+
+    def authService
 
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -92,7 +93,7 @@ class OutboundStockMovementDataService {
             }
             requisition.destination = destination
             requisition.requestedDeliveryDate = deliveryDate.toDate()
-            requisition.requestedBy = AuthService.currentUser.get()
+            requisition.requestedBy = authService.currentUser
             requisition.save(failOnError: true)
         }
 
