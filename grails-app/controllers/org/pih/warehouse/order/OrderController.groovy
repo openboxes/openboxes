@@ -999,6 +999,7 @@ class OrderController {
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
+            orderItem.disableRefresh = false
             render (status: 200, text: "Item canceled successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1010,6 +1011,7 @@ class OrderController {
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
+            orderItem.disableRefresh = false
             render(status: 200, text: "Item restored successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1027,6 +1029,7 @@ class OrderController {
         def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user) && !orderAdjustment.hasRegularInvoice
         if(canEdit) {
             orderAdjustment.canceled = true
+            orderAdjustment.disableRefresh = false
             render (status: 200, text: "Adjustment canceled successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1039,6 +1042,7 @@ class OrderController {
         def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user)
         if(canEdit) {
             orderAdjustment.canceled = false
+            orderAdjustment.disableRefresh = false
             render(status: 200, text: "Adjustment restored successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
