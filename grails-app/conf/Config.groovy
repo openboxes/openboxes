@@ -1504,6 +1504,17 @@ openboxes {
                                     [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/create"],
                                     [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
                             ]
+                    ],
+                    [
+                            // DEPRECATED!
+                            label: "receiving.label",
+                            defaultLabel: "Receiving",
+                            enabled: false,
+                            menuItems: [
+                                    [label: "shipping.createIncomingShipment.label", defaultLabel: "Create inbound shipment", href: "/${appName}/createShipmentWorkflow/createShipment?type=INCOMING"],
+                                    [label: "shipping.listIncoming.label", defaultLabel: "List Inbound Shipments", href: "/${appName}/shipment/list?type=incoming"],
+                                    [label: "default.all.label", defaultLabel: "All", href: "/${appName}/shipment/list?type=incoming"],
+                            ]
                     ]
             ]
         }
@@ -1521,6 +1532,17 @@ openboxes {
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
                         [label: "requests.list.label", defaultLabel: "List Requests", href: "/${appName}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
                         [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/${appName}/stockTransfer/createOutboundReturn"]
+                    ]
+                ],
+                [
+                    // DEPRECATED!
+                    label: "shipping.label",
+                    defaultLabel: "Shipping",
+                    enabled: false,
+                    menuItems: [
+                            [label: "shipping.createOutgoingShipment.label", defaultLabel: "Create outbound shipment", href: "/${appName}/createShipmentWorkflow/createShipment?type=OUTGOING"],
+                            [label: "shipping.listOutgoing.label", defaultLabel: "List Outbound Shipments", href: "/${appName}/shipment/list?type=outgoing"],
+                            [label: "default.all.label", defaultLabel: "All", href: "/${appName}/shipment/list?type=outgoing"],
                     ]
                 ]
             ]
@@ -1709,6 +1731,42 @@ openboxes {
             ]
         }
 
+        // deprecated megamenu configuration
+        requisitions {
+            enabled = false
+            label = "requisitions.label"
+            defaultLabel = "Requisitions"
+            subsections = [
+                    [
+                            label: "requisition.list.label",
+                            defaultLabel: "List Requisitions",
+                            menuItems: [
+                                    [label: "requisition.allIncoming.label", defaultLabel: "All", href: "/${appName}/requisition/list"],
+                                    // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
+                            ],
+                    ],
+                    [
+                            label: "requisition.create.subsection.label",
+                            defaultLabel: "Create Requisitions",
+                            menuItems: [
+                                    [label: "requisition.create.stock.label", defaultLabel: "Create stock requisition", href: "/${appName}/requisition/chooseTemplate?type=STOCK"],
+                                    [label: "requisition.create.nonstock.label", defaultLabel: "Create non-stock requisition", href: "/${appName}/requisition/create?type=NON_STOCK"],
+                                    [label: "requisition.create.adhoc.stock.label", defaultLabel: "Create adhoc stock requisition", href: "/${appName}/requisition/create?type=ADHOC"],
+                            ]
+                    ]
+            ]
+        }
+        shipping {
+            enabled = true
+            label = "shipping.label"
+            defaultLabel = "Shipping"
+        }
+        receiving {
+            enabled = true
+            label = "receiving.label"
+            defaultLabel = "Receiving"
+        }
+
         orders {
             enabled = true
             label = "orders.label"
@@ -1730,22 +1788,7 @@ openboxes {
             defaultLabel = "Putaways"
         }
 
-        // deprecated megamenu configuration
-        requisitions {
-            enabled = false
-            label = "requisitions.label"
-            defaultLabel = "Requisitions"
-        }
-        shipping {
-            enabled = false
-            label = "shipping.label"
-            defaultLabel = "Shipping"
-        }
-        receiving {
-            enabled = false
-            label = "receiving.label"
-            defaultLabel = "Receiving"
-        }
+
     }
     requestorMegamenu {
         request {

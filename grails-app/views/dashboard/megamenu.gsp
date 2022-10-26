@@ -19,31 +19,25 @@
 
         <g:if test="${megamenuConfig.analytics.enabled}">
             <g:isUserAdmin>
-                <li class="mm-item" id="analytics">
-                    <a href="javascript:void(0)" class="mm-item-link">
+                <li class="nav-item dropdown d-flex justify-content-center align-items-center" id="analytics">
+                    <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="analytics.label" default="Analytics"/>
                     </a>
-                    <div class="mm-content-base">
-                        <div class="mm-menu-item">
-                            <g:link controller="inventoryBrowser" action="index" class="list">
-                                <warehouse:message code="inventory.browse.label" default="Inventory browser" />
-                                <span class="beta">Beta</span>
-                            </g:link>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-menu-subsections">
+                            <div class="padding-8">
+                                <g:link controller="inventoryBrowser" action="index" class="dropdown-item">
+                                    <warehouse:message code="inventory.browse.label" default="Inventory browser" />
+                                </g:link>
 
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="inventorySnapshot" action="list" class="list">
-                                <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
-                                <span class="beta">Beta</span>
-                            </g:link>
+                                <g:link controller="inventorySnapshot" action="list" class="dropdown-item">
+                                    <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
+                                </g:link>
 
-                        </div>
-                        <div class="mm-menu-item">
-                            <g:link controller="consumption" action="list" class="list">
-                                <warehouse:message code="consumption.report.label" default="Consumption Report" />
-                                <span class="beta">Beta</span>
-                            </g:link>
-
+                                <g:link controller="consumption" action="list" class="dropdown-item">
+                                    <warehouse:message code="consumption.report.label" default="Consumption Report" />
+                                </g:link>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -102,48 +96,41 @@
         <g:if test="${megamenuConfig.requisitions.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
             <g:supports activitiesAny="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
-                <li class="mm-item">
-                    <a href="javascript:void(0)" class="mm-item-link">
+                <li class="nav-item dropdown d-flex justify-content-center align-items-center" id="requisitions">
+                    <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="requests.label"/>
                         <span class="deprecated"
                               onclick="javascript:alert('${g.message(code: "requisition.deprecation.message")}')">
                             <g:message code="default.deprecated.label"/>
                         </span>
                     </a>
-                    <div class="mm-item-content">
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="default.list.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="requisition" action="list" class="list">
+                    <div class="dropdown-menu">
+                        <div class="dropdown-menu-subsections">
+                            <div class="padding-8">
+                                <span class="subsection-title"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'requisitions.label')]" /></span>
+                                <g:link controller="requisition" action="list" class="dropdown-item">
                                     <warehouse:message code="default.all.label" default="All" />
-                                    (${requisitionStatistics["ALL"]?:0})
+                                    (${requisitionStatistics?.ALL ?: 0})
                                 </g:link>
+                                <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
+                                    <g:if test="${requisitionStatistics?.requisitionStatus?.name()>0}">
+                                            <g:link controller="requisition" action="list" params="[status:requisitionStatus]" class="dropdown-item">
+                                                <format:metadata obj="${requisitionStatus}"/>
+                                                (${requisitionStatistics?.requisitionStatus?.name()?:0 })
+                                            </g:link>
+                                    </g:if>
+                                </g:each>
                             </div>
-                            <g:each var="requisitionStatus" in="${RequisitionStatus.list()}">
-                                <g:if test="${requisitionStatistics[requisitionStatus]>0}">
-                                    <div class="mm-menu-item">
-                                        <g:link controller="requisition" action="list" params="[status:requisitionStatus]">
-                                            <format:metadata obj="${requisitionStatus}"/>
-                                            (${requisitionStatistics[requisitionStatus]?:0 })
-                                        </g:link>
-                                    </div>
-                                </g:if>
-                            </g:each>
-                        </div>
-                        <div class="mm-content-section">
-                            <h3><warehouse:message code="default.create.label" args="[warehouse.message(code: 'requisitions.label')]" /></h3>
-                            <div class="mm-menu-item">
-                                <g:link controller="requisition" action="chooseTemplate" class="create" params="[type:'STOCK']">
+
+                            <div class="padding-8">
+                                <span class="subsection-title"><warehouse:message code="default.create.label" args="[warehouse.message(code: 'requisitions.label')]" /></span>
+                                <g:link controller="requisition" action="chooseTemplate" class="create dropdown-item" params="[type:'STOCK']">
                                     <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardStock.label')]" />
                                 </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="requisition" action="create" class="create" params="[type:'NON_STOCK']">
+                                <g:link controller="requisition" action="create" class="create dropdown-item" params="[type:'NON_STOCK']">
                                     <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardNonStock.label')]" />
                                 </g:link>
-                            </div>
-                            <div class="mm-menu-item">
-                                <g:link controller="requisition" action="create" class="create" params="[type:'ADHOC']">
+                                <g:link controller="requisition" action="create" class="create dropdown-item" params="[type:'ADHOC']">
                                     <warehouse:message code="requisition.create.label" args="[warehouse.message(code:'requisitionType.wardAdhoc.label')]" />
                                 </g:link>
                             </div>
@@ -278,37 +265,28 @@
                                     </div>
                                 </g:if>
                             </g:supports>
-                        </div>
-                        <g:if test="${megamenuConfig.receiving.enabled}">
-                            <div class="mm-content-section">
-                                <h3>
-                                    <warehouse:message code="receiving.label" default="Receiving" />
-                                    <span class="deprecated" onclick="javascript:alert('${g.message(code: "receiving.deprecation.message")}')">deprecated</span>
-                                </h3>
-                                <div class="mm-menu-item">
-                                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create">
+                            <g:if test="${megamenuConfig.receiving.enabled}">
+                                <div class="padding-8">
+                                    <span class="subsection-title"><warehouse:message code="receiving.label" default="Receiving" /><span class="deprecated" onclick="javascript:alert('${g.message(code: "receiving.deprecation.message")}')">deprecated</span></span>
+                                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'INCOMING']" class="create dropdown-item">
                                         <warehouse:message code="shipping.createIncomingShipment.label"/>
                                     </g:link>
-                                </div>
-                                <div class="mm-menu-item">
-                                    <g:link controller="shipment" action="list" params="[type: 'incoming']" class="list">
+                                    <g:link controller="shipment" action="list" params="[type: 'incoming']" class="list dropdown-item">
                                         <warehouse:message code="shipping.listIncoming.label"  default="List incoming shipments"/>
                                     </g:link>
-                                </div>
-                                <div class="mm-menu-item">
-                                    <g:link controller="shipment" action="list" params="[type:'incoming']" class="list">
+                                    <g:link controller="shipment" action="list" params="[type:'incoming']" class="list dropdown-item">
                                         <warehouse:message code="default.all.label"/> (${inboundShipmentsTotal})
                                     </g:link>
+                                    <g:each in="${inboundShipmentsCount}" var="statusRow">
+                                        <div class="mm-menu-item">
+                                            <g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
+                                                <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
+                                            </g:link>
+                                        </div>
+                                    </g:each>
                                 </div>
-                                <g:each in="${inboundShipmentsCount}" var="statusRow">
-                                    <div class="mm-menu-item">
-                                        <g:link controller="shipment" action="list" params="[type: 'incoming', status:statusRow.status]" class="shipment-status-${statusRow.status }">
-                                            <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
-                                        </g:link>
-                                    </div>
-                                </g:each>
-                            </div>
-                        </g:if>
+                            </g:if>
+                        </div>
                     </div>
                 </li>
 
@@ -338,37 +316,29 @@
                                     </g:link>
                                 </g:if>
                             </div>
-                        </div>
-                        <g:if test="${megamenuConfig.shipping.enabled}">
-                            <div class="mm-content-section">
-                                <h3>
-                                    <warehouse:message code="shipping.label" default="Shipping" />
-                                    <span class="deprecated" onclick="javascript:alert('${g.message(code: "shipping.deprecation.message")}')">deprecated</span>
-                                </h3>
-                                <div class="mm-menu-item">
-                                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create">
+
+                            <g:if test="${megamenuConfig.shipping.enabled}">
+                                <div class="padding-8">
+                                    <span class="subsection-title"><warehouse:message code="shipping.label" default="Shipping" /><span class="deprecated" onclick="javascript:alert('${g.message(code: "shipping.deprecation.message")}')">deprecated</span></span>
+                                    <g:link controller="createShipmentWorkflow" action="createShipment" params="[type:'OUTGOING']" class="create dropdown-item">
                                         <warehouse:message code="shipping.createOutgoingShipment.label"/>
                                     </g:link>
-                                </div>
-                                <div class="mm-menu-item">
-                                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list dropdown-item">
                                         <warehouse:message code="shipping.listOutgoing.label"  default="List outgoing shipments"/>
                                     </g:link>
-                                </div>
-                                <div class="mm-menu-item">
-                                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list">
+                                    <g:link controller="shipment" action="list" params="[type:'outgoing']" class="list dropdown-item">
                                         <warehouse:message code="default.all.label"/> (${outboundShipmentsTotal})
                                     </g:link>
+                                    <g:each in="${outboundShipmentsCount}" var="statusRow">
+                                        <div class="mm-menu-item">
+                                            <g:link controller="shipment" action="list" params="[status:statusRow.status]" class="shipment-status-${statusRow.status } dropdown-item">
+                                                <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
+                                            </g:link>
+                                        </div>
+                                    </g:each>
                                 </div>
-                                <g:each in="${outboundShipmentsCount}" var="statusRow">
-                                    <div class="mm-menu-item">
-                                        <g:link controller="shipment" action="list" params="[status:statusRow.status]" class="shipment-status-${statusRow.status }">
-                                            <format:metadata obj="${statusRow.status}"/> (${statusRow.count})
-                                        </g:link>
-                                    </div>
-                                </g:each>
-                            </div>
-                        </g:if>
+                            </g:if>
+                        </div>
                     </div>
                 </li>
             </g:supports>
@@ -578,18 +548,20 @@
 
         <g:if test="${megamenuConfig.customLinks.enabled && megamenuConfig.customLinks.menuItems}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-            <li class="mm-item">
-                <a href="javascript:void(0)" class="mm-item-link">
+            <li class="nav-item dropdown d-flex justify-content-center align-items-center" id="customLinks">
+                <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="customLinks.label" default="Custom Links" />
                 </a>
-                <div class="mm-item-content">
-                    <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
-                        <div class="mm-menu-item">
-                            <a href="${item.href}" target="${item.target}">
-                                <warehouse:message code="${item.label}" default="${item.defaultLabel}" />
-                            </a>
+                <div class="dropdown-menu">
+                    <div class="dropdown-menu-subsections">
+                        <div class="padding-8">
+                            <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
+                                    <a href="${item.href}" target="${item.target}" class="dropdown-item">
+                                        <warehouse:message code="${item.label}" default="${item.defaultLabel}" />
+                                    </a>
+                            </g:each>
                         </div>
-                    </g:each>
+                    </div>
                 </div>
             </li>
             </g:isUserInRole>

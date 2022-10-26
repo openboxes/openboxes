@@ -51,6 +51,9 @@ class MegamenuService {
         def builtSubsections = []
         subsections.each {
             def minRole = it.minimumRequiredRole
+            if (it.enabled == false) {
+                return
+            }
             if (minRole && !userService.isUserInRole(user, minRole)) {
                 return
             }
