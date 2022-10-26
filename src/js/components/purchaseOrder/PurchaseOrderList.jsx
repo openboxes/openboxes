@@ -62,9 +62,7 @@ const PurchaseOrderList = (props) => {
       name: props.currentLocation?.name,
       label: props.currentLocation?.name,
     };
-    if (!isCentralPurchasingEnabled) {
-      defaultValues.destination = currentLocationOption;
-    }
+
     if (isCentralPurchasingEnabled) {
       defaultValues.destinationParty = props.buyers
         .find(org => org.id === props.currentLocation.organization.id);
@@ -92,6 +90,8 @@ const PurchaseOrderList = (props) => {
       defaultValues.destination = props.currentLocation.id === queryProps.destination
         ? currentLocationOption
         : await fetchLocationById(queryProps.destination);
+    } else if (!isCentralPurchasingEnabled && queryProps.destination === undefined) {
+      defaultValues.destination = currentLocationOption;
     }
     if (queryProps.destinationParty) {
       defaultValues.destinationParty = props.buyers
