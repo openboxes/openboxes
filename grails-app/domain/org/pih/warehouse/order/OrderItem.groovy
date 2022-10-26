@@ -33,6 +33,14 @@ import java.text.DecimalFormat
 
 class OrderItem implements Serializable, Comparable<OrderItem> {
 
+    def publishRefreshEvent = {
+        if (order?.isPurchaseOrder && !disableRefresh) {
+            publishEvent(new RefreshOrderSummaryEvent(order))
+        }
+    }
+
+    def afterUpdate = publishRefreshEvent
+
     String id
     String description
     Category category
@@ -74,6 +82,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     Date dateCreated
     Date lastUpdated
 
+    Boolean disableRefresh = Boolean.TRUE
+
     static mapping = {
         id generator: 'uuid'
         shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
@@ -100,6 +110,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "hasInvoices",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
+            "disableRefresh",
             // Statuses
             "partiallyFulfilled",
             "completelyFulfilled",
