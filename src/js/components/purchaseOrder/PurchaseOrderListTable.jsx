@@ -44,7 +44,6 @@ const PurchaseOrderListTable = ({
   translate,
   currencyCode,
   currentLocation,
-  buyers,
   allStatuses,
   isUserApprover,
 }) => {
@@ -67,7 +66,6 @@ const PurchaseOrderListTable = ({
     sourceRef.current = CancelToken.source();
     tableRef.current.fireFetchData();
   };
-  const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
 
   useEffect(() => () => {
     if (currentLocation?.id) {
@@ -390,29 +388,6 @@ const PurchaseOrderListTable = ({
     },
   ];
 
-  const destinationParam = () => {
-    if (filterParams.destination === null) {
-      return '';
-    }
-    if (filterParams.destination && filterParams.destination.id) {
-      return filterParams.destination.id;
-    }
-    if (!isCentralPurchasingEnabled) {
-      return currentLocation.id;
-    }
-    return '';
-  };
-
-  const destinationPartyParam = () => {
-    if (filterParams.destinationParty && filterParams.destinationParty.id) {
-      return filterParams.destinationParty.id;
-    }
-    if (isCentralPurchasingEnabled) {
-      return buyers && buyers.find(org => org.id === currentLocation.organization.id)?.id;
-    }
-    return '';
-  };
-
   const onFetchHandler = (state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
@@ -432,13 +407,13 @@ const PurchaseOrderListTable = ({
           offset: `${offset}`,
           max: `${state.pageSize}`,
           ...sortingParams,
-          ..._.omit(filterParams, 'status'),
+          ...filterParams,
           status: statusParam,
           origin: filterParams.origin && filterParams.origin.id,
           orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-          destinationParty: destinationPartyParam(),
+          destinationParty: filterParams.destinationParty?.id,
         }, _.isEmpty),
-        destination: destinationParam(),
+        destination: filterParams.destination?.id,
       };
 
       // Fetch data
@@ -543,12 +518,6 @@ PurchaseOrderListTable.propTypes = {
   translate: PropTypes.func.isRequired,
   currencyCode: PropTypes.string.isRequired,
   currentLocation: PropTypes.shape({}).isRequired,
-  buyers: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    value: PropTypes.string,
-    label: PropTypes.string,
-    variant: PropTypes.string,
-  })).isRequired,
   allStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     value: PropTypes.string,
