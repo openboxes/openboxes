@@ -1506,9 +1506,10 @@ openboxes {
                             ]
                     ],
                     [
+                            // DEPRECATED!
                             label: "receiving.label",
                             defaultLabel: "Receiving",
-                            enabled: false, // DEPRECATED!
+                            enabled: false,
                             menuItems: [
                                     [label: "shipping.createIncomingShipment.label", defaultLabel: "Create inbound shipment", href: "/${appName}/createShipmentWorkflow/createShipment?type=INCOMING"],
                                     [label: "shipping.listIncoming.label", defaultLabel: "List Inbound Shipments", href: "/${appName}/shipment/list?type=incoming"],
@@ -1534,9 +1535,10 @@ openboxes {
                     ]
                 ],
                 [
+                    // DEPRECATED!
                     label: "shipping.label",
                     defaultLabel: "Shipping",
-                    enabled: false, // DEPRECATED!
+                    enabled: false,
                     menuItems: [
                             [label: "shipping.createOutgoingShipment.label", defaultLabel: "Create outbound shipment", href: "/${appName}/createShipmentWorkflow/createShipment?type=OUTGOING"],
                             [label: "shipping.listOutgoing.label", defaultLabel: "List Outbound Shipments", href: "/${appName}/shipment/list?type=outgoing"],
