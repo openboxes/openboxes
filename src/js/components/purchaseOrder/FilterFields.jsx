@@ -109,4 +109,25 @@ export default {
       loadOptions: debouncedUsersFetch,
     }),
   },
+  createdBy: {
+    type: FilterSelectField,
+    attributes: {
+      async: true,
+      openOnClick: false,
+      autoload: false,
+      cache: false,
+      valueKey: 'id',
+      labelKey: 'name',
+      options: [],
+      filterOptions: options => options,
+      filterElement: true,
+      placeholder: 'Created by',
+      showLabelTooltip: true,
+    },
+    getDynamicAttr: ({
+      debouncedUsersFetch,
+    }) => ({
+      loadOptions: debouncedUsersFetch,
+    }),
+  },
 };

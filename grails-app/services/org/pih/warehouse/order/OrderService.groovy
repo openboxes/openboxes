@@ -102,6 +102,9 @@ class OrderService {
                     if (params.orderedBy) {
                         eq("orderedBy.id", params.orderedBy)
                     }
+                    if (params.createdBy) {
+                        eq("createdBy.id", params.createdBy)
+                    }
                 }
 
                 if (params.sort && params.sort != 'status') {

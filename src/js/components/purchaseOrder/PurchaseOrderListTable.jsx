@@ -411,6 +411,7 @@ const PurchaseOrderListTable = ({
           status: statusParam,
           origin: filterParams.origin && filterParams.origin.id,
           orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
+          createdBy: filterParams.createdBy && filterParams.createdBy.id,
           destinationParty: filterParams.destinationParty?.id,
         }, _.isEmpty),
         destination: filterParams.destination?.id,
