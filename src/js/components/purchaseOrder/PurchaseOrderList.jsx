@@ -102,6 +102,11 @@ const PurchaseOrderList = (props) => {
         ? props.currentUser
         : await fetchUserById(queryProps.orderedBy);
     }
+    if (queryProps.createdBy) {
+      defaultValues.createdBy = queryProps.createdBy === props.currentUser.id
+        ? props.currentUser
+        : await fetchUserById(queryProps.createdBy);
+    }
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
@@ -130,6 +135,7 @@ const PurchaseOrderList = (props) => {
       statusEndDate: { name: 'statusEndDate' },
       destinationParty: { name: 'destinationParty', accessor: 'id' },
       orderedBy: { name: 'orderedBy', accessor: 'id' },
+      createdBy: { name: 'createdBy', accessor: 'id' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
