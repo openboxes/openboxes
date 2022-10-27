@@ -14,7 +14,9 @@ CREATE OR REPLACE VIEW order_item_status AS
             order_item.id               AS order_item_id,
             CASE
                 WHEN order_item.order_item_status_code = 'CANCELED' THEN 0
-                ELSE IFNULL(SUM(order_item.quantity), 0)
+                -- Using MAX as an aggregate function. We cannot use SUM on quantity ordered, because on the multiple
+                -- shipment item (split) case, the quantity ordered value would be multiplied by the amount of rows
+                ELSE IFNULL(MAX(order_item.quantity), 0)
             END AS quantity_ordered,
             CASE
                 -- quantity divided by order_item.quantity_per_uom to match other quantities that are in uom
