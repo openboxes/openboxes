@@ -9,6 +9,10 @@
             <div class="location-chooser location-chooser__login">
                 <div class="location-chooser__header">
                     <h2>${warehouse.message(code: 'dashboard.chooseLocation.label')}</h2>
+                    <g:if test="${flash.message}">
+                        <div class="message">${warehouse.message(code:flash.message,default:flash.message)}</div>
+                        <!-- we wrap this in a message tag since we can't call it directly from with the SecurityFilter -->
+                    </g:if>
                 </div>
                 <g:form controller="dashboard" action="chooseLocation">
                     <g:render template="loginLocations"/>
