@@ -143,7 +143,7 @@ class LocationDataService {
             location.inventory = new Inventory(['warehouse': location])
         }
         def locationType = null
-        if ( params.locationType) {
+        if (params.locationType) {
             locationType = LocationType.createCriteria().get {
                 or {
                     eq('name', params.locationType)

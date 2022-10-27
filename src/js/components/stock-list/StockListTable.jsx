@@ -347,6 +347,7 @@ const StockListTable = ({
       Cell: row => (
         <TableCell
           {...row}
+          tooltip
           link={`/openboxes/requisitionTemplate/show/${row.original.id}`}
         />),
     },
