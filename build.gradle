@@ -81,7 +81,6 @@ group 'com.openboxes'
 mainClassName = 'org.pih.warehouse.Application'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-version '0.9.0-SNAPSHOT'
 
 assetCompile {
     dependsOn 'npm_run_bundle'
@@ -708,17 +707,22 @@ buildProperties.doLast {
         }
     }
 
-    properties.setProperty('build.app.version', project.version.toString())
-    properties.setProperty('build.host', InetAddress.localHost.hostName)
-    properties.setProperty('build.java.version', System.getProperty('java.version'))
-    properties.setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
-    properties.setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
-    properties.setProperty('build.username', System.properties['user.name'])
+    properties.with {
+        setProperty('build.host', InetAddress.localHost.hostName)
+        setProperty('build.java.version', System.getProperty('java.version'))
+        setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
+        setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+        setProperty('build.username', System.properties['user.name'])
 
-    if (env.bamboo_buildNumber) {
-        properties.setProperty('build.git.branch', env.bamboo_planRepository_branchDisplayName)
-        properties.setProperty('build.git.revision', env.bamboo_planRepository_revision)
-        properties.setProperty('build.number', env.bamboo_buildNumber)
+        if (env.bamboo_planRepository_branch) {
+            setProperty('build.git.branch.default', env.bamboo_planRepository_branch)
+        }
+        if (env.bamboo_customRevision) {
+            setProperty('build.git.revision.custom', env.bamboo_customRevision)
+        }
+        if (env.bamboo_repository_revision_number) {
+            setProperty('build.git.sha', env.bamboo_repository_revision_number)
+        }
     }
 
     grailsBuildInfoFile.withOutputStream {
