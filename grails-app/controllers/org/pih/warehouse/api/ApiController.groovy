@@ -140,7 +140,7 @@ class ApiController {
         def buildDate = grailsApplication.metadata.getProperty('build.time') ?: messageSource.getMessage('application.realTimeBuild.label', null, locale)
         def branchName = ConfigHelper.getBranchName(gitProperties)
         def grailsVersion = grailsApplication.metadata.getProperty('info.app.grailsVersion')
-        def appVersion = ConfigHelper.getAppVersion()
+        def appVersion = grailsApplication.metadata.getProperty('info.app.version')
         def environment = Environment.current
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"

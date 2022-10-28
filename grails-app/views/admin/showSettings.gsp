@@ -73,7 +73,7 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    ${ConfigHelper.getAppVersion()} &nbsp;
+                                    <g:meta name="info.app.version"/> &nbsp;
                                     <g:if test="${User.get(session?.user?.id)?.roles?.contains(Role.findByRoleType('ROLE_ADMIN'))}">
                                         <g:link controller="admin" action="showUpgrade"><warehouse:message code="application.upgrade.label"/></g:link>
                                     </g:if>
