@@ -70,11 +70,11 @@ const NavbarIcons = ({
             <RiSettings5Line />
           </div>
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            className="dropdown-menu dropdown-menu-wrapper dropdown-menu-right nav-item padding-8"
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
-            <div className="dropdown-menu-subsections conf-subsections">
+            <div className="dropdown-menu-subsections dropdown-menu-content conf-subsections">
               {configurationMenuSubsections
                 .map(subsection =>
                   (<MenuConfigurationSubsection
@@ -100,20 +100,22 @@ const NavbarIcons = ({
             <RiUser3Line />
           </div>
           <div
-            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            className="dropdown-menu dropdown-menu-wrapper dropdown-menu-right nav-item padding-8"
             onMouseEnter={() => renderProps.setIsTooltipDisabled(true)}
             onMouseLeave={() => renderProps.setIsTooltipDisabled(false)}
           >
-            <span className="subsection-title">
-              {username && username} {highestRole && `(${highestRole})`}
-            </span>
-            {menuItems && menuItems.map(item => (
-              <a className="dropdown-item" key={item.label} href={item.linkAction}>
-                <span className="icon">
-                  {findIcon(item.linkReactIcon)}
-                </span> {item.label}
-              </a>
+            <div className="dropdown-menu-content">
+              <span className="subsection-title">
+                {username && username} {highestRole && `(${highestRole})`}
+              </span>
+              {menuItems && menuItems.map(item => (
+                <a className="dropdown-item" key={item.label} href={item.linkAction}>
+                  <span className="icon">
+                    {findIcon(item.linkReactIcon)}
+                  </span> {item.label}
+                </a>
               ))}
+            </div>
           </div>
         </div>
       ),

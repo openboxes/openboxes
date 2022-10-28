@@ -3515,14 +3515,25 @@ table.pvtTable tr th { background-color: #ddd; }
     display: none !important;
 }
 
-.dropdown-menu {
-    margin: 1px 0 0 0 !important;
+.dropdown-menu-wrapper {
+    background: transparent !important;
+    border: none !important;
+    transform: translateX(-4px);
+    padding: 2px 4px 8px;
+    margin: 0 !important;
     overflow-y: hidden;
     overflow-x: hidden;
     position: absolute !important;
+    border: 0 !important;
+}
+.dropdown-menu-wrapper.dropdown-menu-right {
+    transform: translateX(4px);
+}
+
+.dropdown-menu-content {
+    background-color: white;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
-    border: 0 !important;
 }
 
 .dropdown-menu span {

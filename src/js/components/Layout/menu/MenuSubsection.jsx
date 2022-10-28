@@ -8,8 +8,8 @@ const MenuSubsection = ({ section, active }) => (
     <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
     </a>
-    <div className={`dropdown-menu ${section.label === 'Reporting' && 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
-      <div className="dropdown-menu-subsections">
+    <div className={`dropdown-menu dropdown-menu-wrapper ${section.label === 'Reporting' && 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
+      <div className="dropdown-menu-content dropdown-menu-subsections">
         {_.map(section.subsections, (subsection, subsectionKey) => (
           <div className="padding-8" key={subsectionKey}>
             {subsection.label && <span className="subsection-title">{subsection.label}</span>}
