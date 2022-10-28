@@ -173,7 +173,7 @@ const StockMovementInboundTable = ({
   // List of all actions for inbound Stock Movement rows
   const getActions = (row) => {
     const {
-      isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
+      id, isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
     } = row.original;
     const actions = [];
 
@@ -184,6 +184,10 @@ const StockMovementInboundTable = ({
       leftIcon: <RiInformationLine />,
       href: '/openboxes/stockMovement/show',
     };
+    if (isReturn) {
+      showAction.href = `/openboxes/stockMovement/show/${order?.id}`;
+      showAction.appendId = false;
+    }
     actions.push(showAction);
 
     // Edit
@@ -210,7 +214,7 @@ const StockMovementInboundTable = ({
         label: 'react.stockMovement.action.delete.label',
         leftIcon: <RiDeleteBinLine />,
         variant: 'danger',
-        onClick: deleteConfirmAlert,
+        onClick: () => deleteConfirmAlert(isReturn ? order?.id : id),
       };
       actions.push(deleteAction);
     }
@@ -266,21 +270,30 @@ const StockMovementInboundTable = ({
       accessor: 'identifier',
       fixed: 'left',
       minWidth: 100,
-      Cell: row => (
-        <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
+      Cell: (row) => {
+        const { isReturn, id, order } = row.original;
+        const stockMovementId = isReturn ? order?.id : id;
+        return (
+          <TableCell{...row} link={`/openboxes/stockMovement/show/${stockMovementId}`} />);
+      },
     },
     {
       Header: 'Name',
       accessor: 'name',
       minWidth: 250,
       sortable: false,
-      Cell: row => (
-        <TableCell
+      Cell: (row) => {
+        const {
+          isReturn, id, order, description, name,
+        } = row.original;
+        const stockMovementId = isReturn ? order?.id : id;
+        return (<TableCell
           {...row}
           tooltip
-          link={`/openboxes/stockMovement/show/${row.original.id}`}
-          value={row.original.description || row.original.name}
-        />),
+          link={`/openboxes/stockMovement/show/${stockMovementId}`}
+          value={description || name}
+        />);
+      },
     },
     {
       Header: 'Origin',
