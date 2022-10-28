@@ -17,24 +17,32 @@ import org.springframework.boot.info.GitProperties
 class ConfigHelper {
 
     /**
-     * Return the version of the application, as specified in build.gradle.
+     * Figure out the branch name from bamboo env. vars or Spring Boot.
      */
-    static String getAppVersion() {
-        // build.app.version is readable by war files, app.version by local builds
-        return Holders.grailsApplication.metadata.getProperty(
-            'build.app.version',
-            String,
-            Holders.grailsApplication.config.getProperty('app.version')
-        )
-    }
-
     static String getBranchName(GitProperties gitProperties) {
-        // build.git.branch is set by bamboo; gitProperties.branch from git
-        return Holders.grailsApplication.metadata.getProperty(
-            'build.git.branch',
-            String,
-            gitProperties.branch
-        )
+
+        String customRevision = Holders.grailsApplication.metadata.getProperty('build.git.revision.custom')
+        String defaultBranch = Holders.grailsApplication.metadata.getProperty('build.git.branch.default')
+        String sha = Holders.grailsApplication.metadata.getProperty('build.git.sha')
+
+        if (customRevision) {
+            /*
+             * When using bamboo's "Run customized build", defaultBranch
+             * is misleading (it tells us the branch bamboo checks out by
+             * default, not the actual branch used for a customized build).
+             */
+            if (sha?.startsWith(customRevision)) {
+                // get branch info elsewhere, as customRevision is a sha
+                return gitProperties.branch
+            }
+            return customRevision
+        }
+
+        /*
+         * Absent signs of a custom build, get the branch name from bamboo's
+         * default branch name, if present, or Spring Boot's git integration.
+         */
+        return defaultBranch ?: gitProperties.branch
     }
 
     static getContextPath() {

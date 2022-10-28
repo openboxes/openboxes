@@ -1,4 +1,3 @@
-<%@ page import="util.ConfigHelper" %>
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -125,8 +124,8 @@
                             </g:link>
                         </li>
                         <li>
-                            <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${ConfigHelper.getAppVersion()}" target="_blank">
-                                <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${ConfigHelper.getAppVersion()})
+                            <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'info.app.version')}" target="_blank">
+                                <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'info.app.version')})
                             </g:link>
                         </li>
                         <li class="divider"></li>

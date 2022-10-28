@@ -4,7 +4,7 @@
 		&copy; <g:copyrightYear/>
         <a href="https://openboxes.com"><warehouse:message code="default.poweredBy.label" default="Powered by OpenBoxes"/></a> &nbsp;&nbsp; | &nbsp;&nbsp;
         <g:message code="application.grailsVersion.label"/>: &nbsp; <b><g:meta name="info.app.grailsVersion"></g:meta></b> &nbsp;&nbsp; | &nbsp;&nbsp;
-        <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${ConfigHelper.getAppVersion()}">${ConfigHelper.getAppVersion()}</a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
+        <g:message code="application.version.label"/>: &nbsp;<b><a href="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'info.app.version')}"><g:meta name="info.app.version"/></a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
         <g:if test="${gitProperties}">
             <g:message code="application.branchName.label"/>: <b>${ConfigHelper.getBranchName(gitProperties)}</b>&nbsp;&nbsp; | &nbsp;&nbsp;
             <g:message code="application.buildNumber.label"/>: <b><a href="https://github.com/openboxes/openboxes/commit/${gitProperties?.commitId}">${gitProperties?.shortCommitId}</a></b>&nbsp;&nbsp; | &nbsp;&nbsp;
