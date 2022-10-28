@@ -1,5 +1,4 @@
 <%@ page import="org.pih.warehouse.core.Location" %>
-<%@ page import="util.ConfigHelper" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -19,7 +18,7 @@
 			<div class="yui-u first">
 				<h1>Application Status</h1>
 				<ul>
-					<li>App version: ${ConfigHelper.getAppVersion()} /></li>
+					<li>App version: <g:meta name="info.app.version" /></li>
 					<li>Grails version: <g:meta name="info.app.grailsVersion" /></li>
 					<li>JVM version: ${System.getProperty('java.version')}</li>
 					<li>Controllers: ${grailsApplication.controllerClasses.size()}</li>

@@ -1,5 +1,4 @@
 <%@ page defaultCodec="html" %>
-<%@ page import="util.ConfigHelper" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -158,8 +157,8 @@
                                 </g:link>
                             </li>
                             <li>
-                                <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${ConfigHelper.getAppVersion()}" target="_blank">
-                                    <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${ConfigHelper.getAppVersion()})
+                                <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'info.app.version')}" target="_blank">
+                                    <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'info.app.version')})
                                 </g:link>
                             </li>
                             <li class="divider"></li>
