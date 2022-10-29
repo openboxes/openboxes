@@ -152,12 +152,12 @@ class ProductAvailabilityService {
                 pli.binLocation,
                 pli.inventoryItem,
                 sum(pli.quantity)*((count(distinct pli.requisitionItem) + count(distinct pli.orderItem) )/ count(*))
-            FROM Picklist pl
-            INNER JOIN pl.picklistItems pli
-            LEFT JOIN pl.requisition r
-            LEFT JOIN pl.order o
+            FROM PicklistItem pli
+            INNER JOIN pli.picklist pl
             LEFT JOIN pli.requisitionItem ri
+            LEFT JOIN pl.requisition r
             LEFT JOIN pli.orderItem oi
+            LEFT JOIN pl.order o
             LEFT JOIN pli.inventoryItem ii
             LEFT JOIN pli.binLocation l
             LEFT JOIN l.supportedActivities s
@@ -170,7 +170,7 @@ class ProductAvailabilityService {
                 pendingRequisitionStatus    : RequisitionStatus.listPending(),
                 pendingOrderStatus          : OrderStatus.listPending(),
                 product                     : product?.id ?: ''
-        ])
+        ], [readOnly: true])
 
         return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
     }
