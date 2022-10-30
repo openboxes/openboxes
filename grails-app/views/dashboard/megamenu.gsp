@@ -313,6 +313,9 @@
                                     <g:link controller="stockMovement" action="list" params="[direction:'OUTBOUND']" class="dropdown-item">
                                         <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.outbound.label')]"/>
                                     </g:link>
+                                    <g:link controller="stockMovement" action="list" params="[direction:'OUTBOUND', sourceType: 'ELECTRONIC']" class="dropdown-item">
+                                        <warehouse:message code="requests.list.label" />
+                                    </g:link>
                                     <g:link controller="stockTransfer" action="createOutboundReturn" class="dropdown-item">
                                         <warehouse:message code="outboundReturns.create.label" />
                                     </g:link>
