@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
+import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.receiving.Receipt
@@ -52,7 +53,7 @@ class ShipmentItem implements Comparable, Serializable {
     static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
 
     static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
-                         "orderNumber", "orderId", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders",
+                         "orderNumber", "orderId", "purchaseOrders", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders",
                          "unavailableQuantityPicked"]
 
     static mapping = {
@@ -103,6 +104,11 @@ class ShipmentItem implements Comparable, Serializable {
     String getOrderId() {
         def orderNumbers = orderItems?.collect { OrderItem orderItem -> orderItem.order.id }?.unique()
         return orderNumbers ? orderNumbers.first() : ''
+    }
+
+    List<Order> getPurchaseOrders() {
+        def orders = orderItems?.order?.unique()
+        return orders?.findAll { it.isPurchaseOrder}
     }
 
     String getOrderNumber() {

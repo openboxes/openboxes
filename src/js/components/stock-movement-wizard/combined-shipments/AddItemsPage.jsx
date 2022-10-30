@@ -767,7 +767,9 @@ class AddItemsPage extends Component {
   removeItem(itemId) {
     const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
 
+    this.props.showSpinner();
     return apiClient.delete(removeItemsUrl)
+      .then(() => this.props.hideSpinner())
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
