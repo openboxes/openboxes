@@ -18,9 +18,11 @@ import org.pih.warehouse.shipping.Shipment
 class Receipt implements Serializable, Comparable<Receipt> {
 
     def publishRefreshEvent = {
-        shipment?.orders?.each { Order o ->
-            if (o?.isPurchaseOrder) {
-                publishEvent(new RefreshOrderSummaryEvent(o))
+        if (!disableRefresh) {
+            shipment?.orders?.each { Order o ->
+                if (o?.isPurchaseOrder) {
+                    publishEvent(new RefreshOrderSummaryEvent(o))
+                }
             }
         }
     }
@@ -38,6 +40,8 @@ class Receipt implements Serializable, Comparable<Receipt> {
     Date dateCreated
     Date lastUpdated
 
+    Boolean disableRefresh = Boolean.FALSE
+
     static hasOne = [transaction: Transaction]
     static hasMany = [receiptItems: ReceiptItem]
     static belongsTo = [shipment: Shipment]
@@ -46,6 +50,8 @@ class Receipt implements Serializable, Comparable<Receipt> {
         id generator: 'uuid'
         receiptItems cascade: "all-delete-orphan"
     }
+
+    static transients = ["disableRefresh"]
 
     // Constraints
     static constraints = {

@@ -240,6 +240,7 @@ class ReceiptService {
         receipt.expectedDeliveryDate = partialReceipt?.shipment?.expectedDeliveryDate
         receipt.actualDeliveryDate = partialReceipt.dateDelivered
 
+        receipt.disableRefresh = true
         if (receipt.hasErrors() || !receipt.save()) {
             throw new ValidationException("Receipt is invalid", receipt.errors)
         }
