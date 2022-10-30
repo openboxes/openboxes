@@ -8,8 +8,8 @@ const MenuItem = ({ section, active }) => (
     <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
     </a>
-    <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-      <div className="padding-8">
+    <div className="dropdown-menu dropdown-menu-wrapper" aria-labelledby="navbarDropdown">
+      <div className="dropdown-menu-content padding-8">
         {_.map(section.menuItems, (menuItem, menuItemKey) => (
           <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
             {menuItem.label}

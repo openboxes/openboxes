@@ -23,8 +23,8 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="analytics.label" default="Analytics"/>
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <div class="padding-8">
                                 <g:link controller="inventoryBrowser" action="index" class="dropdown-item">
                                     <warehouse:message code="inventory.browse.label" default="Inventory browser" />
@@ -51,8 +51,8 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="inventory.label" />
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <div class="padding-8">
                                 <span class="subsection-title"><warehouse:message code="inventory.browse.label" /></span>
                                 <g:link controller="inventory" action="browse" params="[resetSearch:true]" class="dropdown-item">
@@ -104,8 +104,8 @@
                             <g:message code="default.deprecated.label"/>
                         </span>
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <div class="padding-8">
                                 <span class="subsection-title"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'requisitions.label')]" /></span>
                                 <g:link controller="requisition" action="list" class="dropdown-item">
@@ -147,8 +147,8 @@
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="order.purchasing.label" />
                 </a>
-                <div class="dropdown-menu">
-                    <div class="dropdown-menu-subsections">
+                <div class="dropdown-menu dropdown-menu-wrapper">
+                    <div class="dropdown-menu-subsections dropdown-menu-content">
                         <div class="padding-8">
                             <g:supports activityCode="${ActivityCode.PLACE_ORDER}">
                                     <g:link controller="purchaseOrder" action="index" class="create dropdown-item">
@@ -188,8 +188,8 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="react.invoicing.label" />
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <div class="padding-8">
                                 <g:link controller="invoice" action="index" class="create dropdown-item">
                                     <warehouse:message code="default.create.label" args="[warehouse.message(code:'react.invoice.label')]"/>
@@ -210,13 +210,15 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="default.inbound.label" />
                     </a>
-                    <div class="dropdown-menu">
-                        <g:link controller="stockMovement" action="createRequest" class="dropdown-item">
-                            <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
-                        </g:link>
-                        <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']" class="dropdown-item">
-                            <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
-                        </g:link>
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-content padding-8">
+                            <g:link controller="stockMovement" action="createRequest" class="dropdown-item">
+                                <warehouse:message code="default.create.label" args="[warehouse.message(code: 'stockRequest.label', default: 'Stock Request')]"/>
+                            </g:link>
+                            <g:link controller="stockMovement" action="list" params="[direction:'INBOUND']" class="dropdown-item">
+                                <warehouse:message code="default.list.label" args="[warehouse.message(code: 'stockMovements.inbound.label')]"/>
+                            </g:link>
+                        </div>
                     </div>
                 </li>
             </g:hasHighestRoleAuthenticated>
@@ -229,8 +231,8 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="default.inbound.label" />
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <g:if test="${megamenuConfig.stockMovement.enabled}">
 
                                     <div class="padding-8">
@@ -301,8 +303,8 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="default.outbound.label" />
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <div class="padding-8">
                                 <g:if test="${megamenuConfig.stockMovement.enabled}">
                                     <g:link controller="stockMovement" action="createOutbound" params="[direction:'OUTBOUND']" class="dropdown-item">
@@ -351,8 +353,8 @@
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="report.label" />
                 </a>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-menu-subsections">
+                <div class="dropdown-menu dropdown-menu-wrapper dropdown-menu-right">
+                    <div class="dropdown-menu-subsections dropdown-menu-content">
                         <div class="padding-8">
                             <span class="subsection-title"><warehouse:message code="report.inventoryReports.label" default="Inventory Reports" /></span>
                             <g:link controller="inventory" action="listInStock" class="dropdown-item">
@@ -449,8 +451,8 @@
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="products.label" />
                     </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-menu-subsections">
+                    <div class="dropdown-menu dropdown-menu-wrapper">
+                        <div class="dropdown-menu-subsections dropdown-menu-content">
                             <div class="padding-8">
                                 <g:isUserAdmin>
                                     <g:link controller="product" action="create" class="create dropdown-item">
@@ -527,8 +529,8 @@
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
                 </a>
-                <div class="dropdown-menu">
-                    <div class="dropdown-menu-subsections">
+                <div class="dropdown-menu dropdown-menu-wrapper">
+                    <div class="dropdown-menu-subsections dropdown-menu-content">
                         <div class="padding-8">
                             <g:link controller="requisitionTemplate" action="list" class="dropdown-item">
                                 <warehouse:message code="requisitionTemplates.list.label" default="List stock lists"/>
@@ -552,8 +554,8 @@
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="customLinks.label" default="Custom Links" />
                 </a>
-                <div class="dropdown-menu">
-                    <div class="dropdown-menu-subsections">
+                <div class="dropdown-menu dropdown-menu-wrapper">
+                    <div class="dropdown-menu-subsections dropdown-menu-content">
                         <div class="padding-8">
                             <g:each var="item" in="${megamenuConfig.customLinks.menuItems}">
                                     <a href="${item.href}" target="${item.target}" class="dropdown-item">
