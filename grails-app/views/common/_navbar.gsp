@@ -124,8 +124,8 @@
                             </g:link>
                         </li>
                         <li>
-                            <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'app.version')}" target="_blank">
-                                <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'app.version')})
+                            <g:link url="https://github.com/openboxes/openboxes/releases/tag/v${g.meta(name:'info.app.version')}" target="_blank">
+                                <warehouse:message code="docs.releaseNotes.label" default="Release Notes"/> (${g.meta(name:'info.app.version')})
                             </g:link>
                         </li>
                         <li class="divider"></li>

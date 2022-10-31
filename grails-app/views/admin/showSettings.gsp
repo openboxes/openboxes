@@ -1,6 +1,7 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.core.User" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
+<%@ page import="util.ConfigHelper" %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -72,7 +73,7 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:meta name="app.version"/> &nbsp;
+                                    <g:meta name="info.app.version"/> &nbsp;
                                     <g:if test="${User.get(session?.user?.id)?.roles?.contains(Role.findByRoleType('ROLE_ADMIN'))}">
                                         <g:link controller="admin" action="showUpgrade"><warehouse:message code="application.upgrade.label"/></g:link>
                                     </g:if>
@@ -85,7 +86,7 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:meta name="app.buildNumber"/>
+                                    ${gitProperties.shortCommitId}
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -95,17 +96,17 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:meta name="app.buildDate"/>
+                                    ${g.meta(name: "build.time") ?: warehouse.message(code: "application.realTimeBuild.label")}
                                 </td>
                             </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label>
-                                        <warehouse:message code="application.revisionNumber.label"/>
+                                        <warehouse:message code="application.branchName.label"/>
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:meta name="app.revisionNumber"/>
+                                    ${ConfigHelper.getBranchName(gitProperties)}
                                 </td>
                             </tr>
                             <tr class="prop">
@@ -115,7 +116,7 @@
                                     </label>
                                 </td>
                                 <td class="value">
-                                    <g:meta name="app.grails.version"></g:meta>
+                                    <g:meta name="info.app.grailsVersion"></g:meta>
                                 </td>
                             </tr>
                             <tr class="prop">

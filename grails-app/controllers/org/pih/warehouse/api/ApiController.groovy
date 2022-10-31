@@ -20,6 +20,8 @@ import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionType
+import org.springframework.boot.info.GitProperties
+import util.ConfigHelper
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -33,6 +35,7 @@ class ApiController {
     GrailsApplication grailsApplication
     def megamenuService
     def messageSource
+    GitProperties gitProperties
 
     def login() {
         def username = request.JSON.username
@@ -133,11 +136,11 @@ class ApiController {
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         def supportedActivities = location.supportedActivities ?: location.locationType.supportedActivities
         boolean isImpersonated = session.impersonateUserId ? true : false
-        def buildNumber = grailsApplication.metadata.getProperty('app.revisionNumber')?:''
-        def buildDate = grailsApplication.metadata.getProperty('app.buildDate')?:''
-        def branchName = grailsApplication.metadata.getProperty('app.branchName')?:''
-        def grailsVersion = grailsApplication.metadata.getProperty('app.grails.version')?:''
-        def appVersion = grailsApplication.metadata.getProperty('app.version')?:''
+        def buildNumber = gitProperties.shortCommitId
+        def buildDate = grailsApplication.metadata.getProperty('build.time') ?: messageSource.getMessage('application.realTimeBuild.label', null, locale)
+        def branchName = ConfigHelper.getBranchName(gitProperties)
+        def grailsVersion = grailsApplication.metadata.getProperty('info.app.grailsVersion')
+        def appVersion = grailsApplication.metadata.getProperty('info.app.version')
         def environment = Environment.current
         def ipAddress = request?.getRemoteAddr()
         def hostname = session.hostname ?: "Unknown"

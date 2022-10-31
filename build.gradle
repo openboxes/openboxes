@@ -81,7 +81,6 @@ group 'com.openboxes'
 mainClassName = 'org.pih.warehouse.Application'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-version '0.9.0-SNAPSHOT'
 
 assetCompile {
     dependsOn 'npm_run_bundle'
@@ -306,6 +305,13 @@ dependencyCheck {
     skipTestGroups = true
 }
 
+manifest {
+    attributes(
+        'Main-Class': project.mainClassName,
+        'Implementation-Version': project.version.toString()
+    )
+}
+
 node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
@@ -334,6 +340,7 @@ sourceSets {
 }
 
 springBoot {
+    buildInfo()
     mainClass = 'org.pih.warehouse.Application'
 }
 
@@ -551,6 +558,9 @@ dependencies {
     // FIXME use commons-csv instead
     implementation 'org.grails.plugins:excel-import:3.0.2'
 
+    // load config via files listed in application.yml::grails.config.locations
+    implementation 'org.grails.plugins:external-config:1.4.0'
+
     // enable `import geb.*`
     testCompile 'org.grails.plugins:geb'
 
@@ -676,32 +686,43 @@ dependencies {
 }
 
 /*
- * Update `.../META-INF/grails.build.info` after any successful build.
+ * Create a grails.build.info file after every successful build, whose
+ * contents can be retrieved via <g:meta name='property.name' /> or
+ * grailsApplication.metadata.getProperty('property.name').
+ *
+ * https://grails.org/blog/2017-04-02.html
  */
 buildProperties.doLast {
     File grailsBuildInfoFile = it.outputs.files.files.find {
         it.name == 'grails.build.info'
     }
-    if (!grailsBuildInfoFile) {
-        return  // nothing to do
-    }
 
     Map<String, String> env = System.getenv()
     Properties properties = new Properties()
-    grailsBuildInfoFile.withInputStream {
-        properties.load(it)
+
+    // load any information created by the build itself
+    if (grailsBuildInfoFile?.canRead()) {
+        grailsBuildInfoFile?.withInputStream {
+            properties.load(it)
+        }
     }
 
-    properties.setProperty('build.host', InetAddress.localHost.hostName)
-    properties.setProperty('build.java.version', System.getProperty('java.version'))
-    properties.setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
-    properties.setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
-    properties.setProperty('build.username', System.properties['user.name'])
+    properties.with {
+        setProperty('build.host', InetAddress.localHost.hostName)
+        setProperty('build.java.version', System.getProperty('java.version'))
+        setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
+        setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+        setProperty('build.username', System.properties['user.name'])
 
-    if (env.bamboo_buildNumber) {
-        properties.setProperty('build.git.branch', env.bamboo_planRepository_branch)
-        properties.setProperty('build.git.revision', env.bamboo_planRepository_revision)
-        properties.setProperty('build.number', env.bamboo_buildNumber)
+        if (env.bamboo_planRepository_branch) {
+            setProperty('build.git.branch.default', env.bamboo_planRepository_branch)
+        }
+        if (env.bamboo_customRevision) {
+            setProperty('build.git.revision.custom', env.bamboo_customRevision)
+        }
+        if (env.bamboo_repository_revision_number) {
+            setProperty('build.git.sha', env.bamboo_repository_revision_number)
+        }
     }
 
     grailsBuildInfoFile.withOutputStream {
