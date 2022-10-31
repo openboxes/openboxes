@@ -96,6 +96,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityRemaining",
             "quantityReceived",
             "quantityReceivedInStandardUom",
+            "quantityCanceled",
+            "quantityCanceledInStandardUom",
             "quantityShipped",
             "quantityShippedInStandardUom",
             "quantityInShipments",
@@ -211,12 +213,22 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         }?:0
     }
 
+    Integer getQuantityCanceledInStandardUom() {
+        return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantityCanceled
+        }?:0
+    }
+
     Integer getQuantityShipped() {
         return quantityShippedInStandardUom / quantityPerUom
     }
 
     Integer getQuantityReceived() {
         return quantityReceivedInStandardUom / quantityPerUom
+    }
+
+    Integer getQuantityCanceled() {
+        return quantityCanceledInStandardUom / quantityPerUom
     }
 
     Integer getQuantityInShipments() {
@@ -255,7 +267,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Boolean isCompletelyReceived() {
-        return quantityReceived >= quantity
+        return (quantityReceived + quantityCanceled) >= quantity
     }
 
     Boolean isCompletelyInvoiced() {
