@@ -26,7 +26,7 @@ class ProductAssociation {
     String id
     ProductAssociationTypeCode code
     Product associatedProduct
-    BigDecimal quantity = 0
+    BigDecimal quantity = 1
     String comments
 
     ProductAssociation mutualAssociation
@@ -55,7 +55,7 @@ class ProductAssociation {
             "Product Name"           : "product.name",
             "Associated Product Code": "associatedProduct.productCode",
             "Associated Product Name": "associatedProduct.name",
-            "Quantity"               : "quantity",
+            "Conversion"             : "quantity",
             "Comments"               : "comments",
             "Date created"           : "dateCreated",
             "Last updated"           : "lastUpdated"
