@@ -361,17 +361,17 @@ dependencies {
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
 
     // security patch
-    compile 'com.google.code.gson:gson:2.8.9'
+    compile 'com.google.code.gson:gson:2.10'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:31.1-jre'
 
     compile 'com.google.zxing:javase:3.5.0'  // barcode support
 
-    testImplementation 'com.icegreen:greenmail:1.6.10'
+    testImplementation 'com.icegreen:greenmail:1.6.11'
 
     // expose com.sun.mail.imap.IMAPStore to MailServiceTests
-    testImplementation 'com.sun.mail:javax.mail:1.5.6'
+    testImplementation 'com.sun.mail:javax.mail:1.6.2'
 
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
@@ -404,7 +404,7 @@ dependencies {
      * FIXME Used in only one place: ApiControllerFunctionalSpec.groovy.
      * FIXME Use apache's httpclient instead.
      */
-    testCompile 'io.micronaut:micronaut-http-client:1.0.0.RC3'
+    testCompile 'io.micronaut:micronaut-http-client:1.2.11'
 
     implementation "io.sentry:sentry:${sentryVersion}"
     implementation "io.sentry:sentry-logback:${sentryVersion}"
@@ -526,16 +526,6 @@ dependencies {
 
     // prevent java.lang.ClassNotFoundException for a few classes we don't directly consume
     implementation 'org.grails.plugins:async'
-
-    // FIXME replace with com.google.zxing
-    implementation('org.grails.plugins:barcode4j:0.3') {
-        /*
-         * Old; relocated to `org.apache.avalon.framework`, which we
-         * pull in transitively via `org.apache.xmlgraphics:fop`.
-         */
-        exclude group: 'avalon-framework'
-        exclude group: 'org.apache.ant'  // not needed for gradle builds
-    }
 
     /*
      * Enable userAgentIdentService.isMobile() and <browser:is*> tags.
@@ -679,8 +669,8 @@ dependencies {
     provided 'org.springframework.boot:spring-boot-starter-tomcat'
 
     // security patch
-    compile 'org.yaml:snakeyaml:1.32'
-    console 'org.yaml:snakeyaml:1.32'
+    compile 'org.yaml:snakeyaml:1.33'
+    console 'org.yaml:snakeyaml:1.33'
 }
 
 /*
