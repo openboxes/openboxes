@@ -21,11 +21,8 @@ class LoggingInterceptor {
 
     boolean before() {
         try {
-            def sessionId = session?.id
-            def userId = session?.user?.username
-            def serverUrl = Holders.grailsApplication.config.grails.serverURL
             MDC.put('sessionId', session?.id ?: "No session ID")
-            MDC.put('username', userId ?: "No user")
+            MDC.put('username', session?.user?.username ?: "No user")
             MDC.put('location', session?.warehouse?.name ?: "No location")
             MDC.put('locale', session?.user?.locale?.toString() ?: "No locale")
             MDC.put('ipAddress', request?.remoteAddr ?: "No IP address")

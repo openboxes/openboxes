@@ -13,11 +13,17 @@ import grails.util.Environment
 import groovy.transform.CompileStatic
 import io.sentry.Sentry
 import io.sentry.protocol.User as SentryUser
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 
 @CompileStatic
 class SentryInterceptor {
+
+    // this interceptor depends on SecurityInterceptor setting user/location
+    int order = LOWEST_PRECEDENCE
+
+    AuthService authService
 
     SentryInterceptor() {
         matchAll().except(uri: '/static/**').except(uri: '/info').except(uri: '/health')
@@ -37,27 +43,24 @@ class SentryInterceptor {
     boolean before() {
         def startTime = System.currentTimeMillis()
         try {
-            String userId = (session.getAttribute('user') as User)?.id
-
-            if (userId) {
-                String locationId = (session.getAttribute('warehouse') as Location)?.id
-                User user = User.get(userId)
-                SentryUser sentryUser = new SentryUser()
-                sentryUser.with {
-                    email = user?.email
-                    id = userId
-                    username = user?.username
-                    data = [
-                        environment: Environment.current.name,
-                        locale: user?.locale?.toString() ?: 'unset',
-                        location: Location.get(locationId)?.name ?: 'unset',
-                        locationId: locationId ?: 'unset',
-                        sessionId: session?.id ?: 'unset',
-                        timezone: user.timezone ?: 'unset',
-                    ] as Map<String, String>
-                }
-                Sentry.user = sentryUser
+            User user = authService.currentUser
+            Location location = authService.currentLocation
+            SentryUser sentryUser = new SentryUser()
+            sentryUser.with {
+                email = user?.email ?: 'unset'
+                id = user?.id ?: 'unset'
+                username = user?.username ?: 'unset'
+                data = [
+                    environment: Environment.current.name,
+                    locale: user?.locale?.toString() ?: 'unset',
+                    location: location?.name ?: 'unset',
+                    locationId: location?.id ?: 'unset',
+                    sessionId: session?.id ?: 'unset',
+                    timezone: user?.timezone ?: 'unset',
+                ] as Map<String, String>
             }
+            Sentry.user = sentryUser
+
         } catch (Exception e) {
             log.warn("Error setting Sentry user data for ${request.requestURI}", e)
         }

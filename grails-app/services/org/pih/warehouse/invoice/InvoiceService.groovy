@@ -10,7 +10,6 @@
 package org.pih.warehouse.invoice
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.order.Order
@@ -26,6 +25,7 @@ import org.joda.time.LocalDate
 @Transactional
 class InvoiceService {
 
+    def authService
     def identifierService
 
     def getInvoices(Invoice invoiceTemplate, Map params) {
@@ -75,7 +75,7 @@ class InvoiceService {
             return []
         }
 
-        def currentLocation = AuthService?.currentLocation?.get()
+        def currentLocation = authService.currentLocation
         List<InvoiceItemCandidate> invoiceItemCandidates = InvoiceItemCandidate.createCriteria()
             .list() {
                 if (invoice.party) {
@@ -109,7 +109,7 @@ class InvoiceService {
             return []
         }
 
-        def currentLocation = AuthService?.currentLocation?.get()
+        def currentLocation = authService.currentLocation
         List<InvoiceItemCandidate> invoiceItemCandidates = InvoiceItemCandidate.createCriteria()
             .list() {
                 projections {
