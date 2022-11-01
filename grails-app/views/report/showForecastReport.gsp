@@ -97,7 +97,7 @@
                         </div>
                         <div class="buttons">
                             <button class="download-button button" name="button" params="[print:true]>
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                                <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />
                                 <g:set var="dataLabel" value="${g.message(code:'', default: '')}"/>
                                 ${g.message(code: 'default.download.label', args: [dataLabel])}
                             </button>

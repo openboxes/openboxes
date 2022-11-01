@@ -52,7 +52,7 @@
                         <td>
                             <g:remoteLink controller="product" action="deleteProductComponent" id="${productComponent.id }" class="button"
                                           update="productComponents" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'delete.png')}" />&nbsp;
                                 <warehouse:message code="default.button.delete.label" args="[warehouse.message(code:'package.label')]"/>
                             </g:remoteLink>
                         </td>
@@ -91,7 +91,7 @@
                         <td></td>
                         <td>
                             <button  class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'add.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.button.add.label')}
                             </button>
                         </td>

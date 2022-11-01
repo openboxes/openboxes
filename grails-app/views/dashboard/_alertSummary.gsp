@@ -7,7 +7,7 @@
     			<tbody>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${resource(dir:'images/icons/silk/exclamation.png')}" class="middle"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'exclamation.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listOutOfStock">
@@ -15,13 +15,13 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="outOfStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="outOfStockCount"><img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${resource(dir:'images/icons/silk/error.png')}" class="middle"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'error.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listLowStock">
@@ -29,13 +29,13 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="lowStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="lowStockCount"><img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
 
 					<tr>
 						<td class="center" style="width: 1%">
-                            <img src="${resource(dir:'images/icons/silk/creditcards.png')}" class="middle"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'creditcards.png')}" class="middle"/>
 						</td>
 						<td>
                             <g:link controller="inventory" action="listReorderStock">
@@ -43,12 +43,12 @@
 							</g:link>
 						</td>
 						<td class="right">
-							<div id="reorderStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
+							<div id="reorderStockCount"><img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/></div>
 						</td>
 					</tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${resource(dir:'images/icons/silk/package.png')}" class="middle"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'package.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listOverStock">
@@ -56,12 +56,12 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="overStockCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="overStockCount"><img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/></div>
                         </td>
                     </tr>
                     <tr>
                         <td class="center" style="width: 1%">
-                            <img src="${resource(dir:'images/icons/silk/box.png')}" class="middle"/>
+                            <img src="${resource(dir: 'images/icons/silk', file: 'box.png')}" class="middle"/>
                         </td>
                         <td>
                             <g:link controller="inventory" action="listQuantityOnHandZero">
@@ -69,7 +69,7 @@
                             </g:link>
                         </td>
                         <td class="right">
-                            <div id="onHandQuantityZeroCount"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
+                            <div id="onHandQuantityZeroCount"><img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/></div>
 
                         </td>
                     </tr>

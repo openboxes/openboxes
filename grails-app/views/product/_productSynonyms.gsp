@@ -49,7 +49,7 @@
                             <g:remoteLink controller="product" action="deleteSynonym" update="synonyms" class="button"
                                           onError="alert('An error occurred while trying to delete this synonym.  Please refresh the page and try again.');"
                                           id="${synonym.id}" params="[productId:productInstance.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'delete.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.button.delete.label')}
                             </g:remoteLink>
                         </td>
@@ -98,8 +98,8 @@
                                     class="medium text"
                                     placeholder="${g.message(code: 'synonym.typeSynonym.placeholder.label', default: 'Type the synonym here')}"
                                 />
-                                <button class="button">
-                                    <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                <button  class="button">
+                                    <img src="${resource(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
                                     ${warehouse.message(code:'default.button.add.label')}
                                 </button>
                             </div>
@@ -113,7 +113,7 @@
                                action="exportSynonymTemplate"
                                params="[productCode: productInstance.productCode]"
                            >
-                               <img src="${createLinkTo(dir:'images/icons/silk',file: 'page_excel.png')}" />&nbsp;
+                               <img src="${resource(dir:'images/icons/silk',file: 'page_excel.png')}" />&nbsp;
                                 <g:message
                                     code="default.download.label"
                                     args="[ g.message(code: 'default.template.label', 'Template') ]"
@@ -121,7 +121,7 @@
                            </g:link>
                            <g:uploadForm controller="product" action="importProductSynonyms">
                                <button class="button" type="submit">
-                                   <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                   <img src="${resource(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
                                    <g:message
                                        code="default.import.label"
                                        args="[ g.message(code: 'default.template.label', 'Template') ]"

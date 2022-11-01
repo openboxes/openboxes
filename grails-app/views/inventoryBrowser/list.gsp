@@ -92,7 +92,7 @@
             },
 
             "oLanguage": {
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner-large.gif' /><br/>Loading..."
+                "sProcessing": "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner-large.gif')}\" /><br/>Loading..."
             },
             "iDisplayLength" : 10,
             "aLengthMenu": [

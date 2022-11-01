@@ -364,7 +364,7 @@
 				buttonImageOnly: true,
 				changeMonth: true,
 				changeYear: true,
-				buttonImage: '${request.contextPath }/images/icons/silk/calendar.png'
+				buttonImage: "${resource(dir: 'images/icons/silk', file: 'calendar.png')}"
 			});
 		});
 
@@ -456,7 +456,7 @@
 	<td class="nowrap">
         <style>
             .expirationDate {
-                background-image: url('${request.contextPath }/images/icons/silk/calendar.png');
+                background-image: url("${resource(dir: 'images/icons/silk', file: 'calendar.png')}");
                 background-repeat: no-repeat;
                 background-position: center right;
 

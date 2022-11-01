@@ -5,7 +5,7 @@
             <tr>
                 <td>
                     <button class="download-button button">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />
                         <warehouse:message code="default.button.download.label"/>
                     </button>
                 </td>
@@ -82,7 +82,7 @@
       },
       "oLanguage": {
         "sZeroRecords": "No records found",
-        "sProcessing": "Loading ... <img alt='spinner' src='${request.contextPath}/images/spinner.gif' />"
+        "sProcessing": "Loading ... <img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" />"
       },
       "aLengthMenu": [
         [5, 10, 25, 100],

@@ -7,7 +7,7 @@
         <meta name="layout" content="custom" />
         <g:set var="entityName" value="${warehouse.message(code: 'order.label', default: 'Order').toLowerCase()}" />
         <title><warehouse:message code="default.view.label" args="[entityName]" /></title>
-        <link rel="stylesheet" href="${createLinkTo(dir: 'css', file: 'badge.css')}" type="text/css" />
+        <link rel="stylesheet" href="${resource(dir: 'css', file: 'badge.css')}" type="text/css" />
 
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
         <style>
