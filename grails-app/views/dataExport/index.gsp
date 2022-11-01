@@ -29,10 +29,10 @@
                             </td>
                             <td class="right">
                                 <g:link controller="dataExport" action="render" id="${document.id}" params="[format:'csv']" class="button">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" class="middle"/>&nbsp; CSV
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" class="middle"/>&nbsp; CSV
                                 </g:link>
                                 <g:link controller="dataExport" action="render" id="${document.id}" params="[format:'json']" class="button">
-                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_code.png')}" class="middle"/>&nbsp; JSON
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_code.png')}" class="middle"/>&nbsp; JSON
                                 </g:link>
                             </td>
                         </tr>

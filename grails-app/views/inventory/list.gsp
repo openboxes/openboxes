@@ -221,7 +221,7 @@
                     " ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
                   "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
                   "sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
-                  "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
+                  "sProcessing": "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
                   "sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
                     "_MAX_" +
                     " ${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"

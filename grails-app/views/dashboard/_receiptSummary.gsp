@@ -38,7 +38,7 @@
 	    			<tbody>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${resource(dir:'images/icons/silk/lorry_flatbed.png')}" class="middle"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'lorry_flatbed.png')}" class="middle"/>
 							</td>
 							<td>
 								<g:link controller="shipment" action="list" params="['type':'incoming','status':pending]">
@@ -53,7 +53,7 @@
 						</tr>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${resource(dir:'images/icons/silk/lorry_go.png')}" class="middle"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'lorry_go.png')}" class="middle"/>
 							</td>
 							<td>
 								<g:link controller="shipment" action="list" params="['type':'incoming','status':shipped]">
@@ -68,7 +68,7 @@
 						</tr>
 						<tr>
 							<td class="center" style="width: 1%">
-								<img src="${resource(dir:'images/icons/silk/lorry_stop.png')}" class="middle"/>
+								<img src="${resource(dir: 'images/icons/silk', file: 'lorry_stop.png')}" class="middle"/>
 							</td>
 
 							<td>

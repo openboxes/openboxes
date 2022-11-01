@@ -34,7 +34,7 @@
                     ${warehouse.message(code:'report.cycleCountReport.label')}
                     <div class="download right center">
                         <g:link controller="report" action="showCycleCountReport" params="[print:true]" class="button">
-                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_excel.png')}" />
+                            <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />
                             ${warehouse.message(code: 'default.button.download.label')}
                         </g:link>
                     </div>

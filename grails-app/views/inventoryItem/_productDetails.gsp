@@ -61,7 +61,7 @@
                         <label><warehouse:message code="forecasting.demand.label"/></label>
                     </td>
                     <td class="value" id="demand">
-                        <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
+                        <img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/>
                          <g:message code="default.month.perMonth.label" default="per month" />
                     </td>
                 </tr>
@@ -70,7 +70,7 @@
                         <label><warehouse:message code="forecasting.onHandMonths.label"/></label>
                     </td>
                     <td class="value" id="onHandMonths">
-                        <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
+                        <img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/>
                         ${g.message(code: "default.time.unit.months.label", default: "Months").toLowerCase()}
                     </td>
                 </tr>
@@ -79,7 +79,7 @@
                         <label><warehouse:message code="forecasting.stockoutDays.label" default="Stockout Days (last 30 days)"/></label>
                     </td>
                     <td class="value" id="stockoutDays">
-                        <img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/>
+                        <img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/>
                         <g:message code="default.days.label" default="Days" />
                     </td>
                 </tr>
@@ -411,5 +411,3 @@
 
     });
 </script>
-
-

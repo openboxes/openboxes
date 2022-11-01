@@ -37,7 +37,7 @@
                         <td>
                             <g:remoteLink action="removeFromProductCatalog" id="${productInstance.id}" params="['productCatalog.id':productCatalog.id]"
                                           class="button" update="productCatalogs">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'delete.png')}" alt="View" />
+                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" alt="View" />
                                 <g:message code="default.button.delete.label"/>
                             </g:remoteLink>
                         </td>
@@ -64,7 +64,7 @@
                         </td>
                         <td>
                             <button class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}" />
+                                <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />
                                 ${warehouse.message(code:'default.button.add.label')}
                             </button>
                         </td>

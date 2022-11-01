@@ -35,12 +35,12 @@
                         </td>
                         <td class="middle">
                             <g:link controller="productGroup" action="edit" id="${productGroup.id}" class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'pencil.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'pencil.png')}" />&nbsp;
                                 <warehouse:message code="default.button.edit.label"/>
                             </g:link>
                             <g:remoteLink controller="product" action="removeFromProductGroups" update="productGroups" class="button"
                                           id="${productGroup.id}" params="[productId:productInstance.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'link_break.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'link_break.png')}" />&nbsp;
                                 <warehouse:message code="default.button.unlink.label" default="Unlink"/>
                             </g:remoteLink>
                         </td>
@@ -67,7 +67,7 @@
                                                  placeholder="${warehouse.message(code:'product.addProductGroup.label', default: 'Enter product group name')}"/>
 
                             <button  class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'add.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.button.add.label')}
                             </button>
                         </g:formRemote>

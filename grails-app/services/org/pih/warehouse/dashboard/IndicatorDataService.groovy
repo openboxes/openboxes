@@ -2,20 +2,21 @@ package org.pih.warehouse.dashboard
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.joda.time.LocalDate
+import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.receiving.ReceiptItem
-import org.pih.warehouse.inventory.InventorySnapshot
-import org.pih.warehouse.inventory.TransactionCode
-import org.pih.warehouse.core.Location
-import org.joda.time.LocalDate
-import org.pih.warehouse.LocalizationUtil
 
 @Transactional
 class IndicatorDataService {
@@ -704,10 +705,12 @@ class IndicatorDataService {
         return graphData;
     }
 
-    GraphData getDelayedShipments(Location location, String contextPath) {
+    GraphData getDelayedShipments(Location location) {
         Date oneWeekAgo = LocalDate.now().minusWeeks(1).toDate()
         Date oneMonthAgo = LocalDate.now().minusMonths(1).toDate()
         Date twoMonthsAgo = LocalDate.now().minusMonths(2).toDate()
+
+        ApplicationTagLib g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
 
         def results = Shipment.executeQuery("""
             select s.shipmentType.id, s.shipmentType.name, s.shipmentNumber, s.name, s.id
@@ -739,7 +742,7 @@ class IndicatorDataService {
             else numberDelayed['landAndSuitcase'] += 1
             def shipmentType = LocalizationUtil.getLocalizedString(it[1], new Locale("en"))
 
-            TableData tableData = new TableData(it[2], it[3], null, '/stockMovement/show/' + it[4], "${contextPath}/static/images/icons/shipmentType/ShipmentType" + shipmentType + '.png')
+            TableData tableData = new TableData(it[2], it[3], null, '/stockMovement/show/' + it[4], g.resource(dir: 'images/icons/shipmentType', file: "ShipmentType${shipmentType}.png"))
             return tableData
         }
 
