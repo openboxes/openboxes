@@ -12,7 +12,7 @@
 		
 		/* Autocomplete */
 		.autocomplete {
-			background-image: url('${request.contextPath}/images/icons/silk/magnifier.png');
+			background-image: url("${resource(dir: 'images/icons/silk', file: 'magnifier.png')}");
 			background-repeat: no-repeat;
 			background-position: center right;
 		}

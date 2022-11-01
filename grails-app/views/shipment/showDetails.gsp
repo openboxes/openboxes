@@ -236,7 +236,7 @@
                                             </tr>
                                             <tr class="odd">
                                                 <td>
-                                                    <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" class="middle"/>
                                                 </td>
                                                 <td>
                                                     <g:link controller="document" action="renderInvoiceTemplate" params="[shipmentId: shipmentInstance?.id]">
@@ -612,7 +612,7 @@
                                     </tr>
                                     <tr class="even">
                                         <td>
-                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" class="middle"/>
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" class="middle"/>
                                         </td>
                                         <td>
                                             <div>

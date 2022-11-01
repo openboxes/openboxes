@@ -7,7 +7,7 @@
 			<g:hasRoleInvoice>
 				<div class="action-menu-item">
 					<g:link controller="invoice" action="show" id="${invoiceId}">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" />&nbsp;
+						<img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />&nbsp;
 						<warehouse:message code="invoice.viewDetails.label" default="View Invoice Details"/>
 					</g:link>
 				</div>

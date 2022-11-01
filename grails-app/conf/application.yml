@@ -161,6 +161,12 @@ grails:
         use:
             accept:
                 header: false
+    resources:
+        #
+        # Set Cache-Control on non-asset-pipeline-managed static assets.
+        # See https://gsp.grails.org/latest/guide/resources.html
+        #
+        cachePeriod: 86400
     urlmapping:
         cache:
             maxsize: 1000

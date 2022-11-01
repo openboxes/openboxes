@@ -4,7 +4,7 @@
 <div id="location-configuration-tab">
     <div class="box">
         <h2>
-            <img src="${createLinkTo(dir: 'images/icons/silk', file: 'cog.png')}" />
+            <img src="${resource(dir: 'images/icons/silk', file: 'cog.png')}" />
             <warehouse:message code="default.configuration.label" default="Configuration"/>
         </h2>
         <table>

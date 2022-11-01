@@ -99,7 +99,7 @@ class ApiController {
 
             localizationMode = [
                 "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
-                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/world_delete.png",
+                "linkIcon"   : resource(dir: 'images/icons/silk', file: 'world_delete.png'),
                 "linkAction" : "${request.contextPath}/user/disableLocalizationMode",
                 "linkReactIcon" : "localization-mode",
             ]
@@ -108,7 +108,7 @@ class ApiController {
 
             localizationMode = [
                     "label"     : messageSource.getMessage('localization.enable.label', emptyArgs, 'Enable translation mode', locale),
-                    "linkIcon"  : "${request.contextPath}/static/images/icons/silk/world_add.png",
+                    "linkIcon"  : resource(dir: 'images/icons/silk', file: 'world_add.png'),
                     "linkAction": "${request.contextPath}/user/enableLocalizationMode",
                     "linkReactIcon" : "localization-mode",
             ]
@@ -118,20 +118,20 @@ class ApiController {
                 "label"      : messageSource.getMessage('default.edit.label',
                         [messageSource.getMessage('user.profile.label', emptyArgs, 'Profile', locale)] as Object[],
                         'Enable translation mode', locale),
-                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/user.png",
+                "linkIcon"   : resource(dir: 'images/icons/silk', file: 'user.png'),
                 "linkAction" : "${request.contextPath}/user/edit/${session?.user?.id}",
                 "linkReactIcon" : "profile",
             ],
             localizationMode,
             [
                 "label"      : messageSource.getMessage('cache.flush.label', emptyArgs, 'Refresh caches', locale),
-                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/database_wrench.png",
+                "linkIcon"   : resource(dir: 'images/icons/silk', file: 'database_wrench.png'),
                 "linkAction" : "${request.contextPath}/dashboard/flushCache",
                 "linkReactIcon" : "flush-cache",
             ],
             [
                 "label"      : messageSource.getMessage('default.logout.label', emptyArgs, 'Logout', locale),
-                "linkIcon"   : "${request.contextPath}/static/images/icons/silk/door.png",
+                "linkIcon"   : resource(dir: 'images/icons/silk', file: 'door.png'),
                 "linkAction" : "${request.contextPath}/auth/logout",
                 "linkReactIcon" : "logout",
             ]
