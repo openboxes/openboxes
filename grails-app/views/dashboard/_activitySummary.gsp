@@ -51,7 +51,7 @@
             },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "Loading ... <img alt='spinner' src=\"${resource(dir:'images/spinner.gif')}\" />"
+                "sProcessing": "Loading ... <img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" />"
             },
             "aLengthMenu": [
                 [5, 10, 25, 100, 1000, -1],
@@ -65,7 +65,16 @@
             ],
             "bUseRendered": false,
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-                $('td:eq(0)', nRow).html('<img src="${request.contextPath}/static/images/icons/silk/' + aData["type"] + '.png" />');
+                /*
+                 * We can't provide aData as a `file:` argument to resource() here,
+                 * as aData is undefined before the client browser executes this
+                 * file. The GSP parts of this file get rendered on the server
+                 * well before then, so we build the file's dirname in GSP and
+                 * its basename in JavaScript then concatenate them. :-( OBGM-65
+                 *
+                 * https://stackoverflow.com/questions/33325965/grails-gsp-accessing-variables-within-script#comment54459606_33330080
+                 */
+                $('td:eq(0)', nRow).html(`<img src="${resource(dir: '/images/icons/silk')}/` + aData['type'] + '.png" />');
                 return nRow;
             }
 

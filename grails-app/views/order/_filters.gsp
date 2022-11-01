@@ -135,7 +135,7 @@
                 </button>
                 <span class="action-menu" style="margin-left: 15px">
                     <button class="action-btn button">
-                        <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />&nbsp;
                     ${warehouse.message(code: 'default.button.download.label')}
                         <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                     </button>

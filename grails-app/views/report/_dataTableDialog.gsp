@@ -60,7 +60,7 @@
             },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+                "sProcessing": "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner.gif')}\" /> Loading... "
             },
             "aoColumns": [
                 {"mData": "transactionDate" },

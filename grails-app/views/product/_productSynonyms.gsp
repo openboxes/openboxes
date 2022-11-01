@@ -22,7 +22,7 @@
                             <g:remoteLink controller="product" action="deleteSynonym" update="synonyms" class="button"
                                         onError="alert('An error occurred while trying to delete this synonym.  Please refresh the page and try again.');"
                                           id="${synonym.id}" params="[productId:productInstance.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'delete.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.button.delete.label')}
                             </g:remoteLink>
                         </td>
@@ -47,7 +47,7 @@
                             <input name="id" type="hidden" value="${productInstance?.id}" />
                             <input id="synonym" type="text" name="synonym" value="" size="80" class="medium text"/>
                             <button  class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file:'add.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.button.add.label')}
                             </button>
                         </g:formRemote>

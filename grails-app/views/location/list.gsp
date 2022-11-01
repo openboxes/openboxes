@@ -60,7 +60,7 @@
 
                                     <div class="filter-list-item">
                                         <button type="submit" class="button block">
-                                            <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'find.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
+                                            <img class="middle" src="${resource(dir: 'images/icons/silk', file: 'find.png')}" alt="${warehouse.message(code: 'default.no.label') }" title="${warehouse.message(code: 'default.no.label') }"/>
                                             ${warehouse.message(code: 'default.button.find.label')}
                                         </button>
                                     </div>

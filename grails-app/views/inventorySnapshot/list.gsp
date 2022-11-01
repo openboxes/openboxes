@@ -133,7 +133,7 @@
             },
             "oLanguage": {
                 "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner-large.gif' /><br/>Loading..."
+                "sProcessing": "<img alt='spinner' src=\"${resource(dir: 'images', file: 'spinner-large.gif')}\" /><br/>Loading..."
             },
             "fnInitComplete": fnInitComplete,
             //"iDisplayLength" : -1,

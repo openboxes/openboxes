@@ -152,7 +152,7 @@ class DashboardApiController {
 
     def getDelayedShipments() {
         Location location = Location.get(params.locationId)
-        def delayedShipments = indicatorDataService.getDelayedShipments(location, request.contextPath)
+        def delayedShipments = indicatorDataService.getDelayedShipments(location)
         render(delayedShipments as JSON)
     }
 

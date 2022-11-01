@@ -41,7 +41,7 @@
             <g:if test="${!invoiceInstance?.datePosted}">
                 <g:link class="button" controller="invoice" action="eraseInvoice" id="${invoiceInstance?.id}"
                         onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                    <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />
+                    <img src="${resource(dir: 'images/icons/silk', file:'delete.png')}" />
                     <g:message code="default.button.delete.label"/>
                 </g:link>
             </g:if>

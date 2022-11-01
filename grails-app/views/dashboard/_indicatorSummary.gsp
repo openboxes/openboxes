@@ -14,7 +14,7 @@
                                 ${indicator.description}
                             </td>
                             <td class="right">
-                                <div id="${indicator.id}"><img class="spinner" src="${resource(dir:'images/spinner.gif')}" class="middle"/></div>
+                                <div id="${indicator.id}"><img class="spinner" src="${resource(dir: 'images', file: 'spinner.gif')}" class="middle"/></div>
                             </td>
                         </tr>
                         <script type="text/javascript">
