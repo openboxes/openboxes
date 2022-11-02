@@ -838,7 +838,7 @@ div.crossed-out .table-inner-row:before {
   }
 }
 
-.negative-value {
+.negative-value input, .negative-row-value  {
   background-color: $red-delta !important;
 }
 
