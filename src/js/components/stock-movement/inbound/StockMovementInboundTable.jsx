@@ -35,6 +35,7 @@ const StockMovementInboundTable = ({
   currentLocation,
   showTheSpinner,
   hideTheSpinner,
+  isUserAdmin,
 }) => {
   const [tableData, setTableData] = useState({
     data: [],
@@ -216,7 +217,10 @@ const StockMovementInboundTable = ({
         variant: 'danger',
         onClick: () => deleteConfirmAlert(isReturn ? order?.id : id),
       };
-      actions.push(deleteAction);
+      // deleting returns should only be available to admin or higher
+      if (!isReturn || (isReturn && isUserAdmin)) {
+        actions.push(deleteAction);
+      }
     }
     return actions;
   };
@@ -387,6 +391,7 @@ const mapStateToProps = state => ({
   shipmentStatuses: state.shipmentStatuses.data,
   isShipmentStatusesFetched: state.shipmentStatuses.fetched,
   currentLocation: state.session.currentLocation,
+  isUserAdmin: state.session.isUserAdmin,
 });
 
 const mapDispatchToProps = {
@@ -407,6 +412,7 @@ StockMovementInboundTable.propTypes = {
   showTheSpinner: PropTypes.func.isRequired,
   hideTheSpinner: PropTypes.func.isRequired,
   isShipmentStatusesFetched: PropTypes.bool.isRequired,
+  isUserAdmin: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
