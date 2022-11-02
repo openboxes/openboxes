@@ -55,7 +55,7 @@ class ProductAssociation {
             "Product Name"           : "product.name",
             "Associated Product Code": "associatedProduct.productCode",
             "Associated Product Name": "associatedProduct.name",
-            "Quantity"               : "quantity",
+            "Conversion"             : "quantity",
             "Comments"               : "comments",
             "Date created"           : "dateCreated",
             "Last updated"           : "lastUpdated"

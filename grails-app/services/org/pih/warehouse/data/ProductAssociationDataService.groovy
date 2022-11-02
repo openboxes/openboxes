@@ -23,6 +23,7 @@ class ProductAssociationDataService {
 
         command.data.eachWithIndex { params, index ->
             params['code'] = params['code']?.toUpperCase()
+            params['quantity'] = params['conversion'] ?: 1
 
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             productAssociationInstance.product = Product.findByProductCode(params['product.productCode'])

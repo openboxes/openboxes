@@ -24,7 +24,7 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
                     'D': 'product.name',
                     'E': 'associatedProduct.productCode',
                     'F': 'associatedProduct.name',
-                    'G': 'quantity',
+                    'G': 'conversion',
                     'H': 'comments',
             ]
     ]
@@ -36,7 +36,7 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
             "product.name"                  : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "associatedProduct.productCode" : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "associatedProduct.name"        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "quantity"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
+            "conversion"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
             "comments"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
