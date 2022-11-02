@@ -26,7 +26,7 @@ class ProductAssociation {
     String id
     ProductAssociationTypeCode code
     Product associatedProduct
-    BigDecimal quantity = 1
+    BigDecimal quantity = 0
     String comments
 
     ProductAssociation mutualAssociation
