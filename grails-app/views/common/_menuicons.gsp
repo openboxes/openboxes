@@ -26,7 +26,7 @@
                aria-haspopup="true"
                aria-expanded="false">
             </i>
-            <div class="dropdown-menu dropdown-menu-right dropdown-menu-right-conf nav-item padding-8 margin-top-18">
+            <div class="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18">
                 <div class="dropdown-menu-subsections conf-subsections">
                     <g:if test="${grailsApplication.config.openboxes.megamenu.configuration.enabled}">
                         <div class="padding-8">
@@ -186,7 +186,7 @@
                aria-haspopup="true"
                aria-expanded="false">
             </i>
-            <div class="dropdown-menu dropdown-menu-right dropdown-menu-right-conf nav-item padding-8 margin-top-18">
+            <div class="dropdown-menu dropdown-menu-right nav-item padding-8 margin-top-18">
                 <span class="subsection-title">${session?.user?.username} (<g:userRole user="${session?.user}"/>)</span>
                 <g:link controller="user" action="edit" id="${session?.user?.id }" class="dropdown-item">
                     <span class="icon">

@@ -5,7 +5,7 @@
 <%@page import="org.pih.warehouse.order.OrderTypeCode"%>
 <%@page import="org.pih.warehouse.requisition.RequisitionStatus"%>
 <%@page import="org.pih.warehouse.shipping.Shipment"%>
-<ul class="d-flex align-items-center navbar-nav mr-auto flex-wrap flex-row">
+<ul class="d-flex align-items-center navbar-nav mr-auto flex-wrap">
     <g:hideIfIsNonInventoryManagedAndCanSubmitRequest>
         <g:if test="${megamenuConfig.dashboard.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">

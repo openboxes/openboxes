@@ -118,8 +118,9 @@
 
     <!-- Header "hd" includes includes logo, global navigation -->
     <g:if test="${session?.user && session?.warehouse}">
-        <div id="main-wrapper">
-            <div class="d-flex align-items-center">
+        <div id="main-wrapper" class="navbar navbar-expand-md navbar-light bg-light bg-white p-0 px-md-4">
+            <div class="d-flex p-2 justify-content-between flex-grow-1">
+                <div class="d-flex align-items-center">
                 <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
                 <g:set var="locationColor" value="${session?.warehouse?.bgColor?.replace('#', '')?.toUpperCase()}"/>
                 <g:if test="${locationColor && ['FFFFFF', 'FFFF'].any{ it == locationColor }}">
@@ -151,14 +152,28 @@
                     </g:if>
                 </div>
             </div>
-            <div id="menu-wrapper">
-                <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
-                <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                    ${g.message(code: 'default.loading.label')}
-                </div>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#navbarToggler"
+                    aria-controls="navbarToggler"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <i class="ri-menu-line"></i>
+                </button>
             </div>
-            <div class="d-flex align-items-center justify-content-end navbar-icons">
-                <g:render template="/common/menuicons" model="[confMenu: grailsApplication.config.openboxes.megamenu.configuration]" />
+            <div class="collapse navbar-collapse w-100" id="navbarToggler">
+                <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
+                    <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
+                    <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
+                        ${g.message(code: 'default.loading.label')}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-end navbar-icons">
+                    <g:render template="/common/menuicons" model="[confMenu: grailsApplication.config.openboxes.megamenu.configuration]" />
+                </div>
             </div>
         </div>
     </g:if>

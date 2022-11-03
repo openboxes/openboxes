@@ -2259,7 +2259,7 @@ img.photo_tiny {
     justify-content: center;
     background:#FFFFFF;
     font-size: 16px;
-    width: 700px;
+    width: clamp(230px, 60vw, 1000px);
     overflow: hidden;
     border: solid 1px var(--blue-500);
     outline: rgba(34, 100, 229, 0.15) outset 3px !important;
@@ -2291,7 +2291,7 @@ img.photo_tiny {
 
 .global-search-results {
     max-height: 300px;
-    width: 700px !important;
+    width: clamp(230px, 60vw, 1000px) !important;
     overflow-y: auto;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.15), 2px 2px 4px rgba(0, 0, 0, 0.15);
     border-radius: 0 0 4px 4px;
@@ -3405,8 +3405,9 @@ table.pvtTable tr th { background-color: #ddd; }
 /* New menu redesign*/
 
 #main-wrapper {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
+    display: flex;
+    flex-direction: row;
+    align-items: unset;
     min-height: 56px;
     width: 100%;
     font-family: 'Inter', sans-serif;
@@ -3421,7 +3422,7 @@ table.pvtTable tr th { background-color: #ddd; }
 
 #main-wrapper #logo-wrapper {
     font-weight: 400;
-    padding: 8px;
+    margin-right: 8px;
 }
 
 #main-wrapper #logo-wrapper > #logo-square {
@@ -3616,21 +3617,21 @@ table.pvtTable tr th { background-color: #ddd; }
     padding: 8px;
 }
 
-#menu-wrapper {
+.menu-wrapper {
     min-height: 56px;
     padding: 0 16px;
 }
 
-#menu-wrapper > ul {
+.menu-wrapper > ul {
     list-style-type: none;
     min-height: 56px;
 }
 
-#menu-wrapper > ul li {
+.menu-wrapper > ul li {
     min-height: 56px;
 }
 
-#menu-wrapper > ul li:hover a {
+.menu-wrapper > ul li:hover a {
     color: var(--blue-700) !important;
 }
 
