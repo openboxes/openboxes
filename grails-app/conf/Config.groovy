@@ -1757,12 +1757,12 @@ openboxes {
             ]
         }
         shipping {
-            enabled = true
+            enabled = false
             label = "shipping.label"
             defaultLabel = "Shipping"
         }
         receiving {
-            enabled = true
+            enabled = false
             label = "receiving.label"
             defaultLabel = "Receiving"
         }
