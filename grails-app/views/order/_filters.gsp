@@ -8,6 +8,7 @@
     <g:form id="listForm" action="list" method="GET">
         <g:hiddenField name="type" value="${params.type}"/>
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
+        <g:hiddenField name="orderType" value="${params.orderType}"/>
         <div class="filter-list">
             <div class="filter-list-item">
                 <label>${warehouse.message(code: 'default.search.label')}</label>
