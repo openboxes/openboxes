@@ -1766,6 +1766,30 @@ openboxes {
             label = "receiving.label"
             defaultLabel = "Receiving"
         }
+
+        orders {
+            enabled = true
+            label = "orders.label"
+            defaultLabel = "Orders"
+        }
+
+        stockRequest {
+            enabled = true
+            label = "stockRequests.label"
+            defaultLabel = "Stock Requests"
+        }
+
+        stockMovement {
+            enabled = true
+            label = "stockMovements.label"
+            defaultLabel = "Stock Movements"
+        }
+
+        putaways {
+            enabled = true
+            label = "putaways.label"
+            defaultLabel = "Putaways"
+        }
     }
     requestorMegamenu {
         request {
