@@ -52,8 +52,6 @@
 									<input type="hidden" name="id" value="${locationInstance.id}" />
 									<input type="file" name="logo" />
 									(<warehouse:message code="location.logoSize.tooltip.label" />)
-
-
 								</td>
 							</tr>
 							<tr class="prop">
