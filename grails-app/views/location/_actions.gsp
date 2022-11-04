@@ -11,7 +11,7 @@
 				<warehouse:message code="default.list.label" args="[warehouse.message(code:'locations.label').toLowerCase()]"/>
 			</g:link>
 		</div>
-		<g:if test="${params.id}">
+		<g:if test="${locationInstance?.id}">
 			<div class="action-menu-item">
 				<g:link class="edit" action="edit" id="${locationInstance?.id}">
 					<img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" class="middle"/>&nbsp;
