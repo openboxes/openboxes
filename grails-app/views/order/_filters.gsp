@@ -156,7 +156,7 @@
                         </div>
                     </div>
                 </span>
-                <g:link controller="order" action="list" class="button icon reload">
+                <g:link controller="order" action="list" class="button icon reload" params="[orderType: 'PUTAWAY_ORDER']">
                     <warehouse:message code="default.button.cancel.label"/>
                 </g:link>
             </div>
