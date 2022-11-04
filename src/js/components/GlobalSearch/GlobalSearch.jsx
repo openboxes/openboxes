@@ -19,14 +19,22 @@ const ValueContainer = ({ children, ...props }) => (
   </React.Fragment>
 );
 
-const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
-  const [isVisible, setIsVisible] = useState(false);
+const GlobalSearch = ({
+  className, visible, renderButton, debounceTime, minSearchLength,
+}) => {
+  const [isVisible, setIsVisible] = useState(visible);
 
   const searchItems = debounceGlobalSearch(debounceTime, minSearchLength);
 
   const showSearchbar = () => setIsVisible(true);
 
   const hideSearchbar = () => setIsVisible(false);
+
+  const hideSearchbarOnBlur = () => {
+    if (renderButton) {
+      hideSearchbar();
+    }
+  };
 
   const onKeyPressHandler = (event) => {
     if (event.key === 'Enter') {
@@ -77,7 +85,9 @@ const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
         setValue('');
         return;
       }
-      hideSearchbar();
+      if (renderButton) {
+        hideSearchbar();
+      }
     };
     return (
       <components.IndicatorsContainer {...props}>
@@ -94,17 +104,17 @@ const GlobalSearch = ({ renderButton, debounceTime, minSearchLength }) => {
 
   return (
     <div className="position-relative d-flex">
-      {renderButton({ isVisible, showSearchbar })}
+      {renderButton?.({ isVisible, showSearchbar })}
       {isVisible && (
         <Async
-          className="app-global-search"
+          className={`app-global-search ${renderButton ? 'position-absolute' : ''} ${className}`}
           classNamePrefix="app-global-search"
           autoFocus
           openMenuOnClick={false}
           loadOptions={searchItems}
           onKeyDown={onKeyPressHandler}
           onChange={onOptionSelectedHandler}
-          onBlur={hideSearchbar}
+          onBlur={hideSearchbarOnBlur}
           components={{
             ValueContainer,
             DropdownIndicator,
@@ -122,8 +132,14 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps)(GlobalSearch);
 
 GlobalSearch.propTypes = {
+  visible: PropTypes.bool,
   renderButton: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  className: PropTypes.string,
 };
 
+GlobalSearch.defaultProps = {
+  visible: false,
+  className: '',
+};

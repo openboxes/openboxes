@@ -1,14 +1,14 @@
 <g:form method="GET" controller="dashboard" action="globalSearch">
-    <div id="global-search" class="d-flex position-absolute global-search global-search--hidden">
+    <div id="global-search-static" class="global-search w-100 my-2">
         <i class="ri-search-line"></i>
         <g:textField
-                id="global-search-input"
-                class="global-search-input"
-                name="searchTerms"
-                type="text"
-                placeholder="${warehouse.message(code: 'globalSearch.placeholder.label')}"
-                value="${attrs.value}"/>
-        <div id="global-search-loading" class="dot-flashing-wrapper global-search-loading d-none">
+            id="global-search-static-input"
+            class="global-search-input"
+            name="searchTerms"
+            type="text"
+            placeholder="${warehouse.message(code: 'globalSearch.placeholder.label')}"
+            value="${attrs.value}"/>
+        <div id="global-search-static-loading" class="dot-flashing-wrapper global-search-loading d-none">
             <div class="dot-flashing"></div>
         </div>
         <span class="ri-close-line" id="global-search-close"></span>
@@ -17,18 +17,6 @@
 <script>
   $(document)
     .ready(function () {
-      $("#${attrs.buttonId}")
-        .click(function () {
-          const globalSearchElement = $("#global-search").get(0);
-          const hiddenClassName = 'global-search--hidden';
-          if (globalSearchElement.classList.contains(hiddenClassName)) {
-            globalSearchElement.classList.remove(hiddenClassName)
-            $("#global-search-input").focus();
-          } else {
-            globalSearchElement.classList.add(hiddenClassName)
-          }
-        })
-
       const splitMatchingStr = (data, str) => {
         const indexOfMatched = data.indexOf(str);
         if (indexOfMatched < 0) {
@@ -41,29 +29,20 @@
         return { before, matched, after };
       };
 
-      function closeInputHandler () {
-        const hiddenClassName = 'global-search--hidden';
-        $("#global-search").get(0).classList.add(hiddenClassName);
-        $("#global-search-input").val('');
-      }
-
-      $("#global-search-close").click(closeInputHandler)
-
-      $("#global-search-input")
-        .blur(closeInputHandler)
+      $("#global-search-static-input")
         .autocomplete({
           delay: ${grailsApplication.config.openboxes.typeahead.delay},
           minLength: ${grailsApplication.config.openboxes.typeahead.minLength},
-          position: { of: "#global-search" },
+          position: { of: "#global-search-static" },
           source: function (req, resp) {
-            $("#global-search-loading").get(0).classList.remove('d-none')
+            $("#global-search-static-loading").get(0).classList.remove('d-none')
             $.getJSON('${attrs.jsonUrl}', req, function (data) {
               var suggestions = [];
               $.each(data, function (i, item) {
                 suggestions.push(item);
               });
               resp(suggestions);
-              $("#global-search-loading").get(0).classList.add('d-none');
+              $("#global-search-static-loading").get(0).classList.add('d-none');
             })
           },
           select: function (event, ui) {
@@ -76,7 +55,7 @@
           }
         })
         .data("autocomplete")._renderItem = function (ul, item) {
-        const { before, matched, after } = splitMatchingStr(item.label, $("#global-search-input").val());
+        const { before, matched, after } = splitMatchingStr(item.label, $("#global-search-static-input").val());
         var link = $("<a></a>").css("color", item.color);
 
         if (before) link.append("<span>" + before + "</span>");
@@ -84,6 +63,7 @@
         if (after) link.append("<span>" + after + "</span>");
 
         ul.addClass("global-search-results")
+          .addClass("global-search-static-results")
           .addClass("scrollbar");
         return $("<li></li>")
           .data("item.autocomplete", item)

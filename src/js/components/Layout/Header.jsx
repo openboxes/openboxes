@@ -13,7 +13,7 @@ import LocationChooser from 'components/location/LocationChooser';
 import 'components/Layout/HeaderStyles.scss';
 
 const Header = ({ isImpersonated }) => (
-  <nav className="navbar navbar-expand-md navbar-light bg-light bg-white main-wrapper p-0 px-md-4">
+  <nav className="navbar navbar-expand-lg navbar-light bg-light bg-white main-wrapper p-0 px-lg-4">
     {isImpersonated && <ImpersonateInfo />}
     <div className="d-flex p-2 justify-content-between flex-1">
       <div className="d-flex align-items-center">
