@@ -13,32 +13,34 @@ import LocationChooser from 'components/location/LocationChooser';
 import 'components/Layout/HeaderStyles.scss';
 
 const Header = ({ isImpersonated }) => (
-  <nav className="navbar navbar-expand-lg navbar-light bg-light bg-white main-wrapper p-0 px-lg-4">
+  <div className="navbar p-0">
     {isImpersonated && <ImpersonateInfo />}
-    <div className="d-flex p-2 justify-content-between flex-1">
-      <div className="d-flex align-items-center">
-        <Logo />
-        <LocationChooser />
+    <nav className="navbar navbar-expand-md navbar-light bg-light bg-white main-wrapper p-0 px-md-4">
+      <div className="d-flex p-2 justify-content-between flex-1">
+        <div className="d-flex align-items-center">
+          <Logo />
+          <LocationChooser />
+        </div>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarToggler"
+          aria-controls="navbarToggler"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <RiMenuLine />
+        </button>
       </div>
-      <button
-        className="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarToggler"
-        aria-controls="navbarToggler"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <RiMenuLine />
-      </button>
-    </div>
-    <div className="collapse navbar-collapse w-100" id="navbarToggler">
-      <ul className="navbar-nav w-100">
-        <Menu />
-        <NavbarIcons />
-      </ul>
-    </div>
-  </nav>);
+      <div className="collapse navbar-collapse w-100" id="navbarToggler">
+        <ul className="navbar-nav w-100">
+          <Menu />
+          <NavbarIcons />
+        </ul>
+      </div>
+    </nav>
+  </div>);
 
 const mapStateToProps = state => ({
   isImpersonated: state.session.isImpersonated,

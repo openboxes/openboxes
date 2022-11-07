@@ -1,6 +1,5 @@
 .main-wrapper {
   display: flex;
-  flex-direction: row;
   min-height: 56px;
   width: 100%;
   font-family: 'Inter', sans-serif;
@@ -179,7 +178,7 @@
   flex-direction: column;
   width: 100%;
   min-height: unset !important;
-  & > a.nav-link {
+  & > .nav-link {
     min-height: 56px;
   }
   .collapse-arrow-icon {
@@ -249,10 +248,12 @@
 }
 
 .active-section {
-  a {
-    color: var(--blue-primary) !important;
-  }
   box-shadow: 0px -3px 0px var(--blue-primary) inset;
+}
+
+.active-section .nav-link,
+.collapse-nav-item .active-section.nav-link {
+  color: var(--blue-primary) !important;
 }
 
 @media (max-width: 1440px) {

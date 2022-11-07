@@ -9,7 +9,7 @@
     <g:hideIfIsNonInventoryManagedAndCanSubmitRequest>
         <g:if test="${megamenuConfig.dashboard.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-                <li class="nav-item dropdown d-flex align-items-center align-items-lg-center" id="dashboard">
+                <li class="nav-item dropdown d-flex align-items-center align-items-md-center" id="dashboard">
                     <g:link controller="dashboard" action="index" class="nav-link dropdown-toggle">
                         <warehouse:message code="dashboard.label" />&nbsp;
                     </g:link>
@@ -47,7 +47,7 @@
         <g:if test="${megamenuConfig.inventory.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
             <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
-                <li class="nav-item dropdown justify-content-center align-items-center d-none d-lg-flex" id="inventory">
+                <li class="nav-item dropdown justify-content-center align-items-center d-none d-md-flex" id="inventory">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="inventory.label" />
                     </a>
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="inventory-collapsed">
                     <button
                         data-target="#collapse-inventory"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -145,7 +145,7 @@
         <g:if test="${megamenuConfig.requisitions.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
             <g:supports activitiesAny="[ActivityCode.PLACE_REQUEST,ActivityCode.FULFILL_REQUEST]">
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="requisitions">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="requisitions">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="requests.label"/>
                         <span class="deprecated"
@@ -186,7 +186,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="requisitions-collapsed" >
                     <button
                         data-target="#collapse-requests"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -234,7 +234,7 @@
 
         <g:if test="${megamenuConfig.purchasing.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-            <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="purchasing">
+            <li class="nav-item dropdown align-items-center d-none d-md-flex" id="purchasing">
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="order.purchasing.label" />
                 </a>
@@ -270,7 +270,7 @@
 
                 </div>
             </li>
-            <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+            <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="purchasing-collapsed">
                 <button
                     data-target="#collapse-purchasing"
                     class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -317,7 +317,7 @@
 
         <g:if test="${megamenuConfig.invoicing.enabled}">
             <g:hasRoleInvoice>
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="invoicing">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="invoicing">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="react.invoicing.label" />
                     </a>
@@ -334,7 +334,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable flex-column align-items-center d-flex d-lg-none" id="invoicing">
+                <li class="nav-item collapsable flex-column align-items-center d-flex d-md-none" id="invoicing-collapsed">
                     <button
                         data-target="#collapse-invoicing"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -363,7 +363,7 @@
 
         <g:if test="${megamenuConfig.stockRequest.enabled}">
             <g:hasHighestRoleAuthenticated>
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="inbound">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="inbound">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="default.inbound.label" />
                     </a>
@@ -378,7 +378,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="inbound-collapsed" >
                     <button
                         data-target="#collapse-stockRequest"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -406,7 +406,7 @@
         <g:if test="${megamenuConfig.inbound.enabled}">
             <g:hasHigherRoleThanAuthenticated>
             <g:supports activityCode="${ActivityCode.RECEIVE_STOCK}">
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="inbound">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="inbound">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="default.inbound.label" />
                     </a>
@@ -470,7 +470,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none" >
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="inbound-collapsed">
                     <button
                         data-target="#collapse-inbound"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -549,7 +549,7 @@
         <g:if test="${megamenuConfig.outbound.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
             <g:supports activityCode="${ActivityCode.SEND_STOCK}">
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="outbound">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="outbound">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="default.outbound.label" />
                     </a>
@@ -596,7 +596,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none" >
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="outbound-collapsed">
                     <button
                         data-target="#collapse-outbound"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -656,7 +656,7 @@
 
         <g:if test="${megamenuConfig.reporting.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-            <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="reporting">
+            <li class="nav-item dropdown align-items-center d-none d-md-flex" id="reporting">
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="report.label" />
                 </a>
@@ -747,7 +747,7 @@
                     </div>
                 </div>
             </li>
-            <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+            <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="reporting-collapsed">
                 <button
                     data-target="#collapse-report"
                     class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -852,7 +852,7 @@
         <g:if test="${megamenuConfig.products.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
             <g:supports activityCode="${ActivityCode.MANAGE_INVENTORY}">
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="products">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="products">
                     <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                         <warehouse:message code="products.label" />
                     </a>
@@ -924,7 +924,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="products-collapsed">
                     <button
                         data-target="#collapse-products"
                         class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -1009,7 +1009,7 @@
 
         <g:if test="${megamenuConfig.requisitionTemplate.enabled}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-            <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="stocklists">
+            <li class="nav-item dropdown align-items-center d-none d-md-flex" id="stocklists">
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="requisitionTemplates.label" default="Stock Lists" />
                 </a>
@@ -1028,7 +1028,7 @@
                     </div>
                 </div>
             </li>
-            <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none">
+            <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="stocklists-collapsed">
                 <button
                     data-target="#collapse-requisitionTemplates"
                     class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -1060,7 +1060,7 @@
 
         <g:if test="${megamenuConfig.customLinks.enabled && megamenuConfig.customLinks.menuItems}">
             <g:isUserInRole roles="[RoleType.ROLE_BROWSER]">
-                <li class="nav-item dropdown align-items-center d-none d-lg-flex" id="customLinks">
+                <li class="nav-item dropdown align-items-center d-none d-md-flex" id="customLinks">
                 <a href="javascript:void(0)" class="nav-link dropdown-toggle">
                     <warehouse:message code="customLinks.label" default="Custom Links" />
                 </a>
@@ -1076,7 +1076,7 @@
                     </div>
                 </div>
             </li>
-                <li class="nav-item collapsable align-items-center flex-column d-flex d-lg-none" >
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="customLinks-collapsed" >
                 <button
                     data-target="#collapse-customLinks"
                     class="nav-link d-flex justify-content-between align-items-center w-100"
@@ -1146,6 +1146,7 @@
 
     // Assign active to matched section
     document.getElementById(matchPath) && document.getElementById(matchPath).classList.add('active-section');
+    document.getElementById(matchPath) && document.getElementById(matchPath + "-collapsed").classList.add('active-section');
 
   });
 </script>

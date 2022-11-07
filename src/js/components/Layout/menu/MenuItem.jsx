@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 
 const DropdownMenuItem = ({ section, active }) => (
-  <li className={`nav-item dropdown d-none d-lg-flex justify-content-center align-items-center ${active && 'active-section'}`} >
+  <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} >
     <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
       {section.label}
     </a>
@@ -22,7 +22,7 @@ const DropdownMenuItem = ({ section, active }) => (
 );
 
 const CollapseMenuItem = ({ section, active }) => (
-  <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-lg-none" >
+  <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none" >
     <a
       className={`nav-link d-flex justify-content-between align-items-center w-100 ${active && 'active-section'}`}
       data-toggle="collapse"

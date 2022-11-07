@@ -1,5 +1,5 @@
 <%@page import="org.pih.warehouse.core.ActivityCode;"%>
-<div class="d-none d-lg-flex">
+<div class="d-none d-md-flex">
     <div class="menu-icon position-relative">
         <div class="tooltip2">
             <i class="ri-search-line" id="global-search-button"></i>
@@ -229,7 +229,7 @@
         </div>
     </div>
 </div>
-<ul class="navbar-nav d-flex d-lg-none flex-column px-3 w-100">
+<ul class="navbar-nav d-flex d-md-none flex-column px-3 w-100">
     <li class="nav-item collapsable align-items-center">
         <g:globalSearch jsonUrl="${request.contextPath}/json/globalSearch"/>
     </li>
@@ -241,7 +241,7 @@
             aria-expanded="false"
             aria-controls="collapse-profile"
         >
-            <span class="d-flex">
+            <span class="d-flex align-items-center">
                 <i class="ri-user-3-line mr-2"></i>
                 Profile
             </span>
@@ -297,7 +297,7 @@
                     aria-expanded="false"
                     aria-controls="collapse-configuration"
                 >
-                    <span class="d-flex">
+                    <span class="d-flex align-items-center">
                         <i class="ri-settings-5-line mr-2"></i>
                         Configuration
                     </span>
@@ -450,7 +450,7 @@
     </g:isUserAdmin>
     <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
         <li class="nav-item mobile-help-scout dropdown align-items-center" onclick="Beacon('toggle');">
-            <a href="#" class="d-flex">
+            <a class="d-flex">
                 <i class="ri-question-line mr-2" ></i>Help
             </a>
         </li>

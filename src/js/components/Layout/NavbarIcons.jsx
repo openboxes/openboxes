@@ -126,7 +126,7 @@ const NavbarIcons = ({
   return (
     <>
       {/* before MD (middle) breakpoint render below nav-icons (as collapsable) */}
-      <div className="px-3 mt-4 d-block d-lg-none">
+      <div className="px-3 mt-4 d-block d-md-none">
         <li className="collapse-nav-item nav-item justify-content-center d-flex" >
           <GlobalSearch visible className="w-100 my-2" />
         </li>
@@ -198,14 +198,14 @@ const NavbarIcons = ({
           </div>
         </li>
         }
-        <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex" >
-          <a href="#" className="nav-link d-flex justify-content-between align-items-center w-100">
-            <span><HelpScout /> Help</span>
+        <li className="nav-item collapse-nav-item d-flex dropdown justify-content-start justify-content-md-center align-items-center mb-2" >
+          <a href="#" className="nav-link w-100 d-flex align-items-center">
+            <HelpScout className="d-flex align-items-center gap-8 w-100" text="Help" />
           </a>
         </li>
       </div>
       {/* after MD (middle) breakpoint render below nav-icons (as dropdowns) */}
-      <div className="d-none d-lg-flex align-items-center justify-content-end navbar-icons">
+      <div className="d-none d-md-flex align-items-center justify-content-end navbar-icons">
         {iconsList
           .filter(({ hide }) => !hide)
           .map(({ name, ...restProps }) =>

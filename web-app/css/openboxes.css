@@ -3548,13 +3548,13 @@ table.pvtTable tr th { background-color: #ddd; }
     line-height: 30px;
 }
 
-
 .nav-item a {
     line-height: 32px;
     color: var(--blue-700) !important;
     font-weight: 500;
     font-size: 15px;
     padding: 0 16px !important;
+    text-decoration: none;
 }
 
 .nav-item a:hover,
@@ -3651,6 +3651,7 @@ table.pvtTable tr th { background-color: #ddd; }
     color: inherit !important;
     min-height: 56px;
     padding: 0 8px !important;
+    font-size: 15px;
 }
 
 .mobile-help-scout {
@@ -3737,7 +3738,7 @@ table.pvtTable tr th { background-color: #ddd; }
     box-shadow: 0 -3px 0 var(--blue-primary) inset;
 }
 
-.active-section a {
+.active-section .nav-link {
     color: var(--blue-primary) !important;
 }
 
