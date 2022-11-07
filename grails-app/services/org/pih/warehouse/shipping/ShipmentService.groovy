@@ -19,7 +19,6 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
 import org.pih.warehouse.api.StockTransfer
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -1084,7 +1083,7 @@ class ShipmentService {
             throw new IllegalArgumentException("Can't find shipment for given order: ${order.id}")
         }
 
-        User user = AuthService.currentUser.get()
+        User user = authService.currentUser
 
         shipments.each { Shipment shipment ->
             sendShipment(shipment, null, user, order.origin, shipment?.dateShipped() ?: new Date())
@@ -2269,7 +2268,7 @@ class ShipmentService {
 
     def createShipmentItems(OrderItem orderItem) {
         def shipmentItems = orderItem.shipmentItems ?: []
-        def currentLocation = AuthService?.currentLocation?.get()
+        def currentLocation = authService.currentLocation
         if (shipmentItems) {
             shipmentItems.each { ShipmentItem shipmentItem ->
                 if (orderItem?.order?.isOutbound(currentLocation)) {

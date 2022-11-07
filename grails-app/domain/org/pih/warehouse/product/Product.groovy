@@ -45,23 +45,12 @@ import grails.util.Holders
  */
 class Product implements Comparable, Serializable {
 
-
     def beforeInsert = {
-        User.withNewSession {
-            def currentUser = AuthService.currentUser.get()
-            if (currentUser) {
-                createdBy = currentUser
-                updatedBy = currentUser
-            }
-        }
+        createdBy = AuthService.currentUser
     }
+
     def beforeUpdate = {
-        User.withNewSession {
-            def currentUser = AuthService.currentUser.get()
-            if (currentUser) {
-                updatedBy = currentUser
-            }
-        }
+        updatedBy = AuthService.currentUser
     }
 
     def publishPersistenceEvent = {

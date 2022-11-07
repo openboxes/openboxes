@@ -13,7 +13,10 @@ import org.pih.warehouse.core.RoleType
  * */
 class RoleInterceptor {
     def userService
-    def dependsOn = [SecurityInterceptor]
+
+    // this interceptor depends on SecurityInterceptor
+    int order = LOWEST_PRECEDENCE
+
     def static changeActions = ['delete', 'create', 'add', 'process', 'save',
                                 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
     def static changeControllers = ['createProductFromTemplate']

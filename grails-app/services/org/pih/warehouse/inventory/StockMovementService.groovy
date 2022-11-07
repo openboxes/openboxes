@@ -9,12 +9,12 @@
  **/
 package org.pih.warehouse.inventory
 
-import grails.gorm.transactions.Transactional
 import grails.core.GrailsApplication
-import org.pih.warehouse.PagedResultList
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
+import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -25,7 +25,6 @@ import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -63,6 +62,7 @@ import org.pih.warehouse.shipping.ShipmentWorkflow
 @Transactional
 class StockMovementService {
 
+    def authService
     def productService
     def identifierService
     def requisitionService
@@ -2431,7 +2431,7 @@ class StockMovementService {
     }
 
     void issueShipmentBasedStockMovement(String id) {
-        User user = AuthService.currentUser.get()
+        User user = authService.currentUser
         StockMovement stockMovement = getStockMovement(id)
         Shipment shipment = stockMovement.shipment
         if (!shipment) {
@@ -2442,7 +2442,7 @@ class StockMovementService {
 
     void issueRequisitionBasedStockMovement(String id) {
 
-        User user = AuthService.currentUser.get()
+        User user = authService.currentUser
         StockMovement stockMovement = getStockMovement(id)
         Requisition requisition = stockMovement.requisition
         def shipment = requisition.shipment

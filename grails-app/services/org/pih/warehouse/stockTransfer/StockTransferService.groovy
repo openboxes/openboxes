@@ -16,7 +16,6 @@ import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -195,7 +194,7 @@ class StockTransferService {
         }
         order.save(failOnError: true)
 
-        def currentLocation = AuthService?.currentLocation?.get()
+        def currentLocation = authService.currentLocation
         if (order.orderType.isReturnOrder() && order.isOutbound(currentLocation) && order?.orderItems) {
             picklistService.createPicklistFromItem(order)
         }

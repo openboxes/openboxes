@@ -4,7 +4,6 @@ import org.junit.Ignore
 
 // import org.apache.commons.lang.StringUtils
 import org.junit.Test
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
@@ -21,8 +20,8 @@ import testutils.DbHelper
 
 @Ignore
 class ProductServiceIntegrationTests extends GroovyTestCase {
-	
-	
+
+	def authService
 	def productService
 	def product1;
 	def product2;
@@ -43,7 +42,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		user.addToRoles(financeRole)
 		user.save()
 
-		AuthService.currentUser.set(user)
+		authService.currentUser = user
 
 		product1 = DbHelper.createProductWithGroups("boo floweree 250mg",["Hoo moodiccina", "Boo floweree"])
 		product2 = DbHelper.createProductWithGroups("boo pill",["Boo floweree"])

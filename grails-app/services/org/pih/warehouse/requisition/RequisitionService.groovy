@@ -13,7 +13,6 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -31,6 +30,7 @@ import org.pih.warehouse.product.Product
 class RequisitionService {
 
     GrailsApplication grailsApplication
+    def authService
     def identifierService
     def inventoryService
 
@@ -258,7 +258,7 @@ class RequisitionService {
                     eq("status", requisition.status)
                 }
                 if (params?.relatedToMe) {
-                    def currentUser = AuthService.getCurrentUser().get()
+                    def currentUser = authService.currentUser
                     or {
                         eq("createdBy.id", currentUser.id)
                         eq("updatedBy.id", currentUser.id)
