@@ -164,7 +164,7 @@ class NotificationService {
     def sendReceiptNotifications(PartialReceipt partialReceipt) {
         Shipment shipment = partialReceipt?.shipment
         def emailValidator = EmailValidator.getInstance()
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib..ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         def recipientItems = partialReceipt.partialReceiptItems.groupBy {it.recipient }
         recipientItems.each { Person recipient, items ->
             if (emailValidator.isValid(recipient?.email)) {

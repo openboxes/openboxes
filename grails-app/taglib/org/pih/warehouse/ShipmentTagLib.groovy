@@ -20,16 +20,16 @@ class ShipmentTagLib {
     def getShipmentTypeIcon = { attrs, body ->
         if (!attrs.shipmentType) {
             out << ""
-        } else if (attrs.shipmentType.name.startsWith("Air")) {
-            out << "<img height='16' width='16' src='${resource(dir: '/static/images/icons/shipmentType', file: "ShipmentTypeAir.png")}'/>"
-        } else if (attrs.shipmentType.name.startsWith("Sea")) {
-            out << "<img height='16' width='16' src='${resource(dir: '/static/images/icons/shipmentType', file: "ShipmentTypeSea.png")}'/>"
-        } else if (attrs.shipmentType.name.startsWith("Land")) {
-            out << "<img height='16' width='16' src='${resource(dir: '/static/images/icons/shipmentType', file: "ShipmentTypeLand.png")}'/>"
-        } else if (attrs.shipmentType.name.startsWith("Suitcase")) {
-            out << "<img height='16' width='16' src='${resource(dir: '/static/images/icons/shipmentType', file: "ShipmentTypeSuitcase.png")}'/>"
-        } else if (attrs.shipmentType.name.startsWith("Default")) {
-            out << "<img height='16' width='16' src='${resource(dir: '/static/images/icons/shipmentType', file: "ShipmentTypeDefault.png")}'/>"
+        } else if (attrs.shipmentType.name.startsWith('Air')) {
+            out << "<img height='16' width='16' src='${resource(dir: 'images/icons/shipmentType', file: 'ShipmentTypeAir.png')}'/>"
+        } else if (attrs.shipmentType.name.startsWith('Sea')) {
+            out << "<img height='16' width='16' src='${resource(dir: 'images/icons/shipmentType', file: 'ShipmentTypeSea.png')}'/>"
+        } else if (attrs.shipmentType.name.startsWith('Land')) {
+            out << "<img height='16' width='16' src='${resource(dir: 'images/icons/shipmentType', file: 'ShipmentTypeLand.png')}'/>"
+        } else if (attrs.shipmentType.name.startsWith('Suitcase')) {
+            out << "<img height='16' width='16' src='${resource(dir: 'images/icons/shipmentType', file: 'ShipmentTypeSuitcase.png')}'/>"
+        } else if (attrs.shipmentType.name.startsWith('Default')) {
+            out << "<img height='16' width='16' src='${resource(dir: 'images/icons/shipmentType', file: 'ShipmentTypeDefault.png')}'/>"
         } else {
             out << "<span class='fade'>${attrs.shipmentType.name}</span>"
         }

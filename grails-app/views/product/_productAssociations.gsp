@@ -87,7 +87,7 @@
                             <button class="button btn-show-dialog"
                                     data-title="${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}"
                                     data-url="${request.contextPath}/productAssociation/dialog?product.id=${productInstance?.id}">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />
+                                <img src="${resource(dir: 'images/icons/silk', file:'add.png')}" />
                                 ${g.message(code: 'default.create.label', args: [g.message(code:'productAssociation.label')])}
                             </button>
                         </div>

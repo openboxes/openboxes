@@ -18,7 +18,7 @@ ul.tabs li {
 
 /* link inside the tab. uses a background image */
 ul.tabs a {
-	background: url(${request.contextPath }/images/tabs.png) no-repeat -420px 0;
+	background: url(${resource(dir: 'images', file: 'tabs.png')}) no-repeat -420px 0;
 	font-size:11px;
 	display:block;
 	height: 30px;
@@ -74,4 +74,3 @@ ul.tabs a.xl.current { background-position: 0 -62px; }
 .panes .pane {
 	display:none;
 }
-

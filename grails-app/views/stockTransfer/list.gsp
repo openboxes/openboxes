@@ -86,7 +86,7 @@
                                     <td class="middle">
 										<g:link class="button" controller="stockTransfer" action="eraseStockTransfer" id="${orderInstance?.id}"
 												onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-											<img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />
+											<img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
 											<g:message code="default.button.delete.label"/>
 										</g:link>
                                     </td>

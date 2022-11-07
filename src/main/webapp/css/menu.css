@@ -22,19 +22,19 @@
 	border: 0px solid black;
 }
 .homePagePanel .panelBody {
-	background: url(${request.contextPath }/images/leftnav_midstretch.png) repeat-y top;
+	background: url(${resource(dir: 'images', file: 'leftnav_midstretch.png')}) repeat-y top;
 	margin: 0px;
 	padding: 0px;
 	padding-left: 25px;
 	/* 35px needed to add to align menu options with background image */
 }
 .homePagePanel .panelBtm {
-	background: url(${request.contextPath }/images/leftnav_btm.png) no-repeat top;
+	background: url(${resource(dir: 'images', file: 'leftnav_btm.png')}) no-repeat top;
 	height: 20px;
 	margin: 0px;
 }
 .homePagePanel .panelTop {
-	background: url(${request.contextPath }/images/leftnav_top.png) no-repeat top;
+	background: url(${resource(dir: 'images', file: leftnav_top.png')}) no-repeat top;
 	height: 11px;
 	margin: 0px;
 }

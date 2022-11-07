@@ -42,7 +42,7 @@
                         <td>${documentTemplate?.lastUpdated}</td>
                         <td class="right" align="right">
                             <g:link action="editDocument" id="${documentTemplate.id}" params="['order.id':orderInstance?.id]">
-                                <img src="${createLinkTo(dir:'images/icons/silk',file:'pencil.png')}" alt="Edit" />
+                                <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" alt="Edit" />
                             </g:link>
                             <g:each var="output" in="[[format:'PDF', icon: 'page_white_acrobat.png'],
                                                       [format:'XHTML', icon: 'xhtml.png'],

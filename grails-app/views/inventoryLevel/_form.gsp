@@ -211,18 +211,18 @@
                     <div class="buttons">
                         <g:if test="${!inventoryLevelInstance?.id}">
                             <button class="button" name="_action_save">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}"/>&nbsp;
                                 ${warehouse.message(code: 'default.button.create.label', default: 'Create')}
                             </button>
                         </g:if>
                         <g:else>
                             <button class="button" name="_action_update">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'accept.png')}"/>&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}"/>&nbsp;
                                 ${warehouse.message(code: 'default.button.update.label', default: 'Update')}
                             </button>
                             <g:link controller="inventoryLevel" action="delete" class="button right" id="${inventoryLevelInstance?.id}"
                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'delete.png')}"/>&nbsp;
+                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}"/>&nbsp;
                                 ${warehouse.message(code:'default.button.delete.label')}</g:link>
                         </g:else>
                     </div>
