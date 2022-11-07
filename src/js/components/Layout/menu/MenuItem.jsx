@@ -21,30 +21,33 @@ const DropdownMenuItem = ({ section, active }) => (
   </li>
 );
 
-const CollapseMenuItem = ({ section, active }) => (
-  <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none" >
-    <a
-      className={`nav-link d-flex justify-content-between align-items-center w-100 ${active && 'active-section'}`}
-      data-toggle="collapse"
-      href={`#collapse-${section.label}`}
-      role="button"
-      aria-expanded="false"
-      aria-controls={`collapse-${section.label}`}
-    >
-      {section.label}
-      <RiArrowDropDownLine className="collapse-arrow-icon" />
-    </a>
-    <div className="collapse w-100" id={`collapse-${section.label}`}>
-      <div className="d-flex flex-row flex-wrap">
-        {_.map(section.menuItems, (menuItem, menuItemKey) => (
-          <a className="subsection-section-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
-            {menuItem.label}
-          </a>
-        ))}
+const CollapseMenuItem = ({ section, active }) => {
+  const id = `collapse-${section?.label?.replaceAll(' ', '-')}`;
+  return (
+    <li className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none" >
+      <a
+        className={`nav-link d-flex justify-content-between align-items-center w-100 ${active && 'active-section'}`}
+        data-toggle="collapse"
+        href={`#${id}`}
+        role="button"
+        aria-expanded="false"
+        aria-controls={id}
+      >
+        {section.label}
+        <RiArrowDropDownLine className="collapse-arrow-icon" />
+      </a>
+      <div className="collapse w-100" id={id}>
+        <div className="d-flex flex-row flex-wrap">
+          {_.map(section.menuItems, (menuItem, menuItemKey) => (
+            <a className="subsection-section-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
+              {menuItem.label}
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
-  </li>
-);
+    </li>
+  );
+};
 
 const MenuItem = props => (<>
   <DropdownMenuItem {...props} />

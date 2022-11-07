@@ -41,6 +41,35 @@
                         </div>
                     </div>
                 </li>
+                <li class="nav-item collapsable align-items-center flex-column d-flex d-md-none" id="analytics-collapsed">
+                    <button
+                        data-target="#collapse-analytics"
+                        class="nav-link d-flex justify-content-between align-items-center w-100"
+                        data-toggle="collapse"
+                        aria-expanded="false"
+                        aria-controls="collapse-analytics"
+                    >
+                        <warehouse:message code="order.purchasing.label" />
+                        <i class="ri-arrow-drop-down-line"></i>
+                    </button>
+                    <div class="collapse w-100" id="collapse-analytics">
+                        <div class="d-flex flex-wrap">
+                            <div class="padding-8">
+                                <g:link controller="inventoryBrowser" action="index" class="dropdown-item">
+                                    <warehouse:message code="inventory.browse.label" default="Inventory browser" />
+                                </g:link>
+
+                                <g:link controller="inventorySnapshot" action="list" class="dropdown-item">
+                                    <warehouse:message code="inventory.snapshot.label" default="Inventory Snapshots" />
+                                </g:link>
+
+                                <g:link controller="consumption" action="list" class="dropdown-item">
+                                    <warehouse:message code="consumption.report.label" default="Consumption Report" />
+                                </g:link>
+                            </div>
+                        </div>
+                    </div>
+                </li>
             </g:isUserAdmin>
         </g:if>
 
