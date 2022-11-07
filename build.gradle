@@ -19,7 +19,7 @@ buildscript {
          *
          * See https://github.com/n0mer/gradle-git-properties/issues/195
          */
-        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5+'
+        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
     }
     dependencies {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
