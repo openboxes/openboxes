@@ -34,7 +34,7 @@ class TagController {
         def tagInstance = new Tag(params)
         if (tagInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
-            redirect(action: "list", id: tagInstance.id)
+            redirect(action: "edit", id: tagInstance.id)
         } else {
             render(view: "create", model: [tagInstance: tagInstance])
         }

@@ -54,6 +54,8 @@ class ProductApiController extends BaseDomainApiController {
         if (params.format == 'csv') {
             boolean includeAttributes = params.boolean("includeAttributes") ?: false
             def csv = productService.exportProducts(products, includeAttributes)
+            response.setHeader("Content-disposition",
+                    "attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: csv)
             return
         }
