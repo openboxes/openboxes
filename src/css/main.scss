@@ -111,6 +111,10 @@ body {
   flex-wrap: wrap;
 }
 
+.navbar-nav .dropdown-menu {
+  position: absolute;
+}
+
 .subsection-title {
   color: $gray-zeta;
   font-size: 1.1em;

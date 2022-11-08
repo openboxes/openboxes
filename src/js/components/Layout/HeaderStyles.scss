@@ -1,16 +1,35 @@
 .main-wrapper {
   display: flex;
-  flex-direction: row;
   min-height: 56px;
   width: 100%;
   font-family: 'Inter', sans-serif;
   font-style: normal;
   color: var(--blue-700);
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15);
-  padding: 0 32px;
 
   .navbar-icons .dropdown-menu-wrapper {
     padding-top: 9px !important;
+  }
+
+  .subsection-section-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--blue-700) !important;
+    padding: 8px 16px !important;
+    line-height: 30px;
+  }
+
+  .subsection-section-item {
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 32px;
+    padding: 0;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: var(--blue-200) !important;
+    }
   }
 
   .dropdown-menu-wrapper {
@@ -29,14 +48,6 @@
     border-radius: 4px;
     border: 0 !important;
     padding: 8px;
-
-    span {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--blue-700) !important;
-      padding: 8px 16px !important;
-      line-height: 30px;
-    }
 
     a {
       font-weight: 400;
@@ -127,25 +138,19 @@
   flex-grow: 1;
   min-height: 56px;
   padding: 0 16px;
-
   ul {
     list-style-type: none;
     min-height: 56px;
-
-    li {
+    align-items: stretch !important;
+    li.nav-item {
       min-height: 56px;
-    }
-
-    li:hover {
-      a {
-        color: var(--blue-700) !important;
-      }
     }
   }
 }
 
-.navbar-nav > li:hover {
-  background-color: var(--blue-200);
+.navbar-nav > .dropdown.nav-item:hover,
+.collapse-nav-item > .nav-link:hover {
+  background-color: var(--blue-200) !important;
   color: var(--blue-700) !important;
 }
 
@@ -168,7 +173,21 @@
   }
 }
 
-
+.collapse-nav-item {
+  display: flex !important;
+  flex-direction: column;
+  width: 100%;
+  min-height: unset !important;
+  & > .nav-link {
+    min-height: 56px;
+  }
+  .collapse-arrow-icon {
+    font-size: 24px;
+  }
+  .nav-link[aria-expanded="true"] > .collapse-arrow-icon {
+    transform: rotate(180deg);
+  }
+}
 
 .dropdown:hover > a:hover {
   color: var(--blue-700) !important;
@@ -229,10 +248,12 @@
 }
 
 .active-section {
-  a {
-    color: var(--blue-primary) !important;
-  }
   box-shadow: 0px -3px 0px var(--blue-primary) inset;
+}
+
+.active-section .nav-link,
+.collapse-nav-item .active-section.nav-link {
+  color: var(--blue-primary) !important;
 }
 
 @media (max-width: 1440px) {

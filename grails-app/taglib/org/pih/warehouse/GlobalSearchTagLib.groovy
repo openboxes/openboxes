@@ -23,8 +23,11 @@ class GlobalSearchTagLib {
         attrs.size = (attrs.size) ?: "150"
         attrs.display = (attrs.display) ?: "visible"
 
-
-        out << g.render(template: '/taglib/globalSearch', model: [attrs: attrs])
+        if (attrs.buttonId) {
+            out << g.render(template: '/taglib/globalSearch', model: [attrs: attrs])
+        } else {
+            out << g.render(template: '/taglib/globalSearchStatic', model: [attrs: attrs])
+        }
     }
 
 }

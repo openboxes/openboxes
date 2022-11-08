@@ -1,8 +1,5 @@
-$global-search-bar-width: 700px;
-
 .app-global-search {
-  position: absolute;
-  width: $global-search-bar-width;
+  width: clamp(200px, 60vw, 1000px);
   color: var(--blue-800);
   right: 0;
   outline: none;

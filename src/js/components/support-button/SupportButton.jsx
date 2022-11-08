@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 
 import './SupportButton.scss';
 
-const SupportButton = ({ locale }) => {
+const SupportButton = ({ locale, text, className }) => {
   const [, loadChat] = useChat();
 
   useEffect(() => {
@@ -28,9 +28,16 @@ const SupportButton = ({ locale }) => {
   const toggleOpenChat = () => window.Beacon('toggle');
 
   return (
-    <RiQuestionLine
+    <span
+      role="button"
+      tabIndex={0}
+      onKeyPress={() => {}}
+      className={className}
       onClick={toggleOpenChat}
-    />
+    >
+      <RiQuestionLine />
+      {text}
+    </span>
   );
 };
 
@@ -40,6 +47,8 @@ const mapStateToProps = state => ({
 
 SupportButton.propTypes = {
   locale: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
 };
 
 
