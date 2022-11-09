@@ -65,40 +65,15 @@ class ProductAssociationDataService {
                 command.errors.reject("Cannot associate a product with itself")
             }
 
-            // Check for association duplicates
-            List<ProductAssociation> foundProductAssociations = ProductAssociation.findAllWhere([
-                    product             : productAssociationInstance.product,
-                    associatedProduct   : productAssociationInstance.associatedProduct,
-                    code                : productAssociationInstance.code,
+
+            ProductAssociation existingAssociation = ProductAssociation.findWhere([
+                    product:            productAssociationInstance.product,
+                    associatedProduct:  productAssociationInstance.associatedProduct,
+                    code:               productAssociationInstance.code,
             ])
-            if (!params['id'] && foundProductAssociations && foundProductAssociations.size() > 0) {
-                command.errors.reject("Row ${index + 1}: Association already exists")
-            }
 
-
-            // find another product association that matches current associationInstance
-            // for two-way association relationship, where:
-            // - association.product = otherAssociation.associatedProduct
-            // - association.associatedProduct = otherAssociation.product
-            // - association.code = otherAssociation.code
-            def otherMatchingTwoWayAssociation = command.data.find {
-                it['product.productCode'] == params['associatedProduct.productCode'] &&
-                it['associatedProduct.productCode'] == params['product.productCode'] &&
-                it['code'] == params['code']
-            }
-
-            if (otherMatchingTwoWayAssociation) {
-                // if such a product association exists then
-                // mark current association as two-way association
-                // and validate quantity on both product associations
-                params.hasMutualAssociation = true
-                if (otherMatchingTwoWayAssociation['quantity'] * productAssociationInstance.quantity != 1) {
-                    command.errors.reject(
-                            "Row ${index + 1}: Quantity of Product association for Products with codes " +
-                            "'${productAssociationInstance.product?.productCode}' and " +
-                            "'${otherMatchingTwoWayAssociation['associatedProduct.productCode']}' does not match"
-                    )
-                }
+            if (existingAssociation) {
+                command.errors.reject("Row ${index + 1}: association already exists")
             }
         }
     }
@@ -106,35 +81,20 @@ class ProductAssociationDataService {
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
 
-        def individualAssociations = command.data.findAll{ !it.hasMutualAssociation }
-        // map of two-way product associations grouped by a product and associatedProduct pairs
-        def twoWayAssociations = command.data
-                .findAll{ it.hasMutualAssociation }
-                .groupBy { [it['product.productCode'], it['associatedProduct.productCode']] as Set<String> }
-        // create individual associations that are not bound by two-way association relationship
-        individualAssociations.each { params ->
+        command.data.each{ params ->
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             if (productAssociationInstance.validate()) {
+                if (Boolean.valueOf(params.hasMutualAssociation as String) || (params.hasMutualAssociation as String).equalsIgnoreCase("yes")) {
+                    Map otherAssociationParams = params.clone() as Map
+                    otherAssociationParams['product.id'] = params['associatedProduct.id']
+                    otherAssociationParams['associatedProduct.id'] = params['product.id']
+                    ProductAssociation mutualAssociationInstance = new ProductAssociation(otherAssociationParams)
+
+                    productAssociationInstance.mutualAssociation = mutualAssociationInstance
+                    mutualAssociationInstance.mutualAssociation = productAssociationInstance
+                    mutualAssociationInstance.save(failOnError: true)
+                }
                 productAssociationInstance.save(failOnError: true)
-            }
-        }
-        // two way association is a pair of two associations where:
-        // - association1.product == association2.associatedProduct
-        // - association1.associatedProduct == association2.product
-        // - association1.code == association2.code
-        // - association1.quantity == 1 / association2.quantity
-        twoWayAssociations.each { key, paramList ->
-            def firstAssociationParams = paramList[0]
-            def secondAssociationParams = paramList[1]
-            ProductAssociation firstProductAssociationInstance = new ProductAssociation(firstAssociationParams)
-            ProductAssociation secondProductAssociationInstance = new ProductAssociation(secondAssociationParams)
-
-            firstProductAssociationInstance.mutualAssociation = secondProductAssociationInstance
-            secondProductAssociationInstance.mutualAssociation = firstProductAssociationInstance
-
-            if (firstProductAssociationInstance.validate() && secondProductAssociationInstance.validate()) {
-                firstProductAssociationInstance.save(failOnError: true)
-                secondProductAssociationInstance.save(failOnError: true)
             }
         }
     }
