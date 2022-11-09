@@ -38,6 +38,7 @@ const StockListTable = ({
   hideSpinner: hideTheSpinner,
   showSpinner: showTheSpinner,
   translate,
+  highestRole,
 }) => {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -247,30 +248,35 @@ const StockListTable = ({
       label: 'react.stocklists.editStock.label',
       leftIcon: <RiPencilLine />,
       href: '/openboxes/requisitionTemplate/editHeader',
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Edit stock list items',
       label: 'react.stocklists.items.editStock.label',
       leftIcon: <RiListUnordered />,
       href: '/openboxes/requisitionTemplate/edit',
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Import stock list items',
       label: 'react.stocklists.items.import.label',
       leftIcon: <RiUploadLine />,
       href: '/openboxes/requisitionTemplate/batch',
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Export stock list items',
       label: 'react.stocklists.items.export.label',
       leftIcon: <RiDownloadLine />,
       onClick: exportStockListItems,
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Clone stock list',
       label: 'react.stocklists.clone.label',
       leftIcon: <RiFileCopyLine />,
       onClick: cloneStocklists,
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Publish stock list',
@@ -278,6 +284,7 @@ const StockListTable = ({
       leftIcon: <RiFile3Line />,
       isPublished: false,
       onClick: publishStocklists,
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Unpublish stock list',
@@ -285,6 +292,7 @@ const StockListTable = ({
       leftIcon: <RiFileForbidLine />,
       isPublished: true,
       onClick: unpublishStocklists,
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Clear stock list items',
@@ -292,6 +300,7 @@ const StockListTable = ({
       leftIcon: <RiEraserLine />,
       variant: 'danger',
       onClick: onClickClearStocklists,
+      minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Delete stock list',
@@ -299,6 +308,7 @@ const StockListTable = ({
       leftIcon: <RiDeleteBinLine />,
       variant: 'danger',
       onClick: onClickDeleteStocklists,
+      minimumRequiredRole: 'Admin',
     },
   ];
 
@@ -314,7 +324,7 @@ const StockListTable = ({
         <ActionDots
           dropdownPlacement="right"
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(actions, row, { customFilter: customActionFilter })}
+          actions={findActions(actions, row, { customFilter: customActionFilter, highestRole })}
           id={row.original.id}
         />),
     },
@@ -337,6 +347,7 @@ const StockListTable = ({
       Cell: row => (
         <TableCell
           {...row}
+          tooltip
           link={`/openboxes/requisitionTemplate/show/${row.original.id}`}
         />),
     },
@@ -424,6 +435,7 @@ const StockListTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  highestRole: state.session.highestRole,
 });
 
 const mapDispatchToProps = {
@@ -439,4 +451,5 @@ StockListTable.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  highestRole: PropTypes.string.isRequired,
 };

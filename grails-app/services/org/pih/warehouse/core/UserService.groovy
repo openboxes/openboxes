@@ -410,7 +410,8 @@ class UserService {
         def fullConfig = grailsApplication.config.openboxes.dashboardConfig
         def mainDashboardId = grailsApplication.config.openboxes.dashboardConfig.mainDashboardId
         def resultConfig = [
-                dashboard: fullConfig.dashboards[id ?: mainDashboardId],
+                // Clone to not overwrite the main config in the line 422
+                dashboard: fullConfig.dashboards[id ?: mainDashboardId].clone(),
                 dashboardWidgets: fullConfig.dashboardWidgets
         ]
         def userConfig = user.deserializeDashboardConfig()

@@ -2,26 +2,22 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-
-import OpenboxesLogo from 'components/Layout/img/openboxes_logo.jpg';
+import { Link, withRouter } from 'react-router-dom';
 
 
 const Logo = ({
-  logoUrl, history,
+  logoUrl,
 }) => (
   <div className="d-flex align-items-center logo-wrapper">
     <div className="logo-square">
-      {logoUrl
-          ? <img
-            src={logoUrl}
-            alt="Openboxes"
-            width="40"
-            height="40"
-            role="presentation"
-            onClick={() => history.push('/openboxes')}
-          />
-          : <img src={OpenboxesLogo} alt="Openboxes" />}
+      <Link to="/openboxes">
+        <img
+          src={logoUrl}
+          alt="Openboxes"
+          width="40"
+          height="40"
+        />
+      </Link>
     </div>
   </div>
 );
@@ -35,8 +31,9 @@ export default withRouter(connect(mapStateToProps)(Logo));
 
 
 Logo.propTypes = {
-  logoUrl: PropTypes.string.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }).isRequired,
+  logoUrl: PropTypes.string,
+};
+
+Logo.defaultProps = {
+  logoUrl: '',
 };

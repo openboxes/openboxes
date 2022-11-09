@@ -595,7 +595,10 @@ class StockMovementService {
         if (requisitionItem) {
             removeRequisitionItem(requisitionItem)
         } else {
+            List<Order> orders = shipmentItem?.purchaseOrders
             removeShipmentItem(shipmentItem)
+            // Trigger Order Summary event for POs after deleting the shipment item
+            orders?.each { it.publishRefreshEvent() }
         }
     }
 
@@ -1625,6 +1628,7 @@ class StockMovementService {
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         // Save shipment before adding the items to avoid referencing an unsaved transient instance
+        shipment.disableRefresh = true
         shipment.save()
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -1657,6 +1661,7 @@ class StockMovementService {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
+        shipment.disableRefresh = false
         return shipment
     }
 
@@ -2031,6 +2036,9 @@ class StockMovementService {
         if (orderItem) {
             orderItem.removeFromShipmentItems(shipmentItem)
         }
+        // do not trigger refresh on shipment for combined shipment because after deleting shipment items there will
+        // be no connection between shipment and order
+        shipment.disableRefresh = true
         shipment.removeFromShipmentItems(shipmentItem)
         shipmentItem.delete()
     }
@@ -2039,6 +2047,13 @@ class StockMovementService {
         shipmentItems?.toArray()?.each {shipmentItem ->
             removeShipmentItem(shipmentItem)
         }
+    }
+
+    void removeShipmentItems(Shipment shipment) {
+        List<Order> orders = shipment.purchaseOrders
+        removeShipmentItems(shipment.shipmentItems)
+        // Trigger Order Summary event for POs after deleting the shipment items
+        orders?.each { it.publishRefreshEvent() }
     }
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {

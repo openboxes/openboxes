@@ -55,16 +55,19 @@ const StockMovementInboundList = (props) => {
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
     // SET STATIC DEFAULT VALUES
-    defaultValues.destination = {
-      id: props.currentLocation?.id,
-      value: props.currentLocation?.id,
-      name: props.currentLocation?.name,
-      label: props.currentLocation?.name,
-    };
     defaultValues.direction = 'INBOUND';
 
     const queryProps = queryString.parse(props.history.location.search);
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
+    if (queryProps.destination === undefined) {
+      defaultValues.destination = {
+        id: props.currentLocation?.id,
+        value: props.currentLocation?.id,
+        name: props.currentLocation?.name,
+        label: props.currentLocation?.name,
+      };
+    }
+
     if (queryProps.receiptStatusCode) {
       const statuses = getParamList(queryProps.receiptStatusCode);
       defaultValues.receiptStatusCode = props.shipmentStatuses

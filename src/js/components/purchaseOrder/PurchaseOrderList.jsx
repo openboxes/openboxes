@@ -62,9 +62,7 @@ const PurchaseOrderList = (props) => {
       name: props.currentLocation?.name,
       label: props.currentLocation?.name,
     };
-    if (!isCentralPurchasingEnabled) {
-      defaultValues.destination = currentLocationOption;
-    }
+
     if (isCentralPurchasingEnabled) {
       defaultValues.destinationParty = props.buyers
         .find(org => org.id === props.currentLocation.organization.id);
@@ -92,6 +90,8 @@ const PurchaseOrderList = (props) => {
       defaultValues.destination = props.currentLocation.id === queryProps.destination
         ? currentLocationOption
         : await fetchLocationById(queryProps.destination);
+    } else if (!isCentralPurchasingEnabled && queryProps.destination === undefined) {
+      defaultValues.destination = currentLocationOption;
     }
     if (queryProps.destinationParty) {
       defaultValues.destinationParty = props.buyers
@@ -101,6 +101,11 @@ const PurchaseOrderList = (props) => {
       defaultValues.orderedBy = queryProps.orderedBy === props.currentUser.id
         ? props.currentUser
         : await fetchUserById(queryProps.orderedBy);
+    }
+    if (queryProps.createdBy) {
+      defaultValues.createdBy = queryProps.createdBy === props.currentUser.id
+        ? props.currentUser
+        : await fetchUserById(queryProps.createdBy);
     }
 
     setDefaultFilterValues(defaultValues);
@@ -130,6 +135,7 @@ const PurchaseOrderList = (props) => {
       statusEndDate: { name: 'statusEndDate' },
       destinationParty: { name: 'destinationParty', accessor: 'id' },
       orderedBy: { name: 'orderedBy', accessor: 'id' },
+      createdBy: { name: 'createdBy', accessor: 'id' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);

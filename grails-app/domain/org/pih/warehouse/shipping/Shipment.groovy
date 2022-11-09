@@ -31,9 +31,11 @@ import org.pih.warehouse.requisition.Requisition
 class Shipment implements Comparable, Serializable {
 
     def publishRefreshEvent = {
-        orders?.each { Order o ->
-            if (o?.isPurchaseOrder) {
-                publishEvent(new RefreshOrderSummaryEvent(o))
+        if (!disableRefresh) {
+            orders?.each { Order o ->
+                if (o?.isPurchaseOrder) {
+                    publishEvent(new RefreshOrderSummaryEvent(o))
+                }
             }
         }
     }
@@ -108,6 +110,8 @@ class Shipment implements Comparable, Serializable {
 
     SortedSet receipts
 
+    Boolean disableRefresh = Boolean.FALSE
+
     static transients = [
             "allShipmentItems",
             "unpackedShipmentItems",
@@ -122,11 +126,13 @@ class Shipment implements Comparable, Serializable {
             "receipt",
             "isFromPurchaseOrder",
             "purchaseOrder",
+            "purchaseOrders",
             "orders",
             "isFromReturnOrder",
             "isFromPutawayOrder",
             "isFromTransferOrder",
-            "returnOrder"
+            "returnOrder",
+            "disableRefresh"
     ]
 
     static mappedBy = [
@@ -318,6 +324,10 @@ class Shipment implements Comparable, Serializable {
     // for inbounds and outbounds only
     Order getReturnOrder() {
         return orders?.find { it.isReturnOrder }
+    }
+
+    List<Order> getPurchaseOrders() {
+        return orders?.findAll { it.isPurchaseOrder }
     }
 
     Order getPurchaseOrder() {

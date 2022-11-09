@@ -283,7 +283,7 @@ function loadGraphOptions(payload) {
   if (payload.config.datalabel) {
     labelAlignment = (payload.type === 'horizontalBar') ? 'horizontal' : 'vertical';
 
-    let sumDatasets = 0;
+    let sumDatasets = [0];
     if (!payload.config.stacked || payload.data.datasets.length === 1) {
       sumDatasets = payload.data.datasets[0].data;
     } else if (payload.data.datasets.length) {

@@ -58,12 +58,12 @@
                                                 </g:link>
                                             </td>
                                             <td>
-                                                <g:link controller="order" action="list" params="[orderType:OrderTypeCode.PURCHASE_ORDER.name(), origin: supplier.id, destination: null]" class="list">
+                                                <g:link controller="purchaseOrder" action="list" params="[origin: supplier.id, destination: null]" class="list">
                                                     ${supplier?.pendingOrdersCount}
                                                 </g:link>
                                             </td>
                                             <td>
-                                                <g:link controller="stockMovement" action="list" params="[direction:'INBOUND', 'origin.id': supplier?.id, 'destination.id': null, receiptStatusCode: ShipmentStatusCode.listPending()]" class="list">
+                                                <g:link controller="stockMovement" action="list" params="[direction:'INBOUND', 'origin': supplier?.id, destination: null, receiptStatusCode: ShipmentStatusCode.listPending()]" class="list">
                                                     ${supplier?.pendingShipmentsCount}
                                                 </g:link>
                                             </td>

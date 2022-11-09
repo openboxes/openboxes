@@ -250,7 +250,7 @@ class StockMovementApiController {
         if (requisition) {
             stockMovementService.removeRequisitionItems(requisition)
         } else {
-            stockMovementService.removeShipmentItems(shipment.shipmentItems)
+            stockMovementService.removeShipmentItems(shipment)
         }
         render status: 204
     }

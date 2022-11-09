@@ -142,7 +142,16 @@ class LocationDataService {
         if (!location.inventory && !location.parentLocation) {
             location.inventory = new Inventory(['warehouse': location])
         }
-        def locationType = params.locationType ? LocationType.findByName(params.locationType) : null
+        def locationType = null
+        if (params.locationType) {
+            locationType = LocationType.createCriteria().get {
+                or {
+                    eq('name', params.locationType)
+                    like('name', params.locationType + "%")
+                }
+            }
+        }
+
         def currentLocationType = location.locationType
 
         //Do not allow to change internal type location to non-internal

@@ -48,13 +48,7 @@ class LocationController {
     }
 
     def show = {
-        def locationInstance = inventoryService.getLocation(params.id)
-        if (!locationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [locationInstance: locationInstance]
-        }
+        redirect(action: "edit", params: params)
     }
 
     def edit = {
@@ -251,7 +245,6 @@ class LocationController {
                     locationInstance.logo = logo.bytes
                     if (!locationInstance.hasErrors()) {
                         inventoryService.saveLocation(locationInstance)
-                        session.warehouse = locationInstance
                         flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), locationInstance.id])}"
                     } else {
                         // there were errors, the logo was not saved

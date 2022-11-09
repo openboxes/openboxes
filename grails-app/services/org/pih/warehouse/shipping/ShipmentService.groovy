@@ -954,6 +954,7 @@ class ShipmentService {
     void deleteShipmentItem(ShipmentItem shipmentItem, boolean saveParent = true) {
         if (shipmentItem) {
             def shipment = Shipment.get(shipmentItem.shipment.id)
+            shipment.disableRefresh = true
             shipment.removeFromShipmentItems(shipmentItem)
             shipmentItem?.orderItems?.toArray()?.flatten()?.each { OrderItem orderItem ->
                 orderItem.removeFromShipmentItems(shipmentItem)

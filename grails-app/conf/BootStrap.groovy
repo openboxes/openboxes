@@ -179,6 +179,7 @@ class BootStrap {
                 destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
                 dateOrdered: orderSummary?.order?.dateOrdered?.format("MMM dd, yyyy"),
                 orderedBy: orderSummary?.order?.orderedBy?.name,
+                createdBy: orderSummary?.order?.createdBy?.name,
                 orderItemsCount: orderSummary?.order?.activeOrderItems?.size()?:0,
                 orderedOrderItemsCount: orderSummary?.order?.orderedOrderItems?.size()?:0,
                 shippedItemsCount: orderSummary?.order?.shippedOrderItems?.size()?:0,

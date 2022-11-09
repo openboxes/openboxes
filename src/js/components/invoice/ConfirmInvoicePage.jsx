@@ -82,7 +82,7 @@ const INVOICE_ITEMS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues && rowValues.totalAmount && rowValues.totalAmount < 0 ? 'negative-value' : '' }),
+    getDynamicRowAttr: ({ rowValues }) => ({ className: rowValues && rowValues.totalAmount && rowValues.totalAmount < 0 ? 'negative-row-value' : '' }),
     fields: {
       prepaymentIcon: {
         type: (params) => {
