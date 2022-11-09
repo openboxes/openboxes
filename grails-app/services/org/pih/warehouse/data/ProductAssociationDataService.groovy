@@ -84,7 +84,7 @@ class ProductAssociationDataService {
         command.data.each{ params ->
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             if (productAssociationInstance.validate()) {
-                if (Boolean.valueOf(params.hasMutualAssociation as String) || (params.hasMutualAssociation as String).equalsIgnoreCase("yes")) {
+                if (Boolean.valueOf(params.hasMutualAssociation as String) || (params.hasMutualAssociation as String)?.equalsIgnoreCase("yes")) {
                     Map otherAssociationParams = params.clone() as Map
                     otherAssociationParams['product.id'] = params['associatedProduct.id']
                     otherAssociationParams['associatedProduct.id'] = params['product.id']
