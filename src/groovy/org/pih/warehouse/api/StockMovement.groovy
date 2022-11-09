@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
@@ -10,6 +11,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -123,8 +125,30 @@ class StockMovement {
             description         : description,
             statusCode          : statusCode,
             identifier          : identifier,
-            origin              : origin,
-            destination         : destination,
+            origin              : [
+                id                  : origin?.id,
+                name                : origin?.name,
+                locationNumber      : origin?.locationNumber,
+                locationType        : origin?.locationType,
+                locationGroup       : origin?.locationGroup,
+                organizationName    : origin?.organization?.name,
+                organizationCode    : origin?.organization?.code,
+                isDepot             : origin?.isDepot(),
+            ],
+            destination         : [
+                id                  : destination?.id,
+                name                : destination?.name,
+                locationNumber      : destination?.locationNumber,
+                locationType        : destination?.locationType,
+                locationGroup       : destination?.locationGroup,
+                organizationName    : destination?.organization?.name,
+                organizationCode    : destination?.organization?.code,
+            ],
+            order                : [
+                id                  : shipment?.returnOrder?.id,
+                name                : shipment?.returnOrder?.name,
+                orderNumber         : shipment?.returnOrder?.orderNumber
+            ],
             hasManageInventory  : origin?.supports(ActivityCode.MANAGE_INVENTORY),
             stocklist           : [
                 id  : stocklist?.id,
@@ -132,10 +156,12 @@ class StockMovement {
             ],
             replenishmentType   : stocklist?.replenishmentTypeCode,
             dateRequested       : dateRequested?.format("MM/dd/yyyy"),
+            dateCreated         : dateCreated?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
             expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
             shipmentType        : shipmentType,
-            shipmentStatus      : currentStatus,
+            currentStatus       : currentStatus,
+            shipmentStatus      : shipment?.status?.name,
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
@@ -154,6 +180,9 @@ class StockMovement {
             isReturn            : isReturn,
             isShipped           : isShipped,
             isReceived          : isReceived,
+            isPartiallyReceived : hasBeenPartiallyReceived(),
+            isElectronicType    : electronicType,
+            isPending           : pending,
             shipped             : isShipped,
             received            : isReceived,
             requestType         : requestType,
@@ -230,8 +259,8 @@ class StockMovement {
         if (electronicType) {
             User user = AuthService.currentUser.get()
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
-            def userRoles = user.getEffectiveRoles(currentLocation)
-            if (!userRoles.any { Role role -> role.roleType == accessRule?.accessRules?.minimumRequiredRole }) {
+            def userService = ApplicationHolder.application.mainContext.getBean("userService")
+            if (!userService.isUserInRole(user, accessRule?.accessRules?.minimumRequiredRole)) {
                 throw new IllegalAccessException("You don't have minimum required role to perform this action")
             }
         }
@@ -245,7 +274,7 @@ class StockMovement {
         boolean isDepot = origin?.isDepot()
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
-        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || !isPending() || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
+        return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || (!isFromOrder && !isPending()) || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
     }
 
     Boolean isReceivingAuthorized(Location currentLocation) {

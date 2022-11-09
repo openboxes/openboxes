@@ -12,12 +12,20 @@
 			<img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
 		</button>
 		<div class="actions" style="min-width: 200px;">
-			<g:if test="${!request.request.requestURL.toString().contains('order/list')}">
+			<g:if test="${!request.request.requestURL.toString().contains('order/list') && orderInstance?.orderType != PUTAWAY_ORDER}">
 				<div class="action-menu-item">
-					<g:link controller="order" action="list">
-						<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
-						&nbsp;${warehouse.message(code: 'order.list.label')}
-					</g:link>
+					<g:if test="${orderInstance?.orderType == PURCHASE_ORDER}">
+						<g:link controller="purchaseOrder" action="list">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
+							&nbsp;${warehouse.message(code: 'order.list.label')}
+						</g:link>
+					</g:if>
+					<g:else>
+						<g:link controller="order" action="list">
+							<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}" alt="View orders" style="vertical-align: middle" />
+							&nbsp;${warehouse.message(code: 'order.list.label')}
+						</g:link>
+					</g:else>
 				</div>
 			</g:if>
 			<div class="action-menu-item">
@@ -106,7 +114,7 @@
 								<g:set var="disabledMessage" value="${g.message(code:'errors.noPermissions.label')}"/>
 							</g:if>
 							<g:elseif test="${orderInstance?.shipments}">
-								<g:set var="disabledMessage" value="${g.message(code:'order.errors.rollback.message')}"/>
+								<g:set var="disabledMessage" value="${g.message(code: 'order.errors.rollback.message')}"/>
 							</g:elseif>
 							<g:if test="${orderInstance?.isPlaced()}">
 								<g:link controller="order" action="rollbackOrderStatus" id="${orderInstance?.id}"
@@ -119,7 +127,7 @@
 							</g:if>
 						</div>
 					</g:isSuperuser>
-					<g:isUserInRole roles="[RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_ASSISTANT, RoleType.ROLE_MANAGER]">
+					<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
 						<div class="action-menu-item">
 							<g:link controller="order" action="remove" id="${orderInstance?.id}"
 									disabled="${orderInstance?.status != OrderStatus.PENDING}"
@@ -132,19 +140,19 @@
 					</g:isUserInRole>
 				</g:supports>
 			</g:if>
-			<g:if test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
-				<g:isSuperuser>
+			<g:elseif test="${orderInstance?.orderType == PUTAWAY_ORDER && orderInstance?.status != OrderStatus.COMPLETED}">
+				<g:isUserInRole roles="[RoleType.ROLE_ASSISTANT]">
 					<div class="action-menu-item">
 						<g:link controller="order" action="remove" id="${orderInstance?.id}"
 								disabled="${orderInstance?.status != OrderStatus.PENDING}"
-								disabledMessage="${g.message(code:'order.errors.delete.message')}"
+								disabledMessage="${g.message(code: 'order.errors.delete.message')}"
 								onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 							<img src="${resource(dir: 'images/icons/silk', file: 'bin.png')}" />
 							&nbsp;${warehouse.message(code: 'order.deleteOrder.label')}
 						</g:link>
 					</div>
-				</g:isSuperuser>
-			</g:if>
-        </div>
+				</g:isUserInRole>
+			</g:elseif>
+		</div>
 	</span>
 </g:if>

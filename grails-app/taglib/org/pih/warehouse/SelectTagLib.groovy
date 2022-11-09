@@ -620,7 +620,7 @@ class SelectTagLib {
 
     def selectProductAssociationTypeCode = { attrs, body ->
         attrs.from = ProductAssociationTypeCode.list()
-        attrs.optionValue = { it }
+        attrs.optionValue = { format.metadata(obj: it) }
         out << g.select(attrs)
     }
 

@@ -9,7 +9,10 @@
  **/
 package org.pih.warehouse.order
 
+import grails.orm.PagedResultList
 import grails.validation.ValidationException
+import org.pih.warehouse.core.ActivityCode
+
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
@@ -54,6 +57,81 @@ class OrderService {
     def personDataService
     def stockMovementService
     def grailsApplication
+
+    def getPurchaseOrders(Map params) {
+        // Parse pagination parameters
+        def max = params.max ? params.int("max") : null
+        def offset = params.offset ? params.int("offset") : null
+
+        // Parse date parameters
+        Date statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
+        Date statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
+
+        // OrderSummery contains only Purchase Orders, hence no need to filter by orderType.
+        return OrderSummary.createCriteria().list(max: max, offset: offset) {
+            if (params.status) {
+                'in'("derivedStatus", params.list("status"))
+            }
+
+            order {
+                and {
+                    if (params.searchTerm) {
+                        or {
+                            ilike("name", "%" + params.searchTerm + "%")
+                            ilike("description", "%" + params.searchTerm + "%")
+                            ilike("orderNumber", "%" + params.searchTerm + "%")
+                        }
+                    }
+                    if (params.destination) {
+                        eq("destination.id", params.destination)
+                    }
+                    if (params.destinationParty) {
+                        destinationParty {
+                            eq("id", params.destinationParty)
+                        }
+                    }
+                    if (params.origin) {
+                        eq("origin.id", params.origin)
+                    }
+                    if (statusStartDate) {
+                        ge("dateOrdered", statusStartDate)
+                    }
+                    if (statusEndDate) {
+                        le("dateOrdered", statusEndDate)
+                    }
+                    if (params.orderedBy) {
+                        eq("orderedBy.id", params.orderedBy)
+                    }
+                    if (params.createdBy) {
+                        eq("createdBy.id", params.createdBy)
+                    }
+                }
+
+                if (params.sort && params.sort != 'status') {
+                    if (params.sort == 'origin') {
+                        origin {
+                            order("name", params.order ?: 'asc')
+                        }
+                    } else if (params.sort == 'destination') {
+                        destination {
+                            order("name", params.order ?: 'asc')
+                        }
+                    } else if (params.sort == 'orderedBy') {
+                        orderedBy {
+                            order("firstName", params.order ?: 'asc')
+                            order("lastName", params.order ?: 'asc')
+                        }
+                    } else {
+                        order(params.sort, params.order ?: 'asc')
+                    }
+                }
+            }
+
+            if (params.sort && params.sort == 'status') {
+                order('derivedStatus', params.order ?: 'asc')
+            }
+        }
+    }
 
     def getOrders(Order orderTemplate, Date dateOrderedFrom, Date dateOrderedTo, Map params) {
         def orders = Order.createCriteria().list(params) {
@@ -420,6 +498,9 @@ class OrderService {
         Order orderInstance = Order.get(orderId)
         if (!orderInstance) {
             throw new RuntimeException("Unable to locate order with order ID ${orderId}")
+        }
+        if (orderInstance.shipments?.size() > 0) {
+            throw new IllegalArgumentException("Cannot rollback order with associated shipments")
         }
 
         try {
@@ -970,7 +1051,9 @@ class OrderService {
     def getOrderSummaryList(Map params) {
         return OrderSummary.createCriteria().list(params) {
             if (params.orderNumber) {
-                ilike("orderNumber", "%${params.orderNumber}%")
+                order {
+                    ilike("orderNumber", "%${params.orderNumber}%")
+                }
             }
             if (params.orderStatus) {
                 'in'("orderStatus", params.orderStatus)
@@ -1127,5 +1210,41 @@ class OrderService {
         }
 
         return results
+    }
+
+    /**
+     * Refreshing entire Order Summary materialized view, should be only triggered from time to time
+     * (same statements as in the order-summary-materialized-view.sql)
+     * */
+    def refreshOrderSummary() {
+        List statements = [
+            // Drop mv temp table if somehow it still exists
+            "DROP TABLE IF EXISTS order_summary_mv_temp;",
+            // Create temp mv table from sql view (to shorten the time when MV is unavailable)
+            "CREATE TABLE order_summary_mv_temp AS SELECT * FROM order_summary;",
+            "DROP TABLE IF EXISTS order_summary_mv;",
+            // Copy data from temp mv table into mv table
+            "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
+            "TRUNCATE order_summary_mv;",
+            "INSERT INTO order_summary_mv SELECT * FROM order_summary_mv_temp;",
+            "ALTER TABLE order_summary_mv ADD UNIQUE INDEX (id);",
+            // Cleanup
+            "DROP TABLE IF EXISTS order_summary_mv_temp;",
+        ]
+        dataService.executeStatements(statements)
+    }
+
+    /**
+     * Refreshing the Order Summary materialized view for a specific Order (PASS ONLY A PO ID)
+     * */
+    def refreshOrderSummary(String orderId, Boolean isDelete) {
+        List statements = []
+        if (isDelete) {
+            statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
+        } else {
+            statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
+        }
+
+        dataService.executeStatements(statements)
     }
 }

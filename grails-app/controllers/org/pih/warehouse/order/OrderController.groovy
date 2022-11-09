@@ -300,18 +300,27 @@ class OrderController {
                 redirect(action: "show", id: orderInstance?.id)
                 return
             }
-            try {
-                orderService.deleteOrder(orderInstance)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", params: [orderType: orderInstance.orderType])
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
+
+            if (orderInstance.status == OrderStatus.PENDING) {
+                try {
+                    orderService.deleteOrder(orderInstance)
+                    flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                }
+                catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                }
+            } else {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                redirect(action: "list", id: params.id, params: [orderType: orderInstance.orderType])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list", params: [orderType: orderInstance.orderType])
+        }
+        if (orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()) {
+            redirect(controller: "purchaseOrder", action: "list")
+        } else if (orderInstance.orderType.code == Constants.PUTAWAY_ORDER) {
+            redirect(controller: "order", action: "list", params: [orderType: Constants.PUTAWAY_ORDER, status: OrderStatus.PENDING])
+        } else {
+            redirect(controller: "order", action: "list")
         }
     }
 
@@ -990,6 +999,7 @@ class OrderController {
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
+            orderItem.disableRefresh = false
             render (status: 200, text: "Item canceled successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1001,6 +1011,7 @@ class OrderController {
         def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
+            orderItem.disableRefresh = false
             render(status: 200, text: "Item restored successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1018,6 +1029,7 @@ class OrderController {
         def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user) && !orderAdjustment.hasRegularInvoice
         if(canEdit) {
             orderAdjustment.canceled = true
+            orderAdjustment.disableRefresh = false
             render (status: 200, text: "Adjustment canceled successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1030,6 +1042,7 @@ class OrderController {
         def canEdit = orderService.canManageAdjustments(orderAdjustment.order, user)
         if(canEdit) {
             orderAdjustment.canceled = false
+            orderAdjustment.disableRefresh = false
             render(status: 200, text: "Adjustment restored successfully")
         } else {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
@@ -1063,6 +1076,13 @@ class OrderController {
 
     def createCombinedShipment = {
         def orderInstance = Order.get(params.orderId)
+        Location currentLocation = Location.get(session.warehouse.id)
+
+        if (!(orderInstance.destination.equals(currentLocation) || currentLocation.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING))) {
+            flash.message = "${warehouse.message(code:'order.cantShipFromDifferentLocation.label')}"
+            redirect(controller: 'order', action: "show", id: orderInstance.id)
+            return
+        }
         if (!orderInstance.orderItems.find {it.quantityRemainingToShip != 0 && it.orderItemStatusCode != OrderItemStatusCode.CANCELED }) {
             flash.message = "${warehouse.message(code:'purchaseOrder.noItemsToShip.label')}"
             redirect(controller: 'order', action: "show", id: orderInstance.id, params: ['tab': 4])

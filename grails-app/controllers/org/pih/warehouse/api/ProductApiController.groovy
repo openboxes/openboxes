@@ -11,10 +11,13 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Tag
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductCatalog
 
 class ProductApiController extends BaseDomainApiController {
 
@@ -23,6 +26,40 @@ class ProductApiController extends BaseDomainApiController {
     def forecastingService
     def grailsApplication
     def productAvailabilityService
+
+    def list = {
+        boolean includeInactive = params.boolean('includeInactive') ?: false
+        def categories = params.categoryId ? Category.findAllByIdInList(params.list("categoryId")) : null
+        def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
+        def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
+
+        // Following this approach of assigning q into other params for productService.getProducts
+        params.name = params.q
+        params.description = params.q
+        params.brandName = params.q
+        params.manufacturer = params.q
+        params.manufacturerCode = params.q
+        params.vendor = params.q
+        params.vendorCode = params.q
+        params.productCode = params.q
+        params.unitOfMeasure = params.q
+
+        // If we specify a format=csv we want to download everything
+        if (params.format == 'csv') {
+            params.max = -1
+        }
+
+        def products = productService.getProducts(categories, catalogs, tags, includeInactive, params)
+
+        if (params.format == 'csv') {
+            boolean includeAttributes = params.boolean("includeAttributes") ?: false
+            def csv = productService.exportProducts(products, includeAttributes)
+            render(contentType: "text/csv", text: csv)
+            return
+        }
+
+        render([data: products, totalCount: products?.totalCount] as JSON)
+    }
 
     def demand = {
         def product = Product.get(params.id)
@@ -56,7 +93,7 @@ class ProductApiController extends BaseDomainApiController {
         render([data: data] as JSON)
     }
 
-    def list = {
+    def search = {
 
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
 
@@ -222,4 +259,28 @@ class ProductApiController extends BaseDomainApiController {
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
     }
 
+    def catalogOptions = {
+        def catalogs = ProductCatalog.list(sort: "name").collect {
+            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
+        }
+
+        render([data: catalogs] as JSON)
+    }
+
+    def categoryOptions = {
+        def categories = Category.list().sort().collect {
+            [id: it.id, label: it.getHierarchyAsString(" > ")]
+        }
+
+        render([data: categories] as JSON)
+
+    }
+
+    def tagOptions = {
+        def tags = Tag.list(sort: "tag").collect {
+            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
+        }
+
+        render([data: tags] as JSON)
+    }
 }

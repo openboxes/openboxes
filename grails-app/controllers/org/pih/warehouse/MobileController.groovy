@@ -100,7 +100,9 @@ class MobileController {
     def outboundList = {
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
         StockMovement stockMovement = new StockMovement(origin: origin, stockMovementDirection: StockMovementDirection.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max:params.max?:10, offset: params.offset?:0])
+        params.max = params.max ?: 10
+        params.offset = params.offset ?: 0
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params)
         [stockMovements:stockMovements]
     }
 

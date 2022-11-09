@@ -1,4 +1,5 @@
 <%@ page import="org.pih.warehouse.product.ProductField" %>
+<%@ page import="org.pih.warehouse.product.ProductType" %>
 <g:set var="formAction"><g:if test="${productInstance?.id}">update</g:if><g:else>save</g:else></g:set>
 <g:form name="productForm" action="${formAction}" onsubmit="return validateForm();">
     <g:hiddenField name="id" value="${productInstance?.id}" />
@@ -24,8 +25,8 @@
                 <tr class="prop first">
                     <td class="name middle"><label id="productTypeLabel" for="productType.id"><warehouse:message code="product.productType.label"/></label></td>
                     <td valign="top" class="value ${hasErrors(bean: productInstance, field: 'productType', 'errors')}">
-                        <g:select name="productType.id" id="productType" from="${org.pih.warehouse.product.ProductType.list() }" class="chzn-select-deselect"
-                                  optionKey="id" optionValue="name" value="${productInstance?.productType?.id}" noSelection="['null':warehouse.message(code:'default.label')]"/>
+                        <g:select name="productType.id" id="productType" from="${ProductType.list() }" class="chzn-select-deselect"
+                                  optionKey="id" optionValue="name" value="${productInstance?.productType?.id ?: ProductType.defaultProductType.list()?.first()?.id}"/>
                     </td>
                 </tr>
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRODUCT_CODE)}">

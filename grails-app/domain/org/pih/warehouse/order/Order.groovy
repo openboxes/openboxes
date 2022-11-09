@@ -36,6 +36,24 @@ class Order implements Serializable {
         }
     }
 
+    def publishRefreshEvent = {
+        if (isPurchaseOrder) {
+            publishEvent(new RefreshOrderSummaryEvent(this))
+        }
+    }
+
+    def publishRefreshEvenBeforeDelete = {
+        if (isPurchaseOrder) {
+            publishEvent(new RefreshOrderSummaryEvent(this, true))
+        }
+    }
+
+    def afterInsert = publishRefreshEvent
+
+    def afterUpdate = publishRefreshEvent
+
+    def beforeDelete = publishRefreshEvenBeforeDelete
+
     String id
     OrderStatus status = OrderStatus.PENDING
     OrderType orderType
@@ -90,6 +108,7 @@ class Order implements Serializable {
             "invoices",
             "hasInvoice",
             "invoiceItems",
+            "invoicedOrderItems",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
             "hasActiveItemsOrAdjustments",
@@ -309,6 +328,10 @@ class Order implements Serializable {
         return orderItems?.findAll { it.completelyReceived }
     }
 
+    def getInvoicedOrderItems() {
+        return orderItems?.findAll { it.completelyInvoiced }
+    }
+
     /**
      * @deprecated should use total
      * @return
@@ -335,7 +358,7 @@ class Order implements Serializable {
     }
 
     def getTotal() {
-        return (subtotal + totalAdjustments)?:0
+        return (subtotal + totalAdjustments)?:0.0
     }
 
     def getTotalNormalized() {
@@ -491,4 +514,22 @@ class Order implements Serializable {
         ]
     }
 
+    Map toJson(OrderTypeCode orderTypeCode) {
+        switch (orderTypeCode) {
+            case OrderTypeCode.TRANSFER_ORDER:
+                return [
+                    id              : id,
+                    status          : status?.name(),
+                    orderNumber     : orderNumber,
+                    name            : name,
+                    createdBy       : createdBy?.name,
+                    dateCreated     : dateCreated?.format("MMM dd, yyyy"),
+                    origin          : origin?.name,
+                    destination     : destination?.name,
+                    orderItemsCount : orderItems?.size(),
+                ]
+            default:
+                return toJson()
+        }
+    }
 }

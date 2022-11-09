@@ -98,10 +98,9 @@
                         </g:if>
                     </td>
                     <td class="center middle">
-                        <g:set var="binLocation" value="${requisitionItem?.product?.getInventoryLevel(location?.id)?.binLocation}"/>
-                        <g:each in="${binLocation?.split(';')}" var="binLocationPart">
-                            ${binLocationPart}<br/>
-                        </g:each>
+                        <g:if test="${picklistItems}">
+                            ${picklistItems[j]?.binLocation?.name}
+                        </g:if>
                     </td>
                     <td class="middle center" width="25%">
                         <g:if test="${picklistItems}">

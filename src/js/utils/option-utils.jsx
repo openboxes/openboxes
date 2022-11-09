@@ -73,7 +73,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
 export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
+      apiClient.get(`/openboxes/api/products/search?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,
@@ -95,7 +95,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
 export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/openboxes/api/products?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
+      apiClient.get(`/openboxes/api/products/search?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
         .then(result => callback(_.map(result.data.data, obj => (
           {
             id: obj.id,
@@ -171,3 +171,20 @@ export const debounceLocationGroupsFetch = (waitTime, minSearchLength) =>
       callback([]);
     }
   }, waitTime);
+
+export const organizationsFetch = (roleTypes = ['ROLE_SUPPLIER'], active = false) =>
+  apiClient.get(`/openboxes/api/organizations?${roleTypes ? roleTypes.map(roleType => `&roleType=${roleType}`).join('') : ''}&active=${active}`)
+    .then((res) => {
+      if (res.data.data) {
+        return res.data.data.map(obj => (
+          {
+            id: obj.id,
+            value: obj.id,
+            name: obj.name,
+            label: `${obj.name}`,
+          }
+        ));
+      }
+      return null;
+    });
+

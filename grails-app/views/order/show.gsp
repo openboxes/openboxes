@@ -13,10 +13,10 @@
         <style>
             .canceled-item { background-color: grey; }
 
-            .ui-tabs-nav > .badge::before {
+            .ui-tabs-nav > .tab-badge::before {
                 background-color: rgb(192, 192, 192);
             }
-            .ui-tabs-nav > .ui-state-active.badge::before {
+            .ui-tabs-nav > .ui-state-active.tab-badge::before {
                 background-color: green;
             }
         </style>
@@ -234,7 +234,7 @@
                                 <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
                                 <li
                                     data-count="${orderInstance.comments.size() < 1000 ? orderInstance.comments.size() : '999+' }"
-                                    class="${orderInstance.comments.size() > 0 ? 'badge' : ''}"
+                                    class="${orderInstance.comments.size() > 0 ? 'tab-badge' : ''}"
                                 >
                                     <a href="#tabs-comments"><warehouse:message code="comments.label" default="Comments"/></a>
                                 </li>

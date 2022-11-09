@@ -54,9 +54,13 @@ export const handleSuccess = response => response;
 
 export const handleError = (error) => {
   switch (error.response.status) {
-    case 400:
-      Alert.error(`Bad Request.</br> ${_.map(_.get(error, 'response.data.errorMessages', ''), errorMessage => `<div>${errorMessage}</div>`)}`);
+    case 400: {
+      const errorMessages = _.map(_.get(error, 'response.data.errorMessages', ''), errorMessage => `<div>${errorMessage}</div>`);
+      const errorMessage = _.get(error, 'response.data.errorMessage', '');
+      Alert.error(`Bad Request.</br> ${errorMessage || errorMessages}`);
       break;
+    }
+
     case 401:
       confirmAlert({
         customUI: props => (<LoginModal {...props} />),

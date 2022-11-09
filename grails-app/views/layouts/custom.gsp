@@ -4,9 +4,15 @@
 <head>
     <!-- Include default page title -->
     <title><g:layoutTitle default="OpenBoxes" /></title>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <!-- YUI -->
     <yui:stylesheet dir="reset-fonts-grids" file="reset-fonts-grids.css" />
+
+    <!-- Remix icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
     <!-- Include Favicon -->
     <link rel="shortcut icon" href="${createLinkTo(dir:'images',file:'favicon.ico')}?v2" type="image/x-icon" />
@@ -18,6 +24,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" type="text/css" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/datatables/1.9.4/css/jquery.dataTables.min.css" type="text/css">
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
     <!-- Include javascript files -->
     <g:javascript library="application"/>
@@ -50,6 +57,7 @@
     <ga:trackPageview/>
     <r:layoutResources/>
 
+    <!-- TODO: replace fontawesowe by remix icons -->
     <script src="https://use.fontawesome.com/releases/v5.14.0/js/all.js" data-auto-replace-svg="nest"></script>
 </head>
 
@@ -64,11 +72,19 @@
         </div>
     </g:if>
     <g:if test="${session.impersonateUserId}">
-        <div class="notice">
-            <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user {0}."/>
-            <g:link controller="auth" action="logout">
-                ${g.message(code:'default.logout.label', default: "Logout")}
-            </g:link>
+        <div class="impersonate-box d-flex justify-content-between align-items-center">
+            <div class="info d-flex align-items-center">
+                <i class="ri-shield-user-line"></i>
+                <span>
+                    <g:message code="user.impersonate.message" args="[session.user.username]" default="You are impersonating user"/>
+                    <span class="font-weight-bold">${session?.user?.username}</span>
+                </span>
+            </div>
+            <a href="/openboxes/auth/logout">
+                <button class="primary-button">
+                    ${g.message(code:'default.logout.label', default: "Logout")}
+                </button>
+            </a>
         </div>
     </g:if>
     <g:if test="${session.useDebugLocale}">
@@ -102,17 +118,63 @@
 
     <!-- Header "hd" includes includes logo, global navigation -->
     <g:if test="${session?.user && session?.warehouse}">
-        <div id="hd" role="banner">
-            <g:render template="/common/header"/>
-        </div>
-        <div id="megamenu">
-            <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
-            <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                ${g.message(code: 'default.loading.label')}
+        <div id="main-wrapper" class="navbar navbar-expand-md navbar-light bg-light bg-white p-0 px-md-4">
+            <div class="d-flex p-2 p-md-0 justify-content-between flex-grow-1">
+                <div class="d-flex align-items-center">
+                <g:displayLogo location="${session?.warehouse?.id}" includeLink="${true}" />
+                <g:set var="locationColor" value="${session?.warehouse?.bgColor?.replace('#', '')?.toUpperCase()}"/>
+                <g:if test="${locationColor && ['FFFFFF', 'FFFF'].any{ it == locationColor }}">
+                    <g:set var="locationColorVariable" value="--location-color: unset"/>
+                </g:if>
+                <g:else>
+                    <g:set var="locationColorVariable" value="--location-color: #${locationColor}"/>
+                </g:else>
+                <div class="tooltip2">
+                    <button
+                        class="btn-show-dialog location-chooser__button"
+                        style="${locationColorVariable}"
+                        data-dialog-class="location-chooser"
+                        data-resizable="false"
+                        data-draggable="true"
+                        data-width="900"
+                        data-title="${g.message(code:'dashboard.chooseLocation.label')}" data-height="300"
+                        data-url="${request.contextPath}/dashboard/changeLocation?targetUri=${targetUri}"
+                    >
+                        <span class="location-chooser__button-title">${session?.warehouse?.name}</span>
+                        <g:if  test="${grailsApplication.config.openboxes.logo.label}">
+                            <span class="location-chooser__button-tag">
+                                ${grailsApplication.config.openboxes.logo.label}
+                            </span>
+                        </g:if>
+                    </button>
+                    <g:if test="${session?.warehouse?.name?.length() > 20}">
+                        <span class="tooltiptext2">${session?.warehouse?.name}</span>
+                    </g:if>
+                </div>
             </div>
-        </div>
-        <div id="breadcrumb">
-            <g:render template="/common/breadcrumb"/>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#navbarToggler"
+                    aria-controls="navbarToggler"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <i class="ri-menu-line"></i>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse w-100" id="navbarToggler">
+                <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
+                    <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
+                    <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
+                        ${g.message(code: 'default.loading.label')}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-end navbar-icons">
+                    <g:render template="/common/menuicons" model="[confMenu: grailsApplication.config.openboxes.megamenu.configuration]" />
+                </div>
+            </div>
         </div>
     </g:if>
 
@@ -310,12 +372,13 @@
 
 <g:javascript>
 
-    function openModalDialog(target, title, width, height, url, reload) {
+    function openModalDialog(target, title, width, height, url, reload, resizable, draggable, dialogClass) {
 
         var position = {
-            my: "center center",
-            at: "center center",
-            of: window
+            my: "center",
+            at: "center",
+            of: window,
+            offset: "0 -100%"
         };
 
         $(target).attr("title", title);
@@ -325,16 +388,32 @@
             modal: true,
             width: width,
             autoResize:true,
-            resizable: true,
+            resizable: resizable,
             minHeight: height,
             position: position,
+            draggable: draggable,
+            dialogClass: dialogClass,
+            create: function(event, ui) {
+                var widget = $(this).dialog("widget");
+                $(".ui-dialog-titlebar-close span", widget)
+                        .removeClass("ui-icon-closethick")
+                        .removeClass("ui-icon")
+                        .addClass("ri-close-line")
+                        .empty();
+            },
             close: function(event, ui) {
               if (reload) {
                 location.reload();
               }
             },
             open: function(event, ui) {
-                $(this).html("<div class='loading'></div>");
+              const loadingElement =
+              "<div class='spinner-container'>" +
+              "<div class='spinner-border circle-spinner' role='status'>" +
+              "<span class='sr-only'>Loading...</span>" +
+              "</div>";
+              "</div>";
+                $(this).html(loadingElement);
                 $(this).load(url, function(response, status, xhr) {
                     if (xhr.status !== 200) {
                         $(this).text("");
@@ -366,7 +445,10 @@
             var width = $(this).data("width") || "800";
             var height = $(this).data("height") || "auto";
             var reload = $(this).data("reload") || false;
-            openModalDialog(target, title, width, height, url, reload);
+            var resizable = $(this).data("resizable");
+            var draggable = $(this).data("draggable");
+            var dialogClass = $(this).data("dialog-class") || "";
+            openModalDialog(target, title, width, height, url, reload, resizable, draggable, dialogClass);
         });
 
         $(".btn-close-dialog").live("click", function (event) {

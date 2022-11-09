@@ -24,6 +24,10 @@ class PurchaseOrderController {
 
     def index = { redirect(action: "create") }
 
+    def list = {
+        render(template: "/common/react")
+    }
+
 
     def create = {
         Location currentLocation = Location.get(session.warehouse.id)

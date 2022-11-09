@@ -331,7 +331,7 @@ jqueryValidationUi {
 
 
 // Allow users to customize logo image url as well as label
-openboxes.logo.url = "https://openboxes.com/img/logo_30.png"
+openboxes.logo.url = "/openboxes/images/logo/openboxes_logo_40x40.jpg"
 openboxes.logo.label = ""
 openboxes.report.logo.url = "https://openboxes.com/img/logo_100.png"
 
@@ -1081,6 +1081,7 @@ openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQ
 openboxes.identifier.productCode.delimiter = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.productCode.format = "\${productTypeCode}\${delimiter}\${sequenceNumber}"
 openboxes.identifier.productCode.properties = ["productTypeCode": "code"]
+openboxes.identifier.defaultProductType.id = "DEFAULT"
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
@@ -1132,6 +1133,9 @@ openboxes.security.rbac.rules = [
         [controller: 'glAccount', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+        [controller: 'purchaseOrderApi', actions: ['*'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+        [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
+        [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
         // Other controller actions that might need explicit rules
         //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
@@ -1311,6 +1315,10 @@ openboxes.jobs.refreshStockoutDataJob.cronExpression = "0 0 1 * * ?" // at 01:00
 openboxes.jobs.refreshDemandDataJob.enabled = true
 openboxes.jobs.refreshDemandDataJob.cronExpression = "0 0 1 * * ?" // at 01:00:00am every day
 
+// Refresh order summary snapshots
+openboxes.jobs.refreshOrderSummaryJob.enabled = true
+openboxes.jobs.refreshOrderSummaryJob.cronExpression = "0 0 2 * * ?" // at 02:00:00am every day
+
 // Assign identifier job
 openboxes.jobs.assignIdentifierJob.enabled = true
 openboxes.jobs.assignIdentifierJob.cronExpression = "0 * * * * ?" // every minute
@@ -1400,8 +1408,8 @@ openboxes {
             href = "/${appName}/dashboard/index"
         }
         analytics {
-            enabled = true
-            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
+            enabled = false
+            minimumRequiredRole = RoleType.ROLE_ADMIN
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
@@ -1448,7 +1456,7 @@ openboxes {
                     defaultLabel: "Purchasing",
                     menuItems: [
                             [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
-                            [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/order/list?orderType=PURCHASE_ORDER"],
+                            [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/purchaseOrder/list"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
                             [label: "dashboard.supplierDashboard.label", defaultLabel: "Supplier Dashboard", href: "/${appName}/dashboard/supplier"]
@@ -1458,7 +1466,7 @@ openboxes {
         }
         invoicing {
             enabled = true
-            requiredRole = [RoleType.ROLE_INVOICE]
+            supplementalRoles = [RoleType.ROLE_INVOICE]
             label = "react.invoicing.label"
             defaultLabel = "Invoicing"
             subsections = [
@@ -1493,8 +1501,19 @@ openboxes {
                             defaultLabel: "Putaways",
                             requiredActivitiesAll: ActivityCode.binTrackingList(),
                             menuItems: [
-                                    [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/index"],
+                                    [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/${appName}/putAway/create"],
                                     [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
+                            ]
+                    ],
+                    [
+                            // DEPRECATED!
+                            label: "receiving.label",
+                            defaultLabel: "Receiving",
+                            enabled: false,
+                            menuItems: [
+                                    [label: "shipping.createIncomingShipment.label", defaultLabel: "Create inbound shipment", href: "/${appName}/createShipmentWorkflow/createShipment?type=INCOMING"],
+                                    [label: "shipping.listIncoming.label", defaultLabel: "List Inbound Shipments", href: "/${appName}/shipment/list?type=incoming"],
+                                    [label: "default.all.label", defaultLabel: "All", href: "/${appName}/shipment/list?type=incoming"],
                             ]
                     ]
             ]
@@ -1511,7 +1530,19 @@ openboxes {
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/${appName}/stockMovement/createOutbound?direction=OUTBOUND"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/${appName}/stockMovement/list?direction=OUTBOUND"],
+                        [label: "requests.list.label", defaultLabel: "List Requests", href: "/${appName}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
                         [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/${appName}/stockTransfer/createOutboundReturn"]
+                    ]
+                ],
+                [
+                    // DEPRECATED!
+                    label: "shipping.label",
+                    defaultLabel: "Shipping",
+                    enabled: false,
+                    menuItems: [
+                            [label: "shipping.createOutgoingShipment.label", defaultLabel: "Create outbound shipment", href: "/${appName}/createShipmentWorkflow/createShipment?type=OUTGOING"],
+                            [label: "shipping.listOutgoing.label", defaultLabel: "List Outbound Shipments", href: "/${appName}/shipment/list?type=outgoing"],
+                            [label: "default.all.label", defaultLabel: "All", href: "/${appName}/shipment/list?type=outgoing"],
                     ]
                 ]
             ]
@@ -1541,7 +1572,7 @@ openboxes {
                         menuItems: [
                             [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
                             [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
-                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstandng Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", requiredRole: [RoleType.ROLE_FINANCE]],
+                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstandng Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", supplementalRoles: [RoleType.ROLE_FINANCE]],
                         ]
                 ],
                 [
@@ -1579,12 +1610,12 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "product.create.label", defaultLabel: "Create product", href: "/${appName}/product/create"],
+                        [label: "product.create.label", defaultLabel: "Create product", href: "/${appName}/product/create", minimumRequiredRole: RoleType.ROLE_ADMIN],
                         [label: "products.list.label", defaultLabel: "List Products", href: "/${appName}/product/list"],
-                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit"],
-                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv"],
-                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv"],
-                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
+                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/${appName}/product/batchEdit", minimumRequiredRole: RoleType.ROLE_ADMIN],
+                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/${appName}/product/importAsCsv", minimumRequiredRole: RoleType.ROLE_ADMIN],
+                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/${appName}/product/exportAsCsv", minimumRequiredRole: RoleType.ROLE_ADMIN],
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/${appName}/productType/list", minimumRequiredRole: RoleType.ROLE_SUPERUSER]
                     ]
                 ],
                 [
@@ -1618,12 +1649,12 @@ openboxes {
             defaultLabel = "Stock Lists"
             menuItems = [
                 [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/${appName}/requisitionTemplate/list"],
-                [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/${appName}/requisitionTemplate/create"],
+                [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/${appName}/requisitionTemplate/create", minimumRequiredRole: RoleType.ROLE_ADMIN],
             ]
         }
         configuration {
             enabled = true
-            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
+            minimumRequiredRole = RoleType.ROLE_ADMIN
             label = "configuration.label"
             defaultLabel = "Configuration"
             subsections = [
@@ -1670,14 +1701,14 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/${appName}/budgetCode/list"],
                         [label: "containerTypes.label", defaultLabel: "Container Types", href: "/${appName}/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/${appName}/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/${appName}/documentType/list"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/${appName}/eventType/list"],
-                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/${appName}/glAccountType/list"],
+                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/${appName}/glAccount/list"],
+                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/${appName}/orderAdjustmentType/list"],
                         [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/${appName}/paymentMethodType/list"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/${appName}/paymentTerm/list"],
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/${appName}/preferenceType/list"],
@@ -1700,32 +1731,30 @@ openboxes {
             ]
         }
 
-        orders {
-            enabled = true
-            label = "orders.label"
-            defaultLabel = "Orders"
-        }
-        stockRequest {
-            enabled = true
-            label = "stockRequests.label"
-            defaultLabel = "Stock Requests"
-        }
-        stockMovement {
-            enabled = true
-            label = "stockMovements.label"
-            defaultLabel = "Stock Movements"
-        }
-        putaways {
-            enabled = true
-            label = "putaways.label"
-            defaultLabel = "Putaways"
-        }
-
         // deprecated megamenu configuration
         requisitions {
             enabled = false
             label = "requisitions.label"
             defaultLabel = "Requisitions"
+            subsections = [
+                    [
+                            label: "requisition.list.label",
+                            defaultLabel: "List Requisitions",
+                            menuItems: [
+                                    [label: "requisition.allIncoming.label", defaultLabel: "All", href: "/${appName}/requisition/list"],
+                                    // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
+                            ],
+                    ],
+                    [
+                            label: "requisition.create.subsection.label",
+                            defaultLabel: "Create Requisitions",
+                            menuItems: [
+                                    [label: "requisition.create.stock.label", defaultLabel: "Create stock requisition", href: "/${appName}/requisition/chooseTemplate?type=STOCK"],
+                                    [label: "requisition.create.nonstock.label", defaultLabel: "Create non-stock requisition", href: "/${appName}/requisition/create?type=NON_STOCK"],
+                                    [label: "requisition.create.adhoc.stock.label", defaultLabel: "Create adhoc stock requisition", href: "/${appName}/requisition/create?type=ADHOC"],
+                            ]
+                    ]
+            ]
         }
         shipping {
             enabled = false
@@ -1737,11 +1766,35 @@ openboxes {
             label = "receiving.label"
             defaultLabel = "Receiving"
         }
+
+        orders {
+            enabled = true
+            label = "orders.label"
+            defaultLabel = "Orders"
+        }
+
+        stockRequest {
+            enabled = true
+            label = "stockRequests.label"
+            defaultLabel = "Stock Requests"
+        }
+
+        stockMovement {
+            enabled = true
+            label = "stockMovements.label"
+            defaultLabel = "Stock Movements"
+        }
+
+        putaways {
+            enabled = true
+            label = "putaways.label"
+            defaultLabel = "Putaways"
+        }
     }
     requestorMegamenu {
         request {
             enabled = true
-            requiredRole = [RoleType.ROLE_REQUESTOR]
+            supplementalRoles = [RoleType.ROLE_REQUESTOR]
             label = "default.inbound.label"
             defaultLabel = "Inbound"
             subsections = [

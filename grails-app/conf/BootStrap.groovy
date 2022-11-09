@@ -32,16 +32,24 @@ import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.Party
+import org.pih.warehouse.core.PartyRole
+import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceItemCandidate
+import org.pih.warehouse.invoice.InvoiceList
 import org.pih.warehouse.jobs.RefreshDemandDataJob
+import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.jobs.RefreshStockoutDataJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.OrderSummary
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
@@ -60,6 +68,7 @@ import org.pih.warehouse.shipping.ShipmentType
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
+import java.math.RoundingMode
 
 class BootStrap {
 
@@ -150,44 +159,61 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(Location) { Location location ->
-            [
-                    id                   : location.id,
-                    name                 : location.name,
-                    description          : location.description,
-                    locationNumber       : location.locationNumber,
-                    locationGroup        : location.locationGroup,
-                    parentLocation       : location.parentLocation,
-                    locationType         : location.locationType,
-                    sortOrder            : location.sortOrder,
-                    hasBinLocationSupport: location.hasBinLocationSupport(),
-                    hasPackingSupport    : location.supports(ActivityCode.PACK_SHIPMENT),
-                    hasPartialReceivingSupport : location.supports(ActivityCode.PARTIAL_RECEIVING),
-                    hasCentralPurchasingEnabled : location.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING),
-                    organizationName     : location?.organization?.name,
-                    organizationCode     : location?.organization?.code,
-                    backgroundColor : location?.bgColor,
-                    zoneName : location?.zone?.name,
-                    zoneId : location?.zone?.id,
-                    active : location?.active,
-                    organization : location?.organization,
-                    manager: location?.manager,
-                    address: location?.address,
-                    supportedActivities: location.supportedActivities ?: location.locationType?.supportedActivities,
-            ]
+            return location.toJson()
         }
 
         JSON.registerObjectMarshaller(Order) { Order order ->
             return order.toJson()
         }
 
+        JSON.registerObjectMarshaller(OrderSummary) { OrderSummary orderSummary ->
+            def defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+            def origOrgCode = orderSummary?.order?.origin?.organization?.code
+            def destOrgCode = orderSummary?.order?.destination?.organization?.code
+            return [
+                status: orderSummary?.derivedStatus,
+                id: orderSummary?.order?.id,
+                orderNumber: orderSummary?.order?.orderNumber,
+                name: orderSummary?.order?.name,
+                origin: orderSummary?.order?.origin?.name + (origOrgCode ? " (${origOrgCode})" : ""),
+                destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
+                dateOrdered: orderSummary?.order?.dateOrdered?.format("MMM dd, yyyy"),
+                orderedBy: orderSummary?.order?.orderedBy?.name,
+                createdBy: orderSummary?.order?.createdBy?.name,
+                orderItemsCount: orderSummary?.order?.activeOrderItems?.size()?:0,
+                orderedOrderItemsCount: orderSummary?.order?.orderedOrderItems?.size()?:0,
+                shippedItemsCount: orderSummary?.order?.shippedOrderItems?.size()?:0,
+                receivedItemsCount: orderSummary?.order?.receivedOrderItems?.size()?:0,
+                invoicedItemsCount: orderSummary?.order?.invoicedOrderItems?.size()?:0,
+                total: "${orderSummary?.order?.total?.setScale(2, RoundingMode.HALF_UP)} ${orderSummary?.order?.currencyCode ?: defaultCurrencyCode}",
+                totalNormalized: "${orderSummary?.order?.totalNormalized?.setScale(2, RoundingMode.HALF_UP)} ${defaultCurrencyCode}",
+                shipmentsCount: orderSummary?.order?.shipments?.size(),
+            ]
+        }
+
         JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->
             return orderItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(Organization) { Organization organization ->
+            return organization.toJson()
+        }
+
+        JSON.registerObjectMarshaller(Party) { Party party ->
+            return party.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PartyRole) { PartyRole partyRole ->
+            return partyRole.toJson()
+        }
+
+        JSON.registerObjectMarshaller(PartyType) { PartyType partyType ->
+            return partyType.toJson()
         }
 
         JSON.registerObjectMarshaller(Person) { Person person ->
             return person.toJson()
         }
-
 
         JSON.registerObjectMarshaller(Picklist) { Picklist picklist ->
             [
@@ -224,7 +250,22 @@ class BootStrap {
 
 
         JSON.registerObjectMarshaller(Product) { Product product ->
-            return product.toJson()
+            [
+                id                  : product.id,
+                productCode         : product.productCode,
+                name                : product.name,
+                description         : product.description,
+                category            : product.category?.name,
+                unitOfMeasure       : product.unitOfMeasure,
+                pricePerUnit        : product.pricePerUnit,
+                dateCreated         : product.dateCreated,
+                lastUpdated         : product.lastUpdated.format("MMM dd, yyyy"),
+                updatedBy           : product.updatedBy?.name,
+                color               : product.color,
+                handlingIcons       : product.handlingIcons,
+                lotAndExpiryControl : product.lotAndExpiryControl,
+                active              : product.active,
+            ]
         }
 
         JSON.registerObjectMarshaller(ProductSearchDto) { ProductSearchDto productSearchDto ->
@@ -411,6 +452,10 @@ class BootStrap {
             return stockMovementItem.toJson()
         }
 
+        JSON.registerObjectMarshaller(OutboundStockMovementListItem) { OutboundStockMovementListItem outboundStockMovementListItem ->
+            return outboundStockMovementListItem.toJson()
+        }
+
         JSON.registerObjectMarshaller(SubstitutionItem) { SubstitutionItem substitutionItem ->
             return substitutionItem.toJson()
         }
@@ -425,6 +470,20 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(StocklistItem) { StocklistItem stocklistItem ->
             return stocklistItem.toJson()
+        }
+
+        JSON.registerObjectMarshaller(InvoiceList) { InvoiceList invoiceListItem ->
+            [
+                id: invoiceListItem?.invoice?.id,
+                invoiceNumber: invoiceListItem?.invoiceNumber,
+                invoiceTypeCode: invoiceListItem?.invoiceTypeCode?.name(),
+                status: invoiceListItem?.status?.name(),
+                partyCode: "${invoiceListItem?.partyCode} ${invoiceListItem?.partyName}",
+                vendorInvoiceNumber: invoiceListItem?.vendorInvoiceNumber,
+                totalValue: invoiceListItem?.invoice?.totalValue,
+                currency: invoiceListItem?.currency,
+                itemCount: invoiceListItem?.itemCount,
+            ]
         }
 
         JSON.registerObjectMarshaller(InvoiceItem) { InvoiceItem invoiceItem ->
@@ -503,7 +562,10 @@ class BootStrap {
             RefreshDemandDataJob.triggerNow()
 
             // Refresh inventory snapshot data
-            RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE]);
+            RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE])
+
+            // Refresh order summary materialized view
+            RefreshOrderSummaryJob.triggerNow()
         }
     }
 

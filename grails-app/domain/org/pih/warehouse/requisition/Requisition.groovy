@@ -379,4 +379,23 @@ class Requisition implements Comparable<Requisition>, Serializable {
                 requisitionItems     : requisitionItems?.sort()?.collect { it?.toJson() }
         ]
     }
+
+    /**
+     * DTO for Requisition Template API (/api/stocklists)
+     * */
+    Map toStocklistJson() {
+        [
+            id: id,
+            name: name,
+            origin: origin?.name,
+            destination: destination?.name,
+            requisitionItemCount: requisitionItemCount,
+            requestedBy: requestedBy?.name,
+            createdBy: createdBy?.name,
+            updatedBy: updatedBy?.name,
+            dateCreated: dateCreated?.format("MMM dd, yyyy"),
+            lastUpdated: lastUpdated?.format("MMM dd, yyyy"),
+            isPublished: isPublished,
+        ]
+    }
 }

@@ -1,17 +1,14 @@
 import React, { useEffect } from 'react';
 
-import { faLifeRing } from '@fortawesome/free-regular-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import PropTypes from 'prop-types';
+import { RiQuestionLine } from 'react-icons/ri';
 import { useChat } from 'react-live-chat-loader';
 import { connect } from 'react-redux';
 
-import Translate from 'utils/Translate';
-
 import './SupportButton.scss';
 
-const SupportButton = ({ text, defaultText, locale }) => {
+const SupportButton = ({ locale, text, className }) => {
   const [, loadChat] = useChat();
 
   useEffect(() => {
@@ -31,15 +28,16 @@ const SupportButton = ({ text, defaultText, locale }) => {
   const toggleOpenChat = () => window.Beacon('toggle');
 
   return (
-    <button
-      type="button"
-      className="btn btn-helpscout ml-1 mr-1"
+    <span
+      role="button"
+      tabIndex={0}
+      onKeyPress={() => {}}
+      className={className}
       onClick={toggleOpenChat}
     >
-      <FontAwesomeIcon icon={faLifeRing} />
-      &nbsp;
-      <Translate id={text} defaultMessage={defaultText} />
-    </button>
+      <RiQuestionLine />
+      {text}
+    </span>
   );
 };
 
@@ -48,14 +46,10 @@ const mapStateToProps = state => ({
 });
 
 SupportButton.propTypes = {
-  text: PropTypes.string,
-  defaultText: PropTypes.string,
   locale: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
 };
 
-SupportButton.defaultProps = {
-  text: 'Help',
-  defaultText: 'Help',
-};
 
 export default connect(mapStateToProps)(SupportButton);

@@ -28,11 +28,11 @@
                 <g:if test="${stockMovement?.id}">
 
                     <div class="title">
-                        <small>${stockMovement?.identifier}</small>
+                        <small class="font-weight-bold">${stockMovement?.identifier}</small>
                         <g:link controller="stockMovement" action="show" id="${stockMovement?.id }">
                             ${stockMovement?.name}
                         </g:link>
-                        <small class="fade uppercase">
+                        <small class="fade uppercase font-weight-bold">
                             <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id}">
                                 <g:message code="shipping.outbound.label" default="outbound"/>
                             </g:if>

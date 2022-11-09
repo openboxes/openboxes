@@ -210,6 +210,7 @@ class RequisitionService {
      * @return
      */
     def getRequisitions(Requisition requisition, Map params) {
+
         return getRequisitions(requisition, params, [], [])
     }
 
@@ -246,7 +247,7 @@ class RequisitionService {
                 } else {
                     eq("isTemplate", requisition.isTemplate)
                 }
-                if (requisition.isPublished) {
+                if (!params.boolean("includeUnpublished")) {
                     eq("isPublished", requisition.isPublished)
                 }
                 if (params?.commodityClassIsNull) {
@@ -292,7 +293,32 @@ class RequisitionService {
                     }
                 }
                 if (params?.sort) {
-                    order(params?.sort, params?.order ?: 'desc')
+                    if (params?.sort == "origin") {
+                        origin {
+                            order("name", params?.order ?: 'desc')
+                        }
+                    } else if (params?.sort == "destination") {
+                        destination {
+                            order("name", params?.order ?: 'desc')
+                        }
+                    } else if (params?.sort == "createdBy") {
+                        createdBy {
+                            order("firstName", params?.order ?: 'desc')
+                            order("lastName", params?.order ?: 'desc')
+                        }
+                    } else if (params?.sort == "updatedBy") {
+                        updatedBy {
+                            order("firstName", params?.order ?: 'desc')
+                            order("lastName", params?.order ?: 'desc')
+                        }
+                    } else if (params?.sort == "requestedBy") {
+                        requestedBy {
+                            order("firstName", params?.order ?: 'desc')
+                            order("lastName", params?.order ?: 'desc')
+                        }
+                    } else {
+                        order(params?.sort, params?.order ?: 'desc')
+                    }
                 } else {
                     order("dateRequested", "desc")
                 }

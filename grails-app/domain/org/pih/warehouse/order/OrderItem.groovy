@@ -33,6 +33,14 @@ import java.text.DecimalFormat
 
 class OrderItem implements Serializable, Comparable<OrderItem> {
 
+    def publishRefreshEvent = {
+        if (order?.isPurchaseOrder && !disableRefresh) {
+            publishEvent(new RefreshOrderSummaryEvent(order))
+        }
+    }
+
+    def afterUpdate = publishRefreshEvent
+
     String id
     String description
     Category category
@@ -74,6 +82,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     Date dateCreated
     Date lastUpdated
 
+    Boolean disableRefresh = Boolean.TRUE
+
     static mapping = {
         id generator: 'uuid'
         shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
@@ -86,6 +96,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "quantityRemaining",
             "quantityReceived",
             "quantityReceivedInStandardUom",
+            "quantityCanceled",
+            "quantityCanceledInStandardUom",
             "quantityShipped",
             "quantityShippedInStandardUom",
             "quantityInShipments",
@@ -100,6 +112,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "hasInvoices",
             "hasPrepaymentInvoice",
             "hasRegularInvoice",
+            "disableRefresh",
             // Statuses
             "partiallyFulfilled",
             "completelyFulfilled",
@@ -200,12 +213,22 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         }?:0
     }
 
+    Integer getQuantityCanceledInStandardUom() {
+        return shippedShipmentItems?.sum { ShipmentItem shipmentItem ->
+            shipmentItem?.quantityCanceled
+        }?:0
+    }
+
     Integer getQuantityShipped() {
         return quantityShippedInStandardUom / quantityPerUom
     }
 
     Integer getQuantityReceived() {
         return quantityReceivedInStandardUom / quantityPerUom
+    }
+
+    Integer getQuantityCanceled() {
+        return quantityCanceledInStandardUom / quantityPerUom
     }
 
     Integer getQuantityInShipments() {
@@ -244,7 +267,11 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Boolean isCompletelyReceived() {
-        return quantityReceived >= quantity
+        return (quantityReceived + quantityCanceled) >= quantity
+    }
+
+    Boolean isCompletelyInvoiced() {
+        return quantityInvoicedInStandardUom >= quantity
     }
 
     Boolean isPending() {

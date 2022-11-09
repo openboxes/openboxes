@@ -130,7 +130,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void validateProducts_shouldCreateNewProductWithNewCategory() {
 		def category = Category.findByName("category 123")
 		assertNull category
-		def row1 = ["1235", "", "", "product 1235", "category 123", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+		def row1 = ["1235", "", "Default", "product 1235", "category 123", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def products = productService.validateProducts(csv)
 
@@ -150,7 +150,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     void importProducts_shouldCreateNewProductWithExistingCategory() {
 		def category = Category.findByName("Medicines")
 		assertNotNull category
-		def row1 = ["1235", "", "", "product 1235", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+		def row1 = ["1235", "", "Default", "product 1235", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", null, null, null, null, null, "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def products = productService.validateProducts(csv)
 
@@ -169,7 +169,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void importProducts_shouldUpdateNameOnExistingProduct() {
 		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 		assertNotNull productBefore.id
-		def row1 = ["${productBefore.id}", "AB12", "", "Sudafed 2.0", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
+		def row1 = ["${productBefore.id}", "AB12", "Default", "Sudafed 2.0", "Medicines", "", "Description", "Unit of Measure", "tag1,tag2", "0.01", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "Brand", "ManufacturerCode", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC", "NDC", "Date Created", "Date Updated"]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 
         def products = productService.validateProducts(csv)
@@ -184,7 +184,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 	void importProducts_shouldUpdateAllFieldsOnExistingProduct() {
 		def productBefore = DbHelper.findOrCreateProduct('Sudafed')
 		assertNotNull productBefore.id
-		def row1 = [productBefore.id, "AB12", "", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, "true", null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+		def row1 = [productBefore.id, "AB12", "Default", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, "true", null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
 		def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
 
         def products = productService.validateProducts(csv)
@@ -217,7 +217,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
         assertNotNull productBefore.id
         assertEquals 0, productBefore?.tags?.size()?:0
-		def row1 = ["${productBefore.id}", "AB12", "", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+		def row1 = ["${productBefore.id}", "AB12", "Default", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
 
         def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def tags = ["tag1", "tag2"] as List
@@ -243,7 +243,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         assertNotNull product.id
         assertEquals 0, product?.tags?.size()?:0
 
-		def row1 = ["${product.id}", "AB12", "", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
+		def row1 = ["${product.id}", "AB12", "Default", "Sudafed 2.0", "Medicines", "", "It's sudafed, dummy.", "EA", "tag1,tag2", "0.01", null, null, null, null, null, "Acme", "Brand X", "ACME-249248", "Manufacturer Name", "Vendor", "Vendor Code", "Vendor Name", "UPC-1202323", "NDC-122929-39292", "", ""]
         def csv = csvize(Constants.EXPORT_PRODUCT_COLUMNS) + csvize(row1)
         def tags = ["tag3", "tag4", "tag1", "tag2"] as List
 
@@ -524,17 +524,20 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
         def product = new Product();
         def returnValue = productService.saveProduct(product)
         assertNull returnValue
-        assertEquals 2, product.errors.getErrorCount()
+        assertEquals 3, product.errors.getErrorCount()
         assertNotNull product.errors.getFieldError("name")
         assertNotNull product.errors.getFieldError("category")
+        assertNotNull product.errors.getFieldError("productType")
         assertNull product.errors.getFieldError("description")
     }
 
     @Test
     void saveProduct_shouldSaveProduct() {
         def product = new Product();
+		def productType = DbHelper.findOrCreateProductType("Default")
         product.name = "Test product"
         product.category = Category.getRootCategory()
+		product.productType = productType
         def returnValue = productService.saveProduct(product)
         println returnValue
         assertNotNull returnValue
@@ -546,8 +549,10 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     @Test
     void saveProduct_shouldSaveProductAndTags() {
         def product = new Product();
+		def productType = DbHelper.findOrCreateProductType("Default")
         product.name = "Test product"
         product.category = Category.getRootCategory()
+		product.productType = productType
 
         def returnValue = productService.saveProduct(product, "a tag,the next tag,another tag")
         assertNotNull returnValue
@@ -559,6 +564,8 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     @Test
     void saveProduct_shouldFailOnInvalidCategory() {
         def product = new Product();
+		def productType = DbHelper.findOrCreateProductType("Default")
+		product.productType = productType
         productService.saveProduct(product)
         println product.errors
         assertNotNull product.errors.getFieldError("category")
@@ -568,8 +575,10 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     @Test
     void saveProduct_shouldGenerateUniqueProductCode() {
         def product = new Product();
+		def productType = DbHelper.findOrCreateProductType("Default")
         product.name = "New product"
         product.category = Category.getRootCategory()
+		product.productType = productType
         productService.saveProduct(product)
         assertNotNull product
         assertNotNull product.productCode
@@ -578,12 +587,14 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
     @Test
     void saveProduct_shouldFailOnDuplicateProductCode() {
         def product = Product.findByProductCode("AB13")
+		def productType = DbHelper.findOrCreateProductType("Default")
         assertNotNull product
 
         product = new Product();
         product.name = "New product"
         product.productCode = "AB13"
         product.category = Category.getRootCategory()
+		product.productType = productType
         def returnValue = productService.saveProduct(product)
         println product.errors
         assertNull returnValue

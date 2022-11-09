@@ -6,15 +6,23 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   FETCH_BREADCRUMBS_CONFIG,
+  FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
   FETCH_CURRENCIES,
   FETCH_GRAPHS,
+  FETCH_INVOICE_STATUSES,
+  FETCH_INVOICE_TYPE_CODES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_ORGANIZATIONS,
+  FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
+  FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
+  FETCH_SHIPMENT_STATUS_CODES,
+  FETCH_STOCK_TRANSFER_STATUSES,
+  FETCH_SUPPLIERS,
   FETCH_USERS,
   HIDE_SPINNER,
   REMOVE_FROM_INDICATORS,
@@ -22,7 +30,6 @@ import {
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
   SHOW_SPINNER,
-  TOGGLE_LOCATION_CHOOSER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
   UPDATE_BREADCRUMBS_PARAMS,
@@ -43,24 +50,10 @@ export function hideSpinner() {
   };
 }
 
-export function showLocationChooser() {
-  return {
-    type: TOGGLE_LOCATION_CHOOSER,
-    payload: true,
-  };
-}
-
 export function showUserActions() {
   return {
     type: TOGGLE_USER_ACTION_MENU,
     payload: true,
-  };
-}
-
-export function hideLocationChooser() {
-  return {
-    type: TOGGLE_LOCATION_CHOOSER,
-    payload: false,
   };
 }
 
@@ -71,6 +64,7 @@ export function hideUserActions() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchReasonCodes() {
   const url = '/openboxes/api/reasonCodes';
   const request = apiClient.get(url);
@@ -81,6 +75,7 @@ export function fetchReasonCodes() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchCurrencies() {
   const url = '/openboxes/api/unitOfMeasure/currencies';
   const request = apiClient.get(url);
@@ -91,6 +86,7 @@ export function fetchCurrencies() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchOrganizations() {
   const url = '/openboxes/api/organizations';
   const request = apiClient.get(url);
@@ -101,6 +97,7 @@ export function fetchOrganizations() {
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchUsers() {
   const url = '/openboxes/api/persons';
   const request = apiClient.get(url, { params: { status: true } });
@@ -110,16 +107,19 @@ export function fetchUsers() {
   };
 }
 
-export function fetchSessionInfo() {
+export async function fetchSessionInfo() {
   const url = '/openboxes/api/getAppContext';
-  const request = apiClient.get(url);
+  const res = await apiClient.get(url);
 
-  return {
-    type: FETCH_SESSION_INFO,
-    payload: request,
+  return (dispatch) => {
+    dispatch({
+      type: FETCH_SESSION_INFO,
+      payload: res,
+    });
   };
 }
 
+// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchMenuConfig() {
   const url = '/openboxes/api/getMenuConfig';
   const request = apiClient.get(url);
@@ -436,6 +436,129 @@ export function fetchBreadcrumbsConfig() {
       dispatch({
         type: FETCH_BREADCRUMBS_CONFIG,
         payload: res.data,
+      });
+    });
+  };
+}
+
+export function fetchPurchaseOrderStatuses() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/orderSummaryStatus').then((res) => {
+      dispatch({
+        type: FETCH_PURCHASE_ORDER_STATUSES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchSuppliers(active = false) {
+  return (dispatch) => {
+    apiClient.get(`/openboxes/api/organizations?roleType=ROLE_SUPPLIER&active=${active}`)
+      .then((res) => {
+        if (res.data.data) {
+          const suppliers = res.data.data.map(obj => (
+            {
+              id: obj.id,
+              value: obj.id,
+              name: obj.name,
+              label: `${obj.name}`,
+            }
+          ));
+          dispatch({
+            type: FETCH_SUPPLIERS,
+            payload: suppliers,
+          });
+          return;
+        }
+        dispatch({
+          type: FETCH_SUPPLIERS,
+          payload: [],
+        });
+      });
+  };
+}
+
+export function fetchBuyers(active = false) {
+  return (dispatch) => {
+    apiClient.get(`/openboxes/api/organizations?roleType=ROLE_BUYER&active=${active}`)
+      .then((res) => {
+        if (res.data.data) {
+          const buyers = res.data.data.map(obj => (
+            {
+              id: obj.id,
+              value: obj.id,
+              name: obj.name,
+              label: `${obj.name}`,
+            }
+          ));
+          dispatch({
+            type: FETCH_BUYERS,
+            payload: buyers,
+          });
+          return;
+        }
+        dispatch({
+          type: FETCH_BUYERS,
+          payload: [],
+        });
+      });
+  };
+}
+
+export function fetchInvoiceStatuses() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/invoiceStatuses').then((res) => {
+      dispatch({
+        type: FETCH_INVOICE_STATUSES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchInvoiceTypeCodes() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/invoiceTypeCodes').then((res) => {
+      dispatch({
+        type: FETCH_INVOICE_TYPE_CODES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchShipmentStatusCodes() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes')
+      .then((res) => {
+        dispatch({
+          type: FETCH_SHIPMENT_STATUS_CODES,
+          payload: res.data.data,
+        });
+      });
+  };
+}
+
+
+export function fetchRequisitionStatusCodes() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/stockMovements/requisitionsStatusCodes')
+      .then((res) => {
+        dispatch({
+          type: FETCH_REQUISITION_STATUS_CODES,
+          payload: res.data.data,
+        });
+      });
+  };
+}
+
+export function fetchStockTransferStatuses() {
+  return (dispatch) => {
+    apiClient.get('/openboxes/api/stockTransfers/statusOptions').then((res) => {
+      dispatch({
+        type: FETCH_STOCK_TRANSFER_STATUSES,
+        payload: res.data.data,
       });
     });
   };

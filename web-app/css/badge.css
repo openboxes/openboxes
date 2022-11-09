@@ -1,13 +1,13 @@
-.badge {
+.tab-badge {
     position: relative;
 }
 
-.badge:before {
+.tab-badge:before {
     content: attr(data-count);
     position: absolute;
     top: -0.45em;
     right: -0.45em;
-    min-width: 0.8em;
+    min-width: 1.8em;
     height: 1.8em;
     display: grid;
     padding: 0 0.5em;

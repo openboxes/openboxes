@@ -28,23 +28,47 @@ class InvoiceService {
 
     def identifierService
 
-    def getInvoices(Invoice invoiceTemplate, Map params) {
-        def invoices = Invoice.createCriteria().list(params) {
-            and {
-                if (invoiceTemplate.invoiceNumber) {
-                    ilike("invoiceNumber", "%" + invoiceTemplate.invoiceNumber + "%")
-                }
-                if (invoiceTemplate.dateInvoiced) {
-                    eq('dateInvoiced', invoiceTemplate.dateInvoiced)
-                }
-                if (invoiceTemplate.createdBy) {
+    def getInvoices(Map params) {
+        // Parse pagination parameters
+        def max = params.max ? params.int("max") : 10
+        def offset = params.offset ? params.int("offset") : 0
 
-                    eq('createdBy', invoiceTemplate.createdBy)
-                }
+        // Parse date parameters
+        params.dateInvoiced = params.dateInvoiced ? Date.parse("MM/dd/yyyy", params.dateInvoiced) : null
+
+        return InvoiceList.createCriteria().list(max: max, offset: offset) {
+            eq("partyFromId", params.partyFromId)
+
+            if (params.invoiceNumber) {
+                ilike("invoiceNumber", "%" + params.invoiceNumber + "%")
             }
-            order("dateInvoiced", "desc")
+
+            if (params.status) {
+                eq("status", params.status as InvoiceStatus)
+            }
+
+            if (params.vendor && params.vendor != "null") {
+                eq("partyId", params.vendor)
+            }
+
+            if (params.invoiceTypeCode) {
+                eq("invoiceTypeCode", params.invoiceTypeCode as InvoiceTypeCode)
+            }
+
+            if (params.dateInvoiced) {
+                eq("dateInvoiced", params.dateInvoiced)
+            }
+
+            if (params.createdBy) {
+                eq("createdById", params.createdBy)
+            }
+
+            if (params.sort) {
+                order(params.sort, params.order ?: 'asc')
+            } else {
+                order("dateCreated", "desc")
+            }
         }
-        return invoices
     }
 
     def getInvoiceItems(String id, String max, String offset) {
@@ -95,12 +119,7 @@ class InvoiceService {
                 }
 
                 order {
-                    or {
-                        eq("destinationParty", currentLocation.organization)
-                        destination {
-                            eq("organization", currentLocation.organization)
-                        }
-                    }
+                    eq("destinationParty", currentLocation.organization)
                 }
             }
 
@@ -136,38 +155,6 @@ class InvoiceService {
             }
 
         return invoiceItemCandidates
-    }
-
-    def listInvoices(Map params) {
-        return InvoiceList.createCriteria().list(params) {
-            eq("partyFromId", params.partyFromId)
-
-            if (params.createdBy) {
-                eq("createdById", params.createdBy)
-            }
-
-            if (params.invoiceNumber) {
-                ilike("invoiceNumber", "%" + params.invoiceNumber + "%")
-            }
-
-            if (params.dateInvoiced) {
-                eq("dateInvoiced", params.dateInvoiced)
-            }
-
-            if (params.vendor && params.vendor != "null") {
-                eq("partyId", params.vendor)
-            }
-
-            if (params.invoiceTypeCode) {
-                eq("invoiceTypeCode", params.invoiceTypeCode as InvoiceTypeCode)
-            }
-
-            if (params.status) {
-                eq("status", params.status as InvoiceStatus)
-            }
-
-            order("dateCreated", "desc")
-        }
     }
 
     ReferenceNumber createOrUpdateVendorInvoiceNumber(Invoice invoice, String vendorInvoiceNumber) {

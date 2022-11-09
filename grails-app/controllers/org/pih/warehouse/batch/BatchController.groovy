@@ -27,6 +27,7 @@ import org.pih.warehouse.importer.ProductPackageExcelImporter
 import org.pih.warehouse.importer.ProductSupplierAttributeImporter
 import org.pih.warehouse.importer.ProductSupplierExcelImporter
 import org.pih.warehouse.importer.ProductSupplierPreferenceImporter
+import org.pih.warehouse.importer.ProductAssociationExcelImporter
 import org.pih.warehouse.importer.TagExcelImporter
 import org.pih.warehouse.importer.UserExcelImporter
 import org.pih.warehouse.importer.UserLocationExcelImporter
@@ -191,6 +192,9 @@ class BatchController {
                             break
                         case "userLocation":
                             dataImporter = new UserLocationExcelImporter(command?.filename)
+                            break
+                        case "productAssociation":
+                            dataImporter = new ProductAssociationExcelImporter(command?.filename)
                             break
                         default:
                             command.errors.reject("type", "${warehouse.message(code: 'import.invalidType.message', default: 'Please choose a valid import type')}")

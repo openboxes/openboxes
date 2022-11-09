@@ -17,6 +17,14 @@ import org.pih.warehouse.invoice.InvoiceTypeCode
 
 class OrderAdjustment implements Serializable {
 
+    def publishRefreshEvent = {
+        if (order?.isPurchaseOrder && !disableRefresh) {
+            publishEvent(new RefreshOrderSummaryEvent(order))
+        }
+    }
+
+    def afterUpdate = publishRefreshEvent
+
     String id
     BigDecimal amount
     BigDecimal percentage
@@ -35,6 +43,8 @@ class OrderAdjustment implements Serializable {
 
     Boolean canceled = Boolean.FALSE
 
+    Boolean disableRefresh = Boolean.TRUE
+
     static transients = [
         'totalAdjustments',
         'postedPurchaseInvoiceItems',
@@ -44,6 +54,7 @@ class OrderAdjustment implements Serializable {
         "hasInvoices",
         "hasPrepaymentInvoice",
         "hasRegularInvoice",
+        "disableRefresh"
     ]
 
     static belongsTo = [order: Order, orderItem: OrderItem]

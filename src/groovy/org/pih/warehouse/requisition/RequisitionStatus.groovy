@@ -11,31 +11,34 @@ package org.pih.warehouse.requisition
 
 import org.pih.warehouse.inventory.StockMovementStatusCode
 
+import org.pih.warehouse.core.StatusType
+
 enum RequisitionStatus {
 
-    CREATED(1),
-    EDITING(2, PENDING),
-    VERIFYING(3, PENDING),
-    PICKING(4, PENDING),
-    PICKED(5, PENDING),
-    PENDING(5),
-    CHECKING(6, PENDING),
-    ISSUED(7),
-    RECEIVED(8),
-    CANCELED(9),
-    DELETED(10),
-    ERROR(11),
+    CREATED(1, null, StatusType.SUCCESS),
+    EDITING(2, PENDING, StatusType.PRIMARY),
+    VERIFYING(3, PENDING, StatusType.WARNING),
+    PICKING(4, PENDING, StatusType.WARNING),
+    PICKED(5, PENDING, StatusType.PRIMARY),
+    PENDING(5,null, StatusType.PRIMARY),
+    CHECKING(6, PENDING, StatusType.WARNING),
+    ISSUED(7, null, StatusType.SUCCESS),
+    RECEIVED(8, null, StatusType.SUCCESS),
+    CANCELED(9, null, StatusType.DANGER),
+    DELETED(10, null, StatusType.DANGER),
+    ERROR(11, null, StatusType.DANGER),
     // for Outbound Stock Movement mapping
-    DISPATCHED(0),
-    REQUESTED(0),
+    DISPATCHED(0, null, StatusType.SUCCESS),
+    REQUESTED(0, null, StatusType.PRIMARY),
     // Removed
-    OPEN(0),
-    FULFILLED(0),
-    REVIEWING(0),
-    CONFIRMING(0)
+    OPEN(0, null, StatusType.SUCCESS),
+    FULFILLED(0, null, StatusType.SUCCESS),
+    REVIEWING(0, null, StatusType.PRIMARY),
+    CONFIRMING(0, null, StatusType.PRIMARY)
 
     int sortOrder
     RequisitionStatus displayStatusCode
+    StatusType variant
 
     RequisitionStatus() { }
 
@@ -46,6 +49,11 @@ enum RequisitionStatus {
         this.displayStatusCode = displayStatusCode
     }
 
+    RequisitionStatus(int sortOrder, RequisitionStatus displayStatusCode, StatusType variant) {
+        this.sortOrder = sortOrder
+        this.displayStatusCode = displayStatusCode
+        this.variant = variant
+    }
     RequisitionStatus getDisplayStatus() {
         return this.displayStatusCode?:this
     }
@@ -57,6 +65,10 @@ enum RequisitionStatus {
 
     static list() {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED]
+    }
+
+    static listOutboundOptions() {
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
     static listPending() {

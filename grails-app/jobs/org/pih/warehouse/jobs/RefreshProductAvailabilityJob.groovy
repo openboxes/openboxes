@@ -13,10 +13,10 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
+//@DisallowConcurrentExecution
 class RefreshProductAvailabilityJob {
 
-    def concurrent = false
+    //def concurrent = false
     def productAvailabilityService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener

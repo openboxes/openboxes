@@ -1,0 +1,43 @@
+.location-chooser {
+  &__button {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid var(--location-color, var(--gray-200));
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 15px;
+    height: 40px;
+    &:hover {
+      background-color: var(--blue-200);
+    }
+    &:focus {
+      outline: none;
+    }
+
+    &-title {
+      font-size: inherit;
+      color: var(--gray-600);
+      max-width: 200px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+    }
+
+    &-tag {
+      padding: 2px 4px;
+      font-size: inherit;
+      color: white;
+      background-color: var(--color-red);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 18px;
+    }
+  }
+}

@@ -4,8 +4,8 @@
 			<g:render template="../transaction/actions"/>
 		</td>
 		<td class="middle">
-			<div class="title"> 
-				<small class="transactionNumber">${transactionInstance?.transactionNumber }</small>
+			<div class="title">
+				<small class="transactionNumber font-weight-bold">${transactionInstance?.transactionNumber }</small>
 				<g:link controller="inventory" action="showTransaction" id="${transactionInstance?.id }">
 
 					<format:metadata obj="${transactionInstance?.transactionType}" /> <g:if
@@ -18,7 +18,7 @@
 					</g:if>
 				</g:link>
 			</div>
-		
+
 		</td>
 		<td class="right" style="width: 1%">
             <g:if test="${transactionInstance?.transactionNumber }">

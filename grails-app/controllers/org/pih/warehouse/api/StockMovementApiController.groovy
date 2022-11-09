@@ -16,6 +16,8 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.StockMovementService
@@ -24,25 +26,61 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionSourceType
+import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class StockMovementApiController {
 
-    StockMovementService stockMovementService
     def dataService
+    def outboundStockMovementService
+    def stockMovementService
+    def stockTransferService
 
     def list = {
-        int max = Math.min(params.max ? params.int('max') : 10, 1000)
-        int offset = params.offset ? params.int("offset") : 0
-        String orderBy = params.orderBy ?: "requisition.dateRequested"
-        StockMovementDirection stockMovementDirection = params.direction ? params.direction as StockMovementDirection : null
         Location destination = params.destination ? Location.get(params.destination) : null
+        Location origin = params.origin ? Location.get(params.origin) : null
+
+        StockMovementDirection direction = params.direction ? params.direction as StockMovementDirection : null
+        if (destination == origin || !params.direction) {
+            def message = "Direction parameter is required. Origin and destination cannot be the same."
+            response.status = 400
+            render([errorMessages: [message]] as JSON)
+            return
+        }
 
         StockMovement stockMovement = new StockMovement()
-        stockMovement.stockMovementDirection = stockMovementDirection
+        stockMovement.stockMovementDirection = direction
+        stockMovement.origin = origin
         stockMovement.destination = destination
+        stockMovement.requestedBy = params.requestedBy ? User.get(params.requestedBy) : null
+        stockMovement.createdBy = params.createdBy ? User.get(params.createdBy) : null
+        stockMovement.updatedBy = params.updatedBy ? User.get(params.updatedBy) : null
+        stockMovement.receiptStatusCodes = params.receiptStatusCode ? params?.list("receiptStatusCode") as ShipmentStatusCode[] : null
+        stockMovement.requisitionStatusCodes = params.requisitionStatusCode ? params?.list("requisitionStatusCode") as RequisitionStatus[] : null
+        stockMovement.requestType = params.requestType ? params.requestType as RequisitionType : null
+        stockMovement.sourceType = params.sourceType ? params.sourceType as RequisitionSourceType : null
 
-        def stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, orderBy: orderBy ])
+        if (params.q) {
+            stockMovement.identifier = "%" + params.q + "%"
+            stockMovement.name = "%" + params.q + "%"
+            stockMovement.description = "%" + params.q + "%"
+        }
+
+        if (params.format == 'csv') {
+            params.max = null
+            params.offset = null
+        }
+
+        def stockMovements = stockMovementService.getStockMovements(stockMovement, params)
+
+        if (params.format == 'csv' && stockMovements) {
+            def csv = getStockMovementsCsv(stockMovements)
+            response.setHeader("Content-disposition", "attachment; filename=\"StockMovements-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+            return
+        }
 
         render([data: stockMovements, totalCount: stockMovements?.totalCount] as JSON)
     }
@@ -109,8 +147,74 @@ class StockMovementApiController {
         render status: 200
     }
 
+    /**
+     * Deleting Stock Movements (Inbound and Outbound). Because there are 3 options (requisition based, shipment
+     * based and order based we have to create a proper StockMovement object. First try to fetch it as outbound type,
+     * then if not found as inbound type.
+     * */
     def delete = {
-        stockMovementService.deleteStockMovement(params.id)
+        // Pull Outbound Stock movement (Requisition based) or Outbound or Inbound Return (Order based)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        // For inbound stockMovement only
+        if (!stockMovement) {
+            stockMovement = stockMovementService.getStockMovement(params.id)
+        }
+
+        // If still no StockMovement found, then throw 404
+        if (!stockMovement) {
+            def message = "Stockmovement with id ${params.id} does not exist"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        if (stockMovement?.order) {
+            /**
+             * If stock movement has an Order, then treat it as a Return Order
+             * and remove it through stockTransferService
+             * */
+            try {
+                stockTransferService.deleteStockTransfer(params.id)
+            } catch (Exception e) {
+                def message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                response.status = 400
+                render([errorMessage: message] as JSON)
+                return
+            }
+
+            render status: 204
+            return
+        } else {
+            /**
+             * Otherwise treat it as a regular Stock Movement or as a Stock Request
+             * */
+            // TODO: Tech huddle around this area (if looking into currentLocation in API like that is ok)
+            def currentLocation = Location.get(session?.warehouse?.id)
+            if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
+                if (stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) {
+                    try {
+                        stockMovementService.deleteStockMovement(params.id)
+                    } catch (Exception e) {
+                        def message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                        response.status = 400
+                        render([errorMessage: message] as JSON)
+                        return
+                    }
+                } else {
+                    def message = "You cannot delete a shipment with status ${stockMovement?.shipment?.currentStatus}"
+                    response.status = 400
+                    render([errorMessage: message] as JSON)
+                    return
+                }
+            }
+            else {
+                def message = "You are not able to delete stock movement from your location."
+                response.status = 400
+                render([errorMessage: message] as JSON)
+                return
+            }
+        }
+
         render status: 204
     }
 
@@ -146,7 +250,7 @@ class StockMovementApiController {
         if (requisition) {
             stockMovementService.removeRequisitionItems(requisition)
         } else {
-            stockMovementService.removeShipmentItems(shipment.shipmentItems)
+            stockMovementService.removeShipmentItems(shipment)
         }
         render status: 204
     }
@@ -386,7 +490,7 @@ class StockMovementApiController {
 
         // Bind all line items
         if (lineItems) {
-            log.info "lineItems: " + lineItems
+            log.info "binding lineItems: ${lineItems}"
             bindLineItems(stockMovement, lineItems)
         }
 
@@ -495,5 +599,220 @@ class StockMovementApiController {
             packPageItems.add(packPageItem)
         }
         return packPageItems
+    }
+
+    /**
+     * Action to get shipped and not yet received items as csv
+     * */
+    def shippedItems = {
+        if (!params.destination) {
+            def message = "Destination parameter cannot be the empty"
+            response.status = 400
+            render([errorMessages: [message]] as JSON)
+            return
+        }
+
+        def destination = Location.get(params.destination)
+
+        if (!destination) {
+            def message = "Destination does not exist"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        // Get shipments that are shipped and not fully received
+        def statuses = [ShipmentStatusCode.SHIPPED, ShipmentStatusCode.PARTIALLY_RECEIVED]
+        def shipments = Shipment.findAllByDestinationAndCurrentStatusInList(destination, statuses)
+
+        def shipmentItems = []
+        shipments.each { Shipment shipment ->
+            shipment.shipmentItems.findAll { it.quantityRemaining > 0 }.groupBy {
+                it.product
+            }.each { product, value ->
+                shipmentItems << [
+                    productCode         : product.productCode,
+                    productName         : product.name,
+                    quantity            : value.sum { it.quantityRemaining },
+                    expectedShippingDate: formatDate(date: shipment.expectedShippingDate, format: "dd-MMM-yy"),
+                    expectedDeliveryDate: formatDate(date: shipment.expectedDeliveryDate, format: "dd-MMM-yy"),
+                    shipmentNumber      : shipment.shipmentNumber,
+                    shipmentName        : shipment.name,
+                    origin              : shipment.origin,
+                    destination         : shipment.destination,
+                ]
+            }
+        }
+
+        if (shipmentItems) {
+            def csv = getShipmentItemsCsv(shipmentItems)
+            def date = new Date()
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"Items shipped not received_${destination.name}_${date.format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+            return
+        } else {
+            def message = "No shipment items found"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+    }
+
+    /**
+     * Action to get pending requisition items as csv
+     * */
+    def pendingRequisitionItems = {
+        if (!params.origin) {
+            def message = "Origin parameter cannot be the empty"
+            response.status = 400
+            render([errorMessages: [message]] as JSON)
+            return
+        }
+
+        def origin = Location.get(params.origin)
+
+        if (!origin) {
+            def message = "Origin does not exist"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        def pendingRequisitionItems = stockMovementService.getPendingRequisitionItems(origin)
+
+        if (pendingRequisitionItems) {
+            def csv = getPendingRequisitionItemsCsv(pendingRequisitionItems)
+            def date = new Date()
+            response.contentType = "text/csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"PendingShipmentItems-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+            return
+        } else {
+            def message = "No pending requisition items found"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+    }
+
+    def getShipmentItemsCsv(List shipmentItems) {
+        def csv = CSVUtils.getCSVPrinter()
+        csv.printRecord(
+            "Code",
+            "Product Name",
+            "Quantity Incoming",
+            "Expected Shipping Date",
+            "Expected Delivery Date",
+            "Shipment Number",
+            "Shipment Name",
+            "Origin",
+            "Destination",
+        )
+
+        shipmentItems.each { shipmentItem ->
+            csv.printRecord(
+                shipmentItem.productCode,
+                shipmentItem.productName,
+                shipmentItem.quantity,
+                shipmentItem.expectedShippingDate,
+                shipmentItem.expectedDeliveryDate,
+                shipmentItem.shipmentNumber,
+                shipmentItem.shipmentName,
+                shipmentItem.origin,
+                shipmentItem.destination,
+            )
+        }
+
+        return csv
+    }
+
+    def getPendingRequisitionItemsCsv(List pendingRequisitionItems) {
+        def csv = CSVUtils.getCSVPrinter()
+        csv.printRecord(
+            "Shipment Number",
+            "Description",
+            "Destination",
+            "Status",
+            "Product Code",
+            "Product",
+            "Qty Picked",
+        )
+
+        pendingRequisitionItems.each { requisitionItem ->
+            def quantityPicked = requisitionItem?.totalQuantityPicked()
+            if (quantityPicked) {
+                csv.printRecord(
+                    requisitionItem?.requisition?.requestNumber,
+                    requisitionItem?.requisition?.description ?: '',
+                    requisitionItem?.requisition?.destination,
+                    requisitionItem?.requisition?.status,
+                    requisitionItem?.product?.productCode,
+                    requisitionItem?.product?.name,
+                    quantityPicked,
+                )
+            }
+        }
+
+        return csv
+    }
+
+    def getStockMovementsCsv(List stockMovements) {
+        def csv = CSVUtils.getCSVPrinter()
+        csv.printRecord(
+            "Status",
+            "Receipt Status",
+            "Identifier",
+            "Name",
+            "Origin",
+            "Destination",
+            "Stocklist",
+            "Requested by",
+            "Date Requested",
+            "Date Created",
+            "Date Shipped",
+        )
+
+        stockMovements?.each { sm ->
+            csv.printRecord(
+                sm.status,
+                sm.shipment?.status,
+                sm.identifier,
+                sm.description,
+                sm.origin?.name ?: "",
+                sm.destination?.name ?: "",
+                sm.stocklist?.name ?: "",
+                sm.requestedBy ?: warehouse.message(code: 'default.none.label'),
+                sm.dateRequested.format("MM-dd-yyyy") ?: "",
+                sm.requisition?.dateCreated?.format("MM-dd-yyyy") ?: "",
+                sm.shipment?.expectedShippingDate?.format("MM-dd-yyyy") ?: "",
+            )
+        }
+
+        return csv
+    }
+
+    def shipmentStatusCodes = {
+        def options = ShipmentStatusCode.list()?.collect {
+            [
+                    id: it.name,
+                    value: it.name,
+                    label: "${g.message(code: 'enum.ShipmentStatusCode.' + it.name)}",
+                    variant: it.variant.name
+            ]
+        }
+        render([data: options] as JSON)
+    }
+
+    def requisitionStatusCodes = {
+        def options = RequisitionStatus.listOutboundOptions()?.collect {
+            [
+                    id: it.name(),
+                    value: it.name(),
+                    label: "${g.message(code: 'enum.RequisitionStatus.' + it.name())}",
+                    variant: it.variant.name
+            ]
+        }
+        render([data: options] as JSON)
     }
 }

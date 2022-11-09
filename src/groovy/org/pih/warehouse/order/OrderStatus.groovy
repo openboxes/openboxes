@@ -9,20 +9,26 @@
  **/
 package org.pih.warehouse.order
 
+import org.pih.warehouse.core.StatusType
+
 enum OrderStatus {
 
-    PENDING(10),
-    APPROVED(20),
-    PLACED(30),
-    PARTIALLY_RECEIVED(40),
-    RECEIVED(50),
-    COMPLETED(60),
-    CANCELED(70),
-    REJECTED(80)
+    PENDING(10, StatusType.WARNING),
+    APPROVED(20, StatusType.PRIMARY),
+    PLACED(30, StatusType.PRIMARY),
+    PARTIALLY_RECEIVED(40, StatusType.PRIMARY),
+    RECEIVED(50, StatusType.PRIMARY),
+    COMPLETED(60, StatusType.SUCCESS),
+    CANCELED(70, StatusType.DANGER),
+    REJECTED(80, StatusType.DANGER)
 
     int sortOrder
+    StatusType variant
 
-    OrderStatus(int sortOrder) { [this.sortOrder = sortOrder] }
+    OrderStatus(int sortOrder, StatusType variant) {
+        this.sortOrder = sortOrder
+        this.variant = variant
+    }
 
     static int compare(OrderStatus a, OrderStatus b) {
         return a.sortOrder <=> b.sortOrder

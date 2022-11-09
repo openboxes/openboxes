@@ -36,7 +36,7 @@ const SortableCards = SortableContainer(({
 }) => (
   <div className="card-component">
     {data.map((value, index) =>
-      (
+      (value &&
         <GraphCard
           key={`item-${value.id}`}
           index={index}
@@ -66,7 +66,7 @@ const SortableCards = SortableContainer(({
 const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }) => (
   <div className="card-component">
     {data.map((value, index) => (
-      (
+      (value &&
         <NumberCard
           key={`item-${value.id}`}
           index={index}

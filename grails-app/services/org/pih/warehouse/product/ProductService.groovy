@@ -271,7 +271,7 @@ class ProductService {
      * @return
      */
     List<Product> getProducts(Category category, List<Tag> tags, boolean includeInactive, Map params) {
-        return getProducts(category, [], tags, includeInactive, params)
+        return getProducts([category], [], tags, includeInactive, params)
     }
 
     /**
@@ -283,9 +283,7 @@ class ProductService {
      * @param params
      * @return
      */
-    List<Product> getProducts(Category category, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
-        log.info "get products where category=" + category + ", catalogs=" + catalogsInput + ", tags=" + tagsInput + ", params=" + params
-
+    List<Product> getProducts(List<Category> categories, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
         int max = params.max ? params.int("max") : 10
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
@@ -305,63 +303,66 @@ class ProductService {
             if (!includeInactive) {
                 eq("active", true)
             }
-            and {
-                if (category) {
-                    if (params.includeCategoryChildren) {
-                        def categories = category.children ?: []
-                        categories << category
 
-                        println "Categories to search in " + categories
-                        'in'("category", categories)
-                    } else {
-                        println "Equality search " + category
-                        eq("category", category)
-                    }
-                }
-
-
-                or {
-                    if (tagsInput) {
-                        tags {
-                            'in'("id", tagsInput.collect { it.id })
-                        }
-                    }
-
-                    if (catalogsInput) {
-                        productCatalogItems {
-                            "in"("productCatalog", catalogsInput)
-                        }
-                    }
-                }
-
-                or {
-                    if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
-                    if (params.description) ilike("description", params.description + "%")
-                    if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
-                    if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
-                    if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
-                    if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
-                    if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
-                    if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
-                    if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
-                    if (params.createdById) eq("createdBy.id", params.createdById)
-                    if (params.updatedById) eq("updatedBy.id", params.updatedById)
-
-                    if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
-                    if (params.productCodeIsNull) isNull("productCode")
-                    if (params.brandNameIsNull) isNull("brandName")
-                    if (params.manufacturerIsNull) isNull("manufacturer")
-                    if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
-                    if (params.vendorIsNull) isNull("vendor")
-                    if (params.vendorCodeIsNull) isNull("vendorCode")
+            if (categories) {
+                if (params.includeCategoryChildren) {
+                    'in'("category", categories + categories*.children?.flatten())
+                } else {
+                    'in'("category", categories)
                 }
             }
-            if (offset) firstResult(offset)
-            if (max) maxResults(max)
-            if (sortColumn) order(sortColumn, sortOrder)
+
+
+            if (tagsInput) {
+                tags {
+                    'in'("id", tagsInput.collect { it.id })
+                }
+            }
+
+            if (catalogsInput) {
+                productCatalogItems {
+                    "in"("productCatalog", catalogsInput)
+                }
+            }
+            or {
+                if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                if (params.description) ilike("description", params.description + "%")
+                if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
+                if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
+                if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
+                if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
+                if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
+                if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
+                if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
+                if (params.createdById) eq("createdBy.id", params.createdById)
+                if (params.updatedById) eq("updatedBy.id", params.updatedById)
+
+                if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
+                if (params.productCodeIsNull) isNull("productCode")
+                if (params.brandNameIsNull) isNull("brandName")
+                if (params.manufacturerIsNull) isNull("manufacturer")
+                if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
+                if (params.vendorIsNull) isNull("vendor")
+                if (params.vendorCodeIsNull) isNull("vendorCode")
+            }
+
+            if (sortColumn) {
+                if (sortColumn == "category") {
+                    category {
+                        order("name", sortOrder)
+                    }
+                } else if (sortColumn == "updatedBy") {
+                    updatedBy {
+                        order("firstName", sortOrder)
+                        order("lastName", sortOrder)
+                    }
+                } else {
+                    order(sortColumn, sortOrder)
+                }
+            }
         }
 
-        return results.unique()
+        return results
     }
 
     /**
@@ -590,6 +591,7 @@ class ProductService {
         int rowCount = 1
 
         Location currentLocation = AuthService?.currentLocation?.get()
+        ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
 
         // Iterate over each line and either update an existing product or create a new product
         csv.toCsvReader(['skipLines': 1, 'separatorChar': delimiter]).eachLine { tokens ->
@@ -635,6 +637,12 @@ class ProductService {
                 if (!productType) {
                     throw new RuntimeException("Product type with name ${productTypeName} does not exist at row " + rowCount)
                 }
+                // Throw an error for product type with empty code and product identifier that is not a default product type
+                if (productType?.id != defaultProductType?.id && !productType?.code && !productType?.productIdentifierFormat) {
+                    throw new RuntimeException("Product type '${productTypeName}' at row ${rowCount} has empty code and empty product identifier format")
+                }
+            } else {
+                throw new RuntimeException("Product type name cannot be empty at row " + rowCount)
             }
 
             if (currentLocation?.accountingRequired && !glAccountCode) {
@@ -728,6 +736,12 @@ class ProductService {
 
             addTagsToProduct(product, tags)
             addTagsToProduct(product, productProperties.tags)
+
+            if (!product?.id || product.validate()) {
+                if (!product.productCode) {
+                    product.productCode = generateProductIdentifier(product.productType)
+                }
+            }
 
             if (!product.save(flush: true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)

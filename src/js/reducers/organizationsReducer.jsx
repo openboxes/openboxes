@@ -1,10 +1,12 @@
 import _ from 'lodash';
 
-import { FETCH_ORGANIZATIONS } from 'actions/types';
+import { FETCH_BUYERS, FETCH_ORGANIZATIONS, FETCH_SUPPLIERS } from 'actions/types';
 
 const initialState = {
   data: [],
   fetched: false,
+  suppliers: [],
+  buyers: null,
 };
 
 export default function (state = initialState, action) {
@@ -17,6 +19,16 @@ export default function (state = initialState, action) {
         return { ...state, data: organizations, fetched: true };
       }
       return state;
+    case FETCH_SUPPLIERS:
+      return {
+        ...state,
+        suppliers: action.payload,
+      };
+    case FETCH_BUYERS:
+      return {
+        ...state,
+        buyers: action.payload,
+      };
     default:
       return state;
   }

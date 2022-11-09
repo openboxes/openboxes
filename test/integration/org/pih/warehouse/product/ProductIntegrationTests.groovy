@@ -31,7 +31,8 @@ class ProductIntegrationTests extends GroovyTestCase {
         def name = "Test" + UUID.randomUUID().toString()[0..5]
         def group = new ProductGroup(name: name + "group", category: suppliers)
         assert group.save(flush:true, failOnError:true)
-        def product = new Product(name: name, category: suppliers)
+        def productType = DbHelper.findOrCreateProductType("Default")
+        def product = new Product(name: name, category: suppliers, productType: productType)
         product.addToProductGroups(group)
         assert product.save(flush:true, failOnError:true)
 
@@ -113,7 +114,8 @@ class ProductIntegrationTests extends GroovyTestCase {
     @Test
     void deleteSynonym_shouldCascadeOnDelete() {
         def category = new Category(name: "new category").save(flush: true)
-        def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
+        def productType = DbHelper.findOrCreateProductType("Default")
+        def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
 
         def synonym = new Synonym(name: "new synonym")
         product1.addToSynonyms(synonym)
@@ -138,7 +140,8 @@ class ProductIntegrationTests extends GroovyTestCase {
     @Test
     void deleteProduct_shouldCascadeOnDelete() {
         def category = new Category(name: "new category").save(flush: true)
-        def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
+        def productType = DbHelper.findOrCreateProductType("Default")
+        def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
 
         def synonym = new Synonym(name: "new synonym")
         product1.addToSynonyms(synonym)
@@ -160,8 +163,9 @@ class ProductIntegrationTests extends GroovyTestCase {
     @Ignore
     void deleteProduct_shouldNotCascadeOnDeleteWhenReferencedFromAnotherProduct() {
         def category = new Category(name: "new category").save(flush: true)
-        def product1 = new Product(name: "new product 1", category: category).save(flush: true, failOnError: true)
-        def product2 = new Product(name: "new product 2", category: category).save(flush: true, failOnError: true)
+        def productType = DbHelper.findOrCreateProductType("Default")
+        def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
+        def product2 = new Product(name: "new product 2", category: category, productType: productType).save(flush: true, failOnError: true)
 
         def synonym = new Synonym(name: "new synonym")
         product1.addToSynonyms(synonym)

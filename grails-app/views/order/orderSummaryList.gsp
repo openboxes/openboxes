@@ -45,7 +45,7 @@
 									<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 										<td class="middle">
 											<g:link action="show" id="${orderSummary?.id}">
-												${fieldValue(bean: orderSummary, field: "orderNumber")}
+												${fieldValue(bean: orderSummary?.order, field: "orderNumber")}
 											</g:link>
 										</td>
 										<td class="middle">

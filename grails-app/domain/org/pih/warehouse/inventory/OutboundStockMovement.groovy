@@ -234,6 +234,7 @@ class OutboundStockMovement implements Serializable {
         boolean isDepot = origin?.isDepot()
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
 
+        // TODO: REFACTOR THIS LINE!
         return !hasBeenReceived() && !hasBeenPartiallyReceived() && (isSameOrigin || (!isDepot && isSameDestination) || !isPending() || isElectronicType() || (isCentralPurchasingEnabled && isFromOrder))
     }
 

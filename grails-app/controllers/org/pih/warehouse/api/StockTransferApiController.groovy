@@ -31,12 +31,23 @@ class StockTransferApiController {
 
     def identifierService
     def inventoryService
+    def orderService
     def shipmentService
     def stockTransferService
 
     def list = {
-        List<Order> stockTransfers = Order.findAllByOrderType(OrderType.get(OrderTypeCode.TRANSFER_ORDER.name()))
-        render([data: stockTransfers.collect { it.toJson() }] as JSON)
+        if (!params.location) {
+            def message = "Location parameter is required"
+            response.status = 400
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        def stockTransfers = stockTransferService.getStockTransfers(params)
+        render([
+            data: stockTransfers?.collect { it.toJson(it.orderType.orderTypeCode) },
+            totalCount: stockTransfers.totalCount
+        ] as JSON)
     }
 
     def read = {
@@ -248,5 +259,32 @@ class StockTransferApiController {
 
         stockTransferService.rollbackReturnOrder(params.id as String, currentLocation)
         render status: 200
+    }
+
+    def delete = {
+        def order = Order.get(params.id)
+        if (!order) {
+            def message = "Order does not exist"
+            response.status = 404
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        if (order.status > OrderStatus.APPROVED || order.orderType.orderTypeCode != OrderTypeCode.TRANSFER_ORDER) {
+            def message = "Cannot delete this order"
+            response.status = 400
+            render([errorMessage: message] as JSON)
+            return
+        }
+
+        orderService.deleteOrder(order)
+        render status: 204
+    }
+
+    def statusOptions = {
+        def statusOptions = OrderStatus.listStockTransfer().collect{
+            [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderStatus.' + it.name())}", variant: it.variant?.name()]
+        }
+        render([data: statusOptions] as JSON)
     }
 }

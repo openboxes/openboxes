@@ -34,16 +34,16 @@
 								</td>
 								<td>
 									<g:if test="${locationInstance?.logo }">
-										<img class="logo" src="${createLink(controller:'location', action:'viewLogo', id:locationInstance?.id)}" class="middle" />
+										<img class="img-fluid" src="${createLink(controller:'location', action:'viewLogo', id:locationInstance?.id)}" />
 										<g:link controller="location" action="deleteLogo" id="${locationInstance?.id }" class="button icon trash">
 											${warehouse.message(code:'default.button.delete.label') }
-										</g:link>						
-									</g:if>						
-									<g:else>										
+										</g:link>
+									</g:if>
+									<g:else>
 										<span class="fade"><warehouse:message code="default.none.label"/></span>
 									</g:else>
 								</td>
-							</tr>						
+							</tr>
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message
 										code="location.logo.label" /></label>
@@ -51,8 +51,7 @@
 								<td>
 									<input type="hidden" name="id" value="${locationInstance.id}" />
 									<input type="file" name="logo" />
-								
-						
+									(<warehouse:message code="location.logoSize.tooltip.label" />)
 								</td>
 							</tr>
 							<tr class="prop">
@@ -61,22 +60,22 @@
 									<div class="buttons left">
 										<input class="button icon approve"
 											type="submit"
-											value="${warehouse.message(code:'default.button.upload.label')}" />									
-										&nbsp;	
+											value="${warehouse.message(code:'default.button.upload.label')}" />
+										&nbsp;
 										<g:link class="show" action="show" id="${locationInstance}">
 											${warehouse.message(code: 'default.button.cancel.label')}
 										</g:link>
 									</div>
-	
+
 								</td>
 							</tr>
-	
+
 						</tbody>
 					</table>
 				</div>
 			</fieldset>
 		</g:form>
-		
+
 	</div>
 </body>
 </html>

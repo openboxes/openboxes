@@ -33,8 +33,12 @@ class OutboundStockMovementService {
 
     def getStockMovements(StockMovement stockMovement, Map params) {
         params.includeStockMovementItems = false
+        def max = params.max ? params.int("max") : null
+        def offset = params.offset ? params.int("offset") : null
+        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
 
-        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: params.max, offset: params.offset) {
+        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
 
             if (stockMovement?.receiptStatusCodes) {
                 'in'("shipmentStatus", stockMovement.receiptStatusCodes)
@@ -94,14 +98,38 @@ class OutboundStockMovementService {
                     }
                 }
             }
-            if(params.createdAfter) {
-                ge("dateCreated", params.createdAfter)
+            if(createdAfter) {
+                ge("dateCreated", createdAfter)
             }
-            if(params.createdBefore) {
-                le("dateCreated", params.createdBefore)
+            if(createdBefore) {
+                le("dateCreated", createdBefore)
             }
-            if (params.sort && params.order) {
-                order(params.sort, params.order)
+
+            if (params.sort) {
+                if (params.sort == "destination.name") {
+                    destination {
+                        order("name", params.order ?: "desc")
+                    }
+                } else if (params.sort == "origin.name") {
+                    origin {
+                        order("name", params.order ?: "desc")
+                    }
+                } else if (params.sort == "requestedBy.name") {
+                    requestedBy {
+                        order("firstName", params.order ?: "desc")
+                        order("lastName", params.order ?: "desc")
+                    }
+                } else if (params.sort == "dateRequested") {
+                    order("dateRequested", params.order ?: "desc")
+                } else if (params.sort == "stocklist.name") {
+                    requisition {
+                        requisitionTemplate {
+                            order("name", params.order ?: "desc")
+                        }
+                    }
+                } else {
+                    order(params.sort, params.order ?: "desc")
+                }
             } else {
                 order("statusSortOrder", "asc")
                 order("dateCreated", "desc")

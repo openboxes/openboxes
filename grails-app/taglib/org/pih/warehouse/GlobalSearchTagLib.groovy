@@ -14,7 +14,6 @@ class GlobalSearchTagLib {
 
     def globalSearch = { attrs, body ->
 
-        attrs.id = (attrs.id) ? attrs.id : "globalSearch_" + (new Random()).nextInt()
         attrs.name = (attrs.name) ? attrs.name : attrs.id
         attrs.value = (attrs.value) ?: ""
         attrs.width = (attrs.width) ?: ""
@@ -24,8 +23,11 @@ class GlobalSearchTagLib {
         attrs.size = (attrs.size) ?: "150"
         attrs.display = (attrs.display) ?: "visible"
 
-
-        out << g.render(template: '/taglib/globalSearch', model: [attrs: attrs])
+        if (attrs.buttonId) {
+            out << g.render(template: '/taglib/globalSearch', model: [attrs: attrs])
+        } else {
+            out << g.render(template: '/taglib/globalSearchStatic', model: [attrs: attrs])
+        }
     }
 
 }

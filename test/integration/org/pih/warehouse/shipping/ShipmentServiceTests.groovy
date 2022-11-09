@@ -20,6 +20,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import testutils.DbHelper
 
 class ShipmentServiceTests extends GroovyTestCase {
 
@@ -28,8 +29,9 @@ class ShipmentServiceTests extends GroovyTestCase {
 	protected void setUp() {
 		super.setUp()
 		
-		new Category(name: "Category").save(flush:true);
-		new Product(name: "Product", category: Category.findByName("Category")).save(flush:true);
+		new Category(name: "Category").save(flush:true)
+		def productType = DbHelper.findOrCreateProductType("Default")
+		new Product(name: "Product", category: Category.findByName("Category"), productType: productType).save(flush:true)
 		new ShipmentType(name: "Ground").save(flush:true)
 		def locationType = new LocationType(name: "Depot").save(flush:true)
 		new Location(name: "Origin", locationType: locationType).save(flush:true)

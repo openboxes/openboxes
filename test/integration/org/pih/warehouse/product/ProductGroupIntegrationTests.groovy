@@ -13,6 +13,7 @@ import grails.test.*
 import groovy.sql.Sql
 import org.junit.Ignore
 import org.junit.Test
+import testutils.DbHelper
 
 class ProductGroupIntegrationTests extends GroovyTestCase {
 	
@@ -23,8 +24,10 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		
 		def category = new Category(name: "Medicines")
 		category.save(flush:true)
+
+		def productType = DbHelper.findOrCreateProductType("Default")
 		
-		def product = new Product(name: "Ibuprofen, 200 mg, tablet", category: category)
+		def product = new Product(name: "Ibuprofen, 200 mg, tablet", category: category, productType: productType)
 		product.save(failOnError:true)
 		
 		def productGroup = new ProductGroup(name:"Ibuprofen", category: category)
@@ -33,7 +36,7 @@ class ProductGroupIntegrationTests extends GroovyTestCase {
 		product.addToProductGroups(productGroup)
 		product.save(flush:true,failOnError:true)
 		
-		def product2 = new Product(name: "Tylenol, 325 mg, tablet", category: category)
+		def product2 = new Product(name: "Tylenol, 325 mg, tablet", category: category, productType: productType)
 		product2.save(failOnError:true)
 				
 		def productGroup2 = new ProductGroup(name:"Tylenol", category: category)

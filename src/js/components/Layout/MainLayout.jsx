@@ -3,12 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Footer from 'components/Layout/Footer';
-import Navbar from 'components/Layout/Navbar';
+import Header from 'components/Layout/Header';
 
 
 const MainLayout = ({ children }) => (
   <div className="page page-dashboard">
-    <Navbar />
+    <Header />
     <div className="main">{children}</div>
     <Footer />
   </div>

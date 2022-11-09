@@ -20,6 +20,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.product.Product
@@ -164,6 +165,7 @@ class DashboardController {
     def flushCache = {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
         RefreshProductAvailabilityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])
+        RefreshOrderSummaryJob.triggerNow()
         redirect(action: "index")
     }
 

@@ -38,4 +38,14 @@ class PartyType {
     String toString() {
         return name
     }
+
+    Map toJson() {
+        return [
+                id: id,
+                name: name,
+                code: code,
+                partyTypeCode: partyTypeCode?.name()
+        ]
+    }
+
 }

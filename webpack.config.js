@@ -70,7 +70,7 @@ module.exports = {
       },
       {
         test: /\.jsx$/,
-        loader: 'babel-loader?presets[]=es2015&presets[]=react&presets[]=stage-1',
+        use: ['cache-loader', 'babel-loader?presets[]=@babel/react&presets[]=@babel/env'],
         include: SRC,
         exclude: /node_modules/,
       },
@@ -93,6 +93,17 @@ module.exports = {
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./fonts/[hash].[ext]',
+      },
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
       },
     ],
   },

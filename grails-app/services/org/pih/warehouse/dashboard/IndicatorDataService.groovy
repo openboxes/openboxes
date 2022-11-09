@@ -355,6 +355,9 @@ class IndicatorDataService {
         Map listRes = [:]
         List listLabel = fillLabels(querySize)
 
+        if (queryData.size() == 0) {
+            listRes.put(null, new IndicatorDatasets(null, [0] * (querySize + 1)))
+        }
         for (item in queryData) {
             // item[0]: item total counted
             // item[1]: item destination
@@ -476,6 +479,9 @@ class IndicatorDataService {
         Map listRes = [:]
         List listLabel = fillLabels(querySize)
 
+        if (queryData.size() == 0) {
+            listRes.put(null, new IndicatorDatasets(null, [0] * (querySize + 1)))
+        }
         for (item in queryData) {
             // item[0]: item total counted
             // item[1]: item origin
@@ -583,7 +589,7 @@ class IndicatorDataService {
 
 
         String baseUrl = '/openboxes/stockMovement/list?direction=OUTBOUND'
-        String statusQuery = RequisitionStatus.listPending().collect { "&status=$it" }.join('')
+        String statusQuery = RequisitionStatus.listPending().collect { "&requisitionStatusCode=$it" }.join('')
         String dateFormat = "MM/dd/yyyy"
 
         String createdAfterQuery = "&createdAfter=${fourDaysAgo.format(dateFormat)}"

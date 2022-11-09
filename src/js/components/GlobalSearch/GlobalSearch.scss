@@ -1,0 +1,75 @@
+.app-global-search {
+  width: clamp(200px, 60vw, 1000px);
+  color: var(--blue-800);
+  right: 0;
+  outline: none;
+
+  &__control {
+    border: solid 1px var(--gray-200) !important;
+    border-radius: 3px;
+    padding: 0 12px;
+    outline: rgba(34, 100, 229, 0.15) outset 0 !important;
+    box-shadow: unset;
+    transition: outline-width ease-in-out 0.1s;
+    &--is-focused {
+      border-color: var(--blue-500) !important;
+      outline-width: 3px !important;
+    }
+  }
+
+  &__indicator-separator {
+    display: none;
+  }
+  &__menu {
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.15), 2px 2px 4px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 4px 4px;
+    margin: 0;
+  }
+
+  &__menu-list {
+    padding: 8px;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+    }
+  }
+
+  &__placeholder, &__menu-notice {
+    color: var(--gray-401);
+  }
+
+  &__option {
+    color: var(--blue-700);
+    cursor: pointer;
+    &:active {
+      background-color: var(--blue-301);
+    }
+    &--is-focused {
+      background-color: var(--blue-200);
+    }
+  }
+
+  &__loading-indicator > span{
+    background-color: var(--blue-primary);
+  }
+
+  &__search-icon {
+    font-size: 16px;
+    color: inherit;
+  }
+
+  &__clear-btn {
+    all: unset;
+    color: inherit;
+    font-size: 24px;
+  }
+}

@@ -13,7 +13,7 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div>
-            
+
 				<div class="button-bar">
                     <g:link class="button" action="list">
                         <img src="${resource(dir: 'images/icons/silk', file: 'application_view_list.png')}" />&nbsp;
@@ -23,9 +23,13 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
                         <warehouse:message code="default.add.label" args="[g.message(code:'productAssociation.label')]"/>
                     </g:link>
-                    <g:link class="button" action="export">
+                    <g:link class="button" controller="batch" action="downloadExcel" params="[type:'ProductAssociation']">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                         <warehouse:message code="default.export.label" args="[g.message(code:'productAssociations.label')]"/>
+                    </g:link>
+                    <g:link class="button" controller="batch" action="importData" params="[type: 'productAssociation']" >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'database_refresh.png')}" />&nbsp;
+                        <warehouse:message code="default.import.label" args="[g.message(code:'productAssociations.label')]"/>
                     </g:link>
 	        	</div>
 
@@ -58,7 +62,7 @@
                                         <img src="${resource(dir: 'images/icons/silk', file: 'zoom.png')}" />&nbsp;
                                     ${g.message(code: 'default.button.search.label')}
                                     </button>
-                                    <button name="format" value="csv" class="button">
+                                    <button name="format" value="xls" class="button">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                                     <warehouse:message code="default.button.download.label" default="Download"/>
                                     </button>
@@ -96,7 +100,7 @@
 
                                         <td><g:link action="edit" id="${productAssociationInstance.id}">${fieldValue(bean: productAssociationInstance, field: "id")}</g:link></td>
 
-                                        <td>${fieldValue(bean: productAssociationInstance, field: "code")}</td>
+                                        <td><format:metadata obj="${productAssociationInstance.code}" /></td>
 
                                         <td>
                                             <g:link controller="product" action="edit" id="${productAssociationInstance?.product?.id}">

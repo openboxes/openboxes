@@ -79,4 +79,19 @@ class Organization extends Party {
         return roles.any { PartyRole role -> role.roleType == roleType }
     }
 
+    Map toJson() {
+        return [
+                id             : id,
+                name           : name,
+                description    : description,
+                code           : code,
+                dateCreated    : dateCreated,
+                lastUpdated    : lastUpdated,
+                defaultLocation: Location.toJson(defaultLocation),
+                partyType      : partyType,
+                roles          : roles,
+                sequences      : sequences
+        ]
+    }
+
 }

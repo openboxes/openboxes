@@ -1,0 +1,212 @@
+.app-react-table-wrapper {
+  //border-radius: 4px;
+  //overflow: hidden;
+}
+.app-react-table-header {
+  background-color: white;
+}
+
+.app-react-table-footer {
+  background-color: #F5F7FB;
+}
+
+.app-react-table {
+  border: none;
+  border-radius: 4px;
+
+  &.hide-data .rt-tbody {
+    display: none;
+  }
+
+  .rt-table {
+    font-size: 14px;
+
+    &::-webkit-scrollbar {
+      width: 0.5em;
+      height: 0.5em;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--blue-200);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--blue-301);
+      border-radius: 4px;
+    }
+
+    .rt-thead {
+      &.-header {
+        box-shadow: unset;
+      }
+      &.-headerGroups {
+        .sorting-arrows {
+          display: none !important;
+        }
+      }
+
+      .rt-th {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 12px;
+        background-color: var(--blue-100);
+        color: var(--gray-600);
+        font-weight: bold;
+        border-right: none;
+
+        .sorting-arrows {
+          display: none;
+          flex-direction: column;
+          font-size: 16px;
+          color: var(--gray-300);
+          margin-left: 4px;
+          .arrow-up {
+            margin-bottom: -5px;
+          }
+          .arrow-down {
+            margin-top: -5px;
+          }
+        }
+        /* HIDE SORTING ARROWS ON COLUMNS WHERE SORTING IS DISABLED
+        * we want to hide sorting arrows if sorting is not available on a column
+        * since it is not possible to access column props in custom ThComponent
+        * we check for class .-cursor-pointer (that is added to sortable columns)
+        * and we set display property from none to flex
+        */
+        &.-cursor-pointer .sorting-arrows {
+          display: flex;
+        }
+
+        &.-sort-asc {
+          box-shadow: unset;
+          .sorting-arrows > .arrow-up {
+            color: var(--gray-600);
+          }
+        }
+        &.-sort-desc {
+          box-shadow: unset;
+          .sorting-arrows > .arrow-down {
+            color: var(--gray-600);
+          }
+        }
+
+        &:hover,
+        &:hover.-sort-asc .sorting-arrows > .arrow-up,
+        &:hover.-sort-desc .sorting-arrows > .arrow-down  {
+          color: var(--blue-primary);
+        }
+      }
+
+    }
+
+    .rt-tbody {
+      .rt-tr-group {
+        border-bottom: 1px solid var(--gray-100);
+      }
+      .rt-td {
+        border-right: none;
+        border-left: none;
+        padding: 12px;
+      }
+      .rt-tr {
+        background-color: white;
+        color: var(--gray-600);
+        &:hover, &:hover .rt-td {
+          background-color: #F8FAFF;
+        }
+      }
+
+    }
+    $column-shadow-blur: 4px;
+    $column-shadow-spread: 6px;
+    $clip-offset: -($column-shadow-blur + $column-shadow-spread);
+    $column-shadow-color: rgba(0, 0, 0, 0.13);
+
+    .rthfc-td-fixed, .rthfc-td-fixed {
+      z-index: 0;
+    }
+
+    .rt-td.rthfc-td-fixed.rthfc-td-fixed-left.rthfc-td-fixed-left-last,
+    .rt-th.rthfc-th-fixed.rthfc-th-fixed-left.rthfc-th-fixed-left-last {
+      box-shadow: -4px 0 $column-shadow-blur $column-shadow-spread $column-shadow-color;
+      clip-path: inset(0 $clip-offset 0 0);
+      border-right: none;
+    }
+    .rt-th.rthfc-th-fixed.rthfc-th-fixed-right.rthfc-th-fixed-right-first,
+    .rt-td.rthfc-td-fixed.rthfc-td-fixed-right.rthfc-td-fixed-right-first {
+      box-shadow: 4px 0 $column-shadow-blur $column-shadow-spread $column-shadow-color;
+      clip-path: inset(0 0 0 $clip-offset);
+      border-left: none;
+    }
+
+
+  }
+  .pagination-bottom {
+    order: 2;
+  }
+  .table-pagination  {
+    color: var(--gray-600);
+    background-color: #FBFCFC;
+    font-size: 12px;
+    &__btn-previous,  &__btn-next  {
+      font-size: 28px;
+      color: var(--gray-300);
+      padding: 0;
+      background-color: transparent;
+      border: none;
+      &:disabled {
+        color: var(--gray-100);
+      }
+      &:focus, &:active {
+        outline: none;
+      }
+    }
+    input {
+      background-color: white;
+      padding: 4px 8px;
+      border: 1px solid var(--gray-200);
+      border-radius: 2px;
+      width: 60px;
+      color: var(--gray-600);
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &-select {
+      width: 100px;
+      &__indicator-separator {
+        display: none;
+      }
+      &__control {
+        border-radius: 2px;
+        border: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        height: 28px;
+        min-height: 28px;
+        & > * {
+          height: 28px;
+        }
+      }
+    }
+
+  }
+
+
+  .rt-noData {
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+    display: flex;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    left: unset;
+    top: unset;
+    transform: unset;
+    -webkit-transform: unset;
+    order: 1;
+  }
+}

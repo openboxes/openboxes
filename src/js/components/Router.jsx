@@ -1,9 +1,10 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { ClimbingBoxLoader } from 'react-spinners';
 
@@ -71,6 +72,11 @@ const AsyncInvoice = Loadable({
   loading: Loading,
 });
 
+const AsyncInvoiceList = Loadable({
+  loader: () => import('components/invoice/InvoiceList'),
+  loading: Loading,
+});
+
 const AsyncStockTransfer = Loadable({
   loader: () => import('components/stock-transfer/StockTransferWizard'),
   loading: Loading,
@@ -121,6 +127,54 @@ const AsyncResetInstancePage = Loadable({
   loading: Loading,
 });
 
+const AsyncPurchaseOrderList = Loadable({
+  loader: () => import('components/purchaseOrder/PurchaseOrderList'),
+  loading: Loading,
+});
+
+
+const AsyncStockList = Loadable({
+  loader: () => import('components/stock-list/StockList'),
+  loading: Loading,
+});
+
+const AsyncProductsList = Loadable({
+  loader: () => import('components/products/ProductsList'),
+  loading: Loading,
+});
+
+const AsyncStockMovementInboundList = Loadable({
+  loader: () => import('components/stock-movement/inbound/StockMovementInboundList'),
+  loading: Loading,
+});
+const AsyncStockMovementOutboundList = Loadable({
+  loader: () => import('components/stock-movement/outbound/StockMovementOutboundList'),
+  loading: Loading,
+});
+
+
+const StockMovementList = (props) => {
+  const parsedSearchQuery = queryString.parse(props?.location?.search);
+  const direction = parsedSearchQuery?.direction?.toUpperCase();
+  switch (direction) {
+    case 'INBOUND':
+      return <AsyncStockMovementInboundList {...props} />;
+    case 'OUTBOUND': {
+      const isRequestsList = parsedSearchQuery?.sourceType?.toUpperCase() === 'ELECTRONIC';
+      return <AsyncStockMovementOutboundList {...props} isRequestsList={isRequestsList} />;
+    }
+    default:
+      return <Redirect to="/openboxes/" />;
+  }
+};
+
+
+const AsyncStockTransferList = Loadable({
+  loader: () => import('components/stock-transfer/list/StockTransferList'),
+  loading: Loading,
+});
+
+
 const Router = (props) => {
   const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
     ? AsyncStockRequestDashboard
@@ -131,6 +185,7 @@ const Router = (props) => {
       <BrowserRouter>
         <Switch>
           <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
+          <MainLayoutRoute path="/**/stockMovement/list" component={StockMovementList} />
           <MainLayoutRoute path="/**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />
           <MainLayoutRoute path="/**/stockMovement/createInbound/:stockMovementId?" component={AsyncStockMovementInbound} />
           <MainLayoutRoute path="/**/stockMovement/createCombinedShipments/:stockMovementId?" component={AsyncStockMovementCombinedShipments} />
@@ -140,6 +195,7 @@ const Router = (props) => {
           <MainLayoutRoute path="/**/partialReceiving/create/:shipmentId" component={AsyncReceivingPage} />
           <MainLayoutRoute path="/**/stocklistManagement/index/:productId?" component={AsyncManagement} />
           <MainLayoutRoute path="/**/invoice/create/:invoiceId?" component={AsyncInvoice} />
+          <MainLayoutRoute path="/**/invoice/list" component={AsyncInvoiceList} />
           <MainLayoutRoute path="/**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
           <MainLayoutRoute path="/**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
           <MainLayoutRoute path="/**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
@@ -154,6 +210,10 @@ const Router = (props) => {
           <Route path="/**/resettingInstanceInfo/index">
             <AsyncResetInstancePage />
           </Route>
+          <MainLayoutRoute path="/**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
+          <MainLayoutRoute path="/**/requisitionTemplate/list" component={AsyncStockList} />
+          <MainLayoutRoute path="/**/product/list" component={AsyncProductsList} />
+          <MainLayoutRoute path="/**/stockTransfer/list" component={AsyncStockTransferList} />
           <MainLayoutRoute path="/**/dashboard/:configId?" component={Dashboard} />
           <MainLayoutRoute path="/**/" component={Dashboard} />
         </Switch>

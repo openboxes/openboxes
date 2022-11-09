@@ -28,7 +28,7 @@
                     <g:set var="quantityAvailable" value="${quantityAvailableMap[associatedProduct?.id] ?: 0}"/>
                     <tr class="${(status%2)?'odd':'even'}">
                         <td class="center">
-                            ${association.code}
+                            <format:metadata obj="${association.code}" />
                         </td>
                         <td>${associatedProduct?.productCode}</td>
                         <td>

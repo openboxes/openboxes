@@ -232,6 +232,24 @@
                         <tr>
                             <td>
                                 <label>
+                                    <g:radio name="type" value="productAssociation" checked="${params.type=='productAssociation'}"/>
+                                    <warehouse:message code="productAssociations.label" default="Product Associations"/>
+                                </label>
+                            </td>
+                            <td>
+                                <g:link controller="batch" action="downloadTemplate" params="[template:'productAssociations.xls']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                                </g:link>
+                            </td>
+                            <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'ProductAssociation']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
                                     <g:radio name="type" value="outboundStockMovement" checked="${params.type=='outboundStockMovement'}"/>
                                     <warehouse:message code="import.outboundStockMovement.label" default="Stock Movements (Outbound)"/>
                                 </label>

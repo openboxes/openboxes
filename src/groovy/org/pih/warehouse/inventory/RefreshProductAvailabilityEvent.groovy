@@ -31,7 +31,7 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
 
     RefreshProductAvailabilityEvent(Location source) {
         super(source)
-        this.locationId = source?.isBinLocation() ?source?.parentLocation?.id : source?.id
+        this.locationId = source?.isInternalLocation() ? source?.parentLocation?.id : source?.id
         this.productIds = []
         this.forceRefresh = forceRefresh
         this.disableRefresh = disableRefresh
@@ -48,7 +48,7 @@ class RefreshProductAvailabilityEvent extends ApplicationEvent {
         super(source)
         this.locationId = source.associatedLocation
         this.productIds = source.associatedProducts
-        this.disableRefresh = source.disableRefresh
+        this.disableRefresh = source.disableRefresh?:source?.requisitionItem?.disableRefresh
     }
 
     RefreshProductAvailabilityEvent(Transaction source, Boolean forceRefresh) {

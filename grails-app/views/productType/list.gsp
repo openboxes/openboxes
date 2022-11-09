@@ -39,6 +39,8 @@
 
                                 <g:sortableColumn property="productIdentifierFormat" title="${warehouse.message(code: 'productType.productIdentifierFormat.label', default: 'Product Identifier Format')}" />
 
+                                <g:sortableColumn property="sequenceNumber" title="${warehouse.message(code: 'productType.sequenceNumber.label', default: 'Sequence Number')}" />
+
                                 <g:sortableColumn property="dateCreated" title="${warehouse.message(code: 'productType.dateCreated.label', default: 'Date Created')}" />
 
                                 <g:sortableColumn property="lastUpdated" title="${warehouse.message(code: 'productType.lastUpdated.label', default: 'Last Updated')}" />
@@ -56,6 +58,8 @@
                                 <td>${fieldValue(bean: productTypeInstance, field: "productTypeCode")}</td>
 
                                 <td>${fieldValue(bean: productTypeInstance, field: "productIdentifierFormat")}</td>
+
+                                <td>${productTypeInstance.sequenceNumber}</td>
 
                                 <td><format:date obj="${productTypeInstance.dateCreated}" /></td>
 

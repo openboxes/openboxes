@@ -14,6 +14,7 @@ import grails.orm.PagedResultList
 class ProductAssociationController {
 
     def dataService
+    def documentService
     def productService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -53,12 +54,23 @@ class ProductAssociationController {
         }
 
         if (params.format && productAssociations) {
-            def filename = "productAssociations.csv"
-            def data = productAssociations ? dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES) : [[:]]
-            def text = dataService.generateCsv(data)
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: text)
-            return
+            String filename = "productAssociations"
+            def data = dataService.transformObjects(productAssociations, ProductAssociation.PROPERTIES)
+
+            if (params.format == 'csv') {
+                filename = "${filename}.csv"
+                def text = dataService.generateCsv(data)
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                render(contentType: "text/csv", text: text)
+                return
+            } else if (params.format == 'xls') {
+                filename = "${filename}.xls"
+                response.contentType = "application/vnd.ms-excel"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                documentService.generateExcel(response.outputStream, data)
+                response.outputStream.flush()
+            }
+
         }
 
         [productAssociationInstanceList: productAssociations, productAssociationInstanceTotal: productAssociations.totalCount, selectedTypes: selectedTypes]
@@ -72,7 +84,8 @@ class ProductAssociationController {
 
     def save = {
         def productAssociationInstance = new ProductAssociation(params)
-        if (productAssociationInstance.save(flush: true)) {
+        validateAssociation(productAssociationInstance)
+        if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
             if (params.hasMutualAssociation) {
                 def mutualAssociationInstance = new ProductAssociation()
                 bindMutualAssociationData(mutualAssociationInstance, params)
@@ -148,6 +161,7 @@ class ProductAssociationController {
             }
 
             productAssociationInstance.properties = params
+            validateAssociation(productAssociationInstance)
             if (!productAssociationInstance.hasErrors() && productAssociationInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), productAssociationInstance.id])}"
                 redirect(controller: "product", action: "edit", id: productAssociationInstance?.product?.id)
@@ -221,5 +235,21 @@ class ProductAssociationController {
         mutualAssociation.quantity = quantity != 0 ? (1 / quantity) : 0 as BigDecimal
         mutualAssociation.code = ProductAssociationTypeCode.valueOf(ProductAssociationTypeCode, params.code)
         mutualAssociation.comments = params.comments
+    }
+
+    void validateAssociation(ProductAssociation productAssociation) {
+        // associate to itself
+        if (productAssociation.product?.id == productAssociation.associatedProduct?.id) {
+            productAssociation.errors.reject("Cannot associate a product with itself")
+        }
+        // duplicates
+        List<ProductAssociation> foundProductAssociations = ProductAssociation.findAllWhere([
+                product             : productAssociation.product,
+                associatedProduct   : productAssociation.associatedProduct,
+                code                : productAssociation.code,
+        ])
+        if (foundProductAssociations && foundProductAssociations.size() > 0) {
+            productAssociation.errors.reject("Association with given parameters already exists")
+        }
     }
 }

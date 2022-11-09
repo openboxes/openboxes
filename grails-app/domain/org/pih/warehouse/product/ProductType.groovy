@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+
 class ProductType {
 
     String id
@@ -37,6 +39,12 @@ class ProductType {
     }
 
     static transients = ["nextSequenceNumber"]
+
+    static namedQueries = {
+        defaultProductType {
+            eq("id", CH.config.openboxes.identifier.defaultProductType.id)
+        }
+    }
 
     Boolean isFieldDisplayed(ProductField field) {
         if (!displayedFields || displayedFields.isEmpty()) {

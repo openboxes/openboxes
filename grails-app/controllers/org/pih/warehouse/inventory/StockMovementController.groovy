@@ -113,6 +113,7 @@ class StockMovementController {
     }
 
     def show = {
+        Location currentLocation = Location.get(session?.warehouse?.id)
         // Pull Outbound Stock movement (Requisition based) or Outbound or Inbound Return (Order based)
         def stockMovement = outboundStockMovementService.getStockMovement(params.id)
         // For inbound stockMovement only
@@ -122,124 +123,14 @@ class StockMovementController {
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
 
         if (stockMovement?.order) {
-            render(view: "/returns/show", model: [stockMovement: stockMovement])
+            render(view: "/returns/show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
         } else {
-            render(view: "show", model: [stockMovement: stockMovement])
+            render(view: "show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
         }
     }
 
     def list = {
-
-        def max = params.max ? params.max as int : 10
-        def offset = params.offset ? params.offset as int : 0
-        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
-        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
-        Location currentLocation = Location.get(session?.warehouse?.id)
-
-        StockMovementDirection stockMovementDirection = params.direction ? params.direction as StockMovementDirection : null
-        // On initial request we set the origin and destination based on the direction
-        if (stockMovementDirection == StockMovementDirection.OUTBOUND) {
-            params.origin = params.origin ?: currentLocation
-            params.destination = params.destination ?: null
-        } else if (stockMovementDirection == StockMovementDirection.INBOUND) {
-            params.origin = params.origin ?: null
-            params.destination = params.destination ?: currentLocation
-        } else {
-            // This is necessary because sometimes we need to infer the direction from the parameters
-            if (params.origin?.id == currentLocation?.id && params.destination?.id == currentLocation?.id) {
-                stockMovementDirection = null
-                params.direction = null
-            } else if (params.origin?.id == currentLocation?.id) {
-                stockMovementDirection = StockMovementDirection.OUTBOUND
-                params.direction = stockMovementDirection.toString()
-            } else if (params.destination?.id == currentLocation?.id) {
-                stockMovementDirection = StockMovementDirection.INBOUND
-                params.direction = stockMovementDirection.toString()
-            } else {
-                params.origin = params.origin ?: currentLocation
-                params.destination = params.destination ?: currentLocation
-            }
-        }
-
-        if (params.format) {
-            max = null
-            offset = null
-        }
-
-        // Discard the requisition so it does not get saved at the end of the request
-        Requisition requisition = new Requisition(params)
-        requisition.discard()
-
-        // Create stock movement to be used as search criteria
-        StockMovement stockMovement = new StockMovement()
-        if (params.q) {
-            stockMovement.identifier = "%" + params.q + "%"
-            stockMovement.name = "%" + params.q + "%"
-            stockMovement.description = "%" + params.q + "%"
-        }
-
-        stockMovement.stockMovementDirection = stockMovementDirection
-        stockMovement.requestedBy = requisition.requestedBy
-        stockMovement.createdBy = requisition.createdBy
-        stockMovement.origin = requisition.origin
-        stockMovement.destination = requisition.destination
-        stockMovement.statusCode = requisition?.status ? requisition?.status.toString() : null
-        stockMovement.receiptStatusCodes = params.receiptStatusCode ? params?.list("receiptStatusCode") as ShipmentStatusCode[] : null
-        stockMovement.requisitionStatusCodes = params.status ? params?.list("status") as RequisitionStatus[] : null
-        stockMovement.requestType = requisition?.type
-        stockMovement.sourceType = requisition?.sourceType
-        stockMovement.updatedBy = requisition?.updatedBy
-
-        def stockMovements
-
-        try {
-            stockMovements = stockMovementService.getStockMovements(stockMovement, [max: max, offset: offset, createdAfter: createdAfter, createdBefore: createdBefore])
-        } catch(Exception e) {
-            flash.message = "${e.message}"
-        }
-
-        if (params.format && stockMovements) {
-
-            def sw = new StringWriter()
-            def csv = new CSVWriter(sw, {
-                "Status" { it.status }
-                "Receipt Status" { it.receiptStatus }
-                "Identifier" { it.id }
-                "Name" { it.name }
-                "Origin" { it.origin }
-                "Destination" { it.destination }
-                "Stocklist" { it.stocklist }
-                "Requested by" { it.requestedBy }
-                "Date Requested" { it.dateRequested }
-                "Date Created" { it.dateCreated }
-                "Date Shipped" { it.dateShipepd }
-            })
-
-            stockMovements.each { stockMov ->
-                csv << [
-                        status       : stockMov.status,
-                        receiptStatus: stockMov.shipment?.status,
-                        id           : stockMov.identifier,
-                        name         : stockMov.description,
-                        origin       : stockMov.origin?.name ?: "",
-                        destination  : stockMov.destination?.name ?: "",
-                        stocklist    : stockMov.stocklist?.name ?: "",
-                        requestedBy  : stockMov.requestedBy ?: warehouse.message(code: 'default.none.label'),
-                        dateRequested: stockMov.dateRequested.format("MM-dd-yyyy") ?: "",
-                        dateCreated  : stockMov.requisition?.dateCreated?.format("MM-dd-yyyy") ?: "",
-                        dateShipepd  : stockMov.shipment?.expectedShippingDate?.format("MM-dd-yyyy") ?: "",
-                ]
-            }
-
-            response.setHeader("Content-disposition", "attachment; filename=\"StockMovements-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
-        }
-
-        if (params.submitted) {
-            flash.message = "${warehouse.message(code:'request.submitMessage.label')} ${params.movementNumber}"
-        }
-
-        render(view: "list", params: params, model: [stockMovements: stockMovements])
+        render(template: "/common/react", params: params)
     }
 
     def rollback = {
@@ -448,6 +339,7 @@ class StockMovementController {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            Location currentLocation = Location.get(session?.warehouse?.id)
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -462,8 +354,8 @@ class StockMovementController {
             def settings = [separatorChar: ',', skipLines: 1]
             Integer sortOrder = 0
             csv.toCsvReader(settings).eachLine { tokens ->
-
-                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens)
+                Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND
+                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, validateLotAndExpiry)
                 stockMovementItem.stockMovement = stockMovement
                 stockMovementItem.sortOrder = sortOrder
                 stockMovement.lineItems.add(stockMovementItem)
@@ -482,6 +374,7 @@ class StockMovementController {
         render([data: "Data will be imported successfully"] as JSON)
     }
 
+    // TODO: Remove after implementing inbound sm list on the react side
     def exportItems = {
         def shipmentItems = []
         def shipments = shipmentService.getShipmentsByDestination(session.warehouse)
@@ -545,6 +438,7 @@ class StockMovementController {
         }
     }
 
+    // TODO: Remove after implementing outbound sm list on the react side
     def exportPendingRequisitionItems = {
         Location currentLocation = Location.get(session?.warehouse?.id)
 

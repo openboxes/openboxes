@@ -52,9 +52,11 @@ class NumberDataService {
                 """,
                 ['location': location, 'user': user, 'orderType': returnOrderType]).get(0)
 
-        return new NumberData(requisitionShipmentCount + returnOrderShipmentCount, "/openboxes/stockMovement/list?receiptStatusCode=PENDING&origin.id=" + location.id + "&createdBy.id=" + user.id)
+        return new NumberData(
+                requisitionShipmentCount + returnOrderShipmentCount,
+                "/openboxes/stockMovement/list?direction=OUTBOUND&receiptStatusCode=PENDING&origin=" + location.id + "&createdBy=" + user.id
+        )
     }
-
     NumberData getInProgressPutaways(def user, def location) {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderType = :orderType AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location",
                 ['user': user, 'location': location, 'orderType': OrderType.findByCode(Constants.PUTAWAY_ORDER)])

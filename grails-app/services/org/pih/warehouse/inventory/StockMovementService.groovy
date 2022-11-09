@@ -365,17 +365,17 @@ class StockMovementService {
             case StockMovementDirection.INBOUND:
                 return getInboundStockMovements(criteria, params)
             default:
-                throw new IllegalArgumentException("Origin and destination cannot be the same")
+                throw new IllegalArgumentException("Missing stock movement direction parameter")
         }
     }
 
-
-    def getInboundStockMovements(Map params = [:]) {
-        return getInboundStockMovements(new StockMovement(), params)
-    }
-
     def getInboundStockMovements(StockMovement criteria, Map params) {
-        def shipments = Shipment.createCriteria().list(max: params.max, offset: params.offset) {
+        def max = params.max ? params.int("max") : null
+        def offset = params.offset ? params.int("offset") : null
+        Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+
+        def shipments = Shipment.createCriteria().list(max: max, offset: offset) {
 
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
@@ -397,22 +397,49 @@ class StockMovementService {
                 eq("createdBy", criteria?.createdBy)
             }
             if (criteria.requestedBy) {
-                requisition {
-                    eq("requestedBy", criteria?.requestedBy)
+                or {
+                    requisition {
+                        eq("requestedBy", criteria?.requestedBy)
+                    }
+                    and {
+                        isNull("requisition")
+                        eq("createdBy", criteria?.requestedBy)
+                    }
                 }
             }
             if (criteria.updatedBy) {
                 eq("updatedBy", criteria.updatedBy)
             }
-            if(params.createdAfter) {
-                ge("dateCreated", params.createdAfter)
+            if(createdAfter) {
+                ge("dateCreated", createdAfter)
             }
-            if(params.createdBefore) {
-                le("dateCreated", params.createdBefore)
+            if(createdBefore) {
+                le("dateCreated", createdBefore)
             }
-            if (params.orderBy == "requisition.dateRequested") {
-                requisition {
-                    order("dateRequested", "desc")
+
+            if (params.sort) {
+                if (params.sort == "destination.name") {
+                    destination {
+                        order("name", params.order ?: "desc")
+                    }
+                } else if (params.sort == "origin.name") {
+                    origin {
+                        order("name", params.order ?: "desc")
+                    }
+                } else if (params.sort == "dateRequested") {
+                    requisition {
+                        order("dateRequested", params.order ?: "desc")
+                    }
+                } else if (params.sort == "stocklist.name") {
+                    requisition {
+                        requisitionTemplate {
+                            order("name", params.order ?: "desc")
+                        }
+                    }
+                } else if (params.sort == "identifier") {
+                    order("shipmentNumber", params.order ?: "desc")
+                } else {
+                    order(params.sort, params.order ?: "desc")
                 }
             } else {
                 order("dateCreated", "desc")
@@ -568,7 +595,10 @@ class StockMovementService {
         if (requisitionItem) {
             removeRequisitionItem(requisitionItem)
         } else {
+            List<Order> orders = shipmentItem?.purchaseOrders
             removeShipmentItem(shipmentItem)
+            // Trigger Order Summary event for POs after deleting the shipment item
+            orders?.each { it.publishRefreshEvent() }
         }
     }
 
@@ -1597,6 +1627,10 @@ class StockMovementService {
         shipment.destination = stockMovement.destination
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
+        // Save shipment before adding the items to avoid referencing an unsaved transient instance
+        shipment.disableRefresh = true
+        shipment.save()
+
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
 
             if (!stockMovementItem.inventoryItem) {
@@ -1618,8 +1652,8 @@ class StockMovementService {
             if (stockMovementItem.orderItemId) {
                 OrderItem orderItem = OrderItem.get(stockMovementItem.orderItemId)
                 shipmentItem.addToOrderItems(orderItem)
-                shipment.save()
             }
+            shipmentItem.save()
             shipment.addToShipmentItems(shipmentItem)
         }
 
@@ -1627,6 +1661,7 @@ class StockMovementService {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
+        shipment.disableRefresh = false
         return shipment
     }
 
@@ -1881,7 +1916,6 @@ class StockMovementService {
 
     void reviseItems(StockMovement stockMovement) {
         Requisition requisition = Requisition.get(stockMovement.id)
-        def revisedItems = []
 
         if (stockMovement.lineItems) {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -1893,17 +1927,11 @@ class StockMovementService {
                     throw new IllegalArgumentException("Could not find stock movement item with ID ${stockMovementItem.id}")
                 }
 
-                if (requisitionItem.shipmentItems || requisitionItem.picklistItems) {
-                    removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
-                }
+                log.info 'Removing previous changes, picklists and shipments, if present'
+                removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
+                requisitionItem.undoChanges()
 
-                log.info "Item revised " + requisitionItem.id
-
-                // Cannot cancel quantity if it has already been canceled
-                if (requisitionItem.quantityCanceled) {
-                    requisitionItem.undoChanges()
-                }
-
+                log.info "Revising quantity for ${requisitionItem.id}"
                 requisitionItem.changeQuantity(
                         stockMovementItem?.quantityRevised?.intValueExact(),
                         stockMovementItem.reasonCode,
@@ -2008,6 +2036,9 @@ class StockMovementService {
         if (orderItem) {
             orderItem.removeFromShipmentItems(shipmentItem)
         }
+        // do not trigger refresh on shipment for combined shipment because after deleting shipment items there will
+        // be no connection between shipment and order
+        shipment.disableRefresh = true
         shipment.removeFromShipmentItems(shipmentItem)
         shipmentItem.delete()
     }
@@ -2016,6 +2047,13 @@ class StockMovementService {
         shipmentItems?.toArray()?.each {shipmentItem ->
             removeShipmentItem(shipmentItem)
         }
+    }
+
+    void removeShipmentItems(Shipment shipment) {
+        List<Order> orders = shipment.purchaseOrders
+        removeShipmentItems(shipment.shipmentItems)
+        // Trigger Order Summary event for POs after deleting the shipment items
+        orders?.each { it.publishRefreshEvent() }
     }
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {

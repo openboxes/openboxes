@@ -8,18 +8,23 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.shipping
+import org.pih.warehouse.core.StatusType
 
 enum ShipmentStatusCode {
 
-    CREATED(0),
-    PENDING(1),
-    SHIPPED(2),
-    PARTIALLY_RECEIVED(3),
-    RECEIVED(4)
+    CREATED(0, StatusType.PRIMARY),
+    PENDING(1, StatusType.WARNING),
+    SHIPPED(2, StatusType.SUCCESS),
+    PARTIALLY_RECEIVED(3,  StatusType.PRIMARY),
+    RECEIVED(4, StatusType.SUCCESS)
 
     int sortOrder
+    StatusType variant
 
-    ShipmentStatusCode(int sortOrder) { [this.sortOrder = sortOrder] }
+    ShipmentStatusCode(int sortOrder, StatusType variant) {
+        this.sortOrder = sortOrder
+        this.variant = variant
+    }
 
     ShipmentStatusCode getDisplayStatus() {
         return this

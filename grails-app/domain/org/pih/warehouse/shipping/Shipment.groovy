@@ -24,10 +24,21 @@ import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.requisition.Requisition
 
 class Shipment implements Comparable, Serializable {
+
+    def publishRefreshEvent = {
+        if (!disableRefresh) {
+            orders?.each { Order o ->
+                if (o?.isPurchaseOrder) {
+                    publishEvent(new RefreshOrderSummaryEvent(o))
+                }
+            }
+        }
+    }
 
     def beforeInsert = {
         def currentUser = AuthService.currentUser.get()
@@ -46,9 +57,12 @@ class Shipment implements Comparable, Serializable {
         }
     }
 
+    def afterInsert = publishRefreshEvent
+
     def afterUpdate = {
         currentEvent = mostRecentEvent
         currentStatus = status.code
+        publishRefreshEvent()
     }
 
     String id
@@ -96,6 +110,8 @@ class Shipment implements Comparable, Serializable {
 
     SortedSet receipts
 
+    Boolean disableRefresh = Boolean.FALSE
+
     static transients = [
             "allShipmentItems",
             "unpackedShipmentItems",
@@ -110,11 +126,13 @@ class Shipment implements Comparable, Serializable {
             "receipt",
             "isFromPurchaseOrder",
             "purchaseOrder",
+            "purchaseOrders",
             "orders",
             "isFromReturnOrder",
             "isFromPutawayOrder",
             "isFromTransferOrder",
-            "returnOrder"
+            "returnOrder",
+            "disableRefresh"
     ]
 
     static mappedBy = [
@@ -306,6 +324,10 @@ class Shipment implements Comparable, Serializable {
     // for inbounds and outbounds only
     Order getReturnOrder() {
         return orders?.find { it.isReturnOrder }
+    }
+
+    List<Order> getPurchaseOrders() {
+        return orders?.findAll { it.isPurchaseOrder }
     }
 
     Order getPurchaseOrder() {

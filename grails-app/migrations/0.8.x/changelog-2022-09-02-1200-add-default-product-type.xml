@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <property name="now" value="now()"/>
+
+  <changeSet author="awalkowiak" id="0209202212000-0">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">SELECT COUNT(*) FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT"</sqlCheck>
+    </preConditions>
+    <insert tableName="product_type">
+      <column name="id" value="DEFAULT"/>
+      <column name="version" valueNumeric="0"/>
+      <column name="name" value="Default"/>
+      <column name="code" value=""/>
+      <column name="product_type_code" value="GOOD"/>
+      <column name="product_identifier_format" value=""/>
+      <column name="sequence_number" value="0"/>
+      <column name="date_created" valueDate="${now}"/>
+      <column name="last_updated" valueDate="${now}"/>
+    </insert>
+  </changeSet>
+  <changeSet author="awalkowiak" id="0209202212000-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <sqlCheck expectedResult="0">SELECT COUNT(*) FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT"</sqlCheck>
+      </not>
+    </preConditions>
+    <sql>
+      UPDATE product SET product_type_id = (SELECT id FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT" LIMIT 1) WHERE product_type_id IS NULL;
+    </sql>
+  </changeSet>
+  <changeSet author="awalkowiak" id="0209202212000-2">
+    <validCheckSum>2512ee5db2b1485885e57c9c8a59ee</validCheckSum>
+    <preConditions onFail="MARK_RAN">
+      <and>
+        <not>
+          <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT"
+          </sqlCheck>
+        </not>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM product_type_supported_activities
+          WHERE product_type_id = (SELECT id FROM product_type WHERE id like "DEFAULT" OR code like "DEFAULT" OR name like "DEFAULT" LIMIT 1)
+          AND
+          product_activity_code = "SEARCHABLE_NO_STOCK"
+        </sqlCheck>
+      </and>
+    </preConditions>
+    <sql>
+      INSERT INTO product_type_supported_activities (product_type_id, product_activity_code) VALUES
+      ((SELECT id FROM product_type WHERE id like 'DEFAULT' OR code like 'DEFAULT' OR name like 'DEFAULT' LIMIT 1), 'SEARCHABLE_NO_STOCK');
+    </sql>
+  </changeSet>
+</databaseChangeLog>
