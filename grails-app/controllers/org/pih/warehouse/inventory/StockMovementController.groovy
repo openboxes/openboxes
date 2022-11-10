@@ -448,6 +448,7 @@ class StockMovementController {
 
         try {
             StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+            Location currentLocation = Location.get(session?.warehouse?.id)
 
             def importFile = command.importFile
             if (importFile.isEmpty()) {
@@ -462,8 +463,8 @@ class StockMovementController {
             def settings = [separatorChar: ',', skipLines: 1]
             Integer sortOrder = 0
             csv.toCsvReader(settings).eachLine { tokens ->
-
-                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens)
+                Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND && !stockMovement.electronicType
+                StockMovementItem stockMovementItem = StockMovementItem.createFromTokens(tokens, validateLotAndExpiry)
                 stockMovementItem.stockMovement = stockMovement
                 stockMovementItem.sortOrder = sortOrder
                 stockMovement.lineItems.add(stockMovementItem)
