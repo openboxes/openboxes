@@ -300,6 +300,11 @@ class OrderController {
                 redirect(action: "show", id: orderInstance?.id)
                 return
             }
+            if (orderInstance.status != OrderStatus.PENDING) {
+                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
+                redirect(action: "list", id: params.id, params: [orderType: orderInstance.orderType])
+                return
+            }
             try {
                 orderService.deleteOrder(orderInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
