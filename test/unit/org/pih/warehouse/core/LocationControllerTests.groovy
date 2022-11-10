@@ -86,50 +86,16 @@ class LocationControllerTests extends ControllerUnitTestCase {
 		assertEquals 1, model["locationInstanceTotal"]
 	}
 
-	/*
-	void test_list_shouldListLocationsMatchingLocationType() {
-		this.controller.params["locationType"] = "1"
-		def model = controller.list()
-		assertEquals 3, model["locationInstanceList"].size()
-		assertEquals 3, model["locationInstanceTotal"]
-
-		this.controller.params["locationType"] = "2"
-		model = controller.list()
-		assertEquals 1, model["locationInstanceList"].size()
-		assertEquals 1, model["locationInstanceTotal"]
-
-		this.controller.params["q"] = "Bos"
-		this.controller.params["locationType"] = "1"
-		model = controller.list()
-		assertEquals 1, model["locationInstanceList"].size()
-		assertEquals 1, model["locationInstanceTotal"]
-	}
-	*/
-
-	void test_show_shouldIncludeLocationInModel() {
+	// Show action redirects to edit action
+	void test_edit_shouldIncludeLocationInModel() {
 		// Mock the inventory service.
-		//def location = new Location(id: 1, name: "Boston", locationType: depot)
-		//assertTrue location.validate()
 		def inventoryControl = mockFor(InventoryService)
 		inventoryControl.demand.getLocation(1..1) { locationId -> Location.get(locationId) }
 
 		// 	Initialise the service and test the target method.
 		this.controller.inventoryService = inventoryControl.createMock()
 		this.controller.params.id = "1"
-		def model = this.controller.show()
+		def model = this.controller.edit()
 		assertEquals "Boston", model["locationInstance"]?.name
-
 	}
-
-	/*
-	void test_uploadLogo_shouldDoSomething() {
-		this.controller.params.id = "1"
-		def model = this.controller.uploadLogo()
-
-
-		println model
-	}
-	*/
-
-
 }
