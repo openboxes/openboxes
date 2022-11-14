@@ -1,0 +1,96 @@
+<div id="merge-product-confirmation-dialog" class="p-2" title="${warehouse.message(code: 'product.mergeProducts.label')}">
+    <div class="message">
+      ${warehouse.message(code: 'product.mergeProducts.confirmation.warning.label')}
+    </div>
+  <div class="my-2">
+    <input
+        id="product-merger-confirmation-input"
+        class="w-100 text mb-2"
+        type="text"
+        placeholder="MERGE"
+    />
+    <i class="fade">
+      ${warehouse.message(code: 'product.mergeProducts.proceed.label')}
+    </i>
+  </div>
+
+</div>
+<style type="text/css">
+.ui-dialog-buttonset {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+<script type="text/javascript">
+  function mergeProductValidate (primaryProduct, duplicateProduct) {
+    const keyword = "MERGE";
+    const errors = [];
+    const inputVal = $("#product-merger-confirmation-input").val();
+    if (inputVal !== keyword) {
+      errors.push("Wrong confirmation keyword - \"" + inputVal + "\" does not equal to \"" + keyword + "\"");
+    }
+    if (errors.length === 0) {
+      mergeProduct(primaryProduct, duplicateProduct);
+    } else {
+      errors.forEach(err => {
+        $("#product-merger-confirmation-input").notify(err, "error");
+      })
+    }
+  }
+
+  function mergeProduct(primaryProduct, duplicateProduct) {
+      $.ajax({
+        url: "${g.createLink(controller:'product', action:'mergeProduct')}",
+        type: "POST",
+        data: {
+          primaryProduct,
+          duplicateProduct
+        },
+        success: function () {
+          $.notify("Products merged successfully", "success");
+          closeModal();
+          window.location.href = '${request.contextPath}/inventoryItem/showStockCard/' + primaryProduct;
+        },
+        error: function (jqXHR) {
+          if (jqXHR.responseText) {
+            try {
+              let data = JSON.parse(jqXHR.responseText);
+              $.notify(data.errorMessage, "error");
+            } catch (e) {
+              $.notify(jqXHR.responseText, "error");
+            }
+          } else {
+            $.notify("An error occurred", "error");
+          }
+        }
+      });
+  }
+
+  function closeModal() {
+    $("#merge-product-confirmation-dialog").dialog("close");
+  }
+
+  $(function() {
+    $("#merge-product-confirmation-dialog").dialog({
+      autoOpen: false,
+      resizable: false,
+      height: "auto",
+      width: 400,
+      modal: true,
+      buttons: {
+        cancel: {
+          text: "Cancel",
+          click: closeModal
+        },
+        merge: {
+          id: "submit-merge-button",
+          text: "Merge",
+          click: function () {
+            mergeProductValidate($(this).data('primaryProduct'), $(this).data('duplicateProduct'));
+          }
+        },
+      }
+    });
+  });
+</script>

@@ -1103,6 +1103,19 @@ class ProductController {
         }
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
+
+    def showMergeProductDialog = {
+        render(template: params.template)
+    }
+
+    def mergeProduct = {
+        // TODO: Will be done as a part of OBPIH-3187
+        // Product primaryProduct = Product.get(params.primaryProduct)
+        // Product duplicateProduct = Product.get(params.duplicateProduct)
+        // productService.mergeDuplicatedProduct(primaryProduct, duplicateProduct)
+
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
+    }
 }
 
 
