@@ -23,6 +23,7 @@ import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
+import isRequestFromWard from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -1075,7 +1076,11 @@ class AddItemsPage extends Component {
             statusCode,
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
-          isRequestFromWard: this.props.currentLocationId === this.state.values.destination.id && this.state.values.destination.type === 'WARD',
+          isRequestFromWard: isRequestFromWard(
+            this.props.currentLocationId,
+            this.state.values.destination.id,
+            this.props.supportedActivities,
+          ),
         });
         this.props.hideSpinner();
       })
