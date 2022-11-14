@@ -781,6 +781,7 @@ class AddItemsPage extends Component {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
+            quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
             product: {
               ...val.product,
               label: `${val.productCode} ${val.product.name}`,
@@ -794,6 +795,7 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
+          quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
           product: {
             ...val.product,
             label: `${val.productCode} ${val.product.name}`,
