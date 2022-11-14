@@ -1359,6 +1359,9 @@ openboxes.ldap.search.filter = "(uid={0})"
 openboxes.ldap.search.searchSubtree = true
 openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
 
+// Merge Products
+openboxes.mergeProducts.enabled = true
+
 //openboxes.ldap.authorities.retrieveGroupRoles = false
 //openboxes.ldap.authorities.groupSearchBase ='DC=example,DC=com'
 //openboxes.ldap.authorities.groupSearchFilter = 'member={0}'

@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
@@ -1109,6 +1110,12 @@ class ProductController {
     }
 
     def mergeProduct = {
+        Boolean enabled = ConfigurationHolder.config.openboxes.mergeProducts.enabled
+        if (!enabled) {
+            flash.message = "${warehouse.message(code: 'product.mergeProducts.notEnabled.label')}"
+            redirect(action: "list")
+            return
+        }
         // TODO: Will be done as a part of OBPIH-3187
         // Product primaryProduct = Product.get(params.primaryProduct)
         // Product duplicateProduct = Product.get(params.duplicateProduct)
