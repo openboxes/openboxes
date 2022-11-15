@@ -1106,19 +1106,26 @@ class ProductController {
     }
 
     def showMergeProductDialog = {
-        render(template: params.template)
+        Product primaryProduct = Product.get(params.primaryProduct)
+        render(template: params.template, model: [ primaryProduct: primaryProduct ])
     }
 
     def mergeProduct = {
         Boolean enabled = ConfigurationHolder.config.openboxes.mergeProducts.enabled
         if (!enabled) {
-            flash.message = "${warehouse.message(code: 'product.mergeProducts.notEnabled.label')}"
-            redirect(action: "list")
-            return
+            throw new IllegalArgumentException("Merge products feature is not enabled")
         }
+        Product primaryProduct = Product.get(params.primaryProduct)
+        Product obsoleteProduct = Product.get(params.obsoleteProduct)
+
+        if (!primaryProduct) {
+            throw new IllegalArgumentException("No Product found with ID ${params.primaryProduct}")
+        }
+        if (!obsoleteProduct) {
+            throw new IllegalArgumentException("No Product found with ID ${params.obsoleteProduct}")
+        }
+
         // TODO: Will be done as a part of OBPIH-3187
-        // Product primaryProduct = Product.get(params.primaryProduct)
-        // Product duplicateProduct = Product.get(params.duplicateProduct)
         // productService.mergeDuplicatedProduct(primaryProduct, duplicateProduct)
 
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)

@@ -15,21 +15,23 @@
                        id="primary-product"
                        name="primary-product"
                        jsonUrl="${request.contextPath}/json/findProductByName?skipQuantity=true"
-                       styleClass="tex"
+                       styleClass="text"
                        showColor="true"
+                        valueId="${primaryProduct.id}"
+                        valueName="${primaryProduct.productCode} ${primaryProduct.name}"
                     />
                 </td>
             </tr>
             <tr class="prop">
                 <td valign="top" class="name">
-                    <label for="duplicate-product">
-                        <warehouse:message code="product.mergeProducts.duplicateProduct.label"/>
+                    <label for="obsolete-product">
+                        <warehouse:message code="product.mergeProducts.obsoleteProduct.label"/>
                     </label>
                 </td>
                 <td valign="top" class="value">
                     <g:autoSuggest
-                        id="duplicate-product"
-                        name="duplicate-product"
+                        id="obsolete-product"
+                        name="obsolete-product"
                         jsonUrl="${request.contextPath}/json/findProductByName?skipQuantity=true"
                         styleClass="text"
                         showColor="true"
@@ -59,16 +61,22 @@
    $("#merge-button")
      .click(function () {
        const primaryProductId = $("#primary-product-id").val();
-       const duplicateProductId = $("#duplicate-product-id").val();
+       const obsoleteProductId = $("#obsolete-product-id").val();
 
-       if (primaryProductId && duplicateProductId) {
+       if (primaryProductId && obsoleteProductId) {
+         const warningMessage = $("#merge-product-warning-message")
+           .text()
+           .replaceAll("{0}", primaryProductId)
+           .replaceAll("{1}", obsoleteProductId);
+         $("#merge-product-warning-message").text(warningMessage)
+
          $('#merge-product-confirmation-dialog')
            .data('primaryProduct', primaryProductId)
-           .data('duplicateProduct', duplicateProductId)
+           .data('obsoleteProduct', obsoleteProductId)
            .dialog('open')
        }
        if (!primaryProductId) $("#primary-product-suggest").notify("primary product must be selected")
-       if (!duplicateProductId) $("#duplicate-product-suggest").notify("duplicate product must be selected")
+       if (!obsoleteProductId) $("#obsolete-product-suggest").notify("obsolete product must be selected")
      })
   });
 </script>

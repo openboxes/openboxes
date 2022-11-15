@@ -1,5 +1,5 @@
 <div id="merge-product-confirmation-dialog" class="p-2" title="${warehouse.message(code: 'product.mergeProducts.label')}">
-    <div class="message">
+    <div id="merge-product-warning-message" class="message">
       ${warehouse.message(code: 'product.mergeProducts.confirmation.warning.label')}
     </div>
   <div class="my-2">
@@ -23,7 +23,7 @@
 }
 </style>
 <script type="text/javascript">
-  function mergeProductValidate (primaryProduct, duplicateProduct) {
+  function mergeProductValidate (primaryProduct, obsoleteProduct) {
     const keyword = "MERGE";
     const errors = [];
     const inputVal = $("#product-merger-confirmation-input").val();
@@ -31,7 +31,7 @@
       errors.push("Wrong confirmation keyword - \"" + inputVal + "\" does not equal to \"" + keyword + "\"");
     }
     if (errors.length === 0) {
-      mergeProduct(primaryProduct, duplicateProduct);
+      mergeProduct(primaryProduct, obsoleteProduct);
     } else {
       errors.forEach(err => {
         $("#product-merger-confirmation-input").notify(err, "error");
@@ -39,13 +39,13 @@
     }
   }
 
-  function mergeProduct(primaryProduct, duplicateProduct) {
+  function mergeProduct(primaryProduct, obsoleteProduct) {
       $.ajax({
         url: "${g.createLink(controller:'product', action:'mergeProduct')}",
         type: "POST",
         data: {
           primaryProduct,
-          duplicateProduct
+          obsoleteProduct
         },
         success: function () {
           $.notify("Products merged successfully", "success");
@@ -87,7 +87,7 @@
           id: "submit-merge-button",
           text: "Merge",
           click: function () {
-            mergeProductValidate($(this).data('primaryProduct'), $(this).data('duplicateProduct'));
+            mergeProductValidate($(this).data('primaryProduct'), $(this).data('obsoleteProduct'));
           }
         },
       }
