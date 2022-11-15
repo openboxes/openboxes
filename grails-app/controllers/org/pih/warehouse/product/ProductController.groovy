@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
@@ -1102,6 +1103,32 @@ class ProductController {
             redirect(action: "list")
         }
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
+    }
+
+    def showMergeProductDialog = {
+        Product primaryProduct = Product.get(params.primaryProduct)
+        render(template: params.template, model: [ primaryProduct: primaryProduct ])
+    }
+
+    def mergeProduct = {
+        Boolean enabled = ConfigurationHolder.config.openboxes.mergeProducts.enabled
+        if (!enabled) {
+            throw new IllegalArgumentException("Merge products feature is not enabled")
+        }
+        Product primaryProduct = Product.get(params.primaryProduct)
+        Product obsoleteProduct = Product.get(params.obsoleteProduct)
+
+        if (!primaryProduct) {
+            throw new IllegalArgumentException("No Product found with ID ${params.primaryProduct}")
+        }
+        if (!obsoleteProduct) {
+            throw new IllegalArgumentException("No Product found with ID ${params.obsoleteProduct}")
+        }
+
+        // TODO: Will be done as a part of OBPIH-3187
+        // productService.mergeDuplicatedProduct(primaryProduct, duplicateProduct)
+
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
     }
 }
 
