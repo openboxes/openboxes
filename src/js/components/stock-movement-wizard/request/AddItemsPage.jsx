@@ -1531,7 +1531,8 @@ class AddItemsPage extends Component {
             <span className="buttons-container">
               <label
                 htmlFor="csvInput"
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${this.state.isRequestFromWard ? 'disabled' : ''}`}
+                title={this.state.isRequestFromWard ? 'Temporarily disabled' : ''}
               >
                 <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
                 <input
@@ -1539,6 +1540,7 @@ class AddItemsPage extends Component {
                   type="file"
                   style={{ display: 'none' }}
                   onChange={this.importTemplate}
+                  disabled={this.state.isRequestFromWard}
                   onClick={(event) => {
                     // eslint-disable-next-line no-param-reassign
                     event.target.value = null;
