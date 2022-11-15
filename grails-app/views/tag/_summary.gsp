@@ -31,9 +31,9 @@
         <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
         <warehouse:message code="default.create.label" args="[g.message(code: 'tag.label')]" />
     </g:link>
-    <g:if test="${tagInstance?.id}">
+    <g:if test="${tagInstance?.id && tagInstance?.products?.size() > 0}">
         <div class="right">
-            <g:link class="button right" controller="productApi" action="list" params="[tagId: tagInstance?.id, format: 'csv']">
+            <g:link class="button right" controller="productApi" action="list" params="[tagId: tagInstance?.id, format: 'csv', fileName: tagInstance?.tag]">
                 <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
                 <g:message code="default.export.label" args="[g.message(code: 'products.label')]"/>
                 (${tagInstance?.products?.size()})
