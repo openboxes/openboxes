@@ -8,13 +8,13 @@ import Translate from 'utils/Translate';
 const StockListHeader = ({ isUserAdmin }) => (
   <div className="d-flex list-page-header">
     <span className="d-flex align-self-center title">
-      <Translate id="react.stockMovement.stockList.label" defaultMessage="Stock List" />
+      <Translate id="react.stocklists.header.label" defaultMessage="Stock List" />
     </span>
     <div className="d-flex justify-content-end buttons align-items-center">
       {
         isUserAdmin && (
           <a className="primary-button" href="/openboxes/requisitionTemplate/create?type=STOCK">
-            <Translate id="react.stockListManagement.addStockList.label" defaultMessage="Add stocklist" />
+            <Translate id="react.stocklists.addStockList.label" defaultMessage="Add stocklist" />
           </a>
         )
       }

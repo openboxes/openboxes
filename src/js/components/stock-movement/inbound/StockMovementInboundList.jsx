@@ -20,6 +20,7 @@ const StockMovementInboundList = (props) => {
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
+    props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
   useEffect(() => {

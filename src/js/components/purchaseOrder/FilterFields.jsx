@@ -7,7 +7,8 @@ export default {
     attributes: {
       multi: true,
       filterElement: true,
-      placeholder: 'Status',
+      placeholder: 'react.purchaseOrder.filters.status.placeholder.label',
+      defaultPlaceholder: 'Status',
       showLabelTooltip: true,
       closeMenuOnSelect: false,
     },
@@ -45,7 +46,8 @@ export default {
       options: [],
       filterOptions: options => options,
       filterElement: true,
-      placeholder: 'Supplier',
+      placeholder: 'react.purchaseOrder.filters.origin.placeholder.label',
+      defaultPlaceholder: 'Supplier',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -66,7 +68,8 @@ export default {
       options: [],
       filterOptions: options => options,
       filterElement: true,
-      placeholder: 'Destination',
+      placeholder: 'react.purchaseOrder.filters.destination.placeholder.label',
+      defaultPlaceholder: 'Destination',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -80,7 +83,8 @@ export default {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Purchasing organization',
+      placeholder: 'react.purchaseOrder.filters.destinationParty.placeholder.label',
+      defaultPlaceholder: 'Purchasing organization',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({ buyers, isCentralPurchasingEnabled }) => ({
@@ -100,7 +104,8 @@ export default {
       options: [],
       filterOptions: options => options,
       filterElement: true,
-      placeholder: 'Ordered by',
+      placeholder: 'react.purchaseOrder.filters.orderedBy.placeholder.label',
+      defaultPlaceholder: 'Ordered by',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({

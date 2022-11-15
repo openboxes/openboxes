@@ -15,7 +15,8 @@ const filterFields = {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Buyer organization',
+      placeholder: 'react.invoice.buyerOrganization.label',
+      defaultPlaceholder: 'Buyer organization',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({ organization }) => ({
@@ -34,7 +35,8 @@ const filterFields = {
     type: FilterSelectField,
     attributes: {
       filterElement: true,
-      placeholder: 'Invoice Status',
+      placeholder: 'react.invoice.status.label',
+      defaultPlaceholder: 'Invoice Status',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({ statuses }) => ({
@@ -46,7 +48,8 @@ const filterFields = {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Vendor',
+      placeholder: 'react.invoice.vendor.label',
+      defaultPlaceholder: 'Vendor',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({ suppliers }) => ({
@@ -57,7 +60,8 @@ const filterFields = {
     type: FilterSelectField,
     attributes: {
       filterElement: true,
-      placeholder: 'Invoice Type',
+      placeholder: 'react.invoice.typeCode.label',
+      defaultPlaceholder: 'Invoice Type',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({ typeCodes }) => ({
@@ -85,7 +89,8 @@ const filterFields = {
       options: [],
       filterOptions: options => options,
       filterElement: true,
-      placeholder: 'Created by',
+      placeholder: 'react.invoice.createdBy.label',
+      defaultPlaceholder: 'Created by',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
@@ -159,7 +164,8 @@ const InvoiceListFilters = ({
           organization: currentLocation.organization,
         }}
         defaultValues={defaultValues}
-        searchFieldPlaceholder="Search by invoice number..."
+        searchFieldPlaceholder="react.invoice.searchField.placeholder.label"
+        searchFieldDefaultPlaceholder="Search by invoice number..."
         searchFieldId="invoiceNumber"
         hidden={false}
         ignoreClearFilters={['buyerOrganization']}

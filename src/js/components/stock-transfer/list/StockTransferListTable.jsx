@@ -135,7 +135,7 @@ const StockTransferListTable = ({
         />),
     },
     {
-      Header: 'Line items',
+      Header: <Translate id="react.stockTransfer.column.lineItems.label" defaultMessage="Line items" />,
       accessor: 'orderItemsCount',
       className: 'd-flex align-items-center justify-content-center',
       sortable: false,
@@ -143,7 +143,7 @@ const StockTransferListTable = ({
       Cell: row => (<span className="items-count-circle d-flex align-items-center justify-content-center align-self-center">{row.original.orderItemsCount}</span>),
     },
     {
-      Header: 'Status',
+      Header: <Translate id="react.stockTransfer.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       className: 'active-circle d-flex',
       headerClassName: 'header',
@@ -151,20 +151,20 @@ const StockTransferListTable = ({
       maxWidth: 250,
     },
     {
-      Header: 'Transfer number',
+      Header: <Translate id="react.stockTransfer.column.transferNumber.label" defaultMessage="Transfer number" />,
       accessor: 'orderNumber',
       className: 'active-circle d-flex align-items-center',
       headerClassName: 'header',
       Cell: row => <TableCell {...row} link={`/openboxes/stockTransfer/show/${row.original.id}`} />,
     },
     {
-      Header: 'Created by',
+      Header: <Translate id="react.stockTransfer.column.createdBy.label" defaultMessage="Created by" />,
       accessor: 'createdBy',
       className: 'active-circle d-flex align-items-center',
       headerClassName: 'header',
     },
     {
-      Header: 'Date created',
+      Header: <Translate id="react.stockTransfer.column.dateCreated.label" defaultMessage="Date created" />,
       accessor: 'dateCreated',
       className: 'd-flex align-items-center',
       Cell: row => <TableCell {...row} tooltip />,

@@ -28,7 +28,8 @@ const StockMovementInboundFilters = ({
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         searchFieldId="q"
-        searchFieldPlaceholder="Search by requisition number, name etc."
+        searchFieldPlaceholder="react.stockMovement.search.placeholder.label"
+        searchFieldDefaultPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
         ignoreClearFilters={['destination', 'direction']}

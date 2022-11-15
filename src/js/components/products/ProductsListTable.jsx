@@ -43,7 +43,7 @@ const ProductsListTable = ({
   // Columns for react-table
   const columns = [
     {
-      Header: 'Active',
+      Header: <Translate id="react.productsList.column.active.label" defaultMessage="Active" />,
       accessor: 'active',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -55,7 +55,7 @@ const ProductsListTable = ({
         />),
     },
     {
-      Header: 'Code',
+      Header: <Translate id="react.productsList.column.code.label" defaultMessage="Code" />,
       accessor: 'productCode',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -63,7 +63,7 @@ const ProductsListTable = ({
       maxWidth: 150,
     },
     {
-      Header: 'Name',
+      Header: <Translate id="react.productsList.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       className: 'active-circle',
       headerClassName: 'header',
@@ -72,16 +72,16 @@ const ProductsListTable = ({
       minWidth: 200,
     },
     {
-      Header: 'Category',
+      Header: <Translate id="react.productsList.filters.category.label" defaultMessage="Category" />,
       accessor: 'category',
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
-      Header: 'Updated by',
+      Header: <Translate id="react.productsList.column.updatedBy.label" defaultMessage="Updated by" />,
       accessor: 'updatedBy',
     },
     {
-      Header: 'Last updated',
+      Header: <Translate id="react.productsList.column.lastUpdated.label" defaultMessage="Last updated" />,
       accessor: 'lastUpdated',
       maxWidth: 200,
     },

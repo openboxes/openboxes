@@ -7,7 +7,8 @@ export default {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Status',
+      placeholder: 'react.stockTransfer.filters.status.placeholder.label',
+      defaultPlaceholder: 'Status',
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
@@ -28,7 +29,8 @@ export default {
       options: [],
       filterOptions: options => options,
       filterElement: true,
-      placeholder: 'Created by',
+      placeholder: 'react.stockTransfer.filters.createdBy.placeholder.label',
+      defaultPlaceholder: 'Created by',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({

@@ -21,6 +21,7 @@ const StockMovementOutboundList = (props) => {
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockMovement');
     props.fetchTranslations(props.locale, 'StockMovementType');
+    props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
   useEffect(() => {

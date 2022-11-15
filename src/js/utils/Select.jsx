@@ -2,9 +2,13 @@ import React, { Component } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
 import { Overlay } from 'react-overlays';
+import { connect } from 'react-redux';
 import ReactSelect, { Async, components } from 'react-select';
 import { Tooltip } from 'react-tippy';
+
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
 
@@ -99,7 +103,7 @@ class Select extends Component {
 
   getTooltipHtml() {
     const {
-      multi, placeholder, showLabelTooltip, value,
+      multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
     } = this.props;
 
     if (showLabelTooltip) {
@@ -107,7 +111,7 @@ class Select extends Component {
       const valueLabel = multi ? valueMapped.join(', ') : (value.label || value.name);
       return (
         <div className="p-1">
-          {`${placeholder}${valueLabel ? `: ${valueLabel}` : ''}`}
+          {`${this.props.translate(placeholder, defaultPlaceholder ?? placeholder)}${valueLabel ? `: ${valueLabel}` : ''}`}
         </div>
       );
     }
@@ -208,6 +212,19 @@ class Select extends Component {
         </div>
       );
     }
+
+    const determinePlaceholder = () => {
+      if (attributes.placeholder) {
+        return (
+          <Translate
+            id={attributes.placeholder}
+            defaultMessage={attributes.defaultPlaceholder ?? attributes.placeholder}
+          />
+        );
+      }
+      return null;
+    };
+
     return (
       <div id={`${this.state.id}-container`}>
         <Tooltip
@@ -223,6 +240,7 @@ class Select extends Component {
         >
           <SelectType
             {...attributes}
+            placeholder={determinePlaceholder()}
             isDisabled={attributes.disabled}
             options={options}
             isMulti={multi}
@@ -293,7 +311,12 @@ class Select extends Component {
   }
 }
 
-export default Select;
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
+
+export default connect(mapStateToProps)(Select);
 
 Select.propTypes = {
   options: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string,
@@ -321,6 +344,8 @@ Select.propTypes = {
   valueRenderer: PropTypes.func,
   customSelectComponents: PropTypes.shape({}),
   classNamePrefix: PropTypes.string,
+  translate: PropTypes.func.isRequired,
+  defaultPlaceholder: PropTypes.string,
 };
 
 Select.defaultProps = {
@@ -331,6 +356,7 @@ Select.defaultProps = {
   async: false,
   delimiter: ';',
   placeholder: '',
+  defaultPlaceholder: '',
   initialValue: null,
   showValueTooltip: false,
   showLabelTooltip: false,

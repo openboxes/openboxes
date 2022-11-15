@@ -5,6 +5,7 @@ import queryString from 'query-string';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
+import { fetchTranslations } from 'actions';
 import filterFields from 'components/stock-list/FilterFields';
 import StockListFilters from 'components/stock-list/StockListFilters';
 import StockListHeader from 'components/stock-list/StockListHeader';
@@ -23,6 +24,11 @@ const StockList = (props) => {
     const response = await apiClient(`/openboxes/api/locations/${id}`);
     return response.data?.data;
   };
+
+  useEffect(() => {
+    props.fetchTranslations(props.locale, 'stocklists');
+    props.fetchTranslations(props.locale, 'reactTable');
+  }, [props.locale]);
 
   useEffect(() => {
     apiClient.get('/openboxes/api/locations')
@@ -118,10 +124,17 @@ const StockList = (props) => {
 };
 
 const mapStateToProps = state => ({
+  locale: state.session.activeLanguage,
   currentLocation: state.session.currentLocation,
 });
 
+const mapDispatchToProps = {
+  fetchTranslations,
+};
+
 StockList.propTypes = {
+  locale: PropTypes.string.isRequired,
+  fetchTranslations: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
     replace: PropTypes.func,
@@ -134,4 +147,4 @@ StockList.propTypes = {
   }).isRequired,
 };
 
-export default withRouter(connect(mapStateToProps)(StockList));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StockList));

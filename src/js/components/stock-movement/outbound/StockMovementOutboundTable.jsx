@@ -242,7 +242,7 @@ const StockMovementOutboundTable = ({
         />),
     },
     {
-      Header: '# items',
+      Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,
       accessor: 'lineItemCount',
       fixed: 'left',
       className: 'active-circle d-flex justify-content-center',
@@ -253,7 +253,7 @@ const StockMovementOutboundTable = ({
         <TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
-      Header: 'Status',
+      Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       fixed: 'left',
       width: 150,
@@ -271,7 +271,7 @@ const StockMovementOutboundTable = ({
       },
     },
     {
-      Header: 'Identifier',
+      Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
       accessor: 'identifier',
       fixed: 'left',
       minWidth: 100,
@@ -279,7 +279,7 @@ const StockMovementOutboundTable = ({
         <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
     },
     {
-      Header: 'Name',
+      Header: <Translate id="react.stockMovement.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       minWidth: 250,
       sortable: false,
@@ -301,32 +301,32 @@ const StockMovementOutboundTable = ({
         </TableCell>),
     },
     {
-      Header: 'Destination',
+      Header: <Translate id="react.stockMovement.destination.label" defaultMessage="Destination" />,
       accessor: 'destination.name',
       minWidth: 250,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Stocklist',
+      Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
       minWidth: 150,
       Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
-      Header: 'Requested by',
+      Header: <Translate id="react.stockMovement.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy.name',
       minWidth: 250,
       sortable: false,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
-      Header: 'Date Requested',
+      Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
-      Header: 'Date Created',
+      Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),

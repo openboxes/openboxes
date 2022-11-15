@@ -7,7 +7,8 @@ export default {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Category',
+      placeholder: 'react.productsList.filters.category.label',
+      defaultPlaceholder: 'Category',
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
@@ -29,7 +30,8 @@ export default {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Formulary',
+      placeholder: 'react.productsList.filters.catalog.label',
+      defaultPlaceholder: 'Formulary',
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
@@ -43,7 +45,8 @@ export default {
     attributes: {
       valueKey: 'id',
       filterElement: true,
-      placeholder: 'Tags',
+      placeholder: 'react.productsList.filters.tags.label',
+      defaultPlaceholder: 'Tags',
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,

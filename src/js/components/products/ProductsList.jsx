@@ -40,6 +40,7 @@ const ProductsList = (props) => {
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'productsList');
+    props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
 
