@@ -213,7 +213,7 @@ class Select extends Component {
       );
     }
 
-    const determinePlaceholder = () => {
+    const getPlaceholder = () => {
       if (attributes.placeholder) {
         return (
           <Translate
@@ -240,7 +240,7 @@ class Select extends Component {
         >
           <SelectType
             {...attributes}
-            placeholder={determinePlaceholder()}
+            placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
             options={options}
             isMulti={multi}
