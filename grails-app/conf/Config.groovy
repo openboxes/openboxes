@@ -1137,6 +1137,7 @@ openboxes.security.rbac.rules = [
         [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_APPROVER]]],
         [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
         [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+        [controller: 'product', actions: ['mergeProduct'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
         // Other controller actions that might need explicit rules
         //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
@@ -1358,6 +1359,9 @@ openboxes.ldap.search.base = "dc=example,dc=com"
 openboxes.ldap.search.filter = "(uid={0})"
 openboxes.ldap.search.searchSubtree = true
 openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
+
+// Merge Products
+openboxes.mergeProducts.enabled = true
 
 //openboxes.ldap.authorities.retrieveGroupRoles = false
 //openboxes.ldap.authorities.groupSearchBase ='DC=example,DC=com'
