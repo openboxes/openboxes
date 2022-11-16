@@ -95,7 +95,7 @@ const InvoiceListTable = ({
         />),
     },
     {
-      Header: '# items',
+      Header: <Translate id="react.invoice.column.itemCount.label" defaultMessage="# items" />,
       accessor: 'itemCount',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -103,7 +103,7 @@ const InvoiceListTable = ({
       Cell: row => (<TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
-      Header: 'Status',
+      Header: <Translate id="react.invoice.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       width: 250,
       Cell: (row) => {
@@ -113,34 +113,34 @@ const InvoiceListTable = ({
       },
     },
     {
-      Header: 'Invoice Type',
+      Header: <Translate id="react.invoice.typeCode.label" defaultMessage="Invoice Type" />,
       accessor: 'invoiceTypeCode',
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Invoice Number',
+      Header: <Translate id="react.invoice.column.invoiceNumber.label" defaultMessage="Invoice Number" />,
       accessor: 'invoiceNumber',
       sortable: false,
       Cell: row => <TableCell {...row} link={`/openboxes/invoice/show/${row.original.id}`} />,
     },
     {
-      Header: 'Vendor',
+      Header: <Translate id="react.invoice.vendor.label" defaultMessage="Vendor" />,
       accessor: 'partyCode',
     },
     {
-      Header: 'Vendor invoice number',
+      Header: <Translate id="react.invoice.column.vendorInvoiceNumber" defaultMessage="Vendor invoice number" />,
       accessor: 'vendorInvoiceNumber',
       minWidth: 200,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Total Value',
+      Header: <Translate id="react.invoice.column.vendorInvoiceNumber" defaultMessage="Total Value" />,
       accessor: 'totalValue',
       headerClassName: 'text-left',
       sortable: false,
     },
     {
-      Header: 'Currency',
+      Header: <Translate id="react.invoice.column.currency" defaultMessage="Currency" />,
       accessor: 'currency',
       className: 'text-left',
     },

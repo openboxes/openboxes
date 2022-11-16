@@ -14,7 +14,8 @@ const StockListFilters = ({
       updateFilterParams={values => setFilterParams({ ...values })}
       formProps={formProps}
       allowEmptySubmit
-      searchFieldPlaceholder="Search by stocklist name"
+      searchFieldPlaceholder="react.stocklists.filters.search.placeholder.label"
+      searchFieldDefaultPlaceholder="Search by stocklist name"
       hidden={false}
       defaultValues={defaultValues}
     />

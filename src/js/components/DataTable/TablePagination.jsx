@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 import Select from 'react-select';
+
+import { fetchTranslations } from 'actions';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 const TablePagination = (props) => {
   const [currentPage, setCurrentPage] = useState(props.page + 1);
@@ -40,7 +45,7 @@ const TablePagination = (props) => {
   }
 
   const pageSizeSelectOptions = props.pageSizeOptions.map(size => ({
-    label: `${size} rows`,
+    label: `${size} ${props.translate('react.reactTable.pagination.rows.label', 'rows')}`,
     value: size,
   }));
   const selectedPageSizeOption = pageSizeSelectOptions.find(({ value }) =>
@@ -51,7 +56,7 @@ const TablePagination = (props) => {
     <div className="table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3">
       <div className="d-flex">
         <span>{`${rangeNumberFrom}-${rangeNumberTo}`}</span>
-        <span className="mx-1">of</span>
+        <span className="mx-1">{props.translate('react.reactTablePagination.of.label', 'of')}</span>
         <span>{totalDataSize}</span>
       </div>
       <div className="d-flex">
@@ -72,7 +77,7 @@ const TablePagination = (props) => {
               onChange={changePageOnChangeHandler}
               onKeyPress={changePageOnKeyPressHandler}
             />
-            <span className="mx-1">of</span>
+            <span className="mx-1">{props.translate('react.reactTablePagination.of.label', 'of')}</span>
             <span>{props.pages}</span>
           </span>
           <button
@@ -97,6 +102,14 @@ const TablePagination = (props) => {
     </div>);
 };
 
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
+const mapDispatchToProps = {
+  fetchTranslations,
+};
+
 TablePagination.defaultProps = {
   totalData: undefined,
 };
@@ -112,7 +125,8 @@ TablePagination.propTypes = {
   canNext: PropTypes.bool.isRequired,
   canPrevious: PropTypes.bool.isRequired,
   totalData: PropTypes.number,
+  translate: PropTypes.func.isRequired,
 };
 
 
-export default TablePagination;
+export default connect(mapStateToProps, mapDispatchToProps)(TablePagination);

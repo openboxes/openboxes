@@ -27,7 +27,8 @@ const StockTransferListFilters = ({
           debouncedUsersFetch,
         }}
         defaultValues={defaultValues}
-        searchFieldPlaceholder="Search by transfer number"
+        searchFieldPlaceholder="react.stockTransfer.filters.searchField.placeholder.label"
+        searchFieldDefaultPlaceholder="Search by transfer number"
         searchFieldId="q"
         allowEmptySubmit
         hidden={false}

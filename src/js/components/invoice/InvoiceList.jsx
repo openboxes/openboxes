@@ -15,6 +15,7 @@ const InvoiceList = (props) => {
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'invoice');
+    props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
 

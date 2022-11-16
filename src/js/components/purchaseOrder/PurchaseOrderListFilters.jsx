@@ -50,7 +50,8 @@ const PurchaseOrderListFilters = ({
         ignoreClearFilters={filtersToIgnore}
         defaultValues={defaultValues}
         allowEmptySubmit
-        searchFieldPlaceholder="Search by order number or name or supplier"
+        searchFieldDefaultPlaceholder="Search by order number or name or supplier"
+        searchFieldPlaceholder="react.purchaseOrder.searchField.placeholder.label"
         hidden={false}
       />
     </div>

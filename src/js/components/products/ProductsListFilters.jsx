@@ -15,7 +15,8 @@ const ProductsListFilters = ({
       filterFields={filterFields}
       updateFilterParams={values => setFilterParams({ ...values })}
       formProps={formProps}
-      searchFieldPlaceholder="Search by product name"
+      searchFieldPlaceholder="react.productsList.filters.search.placeholder.label"
+      searchFieldDefaultPlaceholder="Search by product name"
       searchFieldId="q"
       allowEmptySubmit
       hidden={false}

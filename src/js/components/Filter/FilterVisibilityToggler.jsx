@@ -15,7 +15,7 @@ const FilterVisibilityToggler = ({ filtersHidden, amountFilled, setFiltersHidden
     {filtersHidden ?
       <React.Fragment>
         <span className="hide-filters-label">
-          <Translate id="react.showFilters.label" defaultMessage="Show Filters" />
+          <Translate id="react.button.showFilters.label" defaultMessage="Show Filters" />
         </span>
         <BadgeCount count={amountFilled} />
         <RiArrowDownSLine />
@@ -23,7 +23,7 @@ const FilterVisibilityToggler = ({ filtersHidden, amountFilled, setFiltersHidden
       :
       <React.Fragment>
         <span className="hide-filters-label">
-          <Translate id="react.hideFilters.label" defaultMessage="Hide Filters" />
+          <Translate id="react.button.hideFilters.label" defaultMessage="Hide Filters" />
         </span>
         <BadgeCount count={amountFilled} />
         <RiArrowUpSLine />

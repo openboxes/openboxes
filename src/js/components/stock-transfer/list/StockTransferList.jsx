@@ -21,6 +21,7 @@ const StockTransferList = (props) => {
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'stockTransfer');
+    props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
   const fetchUserById = async (id) => {

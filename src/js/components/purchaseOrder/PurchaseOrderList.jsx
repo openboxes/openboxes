@@ -21,6 +21,7 @@ const PurchaseOrderList = (props) => {
 
   useEffect(() => {
     props.fetchTranslations(props.locale, 'purchaseOrder');
+    props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
   const isCentralPurchasingEnabled = props.supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
