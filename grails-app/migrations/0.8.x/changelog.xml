@@ -153,4 +153,5 @@
     <include file="0.8.x/changelog-2022-07-11-1300-move-active-column-from-user-to-person.xml"/>
     <include file="0.8.x/changelog-2022-08-09-1100-alter-table-party-add-active-column.xml" />
     <include file="0.8.x/changelog-2022-09-02-1200-add-default-product-type.xml" />
+    <include file="0.8.x/changelog-2022-11-14-1200-create-table-product-merge-logger.xml" />
 </databaseChangeLog>
