@@ -44,6 +44,4 @@ class ProductMergeLogger implements Serializable {
         createdBy(nullable: false)
         updatedBy(nullable: false)
     }
-
-    String toString() { return "${primaryProduct.productCode}-${obsoleteProduct.productCode}-${relatedObjectClassName}-${relatedObjectId}" }
 }
