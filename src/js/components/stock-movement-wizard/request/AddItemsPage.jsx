@@ -585,7 +585,6 @@ const REQUEST_FROM_WARD_FIELDS = {
 };
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
-const REPLENISHMENT_TYPE_PUSH = 'PUSH';
 
 /**
  * The second step of stock movement where user can add items to stock list.
