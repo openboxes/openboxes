@@ -336,8 +336,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
         headerTooltip: 'react.stockMovement.tooltip.quantityOnHand.label',
         headerAlign: 'right',
         attributes: {
-          ...FIELDS.quantityAllowed.attributes,
-          required: true,
+          ...FIELDS.quantityOnHand.attributes,
           cellClassName: 'text-right',
         },
         getDynamicAttr: ({
@@ -355,6 +354,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
       quantityRequested: {
         ...FIELDS.quantityRequested,
         headerAlign: 'right',
+        required: true,
         headerTooltip: 'react.stockMovement.tooltip.quantityRequested.label',
         attributes: {
           ...FIELDS.quantityRequested.attributes,
@@ -414,7 +414,6 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QOH',
         flexWidth: '0.6',
-        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
         headerDefaultTooltip: 'Enter your current quantity on hand for this product',
@@ -438,6 +437,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         label: 'react.stockMovement.neededQuantity.label',
         defaultMessage: 'Needed Qty',
         flexWidth: '0.6',
+        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
         headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
@@ -516,7 +516,6 @@ const REQUEST_FROM_WARD_FIELDS = {
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QOH',
         flexWidth: '0.6',
-        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
         headerDefaultTooltip: 'Enter your current quantity on hand for this product',
@@ -540,6 +539,7 @@ const REQUEST_FROM_WARD_FIELDS = {
         label: 'react.stockMovement.neededQuantity.label',
         defaultMessage: 'Needed Qty',
         flexWidth: '0.6',
+        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
         headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
@@ -845,17 +845,12 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
-    const isPush = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PUSH;
-    const isPull = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
 
     _.forEach(values.lineItems, (item, key) => {
       const rowErrors = {};
       if (!_.isNil(item.product)) {
         if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
           rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
-        }
-        if (_.isNil(item.quantityOnHand) && !isPush && !isPull) {
-          rowErrors.quantityOnHand = 'react.stockMovement.error.enterQuantity.label';
         }
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -867,8 +862,8 @@ class AddItemsPage extends Component {
       }
 
       if (this.state.isRequestFromWard) {
-        if (!item.quantityOnHand || item.quantityOnHand < 0) {
-          rowErrors.quantityOnHand = 'react.stockMovement.error.quantityOnHand.label';
+        if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
+          rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
         }
       }
       if (!_.isEmpty(rowErrors)) {
