@@ -619,6 +619,7 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
+    this.cancelRequest = this.cancelRequest.bind(this);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -1247,7 +1248,42 @@ class AddItemsPage extends Component {
       this.saveItems(lineItems);
     }
   }
-
+  cancelRequest() {
+    confirmAlert({
+      title: this.props.translate(
+        'react.stockMovement.request.confirmCancellation.label',
+        'Confirm request cancellation',
+      ),
+      message: this.props.translate(
+        'react.stockMovement.request.confirmCancellation.message.label',
+        'Are you sure you want to delete current request ?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            apiClient.delete(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}`)
+              .then((response) => {
+                if (response.status === 204) {
+                  Alert.success(this.props.translate(
+                    'react.stockMovement.request.successfullyDeleted.label',
+                    'Request was successfully deleted',
+                  ), { timeout: 3000 });
+                  if (this.state.isRequestFromWard) {
+                    this.props.history.push('/openboxes/');
+                  } else {
+                    window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+                  }
+                }
+              });
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
+  }
   /**
    * Saves changes made by user in this step and redirects to the shipment view page
    * @param {object} formValues
@@ -1551,14 +1587,20 @@ class AddItemsPage extends Component {
                 onClick={() => this.exportTemplate(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                <span>
+                  <i className="fa fa-upload pr-2" />
+                  <Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" />
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                <span>
+                  <i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1566,7 +1608,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1574,15 +1619,31 @@ class AddItemsPage extends Component {
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
               <button
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll()}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                </span>
+              </button>
+              <button
+                type="button"
+                className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
+                onClick={() => this.cancelRequest()}
+              >
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.stockMovement.request.cancel.label" defaultMessage="Cancel Request" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
