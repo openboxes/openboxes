@@ -69,6 +69,7 @@
             <%-- TODO  Move status to stock movement; make consistent across all types --%>
             <g:set var="hasBeenPlaced" value="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
+            <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
             <g:if test="${stockMovement?.order}">
                 <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
@@ -100,7 +101,9 @@
                     </g:link>
                 </g:elseif>
             </g:isUserAdmin>
-                <g:if test="${(stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) && (isSameOrigin || !stockMovement?.origin?.isDepot())}">
+                <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
+                <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
+                <g:if test="${isPending && (isSameOrigin || !originIsDepot)}">
                     <g:if test="${stockMovement?.order}">
                         <g:isUserAdmin>
                             <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
@@ -110,15 +113,6 @@
                             </g:link>
                         </g:isUserAdmin>
                     </g:if>
-                    <g:elseif test="${stockMovement?.electronicType}">
-                        <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
-                                onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                                disabledMessage="You do not have minimum required role to delete stock request"
-                        >
-                            <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
-                            <warehouse:message code="default.button.delete.label" />
-                        </g:link>
-                    </g:elseif>
                     <g:else>
                         <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
@@ -128,6 +122,15 @@
                             <warehouse:message code="default.button.delete.label" />
                         </g:link>
                     </g:else>
+                </g:if>
+                <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
+                    <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                            disabledMessage="You do not have minimum required role to delete stock request"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                        <warehouse:message code="default.button.delete.label" />
+                    </g:link>
                 </g:if>
 
             <g:isSuperuser>
