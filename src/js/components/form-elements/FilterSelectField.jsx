@@ -77,10 +77,10 @@ Option.propTypes = {
 
 const IndicatorsContainer = ({ children, ...props }) => (
   <components.IndicatorsContainer {...props}>
-    {props.selectProps.isMulti &&
+    {props.selectProps.isMulti && props.selectProps.value?.length > 0 &&
       <div className="d-flex flex-column justify-content-center align-items-center selected-count-indicator-container">
         <div className="selected-count-indicator-inner">
-          {props.selectProps.value ? props.selectProps.value.length : 0}
+          { props.selectProps.value.length }
         </div>
       </div>
     }
