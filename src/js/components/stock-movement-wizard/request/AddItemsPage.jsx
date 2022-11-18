@@ -1256,20 +1256,24 @@ class AddItemsPage extends Component {
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
+            this.props.showSpinner();
             apiClient.delete(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}`)
               .then((response) => {
                 if (response.status === 204) {
+                  this.props.hideSpinner();
                   Alert.success(this.props.translate(
                     'react.stockMovement.request.successfullyDeleted.label',
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
                   if (this.state.isRequestFromWard) {
+                    this.props.updateBreadcrumbs([]);
                     this.props.history.push('/openboxes/');
                   } else {
                     window.location = '/openboxes/stockMovement/list?direction=INBOUND';
                   }
                 }
-              });
+              })
+              .catch(() => this.props.hideSpinner());
           },
         },
         {

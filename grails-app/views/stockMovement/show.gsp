@@ -103,7 +103,7 @@
             </g:isUserAdmin>
                 <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
                 <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
-                <g:if test="${isPending && (isSameOrigin || !originIsDepot)}">
+                <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
                     <g:if test="${stockMovement?.order}">
                         <g:isUserAdmin>
                             <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"

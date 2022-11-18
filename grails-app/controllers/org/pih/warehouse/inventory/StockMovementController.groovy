@@ -335,6 +335,11 @@ class StockMovementController {
                 return
             }
         }
+        if (!currentLocation.supports(ActivityCode.MANAGE_INVENTORY) && currentLocation.supports(ActivityCode.SUBMIT_REQUEST)) {
+            redirect(uri: "/dashboard")
+            return
+        }
+
         // We need to set the correct parameter so stock movement list is displayed properly
         params.direction = (currentLocation == stockMovement.origin) ? StockMovementDirection.OUTBOUND :
                 (currentLocation == stockMovement.destination) ? StockMovementDirection.INBOUND : "ALL"
