@@ -340,13 +340,11 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
           cellClassName: 'text-right',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
-                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            const valuesWithUpdatedQtyRequested =
+              calculateQtyRequested(values, rowIndex, fieldValue);
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -421,13 +419,11 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
           type: 'number',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue >= 0 ?
-                values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue : 0;
+            const valuesWithUpdatedQtyRequested =
+              calculateQtyRequested(values, rowIndex, fieldValue);
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -523,13 +519,11 @@ const REQUEST_FROM_WARD_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
-                values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            const valuesWithUpdatedQtyRequested =
+              calculateQtyRequested(values, rowIndex, fieldValue);
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -586,6 +580,19 @@ const REQUEST_FROM_WARD_FIELDS = {
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
 
+function calculateQuantityRequested(values, rowIndex, fieldValue) {
+  const valuesWithUpdatedQtyRequested = values;
+  const lineItem = valuesWithUpdatedQtyRequested.lineItems[rowIndex];
+  const { monthlyDemand } = lineItem;
+  if (monthlyDemand) {
+    valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+      values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
+        values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+  }
+  return valuesWithUpdatedQtyRequested;
+}
+
+
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -618,8 +625,9 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
+    this.calculateQuantityRequested =
+      calculateQuantityRequested.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
-
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
@@ -1666,6 +1674,7 @@ class AddItemsPage extends Component {
                     values,
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     updateProductData: this.updateProductData,
+                    calculateQtyRequested: this.calculateQuantityRequested,
                   }))}
               </div>
               <div className="submit-buttons">
