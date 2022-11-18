@@ -344,9 +344,13 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
         }) => ({
           onBlur: () => {
             const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
-                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            const lineItem = valuesWithUpdatedQtyRequested.lineItems[rowIndex];
+            const { monthlyDemand } = lineItem;
+            if (monthlyDemand) {
+              valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+                values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
+                  values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            }
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -425,9 +429,13 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         }) => ({
           onBlur: () => {
             const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue >= 0 ?
-                values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue : 0;
+            const lineItem = valuesWithUpdatedQtyRequested.lineItems[rowIndex];
+            const { monthlyDemand } = lineItem;
+            if (monthlyDemand) {
+              valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+                values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
+                  values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            }
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -527,9 +535,13 @@ const REQUEST_FROM_WARD_FIELDS = {
         }) => ({
           onBlur: () => {
             const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
-                values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            const lineItem = valuesWithUpdatedQtyRequested.lineItems[rowIndex];
+            const { monthlyDemand } = lineItem;
+            if (monthlyDemand) {
+              valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+                values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
+                  values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            }
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
