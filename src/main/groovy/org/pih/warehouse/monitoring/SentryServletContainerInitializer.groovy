@@ -45,6 +45,13 @@ final class SentryServletContainerInitializer implements ServletContainerInitial
                 enableExternalConfiguration = true
                 release = properties.getProperty('git.commit.id', 'unknown')
                 sendDefaultPii = false
+                /*
+                 * Enable transmission of performance data to Sentry.
+                 * This parameter is very different from `sampleRate`!
+                 *
+                 * https://docs.sentry.io/platforms/java/guides/spring-boot/configuration/sampling/#configuring-the-transaction-sample-rate
+                 */
+                tracesSampleRate = 0.5
             }
         }
     }
