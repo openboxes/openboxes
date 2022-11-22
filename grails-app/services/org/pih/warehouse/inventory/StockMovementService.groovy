@@ -757,6 +757,7 @@ class StockMovementService {
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
+                        quantityRequested               : stockMovementItem.quantityRequested,
                         comments                        : stockMovementItem.comments,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
