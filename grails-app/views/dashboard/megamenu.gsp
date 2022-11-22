@@ -1,4 +1,5 @@
 <ul class="d-flex align-items-center navbar-nav mr-auto flex-wrap align-items-stretch">
+    <g:set var="breakPoint" value="md" />
     <g:each var="menuItem" in="${menu}">
         <g:if test="${menuItem?.href}">
             <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-flex">
@@ -8,12 +9,12 @@
             </li>
         </g:if>
         <g:else>
-            %{-- DROPDOWN NAV-ITEM () --}%
-            <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-none d-md-flex">
+            %{-- DROPDOWN NAV-ITEM ( show > break point ) browser view --}%
+            <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-none d-${breakPoint}-flex">
                 <a class="nav-link dropdown-toggle">
                     ${menuItem?.label}
                 </a>
-                <div class="dropdown-menu dropdown-menu-wrapper">
+                <div class="dropdown-menu d-block dropdown-menu-wrapper">
                     <div class="dropdown-menu-subsections dropdown-menu-content">
                         <g:each in="${menuItem?.subsections}" var="subsection">
                             <div class="padding-8">
@@ -37,8 +38,8 @@
                     </div>
                 </div>
             </li>
-            %{-- COLLAPSABLE NAV-ITEM () --}%
-            <li id="${menuItem?.id}-collapsed" class="nav-item collapsable align-items-center flex-column d-flex d-md-none">
+            %{-- COLLAPSABLE NAV-ITEM ( show < break point ) mobile view --}%
+            <li id="${menuItem?.id}-collapsed" class="nav-item collapsable align-items-center flex-column d-flex d-${breakPoint}-none">
                 <button
                         data-target="#collapse-${menuItem?.id}"
                         aria-controls="collapse-${menuItem?.id}"
@@ -86,8 +87,7 @@
 </ul>
 
 <script type="text/javascript">
-  $(document)
-    .ready(function () {
+  $(document).ready(function () {
       const path = window.location.pathname
       const menuConfigValues = $(".menu-config-value").toArray();
       const matchingSection = menuConfigValues.find(it => it.value.includes(path))
@@ -99,5 +99,22 @@
         if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
         if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
       }
+
+
+      function repositionNavDropdowns() {
+        const dropdownRightClass = "dropdown-menu-right";
+        const itemDropdowns = $(".navbar-nav .dropdown-menu").toArray();
+        itemDropdowns.forEach(dropdown => {
+          const rect = dropdown.getBoundingClientRect();
+          if ([...dropdown.classList].includes(dropdownRightClass) && window.innerWidth > rect.right + rect.width) {
+            dropdown.classList.remove(dropdownRightClass)
+          }
+          if (window.innerWidth < rect.right) {
+            dropdown.classList.add(dropdownRightClass);
+          }
+        })
+      }
+      repositionNavDropdowns();
+      addEventListener("resize", repositionNavDropdowns);
     });
 </script>

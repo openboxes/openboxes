@@ -3509,8 +3509,13 @@ table.pvtTable tr th { background-color: #ddd; }
     color: black !important;
 }
 
+.navbar-nav .dropdown-menu {
+    visibility: hidden;
+}
+
 .dropdown:hover .dropdown-menu {
     display: block;
+    visibility: visible;
     color: black !important;
 }
 
