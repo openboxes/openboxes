@@ -1,7 +1,9 @@
-<%@ page import="java.util.Locale" %>
+<%@ page import="com.newrelic.api.agent.NewRelic; java.util.Locale" %>
 <?xml version="1.0" encoding="UTF-8"?>
 <html lang="en">
 <head>
+    <%= NewRelic.getBrowserTimingHeader() %>
+
     <!-- Include default page title -->
     <title><g:layoutTitle default="OpenBoxes" /></title>
 
@@ -649,6 +651,6 @@
     </g:if>
 </g:if>
 <r:layoutResources/>
-
+<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>
