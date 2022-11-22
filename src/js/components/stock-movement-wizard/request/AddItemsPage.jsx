@@ -46,6 +46,19 @@ function addButton({
   );
 }
 
+// Used for util function to calculate quantityRequested for requests from wards
+// where quantityRequested is calculated by subtracting one of below from QOH
+const RequestFromWardTypes = {
+  MANUAL: {
+    calculateQtyRequestedFrom: 'monthlyDemand',
+  },
+  STOCKLIST_PUSH_TYPE: {
+    calculateQtyRequestedFrom: 'quantityAllowed',
+  },
+  STOCKLIST_PULL_TYPE: {
+    calculateQtyRequestedFrom: 'demandPerReplenishmentPeriod',
+  },
+};
 
 const FIELDS = {
   product: {
@@ -344,7 +357,12 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
         }) => ({
           onBlur: () => {
             const valuesWithUpdatedQtyRequested =
-              calculateQtyRequested(values, rowIndex, fieldValue);
+              calculateQtyRequested(
+                values,
+                rowIndex,
+                fieldValue,
+                RequestFromWardTypes.STOCKLIST_PUSH_TYPE,
+              );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -423,7 +441,12 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         }) => ({
           onBlur: () => {
             const valuesWithUpdatedQtyRequested =
-              calculateQtyRequested(values, rowIndex, fieldValue);
+              calculateQtyRequested(
+                values,
+                rowIndex,
+                fieldValue,
+                RequestFromWardTypes.STOCKLIST_PULL_TYPE,
+              );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -523,7 +546,7 @@ const REQUEST_FROM_WARD_FIELDS = {
         }) => ({
           onBlur: () => {
             const valuesWithUpdatedQtyRequested =
-              calculateQtyRequested(values, rowIndex, fieldValue);
+              calculateQtyRequested(values, rowIndex, fieldValue, RequestFromWardTypes.MANUAL);
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -580,14 +603,16 @@ const REQUEST_FROM_WARD_FIELDS = {
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
 
-function calculateQuantityRequested(values, rowIndex, fieldValue) {
+function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
   const valuesWithUpdatedQtyRequested = values;
   const lineItem = valuesWithUpdatedQtyRequested.lineItems[rowIndex];
-  const { monthlyDemand } = lineItem;
-  if (monthlyDemand) {
+  // Options: quantityAllowed, demandPerReplenishmentPeriod, monthlyDemand
+  // depending on request from ward type: stocklist push, stocklist pull, manual respectively
+  const baseValue = lineItem[requestType.calculateQtyRequestedFrom];
+  if (baseValue) {
     valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-      values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
-        values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+      baseValue - fieldValue >= 0 ?
+        baseValue - fieldValue : 0;
   }
   return valuesWithUpdatedQtyRequested;
 }
