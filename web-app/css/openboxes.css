@@ -3555,6 +3555,7 @@ table.pvtTable tr th { background-color: #ddd; }
     font-size: 15px;
     padding: 0 16px !important;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .nav-item a:hover,

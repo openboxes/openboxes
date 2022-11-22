@@ -174,7 +174,7 @@
             </div>
             <div class="collapse navbar-collapse w-100" id="navbarToggler">
                 <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
-                    <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
+                    <g:include controller="dashboard" action="megamenu" />
                     <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
                         ${g.message(code: 'default.loading.label')}
                     </div>
