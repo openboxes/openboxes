@@ -1,10 +1,11 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.newrelic.api.agent.NewRelic" contentType="text/html;charset=UTF-8" %>
 <!doctype html>
 <html lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= NewRelic.getBrowserTimingHeader() %>
     <title><g:layoutTitle default="OpenBoxes"/></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
           rel="stylesheet"
@@ -56,5 +57,6 @@
         });
     });
     </script>
+    <%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>

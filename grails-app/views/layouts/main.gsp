@@ -1,8 +1,11 @@
+<%@ page import="com.newrelic.api.agent.NewRelic" %>
 <!doctype html>
 <html lang="en" class="no-js">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <%= NewRelic.getBrowserTimingHeader() %>
     <title>
         <g:layoutTitle default="OpenBoxes" />
     </title>
@@ -16,7 +19,6 @@
     </g:if>
     <g:googleSiteTag />
     <g:render template="/common/hotjar"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <asset:link rel="icon" href="favicon.ico" type="image/x-ico"/>
 
     <asset:stylesheet src="application.css"/>
@@ -96,5 +98,6 @@
 
 <asset:javascript src="application.js"/>
 
+<%= NewRelic.getBrowserTimingFooter() %>
 </body>
 </html>
