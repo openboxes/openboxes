@@ -42,6 +42,7 @@ class ProductController {
     def documentService
     def inventoryService
     def barcodeService
+    def productMergeService
     UploadService uploadService
 
     static allowedMethods = [save: "POST", update: "POST"]
@@ -1106,6 +1107,7 @@ class ProductController {
     }
 
     def showMergeProductDialog = {
+        // TODO: ADD WARNING IF PRODUCT HAS PENDING ORDER/SHIPMENT/RECEIPT/whatever
         Product primaryProduct = Product.get(params.primaryProduct)
         render(template: params.template, model: [ primaryProduct: primaryProduct ])
     }
@@ -1125,12 +1127,24 @@ class ProductController {
             throw new IllegalArgumentException("No Product found with ID ${params.obsoleteProduct}")
         }
 
-        // TODO: Will be done as a part of OBPIH-3187
-        // productService.mergeDuplicatedProduct(primaryProduct, duplicateProduct)
+        if (primaryProduct == obsoleteProduct) {
+            throw new IllegalArgumentException("Cannot merge the product with itself")
+        }
 
+        productMergeService.mergeObsoletedProduct(primaryProduct, obsoleteProduct)
+
+        flash.message = "${obsoleteProduct.productCode} Product merge to ${primaryProduct.productCode} has succeeded. " +
+            "There are currently running refresh data jobs in the background, that can take some time to process."
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
     }
+
+    /**
+     * Temporary helper for testing and looking at Product Merge logs for QA
+     * */
+    def productMergeLogs = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def productMergeLogs = productMergeService.getProductMergeLogs(params)
+        render(view: "productMergeLogs", model: [productMergeLogs: productMergeLogs ?: []], params: params)
+    }
 }
-
-
-

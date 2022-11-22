@@ -17,6 +17,7 @@ import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
 
@@ -283,5 +284,27 @@ class PicklistService {
             eq("inventory", warehouse.inventory)
             order("lastUpdated", "desc")
         }
+    }
+
+    /**
+     * Used for product merge feature (when primary product's inventory item *had* the same lot as obsolete)
+     * Change inventory item to primary for rows with given obsolete inventory item
+     * */
+    void updatePicklistItemsOnProductMerge(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem) {
+        if (!primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        def results = PicklistItem.executeUpdate(
+            "update PicklistItem pi " +
+                "set pi.inventoryItem = :primaryInventoryItem " +
+                "where pi.inventoryItem.id = :obsoleteInventoryItemId",
+            [
+                primaryInventoryItem    : primaryInventoryItem,
+                obsoleteInventoryItemId : obsoleteInventoryItem.id
+            ]
+        )
+        log.info "Updated ${results} picklist items for product: ${primaryInventoryItem?.product?.productCode} and " +
+            "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
     }
 }

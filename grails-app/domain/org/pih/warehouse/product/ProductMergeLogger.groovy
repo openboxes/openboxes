@@ -9,9 +9,25 @@
  **/
 package org.pih.warehouse.product
 
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.User
 
 class ProductMergeLogger implements Serializable {
+
+    def beforeInsert = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            createdBy = currentUser
+            updatedBy = currentUser
+        }
+    }
+
+    def beforeUpdate = {
+        def currentUser = AuthService.currentUser.get()
+        if (currentUser) {
+            updatedBy = currentUser
+        }
+    }
 
     String id
     Product primaryProduct
@@ -41,7 +57,7 @@ class ProductMergeLogger implements Serializable {
         dateMerged(nullable: false)
         dateReverted(nullable: true)
         comments(nullable: true)
-        createdBy(nullable: false)
-        updatedBy(nullable: false)
+        createdBy(nullable: true)
+        updatedBy(nullable: true)
     }
 }
