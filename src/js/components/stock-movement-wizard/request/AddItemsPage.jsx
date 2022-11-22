@@ -609,7 +609,7 @@ function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
   // Options: quantityAllowed, demandPerReplenishmentPeriod, monthlyDemand
   // depending on request from ward type: stocklist push, stocklist pull, manual respectively
   const baseValue = lineItem[requestType.calculateQtyRequestedFrom];
-  if (baseValue) {
+  if (baseValue && fieldValue) {
     valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
       baseValue - fieldValue >= 0 ?
         baseValue - fieldValue : 0;
