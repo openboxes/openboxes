@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCloseLine, RiSearchLine } from 'react-icons/ri';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { Async, components } from 'react-select';
 
 import { debounceGlobalSearch } from 'utils/option-utils';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/GlobalSearch/GlobalSearch.scss';
 
@@ -20,7 +22,7 @@ const ValueContainer = ({ children, ...props }) => (
 );
 
 const GlobalSearch = ({
-  className, visible, renderButton, debounceTime, minSearchLength,
+  className, visible, renderButton, debounceTime, minSearchLength, translate,
 }) => {
   const [isVisible, setIsVisible] = useState(visible);
 
@@ -115,6 +117,7 @@ const GlobalSearch = ({
           onKeyDown={onKeyPressHandler}
           onChange={onOptionSelectedHandler}
           onBlur={hideSearchbarOnBlur}
+          placeholder={translate('react.default.globalSearch.placeholder.label', 'Search...')}
           components={{
             ValueContainer,
             DropdownIndicator,
@@ -127,6 +130,7 @@ const GlobalSearch = ({
 const mapStateToProps = state => ({
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps)(GlobalSearch);
@@ -137,6 +141,7 @@ GlobalSearch.propTypes = {
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   className: PropTypes.string,
+  translate: PropTypes.func.isRequired,
 };
 
 GlobalSearch.defaultProps = {

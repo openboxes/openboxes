@@ -1520,7 +1520,7 @@ openboxes {
         }
         outbound {
             enabled = true
-            label = "outbound.label"
+            label = "default.outbound.label"
             defaultLabel = "Outbound"
             requiredActivitiesAny = [ActivityCode.SEND_STOCK]
             subsections = [
@@ -1549,7 +1549,7 @@ openboxes {
         }
         reporting {
             enabled = true
-            label = "reporting.label"
+            label = "report.label"
             defaultLabel = "Reporting"
             subsections = [
                 [
@@ -1563,7 +1563,7 @@ openboxes {
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/report/showCycleCountReport"],
                         [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
-                        [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
+                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/${appName}/report/showOnOrderReport"]
                     ]
                 ],
                 [
@@ -1572,7 +1572,7 @@ openboxes {
                         menuItems: [
                             [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
                             [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
-                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstandng Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", supplementalRoles: [RoleType.ROLE_FINANCE]],
+                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstanding Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", supplementalRoles: [RoleType.ROLE_FINANCE]],
                         ]
                 ],
                 [
@@ -1672,7 +1672,7 @@ openboxes {
                     ]
                 ],
                 [
-                    label: "parties.label",
+                    label: "locations.label",
                     defaultLabel: "Locations",
                     menuItems: [
                         [label: "locations.label", defaultLabel: "Locations", href: "/${appName}/location/list"],
