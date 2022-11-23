@@ -67,8 +67,14 @@ const FilterForm = ({
 
   // Calculate which object's values are not empty
   const countFilled = (values) => {
-    setAmountFilled(Object.values(values)
-      .filter((value) => {
+    setAmountFilled(Object.entries(values)
+      .filter(([key, value]) => {
+        // Ignore accounting for filter that is specified in "ignoreClearFilters"
+        if (ignoreClearFilters.includes(key)) return false;
+        // Ignore filter that is not specified in filterFields config
+        // and that is not a search field
+        if (!filterFields[key] && key !== searchFieldId) return false;
+        // evaluate filter value
         if (typeof value === 'object') return !_.isEmpty(value);
         return !!value;
       }).length);
