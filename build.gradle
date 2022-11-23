@@ -386,7 +386,7 @@ dependencies {
         runtime "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
         runtime "javax.websocket:javax.websocket-api:${websocketVersion}"
         runtime "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
-        runtime "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        compile "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
         runtime "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
         runtime "org.apache.tomcat:tomcat-servlet-api:${minimumTomcatVersion}"
         runtime 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
