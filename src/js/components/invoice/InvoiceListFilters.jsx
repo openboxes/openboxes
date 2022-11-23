@@ -18,6 +18,7 @@ const filterFields = {
       placeholder: 'react.invoice.buyerOrganization.label',
       defaultPlaceholder: 'Buyer organization',
       showLabelTooltip: true,
+      disabled: true,
     },
     getDynamicAttr: ({ organization }) => ({
       options: [
@@ -28,7 +29,6 @@ const filterFields = {
           label: organization.name,
         },
       ],
-      disabled: true,
     }),
   },
   status: {
