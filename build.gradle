@@ -349,6 +349,49 @@ war {
 }
 
 dependencies {
+    /*
+     * Tomcat provides many libraries out of the box, while Grails, by
+     * default, embeds (some) (old) Tomcat dependencies within its war
+     * files so they can run in a standalone context (we make use of
+     * this in openboxes-devops/arm-template/scripts/ob-vm-setup.sh).
+     * When deploying to a Tomcat container, we should use `provided`,
+     * per Grails 3's deployment guide, to leverage the web server. If
+     * `export ORG_GRADLE_PROJECT_WEB_SERVER=tomcat` is set, the war file
+     * will not contain tomcat-provided dependencies. Otherwise, it will.
+     *
+     * https://tomcat.apache.org/tomcat-8.5-doc/RELEASE-NOTES.txt
+     * http://docs.grails.org/3.3.16/guide/deployment.html
+     *
+     * This ticket has a good discussion of `provided` gotchas.
+     * https://github.com/grails/grails-core/issues/10483
+     *
+     * We can't wrap this logic in a function call because 'compile',
+     * 'provided' and 'runtime' are magic words that only work in a
+     * 'dependency' block.
+     */
+    if (project.hasProperty('WEB_SERVER') && project.getProperty('WEB_SERVER') == 'tomcat') {
+        provided 'javax.annotation:javax.annotation-api:1.3.2'
+        provided "javax.servlet:javax.servlet-api:${servletVersion}"
+        provided "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
+        provided "javax.websocket:javax.websocket-api:${websocketVersion}"
+        provided "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
+        provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        provided "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
+        provided "org.apache.tomcat:tomcat-servlet-api:${minimumTomcatVersion}"
+        provided 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
+        provided 'org.springframework.boot:spring-boot-starter-tomcat'
+    } else {
+        runtime 'javax.annotation:javax.annotation-api:1.3.2'
+        compile "javax.servlet:javax.servlet-api:${servletVersion}"
+        runtime "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
+        runtime "javax.websocket:javax.websocket-api:${websocketVersion}"
+        runtime "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
+        runtime "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        runtime "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
+        runtime "org.apache.tomcat:tomcat-servlet-api:${minimumTomcatVersion}"
+        runtime 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
+        runtime 'org.springframework.boot:spring-boot-starter-tomcat'
+    }
 
     implementation 'ch.qos.logback:logback-classic'
     implementation 'ch.qos.logback:logback-core'
@@ -410,15 +453,6 @@ dependencies {
     implementation "io.sentry:sentry-logback:${sentryVersion}"
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
 
-    /*
-     * Tomcat provides these libraries out of the box.
-     * https://tomcat.apache.org/tomcat-8.5-doc/RELEASE-NOTES.txt
-     */
-    provided 'javax.annotation:javax.annotation-api:1.3.2'
-    provided "javax.servlet:javax.servlet-api:${servletVersion}"
-    provided "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
-    provided "javax.websocket:javax.websocket-api:${websocketVersion}"
-
     testCompile 'junit:junit:4.13.2'
 
     compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
@@ -437,19 +471,6 @@ dependencies {
 
     implementation 'org.apache.poi:poi'
     implementation 'org.apache.poi:poi-scratchpad'
-
-    provided "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
-
-    // tomcat native connection pooling
-    provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
-
-    // this library is provided by tomcat
-    provided "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
-
-    provided "org.apache.tomcat:tomcat-servlet-api:${minimumTomcatVersion}"
-
-    // contents of this module are included in modern tomcat distributions
-    provided 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
 
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
@@ -656,17 +677,6 @@ dependencies {
 
     // set up Spring log framework (slf4j under the hood)
     implementation 'org.springframework.boot:spring-boot-starter-logging'
-
-    /*
-     * Use `provided` per Grails 3's deployment guide, see
-     * http://docs.grails.org/3.3.16/guide/deployment.html
-     *
-     * We don't support application servers other than Tomcat.
-     *
-     * This ticket has a good discussion of `provided` gotchas.
-     * https://github.com/grails/grails-core/issues/10483
-     */
-    provided 'org.springframework.boot:spring-boot-starter-tomcat'
 
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
