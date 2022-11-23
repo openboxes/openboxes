@@ -66,7 +66,7 @@ const InvoiceListTable = ({
       href: '/openboxes/invoice/show',
     },
     {
-      label: 'react.purchaseOrder.addDocument.label',
+      label: 'react.invoice.addDocument.label',
       defaultLabel: 'Add document',
       leftIcon: <RiFileLine />,
       href: '/openboxes/invoice/addDocument',
@@ -134,7 +134,7 @@ const InvoiceListTable = ({
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: <Translate id="react.invoice.column.vendorInvoiceNumber" defaultMessage="Total Value" />,
+      Header: <Translate id="react.invoice.column.totalValue" defaultMessage="Total Value" />,
       accessor: 'totalValue',
       headerClassName: 'text-left',
       sortable: false,

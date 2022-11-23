@@ -107,7 +107,7 @@ const StockTransferListTable = ({
       href: '/openboxes/stockTransfer/show',
     },
     {
-      label: 'react.purchaseOrder.delete.label',
+      label: 'react.stockTransfer.delete.label',
       defaultLabel: 'Delete',
       leftIcon: <RiDeleteBinLine />,
       minimumRequiredRole: 'Manager',

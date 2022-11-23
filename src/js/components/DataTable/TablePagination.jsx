@@ -56,7 +56,7 @@ const TablePagination = (props) => {
     <div className="table-pagination d-flex flex-row align-items-center justify-content-between py-2 px-3">
       <div className="d-flex">
         <span>{`${rangeNumberFrom}-${rangeNumberTo}`}</span>
-        <span className="mx-1">{props.translate('react.reactTablePagination.of.label', 'of')}</span>
+        <span className="mx-1">{props.translate('react.reactTable.pagination.of.label', 'of')}</span>
         <span>{totalDataSize}</span>
       </div>
       <div className="d-flex">
@@ -77,7 +77,7 @@ const TablePagination = (props) => {
               onChange={changePageOnChangeHandler}
               onKeyPress={changePageOnKeyPressHandler}
             />
-            <span className="mx-1">{props.translate('react.reactTablePagination.of.label', 'of')}</span>
+            <span className="mx-1">{props.translate('react.reactTable.pagination.of.label', 'of')}</span>
             <span>{props.pages}</span>
           </span>
           <button

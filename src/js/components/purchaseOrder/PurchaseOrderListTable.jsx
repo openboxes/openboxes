@@ -379,7 +379,7 @@ const PurchaseOrderListTable = ({
       minWidth: 230,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.totalAmountDefaultCurrency.label=" defaultMessage="Total amount (default currency)" />,
+      Header: <Translate id="react.purchaseOrder.column.totalAmountDefaultCurrency.label" defaultMessage="Total amount (default currency)" />,
       accessor: 'totalNormalized',
       className: 'text-right',
       headerClassName: 'justify-content-end',

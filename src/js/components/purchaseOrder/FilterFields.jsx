@@ -126,7 +126,8 @@ export default {
       options: [],
       filterOptions: options => options,
       filterElement: true,
-      placeholder: 'Created by',
+      placeholder: 'react.purchaseOrder.filters.createdBy.placeholder.label',
+      defaultPlaceholder: 'Created by',
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
