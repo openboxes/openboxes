@@ -28,12 +28,23 @@ const FilterForm = ({
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
+  const formRef = useRef(null);
+
+  const submitOnEnter = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (event.target.value) {
+        formRef.current.submit();
+      }
+    }
+  };
 
   const searchField = {
     type: SearchField,
     attributes: {
       placeholder: searchFieldPlaceholder,
       filterElement: true,
+      onKeyPress: submitOnEnter,
     },
   };
 
@@ -66,8 +77,6 @@ const FilterForm = ({
       }, {});
     form.reset(clearedFilterList);
   };
-
-  const formRef = useRef(null);
 
   useEffect(() => {
     if (formRef.current) {
