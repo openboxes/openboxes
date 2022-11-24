@@ -70,7 +70,10 @@ const FilterForm = ({
     setAmountFilled(Object.entries(values)
       .filter(([key, value]) => {
         // Ignore accounting for filter that is disabled
-        if (_.get(filterFields[key], 'attributes.disabled')) return false;
+        const dynamicAttributes = _.invoke(filterFields, `${key}.getDynamicAttr`, formProps);
+        const attributes = _.get(filterFields, `${key}.attributes`);
+        if (dynamicAttributes?.disabled || attributes?.disabled) return false;
+
         // Ignore filter that is not specified in filterFields config
         // and that is not a search field
         if (!filterFields[key] && key !== searchFieldId) return false;
