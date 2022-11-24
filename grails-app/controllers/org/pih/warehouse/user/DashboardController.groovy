@@ -165,7 +165,7 @@ class DashboardController {
 
         // Separate configuration section from the rest of the megamenu since it will be rendered separately as menuicon
         def indexOfConfigurationSection = translatedMenu.findIndexOf{ it?.id == 'configuration' }
-        def configurationSection = translatedMenu.remove(indexOfConfigurationSection)
+        def configurationSection = indexOfConfigurationSection > 0 ? translatedMenu.remove(indexOfConfigurationSection) : null
 
         [
                 menu                    : translatedMenu,
