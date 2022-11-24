@@ -156,17 +156,21 @@ class DashboardController {
         }
 
         Map menuConfig = grailsApplication.config.openboxes.megamenu;
-        menuConfig = menuConfig.findAll { key, val -> key != "configuration" }
         User user = User.get(session?.user?.id)
 
         if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
             menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
         }
-        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location).findAll { !it.isEmpty() }
+        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
+
+        // Separate configuration section from the rest of the megamenu since it will be rendered separately as menuicon
+        def indexOfConfigurationSection = translatedMenu.findIndexOf{ it?.id == 'configuration' }
+        def configurationSection = translatedMenu.remove(indexOfConfigurationSection)
 
         [
-                menu            : translatedMenu,
-                megamenuConfig  : grailsApplication.config.openboxes.megamenu,
+                menu                    : translatedMenu,
+                configurationSection    : configurationSection,
+                megamenuConfig          : grailsApplication.config.openboxes.megamenu,
         ]
     }
 

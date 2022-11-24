@@ -173,15 +173,7 @@
                 </button>
             </div>
             <div class="collapse navbar-collapse w-100" id="navbarToggler">
-                <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
-                    <g:include controller="dashboard" action="megamenu" />
-                    <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                        ${g.message(code: 'default.loading.label')}
-                    </div>
-                </div>
-                <div class="d-flex align-items-center justify-content-end navbar-icons">
-                    <g:render template="/common/menuicons" model="[confMenu: grailsApplication.config.openboxes.megamenu.configuration]" />
-                </div>
+                <g:include controller="dashboard" action="megamenu" />
             </div>
         </div>
     </g:if>

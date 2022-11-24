@@ -139,7 +139,10 @@ class MegamenuService {
                 return
             }
             if (value.enabled) {
-                parsedMenuConfig << buildAndTranslateSections(value, key, user, location)
+                def translatedSections = buildAndTranslateSections(value, key, user, location)
+                if (translatedSections) {
+                    parsedMenuConfig << translatedSections
+                }
             }
         }
         return parsedMenuConfig
