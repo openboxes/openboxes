@@ -9,6 +9,7 @@
         </div>
         <g:globalSearch buttonId="global-search-button" jsonUrl="${request.contextPath}/json/globalSearch"/>
     </div>
+    <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
     <div class="menu-icon">
         <div class="tooltip2">
             <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
@@ -22,6 +23,8 @@
             </span>
         </div>
     </div>
+    </g:if>
+    <g:if test="${configurationSection}">
     <div class="menu-icon">
         <div class="btn-group">
             <div class="tooltip2">
@@ -50,6 +53,7 @@
             </div>
         </div>
     </div>
+    </g:if>
     <div class="menu-icon">
         <div class="btn-group">
             <div class="tooltip2">
@@ -160,6 +164,7 @@
             </div>
         </div>
     </li>
+    <g:if test="${configurationSection}">
     <li class="nav-item collapsable align-items-center">
         <button
             data-target="#collapse-configuration"
@@ -191,6 +196,7 @@
             </div>
         </div>
     </li>
+    </g:if>
     <g:if test="${grailsApplication.config.openboxes.helpscout.widget.enabled}">
         <li class="nav-item mobile-help-scout dropdown align-items-center" onclick="Beacon('toggle');">
             <a class="d-flex">
