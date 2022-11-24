@@ -22,23 +22,26 @@ class MegamenuService {
         return grailsApplication.mainContext.getBean('org.pih.warehouse.MessageTagLib')
     }
 
-    Map buildAndTranslateSections(section, User user, Location location) {
+    Map buildAndTranslateSections(section, String key, User user, Location location) {
         def label = getMessageTagLib().message(code: section.label, default: section.defaultLabel)
         def translatedSection
         if (section.href) {
             translatedSection = [
+                    id: key,
                     label: label,
                     href: section.href
             ]
             return translatedSection
         } else if (section.subsections) {
             translatedSection = [
+                    id: key,
                     label: label,
                     subsections: buildAndTranslateSubsections(section.subsections, user, location)
             ]
             return translatedSection
         } else if (section.menuItems) {
             translatedSection = [
+                    id: key,
                     label: label,
                     menuItems: buildAndTranslateMenuItems(section.menuItems, user, location)
             ]
@@ -136,7 +139,10 @@ class MegamenuService {
                 return
             }
             if (value.enabled) {
-                parsedMenuConfig << buildAndTranslateSections(value, user, location)
+                def translatedSections = buildAndTranslateSections(value, key, user, location)
+                if (translatedSections) {
+                    parsedMenuConfig << translatedSections
+                }
             }
         }
         return parsedMenuConfig

@@ -3509,8 +3509,13 @@ table.pvtTable tr th { background-color: #ddd; }
     color: black !important;
 }
 
+.navbar-nav .dropdown-menu {
+    visibility: hidden;
+}
+
 .dropdown:hover .dropdown-menu {
     display: block;
+    visibility: visible;
     color: black !important;
 }
 
@@ -3555,6 +3560,7 @@ table.pvtTable tr th { background-color: #ddd; }
     font-size: 15px;
     padding: 0 16px !important;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .nav-item a:hover,
