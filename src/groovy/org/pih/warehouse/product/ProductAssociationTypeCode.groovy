@@ -25,6 +25,7 @@ enum ProductAssociationTypeCode {
     INCOMPATIBLE(140),
     UPGRADE(150),
     VARIANT(160),
+    FAMILY(160),
 
     int sortOrder
 
@@ -36,7 +37,7 @@ enum ProductAssociationTypeCode {
 
     static list() {
         [ACCESSORY, REPLACEMENT, SUBSTITUTE, CONSUMABLE, PREVENTATIVE, CORRECTIVE,
-         COMPATIBLE, COMPLEMENT, COMPONENT, EQUIVALENT, INCOMPATIBLE, UPGRADE, VARIANT]
+         COMPATIBLE, COMPLEMENT, COMPONENT, EQUIVALENT, INCOMPATIBLE, UPGRADE, VARIANT, FAMILY]
     }
 
     String getName() { return name() }
