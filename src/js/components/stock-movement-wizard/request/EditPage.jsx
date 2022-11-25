@@ -85,6 +85,9 @@ const AD_HOCK_FIELDS = {
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
@@ -384,6 +387,9 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
@@ -683,6 +689,9 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
