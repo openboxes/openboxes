@@ -71,6 +71,9 @@ const FIELDS = {
         }),
         label: 'react.stockMovement.code.label',
         defaultMessage: 'Code',
+        attributes: {
+          showValueTooltip: true,
+        },
       },
       product: {
         type: LabelField,
