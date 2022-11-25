@@ -451,7 +451,11 @@
               if (jqXHR.responseText) {
                 try {
                   let data = JSON.parse(jqXHR.responseText);
-                  $.notify(data.errorMessage, "error");
+                  if (data.errorMessages.length > 0) {
+                    $.notify(data.errorMessages.join("\n"), "error");
+                  } else {
+                    $.notify(data.errorMessage, "error");
+                  }
                 } catch (e) {
                   $.notify(jqXHR.responseText, "error");
                 }
