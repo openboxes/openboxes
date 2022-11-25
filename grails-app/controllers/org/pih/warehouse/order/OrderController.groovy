@@ -750,19 +750,21 @@ class OrderController {
             orderItem.productSupplier = productSupplier
         }
 
+        if (!order.save(flush:true)) {
+            throw new ValidationException("Order is invalid", order.errors)
+        }
+
         try {
-            if (!order.save(flush:true)) {
-                throw new ValidationException("Order is invalid", order.errors)
-            }
             if (order.status >= OrderStatus.PLACED) {
                 orderService.updateProductPackage(orderItem)
                 orderService.updateProductUnitPrice(orderItem)
             }
-
         } catch (Exception e) {
             log.error("Error " + e.message, e)
             render(status: 500, text: "Not saved")
+            return
         }
+
         render (status: 200, text: "Successfully added order item")
     }
 
