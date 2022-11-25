@@ -34,10 +34,10 @@
                         </g:link>
                         <small class="fade uppercase font-weight-bold">
                             <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id}">
-                                <g:message code="shipping.outbound.label" default="outbound"/>
+                                <warehouse:message code="default.outbound.label" default="outbound"/>
                             </g:if>
                             <g:elseif test="${shipmentInstance?.destination?.id == session?.warehouse?.id}">
-                                <g:message code="shipping.inbound.label" default="inbound"/>
+                                <warehouse:message code="default.inbound.label" default="inbound"/>
                             </g:elseif>
                         </small>
                     </div>
