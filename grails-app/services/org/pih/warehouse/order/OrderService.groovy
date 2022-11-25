@@ -700,8 +700,11 @@ class OrderService {
                             throw new IllegalArgumentException("Could not find provided Unit of Measure: ${unitOfMeasure}.")
                         }
                         UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0]) : null
-                        BigDecimal qtyPerUom = uomParts.length > 1 ? CSVUtils.parseNumber(uomParts[1], "unitOfMeasure"): null
                         orderItem.quantityUom = uom
+                        BigDecimal qtyPerUom = uomParts.length > 1 ? CSVUtils.parseNumber(uomParts[1], "unitOfMeasure"): null
+                        if (!qtyPerUom) {
+                            throw new IllegalArgumentException("Quantity per UoM cannot be 0 or empty")
+                        }
                         orderItem.quantityPerUom = qtyPerUom
                     } else {
                         throw new IllegalArgumentException("Missing unit of measure.")
