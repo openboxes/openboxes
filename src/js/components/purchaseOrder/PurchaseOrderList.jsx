@@ -29,10 +29,9 @@ const PurchaseOrderList = (props) => {
     if (!props.statuses || props.statuses.length === 0) {
       props.fetchStatuses();
     }
-
-    if (!props.buyers || props.buyers.length === 0) {
-      props.fetchBuyerOrganizations();
-    }
+    // TODO: If editing organizations is in React,
+    //  fetch only if !buyers || buyers.length === 0
+    props.fetchBuyerOrganizations();
   }, []);
 
   const fetchLocationById = async (id) => {
