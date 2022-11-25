@@ -202,10 +202,7 @@ class AddItemsPage extends Component {
     if (nextProps.inboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchInboundReturn();
-
-      if (!this.props.recipientsFetched) {
-        this.props.fetchUsers();
-      }
+      this.props.fetchUsers();
     }
   }
 
@@ -545,7 +542,6 @@ class AddItemsPage extends Component {
 
 const mapStateToProps = state => ({
   recipients: state.users.data,
-  recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,
   debounceTime: state.session.searchConfig.debounceTime,
@@ -569,7 +565,6 @@ AddItemsPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   fetchUsers: PropTypes.func.isRequired,
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  recipientsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   inboundReturnsTranslationsFetched: PropTypes.bool.isRequired,
   debounceTime: PropTypes.number.isRequired,

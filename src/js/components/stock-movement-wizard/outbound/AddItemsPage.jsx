@@ -319,7 +319,7 @@ class AddItemsPage extends Component {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
 
-      this.fetchAllData(false);
+      this.fetchAllData();
     }
   }
 
@@ -327,7 +327,7 @@ class AddItemsPage extends Component {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
-      this.fetchAllData(false);
+      this.fetchAllData();
     }
   }
 
@@ -559,14 +559,10 @@ class AddItemsPage extends Component {
 
   /**
    * Fetches all required data.
-   * @param {boolean} forceFetch
    * @public
    */
-  fetchAllData(forceFetch) {
-    if (!this.props.recipientsFetched || forceFetch) {
-      this.props.fetchUsers();
-    }
-
+  fetchAllData() {
+    this.props.fetchUsers();
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
@@ -826,7 +822,7 @@ class AddItemsPage extends Component {
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => this.fetchAllData(true),
+          onClick: () => this.fetchAllData(),
         },
         {
           label: this.props.translate('react.default.no.label', 'No'),
@@ -1127,7 +1123,6 @@ class AddItemsPage extends Component {
 
 const mapStateToProps = state => ({
   recipients: state.users.data,
-  recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   debounceTime: state.session.searchConfig.debounceTime,
@@ -1165,8 +1160,6 @@ AddItemsPage.propTypes = {
   fetchUsers: PropTypes.func.isRequired,
   /** Array of available recipients  */
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  /** Indicator if recipients' data is fetched */
-  recipientsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   debounceTime: PropTypes.number.isRequired,
