@@ -64,7 +64,7 @@ const Menu = ({ menuConfig, location }) => {
     <div className="menu-wrapper" id="navbarSupportedContent">
       <ul className="d-flex align-items-center navbar-nav mr-auto flex-wrap">
         { _.chain(menuConfig)
-          .filter(section => section.label !== 'Configuration')
+          .filter(section => section.id !== 'configuration')
           .map((section) => {
             if (section.href) {
               return (

@@ -220,7 +220,7 @@ const mapStateToProps = state => ({
   username: state.session.user.username,
   highestRole: state.session.highestRole,
   menuItems: state.session.menuItems,
-  configurationMenuSection: _.find(state.session.menuConfig, section => section.label === 'Configuration'),
+  configurationMenuSection: _.find(state.session.menuConfig, section => section.id === 'configuration'),
   localizedHelpScoutKey: state.session.localizedHelpScoutKey,
   isHelpScoutEnabled: state.session.isHelpScoutEnabled,
 });
