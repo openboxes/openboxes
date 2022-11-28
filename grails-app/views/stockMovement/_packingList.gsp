@@ -21,7 +21,7 @@
             <th><warehouse:message code="product.productCode.label"/></th>
             <th><warehouse:message code="product.label"/></th>
             <th class="left">
-                <warehouse:message code="receiptItem.binLocation.label" default="Bin Location"/>
+                <warehouse:message code="inventoryItem.binLocation.label" default="Bin Location"/>
                 <g:if test="${shipmentInstance?.origin?.id == session.warehouse?.id}">
                     <small><warehouse:message code="location.picking.label"/></small>
                 </g:if>
@@ -173,7 +173,7 @@
                             <div title="${shipmentItem?.recipient?.email}">${shipmentItem?.recipient?.name}</div>
                         </g:elseif>
                         <g:else>
-                            <div class="fade"><g:message code="default.none.label"/></div>
+                            <div class="fade"><warehouse:message code="default.none.label"/></div>
                         </g:else>
                     </td>
                     <td class="left" >
@@ -183,7 +183,7 @@
                             </div>
                         </g:if>
                         <g:else>
-                            <div class="fade"><g:message code="default.empty.label"/></div>
+                            <div class="fade"><warehouse:message code="default.empty.label"/></div>
                         </g:else>
                     </td>
                     <td>

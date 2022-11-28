@@ -33,7 +33,7 @@
                     <span class="action-menu">
                         <button class="action-btn button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'page_save.png')}" />
-                            &nbsp; <g:message code="default.button.download.label"/>
+                            &nbsp; <warehouse:message code="default.button.download.label"/>
                             <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
                         </button>
                         <div class="actions">
@@ -138,10 +138,10 @@
             <g:isSuperuser>
                 <a href="javascript:void(0);" class="button btn-show-dialog"
                     data-height="600" data-width="1000"
-                   data-title="${g.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
+                   data-title="${warehouse.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
                    data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
                     <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
-                    <g:message code="default.button.synchronize.label" default="Synchronize"/>
+                    <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
                 </a>
             </g:isSuperuser>
         </div>
@@ -149,13 +149,13 @@
     <div class="yui-gf">
         <div class="yui-u first">
             <div class="box">
-                <h2><g:message code="default.details.label" /></h2>
+                <h2><warehouse:message code="default.details.label" /></h2>
                 <div class="dialog">
 
                     <table>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.identifier.label"/>
+                                <warehouse:message code="stockMovement.identifier.label"/>
                             </td>
                             <td class="value">
                                 ${stockMovement?.identifier}
@@ -163,7 +163,7 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.status.label"/>
+                                <warehouse:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
                                 <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.requisition?.status }"/>
@@ -171,7 +171,7 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.origin.label"/>
+                                <warehouse:message code="stockMovement.origin.label"/>
                             </td>
                             <td class="value">
                                 ${stockMovement?.origin?.name}
@@ -179,7 +179,7 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.destination.label"/>
+                                <warehouse:message code="stockMovement.destination.label"/>
                             </td>
                             <td class="value">
                                 ${stockMovement?.destination?.name}
@@ -188,7 +188,7 @@
                         <g:if test="${session.warehouse == stockMovement?.origin}">
                             <tr class="prop">
                                 <td class="name">
-                                    <g:message code="stockMovement.requestType.label"/>
+                                    <warehouse:message code="stockMovement.requestType.label"/>
                                 </td>
                                 <td class="value">
                                     <format:metadata obj="${stockMovement?.requestType}"/>
@@ -197,46 +197,46 @@
                         </g:if>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.stocklist.label"/>
+                                <warehouse:message code="stockMovement.stocklist.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.stocklist?.name?:"None"}
+                                ${stockMovement?.stocklist?.name?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.comments.label"/>
+                                <warehouse:message code="stockMovement.comments.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.comments?:g.message(code:"default.none.label")}
+                                ${stockMovement?.comments?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.trackingNumber.label"/>
+                                <warehouse:message code="stockMovement.trackingNumber.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.trackingNumber?:g.message(code:"default.none.label")}
+                                ${stockMovement?.trackingNumber?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.driverName.label"/>
+                                <warehouse:message code="stockMovement.driverName.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.driverName?:g.message(code:"default.none.label")}
+                                ${stockMovement?.driverName?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="shipping.shipmentType.label"/>
+                                <warehouse:message code="shipping.shipmentType.label"/>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.shipmentType}">
                                     <format:metadata obj="${stockMovement?.shipmentType?.name}"/>
                                 </g:if>
                                 <g:else>
-                                    ${g.message(code:"default.none.label")}
+                                    ${warehouse.message(code:"default.none.label")}
                                 </g:else>
                             </td>
                         </tr>
@@ -245,7 +245,7 @@
                                 <warehouse:message code="shipping.totalValue.label"/>
                             </td>
                             <td class="value">
-                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
+                                <g:hasRoleFinance onAccessDenied="${warehouse.message(code:'errors.blurred.message', args: [warehouse.message(code:'default.none.label')])}">
                                     <g:formatNumber format="###,###,##0.00" number="${stockMovement?.shipment?.calculateTotalValue() ?: 0.00 }" />
                                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </g:hasRoleFinance>
@@ -254,12 +254,12 @@
                         <g:if test="${stockMovement?.shipment?.orders}">
                             <tr class="prop">
                                 <td class="name">
-                                    <g:message code="order.label"/>
+                                    <warehouse:message code="order.label"/>
                                 </td>
                                 <td class="value">
                                     <g:each var="order" in="${stockMovement?.shipment?.orders}">
                                         <g:link controller="order" action="show" id="${order?.id}" params="[override:true]">
-                                            ${g.message(code:'default.view.label', args: [g.message(code: 'order.label')])}
+                                            ${warehouse.message(code:'default.view.label', args: [warehouse.message(code: 'order.label')])}
                                             ${order.orderNumber}
                                         </g:link>
                                     </g:each>
@@ -270,11 +270,11 @@
                             <g:if test="${stockMovement.requisition}">
                                 <tr class="prop">
                                     <td class="name">
-                                        <g:message code="requisition.label"/>
+                                        <warehouse:message code="requisition.label"/>
                                     </td>
                                     <td class="value">
                                         <g:link controller="requisition" action="show" id="${stockMovement?.requisition?.id}" params="[override:true]">
-                                            ${g.message(code:'default.view.label', args: [g.message(code: 'requisition.label')])}
+                                            ${warehouse.message(code:'default.view.label', args: [warehouse.message(code: 'requisition.label')])}
                                             ${stockMovement?.requisition?.requestNumber}
                                         </g:link>
                                     </td>
@@ -283,11 +283,11 @@
                             <g:if test="${stockMovement.shipment}">
                                 <tr class="prop">
                                     <td class="name">
-                                        <g:message code="shipment.label"/>
+                                        <warehouse:message code="shipment.label"/>
                                     </td>
                                     <td class="value">
                                         <g:link controller="shipment" action="showDetails" id="${stockMovement?.shipment?.id}" params="[override:true]">
-                                            ${g.message(code:'default.view.label', args: [g.message(code: 'shipment.label')])}
+                                            ${warehouse.message(code:'default.view.label', args: [warehouse.message(code: 'shipment.label')])}
                                             ${stockMovement?.shipment?.shipmentNumber}
                                         </g:link>
                                     </td>
@@ -296,13 +296,13 @@
                             <g:if test="${stockMovement.shipment?.incomingTransactions}">
                                 <tr class="prop">
                                     <td class="name">
-                                        <g:message code="default.inbound.label"/>
+                                        <warehouse:message code="default.inbound.label"/>
                                     </td>
                                     <td class="value">
                                         <g:each var="inboundTransaction" in="${stockMovement?.shipment?.incomingTransactions}">
                                             <div>
                                                 <g:link controller="inventory" action="showTransaction" id="${inboundTransaction?.id}">
-                                                    ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
+                                                    ${warehouse.message(code:'default.view.label', args: [warehouse.message(code: 'transaction.label')])}
                                                     ${inboundTransaction?.transactionNumber?:inboundTransaction?.id}
                                                 </g:link>
                                             </div>
@@ -313,13 +313,13 @@
                             <g:if test="${stockMovement.shipment?.outgoingTransactions}">
                                 <tr class="prop">
                                     <td class="name">
-                                        <g:message code="default.outbound.label"/>
+                                        <warehouse:message code="default.outbound.label"/>
                                     </td>
                                     <td class="value">
                                         <g:each var="outboundTransaction" in="${stockMovement?.shipment?.outgoingTransactions}">
                                             <div>
                                                 <g:link controller="inventory" action="showTransaction" id="${outboundTransaction?.id}">
-                                                    ${g.message(code:'default.view.label', args: [g.message(code: 'transaction.label')])}
+                                                    ${warehouse.message(code:'default.view.label', args: [warehouse.message(code: 'transaction.label')])}
                                                     ${outboundTransaction?.transactionNumber?:outboundTransaction?.id}
                                                 </g:link>
                                             </div>
@@ -332,13 +332,13 @@
                 </div>
             </div>
             <div class="box">
-                <h2><g:message code="default.auditing.label"/></h2>
+                <h2><warehouse:message code="default.auditing.label"/></h2>
                 <div class="dialog">
 
                     <table>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.dateRequested.label"/>
+                                <warehouse:message code="stockMovement.dateRequested.label"/>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.dateRequested}">
@@ -346,20 +346,20 @@
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement.dateRequested}"/>
                                     </span>
                                     <g:if test="${stockMovement?.requestedBy}">
-                                        <g:message code="default.by.label"/>
+                                        <warehouse:message code="default.by.label"/>
                                         ${stockMovement?.requestedBy?.name}
                                     </g:if>
                                 </g:if>
                                 <g:else>
-                                    <g:message code="default.none.label"/>
+                                    <warehouse:message code="default.none.label"/>
                                 </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.dateShipped.label"/>
+                                <warehouse:message code="stockMovement.dateShipped.label"/>
                                 <g:if test="${stockMovement?.shipment?.status?.code==org.pih.warehouse.shipping.ShipmentStatusCode.PENDING}">
-                                    <small><g:message code="default.expected.label"/></small>
+                                    <small><warehouse:message code="default.expected.label"/></small>
                                 </g:if>
                             </td>
                             <td class="value">
@@ -368,18 +368,18 @@
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateShipped}"/>
                                     </span>
                                     <g:if test="${stockMovement?.shipment?.createdBy}">
-                                        <g:message code="default.by.label"/>
+                                        <warehouse:message code="default.by.label"/>
                                         ${stockMovement?.shipment?.createdBy?.name}
                                     </g:if>
                                 </g:if>
                                 <g:else>
-                                    <g:message code="default.none.label"/>
+                                    <warehouse:message code="default.none.label"/>
                                 </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="stockMovement.dateReceived.label"/>
+                                <warehouse:message code="stockMovement.dateReceived.label"/>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.shipment?.receipts}">
@@ -388,20 +388,20 @@
                                             <g:formatDate format="MMMM dd, yyyy" date="${receipt?.actualDeliveryDate}"/>
                                         </span>
                                         <g:if test="${receipt.recipient}">
-                                            <g:message code="default.by.label"/>
+                                            <warehouse:message code="default.by.label"/>
                                             ${receipt.recipient?.name}
                                         </g:if>
                                     </g:each>
                                 </g:if>
                                 <g:else>
-                                    <g:message code="default.none.label"/>
+                                    <warehouse:message code="default.none.label"/>
                                 </g:else>
 
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="default.dateCreated.label"/>
+                                <warehouse:message code="default.dateCreated.label"/>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.dateCreated}">
@@ -409,18 +409,18 @@
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.dateCreated}"/>
                                     </span>
                                     <g:if test="${stockMovement?.createdBy}">
-                                        <g:message code="default.by.label"/>
+                                        <warehouse:message code="default.by.label"/>
                                         ${stockMovement?.createdBy?.name}
                                     </g:if>
                                 </g:if>
                                 <g:else>
-                                    <g:message code="default.none.label"/>
+                                    <warehouse:message code="default.none.label"/>
                                 </g:else>
                             </td>
                         </tr>
                         <tr class="prop">
                             <td class="name">
-                                <g:message code="default.lastUpdated.label"/>
+                                <warehouse:message code="default.lastUpdated.label"/>
                             </td>
                             <td class="value">
                                 <g:if test="${stockMovement?.lastUpdated}">
@@ -428,12 +428,12 @@
                                         <g:formatDate format="MMMM dd, yyyy" date="${stockMovement?.lastUpdated}"/>
                                     </span>
                                     <g:if test="${stockMovement?.updatedBy}">
-                                        <g:message code="default.by.label"/>
+                                        <warehouse:message code="default.by.label"/>
                                         ${stockMovement?.updatedBy?.name}
                                     </g:if>
                                 </g:if>
                                 <g:else>
-                                    <g:message code="default.none.label"/>
+                                    <warehouse:message code="default.none.label"/>
                                 </g:else>
                             </td>
                         </tr>
