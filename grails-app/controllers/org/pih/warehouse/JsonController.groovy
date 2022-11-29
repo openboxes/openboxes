@@ -793,6 +793,92 @@ class JsonController {
 
     }
 
+    def findCatalogs = {
+        def terms = params?.term?.split(" ")
+        List<ProductCatalog> catalogs = ProductCatalog.createCriteria().list {
+            terms.each{ term ->
+                ilike("name", "%" + term + "%")
+            }
+            order("name", "asc")
+        }.collect {
+            [
+              id         : it.id,
+              text       : it.name + " (" + it.productCatalogItems?.size() + ")",
+              value      : it.id,
+            ]
+        }
+
+        render catalogs as JSON
+    }
+
+    def findTagsByName = {
+        def terms = params?.term?.split(" ")
+        List<Tag> tags = Tag.createCriteria().list {
+            terms.each{ term ->
+                ilike("tag", "%" + term + "%")
+            }
+            order("tag", "asc")
+        }.collect {
+            [
+                    id         : it.id,
+                    text       : it.tag + " (" + it.products?.size() + ")",
+                    value      : it.id,
+            ]
+        }
+
+        render tags as JSON
+    }
+
+    def findCategory = {
+        def terms = params?.term?.split(" > ")
+        List<Category> allCategories = Category.getAll()
+        // If we type any term and we have category list is not empty, check for the term in the parents of each category apart from category name itself
+        // e.g. if the term is "Medicines", we want to search for: "ROOT > Medicines > TB", "ROOT > Medicines", etc.
+        if (terms && allCategories.size()) {
+            List<Category> matchedCategories = []
+            allCategories.each { category ->
+                def parents = category.getParents()
+                parents.each { parent ->
+                    Boolean matches = true
+                    terms.each{ term ->
+                        // Case insensitive regex for searching any category matching term
+                        GString regex = "^(?i)${term}.*"
+                        // If category.name and its parents' name doesn't match the regex, mark flag as false
+                        if (!parent.name.matches(regex) && !category.name.matches(regex)) {
+                            matches = false
+                        }
+                    }
+                    // If the category.name or its parents' name matches the regex, the flag is still true, so add the category
+                    // to the result list
+                    if (matches) {
+                        matchedCategories.add(category)
+                    }
+                }
+            }
+            matchedCategories = matchedCategories.unique().collect{
+                [
+                        id         : it.id,
+                        text       : it.getHierarchyAsString(" > "),
+                        value      : it.id,
+                ]
+            }
+
+            render matchedCategories as JSON
+            return
+        }
+
+        // If the search term is null, we want to return all categories
+        allCategories = allCategories.collect{
+            [
+                    id         : it.id,
+                    text       : it.getHierarchyAsString(" > "),
+                    value      : it.id,
+            ]
+        }
+
+        render allCategories as JSON
+    }
+
     def findProductByName = {
 
         log.info("find products by name " + params)

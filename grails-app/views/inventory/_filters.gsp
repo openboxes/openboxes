@@ -11,24 +11,39 @@
 							 class="text medium" style="width:100%;"/>
 			</div>
 			<div class="filter-list-item">
-				<g:selectCategory id="category"
-								  name="categoryId"
-								  class="chzn-select-deselect"
-								  noSelection="['':'']"
-								  data-placeholder="Select a category"
-								  value="${commandInstance?.category?.id}"/>
+				<g:selectCategoryViaAjax id="category"
+										 name="categoryId"
+										 class="ajaxSelect2"
+										 noSelection="['':'']"
+										 data-placeholder="Select a category"
+										 value="${commandInstance?.category?.id}"
+										 data-allow-clear="true"
+										 data-ajax--url="${request.contextPath }/json/findCategory"
+										 data-ajax--cache="true"/>
 			</div>
 			<div class="filter-list-item">
-				<g:selectTags name="tags" noSelection="['':'']"
-							  value="${commandInstance.tags*.id}"
-							  data-placeholder="Select a tag"
-							  class="chzn-select-deselect"/>
+				<g:selectTagsViaAjax id="tags"
+										 name="tags"
+										 class="ajaxSelect2"
+										 noSelection="['':'']"
+										 multiple="true"
+					                     data-placeholder="Select a tag"
+										 value="${commandInstance?.tags*.id}"
+										 data-allow-clear="true"
+										 data-ajax--url="${request.contextPath }/json/findTagsByName"
+										 data-ajax--cache="true"/>
 			</div>
 			<div class="filter-list-item">
-				<g:selectCatalogs name="catalogs" noSelection="['':'']"
-							  value="${commandInstance?.catalogs*.id}"
-							  data-placeholder="Select a catalog"
-							  class="chzn-select-deselect"/>
+				<g:selectCatalogsViaAjax id="catalogs"
+										 name="catalogs"
+										 class="ajaxSelect2"
+										 noSelection="['':'']"
+										 data-placeholder="Select a catalog"
+										 multiple="true"
+										 value="${commandInstance?.catalogs*.id}"
+										 data-allow-clear="true"
+										 data-ajax--url="${request.contextPath }/json/findCatalogs"
+										 data-ajax--cache="true"/>
 			</div>
 			<div class="buttons">
 				<button type="submit" class="button icon search" name="searchPerformed" value="true">

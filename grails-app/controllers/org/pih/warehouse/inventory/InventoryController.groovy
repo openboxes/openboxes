@@ -138,6 +138,8 @@ class InventoryController {
         command.location = command?.location ?: Location.get(session.warehouse.id)
         def category = params.categoryId ? Category.get(params.categoryId) : productService.getRootCategory()
         command.category = category?.id ? category : null
+        command.catalogs = params.catalogs ? command.catalogs : null
+        command.tags = params.tags ? command.tags : null
         command.maxResults = params?.max as Integer
         command.offset = params?.offset as Integer
         command.searchResults = productAvailabilityService.searchProducts(command)
