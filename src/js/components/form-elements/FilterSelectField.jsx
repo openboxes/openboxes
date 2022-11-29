@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import PropTypes from 'prop-types';
 import { Overlay } from 'react-overlays';
@@ -108,21 +108,41 @@ IndicatorsContainer.propTypes = {
 };
 
 const FilterSelectField = (props) => {
-  const renderInput = ({ className, ...attributes }) => (
-    <Select
-      name={attributes.id}
-      {...attributes}
-      className={`filter-select ${className}`}
-      classNamePrefix="filter-select"
-      hideSelectedOptions={false}
-      controlShouldRenderValue={!attributes.multi}
-      customSelectComponents={{
-        Menu,
-        Option,
-        IndicatorsContainer,
-      }}
-    />
-  );
+  const renderInput = ({ className, ...attributes }) => {
+    const selectPropsRef = useRef(null);
+
+    const customSelectComponents = {
+      Menu,
+      Option,
+      IndicatorsContainer,
+    };
+
+    if (attributes?.async) {
+      // eslint-disable-next-line no-shadow
+      customSelectComponents.ValueContainer = (props) => {
+        selectPropsRef.current = props;
+        return <components.ValueContainer {...props} />;
+      };
+    }
+    // disable api call on async select component when clicking enter if there are no options
+    const onEnterHandler = (e) => {
+      if (selectPropsRef.current && !selectPropsRef.current?.options?.length) {
+        e.preventDefault();
+      }
+    };
+    return (
+      <Select
+        name={attributes.id}
+        {...attributes}
+        className={`filter-select ${className}`}
+        classNamePrefix="filter-select"
+        hideSelectedOptions={false}
+        controlShouldRenderValue={!attributes.multi}
+        onEnterPress={onEnterHandler}
+        customSelectComponents={customSelectComponents}
+      />
+    );
+  };
 
   return (
     <BaseField
