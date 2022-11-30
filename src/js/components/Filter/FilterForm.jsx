@@ -75,6 +75,7 @@ const FilterForm = ({
         }
         return { ...acc, [key]: '' };
       }, {});
+    updateFilterParams(clearedFilterList);
     form.reset(clearedFilterList);
   };
 
@@ -110,14 +111,15 @@ const FilterForm = ({
                       label="react.button.clear.label"
                       onClick={() => onClearHandler(form)}
                       variant="transparent"
-                      type="submit"
+                      type="button"
                     />
                     <Button
                       defaultLabel="Search"
                       label="react.button.search.label"
+                      onClick={() => updateFilterParams(values)}
                       disabled={!allowEmptySubmit && _.every(values, value => !value)}
                       variant="primary"
-                      type="submit"
+                      type="button"
                     />
                   </div>
                 </div>
