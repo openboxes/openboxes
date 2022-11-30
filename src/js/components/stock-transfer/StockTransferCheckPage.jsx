@@ -224,7 +224,7 @@ class StockTransferSecondPage extends Component {
     return apiClient.put(url, flattenRequest(payload))
       .then(() => {
         this.props.hideSpinner();
-        this.props.previousPage(this.state.stockTransfer);
+        this.props.previousPage({ stockTransfer: this.state.stockTransfer });
       })
       .catch(() => this.props.hideSpinner());
   }

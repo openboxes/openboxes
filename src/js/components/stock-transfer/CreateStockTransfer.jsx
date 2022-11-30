@@ -166,7 +166,7 @@ class CreateStockTransfer extends Component {
         this.props.hideSpinner();
 
         this.props.history.push(`/openboxes/stockTransfer/create/${stockTransfer.id}`);
-        this.props.nextPage({ ...stockTransfer });
+        this.props.nextPage({ stockTransfer });
       })
       .catch(() => this.props.hideSpinner());
   }

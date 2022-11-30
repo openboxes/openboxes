@@ -73,7 +73,18 @@ class InvoiceWizard extends Component {
     if (!values.invoiceNumber) {
       return '';
     }
-    return `${translateWithDefaultMessage('react.invoice.label, "Invoice"')} - ${values.invoiceNumber}`;
+    return [
+      {
+        text: this.props.translate('react.invoice.label', 'Invoice'),
+        color: '#000000',
+        delimeter: ' | ',
+      },
+      {
+        text: values.invoiceNumber,
+        color: '#000000',
+        delimeter: '',
+      },
+    ];
   }
 
   updateWizardValues(currentPage, values) {
