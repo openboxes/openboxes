@@ -17,8 +17,8 @@
                        jsonUrl="${request.contextPath}/json/findProductByName?skipQuantity=true"
                        styleClass="text"
                        showColor="true"
-                        valueId="${primaryProduct.id}"
-                        valueName="${primaryProduct.productCode} ${primaryProduct.name}"
+                       valueId="${primaryProduct.id}"
+                       valueName="${primaryProduct.productCode} ${primaryProduct.name}"
                     />
                 </td>
             </tr>
@@ -62,8 +62,15 @@
      .click(function () {
        const primaryProductId = $("#primary-product-id").val();
        const obsoleteProductId = $("#obsolete-product-id").val();
+       const errors = {
+         "primary-product": null,
+         "obsolete-product": null,
+       }
+       if (!primaryProductId) errors["primary-product"] = "Primary product must be selected";
+       if (!obsoleteProductId) errors["obsolete-product"] = "Obsolete product must be selected";
+       if (primaryProductId === obsoleteProductId) errors["obsolete-product"] = "Can't merge same product - please choose a different product";
 
-       if (primaryProductId && obsoleteProductId) {
+       if (Object.values(errors).every(err => !err)) {
          const warningMessage = $("#merge-product-warning-message")
            .text()
            .replaceAll("{0}", primaryProductId)
@@ -74,9 +81,11 @@
            .data('primaryProduct', primaryProductId)
            .data('obsoleteProduct', obsoleteProductId)
            .dialog('open')
+       } else {
+         Object.entries(errors).forEach(([key, value]) => {
+           if (value) $("#" + key + "-suggest").notify(value)
+         })
        }
-       if (!primaryProductId) $("#primary-product-suggest").notify("primary product must be selected")
-       if (!obsoleteProductId) $("#obsolete-product-suggest").notify("obsolete product must be selected")
      })
   });
 </script>
