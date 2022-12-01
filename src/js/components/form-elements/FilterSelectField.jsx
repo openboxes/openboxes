@@ -117,10 +117,10 @@ const FilterSelectField = (props) => {
       hideSelectedOptions={false}
       controlShouldRenderValue={!attributes.multi}
       customSelectComponents={{
-        Menu,
-        Option,
-        IndicatorsContainer,
-      }}
+          Menu,
+          Option,
+          IndicatorsContainer,
+        }}
     />
   );
 

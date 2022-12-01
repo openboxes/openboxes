@@ -28,12 +28,23 @@ const FilterForm = ({
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
+  const formRef = useRef(null);
+
+  const submitOnEnter = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (event.target.value) {
+        formRef.current.submit();
+      }
+    }
+  };
 
   const searchField = {
     type: SearchField,
     attributes: {
       placeholder: searchFieldPlaceholder,
       filterElement: true,
+      onKeyPress: submitOnEnter,
     },
   };
 
@@ -64,10 +75,9 @@ const FilterForm = ({
         }
         return { ...acc, [key]: '' };
       }, {});
+    updateFilterParams(clearedFilterList);
     form.reset(clearedFilterList);
   };
-
-  const formRef = useRef(null);
 
   useEffect(() => {
     if (formRef.current) {
@@ -101,14 +111,15 @@ const FilterForm = ({
                       label="react.button.clear.label"
                       onClick={() => onClearHandler(form)}
                       variant="transparent"
-                      type="submit"
+                      type="button"
                     />
                     <Button
                       defaultLabel="Search"
                       label="react.button.search.label"
+                      onClick={() => updateFilterParams(values)}
                       disabled={!allowEmptySubmit && _.every(values, value => !value)}
                       variant="primary"
-                      type="submit"
+                      type="button"
                     />
                   </div>
                 </div>

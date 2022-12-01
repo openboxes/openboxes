@@ -29,7 +29,7 @@
                 <g:each in="${productInstance?.associations}" status="i" var="productAssociation">
                     <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                        <td>${fieldValue(bean: productAssociation, field: "code")}</td>
+                        <td><format:metadata obj="${productAssociation?.code}" /></td>
 
                         <td>
                             <g:link controller="product" action="edit" id="${productAssociation?.associatedProduct?.id}">
