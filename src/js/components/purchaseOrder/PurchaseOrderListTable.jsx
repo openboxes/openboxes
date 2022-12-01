@@ -46,6 +46,7 @@ const PurchaseOrderListTable = ({
   currentLocation,
   allStatuses,
   isUserApprover,
+  locale,
 }) => {
   const [ordersData, setOrdersData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -437,13 +438,15 @@ const PurchaseOrderListTable = ({
     }
   };
 
+  const totalAmount = () => `${translate('react.purchaseOrder.totalAmount.label', 'Total amount')}: ${totalPrice.toLocaleString([locale, 'en'])} ${currencyCode}`;
+
   return (
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <span>
           <Translate id="react.purchaseOrder.listOrders.label" defaultMessage="List Orders" />
           &nbsp;
-          (<Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode})
+          ({totalAmount()})
         </span>
         <div className="btn-group">
           <Button
@@ -483,7 +486,7 @@ const PurchaseOrderListTable = ({
         noDataText="No orders match the given criteria"
         footerComponent={() => (
           <span className="title-text p-1 d-flex flex-1 justify-content-end">
-            <Translate id="react.purchaseOrder.totalAmount.label" defaultMessage="Total amount" />: {totalPrice} {currencyCode}
+            {totalAmount()}
           </span>
         )}
       />
@@ -500,6 +503,7 @@ const mapStateToProps = state => ({
   buyers: state.organizations.buyers,
   allStatuses: state.purchaseOrder.statuses,
   isUserApprover: state.session.isUserApprover,
+  locale: state.session.activeLanguage,
 });
 
 const mapDispatchToProps = {
@@ -526,6 +530,7 @@ PurchaseOrderListTable.propTypes = {
     variant: PropTypes.string,
   })).isRequired,
   isUserApprover: PropTypes.bool,
+  locale: PropTypes.string.isRequired,
 };
 
 PurchaseOrderListTable.defaultProps = {
