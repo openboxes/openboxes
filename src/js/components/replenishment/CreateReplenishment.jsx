@@ -285,8 +285,8 @@ class CreateReplenishment extends Component {
     apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         this.props.hideSpinner();
-        this.props.history.push(`/openboxes/replenishment/create/${response.data}`);
-        this.props.nextPage(this.state.values);
+        this.props.history.push(`/openboxes/replenishment/create/${response.data?.data?.id}`);
+        this.props.nextPage(response.data?.data);
       })
       .catch(() => this.props.hideSpinner());
   }

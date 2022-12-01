@@ -87,7 +87,21 @@ class ReplenishmentWizard extends Component {
 
   getWizardTitle() {
     const { replenishment } = this.state;
-    return replenishment ? `Replenishment - ${replenishment.replenishmentNumber}` : '';
+    if (replenishment?.replenishmentNumber) {
+      return [
+        {
+          text: this.props.translate('react.binReplenishment.label', 'Bin replenishment'),
+          color: '#000000',
+          delimeter: ' | ',
+        },
+        {
+          text: replenishment.replenishmentNumber,
+          color: '#000000',
+          delimeter: '',
+        },
+      ];
+    }
+    return '';
   }
 
   updateWizardValues(page, replenishment) {

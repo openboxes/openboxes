@@ -220,7 +220,7 @@ class ReplenishmentSecondPage extends Component {
   }
 
   previousPage() {
-    this.props.previousPage({});
+    this.props.previousPage(this.state.values.replenishment);
   }
 
   render() {

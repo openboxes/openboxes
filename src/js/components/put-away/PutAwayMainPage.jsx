@@ -65,8 +65,21 @@ class PutAwayMainPage extends Component {
 
   getWizardTitle() {
     const { putAway } = this.state;
-    const newName = putAway && putAway.putAway ? `Putaway - ${putAway.putAway.putawayNumber}` : '';
-    return newName;
+    if (putAway?.putAway?.putawayNumber) {
+      return [
+        {
+          text: this.props.translate('react.putAway.putAway.label', 'Putaway'),
+          color: '#000000',
+          delimeter: ' | ',
+        },
+        {
+          text: putAway.putAway.putawayNumber,
+          color: '#000000',
+          delimeter: '',
+        },
+      ];
+    }
+    return '';
   }
 
   updateWizardValues(page, putAway) {

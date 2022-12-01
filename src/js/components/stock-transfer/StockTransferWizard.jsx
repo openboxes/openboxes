@@ -92,8 +92,21 @@ class StockTransferWizard extends Component {
 
   getWizardTitle() {
     const { stockTransfer } = this.state;
-    const newName = stockTransfer ? `Stock Transfer - ${stockTransfer.orderNumber}` : '';
-    return newName;
+    if (stockTransfer?.stockTransfer?.stockTransferNumber) {
+      return [
+        {
+          text: this.props.translate('react.stockTransfer.label', 'Stock Transfer'),
+          color: '#000000',
+          delimeter: ' | ',
+        },
+        {
+          text: stockTransfer.stockTransfer.stockTransferNumber,
+          color: '#000000',
+          delimeter: '',
+        },
+      ];
+    }
+    return '';
   }
 
   updateWizardValues(page, stockTransfer) {
