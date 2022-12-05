@@ -887,4 +887,50 @@ class ProductAvailabilityService {
 
         return quantityAvailableToPromiseByProductNotInBin ?: 0
     }
+
+    /**
+     * Used for product merge feature (when primary product *had not*
+     * the same lot as obsolete product). Change product to primary for rows
+     * with given inventory item
+     * */
+    void updateProductAvailabilityOnMergeProduct(InventoryItem inventoryItem, Product product) {
+        if (!product?.id || !inventoryItem?.id) {
+            return
+        }
+
+        // FIXME: Temporary update ignore is due to the fact that we might hit product_availability_uniq_idx and in that case rows should be added
+        String updateStatement = """
+            UPDATE IGNORE product_availability
+            SET product_code = '${product.productCode}', 
+                product_id = '${product.id}' 
+            WHERE inventory_item_id = '${inventoryItem.id}';
+        """
+        dataService.executeStatement(updateStatement)
+        log.info "Updated product availabilities for product: ${product?.productCode} and " +
+            "inventory item: ${inventoryItem?.id}"
+    }
+
+    /**
+     * Used for product merge feature (when primary product *had* the same lot as obsolete)
+     * Change product and inventory to primary for rows with given obsolete inventory item
+     * */
+    void updateProductAvailabilityOnMergeProduct(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product product) {
+        if (!product?.id || !primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        // FIXME: Temporary update ignore is due to the fact that we might hit product_availability_uniq_idx and
+        //  in that case rows should be added
+        String updateStatement = """
+            UPDATE IGNORE product_availability
+            SET product_code = '${product.productCode}', 
+                product_id = '${product.id}', 
+                invenotry_item_id = '${primaryInventoryItem.id}', 
+                lot_number = '${primaryInventoryItem.lotNumber ?: 'DEFAUL'}' 
+            WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
+        """
+        dataService.executeStatement(updateStatement)
+        log.info "Updated product availabilities for product: ${product?.productCode} and " +
+            "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
+    }
 }
