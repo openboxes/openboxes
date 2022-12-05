@@ -69,8 +69,22 @@ jobs:
         version: 1.3.9
 
     - if: steps.grails-sdk.outputs.cache-hit != 'true'
+      continue-on-error: true
       name: unzip grails SDK (unless cached)
-      run: unzip -o ${{ steps.sdkman.outputs.file }} -d ~/
+      run: |
+        ls -l ${{ steps.sdkman.outputs.file }}
+        ls -l `dirname ${{ steps.sdkman.outputs.file }}`
+        file ${{ steps.sdkman.outputs.file }}
+        unzip -o ${{ steps.sdkman.outputs.file }} -d ~/
+
+    - name: unzip grails SDK (if sdkman fails)
+      run: |
+        if [ ! -d ~/grails-1.3.9 ]
+        then
+          rm ${{ steps.sdkman.outputs.file }}
+          curl --output-dir /tmp -sOL https://github.com/grails/grails-core/releases/download/v1.3.9/grails-1.3.9.zip
+          unzip -o ${{ steps.sdkman.outputs.file }} -d ~/
+        fi
 
     - name: npm install
       run: npm install
