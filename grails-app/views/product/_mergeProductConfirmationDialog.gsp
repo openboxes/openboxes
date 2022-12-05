@@ -40,6 +40,7 @@
   }
 
   function mergeProduct(primaryProduct, obsoleteProduct) {
+      $(".loading").show();
       $.ajax({
         url: "${g.createLink(controller:'product', action:'mergeProduct')}",
         type: "POST",
@@ -49,10 +50,12 @@
         },
         success: function () {
           $.notify("Products merged successfully", "success");
+          $(".loading").hide();
           closeModal();
           window.location.href = '${request.contextPath}/inventoryItem/showStockCard/' + primaryProduct;
         },
         error: function (jqXHR) {
+          $(".loading").hide();
           if (jqXHR.responseText) {
             try {
               let data = JSON.parse(jqXHR.responseText);
