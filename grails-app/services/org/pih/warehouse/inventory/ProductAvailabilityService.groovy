@@ -924,16 +924,16 @@ class ProductAvailabilityService {
     }
 
     /**
-     * Used for product merge feature (when primary product *had not* the same lot as obsolete product)
-     * Change product to primary for rows with given inventory item
+     * Used for product merge feature (when primary product *had not*
+     * the same lot as obsolete product). Change product to primary for rows
+     * with given inventory item
      * */
-    void updateProductAvailabilityOnProductMerge(InventoryItem inventoryItem, Product product) {
+    void updateProductAvailabilityOnMergeProduct(InventoryItem inventoryItem, Product product) {
         if (!product?.id || !inventoryItem?.id) {
             return
         }
 
-        // FIXME: Temporary update ignore is due to the fact that we might hit product_availability_uniq_idx and
-        //  in that case rows should be added
+        // FIXME: Temporary update ignore is due to the fact that we might hit product_availability_uniq_idx and in that case rows should be added
         String updateStatement = """
             UPDATE IGNORE product_availability
             SET product_code = '${product.productCode}', 
@@ -949,7 +949,7 @@ class ProductAvailabilityService {
      * Used for product merge feature (when primary product *had* the same lot as obsolete)
      * Change product and inventory to primary for rows with given obsolete inventory item
      * */
-    void updateProductAvailabilityOnProductMerge(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product product) {
+    void updateProductAvailabilityOnMergeProduct(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product product) {
         if (!product?.id || !primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
             return
         }

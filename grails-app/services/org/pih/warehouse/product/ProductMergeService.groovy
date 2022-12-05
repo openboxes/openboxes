@@ -14,12 +14,7 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.jobs.RefreshDemandDataJob
-import org.pih.warehouse.jobs.RefreshOrderSummaryJob
-import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
-import org.pih.warehouse.jobs.RefreshStockoutDataJob
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.order.OrderSummary
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.RequisitionItem
@@ -34,7 +29,7 @@ class ProductMergeService {
     /**
      * Preforms product swapping for a product pairs passed as params
      * */
-    def mergeObsoletedProduct(Product primary, Product obsolete) {
+    def mergeProduct(Product primary, Product obsolete) {
         /**
          * ================================
          * === Swap Product's relations ===
@@ -206,7 +201,7 @@ class ProductMergeService {
                 }
                 // if product inventory item already exists, then check if obsolete InventoryItem has ProductAvailability
                 if (productAvailabilitiesCount > 0) {
-                    productAvailabilityService.updateProductAvailabilityOnProductMerge(primaryInventoryItem, obsoleteInventoryItem, primary)
+                    productAvailabilityService.updateProductAvailabilityOnMergeProduct(primaryInventoryItem, obsoleteInventoryItem, primary)
                 }
                 // if product inventory item already exists, then check if obsolete InventoryItem has PicklistItems
                 int picklistItemsCount = PicklistItem.countByInventoryItem(obsoleteInventoryItem)
@@ -226,7 +221,7 @@ class ProductMergeService {
 
             // Swap product availability product for the records with inventory item that will have changed products
             if (productAvailabilitiesCount) {
-                productAvailabilityService.updateProductAvailabilityOnProductMerge(obsoleteInventoryItem, primary)
+                productAvailabilityService.updateProductAvailabilityOnMergeProduct(obsoleteInventoryItem, primary)
             }
 
             // Swap product to primary

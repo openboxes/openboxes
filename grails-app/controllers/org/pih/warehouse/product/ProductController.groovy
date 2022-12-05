@@ -1131,7 +1131,7 @@ class ProductController {
             throw new IllegalArgumentException("Cannot merge the product with itself")
         }
 
-        productMergeService.mergeObsoletedProduct(primaryProduct, obsoleteProduct)
+        productMergeService.mergeProduct(primaryProduct, obsoleteProduct)
 
         flash.message = "${obsoleteProduct.productCode} Product merge to ${primaryProduct.productCode} has succeeded. " +
             "There are currently running refresh data jobs in the background, that can take some time to process."

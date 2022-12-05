@@ -427,8 +427,9 @@ class InventorySnapshotService {
     }
 
     /**
-     * Used for product merge feature (when primary product *had not* the same lot as obsolete product)
-     * Change product to primary for rows with given inventory item
+     * Used for product merge feature (when primary product *had not*
+     * the same lot as obsolete product). Change product to primary for rows
+     * with given inventory item
      * */
     void updateInventorySnapshots(InventoryItem inventoryItem, Product product) {
         if (!product?.id || !inventoryItem?.id) {
