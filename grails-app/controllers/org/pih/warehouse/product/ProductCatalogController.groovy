@@ -13,6 +13,7 @@ package org.pih.warehouse.product
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.importer.ImportDataCommand
+import grails.plugin.springcache.annotations.CacheFlush
 
 class ProductCatalogController {
 
@@ -37,6 +38,7 @@ class ProductCatalogController {
         return [productCatalogInstance: productCatalogInstance]
     }
 
+    @CacheFlush("selectCatalogsCache")
     def save = {
         def productCatalogInstance = new ProductCatalog(params)
         if (productCatalogInstance.save(flush: true)) {
@@ -67,6 +69,7 @@ class ProductCatalogController {
         }
     }
 
+    @CacheFlush("selectCatalogsCache")
     def update = {
         def productCatalogInstance = ProductCatalog.get(params.id)
         if (productCatalogInstance) {
@@ -92,6 +95,7 @@ class ProductCatalogController {
         }
     }
 
+    @CacheFlush("selectCatalogsCache")
     def delete = {
         def productCatalogInstance = ProductCatalog.get(params.id)
         if (productCatalogInstance) {
@@ -116,6 +120,7 @@ class ProductCatalogController {
         render(template: "productCatalogItems", model: [productCatalogInstance: productCatalogInstance])
     }
 
+    @CacheFlush("selectCatalogsCache")
     def addProductCatalogItem = { ProductCatalogCommand command ->
         log.info("Command: " + command)
         log.info("Params: " + params)
@@ -129,6 +134,7 @@ class ProductCatalogController {
         redirect(action: "productCatalogItems", id: command.productCatalog.id)
     }
 
+    @CacheFlush("selectCatalogsCache")
     def removeProductCatalogItem = {
         String productCatalogId
         def productCatalogItem = ProductCatalogItem.get(params.id)

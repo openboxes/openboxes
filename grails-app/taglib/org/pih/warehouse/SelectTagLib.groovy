@@ -372,51 +372,6 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
-    def selectCatalogsViaAjax = { attrs, body ->
-        List<ProductCatalog> catalogs = []
-        // Initially we want to fetch only catalogs, which are currently selected e.g. in url after refreshing the page
-        if (attrs.value) {
-            catalogs = ProductCatalog.createCriteria().list {
-                'in'("id", attrs.value)
-                order("name", "asc")
-            }.collect{
-                [id: it.id, name: it.name, productCount: it?.productCatalogItems?.size()]
-            }
-        }
-        attrs.from = catalogs
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " (" + it?.productCount + ")" }
-        out << g.select(attrs)
-    }
-
-    def selectTagsViaAjax = { attrs, body ->
-        List<Tag> tags = []
-        // Initially we want to fetch only tags, which are currently selected e.g. in url after refreshing the page
-        if (attrs.value) {
-            tags = Tag.createCriteria().list {
-                'in'("id", attrs.value)
-                order("tag", "asc")
-            }.collect{
-                [id: it.id, name: it.tag, productCount: it?.products?.size()]
-            }
-        }
-        attrs.from = tags
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.name + " (" + it?.productCount + ")" }
-        out << g.select(attrs)
-    }
-
-    def selectCategoryViaAjax = { attrs, body ->
-        // Initially we want to only fetch category, which is currently selected e.g. in url after refreshing the page
-        List<Category> category = attrs.value ? [Category.get(attrs.value)] : []
-        attrs.optionKey = "id"
-        attrs.from = category
-        attrs.optionValue = {
-            it.getHierarchyAsString(" > ")
-        }
-        out << g.select(attrs)
-    }
-
     def selectPerson = { attrs, body ->
         attrs.from = Person.list().findAll { it.active }.sort { it.firstName }
         attrs.optionKey = 'id'

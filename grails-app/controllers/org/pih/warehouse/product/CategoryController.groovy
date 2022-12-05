@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import grails.plugin.springcache.annotations.CacheFlush
+
 class CategoryController {
 
     def productService
@@ -43,6 +45,7 @@ class CategoryController {
         redirect(action: "tree")
     }
 
+    @CacheFlush("selectCategoryCache")
     def saveCategory = {
         log.info params
 
@@ -90,6 +93,7 @@ class CategoryController {
         return [categoryInstance: categoryInstance, rootCategory: productService.getRootCategory()]
     }
 
+    @CacheFlush("selectCategoryCache")
     def save = {
         def categoryInstance = new Category(params)
 
@@ -122,6 +126,7 @@ class CategoryController {
         }
     }
 
+    @CacheFlush("selectCategoryCache")
     def update = {
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {
@@ -147,6 +152,7 @@ class CategoryController {
         }
     }
 
+    @CacheFlush("selectCategoryCache")
     def delete = {
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {
