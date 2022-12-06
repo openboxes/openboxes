@@ -205,6 +205,23 @@ body {
   min-width: 200px;
 }
 
+.filter-form {
+  .filter-group {
+    min-width: unset;
+  }
+  .filter-select {
+    min-width: unset!important;
+
+    .filter-select__placeholder, .filter-select__single-value {
+      position: relative !important;
+      transform: unset;
+      -webkit-transform: unset;
+      margin-left: -12px;
+      order: 1;
+    }
+  }
+}
+
 .flex-1 {
   flex: 1;
 }

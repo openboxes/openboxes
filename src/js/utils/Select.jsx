@@ -283,7 +283,7 @@ class Select extends Component {
               ...customSelectComponents,
               Menu: customSelectComponents.Menu ?? Menu,
               Option: customSelectComponents.Option ?? Option,
-              SingleValue,
+              SingleValue: customSelectComponents.SingleValue ?? SingleValue,
             }}
             ref={fieldRef}
             classNamePrefix={classNamePrefix}

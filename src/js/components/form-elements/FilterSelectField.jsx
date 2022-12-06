@@ -9,33 +9,62 @@ import Select from 'utils/Select';
 
 import 'components/form-elements/FilterSelectField.scss';
 
-const Dropdown = ({ children, style, width }) => (
-  <div
-    className="filter-select__dropdown"
-    style={{
-      ...style, width,
-    }}
-  >
-    {children}
-  </div>
-);
+const Dropdown = ({
+  children, style, inputContainerRec,
+}) => {
+  const dropdownRef = useRef(null);
+  // if current dropdown width is smaller than the input container
+  // then change dropdown width to the same width as the input container
+  const currentDropdownWidth = dropdownRef.current?.offsetWidth;
+  const inputContainerWidth = inputContainerRec?.width;
+  const dropdownWidth = inputContainerWidth > currentDropdownWidth
+    ? inputContainerWidth
+    : currentDropdownWidth;
+  return (
+    <div
+      ref={dropdownRef}
+      className="filter-select__dropdown"
+      style={{
+        ...style,
+        width: dropdownWidth,
+        left: inputContainerRec.left,
+        top: inputContainerRec?.bottom,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 Dropdown.propTypes = {
   children: PropTypes.element.isRequired,
-  style: PropTypes.shape({}).isRequired,
-  width: PropTypes.string.isRequired,
+  style: PropTypes.shape({}),
+  inputContainerRec: PropTypes.shape({
+    height: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    bottom: PropTypes.number.isRequired,
+    top: PropTypes.number.isRequired,
+    right: PropTypes.number.isRequired,
+    left: PropTypes.number.isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+  }).isRequired,
+};
+
+Dropdown.defaultProps = {
+  style: {},
 };
 
 const Menu = (props) => {
-  const target = document.getElementById(`${props.selectProps.id}-container`);
+  const inputContainer = document.getElementById(`${props.selectProps.id}-container`);
   return (
     <Overlay
       show
       placement="bottom"
-      target={target}
+      target={inputContainer}
       container={document.getElementById('root')}
     >
-      <Dropdown width={(target.offsetWidth - 10).toString()}>
+      <Dropdown inputContainerRec={inputContainer.getBoundingClientRect()} >
         <div className="filter-select__custom-option" {...props.innerProps}>
           {props.children}
         </div>
@@ -62,7 +91,9 @@ const Option = props => (
           className="mr-1"
         />
       }
-      {props.data.label}
+      <span className="option-label">
+        {props.data.label}
+      </span>
     </div>
   </components.Option>
 );
@@ -108,41 +139,21 @@ IndicatorsContainer.propTypes = {
 };
 
 const FilterSelectField = (props) => {
-  const renderInput = ({ className, ...attributes }) => {
-    const selectPropsRef = useRef(null);
-
-    const customSelectComponents = {
-      Menu,
-      Option,
-      IndicatorsContainer,
-    };
-
-    if (attributes?.async) {
-      // eslint-disable-next-line no-shadow
-      customSelectComponents.ValueContainer = (props) => {
-        selectPropsRef.current = props;
-        return <components.ValueContainer {...props} />;
-      };
-    }
-    // disable api call on async select component when clicking enter if there are no options
-    const onEnterHandler = (e) => {
-      if (selectPropsRef.current && !selectPropsRef.current?.options?.length) {
-        e.preventDefault();
-      }
-    };
-    return (
-      <Select
-        name={attributes.id}
-        {...attributes}
-        className={`filter-select ${className}`}
-        classNamePrefix="filter-select"
-        hideSelectedOptions={false}
-        controlShouldRenderValue={!attributes.multi}
-        onEnterPress={onEnterHandler}
-        customSelectComponents={customSelectComponents}
-      />
-    );
-  };
+  const renderInput = ({ className, ...attributes }) => (
+    <Select
+      name={attributes.id}
+      {...attributes}
+      className={`filter-select ${className}`}
+      classNamePrefix="filter-select"
+      hideSelectedOptions={false}
+      controlShouldRenderValue={!attributes.multi}
+      customSelectComponents={{
+          Menu,
+          Option,
+          IndicatorsContainer,
+        }}
+    />
+  );
 
   return (
     <BaseField
