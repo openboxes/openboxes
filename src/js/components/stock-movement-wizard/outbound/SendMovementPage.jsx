@@ -883,7 +883,7 @@ class SendMovementPage extends Component {
                       <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
                     </button> }
                 </span>
-                <div className="form-title"><Translate id="react.attribute.options.label" defaultMessage="Sending options" /></div>
+                <div className="form-title"><Translate id="react.stockMovement.sendingOptions.label" defaultMessage="Sending options" /></div>
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,
