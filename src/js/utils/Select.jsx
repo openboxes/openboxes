@@ -95,6 +95,7 @@ class Select extends Component {
     this.state = {
       value: props.initialValue === undefined ? null : props.initialValue,
       id: _.uniqueId('select-id_'),
+      sortedOptionsByChecked: null,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -128,6 +129,34 @@ class Select extends Component {
       this.setState({ value: null });
     }
   }
+
+  sortOptionsByChecked(options, checkedValues) {
+    const groupByChecked = () => {
+      if (options?.length) {
+        return options.reduce((acc, curr) => {
+          // If checked values contain current option, add it to checked options
+          if (checkedValues?.some(val => val.id === curr.id)) {
+            return {
+              ...acc,
+              checked: [...acc.checked, curr],
+            };
+          }
+          // If checked values don't contain current option, add it to unchecked
+          return {
+            ...acc,
+            unchecked: [...acc.unchecked, curr],
+          };
+        }, { checked: [], unchecked: [] });
+      }
+      return { checked: [], unchecked: [] };
+    };
+    const { checked, unchecked } = groupByChecked();
+    // Concat checked and unchecked options in order: checked, unchecked, so checked are at the top
+    this.setState({
+      sortedOptionsByChecked: [...checked, ...unchecked],
+    });
+  }
+
 
   render() {
     const {
@@ -242,11 +271,12 @@ class Select extends Component {
             {...attributes}
             placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
-            options={options}
+            options={this.state.sortedOptionsByChecked ?? options}
             isMulti={multi}
             isClearable={clearable}
             title=""
             delimiter={delimiter}
+            onMenuClose={multi ? () => this.sortOptionsByChecked(options, value) : null}
             value={value}
             onChange={this.handleChange}
             components={{
