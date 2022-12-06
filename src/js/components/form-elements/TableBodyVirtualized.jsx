@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
 
 import TableRow from 'components/form-elements/TableRow';
+import Translate from 'utils/Translate';
 
 
 class TableBodyVirtualized extends Component {
@@ -131,7 +132,7 @@ class TableBodyVirtualized extends Component {
     }
     return (
       <div key={key} style={style}>
-        Loading...
+        <Translate id="react.default.loading.label" defaultMessage="Loading..." />
       </div>
     );
   }

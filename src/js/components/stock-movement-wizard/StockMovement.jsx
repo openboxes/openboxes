@@ -137,7 +137,7 @@ class StockMovements extends Component {
     }
     return [
       {
-        text: 'Stock Movement',
+        text: this.props.translate('react.stockMovement.label', 'Stock Movement'),
         color: '#000000',
         delimeter: ' | ',
       },
@@ -149,7 +149,7 @@ class StockMovements extends Component {
       {
         text: values.origin.name,
         color: '#004d40',
-        delimeter: ' to ',
+        delimeter: ` ${this.props.translate('react.default.to.label', 'to')} `,
       },
       {
         text: values.destination.name,
@@ -171,13 +171,13 @@ class StockMovements extends Component {
 
   getAdditionalWizardTitle() {
     const { currentPage, values } = this.state;
-    const shipped = values.shipped ? 'SHIPPED' : '';
-    const received = values.received ? 'RECEIVED' : '';
+    const shipped = values.shipped ? this.props.translate('react.stockMovement.status.shipped.label', 'SHIPPED') : '';
+    const received = values.received ? this.props.translate('react.stockMovement.status.received.label', 'RECEIVED') : '';
     if ((this.props.hasPackingSupport && currentPage === 6) ||
       (!this.props.hasPackingSupport && currentPage === 5)) {
       return (
         <span className="shipment-status float-right">
-          {`${shipped || received || 'PENDING'}`}
+          {`${shipped || received || this.props.translate('react.stockMovement.status.pending.label', 'PENDING')}`}
         </span>
       );
     }
