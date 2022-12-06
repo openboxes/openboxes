@@ -131,9 +131,9 @@ class Select extends Component {
   }
 
   sortOptionsByChecked(options, checkedValues) {
-    const groupedByChecked =
-      options?.length ?
-        options.reduce((acc, curr) => {
+    const groupByChecked = () => {
+      if (options?.length) {
+        return options.reduce((acc, curr) => {
           // If checked values contain current option, add it to checked options
           if (checkedValues?.some(val => val.id === curr.id)) {
             return {
@@ -141,15 +141,19 @@ class Select extends Component {
               checked: [...acc.checked, curr],
             };
           }
-          // If checked values don't containt current option, add it to unchecked
+          // If checked values don't contain current option, add it to unchecked
           return {
             ...acc,
             unchecked: [...acc.unchecked, curr],
           };
-        }, { checked: [], unchecked: [] }) : { checked: [], unchecked: [] };
+        }, { checked: [], unchecked: [] });
+      }
+      return { checked: [], unchecked: [] };
+    };
+    const { checked, unchecked } = groupByChecked();
     // Concat checked and unchecked options in order: checked, unchecked, so checked are at the top
     this.setState({
-      sortedOptionsByChecked: [...groupedByChecked.checked, ...groupedByChecked.unchecked],
+      sortedOptionsByChecked: [...checked, ...unchecked],
     });
   }
 
