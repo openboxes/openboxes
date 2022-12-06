@@ -82,15 +82,15 @@ class StockTransferWizard extends Component {
   /**
    * @public
    */
-  getStepList() {
-    const stepList = [this.props.translate('react.stockTransfer.createStockTransfer.label', 'Create Stock Transfer'),
+  get stepList() {
+    return [
+      this.props.translate('react.stockTransfer.createStockTransfer.label', 'Create Stock Transfer'),
       this.props.translate('react.stockTransfer.startStockTransfer.label', 'Start Stock Transfer'),
       this.props.translate('react.stockTransfer.checkStockTransfer.label', 'Check Stock Transfer'),
     ];
-    return stepList;
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { stockTransfer } = this.state;
     if (stockTransfer?.stockTransfer?.stockTransferNumber) {
       return [
@@ -135,18 +135,16 @@ class StockTransferWizard extends Component {
     const { page, stockTransfer } = this.state;
     const { location, history, match } = this.props;
     const locationId = location.id;
-    const title = this.getWizardTitle();
     const additionalTitle = null;
     const pageList = [CreateStockTransfer, StockTransferSecondPage, StockTransferCheckPage];
-    const stepList = this.getStepList();
 
     if (_.get(location, 'id')) {
       return (
         <Wizard
           pageList={pageList}
-          stepList={stepList}
+          stepList={this.stepList}
           initialValues={stockTransfer}
-          title={title}
+          title={this.wizardTitle}
           additionalTitle={additionalTitle}
           currentPage={page}
           prevPage={page === 1 ? 1 : page - 1}

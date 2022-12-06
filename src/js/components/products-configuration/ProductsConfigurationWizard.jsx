@@ -57,7 +57,7 @@ class ProductsConfigurationWizard extends Component {
     }
   }
 
-  getStepList() {
+  get stepList() {
     return [
       this.props.translate('react.productsConfiguration.configureCategories.label', 'Configure Product Categories'),
       this.props.translate('react.productsConfiguration.reviewCategories.label', 'Review Categories'),
@@ -76,14 +76,13 @@ class ProductsConfigurationWizard extends Component {
   render() {
     const { values, currentPage } = this.state;
     const pageList = [ConfigureProductCategories, ReviewCategories, ConfigureProducts];
-    const stepList = this.getStepList();
     const { location, history } = this.props;
     const locationId = location.id;
 
     return (
       <Wizard
         pageList={pageList}
-        stepList={stepList}
+        stepList={this.stepList}
         initialValues={values}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}

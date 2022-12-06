@@ -78,14 +78,15 @@ class ReplenishmentWizard extends Component {
     }
   }
 
-  getStepList() {
-    return [this.props.translate('react.replenishment.createReplenishment.label', 'Create Replenishment'),
+  get stepList() {
+    return [
+      this.props.translate('react.replenishment.createReplenishment.label', 'Create Replenishment'),
       this.props.translate('react.replenishment.startReplenishment.label', 'Start Replenishment'),
       this.props.translate('react.replenishment.checkReplenishment.label', 'Check Replenishment'),
     ];
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { replenishment } = this.state;
     if (replenishment?.replenishmentNumber) {
       return [
@@ -131,19 +132,15 @@ class ReplenishmentWizard extends Component {
     const { page, replenishment } = this.state;
     const { location, history, match } = this.props;
     const locationId = location.id;
-    const title = this.getWizardTitle();
-    const additionalTitle = null;
     const pageList = [CreateReplenishment, ReplenishmentSecondPage, ReplenishmentCheckPage];
-    const stepList = this.getStepList();
 
     if (_.get(location, 'id')) {
       return (
         <Wizard
           pageList={pageList}
-          stepList={stepList}
+          stepList={this.stepList}
           initialValues={replenishment}
-          title={title}
-          additionalTitle={additionalTitle}
+          title={this.wizardTitle}
           currentPage={page}
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}

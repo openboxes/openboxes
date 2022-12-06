@@ -70,7 +70,7 @@ class OutboundReturns extends Component {
     }
   }
 
-  getStepList() {
+  get stepList() {
     return [
       this.props.translate('react.outboundReturns.create.label', 'Create'),
       this.props.translate('react.outboundReturns.addItems.label', 'Add items'),
@@ -79,7 +79,7 @@ class OutboundReturns extends Component {
     ];
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.stockTransferNumber || !values.origin || !values.destination) {
       return '';
@@ -87,7 +87,7 @@ class OutboundReturns extends Component {
 
     return [
       {
-        text: 'Outbound Return',
+        text: ` ${this.props.translate('react.outboundReturns.outboundReturn.label', 'Outbound Return')} `,
         color: '#000000',
         delimeter: ' | ',
       },
@@ -99,7 +99,7 @@ class OutboundReturns extends Component {
       {
         text: values.origin.name,
         color: '#004d40',
-        delimeter: ' to ',
+        delimeter: ` ${this.props.translate('react.default.to.label', 'to')} `,
       },
       {
         text: values.destination.name,
@@ -184,18 +184,16 @@ class OutboundReturns extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const title = this.getWizardTitle();
     const pageList = [CreateOutboundReturn, AddItemsPage, PickPage, SendOutboundReturns];
-    const stepList = this.getStepList();
     const { location, history, match } = this.props;
     const locationId = location.id;
 
     return (
       <Wizard
         pageList={pageList}
-        stepList={stepList}
+        stepList={this.stepList}
         initialValues={values}
-        title={title}
+        title={this.wizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{
