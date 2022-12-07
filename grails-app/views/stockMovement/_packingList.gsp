@@ -187,7 +187,7 @@
                         </g:else>
                     </td>
                     <td>
-                        ${shipmentItem?.isFullyReceived()}
+                        <g:message code="default.boolean.${shipmentItem?.isFullyReceived()}"/>
                     </td>
                 </tr>
                 <g:set var="previousContainer" value="${shipmentItem.container }"/>
