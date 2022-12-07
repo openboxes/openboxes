@@ -18,6 +18,9 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.CreationHelper
 import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.VerticalAlignment
+import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -440,12 +443,12 @@ class DocumentService {
 
         // Align center cell style
         CellStyle tableDataPalletStyle = workbook.createCellStyle()
-        tableDataPalletStyle.setAlignment(CellStyle.ALIGN_LEFT)
+        tableDataPalletStyle.setAlignment(HorizontalAlignment.LEFT)
         tableDataPalletStyle.setVerticalAlignment(VerticalAlignment.CENTER)
 
         // Align left cell style
         CellStyle tableDataLeftStyle = workbook.createCellStyle()
-        tableDataLeftStyle.setAlignment(CellStyle.ALIGN_LEFT)
+        tableDataLeftStyle.setAlignment(HorizontalAlignment.LEFT)
         tableDataLeftStyle.setVerticalAlignment(VerticalAlignment.CENTER)
 
         // Align left cell style
@@ -462,7 +465,7 @@ class DocumentService {
         // Date cell style
         CellStyle dateStyle = workbook.createCellStyle()
         dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"))
-        dateStyle.setAlignment(CellStyle.ALIGN_LEFT)
+        dateStyle.setAlignment(HorizontalAlignment.LEFT)
         dateStyle.setVerticalAlignment(VerticalAlignment.CENTER)
 
         // Date cell style
