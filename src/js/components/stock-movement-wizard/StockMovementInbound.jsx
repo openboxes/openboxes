@@ -76,14 +76,14 @@ class StockMovements extends Component {
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
    */
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.movementNumber && !values.trackingNumber) {
       return '';
     }
     return [
       {
-        text: 'Stock Movement',
+        text: this.props.translate('react.stockMovement.label', 'Stock Movement'),
         color: '#000000',
         delimeter: ' | ',
       },
@@ -115,7 +115,7 @@ class StockMovements extends Component {
     ];
   }
 
-  getAdditionalWizardTitle() {
+  get additionalWizardTitle() {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
     const received = values.received ? 'RECEIVED' : '';
@@ -127,6 +127,18 @@ class StockMovements extends Component {
       );
     }
     return null;
+  }
+
+  /**
+   * Returns array of form steps.
+   * @public
+   */
+  get stepList() {
+    return [
+      this.props.translate('react.stockMovement.create.label', 'Create'),
+      this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+      this.props.translate('react.stockMovement.send.label', 'Send'),
+    ];
   }
 
   updateWizardValues(currentPage, values) {
@@ -142,15 +154,6 @@ class StockMovements extends Component {
       ]);
     }
   }
-
-  /**
-   * Returns array of form steps.
-   * @public
-   */
-  stepList = [
-    this.props.translate('react.stockMovement.create.label', 'Create'),
-    this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-    this.props.translate('react.stockMovement.send.label', 'Send')];
 
   /**
    * Returns array of form's components.
@@ -217,16 +220,14 @@ class StockMovements extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const title = this.getWizardTitle();
-    const additionalTitle = this.getAdditionalWizardTitle();
 
     return (
       <Wizard
         pageList={this.pageList}
         stepList={this.stepList}
         initialValues={values}
-        title={title}
-        additionalTitle={additionalTitle}
+        title={this.wizardTitle}
+        additionalTitle={this.additionalWizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}

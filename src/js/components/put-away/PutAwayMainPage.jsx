@@ -55,15 +55,15 @@ class PutAwayMainPage extends Component {
   /**
    * @public
    */
-  getStepList() {
-    const stepList = [this.props.translate('react.putAway.createPutAway.label', 'Create Putaway'),
+  get stepList() {
+    return [
+      this.props.translate('react.putAway.createPutAway.label', 'Create Putaway'),
       this.props.translate('react.putAway.startPutAway.label', 'Start Putaway'),
       this.props.translate('react.putAway.completePutAway.label', 'Complete Putaway'),
     ];
-    return stepList;
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { putAway } = this.state;
     if (putAway?.putAway?.putawayNumber) {
       return [
@@ -111,19 +111,15 @@ class PutAwayMainPage extends Component {
     const { page, putAway } = this.state;
     const { location, history, match } = this.props;
     const locationId = location.id;
-    const title = this.getWizardTitle();
-    const additionalTitle = null;
     const pageList = [PutAwayPage, PutAwaySecondPage, PutAwayCheckPage];
-    const stepList = this.getStepList();
 
     if (_.get(location, 'id')) {
       return (
         <Wizard
           pageList={pageList}
-          stepList={stepList}
+          stepList={this.stepList}
           initialValues={putAway}
-          title={title}
-          additionalTitle={additionalTitle}
+          title={this.wizardTitle}
           currentPage={page}
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}

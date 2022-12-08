@@ -63,7 +63,7 @@ class LocationsConfigurationWizard extends Component {
     }
   }
 
-  getStepList() {
+  get stepList() {
     return [
       this.props.translate('react.locationsConfiguration.locationDetails.label', 'Details'),
       this.props.translate('react.locationsConfiguration.address.label', 'Address'),
@@ -79,13 +79,12 @@ class LocationsConfigurationWizard extends Component {
   render() {
     const { values, currentPage } = this.state;
     const pageList = [LocationDetails, LocationAddress, ZoneAndBinLocations, Forecasting];
-    const stepList = this.getStepList();
     const { history } = this.props;
 
     return (
       <Wizard
         pageList={pageList}
-        stepList={stepList}
+        stepList={this.stepList}
         initialValues={values}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}

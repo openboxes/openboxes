@@ -68,7 +68,7 @@ class InvoiceWizard extends Component {
     }
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.invoiceNumber) {
       return '';
@@ -87,6 +87,18 @@ class InvoiceWizard extends Component {
     ];
   }
 
+  /**
+   * Returns array of form steps.
+   * @public
+   */
+  get stepList() {
+    return [
+      this.props.translate('react.invoice.create.label', 'Create'),
+      this.props.translate('react.invoice.addItems.label', 'Add items'),
+      this.props.translate('react.invoice.confirm.label', 'Confirm'),
+    ];
+  }
+
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
     if (values.invoiceNumber && values.id) {
@@ -100,16 +112,6 @@ class InvoiceWizard extends Component {
       ]);
     }
   }
-
-  /**
-   * Returns array of form steps.
-   * @public
-   */
-  stepList = [
-    this.props.translate('react.invoice.create.label', 'Create'),
-    this.props.translate('react.invoice.addItems.label', 'Add items'),
-    this.props.translate('react.invoice.confirm.label', 'Confirm'),
-  ];
 
   /**
    * Returns array of form's components.
@@ -150,14 +152,13 @@ class InvoiceWizard extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const title = this.getWizardTitle();
 
     return (
       <Wizard
         pageList={this.pageList}
         stepList={this.stepList}
         initialValues={values}
-        title={title}
+        title={this.wizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}

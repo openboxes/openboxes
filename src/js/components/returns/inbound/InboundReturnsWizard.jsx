@@ -69,7 +69,7 @@ class InboundReturns extends Component {
     }
   }
 
-  getStepList() {
+  get stepList() {
     return [
       this.props.translate('react.inboundReturns.create.label', 'Create'),
       this.props.translate('react.inboundReturns.addItems.label', 'Add items'),
@@ -77,7 +77,7 @@ class InboundReturns extends Component {
     ];
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.stockTransferNumber || !values.origin || !values.destination) {
       return '';
@@ -170,18 +170,16 @@ class InboundReturns extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const title = this.getWizardTitle();
     const pageList = [CreateInboundReturn, AddItemsPage, SendInboundReturn];
-    const stepList = this.getStepList();
     const { location, history, match } = this.props;
     const locationId = location.id;
 
     return (
       <Wizard
         pageList={pageList}
-        stepList={stepList}
+        stepList={this.stepList}
         initialValues={values}
-        title={title}
+        title={this.wizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{

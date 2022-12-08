@@ -60,11 +60,11 @@ class ReceivingPage extends Component {
    * @public
    */
 
-  getStepList() {
-    const stepList = [this.props.translate('react.receiving.label', 'Receiving'),
-      this.props.translate('react.requisition.wizard.confirm.label', 'Check')];
-
-    return stepList;
+  get stepList() {
+    return [
+      this.props.translate('react.receiving.label', 'Receiving'),
+      this.props.translate('react.requisition.wizard.confirm.label', 'Check'),
+    ];
   }
 
   /**
@@ -72,7 +72,7 @@ class ReceivingPage extends Component {
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
    */
-  getWizardTitle() {
+  get wizardTitle() {
     const { formData } = this.state;
     if (!formData.shipment) {
       return '';
@@ -167,17 +167,15 @@ class ReceivingPage extends Component {
       formData, locationId, currentPage, bins,
     } = this.state;
     const { match, translate } = this.props;
-    const title = this.getWizardTitle();
     const pageList = [PartialReceivingPage, ReceivingCheckScreen];
-    const stepList = this.getStepList();
 
     if (locationId) {
       return (
         <Wizard
           pageList={pageList}
-          stepList={stepList}
+          stepList={this.stepList}
           initialValues={formData}
-          title={title}
+          title={this.wizardTitle}
           currentPage={currentPage}
           prevPage={currentPage === 1 ? 1 : currentPage - 1}
           additionalProps={{

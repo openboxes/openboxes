@@ -79,7 +79,7 @@ class StockMovements extends Component {
    * Returns array of form steps.
    * @public
    */
-  getStepList() {
+  get stepList() {
     let stepList = [];
     if (this.props.hasPackingSupport) {
       stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
@@ -102,7 +102,7 @@ class StockMovements extends Component {
    * Returns array of form's components.
    * @public
    */
-  getPageList() {
+  get pageList() {
     let formList = [];
     if (this.props.hasPackingSupport) {
       formList = [
@@ -130,7 +130,7 @@ class StockMovements extends Component {
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
    */
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.movementNumber && !values.trackingNumber) {
       return '';
@@ -169,7 +169,7 @@ class StockMovements extends Component {
     ];
   }
 
-  getAdditionalWizardTitle() {
+  get additionalWizardTitle() {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? this.props.translate('react.stockMovement.status.shipped.label', 'SHIPPED') : '';
     const received = values.received ? this.props.translate('react.stockMovement.status.received.label', 'RECEIVED') : '';
@@ -274,19 +274,15 @@ class StockMovements extends Component {
   render() {
     const { values, currentPage } = this.state;
     const { currentLocation } = this.props;
-    const title = this.getWizardTitle();
-    const additionalTitle = this.getAdditionalWizardTitle();
-    const pageList = this.getPageList();
-    const stepList = this.getStepList();
     const showOnly = values.origin && values.origin.id !== currentLocation.id;
 
     return (
       <Wizard
-        pageList={pageList}
-        stepList={stepList}
+        pageList={this.pageList}
+        stepList={this.stepList}
         initialValues={values}
-        title={title}
-        additionalTitle={additionalTitle}
+        title={this.wizardTitle}
+        additionalTitle={this.additionalWizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}
