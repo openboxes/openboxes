@@ -16,7 +16,7 @@ const WizardTitle = (props) => {
           <div>
             {
               _.map(props.title, element => (
-                <span style={{ color: element.color }}>
+                <span key={element} style={{ color: element.color }}>
                   {element.text}
                   <span style={{ color: 'black' }}>
                     {element.delimeter}

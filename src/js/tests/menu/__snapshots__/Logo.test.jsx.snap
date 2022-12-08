@@ -21,34 +21,3 @@ exports[`test if logo matches snapshot 1`] = `
   </div>
 </div>
 `;
-
-exports[`test redirecting to main page 1`] = `
-<div
-  className="d-flex align-items-center logo-wrapper"
->
-  <div
-    className="logo-square"
-  >
-    <a
-      href="/openboxes"
-      onClick={[Function]}
-    >
-      <img
-        alt="Openboxes"
-        height="40"
-        src=""
-        width="40"
-      />
-    </a>
-  </div>
-</div>
-`;
-
-exports[`test redirecting to main page 2`] = `
-<img
-  alt="Openboxes"
-  height="40"
-  src=""
-  width="40"
-/>
-`;
