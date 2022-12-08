@@ -271,7 +271,7 @@ class Select extends Component {
             {...attributes}
             placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
-            options={this.state.sortedOptionsByChecked ?? options}
+            options={(value?.length && this.state.sortedOptionsByChecked) || options}
             isMulti={multi}
             isClearable={clearable}
             title=""
