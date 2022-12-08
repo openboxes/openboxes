@@ -22,6 +22,7 @@ class ProductSearchDto {
 
     String productColor
 
+    Boolean exactMatch = Boolean.FALSE
 
     def getApplicationTagLib() {
         return ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
@@ -39,12 +40,13 @@ class ProductSearchDto {
 
     Map toJson() {
         [
-                id                  : id,
-                productCode         : productCode,
-                name                : name,
-                color               : productColor,
-                handlingIcons       : handlingIcons,
-                lotAndExpiryControl : lotAndExpiryControl
+                id                 : id,
+                productCode        : productCode,
+                name               : name,
+                color              : productColor,
+                handlingIcons      : handlingIcons,
+                lotAndExpiryControl: lotAndExpiryControl,
+                exactMatch         : exactMatch
         ]
     }
 }
