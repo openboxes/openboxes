@@ -15,7 +15,6 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
-import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -29,12 +28,12 @@ import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.util.LocalizationUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.xhtmlrenderer.pdf.ITextRenderer
 import util.InventoryUtil
 
 import java.text.NumberFormat
