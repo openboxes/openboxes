@@ -27,6 +27,9 @@ export function parseResponse(data) {
 }
 
 export function flattenRequest(data) {
+  // TODO: flattenRequest was specifically for the Grails 1. Temporary return unflattened data, but when rebase process will be finished clean up and remove this util
+  return data
+
   if (_.isArray(data)) {
     return _.map(data, value => flattenRequest(value));
   }

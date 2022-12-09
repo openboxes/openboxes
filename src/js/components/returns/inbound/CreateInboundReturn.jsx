@@ -185,8 +185,8 @@ class CreateInboundReturn extends Component {
 
       const payload = {
         description: values.description,
-        'origin.id': values.origin.id,
-        'destination.id': values.destination.id,
+        origin: { id: values.origin.id },
+        destination: { id: values.destination.id },
         type: 'RETURN_ORDER',
       };
 

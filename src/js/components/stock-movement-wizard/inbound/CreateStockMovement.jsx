@@ -13,7 +13,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient, {flattenRequest, stringUrlInterceptor} from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -258,13 +258,13 @@ class CreateStockMovement extends Component {
         name: '',
         description: values.description,
         dateRequested: values.dateRequested,
-        'origin.id': values.origin.id,
-        'destination.id': values.destination.id,
-        'requestedBy.id': values.requestedBy.id,
-        'stocklist.id': _.get(values.stocklist, 'id') || '',
+        origin: { id: values.origin.id },
+        destination: { id: values.destination.id },
+        requestedBy: { id: values.requestedBy.id },
+        stocklist: { id: _.get(values.stocklist, 'id') || '' },
       };
 
-      apiClient.post(stockMovementUrl, payload)
+      apiClient.post(stockMovementUrl, flattenRequest(payload))
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
