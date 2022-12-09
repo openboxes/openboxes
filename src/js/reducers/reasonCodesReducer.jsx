@@ -10,8 +10,8 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_REASONCODES:
-      if (action.payload.data !== undefined) {
-        const reasonCodes = _.map(action.payload.data.data, reasonCode => (
+      if (action.payload !== undefined) {
+        const reasonCodes = _.map(action.payload.data, reasonCode => (
           { value: reasonCode.id, id: reasonCode.id, label: reasonCode.name }
         ));
         return { ...state, data: reasonCodes, fetched: true };
