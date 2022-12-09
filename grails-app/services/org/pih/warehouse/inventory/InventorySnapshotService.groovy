@@ -525,14 +525,15 @@ class InventorySnapshotService {
             row.put("Opening", balanceOpening)
             def includeRow = balanceOpening || balanceClosing || quantityAdjustments
             transactionTypeNames.each { String transactionTypeName ->
+                String translatedTransactionTypeName = transactionTypeName
                 if (transactionTypeName.contains(Constants.LOCALIZED_STRING_SEPARATOR)) {
-                    transactionTypeName = LocalizationUtil.getLocalizedString(transactionTypeName)
+                    translatedTransactionTypeName = LocalizationUtil.getLocalizedString(transactionTypeName)
                 }
                 def quantity =
                         transactionData.find {
-                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
+                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName.split("\\|")[0]
                         }?.quantity?:0
-                row[transactionTypeName] = quantity
+                row[translatedTransactionTypeName] = quantity
                 includeRow = quantity != 0 ? true : includeRow
             }
 
