@@ -231,7 +231,7 @@
         <g:set var="showUnlinkedAttributes" value="${true}"/>
         <table>
             <tbody>
-                <g:render template="../attribute/renderFormList"
+                <g:render template="/attribute/renderFormList"
                           model="[fieldPrefix: 'productAttributes.',
                                   populatedAttributes:productInstance?.attributes,
                                   entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT],
