@@ -129,6 +129,9 @@ configurations {
         // log4j-over-slf4j exposes the same API as this fork of log4j 1.x does
         exclude group: 'ch.qos.reload4j', module: 'reload4j'
 
+        // use com.github.librepdf:openpdf instead
+        exclude group: 'com.lowagie', module: 'itext'
+
         // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
 
@@ -153,6 +156,9 @@ configurations {
          * See https://github.com/bertramdev/asset-pipeline/issues/247#issuecomment-649594531
          */
         exclude group: 'org.grails.plugins', module: 'asset-pipeline'
+
+        // superseded by org.xhtmlrenderer:flying-saucer-core
+        exclude group: 'org.xhtmlrenderer', module: 'core-renderer'
 
         resolutionStrategy {
             /*
@@ -266,7 +272,6 @@ configurations {
             force 'com.github.sommeri:less4j:1.17.2'  // use consistent version
             force 'com.google.code.findbugs:jsr305:3.0.2'  // use consistent version
             force 'com.google.protobuf:protobuf-java:3.21.4'  // security patch
-            force 'com.lowagie:itext:2.1.7'  // use latest version
             force 'commons-fileupload:commons-fileupload:1.4'  // security patch
             force 'commons-io:commons-io:2.11.0'  // security patch
             force 'commons-validator:commons-validator:1.7'  // security patch
@@ -402,6 +407,8 @@ dependencies {
      * See https://github.com/bertramdev/asset-pipeline#documentation-1
      */
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
+
+    implementation "com.github.librepdf:openpdf:${openPdfVersion}"
 
     // security patch
     compile 'com.google.code.gson:gson:2.10'
@@ -671,6 +678,9 @@ dependencies {
 
     // set up Spring log framework (slf4j under the hood)
     implementation 'org.springframework.boot:spring-boot-starter-logging'
+
+    implementation "org.xhtmlrenderer:flying-saucer-core:${flyingSaucerVersion}"
+    implementation "org.xhtmlrenderer:flying-saucer-pdf-openpdf:${flyingSaucerVersion}"
 
     // security patch
     compile 'org.yaml:snakeyaml:1.33'

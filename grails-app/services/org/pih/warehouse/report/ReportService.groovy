@@ -15,7 +15,7 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
-import org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.Inventory
@@ -23,16 +23,13 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.order.OrderItem
-import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
-import org.pih.warehouse.requisition.RequisitionItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.xhtmlrenderer.pdf.ITextRenderer
 import util.InventoryUtil
 
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
 import java.text.NumberFormat
 
 class ReportService implements ApplicationContextAware {
@@ -77,10 +74,6 @@ class ReportService implements ApplicationContextAware {
         def html = ""
         log.info "Generate PDF for URL " + url
         try {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance()
-            builderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            DocumentBuilder builder = builderFactory.newDocumentBuilder()
-
             html = getHtmlContent(url)
 
             ITextRenderer renderer = new ITextRenderer()
