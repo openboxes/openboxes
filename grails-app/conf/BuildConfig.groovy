@@ -27,6 +27,8 @@ grails.project.dependency.resolution = {
         // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
         excludes(
                 "commons-logging",  // use jcl-over-slf4j instead
+                "core-renderer", // use flying-saucer-core instead
+                "itext",  // use flying-saucer-pdf-openpdf instead
                 "log4j",  // use reload4j instead
                 "slf4j-log4j12",  // use slf4j-reload4j instead
                 "xml-apis",  // looks like this conflicts with Grails's internal SAXParserImpl
@@ -149,6 +151,22 @@ grails.project.dependency.resolution = {
          * java 8, too. We exclude its jxls requirement to force the one above.
          */
         compile('org.jxls:jxls-poi:1.0.9') { exclude "jxls" }
+
+        /*
+         * Core-renderer, last updated in 2010, will, for unclear reasons,
+         * occasionally fail to resolve core fonts in itext, which was last
+         * updated in 2008. See OBS-1238, etc.
+         *
+         * The following libraries are actively maintained, export the same
+         * API's as core-renderer and itext, and are tested and packaged together.
+         * Seeing as they fix a number of rendering bugs, with any luck they'll
+         * prevent the font-resolver gremlins that have plagued us, too.
+         *
+         * Note that point releases past these require Java 8.
+         */
+        compile 'org.xhtmlrenderer:flying-saucer-core:9.1.15'
+        compile 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.15'
+        compile 'com.github.librepdf:openpdf:1.2.0'
     }
     plugins {
 

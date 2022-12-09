@@ -5,7 +5,6 @@
 <head>
     <style>
 
-        table {border-collapse: collapse; page-break-inside: auto;}
         thead {display: table-header-group;}
         tr {page-break-inside: avoid; page-break-after: auto;}
         td {vertical-align: top; }
@@ -42,8 +41,6 @@
             page-break-before: avoid;
         }
         table {
-            -fs-table-paginate: paginate;
-            page-break-inside: avoid;
             border-collapse: collapse;
             border-spacing: 0;
             margin: 5px;
@@ -70,8 +67,6 @@
         table td, table th {
             padding: 5px;
             border: 1px solid black;
-            word-wrap: break-word;
-            overflow-wrap:break-word;
         }
     </style>
 
@@ -97,12 +92,12 @@
                 </td>
             </tr>
             <tr>
-                <th><g:message code="putawayOrder.createdBy.label"/></th>
-                <td width="50%">${jsonObject?.orderedBy}</td>
+                <th style="white-space: nowrap;"><g:message code="putawayOrder.createdBy.label"/></th>
+                <td style="white-space: nowrap; width: 50%;">${jsonObject?.orderedBy}</td>
             </tr>
             <tr>
                 <th><g:message code="default.dateCreated.label"/></th>
-                <td width="50%">${jsonObject?.dateCreated}</td>
+                <td style="white-space: nowrap; width: 50%;">${jsonObject?.dateCreated}</td>
             </tr>
         </table>
         <h2><warehouse:message code="putawayOrder.label"/></h2>
@@ -110,52 +105,53 @@
             <thead>
                 <tr>
                     <th>Code</th>
-                    <th>Name</th>
-                    <th>Lot/Serial No.</th>
+                    <th style="width: 100px;" >Name</th>
+                    <th style="white-space: nowrap;">Lot/Serial No.</th>
                     <th>Expiry</th>
-                    <th>Total Qty</th>
-                    <th>Putaway Quantity</th>
-                    <th>Preferred Bin</th>
-                    <th>Current Bins</th>
-                    <th>Putaway Bin</th>
+                    <th style="width: 30px;">Total Quantity</th>
+                    <th style="width: 50px;">Putaway Quantity</th>
+                    <th style="white-space: nowrap; width: 50px;">Preferred Bin</th>
+                    <th style="white-space: nowrap; width: 70px;">Current Bins</th>
+                    <th style="white-space: nowrap; width: 130px;">Putaway Bin</th>
                 </tr>
             </thead>
             <g:each var="putawayItem" in="${jsonObject.putawayItems}">
                 <g:if test="${putawayItem.splitItems.empty}">
                     <tr>
-                        <td>${putawayItem["product.productCode"]}</td>
-                        <td style="width: 100px;">${putawayItem["product.name"]}</td>
-                        <td>${putawayItem["inventoryItem.lotNumber"]}</td>
-                        <td>${putawayItem["inventoryItem.expirationDate"]}</td>
-                        <td style="width: 30px;">${putawayItem?.quantity}</td>
-                        <td style="width: 50px;">${putawayItem?.quantity}</td>
-                        <td style="width: 50px;">${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</td>
-                        <td style="width: 70px;">${putawayItem["currentBins"]}</td>
-                        <td style="width: 130px;">${(putawayItem["putawayLocation.zoneName"] ? putawayItem["putawayLocation.zoneName"] + ": " : '') + putawayItem["putawayLocation.name"]}</td>
+                        <wordwrap:td>${putawayItem["product.productCode"]}</wordwrap:td>
+                        <wordwrap:td>${putawayItem["product.name"]}</wordwrap:td>
+                        <wordwrap:td>${putawayItem["inventoryItem.lotNumber"]}</wordwrap:td>
+                        <wordwrap:td>${putawayItem["inventoryItem.expirationDate"]}</wordwrap:td>
+                        <wordwrap:td>${putawayItem?.quantity}</wordwrap:td>
+                        <wordwrap:td>${putawayItem?.quantity}</wordwrap:td>
+                        <wordwrap:td>${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</wordwrap:td>
+                        <wordwrap:td>${putawayItem["currentBins"]}</wordwrap:td>
+                        <wordwrap:td>${(putawayItem["putawayLocation.zoneName"] ? putawayItem["putawayLocation.zoneName"] + ": " : '') + putawayItem["putawayLocation.name"]}</wordwrap:td>
                     </tr>
                 </g:if>
                 <g:else>
                     <g:each var="splitItem" in="${putawayItem.splitItems}" status="status">
                         <tr>
-                            <td>${status==0 ? putawayItem["product.productCode"] : ""}</td>
-                            <td style="width: 100px;">${status==0 ? putawayItem["product.name"]: ""}</td>
-                            <td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</td>
-                            <td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</td>
-                            <td style="width: 30px;">${status==0 ? putawayItem?.quantity: ""}</td>
-                            <td style="width: 50px;">${splitItem["quantity"]?:""}</td>
-                            <td style="width: 50px;">${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</td>
-                            <td style="width: 70px;">${putawayItem["currentBins"]}</td>
-                            <td style="width: 130px;">${(splitItem["putawayLocation.zoneName"] ? splitItem["putawayLocation.zoneName"] + ": " : '') + splitItem["putawayLocation.name"]}</td>
+                            <wordwrap:td>${status==0 ? putawayItem["product.productCode"] : ""}</wordwrap:td>
+                            <wordwrap:td>${status==0 ? putawayItem["product.name"]: ""}</wordwrap:td>
+                            <wordwrap:td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</wordwrap:td>
+                            <wordwrap:td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</wordwrap:td>
+                            <wordwrap:td>${status==0 ? putawayItem?.quantity: ""}</wordwrap:td>
+                            <wordwrap:td>${splitItem["quantity"]?:""}</wordwrap:td>
+                            <wordwrap:td>${(putawayItem["preferredBin.zoneName"] ? putawayItem["preferredBin.zoneName"] + ": " : '') + putawayItem["preferredBin.name"]}</wordwrap:td>
+                            <wordwrap:td>${putawayItem["currentBins"]}</wordwrap:td>
+                            <wordwrap:td>${(splitItem["putawayLocation.zoneName"] ? splitItem["putawayLocation.zoneName"] + ": " : '') + splitItem["putawayLocation.name"]}</wordwrap:td>
                         </tr>
                     </g:each>
-
                 </g:else>
             </g:each>
         </table>
 
+        <br />
+
         <table>
             <tr>
-                <th><g:message code="putawayOrder.completedBy.label"/></th>
+                <th style="white-space: nowrap;"><g:message code="putawayOrder.completedBy.label"/></th>
                 <td width="50%"></td>
             </tr>
             <tr>

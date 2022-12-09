@@ -6,8 +6,6 @@
 
         table {
             border-collapse: collapse;
-            page-break-inside: auto;
-            -fs-table-paginate: paginate;
             border-spacing: 0;
             margin: 5px;
         }
@@ -52,7 +50,6 @@
         table td, table th {
             padding: 5px;
             border: 1px solid black;
-            vertical-align: middle;
         }
         .first-line {
             display: flex;
@@ -107,7 +104,7 @@
                             <td>
                                 <g:displayReportLogo/>
                             </td>
-                            <td>
+                            <td style="white-space: nowrap;">
                                 <h3>${warehouse.message(code: 'report.stockRequisition.label')}: ${stocklist?.requisition?.name} </h3>
                                 <h3>${stocklist?.destination}</h3>
                             </td>
