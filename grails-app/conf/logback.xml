@@ -37,6 +37,7 @@
 
     <logger name="asset.pipeline" level="debug" /><!-- use 'info' to hide asset-pipeline logs -->
     <logger name="ch.qos.logback" level="warn" /><!-- hide logs about logging -->
+    <logger name="grails.app.services" level="info" /><!-- use `debug` to see service/plugin logs -->
     <logger name="grails.artefact" level="info" />
     <logger name="grails.boot" level="info" />
     <logger name="grails.plugins" level="info" /><!-- use 'debug' to see plugin loading details -->

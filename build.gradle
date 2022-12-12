@@ -612,6 +612,8 @@ dependencies {
      * FIXME Stop using grails.plugins.rendering.pdf.PdfRenderingService.
      *
      * Need `compile` here to pick up trans. deps. like RenderingTrait.
+     *
+     * This plugin has an undeclared dependency on spring-test, q.v.
      */
     compile 'org.grails.plugins:rendering:2.0.3'
 
@@ -665,6 +667,14 @@ dependencies {
 
     // enable `import org.springframework.orm.hibernate5.*`
     implementation 'org.springframework:spring-orm'
+
+    /*
+     * The rendering plugin requires this module at runtime (OBS-372):
+     * 1. grails.plugins.rendering.document.RenderEnvironment.init(), calls
+     * 2. grails.util.GrailsWebMockUtil.bindMockWebRequest(), creates
+     * 3. org.springframework.mock.web.MockHttpServletRequest
+     */
+    runtime 'org.springframework:spring-test'
 
     // may enable '/health' and '/info' endpoints
     compile 'org.springframework.boot:spring-boot-starter-actuator'
