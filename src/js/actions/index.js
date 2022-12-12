@@ -34,7 +34,6 @@ import {
   UPDATE_BREADCRUMBS_PARAMS,
 } from 'actions/types';
 import apiClient, { parseResponse } from 'utils/apiClient';
-// import { dispatch } from 'store';
 
 export function showSpinner() {
   return {
