@@ -61,6 +61,9 @@ plugins {
 
     id 'war'
 
+    // find outdated dependencies with `grails gradle dependencyUpdates`
+    id 'com.github.ben-manes.versions' version '0.27.0'
+
     // git magic, but releases past v2.3.0 require Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
@@ -287,7 +290,7 @@ configurations {
              * consume their API's directly.
              */
             force 'com.google.errorprone:error_prone_annotations:2.11.0'  // use consistent version
-            force 'com.google.protobuf:protobuf-java:3.21.4'  // security patch
+            force 'com.google.protobuf:protobuf-java:3.21.11'  // security patch
             force 'commons-io:commons-io:2.11.0'  // security patch
             force 'commons-validator:commons-validator:1.7'  // security patch
             force 'jline:jline:2.14.6'  // use consistent version
@@ -415,7 +418,7 @@ dependencies {
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:31.1-jre'
 
-    compile 'com.google.zxing:javase:3.5.0'  // barcode support
+    compile 'com.google.zxing:javase:3.5.1'  // barcode support
 
     testImplementation 'com.icegreen:greenmail:1.6.11'
 
@@ -485,7 +488,7 @@ dependencies {
     // enable `import groovy.sql.Sql`
     implementation 'org.codehaus.groovy:groovy-sql'
 
-    compile "org.docx4j:docx4j-JAXB-ReferenceImpl:${docx4jVersion}"
+    compile 'org.docx4j:docx4j-JAXB-ReferenceImpl'
 
     // enable grails console web ui
     console 'org.grails:grails-console'
