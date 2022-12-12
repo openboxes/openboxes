@@ -1140,7 +1140,7 @@ exports[`wizardSteps component should match snapshot 1`] = `
 </div>
 `;
 
-exports[`wizardTitle components should match snapshot 1`] = `
+exports[`wizardTitle component should match snapshot 1`] = `
 <div
   className="panel-heading movement-number"
   data-testid="wizardTitle"
