@@ -177,16 +177,6 @@ configurations {
              */
             eachDependency { DependencyResolveDetails details ->
 
-                if (details.requested.group == 'bouncycastle') {
-                    // e.g., bouncycastle:bctsp-jdk14:138 -> org.bouncycastle:bctsp-jdk14:1.38
-                    details.because 'include only one set of bouncycastle dependencies for iText'
-                    details.useTarget(
-                        group: 'org.bouncycastle',
-                        name: details.requested.name,
-                        version: bouncyCastleVersion
-                    )
-                }
-
                 if (details.requested.group == 'ch.qos.logback') {
                     details.because 'use a consistent logback version'
                     details.useVersion(logbackVersion)
@@ -211,11 +201,6 @@ configurations {
                     }
                 }
 
-                if (details.requested.group == 'org.apache.poi') {
-                    details.because 'enforce consistent POI versioning'
-                    details.useVersion(poiVersion)
-                }
-
                 if (details.requested.group == 'org.apache.xmlgraphics') {
                     details.because 'apply batik security patches'
                     if (details.requested.name.startsWith('batik')) {
@@ -233,9 +218,9 @@ configurations {
                     details.useVersion(groovyVersion)
                 }
 
-                if (details.requested.group == 'org.eclipse.jetty') {
-                    details.because 'enforce consistent Eclipse Jetty versioning'
-                    details.useVersion(jettyVersion)
+                if (details.requested.group == 'org.docx4j') {
+                    details.because 'enforce consistent docx4j versioning'
+                    details.useVersion(docx4jVersion)
                 }
 
                 if (details.requested.group == 'org.hibernate') {
@@ -243,11 +228,6 @@ configurations {
                         details.because 'enforce consistent hibernate versioning'
                         details.useVersion(hibernateVersion)
                     }
-                }
-
-                if (details.requested.group == 'org.jboss.byteman') {
-                    details.because 'avoid beta byteman releases'
-                    details.useVersion(jbossBytemanVersion)
                 }
 
                 if (details.requested.group == 'org.seleniumhq.selenium') {
@@ -276,26 +256,17 @@ configurations {
              * wouldn't mark in the `dependencies` block because we don't
              * consume their API's directly.
              */
-            force 'com.github.sommeri:less4j:1.17.2'  // use consistent version
-            force 'com.google.code.findbugs:jsr305:3.0.2'  // use consistent version
             force 'com.google.errorprone:error_prone_annotations:2.11.0'  // use consistent version
             force 'com.google.protobuf:protobuf-java:3.21.4'  // security patch
-            force 'commons-fileupload:commons-fileupload:1.4'  // security patch
             force 'commons-io:commons-io:2.11.0'  // security patch
             force 'commons-validator:commons-validator:1.7'  // security patch
             force 'jline:jline:2.14.6'  // use consistent version
-            force 'org.antlr:antlr-runtime:3.5.3'  // use consistent version
             force 'org.apache.commons:commons-lang3:3.12.0'  // security patch
-            force 'org.apache.commons:commons-text:1.9'  // use consistent version
             force 'org.apache.xmlgraphics:xmlgraphics-commons:2.7'  // use consistent version
             force 'org.apache.xmlbeans:xmlbeans:3.1.0'  // security patch, build fixes
             force 'org.checkerframework:checker-qual:3.12.0'  // use consistent version
             force 'org.dom4j:dom4j:2.1.3'  // security patch
             force 'org.quartz-scheduler:quartz:2.3.2'  // security patch
-            force 'org.reactivestreams:reactive-streams:1.0.4'
-            force 'xalan:serializer:2.7.2'  // security patch
-            force 'xalan:xalan:2.7.2'  // security patch
-            force 'xerces:xercesImpl:2.12.2'  // security patch
         }
     }
 }
@@ -488,8 +459,8 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-api:${slf4jProvidedLog4j2Version}"
     implementation "org.apache.logging.log4j:log4j-to-slf4j:${slf4jProvidedLog4j2Version}"
 
-    implementation 'org.apache.poi:poi'
-    implementation 'org.apache.poi:poi-scratchpad'
+    implementation "org.apache.poi:poi:${poiVersion}"
+    implementation "org.apache.poi:poi-scratchpad:${poiVersion}"
 
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
@@ -575,7 +546,11 @@ dependencies {
 
     // enable `grails test-app -coverage`
     testImplementation('org.grails.plugins:code-coverage:2.0.3-3') {
+        // last updated in 2016, this plugin pulls in 10+year-old dependencies
         exclude group: 'org.apache.ant'  // not needed for gradle builds
+        exclude group: 'org.mortbay.jetty'  // superseded by org.eclipse.jetty
+        exclude group: 'xalan'
+        exclude group: 'xerces'
     }
 
     // FIXME use commons-csv instead
