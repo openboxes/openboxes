@@ -142,6 +142,13 @@ configurations {
         // use com.github.librepdf:openpdf instead
         exclude group: 'com.lowagie', module: 'itext'
 
+        // these API's have moved to jakarta.activation:jakarta.activation-api
+        exclude group: 'com.sun.activation', module: 'jakarta.activation'
+        exclude group: 'javax.activation', module: 'activation'
+
+        // superseded by com.sun.mail:jakarta.mail
+        exclude group: 'com.sun.mail', module: 'javax.mail'
+
         // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
 
@@ -157,6 +164,9 @@ configurations {
          * (org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec).
          */
         exclude group: 'javax.transaction', module: 'jta'
+
+        // superseded by jakarta.xml.bind:jakarta.xml.bind-api
+        exclude group: 'javax.xml.bind', module: 'jaxb-api'
 
         // log4j-over-slf4j exposes the same API as log4j 1.x
         exclude group: 'log4j', module: 'log4j'
@@ -411,8 +421,7 @@ dependencies {
 
     compile 'com.newrelic.agent.java:newrelic-api:7.11.1'
 
-    // expose com.sun.mail.imap.IMAPStore to MailServiceTests
-    testImplementation 'com.sun.mail:javax.mail:1.6.2'
+    implementation 'com.sun.mail:jakarta.mail:1.6.7'
 
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
