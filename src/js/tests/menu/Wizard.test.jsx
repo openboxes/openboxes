@@ -13,10 +13,10 @@ import WizardTitle from 'components/wizard/WizardTitle';
 
 import store from '../../store';
 
-let renderedWizard,
-  renderedWizardPage,
-  renderedWizardSteps,
-  renderedWizardTitle;
+let renderedWizard;
+let renderedWizardPage;
+let renderedWizardSteps;
+let renderedWizardTitle;
 
 
 describe('wizard component test', () => {
@@ -76,7 +76,7 @@ describe('wizardSteps component tests', () => {
   beforeEach(() => {
     renderedWizardSteps = renderer.create(<Router><Provider
       store={store}
-    ><WizardSteps steps={['firstTestStep', 'secondTestStep']} currentStep={1}/>
+    ><WizardSteps steps={['firstTestStep', 'secondTestStep']} currentStep={1} />
     </Provider>
     </Router>);
   });
@@ -100,7 +100,10 @@ describe('wizardSteps component tests', () => {
 describe('wizardTitle components tests', () => {
   beforeEach(() => {
     renderedWizardTitle = renderer.create(<Router><Provider store={store}><WizardTitle
-      title={[{ title: '' }]}/></Provider></Router>);
+      title={[{ title: '' }]}
+    />
+    </Provider>
+    </Router>);
   });
 
   it('test if wizardTitle matches snapshot', () => {
@@ -116,8 +119,11 @@ describe('wizardTitle components tests', () => {
   it('test if wizardTitle correctly displaying text', () => {
     render(<Router><Provider store={store}><WizardTitle title={[{
       title: '',
-      text: 'test'
-    }]}/></Provider></Router>);
+      text: 'test',
+    }]}
+    />
+    </Provider>
+    </Router>);
     expect(screen.getByText('test'))
       .toBeTruthy();
   });

@@ -10,8 +10,7 @@ import Logo from 'components/Layout/Logo';
 let renderedLogo;
 describe('test logo component', () => {
   beforeEach(() => {
-    renderedLogo = renderer.create(<Router><Logo logoUrl="" store={store}/></Router>);
-
+    renderedLogo = renderer.create(<Router><Logo logoUrl="" store={store} /></Router>);
   });
 
   it('test if logo matches snapshot', () => {
@@ -25,7 +24,7 @@ describe('test logo component', () => {
   });
 
   it('test if logo is present after redirecting to main page', () => {
-    render(<Router><Logo logoUrl="" store={store}/></Router>);
+    render(<Router><Logo logoUrl="" store={store} /></Router>);
     const image = screen.getByAltText('Openboxes');
     expect(image)
       .toBeTruthy();
