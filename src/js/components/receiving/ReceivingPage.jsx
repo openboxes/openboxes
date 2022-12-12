@@ -62,8 +62,8 @@ class ReceivingPage extends Component {
 
   get stepList() {
     return [
-      this.props.translate('react.receiving.label', 'Receiving'),
-      this.props.translate('react.requisition.wizard.confirm.label', 'Check'),
+      this.props.translate('react.partialReceiving.receiving.label', 'Receiving'),
+      this.props.translate('react.partialReceiving.check.label', 'Check'),
     ];
   }
 
@@ -80,7 +80,7 @@ class ReceivingPage extends Component {
     const dateShipped = moment(formData.dateShipped).format('MM/DD/YYYY');
     return [
       {
-        text: 'Receiving',
+        text: `${this.props.translate('react.partialReceiving.receiving.label', 'Receiving')}`,
         color: '#000000',
         delimeter: ' | ',
       },
@@ -92,7 +92,7 @@ class ReceivingPage extends Component {
       {
         text: formData.origin.name,
         color: '#004d40',
-        delimeter: ' to ',
+        delimeter: ` ${this.props.translate('react.default.to.label', 'to')} `,
       },
       {
         text: formData.destination.name,
