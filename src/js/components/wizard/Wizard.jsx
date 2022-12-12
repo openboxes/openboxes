@@ -84,7 +84,7 @@ class Wizard extends Component {
     } = this.props;
 
     return (
-      <div className="content-wrap">
+      <div className="content-wrap" data-testid="content-wrap">
         <WizardTitle title={title} additionalTitle={additionalTitle} values={values} />
         <WizardSteps steps={stepList} currentStep={currentPage} showStepNumber={showStepNumber} />
         <div className="panel panel-primary">

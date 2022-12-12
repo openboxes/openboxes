@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test spinner component test if spinner matches snapshot 1`] = `
+exports[`spinner component should match snapshot 1`] = `
 <div
   className="d-flex w-100 h-100 justify-content-center align-items-center"
 >

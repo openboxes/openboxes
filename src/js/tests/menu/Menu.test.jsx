@@ -15,7 +15,7 @@ let renderedMenuConfigurationSubsection;
 let renderedMenuItem;
 let subsection;
 
-describe('test menu component', () => {
+describe('menu component', () => {
   beforeEach(() => {
     const menuConfig = [{
       id: 'configuration',
@@ -30,14 +30,14 @@ describe('test menu component', () => {
     </Router>);
   });
 
-  it('test if menu component matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedMenu.toJSON())
       .toMatchSnapshot();
   });
 });
 
 
-describe('test menuConfigurationSubsection component', () => {
+describe('menuConfigurationSubsection component', () => {
   beforeEach(() => {
     subsection = {
       label: 'Administration',
@@ -50,34 +50,34 @@ describe('test menuConfigurationSubsection component', () => {
       .create(<Router><MenuConfigurationSubsection subsection={subsection} /></Router>);
   });
 
-  it('test if menuConfigurationSubsection component correctly mapped menu items', () => {
+  it('should map menu items correctly', () => {
     render(<Router><MenuConfigurationSubsection subsection={subsection} /></Router>);
     expect(screen.findByText('Settings'))
       .toBeTruthy();
   });
 
-  it('test if menuConfigurationSubsection matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedMenuConfigurationSubsection.toJSON())
       .toMatchSnapshot();
   });
 });
 
 
-describe('test menuItem component', () => {
+describe('menuItem component', () => {
   beforeEach(() => {
     renderedMenuItem = renderer
       .create(<Router><MenuItem section={{}} active={false} /></Router>);
   });
 
-  it('test if MenuItem matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedMenuItem.toJSON())
       .toMatchSnapshot();
   });
 
-  it('test if collapseMenuItem and dropdownMenuItem are correctly rendering', () => {
-    expect(renderedMenuItem.root.findByProps({ className: 'collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none' }))
+  it('should render collapseMenuItem and dropdownMenuItem correctly', () => {
+    expect(renderedMenuItem.root.findByProps({ 'data-testid': 'collapseMenuItem' }))
       .toBeTruthy();
-    expect(renderedMenuItem.root.findByProps({ className: 'nav-item dropdown d-none d-md-flex justify-content-center align-items-center false' }))
+    expect(renderedMenuItem.root.findByProps({ 'data-testid': 'dropdownMenuItem' }))
       .toBeTruthy();
   });
 });

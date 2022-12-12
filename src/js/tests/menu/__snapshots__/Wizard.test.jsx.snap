@@ -1,11 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`wizard component test test if wizard component matches snapshot 1`] = `
+exports[`wizard component should match snapshot 1`] = `
 <div
   className="content-wrap"
+  data-testid="content-wrap"
 >
   <div
     className="panel-heading movement-number"
+    data-testid="wizardTitle"
   >
     <div>
       <span
@@ -33,6 +35,7 @@ exports[`wizard component test test if wizard component matches snapshot 1`] = `
     >
       <div
         className="step-container active"
+        data-testid="active"
       >
         <div
           className="circle"
@@ -50,6 +53,7 @@ exports[`wizard component test test if wizard component matches snapshot 1`] = `
       </div>
       <div
         className="step-container "
+        data-testid="inactive"
       >
         <div
           className="circle"
@@ -67,6 +71,7 @@ exports[`wizard component test test if wizard component matches snapshot 1`] = `
       </div>
       <div
         className="step-container "
+        data-testid="inactive"
       >
         <div
           className="circle"
@@ -89,6 +94,7 @@ exports[`wizard component test test if wizard component matches snapshot 1`] = `
   >
     <div
       className="panel-body m-4"
+      data-testid="wizardPage"
     >
       <form
         onSubmit={[Function]}
@@ -587,9 +593,10 @@ exports[`wizard component test test if wizard component matches snapshot 1`] = `
 </div>
 `;
 
-exports[`wizardPage component tests test if wizardPage matches snapshot 1`] = `
+exports[`wizardPage component should match snapshot 1`] = `
 <div
   className="panel-body m-4"
+  data-testid="wizardPage"
 >
   <form
     onSubmit={[Function]}
@@ -1086,7 +1093,7 @@ exports[`wizardPage component tests test if wizardPage matches snapshot 1`] = `
 </div>
 `;
 
-exports[`wizardSteps component tests test if wizardSteps matches snapshot 1`] = `
+exports[`wizardSteps component should match snapshot 1`] = `
 <div
   className="steps-main-box"
 >
@@ -1095,6 +1102,7 @@ exports[`wizardSteps component tests test if wizardSteps matches snapshot 1`] = 
   >
     <div
       className="step-container active"
+      data-testid="active"
     >
       <div
         className="circle"
@@ -1112,6 +1120,7 @@ exports[`wizardSteps component tests test if wizardSteps matches snapshot 1`] = 
     </div>
     <div
       className="step-container "
+      data-testid="inactive"
     >
       <div
         className="circle"
@@ -1131,9 +1140,10 @@ exports[`wizardSteps component tests test if wizardSteps matches snapshot 1`] = 
 </div>
 `;
 
-exports[`wizardTitle components tests test if wizardTitle matches snapshot 1`] = `
+exports[`wizardTitle components should match snapshot 1`] = `
 <div
   className="panel-heading movement-number"
+  data-testid="wizardTitle"
 >
   <div>
     <span

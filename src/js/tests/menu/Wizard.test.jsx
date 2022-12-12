@@ -19,7 +19,7 @@ let renderedWizardSteps;
 let renderedWizardTitle;
 
 
-describe('wizard component test', () => {
+describe('wizard component', () => {
   beforeEach(() => {
     const props = {
       title: [{ title: '' }],
@@ -35,18 +35,18 @@ describe('wizard component test', () => {
     </Router>);
   });
 
-  it('test if wizard component matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedWizard.toJSON())
       .toMatchSnapshot();
   });
 
-  it('test if wizard component correctly rendering', () => {
-    expect(renderedWizard.root.findByProps({ className: 'content-wrap' }))
+  it('should render component correctly', () => {
+    expect(renderedWizard.root.findByProps({ 'data-testid': 'content-wrap' }))
       .toBeTruthy();
   });
 });
 
-describe('wizardPage component tests', () => {
+describe('wizardPage component', () => {
   beforeEach(() => {
     renderedWizardPage = renderer.create(<Router><Provider
       store={store}
@@ -61,18 +61,18 @@ describe('wizardPage component tests', () => {
     </Router>);
   });
 
-  it('test if wizardPage matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedWizardPage.toJSON())
       .toMatchSnapshot();
   });
 
-  it('test if wizardPage correctly rendering', () => {
-    expect(renderedWizardPage.root.findByProps({ className: 'panel-body m-4' }))
+  it('should render component correctly', () => {
+    expect(renderedWizardPage.root.findByProps({ 'data-testid': 'wizardPage' }))
       .toBeTruthy();
   });
 });
 
-describe('wizardSteps component tests', () => {
+describe('wizardSteps component', () => {
   beforeEach(() => {
     renderedWizardSteps = renderer.create(<Router><Provider
       store={store}
@@ -81,23 +81,23 @@ describe('wizardSteps component tests', () => {
     </Router>);
   });
 
-  it('test if wizardSteps matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedWizardSteps.toJSON())
       .toMatchSnapshot();
   });
 
-  it('test if wizardSteps has active element', () => {
-    expect(renderedWizardSteps.root.findByProps({ className: 'step-container active' }))
+  it('should have an active element', () => {
+    expect(renderedWizardSteps.root.findByProps({ 'data-testid': 'active' }))
       .toBeTruthy();
   });
 
-  it('test if wizardSteps has inactive elements', () => {
-    expect(renderedWizardSteps.root.findByProps({ className: 'step-container ' }))
+  it('should have an inactive element', () => {
+    expect(renderedWizardSteps.root.findByProps({ 'data-testid': 'inactive' }))
       .toBeTruthy();
   });
 });
 
-describe('wizardTitle components tests', () => {
+describe('wizardTitle component', () => {
   beforeEach(() => {
     renderedWizardTitle = renderer.create(<Router><Provider store={store}><WizardTitle
       title={[{ title: '' }]}
@@ -106,17 +106,17 @@ describe('wizardTitle components tests', () => {
     </Router>);
   });
 
-  it('test if wizardTitle matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedWizardTitle.toJSON())
       .toMatchSnapshot();
   });
 
-  it('test if wizardTitle correctly rendering', () => {
-    expect(renderedWizardTitle.root.findByProps({ className: 'panel-heading movement-number' }))
+  it('should render component correctly', () => {
+    expect(renderedWizardTitle.root.findByProps({ 'data-testid': 'wizardTitle' }))
       .toBeTruthy();
   });
 
-  it('test if wizardTitle correctly displaying text', () => {
+  it('should display text correctly', () => {
     render(<Router><Provider store={store}><WizardTitle title={[{
       title: '',
       text: 'test',

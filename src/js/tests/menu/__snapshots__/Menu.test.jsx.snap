@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test menu component test if menu component matches snapshot 1`] = `
+exports[`menu component should match snapshot 1`] = `
 <div
   className="menu-wrapper"
   id="navbarSupportedContent"
@@ -11,7 +11,7 @@ exports[`test menu component test if menu component matches snapshot 1`] = `
 </div>
 `;
 
-exports[`test menuConfigurationSubsection component test if menuConfigurationSubsection matches snapshot 1`] = `
+exports[`menuConfigurationSubsection component should match snapshot 1`] = `
 <div
   className="padding-8"
 >
@@ -29,10 +29,11 @@ exports[`test menuConfigurationSubsection component test if menuConfigurationSub
 </div>
 `;
 
-exports[`test menuItem component test if MenuItem matches snapshot 1`] = `
+exports[`menuItem component should match snapshot 1`] = `
 [
   <li
     className="nav-item dropdown d-none d-md-flex justify-content-center align-items-center false"
+    data-testid="dropdownMenuItem"
   >
     <a
       aria-expanded="false"
@@ -52,6 +53,7 @@ exports[`test menuItem component test if MenuItem matches snapshot 1`] = `
   </li>,
   <li
     className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none"
+    data-testid="collapseMenuItem"
   >
     <a
       aria-controls="collapse-undefined"

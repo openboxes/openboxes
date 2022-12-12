@@ -8,22 +8,22 @@ import store from 'store';
 import Logo from 'components/Layout/Logo';
 
 let renderedLogo;
-describe('test logo component', () => {
+describe('logo component', () => {
   beforeEach(() => {
     renderedLogo = renderer.create(<Router><Logo logoUrl="" store={store} /></Router>);
   });
 
-  it('test if logo matches snapshot', () => {
+  it('should match snapshot', () => {
     expect(renderedLogo.toJSON())
       .toMatchSnapshot();
   });
 
-  it('test if logo correctly rendering', () => {
-    expect(renderedLogo.root.findByProps({ className: 'd-flex align-items-center logo-wrapper' }))
+  it('should render component correctly', () => {
+    expect(renderedLogo.root.findByProps({ 'data-testid': 'logo-wrapper' }))
       .toBeTruthy();
   });
 
-  it('test if logo is present after redirecting to main page', () => {
+  it('should include logo after redirecting to the main page', () => {
     render(<Router><Logo logoUrl="" store={store} /></Router>);
     const image = screen.getByAltText('Openboxes');
     expect(image)
