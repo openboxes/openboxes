@@ -445,7 +445,6 @@ class EditItemsPage extends Component {
    */
   fetchAllData(forceFetch) {
     this.props.showSpinner();
-
     if (!this.props.reasonCodesFetched || forceFetch) {
       this.props.fetchReasonCodes();
     }
