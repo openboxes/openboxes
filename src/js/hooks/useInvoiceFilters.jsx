@@ -107,7 +107,7 @@ const useInvoiceFilters = ({ setDefaultValues, history, setFilterParams }) => {
       createdBy: { name: 'createdBy', accessor: 'id' },
     };
 
-    if (Object.keys(values).length > 0) {
+    if (Object.keys(values).length) {
       const transformedParams = transformFilterParams(values, filterAccessors);
       const queryFilterParams = queryString.stringify(transformedParams);
       const { pathname } = history.location;
