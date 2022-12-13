@@ -9,8 +9,6 @@
 **/ 
 package org.pih.warehouse.product
 
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventorySnapshot
 import org.pih.warehouse.inventory.TransactionEntry
@@ -36,12 +34,8 @@ class ProductMergeService {
          * ================================
          *
          * === "Easy" relations ===
-         * - ProductAssociation.product
-         * - ProductComponent.assemblyProduct
-         * - ProductPackage <-- compare products packages for both items and replace product only for the package that is not available for primary
-         * - ProductSupplier <-- probably same case as ProductPackage
-         * - Synonym <-- if the same synonym does not exist on primary product, then can be swapped
-         * - Document <-- probably can be swapped (?)
+         * - ProductSupplier - Swap product if this supplier does not exist for primary (check product and code pair)
+         * - ProductComponent (additionally, not mentioned in the ticket)
          *
          * === "Complex" relations ===
          * - InventoryItem <-- find inventory items and replace product only for InventoryItems with lotNumber that are not exisitng for primary product
@@ -50,94 +44,40 @@ class ProductMergeService {
          * - InventorySnapshot <-- Adjusted during InventoryItems management for specific inventory items and products
          * - ProductAvailability <-- Adjusted during InventoryItems management for specific inventory items and products
          *
-         * - RequisitionItem <-- probably can be swapped, but watch out for InventoryItems (in case the there is existing one on primary product)
-         * - ShipmentItem <-- probably can be swapped, but watch out for InventoryItems (in case the there is existing one on primary product)
-         * - OrderItem <-- probably can be swapped, but watch out for InventoryItems (in case the there is existing one on primary product)
-         * - ReceiptItem <-- probably can be swapped, but watch out for InventoryItems (in case the there is existing one on primary product)
+         * - RequisitionItem
+         * - ShipmentItem
+         * - OrderItem
+         * - ReceiptItem
+         * - TransactionEntry
          *
-         * - TransactionEntry <-- probably can be swapped, but watch out for InventoryItems (in case the there is existing one on primary product)
+         * === Ignored relations (see: https://pihemr.atlassian.net/browse/OBPIH-3187 description) ===
+         * - Document
+         * - ProductPackage
+         * - ProductAssociation
+         * - ProductAttribute
+         * - ProductCatalogItem (Catalogs)
+         * - Tag
+         * - InventoryLevel
+         * - Synonyms
+         * - ProductSummary (additionally, not mentioned in the ticket)
+         * - Category (additionally, not mentioned in the ticket)
+         * - ProductGroup (additionally, not mentioned in the ticket)
+         *
+         * === Post processing ===
+         * - Mark obsolete product as inactive
          *
          * === Tables potentially requiring refresh ===
          * - StockoutData - skipped for now
          * - DemandData - skipped for now
          * - OrderSummary - product merge should not affect the order summary data since it is not product bound
          *
-         * === "Ignored" relations ===
-         * - ProductSummary <-- probably can be ignored (not changed)
-         * - InventoryLevel <-- probably can be ignored (not changed)
-         * - Category <-- probably can be ignored (not changed)
-         * - ProductAttribute <-- probably can be ignored (not changed)
-         * - ProductCatalogItem <-- probably can be ignored (not changed)
-         * - ProductGroup <-- probably can be ignored (not changed)
-         * - Tag <-- probably can be ignored (not changed)
          * */
 
         /**
          * SWAP TRIVIAL RELATIONS
          * */
 
-        // 1. ProductAssociation <-- swap only associations that does not exist for primary product
-        List<ProductAssociation> obsoleteAssociations = ProductAssociation.findAllByProduct(obsolete)
-        obsoleteAssociations?.each { ProductAssociation obsoleteAssociation ->
-            // Find if primary product has already the same association
-            ProductAssociation primaryAssociation = ProductAssociation.findByProductAndAssociatedProduct(
-                primary, obsoleteAssociation.associatedProduct
-            )
-
-            if (primaryAssociation) {
-                // if product association already exists, then do nothing with it
-                return
-            }
-
-            logProductMergeData(primary, obsolete, obsoleteAssociation)
-
-            // Swap product to primary
-            obsoleteAssociation.product = primary
-            // Note: needs flush because of "User.locationRoles not processed by flush"
-            obsoleteAssociation.save(flush: true)
-        }
-
-        // 2. ProductComponent <-- swap only components that does not exist for primary product
-        List<ProductComponent> obsoletedComponents = ProductComponent.findAllByAssemblyProduct(obsolete)
-        obsoletedComponents?.each { ProductComponent obsoletedComponent ->
-            // Find if primary product has already the same component
-            ProductComponent primaryComponent = ProductComponent.findAllByAssemblyProductAndComponentProduct(
-                primary, obsoletedComponent.componentProduct
-            )
-
-            if (primaryComponent) {
-                // if product component already exists, then do nothing with it
-                return
-            }
-
-            logProductMergeData(primary, obsolete, obsoletedComponent)
-
-            // Swap assemblyProduct to primary
-            obsoletedComponent.assemblyProduct = primary
-            // Note: needs flush because of "User.locationRoles not processed by flush"
-            obsoletedComponent.save(flush: true)
-        }
-
-        // 3. ProductPackage <-- compare products packages for both items and replace product only for the package that is not available for primary
-        List<ProductPackage> obsoletedPackages = ProductPackage.findAllByProduct(obsolete)
-        obsoletedPackages?.each { ProductPackage obsoletedPackage ->
-            // Find if primary product has already the same package
-            ProductPackage primaryPackage = ProductPackage.findByProductAndName(primary, obsoletedPackage.name)
-
-            if (primaryPackage) {
-                // if product package already exists, then do nothing with it
-                return
-            }
-
-            logProductMergeData(primary, obsolete, obsoletedPackage)
-
-            // Swap product to primary
-            obsoletedPackage.product = primary
-            // Note: needs flush because of "User.locationRoles not processed by flush"
-            obsoletedPackage.save(flush: true)
-        }
-
-        // 4. ProductSupplier <-- probably same case as ProductPackage
+        // 1. ProductSupplier
         List<ProductSupplier> obsoletedSuppliers = ProductSupplier.findAllByProduct(obsolete)
         obsoletedSuppliers?.each { ProductSupplier obsoletedSupplier ->
             // Find if primary product has already the same supplier
@@ -156,30 +96,25 @@ class ProductMergeService {
             obsoletedSupplier.save(flush: true)
         }
 
-        // 5. Synonym <-- if the same synonym does not exist on primary product, then can be swapped
-        List<Synonym> obsoletedSynonyms = Synonym.findAllByProduct(obsolete)
-        obsoletedSynonyms?.each { Synonym obsoletedSynonym ->
-            // Find if primary product has already the same synonym
-            Synonym primarySynonym = Synonym.findByProductAndName(primary, obsoletedSynonym.name)
+        // 2. ProductComponent <-- swap only components that does not exist for primary product
+        List<ProductComponent> obsoletedComponents = ProductComponent.findAllByAssemblyProduct(obsolete)
+        obsoletedComponents?.each { ProductComponent obsoletedComponent ->
+            // Find if primary product has already the same component
+            List<ProductComponent> primaryComponents = ProductComponent.findAllByAssemblyProductAndComponentProduct(
+                primary, obsoletedComponent.componentProduct
+            )
 
-            if (primarySynonym) {
-                // if product synonym already exists, then do nothing with it
+            if (primaryComponents) {
+                // if product component already exists, then do nothing with it
                 return
             }
 
-            logProductMergeData(primary, obsolete, obsoletedSynonym)
+            logProductMergeData(primary, obsolete, obsoletedComponent)
 
             // Swap assemblyProduct to primary
-            obsoletedSynonym.product = primary
+            obsoletedComponent.assemblyProduct = primary
             // Note: needs flush because of "User.locationRoles not processed by flush"
-            obsoletedSynonym.save(flush: true)
-        }
-
-        // 6. Documents
-        obsolete.documents?.each { Document obsoleteDocument ->
-            logProductMergeData(primary, obsolete, obsoleteDocument)
-            obsolete.removeFromDocuments(obsoleteDocument)
-            primary.addToDocuments(obsoleteDocument)
+            obsoletedComponent.save(flush: true)
         }
 
         /**
