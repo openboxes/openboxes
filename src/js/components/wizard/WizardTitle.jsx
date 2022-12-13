@@ -10,13 +10,13 @@ const WizardTitle = (props) => {
   }
 
   return (
-    <div className="panel-heading movement-number">
+    <div className="panel-heading movement-number" data-testid="wizardTitle">
       {props.title ?
         (
           <div>
             {
               _.map(props.title, element => (
-                <span style={{ color: element.color }}>
+                <span key={element.text} style={{ color: element.color }}>
                   {element.text}
                   <span style={{ color: 'black' }}>
                     {element.delimeter}

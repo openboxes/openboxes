@@ -8,7 +8,7 @@ import { Link, withRouter } from 'react-router-dom';
 const Logo = ({
   logoUrl,
 }) => (
-  <div className="d-flex align-items-center logo-wrapper">
+  <div className="d-flex align-items-center logo-wrapper" data-testid="logo-wrapper">
     <div className="logo-square">
       <Link to="/openboxes">
         <img
