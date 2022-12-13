@@ -67,7 +67,7 @@ class StockTransferApiController {
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
         Order order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
-        if (order.hasErrors() || !order.save(flush: true)) {
+        if (order.hasErrors()) {
             throw new ValidationException("Invalid order", order.errors)
         }
 

@@ -303,13 +303,13 @@ class AddItemsPage extends Component {
 
     return _.map(items, item => ({
       id: item.id || null,
-      'product.id': item.product.id,
+      product: { id: item.product.id },
       quantityRequested: item.quantityRequested,
       palletName: item.palletName,
       boxName: item.boxName,
       lotNumber: item.lotNumber,
       expirationDate: item.expirationDate,
-      'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+      recipient: { id: _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '' },
       sortOrder: item.sortOrder,
       orderItemId: item.orderItemId,
     }));

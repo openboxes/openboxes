@@ -172,8 +172,8 @@ class CreateStockMovement extends Component {
 
       let payload = {
         description: values.description,
-        'origin.id': values.origin.id,
-        'destination.id': values.destination.id,
+        origin: { id: values.origin.id },
+        destination: { id: values.destination.id },
       };
       let stockMovementUrl = '';
 
@@ -181,7 +181,7 @@ class CreateStockMovement extends Component {
         stockMovementUrl = `/api/stockMovements/${values.stockMovementId}/updateRequisition`;
         payload = {
           description: values.description,
-          'destination.id': values.destination.id,
+          destination: { id: values.destination.id },
         };
       } else {
         stockMovementUrl = '/api/stockMovements/createCombinedShipments';

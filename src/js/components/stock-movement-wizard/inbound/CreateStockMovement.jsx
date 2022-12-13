@@ -13,7 +13,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, {flattenRequest, stringUrlInterceptor} from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -264,7 +264,7 @@ class CreateStockMovement extends Component {
         stocklist: { id: _.get(values.stocklist, 'id') || '' },
       };
 
-      apiClient.post(stockMovementUrl, flattenRequest(payload))
+      apiClient.post(stockMovementUrl, payload)
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
