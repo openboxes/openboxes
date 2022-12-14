@@ -289,7 +289,7 @@ class SendMovementPage extends Component {
 
   saveValues(values) {
     const payload = {
-      'destination.id': values.destination.id,
+      destination: { id: values.destination.id },
       dateShipped: values.dateShipped,
       shipmentType: values.shipmentType.id,
       trackingNumber: values.trackingNumber || '',

@@ -87,13 +87,18 @@ class StockMovement implements Validateable{
 
     static constraints = {
         id(nullable: true)
+        identifier(nullable: true)
         name(nullable: true)
         description(nullable: true)
         statusCode(nullable: true)
+        currentStatus(nullable: true)
+        status(nullable: true)
         origin(nullable: false)
         destination(nullable: false)
         stocklist(nullable: true)
         requestedBy(nullable: false)
+        createdBy(nullable: true)
+        updatedBy(nullable: true)
         dateRequested(nullable: false)
 
         stockMovementDirection(nullable: true)
@@ -106,6 +111,7 @@ class StockMovement implements Validateable{
         driverName(nullable: true)
         comments(nullable: true)
         totalValue(nullable: true)
+        lineItemCount(nullable: true)
 
         shipment(nullable:true)
         requisition(nullable:true)
