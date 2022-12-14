@@ -11,8 +11,19 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Return the value of the ORG_GRADLE_PROJECT_WEB_SERVER environment variable, if set.
+ *
+ * We support 'jetty' (Jetty 9) and 'tomcat' (Tomcat 8.5-9.x).
+ *
+ * If the env. var is not set, we embed a Tomcat server in the war file.
+ */
+String targetWebServer() {
+    return project.hasProperty('WEB_SERVER') ? project.getProperty('WEB_SERVER') : null
+}
+
 buildscript {
-    configurations.all {
+    configurations.configureEach {
         /*
          * The gradle-git-properties plugin pulls in JGit 6.x, which
          * requires Java 11+; for our builds to succeed we need 5.x.
@@ -49,6 +60,9 @@ plugins {
     id 'project-report'
 
     id 'war'
+
+    // find outdated dependencies with `grails gradle dependencyUpdates`
+    id 'com.github.ben-manes.versions' version '0.27.0'
 
     // git magic, but releases past v2.3.0 require Gradle 5.1+
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
@@ -124,10 +138,19 @@ bootRun {
 }
 
 configurations {
-    all {
-
+    configureEach {
         // log4j-over-slf4j exposes the same API as this fork of log4j 1.x does
         exclude group: 'ch.qos.reload4j', module: 'reload4j'
+
+        // use com.github.librepdf:openpdf instead
+        exclude group: 'com.lowagie', module: 'itext'
+
+        // these API's have moved to jakarta.activation:jakarta.activation-api
+        exclude group: 'com.sun.activation', module: 'jakarta.activation'
+        exclude group: 'javax.activation', module: 'activation'
+
+        // superseded by com.sun.mail:jakarta.mail
+        exclude group: 'com.sun.mail', module: 'javax.mail'
 
         // jcl-over-slf4j exposes the same API as commons-logging
         exclude group: 'commons-logging', module: 'commons-logging'
@@ -135,11 +158,18 @@ configurations {
         // relocated to `org.dom4j:dom4j` with Java 8 support
         exclude group: 'dom4j', module: 'dom4j'
 
+        // presented by spring-boot-starter-jetty and spring-boot-starter-tomcat
+        exclude group: 'javax.annotation', module: 'javax.annotation-api'
+        exclude group: 'javax.el', module: 'javax.el-api'
+
         /*
          * The same API is provided by a transitive dependency of Hibernate
          * (org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec).
          */
         exclude group: 'javax.transaction', module: 'jta'
+
+        // superseded by jakarta.xml.bind:jakarta.xml.bind-api
+        exclude group: 'javax.xml.bind', module: 'jaxb-api'
 
         // log4j-over-slf4j exposes the same API as log4j 1.x
         exclude group: 'log4j', module: 'log4j'
@@ -147,12 +177,21 @@ configurations {
         // log4j-to-slf4j exposes the same API as log4j 2.x
         exclude group: 'org.apache.logging.log4j', module: 'log4j'
 
+        // presented by spring-boot-starter-jetty and spring-boot-starter-tomcat
+        exclude group: 'org.apache.tomcat', module: 'tomcat-juli'
+
+        // this API moved to tomcat-core after 8.5.2
+        exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-logging-log4j'
+
         /*
          * The `asset-pipeline` has moved to com.bertramlabs.plugins.
          * Ignore requests for the out-of-date version.
          * See https://github.com/bertramdev/asset-pipeline/issues/247#issuecomment-649594531
          */
         exclude group: 'org.grails.plugins', module: 'asset-pipeline'
+
+        // superseded by org.xhtmlrenderer:flying-saucer-core
+        exclude group: 'org.xhtmlrenderer', module: 'core-renderer'
 
         resolutionStrategy {
             /*
@@ -170,16 +209,6 @@ configurations {
              * version skew is to apply useVersion() on a group-wide basis.
              */
             eachDependency { DependencyResolveDetails details ->
-
-                if (details.requested.group == 'bouncycastle') {
-                    // e.g., bouncycastle:bctsp-jdk14:138 -> org.bouncycastle:bctsp-jdk14:1.38
-                    details.because 'include only one set of bouncycastle dependencies for iText'
-                    details.useTarget(
-                        group: 'org.bouncycastle',
-                        name: details.requested.name,
-                        version: bouncyCastleVersion
-                    )
-                }
 
                 if (details.requested.group == 'ch.qos.logback') {
                     details.because 'use a consistent logback version'
@@ -205,9 +234,11 @@ configurations {
                     }
                 }
 
-                if (details.requested.group == 'org.apache.poi') {
-                    details.because 'enforce consistent POI versioning'
-                    details.useVersion(poiVersion)
+                if (details.requested.group == 'org.apache.xmlgraphics') {
+                    details.because 'apply batik security patches'
+                    if (details.requested.name.startsWith('batik')) {
+                        details.useVersion(batikVersion)
+                    }
                 }
 
                 if (details.requested.group == 'org.ow2.asm') {
@@ -220,9 +251,9 @@ configurations {
                     details.useVersion(groovyVersion)
                 }
 
-                if (details.requested.group == 'org.eclipse.jetty') {
-                    details.because 'enforce consistent Eclipse Jetty versioning'
-                    details.useVersion(jettyVersion)
+                if (details.requested.group == 'org.docx4j') {
+                    details.because 'enforce consistent docx4j versioning'
+                    details.useVersion(docx4jVersion)
                 }
 
                 if (details.requested.group == 'org.hibernate') {
@@ -230,11 +261,6 @@ configurations {
                         details.because 'enforce consistent hibernate versioning'
                         details.useVersion(hibernateVersion)
                     }
-                }
-
-                if (details.requested.group == 'org.jboss.byteman') {
-                    details.because 'avoid beta byteman releases'
-                    details.useVersion(jbossBytemanVersion)
                 }
 
                 if (details.requested.group == 'org.seleniumhq.selenium') {
@@ -263,24 +289,17 @@ configurations {
              * wouldn't mark in the `dependencies` block because we don't
              * consume their API's directly.
              */
-            force 'com.github.sommeri:less4j:1.17.2'  // use consistent version
-            force 'com.google.code.findbugs:jsr305:3.0.2'  // use consistent version
-            force 'com.google.protobuf:protobuf-java:3.21.4'  // security patch
-            force 'com.lowagie:itext:2.1.7'  // use latest version
-            force 'commons-fileupload:commons-fileupload:1.4'  // security patch
+            force 'com.google.errorprone:error_prone_annotations:2.11.0'  // use consistent version
+            force 'com.google.protobuf:protobuf-java:3.21.11'  // security patch
             force 'commons-io:commons-io:2.11.0'  // security patch
             force 'commons-validator:commons-validator:1.7'  // security patch
             force 'jline:jline:2.14.6'  // use consistent version
-            force 'org.antlr:antlr-runtime:3.5.3'  // use consistent version
             force 'org.apache.commons:commons-lang3:3.12.0'  // security patch
-            force 'org.apache.commons:commons-text:1.9'  // use consistent version
+            force 'org.apache.xmlgraphics:xmlgraphics-commons:2.7'  // use consistent version
             force 'org.apache.xmlbeans:xmlbeans:3.1.0'  // security patch, build fixes
+            force 'org.checkerframework:checker-qual:3.12.0'  // use consistent version
             force 'org.dom4j:dom4j:2.1.3'  // security patch
             force 'org.quartz-scheduler:quartz:2.3.2'  // security patch
-            force 'org.reactivestreams:reactive-streams:1.0.4'
-            force 'xalan:serializer:2.7.2'  // security patch
-            force 'xalan:xalan:2.7.2'  // security patch
-            force 'xerces:xercesImpl:2.12.2'  // security patch
         }
     }
 }
@@ -355,9 +374,7 @@ dependencies {
      * files so they can run in a standalone context (we make use of
      * this in openboxes-devops/arm-template/scripts/ob-vm-setup.sh).
      * When deploying to a Tomcat container, we should use `provided`,
-     * per Grails 3's deployment guide, to leverage the web server. If
-     * `export ORG_GRADLE_PROJECT_WEB_SERVER=tomcat` is set, the war file
-     * will not contain tomcat-provided dependencies. Otherwise, it will.
+     * per Grails 3's deployment guide, to leverage the web server.
      *
      * https://tomcat.apache.org/tomcat-8.5-doc/RELEASE-NOTES.txt
      * http://docs.grails.org/3.3.16/guide/deployment.html
@@ -365,32 +382,22 @@ dependencies {
      * This ticket has a good discussion of `provided` gotchas.
      * https://github.com/grails/grails-core/issues/10483
      *
-     * We can't wrap this logic in a function call because 'compile',
-     * 'provided' and 'runtime' are magic words that only work in a
-     * 'dependency' block.
+     * We can't wrap this logic in a function call because 'compile' and
+     * 'provided' are magic words that only work in a 'dependency' block.
      */
-    if (project.hasProperty('WEB_SERVER') && project.getProperty('WEB_SERVER') == 'tomcat') {
-        provided 'javax.annotation:javax.annotation-api:1.3.2'
-        provided "javax.servlet:javax.servlet-api:${servletVersion}"
-        provided "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
-        provided "javax.websocket:javax.websocket-api:${websocketVersion}"
-        provided "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
+    if (targetWebServer() == 'tomcat') {
+        logger.quiet 'configuring for a Tomcat-hosted environment...'
         provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
-        provided "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
-        provided "org.apache.tomcat:tomcat-servlet-api:${minimumTomcatVersion}"
-        provided 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
         provided 'org.springframework.boot:spring-boot-starter-tomcat'
-    } else {
-        runtime 'javax.annotation:javax.annotation-api:1.3.2'
-        compile "javax.servlet:javax.servlet-api:${servletVersion}"
-        runtime "javax.servlet.jsp:javax.servlet.jsp-api:${jspVersion}"
-        runtime "javax.websocket:javax.websocket-api:${websocketVersion}"
-        runtime "org.apache.tomcat:tomcat-el-api:${minimumTomcatVersion}"
+    } else if (targetWebServer() == 'jetty') {
+        logger.quiet 'configuring for a Jetty-hosted environment...'
+        provided "javax.servlet:javax.servlet-api:${servletVersion}"
         compile "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
-        runtime "org.apache.tomcat:tomcat-juli:${minimumTomcatVersion}"
-        runtime "org.apache.tomcat:tomcat-servlet-api:${minimumTomcatVersion}"
-        runtime 'org.apache.tomcat.embed:tomcat-embed-logging-log4j:8.5.2'
-        runtime 'org.springframework.boot:spring-boot-starter-tomcat'
+        provided 'org.springframework.boot:spring-boot-starter-jetty'
+    } else {
+        logger.quiet 'configuring for a standalone environment...'
+        compile "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        compile 'org.springframework.boot:spring-boot-starter-tomcat'
     }
 
     implementation 'ch.qos.logback:logback-classic'
@@ -403,20 +410,21 @@ dependencies {
      */
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
 
+    implementation "com.github.librepdf:openpdf:${openPdfVersion}"
+
     // security patch
     compile 'com.google.code.gson:gson:2.10'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:31.1-jre'
 
-    compile 'com.google.zxing:javase:3.5.0'  // barcode support
+    compile 'com.google.zxing:javase:3.5.1'  // barcode support
 
     testImplementation 'com.icegreen:greenmail:1.6.11'
 
     compile 'com.newrelic.agent.java:newrelic-api:7.11.1'
 
-    // expose com.sun.mail.imap.IMAPStore to MailServiceTests
-    testImplementation 'com.sun.mail:javax.mail:1.6.2'
+    implementation 'com.sun.mail:jakarta.mail:1.6.7'
 
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
@@ -471,8 +479,8 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-api:${slf4jProvidedLog4j2Version}"
     implementation "org.apache.logging.log4j:log4j-to-slf4j:${slf4jProvidedLog4j2Version}"
 
-    implementation 'org.apache.poi:poi'
-    implementation 'org.apache.poi:poi-scratchpad'
+    implementation "org.apache.poi:poi:${poiVersion}"
+    implementation "org.apache.poi:poi-scratchpad:${poiVersion}"
 
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
@@ -480,11 +488,7 @@ dependencies {
     // enable `import groovy.sql.Sql`
     implementation 'org.codehaus.groovy:groovy-sql'
 
-    /*
-     * We can't update docx4j without refactoring ReportService.groovy
-     * to not use org.docx4j.org.xhtmlrenderer.pdf.ITextRenderer.
-     */
-    compile 'org.docx4j:docx4j:2.8.1'  // FIXME update to 8.3.x
+    compile 'org.docx4j:docx4j-JAXB-ReferenceImpl'
 
     // enable grails console web ui
     console 'org.grails:grails-console'
@@ -562,7 +566,11 @@ dependencies {
 
     // enable `grails test-app -coverage`
     testImplementation('org.grails.plugins:code-coverage:2.0.3-3') {
+        // last updated in 2016, this plugin pulls in 10+year-old dependencies
         exclude group: 'org.apache.ant'  // not needed for gradle builds
+        exclude group: 'org.mortbay.jetty'  // superseded by org.eclipse.jetty
+        exclude group: 'xalan'
+        exclude group: 'xerces'
     }
 
     // FIXME use commons-csv instead
@@ -681,6 +689,9 @@ dependencies {
 
     // set up Spring log framework (slf4j under the hood)
     implementation 'org.springframework.boot:spring-boot-starter-logging'
+
+    implementation "org.xhtmlrenderer:flying-saucer-core:${flyingSaucerVersion}"
+    implementation "org.xhtmlrenderer:flying-saucer-pdf-openpdf:${flyingSaucerVersion}"
 
     // security patch
     compile 'org.yaml:snakeyaml:1.33'

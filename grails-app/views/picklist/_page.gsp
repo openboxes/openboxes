@@ -88,27 +88,27 @@
                     <td class="middle">
                         <g:if test="${j==0}">
                             <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
-                                <div class="canceled">
+                                <wordwrap:div class="canceled">
                                     ${StringEscapeUtils.escapeXml(requisitionItem?.parentRequisitionItem?.product?.name)}
-                                </div>
+                                </wordwrap:div>
                             </g:if>
-                            <div class="${requisitionItem?.status}">
+                            <wordwrap:div class="${requisitionItem?.status}">
                                 ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
-                            </div>
+                            </wordwrap:div>
                         </g:if>
                     </td>
-                    <td class="center middle">
+                    <wordwrap:td class="center middle">
                         <g:set var="binLocation" value="${requisitionItem?.product?.getInventoryLevel(location?.id)?.binLocation}"/>
                         <g:each in="${binLocation?.split(';')}" var="binLocationPart">
                             ${binLocationPart}<br/>
                         </g:each>
-                    </td>
-                    <td class="middle center" width="25%">
+                    </wordwrap:td>
+                    <wordwrap:td class="middle center lotNumber" width="25%">
                         <g:if test="${picklistItems}">
-                            <span class="lotNumber">${picklistItems[j]?.inventoryItem?.lotNumber}</span>
+                            ${picklistItems[j]?.inventoryItem?.lotNumber}
                         </g:if>
-                    </td>
-                    <td class="middle center">
+                    </wordwrap:td>
+                    <td class="middle center" style="white-space: nowrap;">
                         <g:if test="${picklistItems}">
                             <g:formatDate date="${picklistItems[j]?.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                         </g:if>
