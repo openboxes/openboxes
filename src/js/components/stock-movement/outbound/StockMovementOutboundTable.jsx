@@ -335,7 +335,6 @@ const StockMovementOutboundTable = ({
 
   return (
     <div className="list-page-list-section">
-      {console.log('rerendered')}
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <div>
           {
