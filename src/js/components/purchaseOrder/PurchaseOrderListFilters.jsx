@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -16,25 +16,33 @@ const PurchaseOrderListFilters = ({
   formProps,
   supportedActivities,
 }) => {
-  const debouncedOriginLocationsFetch = debounceLocationsFetch(
+  const debouncedOriginLocationsFetch = useCallback(debounceLocationsFetch(
     debounceTime,
     minSearchLength,
     ['FULFILL_ORDER'],
     true,
     false,
     false,
-  );
-  const debouncedDestinationLocationsFetch = debounceLocationsFetch(
-    debounceTime,
-    minSearchLength,
-    ['RECEIVE_STOCK'],
-    true,
-    false,
-    false,
-  );
-  const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
+  ), [debounceTime, minSearchLength]);
 
-  const filtersToIgnore = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING') ? ['destinationParty'] : ['destination'];
+  const debouncedDestinationLocationsFetch = useCallback(
+    debounceLocationsFetch(
+      debounceTime,
+      minSearchLength,
+      ['RECEIVE_STOCK'],
+      true,
+      false,
+      false,
+    ),
+    [debounceTime, minSearchLength],
+  );
+
+  const debouncedUsersFetch = useCallback(
+    debounceUsersFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
+
+  const filtersToIgnore = useMemo(() => (supportedActivities.includes('ENABLE_CENTRAL_PURCHASING') ? ['destinationParty'] : ['destination']), [supportedActivities]);
 
   return (
     <div className="d-flex flex-column list-page-filters">

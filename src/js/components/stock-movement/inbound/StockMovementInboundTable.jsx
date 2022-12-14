@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -91,7 +91,7 @@ const StockMovementInboundTable = ({
     status.toLowerCase(),
   );
 
-  const onFetchHandler = (state) => {
+  const onFetchHandler = useCallback((state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -135,7 +135,7 @@ const StockMovementInboundTable = ({
         })
         .catch(() => Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements'))));
     }
-  };
+  }, [filterParams]);
 
   const deleteReturnStockMovement = (id) => {
     showTheSpinner();
@@ -226,7 +226,7 @@ const StockMovementInboundTable = ({
   };
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -335,7 +335,7 @@ const StockMovementInboundTable = ({
           value={row.value && moment(row.value).format('MMM DD, yyyy')}
         />),
     },
-  ];
+  ], []);
 
   return (
     <div className="list-page-list-section">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -24,7 +24,7 @@ const PurchaseOrderList = (props) => {
     props.fetchTranslations(props.locale, 'reactTable');
   }, [props.locale]);
 
-  const isCentralPurchasingEnabled = props.supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
+  const isCentralPurchasingEnabled = useMemo(() => props.supportedActivities.includes('ENABLE_CENTRAL_PURCHASING'), [props.supportedActivities]);
 
   useEffect(() => {
     if (!props.statuses || props.statuses.length === 0) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -195,7 +195,7 @@ const StockListTable = ({
       .finally(() => hideTheSpinner());
   };
 
-  const onFetchHandler = (state) => {
+  const onFetchHandler = useCallback((state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -233,10 +233,10 @@ const StockListTable = ({
           setCurrentParams(params);
         });
     }
-  };
+  }, [filterParams]);
 
   // List of all actions for Stocklists rows
-  const actions = [
+  const actions = useMemo(() => [
     {
       defaultLabel: 'Show stock list',
       label: 'react.stocklists.show.label',
@@ -310,10 +310,10 @@ const StockListTable = ({
       onClick: onClickDeleteStocklists,
       minimumRequiredRole: 'Admin',
     },
-  ];
+  ], []);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -396,7 +396,7 @@ const StockListTable = ({
       accessor: 'lastUpdated',
       width: 150,
     },
-  ];
+  ], []);
 
   return (
     <div className="list-page-list-section">
