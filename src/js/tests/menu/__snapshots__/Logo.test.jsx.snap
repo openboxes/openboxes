@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`logo component should match snapshot 1`] = `
+<div
+  className="d-flex align-items-center logo-wrapper"
+  data-testid="logo-wrapper"
+>
+  <div
+    className="logo-square"
+  >
+    <a
+      href="/openboxes"
+      onClick={[Function]}
+    >
+      <img
+        alt="Openboxes"
+        height="40"
+        src=""
+        width="40"
+      />
+    </a>
+  </div>
+</div>
+`;

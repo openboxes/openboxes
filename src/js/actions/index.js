@@ -15,7 +15,6 @@ import {
   FETCH_INVOICE_TYPE_CODES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
-  FETCH_ORGANIZATIONS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
@@ -64,46 +63,39 @@ export function hideUserActions() {
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchReasonCodes() {
   const url = '/openboxes/api/reasonCodes';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_REASONCODES,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_REASONCODES,
+        payload: res.data,
+      });
+    });
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchCurrencies() {
   const url = '/openboxes/api/unitOfMeasure/currencies';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_CURRENCIES,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_CURRENCIES,
+        payload: res.data,
+      });
+    });
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
-export function fetchOrganizations() {
-  const url = '/openboxes/api/organizations';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_ORGANIZATIONS,
-    payload: request,
-  };
-}
-
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchUsers() {
   const url = '/openboxes/api/persons';
-  const request = apiClient.get(url, { params: { status: true } });
-  return {
-    type: FETCH_USERS,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url, { params: { status: true } }).then((res) => {
+      dispatch({
+        type: FETCH_USERS,
+        payload: res.data,
+      });
+    });
   };
 }
 
@@ -119,14 +111,15 @@ export async function fetchSessionInfo() {
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchMenuConfig() {
   const url = '/openboxes/api/getMenuConfig';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_MENU_CONFIG,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_MENU_CONFIG,
+        payload: res,
+      });
+    });
   };
 }
 

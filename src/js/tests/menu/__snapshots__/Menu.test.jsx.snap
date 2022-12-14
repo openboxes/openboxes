@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`menu component should match snapshot 1`] = `
+<div
+  className="menu-wrapper"
+  id="navbarSupportedContent"
+>
+  <ul
+    className="d-flex align-items-center navbar-nav mr-auto flex-wrap"
+  />
+</div>
+`;
+
+exports[`menuConfigurationSubsection component should match snapshot 1`] = `
+<div
+  className="padding-8"
+>
+  <span
+    className="subsection-section-title"
+  >
+    Administration
+  </span>
+  <a
+    className="dropdown-item"
+    href="/openboxes/admin/showSettings"
+  >
+    Settings
+  </a>
+</div>
+`;
+
+exports[`menuItem component should match snapshot 1`] = `
+[
+  <li
+    className="nav-item dropdown d-none d-md-flex justify-content-center align-items-center false"
+    data-testid="dropdownMenuItem"
+  >
+    <a
+      aria-expanded="false"
+      aria-haspopup="true"
+      className="nav-link dropdown-toggle"
+      href="#"
+      id="navbarDropdown"
+    />
+    <div
+      aria-labelledby="navbarDropdown"
+      className="dropdown-menu dropdown-menu-wrapper"
+    >
+      <div
+        className="dropdown-menu-content padding-8"
+      />
+    </div>
+  </li>,
+  <li
+    className="collapse-nav-item nav-item justify-content-center align-items-center d-flex d-md-none"
+    data-testid="collapseMenuItem"
+  >
+    <a
+      aria-controls="collapse-undefined"
+      aria-expanded="false"
+      className="nav-link d-flex justify-content-between align-items-center w-100 false"
+      data-toggle="collapse"
+      href="#collapse-undefined"
+      role="button"
+    >
+      <svg
+        className="collapse-arrow-icon"
+        fill="currentColor"
+        height="1em"
+        stroke="currentColor"
+        strokeWidth="0"
+        style={
+          {
+            "color": undefined,
+          }
+        }
+        viewBox="0 0 24 24"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g>
+          <path
+            d="M0 0h24v24H0z"
+            fill="none"
+          />
+          <path
+            d="M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z"
+          />
+        </g>
+      </svg>
+    </a>
+    <div
+      className="collapse w-100"
+      id="collapse-undefined"
+    >
+      <div
+        className="d-flex flex-row flex-wrap"
+      />
+    </div>
+  </li>,
+]
+`;
