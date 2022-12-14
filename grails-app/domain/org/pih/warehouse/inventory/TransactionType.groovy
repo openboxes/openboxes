@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.core.Constants
+
 class TransactionType implements Serializable {
 
     String id
@@ -33,4 +35,8 @@ class TransactionType implements Serializable {
         sort "sortOrder"
     }
 
+    Boolean compareName(String transactionTypeName) {
+        String regex = "\\${Constants.LOCALIZED_STRING_SEPARATOR}"
+        return name.split(regex)[0] == transactionTypeName.split(regex)[0]
+    }
 }

@@ -467,9 +467,9 @@ class InventorySnapshotService {
 
         def transactionData = getTransactionReportData(location, startDate, endDate)
 
-        def transactionTypeNames = TransactionType.createCriteria().list {
+        def transactionTypes = TransactionType.createCriteria().list {
             'in'("transactionCode", [TransactionCode.DEBIT, TransactionCode.CREDIT])
-        }.collect { it.name }
+        }
 
         // Get starting balance
         def balanceOpeningMap = getQuantityOnHandByProduct(location, startDate)
@@ -524,15 +524,16 @@ class InventorySnapshotService {
             ]
             row.put("Opening", balanceOpening)
             def includeRow = balanceOpening || balanceClosing || quantityAdjustments
-            transactionTypeNames.each { String transactionTypeName ->
-                if (transactionTypeName.contains(Constants.LOCALIZED_STRING_SEPARATOR)) {
-                    transactionTypeName = LocalizationUtil.getLocalizedString(transactionTypeName)
+            transactionTypes.each { TransactionType transactionType ->
+                String translatedTransactionTypeName = transactionType?.name
+                if (transactionType?.name?.contains(Constants.LOCALIZED_STRING_SEPARATOR)) {
+                    translatedTransactionTypeName = LocalizationUtil.getLocalizedString(transactionType?.name)
                 }
                 def quantity =
                         transactionData.find {
-                            it.productCode == product.productCode && it.transactionTypeName == transactionTypeName
+                            it.productCode == product.productCode && transactionType.compareName(it?.transactionTypeName)
                         }?.quantity?:0
-                row[transactionTypeName] = quantity
+                row[translatedTransactionTypeName] = quantity
                 includeRow = quantity != 0 ? true : includeRow
             }
 
