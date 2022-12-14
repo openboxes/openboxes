@@ -165,7 +165,7 @@ class AdjustInventoryModal extends Component {
       if (!item['inventoryItem.id']) {
         return {
           productId: item.productId,
-          'binLocation.id': item.binLocation || '',
+          binLocation: { id: item.binLocation || '' },
           lotNumber: item.lotNumber,
           expirationDate: item.expirationDate,
           quantityAdjusted: parseInt(item.quantityAdjusted, 10),
@@ -173,8 +173,8 @@ class AdjustInventoryModal extends Component {
         };
       }
       return {
-        'inventoryItem.id': item['inventoryItem.id'] || '',
-        'binLocation.id': item['binLocation.id'] || '',
+        inventoryItem: { id: item['inventoryItem.id'] || '' },
+        binLocation: { id: item['binLocation.id'] || '' },
         quantityAdjusted: parseInt(item.quantityAdjusted, 10),
         comments: item.comments,
       };

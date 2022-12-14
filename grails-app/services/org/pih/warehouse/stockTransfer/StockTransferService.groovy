@@ -11,6 +11,7 @@ package org.pih.warehouse.stockTransfer
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
@@ -39,6 +40,7 @@ class StockTransferService {
     def shipmentService
     GrailsApplication grailsApplication
     def orderService
+    def authService
 
     /**
      * Gets paginated list of stock transfers (Orders with TRANSFER_ORDER type)
@@ -211,6 +213,9 @@ class StockTransferService {
                     childOrderItem.parentOrderItem = orderItem
                 }
             }
+        }
+        if (order.hasErrors() || !order.validate()) {
+            throw new ValidationException("Invalid order", order.errors)
         }
         order.save(failOnError: true)
 

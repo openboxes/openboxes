@@ -258,10 +258,10 @@ class CreateStockMovement extends Component {
         name: '',
         description: values.description,
         dateRequested: values.dateRequested,
-        'origin.id': values.origin.id,
-        'destination.id': values.destination.id,
-        'requestedBy.id': values.requestedBy.id,
-        'stocklist.id': _.get(values.stocklist, 'id') || '',
+        origin: { id: values.origin.id },
+        destination: { id: values.destination.id },
+        requestedBy: { id: values.requestedBy.id },
+        stocklist: { id: _.get(values.stocklist, 'id') || '' },
       };
 
       apiClient.post(stockMovementUrl, payload)
