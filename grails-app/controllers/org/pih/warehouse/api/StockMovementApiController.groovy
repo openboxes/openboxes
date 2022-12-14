@@ -115,7 +115,6 @@ class StockMovementApiController {
         // Detect whether inbound or outbound stock movement
         def currentLocation = Location.get(session.warehouse.id)
 
-        stockMovement.requestType = params.requestType
         stockMovement.sourceType = params.sourceType as RequisitionSourceType
         StockMovement newStockMovement = stockMovementService.createStockMovement(stockMovement)
         response.status = 201

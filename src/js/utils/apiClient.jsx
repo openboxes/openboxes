@@ -28,27 +28,34 @@ export function parseResponse(data) {
 }
 
 export function flattenRequest(data) {
-  if (_.isArray(data)) {
-    return _.map(data, value => flattenRequest(value));
-  }
+  // eslint-disable-next-line max-len
+  // TODO: flattenRequest was specifically for the Grails 1. Temporary return unflattened data, but when rebase process will be finished clean up and remove this util
+  return data;
 
-  if (_.isPlainObject(data)) {
-    const obj = {};
-
-    _.forEach(data, (value, key) => {
-      const flattenedVal = flattenRequest(value);
-
-      if (_.isPlainObject(flattenedVal)) {
-        _.forEach(flattenedVal, (childVal, childKey) => { obj[`${key}.${childKey}`] = childVal; });
-      } else {
-        obj[key] = flattenedVal;
-      }
-    });
-
-    return obj;
-  }
-
-  return data === null || data === undefined ? '' : data;
+  // if (_.isArray(data)) {
+  //   return _.map(data, value => flattenRequest(value));
+  // }
+  //
+  // if (_.isPlainObject(data)) {
+  //   const obj = {};
+  //
+  //   _.forEach(data, (value, key) => {
+  //     const flattenedVal = flattenRequest(value);
+  //
+  //     if (_.isPlainObject(flattenedVal)) {
+  //       _.forEach(
+  //          flattenedVal,
+  //          (childVal, childKey) => { obj[`${key}.${childKey}`] = childVal; }
+  //       );
+  //     } else {
+  //       obj[key] = flattenedVal;
+  //     }
+  //   });
+  //
+  //   return obj;
+  // }
+  //
+  // return data === null || data === undefined ? '' : data;
 }
 
 export const handleSuccess = response => response;

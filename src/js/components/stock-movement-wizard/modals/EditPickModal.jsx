@@ -205,8 +205,8 @@ class EditPickModal extends Component {
     const payload = {
       picklistItems: _.map(values.availableItems, avItem => ({
         id: avItem.id || '',
-        'inventoryItem.id': avItem['inventoryItem.id'],
-        'binLocation.id': avItem['binLocation.id'] || '',
+        inventoryItem: { id: avItem['inventoryItem.id'] },
+        binLocation: { id: avItem['binLocation.id'] || '' },
         quantityPicked: _.isNil(avItem.quantityPicked) ? '' : avItem.quantityPicked,
       })),
       reasonCode: values.reasonCode.value || '',

@@ -78,9 +78,6 @@ class StockTransferApiController {
         bindStockTransferData(stockTransfer, currentUser, currentLocation, jsonObject)
 
         Order order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
-        if (order.hasErrors() || !order.save(flush: true)) {
-            throw new ValidationException("Invalid order", order.errors)
-        }
 
         // TODO: Refactor - Return only status
         stockTransfer = StockTransfer.createFromOrder(order)
@@ -114,10 +111,6 @@ class StockTransferApiController {
             order = stockTransferService.completeStockTransfer(stockTransfer)
         } else {
             order = stockTransferService.createOrUpdateOrderFromStockTransfer(stockTransfer)
-        }
-
-        if (order.hasErrors() || !order.save(flush: true)) {
-            throw new ValidationException("Invalid order", order.errors)
         }
 
         // TODO: Refactor - Return only status

@@ -292,9 +292,9 @@ class SendMovementPage extends Component {
 
   saveValues(values) {
     const payload = {
-      'destination.id': values.destination.id,
+      destination: { id: values.destination.id },
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType.id,
+      shipmentType: { id: values.shipmentType.id },
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
@@ -539,9 +539,9 @@ class SendMovementPage extends Component {
 
   prepareRequestAndSubmitStockMovement(values) {
     const payload = {
-      'destination.id': values.destination.id,
+      destination: { id: values.destination.id },
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType.id,
+      shipmentType: { id: values.shipmentType.id },
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
