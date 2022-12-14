@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchInvoiceStatuses, fetchInvoiceTypeCodes, fetchSuppliers } from 'actions';
@@ -11,7 +12,8 @@ import apiClient from 'utils/apiClient';
 import { transformFilterParams } from 'utils/list-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
-const useInvoiceFilters = ({ setDefaultValues, history, setFilterParams }) => {
+
+const useInvoiceFilters = ({ setFilterParams }) => {
   const {
     statuses, suppliers, typeCodes, currentLocation, currentUser, translate,
   } = useSelector(state => ({
@@ -22,8 +24,10 @@ const useInvoiceFilters = ({ setDefaultValues, history, setFilterParams }) => {
     currentUser: state.session.user,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
+  const [defaultValues, setDefaultValues] = useState({});
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const fetchUserById = useCallback(async (id) => {
     try {
@@ -116,7 +120,7 @@ const useInvoiceFilters = ({ setDefaultValues, history, setFilterParams }) => {
     setFilterParams(values);
   }, []);
 
-  return { setFilterValues };
+  return { defaultValues, setFilterValues };
 };
 
 export default useInvoiceFilters;

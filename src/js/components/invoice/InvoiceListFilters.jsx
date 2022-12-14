@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 
 import FilterForm from 'components/Filter/FilterForm';
 import filterFields from 'components/invoice/FilterFields';
@@ -17,11 +16,9 @@ const InvoiceListFilters = ({
   statuses,
   suppliers,
   typeCodes,
-  history,
 }) => {
-  const [defaultValues, setDefaultValues] = useState({});
-  const { setFilterValues } =
-    useInvoiceFilters({ setDefaultValues, history, setFilterParams });
+  const { defaultValues, setFilterValues } =
+    useInvoiceFilters({ setFilterParams });
 
   const debouncedUsersFetch = useCallback(
     debounceUsersFetch(debounceTime, minSearchLength),
@@ -62,7 +59,7 @@ const mapStateToProps = state => ({
 });
 
 
-export default withRouter(connect(mapStateToProps)(InvoiceListFilters));
+export default connect(mapStateToProps)(InvoiceListFilters);
 
 InvoiceListFilters.propTypes = {
   setFilterParams: PropTypes.func.isRequired,
@@ -86,11 +83,4 @@ InvoiceListFilters.propTypes = {
     value: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
   })).isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func,
-    replace: PropTypes.func,
-    location: PropTypes.shape({
-      search: PropTypes.string,
-    }),
-  }).isRequired,
 };
