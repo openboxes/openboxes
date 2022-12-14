@@ -11,12 +11,12 @@ package org.pih.warehouse.stockTransfer
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import org.apache.commons.beanutils.BeanUtils
 import org.pih.warehouse.api.DocumentGroupCode
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.api.StockTransferItem
 import org.pih.warehouse.api.StockTransferStatus
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransferStockCommand
@@ -40,6 +40,7 @@ class StockTransferService {
     def shipmentService
     GrailsApplication grailsApplication
     def orderService
+    def authService
 
     def getStockTransfers(Order orderTemplate, Date lastUpdatedStartDate, Date lastUpdatedEndDate, Map params) {
         def orders = Order.createCriteria().list(params) {
@@ -193,9 +194,12 @@ class StockTransferService {
                 }
             }
         }
+        if (order.hasErrors() || !order.validate()) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
         order.save(failOnError: true)
 
-        def currentLocation = AuthService?.currentLocation
+        def currentLocation = authService.currentLocation
         if (order.orderType.isReturnOrder() && order.isOutbound(currentLocation) && order?.orderItems) {
             picklistService.createPicklistFromItem(order)
         }
