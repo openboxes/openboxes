@@ -396,7 +396,7 @@ const StockListTable = ({
       accessor: 'lastUpdated',
       width: 150,
     },
-  ], []);
+  ], [highestRole]);
 
   return (
     <div className="list-page-list-section">

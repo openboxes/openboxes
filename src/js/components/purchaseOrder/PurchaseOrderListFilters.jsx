@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -42,7 +42,7 @@ const PurchaseOrderListFilters = ({
     [debounceTime, minSearchLength],
   );
 
-  const filtersToIgnore = useMemo(() => (supportedActivities.includes('ENABLE_CENTRAL_PURCHASING') ? ['destinationParty'] : ['destination']), [supportedActivities]);
+  const filtersToIgnore = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING') ? ['destinationParty'] : ['destination'];
 
   return (
     <div className="d-flex flex-column list-page-filters">

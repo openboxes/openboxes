@@ -269,7 +269,7 @@ const PurchaseOrderListTable = ({
       variant: 'danger',
       onClick: id => deleteHandler(id),
     },
-  ], []);
+  ], [allStatuses]);
 
   // Columns for react-table
   const columns = useMemo(() => [
@@ -415,7 +415,7 @@ const PurchaseOrderListTable = ({
       sortable: false,
       minWidth: 230,
     },
-  ], []);
+  ], [supportedActivities, highestRole, actions]);
 
   const onFetchHandler = useCallback((state) => {
     if (!_.isEmpty(filterParams)) {

@@ -144,7 +144,7 @@ const InvoiceListTable = ({
       accessor: 'currency',
       className: 'text-left',
     },
-  ], []);
+  ], [supportedActivities, highestRole, invoiceStatuses]);
 
 
   const onFetchHandler = useCallback((state) => {

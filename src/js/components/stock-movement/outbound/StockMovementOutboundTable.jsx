@@ -331,7 +331,7 @@ const StockMovementOutboundTable = ({
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
-  ], []);
+  ], [requisitionStatuses]);
 
   return (
     <div className="list-page-list-section">

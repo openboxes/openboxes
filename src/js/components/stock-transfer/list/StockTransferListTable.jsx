@@ -169,7 +169,7 @@ const StockTransferListTable = ({
       className: 'd-flex align-items-center',
       Cell: row => <TableCell {...row} tooltip />,
     },
-  ], []);
+  ], [highestRole]);
 
 
   const onFetchHandler = useCallback((tableState) => {

@@ -172,7 +172,7 @@ const StockMovementInboundTable = ({
   };
 
   // List of all actions for inbound Stock Movement rows
-  const getActions = (row) => {
+  const getActions = useCallback((row) => {
     const {
       id, isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
     } = row.original;
@@ -223,7 +223,7 @@ const StockMovementInboundTable = ({
       }
     }
     return actions;
-  };
+  }, []);
 
   // Columns for react-table
   const columns = useMemo(() => [
@@ -335,7 +335,7 @@ const StockMovementInboundTable = ({
           value={row.value && moment(row.value).format('MMM DD, yyyy')}
         />),
     },
-  ], []);
+  ], [shipmentStatuses]);
 
   return (
     <div className="list-page-list-section">
