@@ -1,14 +1,14 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiShieldUserLine } from 'react-icons/all';
+import { RiLogoutBoxRLine, RiShieldUserLine } from 'react-icons/all';
 import { connect } from 'react-redux';
 
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
 const ImpersonateInfo = ({ currentUserName }) => (
-  <div className="impersonate-box d-flex justify-content-between align-items-center">
+  <div className="header-indicator-box d-flex justify-content-between align-items-center">
     <div className="info d-flex align-items-center">
       <RiShieldUserLine />
       <span>
