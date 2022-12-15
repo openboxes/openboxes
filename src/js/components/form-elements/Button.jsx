@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import Translate from 'utils/Translate';
 
 const Button = ({
-  label, defaultLabel, disabled, variant, type, onClick, EndIcon, isDropdown,
+  label, defaultLabel, disabled, variant, type, onClick, EndIcon, isDropdown, StartIcon,
 }) => {
   const buttonClass = 'd-flex justify-content-around align-items-center gap-8';
   const variantClass = `${variant}-button`;
@@ -22,6 +22,7 @@ const Button = ({
       aria-expanded={isDropdown && 'false'}
     >
       <React.Fragment>
+        {StartIcon && StartIcon}
         <Translate id={label} defaultMessage={defaultLabel} />
         {EndIcon && EndIcon}
       </React.Fragment>
@@ -44,6 +45,7 @@ Button.propTypes = {
   ]),
   onClick: PropTypes.func,
   EndIcon: PropTypes.element,
+  StartIcon: PropTypes.element,
   isDropdown: PropTypes.bool,
 };
 
@@ -54,4 +56,5 @@ Button.defaultProps = {
   variant: 'primary',
   onClick: undefined,
   EndIcon: null,
+  StartIcon: null,
 };
