@@ -164,6 +164,8 @@ class ApiController {
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
         String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
+        boolean localizationModeEnabled = session.useDebugLocale ?: false
+
         render([
             data: [
                 user                 : user,
@@ -195,6 +197,7 @@ class ApiController {
                 currencyCode         : currencyCode,
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
+                localizationModeEnabled : localizationModeEnabled
             ],
         ] as JSON)
     }
