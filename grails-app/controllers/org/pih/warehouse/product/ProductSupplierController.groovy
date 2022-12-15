@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
 import java.math.RoundingMode
@@ -330,7 +331,7 @@ class ProductSupplierController {
 
         // Process attributes
         def availableAttributes =
-                Attribute.findAll("from Attribute a where :entityTypeCodes in elements(a.entityTypeCodes)", [entityTypeCodes:"PRODUCT_SUPPLIER"])
+                Attribute.findAll("from Attribute a where :entityTypeCodes in elements(a.entityTypeCodes)", [entityTypeCodes: EntityTypeCode.PRODUCT_SUPPLIER])
 
         log.info "Available attributes: " + availableAttributes
         availableAttributes.each() {
