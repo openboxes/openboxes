@@ -150,17 +150,17 @@ class StockTransferApiController {
 
         jsonObject.stockTransferItems.each { stockTransferItemMap ->
             StockTransferItem stockTransferItem = new StockTransferItem()
-            stockTransferItem.id = !isNull(stockTransferItemMap["id"]) ? stockTransferItemMap["id"] : null
-            stockTransferItem.productAvailabilityId = !isNull(stockTransferItemMap["productAvailabilityId"]) ? stockTransferItemMap["productAvailabilityId"] : null
-            stockTransferItem.product = !isNull(stockTransferItemMap["product.id"]) ? Product.load(stockTransferItemMap["product.id"]) : null
-            stockTransferItem.originBinLocation = !isNull(stockTransferItemMap["originBinLocation.id"]) ? Location.load(stockTransferItemMap["originBinLocation.id"]) : null
-            stockTransferItem.destinationBinLocation = !isNull(stockTransferItemMap["destinationBinLocation.id"]) ? Location.load(stockTransferItemMap["destinationBinLocation.id"]) : null
-            stockTransferItem.inventoryItem = !isNull(stockTransferItemMap["inventoryItem.id"]) ? InventoryItem.load(stockTransferItemMap["inventoryItem.id"]) : null
+            stockTransferItem.id = stockTransferItemMap["id"] ? stockTransferItemMap["id"] : null
+            stockTransferItem.productAvailabilityId = stockTransferItemMap["productAvailabilityId"] ? stockTransferItemMap["productAvailabilityId"] : null
+            stockTransferItem.product = stockTransferItemMap?.product?.id ? Product.load(stockTransferItemMap?.product?.id) : null
+            stockTransferItem.originBinLocation = stockTransferItemMap?.originBinLocation?.id ? Location.load(stockTransferItemMap?.originBinLocation?.id) : null
+            stockTransferItem.destinationBinLocation = stockTransferItemMap?.destinationBinLocation?.id ? Location.load(stockTransferItemMap?.destinationBinLocation?.id) : null
+            stockTransferItem.inventoryItem = stockTransferItemMap?.inventoryItem?.id ? InventoryItem.load(stockTransferItemMap?.inventoryItem?.id) : null
             stockTransferItem.quantityOnHand = stockTransferItemMap["quantityOnHand"] ? stockTransferItemMap["quantityOnHand"] : 0
             stockTransferItem.quantityNotPicked = stockTransferItemMap["quantityNotPicked"] ? stockTransferItemMap["quantityNotPicked"] : 0
             stockTransferItem.quantity = stockTransferItemMap["quantity"] ? new BigDecimal(stockTransferItemMap["quantity"]) : 0
             stockTransferItem.status = stockTransferItemMap["status"] ? stockTransferItemMap["status"] : null
-            stockTransferItem.recipient = !isNull(stockTransferItemMap["recipient.id"]) ? Person.load(stockTransferItemMap["recipient.id"]) : null
+            stockTransferItem.recipient = stockTransferItemMap?.recipient?.id ? Person.load(stockTransferItemMap?.recipient?.id) : null
 
             if (!stockTransferItem.location) {
                 stockTransferItem.location = stockTransfer.origin

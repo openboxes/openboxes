@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import axios from 'axios';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
@@ -19,10 +18,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import AlertMessage from 'utils/AlertMessage';
-import {
-  flattenRequest,
-  handleError,
-  handleSuccess,
+import apiClient, {
   parseResponse,
   stringUrlInterceptor,
 } from 'utils/apiClient';
@@ -186,7 +182,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue, revertUserPick, subfield, showOnly,
         }) => ({
-          onClick: flattenRequest(fieldValue)['requisitionItem.id'] ? () => revertUserPick(flattenRequest(fieldValue)['requisitionItem.id']) : () => null,
+          onClick: _.get(fieldValue, 'requisitionItem.id') ? () => revertUserPick(_.get(fieldValue, 'requisitionItem.id')) : () => null,
           hidden: subfield,
           disabled: showOnly,
         }),
@@ -197,8 +193,6 @@ const FIELDS = {
     },
   },
 };
-
-const apiClient = axios.create({});
 
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
@@ -228,9 +222,6 @@ class PickPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.recreatePicklist = this.recreatePicklist.bind(this);
-    this.handleValidationErrors = this.handleValidationErrors.bind(this);
-
-    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
   }
 
   componentDidMount() {
@@ -434,17 +425,6 @@ class PickPage extends Component {
   validatePicklist() {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
     return apiClient.get(url);
-  }
-
-  handleValidationErrors(error) {
-    if (error.response.status === 400) {
-      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
-      this.setState({ alertMessage, showAlert: true });
-
-      return Promise.reject(error);
-    }
-
-    return handleError(error);
   }
 
   validateReasonCodes(lineItems) {
