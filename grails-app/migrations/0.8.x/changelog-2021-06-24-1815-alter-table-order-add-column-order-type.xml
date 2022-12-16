@@ -13,4 +13,14 @@
       <column name="order_type_id" type="CHAR(38)"/>
     </addColumn>
   </changeSet>
+  <changeSet author="jmiranda" id="2406202118150-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="FK651874E8AF312E3"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="order_type_id" baseTableName="order"
+      constraintName="FK651874E8AF312E3" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="order_type"/>
+  </changeSet>
 </databaseChangeLog>

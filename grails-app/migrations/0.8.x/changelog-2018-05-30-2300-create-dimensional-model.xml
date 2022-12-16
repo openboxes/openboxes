@@ -372,5 +372,24 @@
             <column name="date"/>
         </createIndex>
     </changeSet>
-
+    <changeSet author="jmiranda (generated)" id="1546354459620-35">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FK7FA87A22B3FB7111"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="transaction_type_id" baseTableName="transaction_type_dimension"
+          constraintName="FK7FA87A22B3FB7111" deferrable="false" initiallyDeferred="false"
+          referencedColumnNames="id" referencedTableName="transaction_type"/>
+    </changeSet>
+    <changeSet author="jmiranda (generated)" id="1546354459620-36">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKD2EAD9F8AA992CED"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="inventory_item_id" baseTableName="lot_dimension"
+          constraintName="FKD2EAD9F8AA992CED" deferrable="false" initiallyDeferred="false"
+          referencedColumnNames="id" referencedTableName="inventory_item"/>
+    </changeSet>
 </databaseChangeLog>
