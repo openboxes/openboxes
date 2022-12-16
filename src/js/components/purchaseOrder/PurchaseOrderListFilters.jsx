@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -16,23 +16,31 @@ const PurchaseOrderListFilters = ({
   formProps,
   supportedActivities,
 }) => {
-  const debouncedOriginLocationsFetch = debounceLocationsFetch(
+  const debouncedOriginLocationsFetch = useCallback(debounceLocationsFetch(
     debounceTime,
     minSearchLength,
     ['FULFILL_ORDER'],
     true,
     false,
     false,
+  ), [debounceTime, minSearchLength]);
+
+  const debouncedDestinationLocationsFetch = useCallback(
+    debounceLocationsFetch(
+      debounceTime,
+      minSearchLength,
+      ['RECEIVE_STOCK'],
+      true,
+      false,
+      false,
+    ),
+    [debounceTime, minSearchLength],
   );
-  const debouncedDestinationLocationsFetch = debounceLocationsFetch(
-    debounceTime,
-    minSearchLength,
-    ['RECEIVE_STOCK'],
-    true,
-    false,
-    false,
+
+  const debouncedUsersFetch = useCallback(
+    debounceUsersFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
   );
-  const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
 
   const filtersToIgnore = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING') ? ['destinationParty'] : ['destination'];
 

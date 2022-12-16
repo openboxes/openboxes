@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
@@ -41,7 +41,7 @@ const ProductsListTable = ({
 
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: <Translate id="react.productsList.column.active.label" defaultMessage="Active" />,
       accessor: 'active',
@@ -85,10 +85,10 @@ const ProductsListTable = ({
       accessor: 'lastUpdated',
       maxWidth: 200,
     },
-  ];
+  ], []);
 
 
-  const onFetchHandler = (tableState) => {
+  const onFetchHandler = useCallback((tableState) => {
     if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
       const sortingParams = tableState.sorted.length > 0 ?
@@ -136,7 +136,7 @@ const ProductsListTable = ({
           return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
         });
     }
-  };
+  }, [filterParams]);
 
   const exportProducts = (allProducts = false, withAttributes = false) => {
     const params = () => {

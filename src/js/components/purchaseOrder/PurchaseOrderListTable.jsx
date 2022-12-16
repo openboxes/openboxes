@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -191,7 +191,7 @@ const PurchaseOrderListTable = ({
   );
 
   // List of all actions for PO rows
-  const actions = [
+  const actions = useMemo(() => [
     {
       label: 'react.purchaseOrder.viewOrderDetails.label',
       defaultLabel: 'View order details',
@@ -257,7 +257,8 @@ const PurchaseOrderListTable = ({
       minimumRequiredRole: 'Superuser',
       activityCode: ['PLACE_ORDER'],
       // Display for statuses > PENDING
-      statuses: allStatuses.filter(stat => stat.id !== 'PENDING').map(status => status.id),
+      statuses: allStatuses.filter(stat => stat.id !== 'PENDING')
+        .map(status => status.id),
       onClick: id => rollbackHandler(id),
     },
     {
@@ -268,21 +269,27 @@ const PurchaseOrderListTable = ({
       variant: 'danger',
       onClick: id => deleteHandler(id),
     },
-  ];
+  ], [allStatuses]);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
       fixed: 'left',
       sortable: false,
-      style: { overflow: 'visible', zIndex: 1 },
+      style: {
+        overflow: 'visible',
+        zIndex: 1,
+      },
       Cell: row => (
         <ActionDots
           dropdownPlacement="right"
           dropdownClasses="action-dropdown-offset"
-          actions={findActions(actions, row, { supportedActivities, highestRole })}
+          actions={findActions(actions, row, {
+            supportedActivities,
+            highestRole,
+          })}
           id={row.original.id}
         />),
     },
@@ -299,7 +306,10 @@ const PurchaseOrderListTable = ({
         </TableCell>),
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.orderNumber.label" defaultMessage="Order Number" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.orderNumber.label"
+        defaultMessage="Order Number"
+      />,
       accessor: 'orderNumber',
       fixed: 'left',
       width: 150,
@@ -319,25 +329,37 @@ const PurchaseOrderListTable = ({
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.destination.label" defaultMessage="Destination" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.destination.label"
+        defaultMessage="Destination"
+      />,
       accessor: 'destination',
       minWidth: 300,
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.orderedOn.label" defaultMessage="Ordered On" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.orderedOn.label"
+        defaultMessage="Ordered On"
+      />,
       accessor: 'dateOrdered',
       minWidth: 120,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.orderedBy.label" defaultMessage="Ordered By" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.orderedBy.label"
+        defaultMessage="Ordered By"
+      />,
       accessor: 'orderedBy',
       headerClassName: 'text-left',
       minWidth: 150,
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.lineItems.label" defaultMessage="Line Items" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.lineItems.label"
+        defaultMessage="Line Items"
+      />,
       accessor: 'orderItemsCount',
       className: 'text-right',
       headerClassName: 'justify-content-end',
@@ -372,7 +394,10 @@ const PurchaseOrderListTable = ({
       sortable: false,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.totalAmountLocalCurrency.label" defaultMessage="Total amount (local currency)" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.totalAmountLocalCurrency.label"
+        defaultMessage="Total amount (local currency)"
+      />,
       accessor: 'total',
       className: 'text-right',
       headerClassName: 'justify-content-end',
@@ -380,16 +405,19 @@ const PurchaseOrderListTable = ({
       minWidth: 230,
     },
     {
-      Header: <Translate id="react.purchaseOrder.column.totalAmountDefaultCurrency.label" defaultMessage="Total amount (default currency)" />,
+      Header: <Translate
+        id="react.purchaseOrder.column.totalAmountDefaultCurrency.label"
+        defaultMessage="Total amount (default currency)"
+      />,
       accessor: 'totalNormalized',
       className: 'text-right',
       headerClassName: 'justify-content-end',
       sortable: false,
       minWidth: 230,
     },
-  ];
+  ], [supportedActivities, highestRole, actions]);
 
-  const onFetchHandler = (state) => {
+  const onFetchHandler = useCallback((state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -436,7 +464,7 @@ const PurchaseOrderListTable = ({
         })
         .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))));
     }
-  };
+  }, [filterParams]);
 
   const totalAmount = () => `${translate('react.purchaseOrder.totalAmount.label', 'Total amount')}: ${totalPrice.toLocaleString([locale, 'en'])} ${currencyCode}`;
 
@@ -456,8 +484,17 @@ const PurchaseOrderListTable = ({
             variant="secondary"
             EndIcon={<RiDownload2Line />}
           />
-          <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-            <a href="#" className="dropdown-item" onClick={() => downloadOrders(true)} role="button" tabIndex={0}>
+          <div
+            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            aria-labelledby="dropdownMenuButton"
+          >
+            <a
+              href="#"
+              className="dropdown-item"
+              onClick={() => downloadOrders(true)}
+              role="button"
+              tabIndex={0}
+            >
               <Translate
                 id="react.purchaseOrder.export.orderLineDetails.label"
                 defaultMessage="Export order line details"

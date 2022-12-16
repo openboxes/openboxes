@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -99,7 +99,7 @@ const StockTransferListTable = ({
     });
   };
 
-  const actions = [
+  const actions = useMemo(() => [
     {
       label: 'react.stockTransfer.view.label',
       defaultLabel: 'View stock transfer',
@@ -115,11 +115,11 @@ const StockTransferListTable = ({
       variant: 'danger',
       onClick: id => deleteHandler(id),
     },
-  ];
+  ], []);
 
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -169,10 +169,10 @@ const StockTransferListTable = ({
       className: 'd-flex align-items-center',
       Cell: row => <TableCell {...row} tooltip />,
     },
-  ];
+  ], [highestRole]);
 
 
-  const onFetchHandler = (tableState) => {
+  const onFetchHandler = useCallback((tableState) => {
     if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
       const sortingParams = tableState.sorted.length > 0 ?
@@ -216,7 +216,7 @@ const StockTransferListTable = ({
           return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
         });
     }
-  };
+  }, [filterParams]);
 
 
   return (

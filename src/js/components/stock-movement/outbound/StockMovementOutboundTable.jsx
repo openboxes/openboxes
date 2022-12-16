@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -94,7 +94,7 @@ const StockMovementOutboundTable = ({
     status.toLowerCase(),
   );
 
-  const onFetchHandler = (state) => {
+  const onFetchHandler = useCallback((state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -139,7 +139,7 @@ const StockMovementOutboundTable = ({
         })
         .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements'))));
     }
-  };
+  }, [filterParams]);
 
   const deleteStockMovement = (id) => {
     showTheSpinner();
@@ -176,7 +176,7 @@ const StockMovementOutboundTable = ({
   };
 
   // List of all actions for outbound Stock Movement rows
-  const getActions = (row) => {
+  const getActions = useCallback((row) => {
     const {
       isPending, isReturn, order, origin, isReceived, isPartiallyReceived, currentStatus,
     } = row.original;
@@ -223,10 +223,10 @@ const StockMovementOutboundTable = ({
       }
     }
     return actions;
-  };
+  }, []);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -331,7 +331,7 @@ const StockMovementOutboundTable = ({
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
-  ];
+  ], [requisitionStatuses]);
 
   return (
     <div className="list-page-list-section">

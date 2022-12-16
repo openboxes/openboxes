@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CancelToken } from 'axios';
 import _ from 'lodash';
@@ -58,7 +58,7 @@ const InvoiceListTable = ({
 
 
   // List of all actions for invoice rows
-  const actions = [
+  const actions = useMemo(() => [
     {
       label: 'react.invoice.viewDetails.label',
       defaultLabel: 'View Invoice Details',
@@ -77,10 +77,10 @@ const InvoiceListTable = ({
       leftIcon: <RiPencilLine />,
       href: '/openboxes/invoice/create',
     },
-  ];
+  ], []);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -144,10 +144,10 @@ const InvoiceListTable = ({
       accessor: 'currency',
       className: 'text-left',
     },
-  ];
+  ], [supportedActivities, highestRole, invoiceStatuses]);
 
 
-  const onFetchHandler = (state) => {
+  const onFetchHandler = useCallback((state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -188,7 +188,7 @@ const InvoiceListTable = ({
         })
         .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
     }
-  };
+  }, [filterParams]);
 
 
   return (

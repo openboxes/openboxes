@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -14,15 +14,18 @@ const StockMovementInboundFilters = ({
   filterFields,
   defaultValues,
 }) => {
-  const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
-  const fetchLocations = debounceLocationsFetch(
+  const fetchUsers = useCallback(
+    debounceUsersFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
+  const fetchLocations = useCallback(debounceLocationsFetch(
     debounceTime,
     minSearchLength,
     [],
     true,
     false,
     false,
-  );
+  ), [debounceTime, minSearchLength]);
 
   return (
     <div className="d-flex flex-column list-page-filters">
