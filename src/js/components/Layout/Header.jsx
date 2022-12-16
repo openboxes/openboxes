@@ -5,6 +5,7 @@ import { RiMenuLine } from 'react-icons/ri';
 import { connect } from 'react-redux';
 
 import ImpersonateInfo from 'components/Layout/ImpersonateInfo';
+import LocalizationModeInfo from 'components/Layout/LocalizationModeInfo';
 import Logo from 'components/Layout/Logo';
 import Menu from 'components/Layout/menu/Menu';
 import NavbarIcons from 'components/Layout/NavbarIcons';
@@ -12,9 +13,10 @@ import LocationChooser from 'components/location/LocationChooser';
 
 import 'components/Layout/HeaderStyles.scss';
 
-const Header = ({ isImpersonated }) => (
+const Header = ({ isImpersonated, localizationModeEnabled }) => (
   <div className="navbar p-0">
     {isImpersonated && <ImpersonateInfo />}
+    {localizationModeEnabled && <LocalizationModeInfo />}
     <nav className="navbar navbar-expand-md navbar-light bg-light bg-white main-wrapper p-0 px-md-4">
       <div className="d-flex p-2 justify-content-between flex-1">
         <div className="d-flex align-items-center">
@@ -44,10 +46,12 @@ const Header = ({ isImpersonated }) => (
 
 const mapStateToProps = state => ({
   isImpersonated: state.session.isImpersonated,
+  localizationModeEnabled: state.session.localizationModeEnabled,
 });
 
 export default connect(mapStateToProps)(Header);
 
 Header.propTypes = {
   isImpersonated: PropTypes.bool.isRequired,
+  localizationModeEnabled: PropTypes.bool.isRequired,
 };
