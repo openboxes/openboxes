@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import axios from 'axios';
 import arrayMutators from 'final-form-arrays';
 import _ from 'lodash';
 import moment from 'moment';
@@ -21,7 +20,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AlertMessage from 'utils/AlertMessage';
-import { handleError, handleSuccess, stringUrlInterceptor } from 'utils/apiClient';
+import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
@@ -265,8 +264,6 @@ const FIELDS = {
   },
 };
 
-const apiClient = axios.create({});
-
 /**
  * The last step of stock movement where user can see the whole movement,
  * print documents, upload documents, add additional information and send it.
@@ -291,12 +288,9 @@ class SendMovementPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.validate = this.validate.bind(this);
-    this.handleValidationErrors = this.handleValidationErrors.bind(this);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
-
-    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
   }
 
   componentDidMount() {

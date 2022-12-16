@@ -61,6 +61,7 @@ class ShipmentService {
     def documentService
     def personDataService
     def productAvailabilityService
+    def authService
 
     /**
      * Returns the shipment referenced by the passed id parameter;
