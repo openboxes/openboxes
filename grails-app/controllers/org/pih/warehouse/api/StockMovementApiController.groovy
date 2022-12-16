@@ -360,9 +360,9 @@ class StockMovementApiController {
         }
 
         // If the stocklist.id key is present and empty, then we need to remove the stocklist from the stock movement
-        if (jsonObject.containsKey("stocklist.id")) {
-            String stocklistId = jsonObject.remove("stocklist.id")
-            stockMovement.stocklist = (stocklistId) ? Requisition.get(stocklistId) : null
+        if (jsonObject.containsKey("stocklist")) {
+            def stocklist = jsonObject.remove("stocklist")
+            stockMovement.stocklist = stocklist?.id ? Requisition.get(stocklist?.id) : null
         }
 
         // Bind the rest of the JSON attributes to the stock movement object
@@ -414,7 +414,7 @@ class StockMovementApiController {
             stockMovementItem.stockMovement = stockMovement
 
             // Required properties
-            stockMovementItem.product = lineItem["product.id"] ? Product.load(lineItem["product.id"]) : null
+            stockMovementItem.product = lineItem?.product?.id ? Product.load(lineItem?.product?.id) : null
             stockMovementItem.quantityRequested = lineItem.quantityRequested ? new BigDecimal(lineItem.quantityRequested) : null
 
             // Containers (optional)
@@ -423,7 +423,7 @@ class StockMovementApiController {
 
             // Inventory item (optional)
             // FIXME Lookup inventory item by product, lot number, expiration date
-            stockMovementItem.inventoryItem = lineItem["inventoryItem.id"] ? InventoryItem.load(lineItem["inventoryItem.id"]) : null
+            stockMovementItem.inventoryItem = lineItem?.inventoryItem?.id ? InventoryItem.load(lineItem?.inventoryItem?.id) : null
             stockMovementItem.lotNumber = lineItem["lotNumber"]
             stockMovementItem.expirationDate = (!isNull(lineItem["expirationDate"])) ?
                     Constants.EXPIRATION_DATE_FORMATTER.parse(lineItem["expirationDate"]) : null
@@ -438,7 +438,7 @@ class StockMovementApiController {
             stockMovementItem.substitute = lineItem.substitute ? Boolean.valueOf(lineItem.substitute) : Boolean.FALSE
 
             // When substituting a product, we need to include the new product, quantity and reason code
-            stockMovementItem.newProduct = lineItem["newProduct.id"] ? Product.load(lineItem["newProduct.id"]) : null
+            stockMovementItem.newProduct = lineItem?.newProduct?.id ? Product.load(lineItem?.newProduct?.id) : null
             stockMovementItem.newQuantity = lineItem.newQuantity ? new BigDecimal(lineItem.newQuantity) : null
 
             // When revising quantity you need quantity revised and reason code
@@ -447,7 +447,7 @@ class StockMovementApiController {
             stockMovementItem.comments = lineItem.comments
 
             // Update recipient
-            stockMovementItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
+            stockMovementItem.recipient = lineItem?.recipient?.id ? Person.load(lineItem?.recipient?.id) : null
 
             // Pack page fields
             stockMovementItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null

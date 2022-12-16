@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import axios from 'axios';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
@@ -18,10 +17,8 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import PackingSplitLineModal from 'components/stock-movement-wizard/modals/PackingSplitLineModal';
 import AlertMessage from 'utils/AlertMessage';
-import {
+import apiClient, {
   flattenRequest,
-  handleError,
-  handleSuccess,
   stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -175,8 +172,6 @@ const FIELDS = {
   },
 };
 
-const apiClient = axios.create({});
-
 function validate(values) {
   const errors = {};
   errors.packPageItems = [];
@@ -208,9 +203,6 @@ class PackingPage extends Component {
     this.saveSplitLines = this.saveSplitLines.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
-    this.handleValidationErrors = this.handleValidationErrors.bind(this);
-
-    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
 
     this.debouncedUsersFetch =
       debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -377,17 +369,6 @@ class PackingPage extends Component {
   validatePicklist() {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
     return apiClient.get(url);
-  }
-
-  handleValidationErrors(error) {
-    if (error.response.status === 400) {
-      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
-      this.setState({ alertMessage, showAlert: true });
-
-      return Promise.reject(error);
-    }
-
-    return handleError(error);
   }
 
   /**
