@@ -109,16 +109,14 @@
             <tr class="prop">
                 <td colspan="14" class="center">
 
-                    <a href="javascript:void(0);" class="open-dialog create button" dialog-id="inventory-level-dialog">
+                    <a href="javascript:void(0);" class="button btn-show-dialog"
+                       data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"
+                       data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}?productId=${productInstance?.id}">
                         <img src="${resource(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}</a>
 
                     <g:link class="button" controller="inventoryLevel" action="export" id="${productInstance?.id}">
                         <img src="${resource(dir:'images/icons/silk', file: 'page_excel.png')}"/>&nbsp;
-                    <a href="javascript:void(0);" class="button btn-show-dialog"
-                       data-title="${warehouse.message(code:'inventoryLevel.create.label', default: 'Create stock level')}" data-width="900" data-height="500"
-                       data-url="${request.contextPath}/inventoryLevel/dialog/${inventoryLevelInstance?.id}?productId=${productInstance?.id}">
-                        <img src="${resource(dir:'images/icons/silk', file: 'add.png')}"/>&nbsp;
                         ${warehouse.message(code:'inventoryLevel.export.label', default: 'Export stock levels')}
                     </g:link>
 
