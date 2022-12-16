@@ -745,14 +745,14 @@ class AddItemsPage extends Component {
     // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
       _.map(lineItemsToBeAdded, item => ({
-        'product.id': item.product.id,
+        product: { id: item.product.id },
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
         comments: !_.isNil(item.comments) ? item.comments : '',
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
-        'product.id': item.product.id,
+        product: { id: item.product.id },
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
         comments: !_.isNil(item.comments) ? item.comments : '',
