@@ -8,7 +8,7 @@
     <g:hiddenField name="redirectUrl" value="${params.redirectUrl}"/>
 
     <g:if test="${productInstance}">
-        <g:render template="../product/summaryDialog" model="[productInstance:productInstance]"/>
+        <g:render template="/product/summaryDialog" model="[productInstance:productInstance]"/>
     </g:if>
 
     <div class="tabs">
