@@ -190,7 +190,7 @@
 					<h2>${g.message(code: 'attributes.label')}</h2>
 					<table>
 						<tbody>
-							<g:render template="../attribute/renderFormList"
+							<g:render template="/attribute/renderFormList"
 									  model="[fieldPrefix: 'productAttributes.',
 											  entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT_SUPPLIER],
 											  populatedAttributes:productSupplierInstance?.attributes]"/>

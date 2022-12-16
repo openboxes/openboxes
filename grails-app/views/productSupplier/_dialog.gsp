@@ -149,7 +149,7 @@
                                      value="${productSupplier?.minOrderQuantity}" />
                     </td>
                 </tr>
-                <g:render template="../attribute/renderFormList"
+                <g:render template="/attribute/renderFormList"
                           model="[fieldPrefix: 'productAttributes.',
                                   entityTypeCodes: [org.pih.warehouse.core.EntityTypeCode.PRODUCT_SUPPLIER],
                                   populatedAttributes:productSupplier?.attributes]"/>
