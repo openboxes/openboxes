@@ -13,9 +13,14 @@
                        styleClass="text large required" showColor="true"/>
     </td>
     <td class="middle center">
-        <g:selectProductSupplier id="productSupplier"
-                                 name="productSupplier" class="select2"
-                                 noSelection="['':'']" disabled="${true}" />
+        <g:selectProductSupplier
+            id="productSupplier"
+            name="productSupplier"
+            class="select2"
+            noSelection="['':'']"
+            disabled="${true}"
+            data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+        />
     </td>
     <td class="middle center" style="width: 100px; word-wrap: break-word;" id="supplierCode">
     </td>
@@ -24,36 +29,55 @@
     <td class="middle center" style="width: 100px; word-wrap: break-word;" id="manufacturerCode">
     </td>
     <td class="middle center">
-        <input type="number" id="quantity" name="quantity" class="text" placeholder="Quantity" style="width: 100px"/>
+        <input type="number" id="quantity" name="quantity" class="text" placeholder="${g.message(code:'default.quantity.label', default: 'Quantity')}" style="width: 100px"/>
     </td>
     <td class="center middle">
-        <g:selectUnitOfMeasure id="quantityUom" data-placeholder="UoM"
-                               name="quantityUom.id" class="select2 required" style="width: 100px"
-                               noSelection="['':'']"/>
+        <g:selectUnitOfMeasure
+            id="quantityUom"
+            data-placeholder="${g.message(code: 'default.uom.label', default: 'UoM')}"
+            name="quantityUom.id"
+            class="select2 required"
+            style="width: 100px"
+            noSelection="['':'']"
+        />
     </td>
     <td class="center middle">
-        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="Qty per UoM" style="width: 100px"/>
+        <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="${g.message(code: 'default.qtyPerUom.label', default: 'Qty per UoM')}" style="width: 100px"/>
     </td>
     <td class="center middle">
-        <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text required" placeholder="Price per UoM" style="width: 100px"/>
+        <input type="number" id="unitPrice" required name="unitPrice" size="2" class="text required" placeholder="${g.message(code: 'default.pricePerUom.label', default: 'Price per UoM')}" style="width: 100px"/>
     </td>
     <td class="center middle">
     </td>
     <td class="center middle">
         <g:hiddenField id="defaultRecipient" name="defaultRecipient" value="${order?.orderedBy?.id}"/>
-        <g:selectPerson id="recipient" name="recipient" value="${order?.orderedBy?.id}"
-                        noSelection="['':'']" class="select2"/>
+        <g:selectPerson
+            id="recipient"
+            name="recipient"
+            value="${order?.orderedBy?.id}"
+            noSelection="['':'']" class="select2"
+            data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+        />
     </td>
     <td class="center middle">
-        <g:jqueryDatePicker id="estimatedReadyDate" name="estimatedReadyDate" value="" placeholder="Expected ready date"
-                            autocomplete="off" noSelection="['':'']"/>
+        <g:jqueryDatePicker
+            id="estimatedReadyDate"
+            name="estimatedReadyDate"
+            value=""
+            placeholder="${g.message(code: 'order.expectedReadyDate.label', default: 'Expected ready date')}"
+            autocomplete="off"
+            noSelection="['':'']"
+        />
     </td>
     <td class="center middle">
-        <g:selectBudgetCode name="budgetCode"
-                            id="budgetCode"
-                            class="select2"
-                            active="true"
-                            noSelection="['':'']"/>
+        <g:selectBudgetCode
+            name="budgetCode"
+            id="budgetCode"
+            class="select2"
+            active="true"
+            noSelection="['':'']"
+            data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+        />
     </td>
     <td class="center middle">
         <button id="save-item-button" class="button save-item">

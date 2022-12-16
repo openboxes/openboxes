@@ -71,7 +71,7 @@
                             <div class="filters-container">
                                 <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
                                 <div>
-                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="Filter by name or code"/>
+                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByNameOrCode.label', default: 'Filter by name or code')}"/>
                                 </div>
                             </div>
                             <div class="button-group" style="margin-right: 5px;">
@@ -158,17 +158,23 @@
                             </tbody>
                             <tfoot>
                                 <td>
-                                    <g:selectOrderAdjustmentTypes name="orderAdjustmentType.id"
-                                                                  id="orderAdjustmentType"
-                                                                  class="select2"
-                                                                  noSelection="['':'']"/>
+                                    <g:selectOrderAdjustmentTypes
+                                        name="orderAdjustmentType.id"
+                                        id="orderAdjustmentType"
+                                        class="select2"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                                 <td>
-                                    <g:selectOrderItems name="orderItem.id"
-                                                        id="orderItems"
-                                                        orderId="${order?.id}"
-                                                        class="select2"
-                                                        noSelection="['':'']"/>
+                                    <g:selectOrderItems
+                                        name="orderItem.id"
+                                        id="orderItems"
+                                        orderId="${order?.id}"
+                                        class="select2"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                                 <td>
                                     <g:textField name="description" id="description" class="large text"/>
@@ -183,11 +189,14 @@
                                     <g:textArea name="comments" id="comments"/>
                                 </td>
                                 <td>
-                                    <g:selectBudgetCode name="budgetCode"
-                                                        id="adjustmentBudgetCode"
-                                                        class="select2"
-                                                        active="true"
-                                                        noSelection="['':'']"/>
+                                    <g:selectBudgetCode
+                                        name="budgetCode"
+                                        id="adjustmentBudgetCode"
+                                        class="select2"
+                                        active="true"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                                 <td class="center middle">
                                     <button type="button" class="button" onclick="saveOrderAdjustment()">
@@ -217,7 +226,7 @@
                             params="[id:order?.id]"
                             class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" />&nbsp;
-                        <warehouse:message code="default.back.label" default="Back"/>
+                        <g:message code="default.back.label" default="Back"/>
                     </g:link>
                 </div>
                 <div class="right">
@@ -249,7 +258,7 @@
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
           if (isFormDirty()) {
-            $.notify("Please save item before proceeding");
+            $.notify("${g.message(code: 'order.errors.saveItem.message', default: 'Please save item before proceeding')}");
             return false;
           } else {
             // This seems to be the best way to proceed after stopping propagation

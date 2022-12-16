@@ -41,7 +41,7 @@
                     <div class="yui-u first">
                         <div id="details" class="box">
                             <h2>
-                                <warehouse:message code="order.orderHeader.label" default="Order Header"/>
+                                <g:message code="order.header.label" default="Order Header"/>
                             </h2>
                             <table>
                                 <tbody>
