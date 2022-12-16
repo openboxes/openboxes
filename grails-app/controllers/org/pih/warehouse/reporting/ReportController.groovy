@@ -414,7 +414,7 @@ class ReportController {
                     binLocations = binLocations.findAll { it.status == params.status }
                 }
 
-                String csv = ReportUtil.getCsvForListOfMapEntries(binLocations, binLocationCsvHeader, binLocationCsvRow)
+                String csv = ReportUtil.getCsvForListOfMapEntries(binLocations, this.&binLocationCsvHeader, this.&binLocationCsvRow)
                 def filename = "Bin Location Report - ${location?.name} - ${params.status ?: 'All'}.csv"
                 response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
                 render(contentType: "text/csv", text: csv)
