@@ -502,16 +502,16 @@ class AddItemsPage extends Component {
 
     const lineItemsToSave = [].concat(
       _.map(lineItemsToBeAdded, item => ({
-        'product.id': item.product.id,
+        product: { id: item.product.id },
         quantityRequested: item.quantityRequested,
-        'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+        recipient: { id: _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '' },
         sortOrder: item.sortOrder,
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
-        'product.id': item.product.id,
+        product: { id: item.product.id },
         quantityRequested: item.quantityRequested,
-        'recipient.id': _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '',
+        recipient: { id: _.isObject(item.recipient) ? item.recipient.id || '' : item.recipient || '' },
         sortOrder: item.sortOrder,
       })),
     );

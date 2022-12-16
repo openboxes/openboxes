@@ -752,7 +752,7 @@ class AddItemsPage extends Component {
       const itemQuantityCounted = item.quantityOnHand ?
         { quantityCounted: parseInt(item.quantityOnHand, 10) } : {};
       return {
-        'product.id': item.product.id,
+        product: { id: item.product.id },
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
         comments: !_.isNil(item.comments) ? item.comments : '',

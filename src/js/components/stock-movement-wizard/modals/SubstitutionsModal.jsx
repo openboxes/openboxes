@@ -193,7 +193,7 @@ class SubstitutionsModal extends Component {
     const url = `/api/stockMovementItems/${originalItem.requisitionItemId}/substituteItem`;
     const payload = {
       substitutionItems: _.map(substitutions, (sub, key) => ({
-        'newProduct.id': sub.product.id,
+        newProduct: { id: sub.product.id },
         newQuantity: sub.quantitySelected,
         reasonCode: substitutionReasonCode === 'SUBSTITUTION'
           ? substitutionReasonCode
