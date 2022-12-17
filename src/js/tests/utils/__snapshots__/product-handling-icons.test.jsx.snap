@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`product-handling-icons should match snapshot 1`] = `
-<span
-  className="d-flex align-items-center"
-/>
-`;
