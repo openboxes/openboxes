@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`checkbox with label should match snapshot 1`] = `
+<div
+  className="d-flex align-items-center"
+  data-testid="with-label-checkbox"
+>
+  <input
+    checked={false}
+    id=""
+    onChange={[Function]}
+    type="checkbox"
+  />
+  <label
+    htmlFor=""
+    style={
+      {
+        "margin": "0 0 0 5px",
+      }
+    }
+  >
+    test label
+  </label>
+</div>
+`;
+
+exports[`custom checkbox should match snapshot 1`] = `
+<div
+  className="custom-checkbox"
+  data-testid="custom-checkbox"
+>
+  <input
+    checked={false}
+    id=""
+    onChange={[Function]}
+    type="checkbox"
+  />
+  <label
+    htmlFor=""
+  />
+</div>
+`;
+
+exports[`default checkbox should match snapshot 1`] = `
+<input
+  checked={false}
+  data-testid="checkbox"
+  id=""
+  onChange={[Function]}
+  type="checkbox"
+/>
+`;

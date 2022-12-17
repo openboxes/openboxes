@@ -15,7 +15,7 @@ const Checkbox = ({
 
   if (custom) {
     return (
-      <div className="custom-checkbox">
+      <div data-testid="custom-checkbox" className="custom-checkbox">
         <input
           type="checkbox"
           ref={fieldRef}
@@ -30,7 +30,7 @@ const Checkbox = ({
 
   if (withLabel) {
     return (
-      <div className="d-flex align-items-center">
+      <div data-testid="with-label-checkbox" className="d-flex align-items-center">
         <input
           type="checkbox"
           ref={(elem) => {
@@ -53,6 +53,7 @@ const Checkbox = ({
 
   return (
     <input
+      data-testid="checkbox"
       type="checkbox"
       ref={(elem) => {
         if (elem) {

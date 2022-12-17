@@ -3,7 +3,10 @@ import _ from 'lodash';
 export const hasMinimumRequiredRole = (role, highestUserRole) => {
   // TODO: Figure out better way to check roles
   const roles = ['Superuser', 'Admin', 'Manager', 'Assistant', 'Browser', 'Authenticated', 'Anonymous'];
-  return roles.indexOf(highestUserRole) <= roles.indexOf(role);
+  const userRoleIndex = roles.indexOf(role);
+  const highestUserRoleIndex = roles.indexOf(highestUserRole);
+  return (userRoleIndex !== -1 && highestUserRoleIndex !== -1) &&
+    highestUserRoleIndex <= userRoleIndex;
 };
 
 
