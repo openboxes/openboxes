@@ -15,6 +15,7 @@ import grails.plugins.csv.CSVWriter
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
@@ -597,7 +598,6 @@ class ReportController {
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
-        String dateFormat = grailsApplication.config.openboxes.expirationDate.format
 
         List rows = binLocations.collect { row ->
 
@@ -610,7 +610,7 @@ class ReportController {
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
                             "Product name"        : row?.product.name ?: "",
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
-                            "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
+                            "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
                             "OB QOH"              : row?.quantity ?: 0,
                             "Physical QOH"        : "",
@@ -620,7 +620,7 @@ class ReportController {
                             "Formularies"         : product.productCatalogs.join(", ") ?: "",
                             "ABC Classification"  : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
                             "Status"              : g.message(code: "binLocationSummary.${row?.status}.label"),
-                            "Last Inventory Date" : latestInventoryDate ? latestInventoryDate.format(dateFormat) : "",
+                            "Last Inventory Date" : latestInventoryDate ? latestInventoryDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
                     ] : [
                             productCode       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
                             productName       : row?.product.name ?: "",
@@ -628,11 +628,11 @@ class ReportController {
                             category          : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
                             formularies       : product.productCatalogs.join(", ") ?: "",
                             lotNumber         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
-                            expirationDate    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
+                            expirationDate    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
                             abcClassification : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
                             binLocation       : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
                             status            : g.message(code: "binLocationSummary.${row?.status}.label"),
-                            lastInventoryDate : latestInventoryDate ? latestInventoryDate.format(dateFormat) : "",
+                            lastInventoryDate : latestInventoryDate ? latestInventoryDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
                             quantityOnHand    : row?.quantity ?: 0,
                     ]
 
