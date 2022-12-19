@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import TableRow from 'components/form-elements/TableRow';
+import Spinner from 'components/spinner/Spinner';
 
 
 const TableBody = (props) => {
@@ -11,6 +12,10 @@ const TableBody = (props) => {
     addRow = (row = {}) => fields.push(row),
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
+
+  if (properties?.loadingSubstitutions) {
+    return (<Spinner />);
+  }
 
   return (
     fields.map((field, index) => (

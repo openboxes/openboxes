@@ -31,7 +31,9 @@ const FIELDS = {
   },
   substitutions: {
     type: ArrayField,
-    getDynamicRowAttr: ({ rowValues, originalItem }) => {
+    getDynamicRowAttr: ({
+      rowValues, originalItem, loadingSubstitutions,
+    }) => {
       let className = '';
       const rowDate = new Date(rowValues.minExpirationDate);
       const origDate = originalItem && originalItem.minExpirationDate ?
@@ -41,7 +43,7 @@ const FIELDS = {
       } else {
         className = 'font-weight-bold';
       }
-      return { className };
+      return { className, loadingSubstitutions };
     },
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow }) => (
@@ -158,6 +160,7 @@ class SubstitutionsModal extends Component {
     const attr = { ...attributes, ...dynamicAttr };
 
     this.state = {
+      loadingSubstitutions: false,
       attr,
       formValues: {},
       originalItem: null,
@@ -222,8 +225,8 @@ class SubstitutionsModal extends Component {
   }
 
   fetchSubstitutions() {
+    this.setState({ loadingSubstitutions: true });
     const url = `/openboxes/api/stockMovements/${this.state.attr.lineItem.requisitionItemId}/substitutionItems`;
-
     return apiClient.get(url)
       .then((resp) => {
         let substitutions = _.map(
@@ -264,6 +267,7 @@ class SubstitutionsModal extends Component {
         }
 
         this.setState({
+          loadingSubstitutions: false,
           formValues: {
             substitutions,
           },
@@ -324,6 +328,7 @@ class SubstitutionsModal extends Component {
         validate={this.validate}
         initialValues={this.state.formValues}
         formProps={{
+          loadingSubstitutions: this.state.loadingSubstitutions,
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,
           debouncedProductsFetch: this.debouncedProductsFetch,
