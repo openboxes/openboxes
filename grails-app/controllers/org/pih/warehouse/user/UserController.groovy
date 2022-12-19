@@ -19,6 +19,7 @@ import org.pih.warehouse.core.User
 
 import javax.imageio.ImageIO as IIO
 import javax.swing.*
+import grails.gorm.transactions.Transactional
 import java.awt.*
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
@@ -321,8 +322,7 @@ class UserController {
             // fetch an instance of authenticated user
             def userInstance = User.get(session?.user?.id)
             if (userInstance) {
-                userInstance.locale = locale
-                userInstance.save(flush: true)
+                userService.updateUserLocale(userInstance, locale)
 
                 session.locale = null
                 // update the reference to the user in the session
