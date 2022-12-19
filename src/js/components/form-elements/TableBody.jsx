@@ -8,19 +8,28 @@ import Spinner from 'components/spinner/Spinner';
 
 const TableBody = (props) => {
   const {
-    fieldsConfig, properties, fields, tableRef = () => {},
+    fieldsConfig,
+    properties,
+    fields,
+    tableRef = () => {
+    },
     addRow = (row = {}) => fields.push(row),
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
 
-  console.log(properties?.emptySubstitutions)
-  if (properties?.emptySubstitutions) {
+  const {
+    emptySubstitutions,
+    loadingSubstitutions,
+  } = properties;
+
+  if (loadingSubstitutions) {
+    return (<Spinner />);
+  }
+
+  if (emptySubstitutions && !fields.length) {
     return (<div>There is no data to load</div>);
   }
 
-  if (properties?.loadingSubstitutions) {
-    return (<Spinner />);
-  }
 
   return (
     fields.map((field, index) => (

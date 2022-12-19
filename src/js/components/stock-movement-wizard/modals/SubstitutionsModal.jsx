@@ -32,7 +32,10 @@ const FIELDS = {
   substitutions: {
     type: ArrayField,
     getDynamicRowAttr: ({
-      rowValues, originalItem, loadingSubstitutions, emptySubstitutions,
+      rowValues,
+      originalItem,
+      loadingSubstitutions,
+      emptySubstitutions,
     }) => {
       let className = '';
       const rowDate = new Date(rowValues.minExpirationDate);
@@ -43,7 +46,11 @@ const FIELDS = {
       } else {
         className = 'font-weight-bold';
       }
-      return { className, loadingSubstitutions, emptySubstitutions };
+      return {
+        className,
+        loadingSubstitutions,
+        emptySubstitutions,
+      };
     },
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow }) => (
@@ -51,7 +58,10 @@ const FIELDS = {
         type="button"
         className="btn btn-outline-success btn-xs"
         onClick={() => addRow({}, null, false)}
-      ><Translate id="react.default.button.addCustomSubstitution.label" defaultMessage="Add custom substitution" />
+      ><Translate
+        id="react.default.button.addCustomSubstitution.label"
+        defaultMessage="Add custom substitution"
+      />
       </button>
     ),
     fields: {
@@ -73,7 +83,10 @@ const FIELDS = {
           className: 'text-left',
           showLabel: true,
           optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
+            <strong
+              style={{ color: option.color ? option.color : 'black' }}
+              className="d-flex align-items-center"
+            >
               {option.label}
               &nbsp;
               {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
@@ -98,7 +111,8 @@ const FIELDS = {
           ),
         },
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch,
+          fieldValue,
+          debouncedProductsFetch,
         }) => ({
           disabled: !!fieldValue,
           loadOptions: debouncedProductsFetch,
@@ -121,14 +135,18 @@ const FIELDS = {
         fieldKey: '',
         attributes: {
           // eslint-disable-next-line no-nested-ternary
-          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable').toLocaleString('en-US') :
-            _.get(fieldValue, 'product.quantityAvailable') ? _.get(fieldValue, 'product.quantityAvailable').toLocaleString('en-US') : null),
+          formatValue: fieldValue => (_.get(fieldValue, 'quantityAvailable') ? _.get(fieldValue, 'quantityAvailable')
+            .toLocaleString('en-US') :
+            _.get(fieldValue, 'product.quantityAvailable') ? _.get(fieldValue, 'product.quantityAvailable')
+              .toLocaleString('en-US') : null),
           showValueTooltip: true,
         },
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: _.map(fieldValue && fieldValue.availableItems, availableItem =>
             (
-              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.expirationDate ? availableItem.expirationDate : '---'}, Qty {availableItem.quantityAvailable}</p>
+              <p>{fieldValue.productCode} {fieldValue.productName}, {availableItem.expirationDate ? availableItem.expirationDate : '---'},
+                Qty {availableItem.quantityAvailable}
+              </p>
             )),
         }),
       },
@@ -149,12 +167,16 @@ const FIELDS = {
  * Modal window where user can choose substitution and it's quantity.
  * It is available only when there is a substitution for an item.
  */
+
 /* eslint no-param-reassign: "error" */
 class SubstitutionsModal extends Component {
   constructor(props) {
     super(props);
     const {
-      fieldConfig: { attributes, getDynamicAttr },
+      fieldConfig: {
+        attributes,
+        getDynamicAttr,
+      },
     } = props;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
     const attr = { ...attributes, ...dynamicAttr };
@@ -178,7 +200,10 @@ class SubstitutionsModal extends Component {
 
   componentWillReceiveProps(nextProps) {
     const {
-      fieldConfig: { attributes, getDynamicAttr },
+      fieldConfig: {
+        attributes,
+        getDynamicAttr,
+      },
     } = nextProps;
     const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
     const attr = { ...attributes, ...dynamicAttr };
@@ -190,7 +215,8 @@ class SubstitutionsModal extends Component {
    * @public
    */
   onOpen() {
-    this.state.attr.onOpen().then(() => this.fetchSubstitutions());
+    this.state.attr.onOpen()
+      .then(() => this.fetchSubstitutions());
   }
 
   /** Sends all changes made by user in this modal to API and updates data.
@@ -220,8 +246,12 @@ class SubstitutionsModal extends Component {
     };
 
     apiClient.post(url, payload)
-      .then(() => { this.props.onResponse(); })
-      .catch(() => { this.props.hideSpinner(); });
+      .then(() => {
+        this.props.onResponse();
+      })
+      .catch(() => {
+        this.props.hideSpinner();
+      });
   }
 
   fetchSubstitutions() {
@@ -274,7 +304,8 @@ class SubstitutionsModal extends Component {
           },
           originalItem,
         });
-      }).catch(err => err);
+      })
+      .catch(err => err);
   }
 
   validate(values) {
@@ -305,12 +336,16 @@ class SubstitutionsModal extends Component {
    * @param {object} values
    * @public
    */
+
   /* eslint-disable-next-line class-methods-use-this */
   calculateSelected(values) {
     return (
       <div>
         <div className="font-weight-bold pb-2">
-          <Translate id="react.stockMovement.quantitySelected.label" defaultMessage="Quantity selected" />: {_.reduce(values.substitutions, (sum, val) =>
+          <Translate
+            id="react.stockMovement.quantitySelected.label"
+            defaultMessage="Quantity selected"
+          />: {_.reduce(values.substitutions, (sum, val) =>
           (sum + (val.quantitySelected ? _.toInteger(val.quantitySelected) : 0)), 0)
         }
         </div>
@@ -339,13 +374,22 @@ class SubstitutionsModal extends Component {
       >
         <div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.attr.lineItem.productCode}
+            <Translate
+              id="react.stockMovement.productCode.label"
+              defaultMessage="Product code"
+            />: {this.state.attr.lineItem.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.attr.lineItem.productName}
+            <Translate
+              id="react.stockMovement.productName.label"
+              defaultMessage="Product name"
+            />: {this.state.attr.lineItem.productName}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.quantityRequested.label" defaultMessage="Qty Requested" />: {this.state.attr.lineItem.quantityRequested}
+            <Translate
+              id="react.stockMovement.quantityRequested.label"
+              defaultMessage="Qty Requested"
+            />: {this.state.attr.lineItem.quantityRequested}
           </div>
         </div>
       </ModalWrapper>
@@ -358,7 +402,10 @@ const mapStateToProps = state => ({
   minSearchLength: state.session.searchConfig.minSearchLength,
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(SubstitutionsModal);
+export default connect(mapStateToProps, {
+  showSpinner,
+  hideSpinner,
+})(SubstitutionsModal);
 
 SubstitutionsModal.propTypes = {
   /** Name of the field */
