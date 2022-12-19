@@ -11,7 +11,7 @@ const renderHandlingIcons = (handlingIcons) => {
   }
 
   return (
-    <span className="d-flex align-items-center">
+    <span data-testid="product-handling-icons" className="d-flex align-items-center">
       {_.map(handlingIcons, (handlingIcon) => {
         if (!handlingIcon || !getIcon(handlingIcon.icon)) {
           return null;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiMoreLine } from 'react-icons/all';
+import { RiMoreLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
 import Translate from 'utils/Translate';
@@ -39,8 +39,9 @@ const ActionDots = ({
   };
 
   return (
-    <div className={`btn-group ${getPositionClass()}`}>
+    <div className={`btn-group ${getPositionClass()}`} data-testid="action-dots-component">
       <button
+        data-testid="dropdown-toggle"
         className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"
         data-toggle="dropdown"
         aria-haspopup="true"
@@ -48,7 +49,7 @@ const ActionDots = ({
       >
         <RiMoreLine />
       </button>
-      <div className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
+      <div data-testid="dropdown-menu" className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
         {actions && actions.map((action) => {
           const itemClasses = `d-flex align-items-center gap-8 dropdown-item ${action.variant === 'danger' ? 'font-red-ob' : ''}`;
           const itemValue = (

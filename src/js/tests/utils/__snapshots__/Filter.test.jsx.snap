@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`filter should match snapshot 1`] = `
+<input
+  data-testid="filter-input"
+  onChange={[Function]}
+  placeholder="Search"
+  style={
+    {
+      "width": "100%",
+    }
+  }
+  value=""
+/>
+`;

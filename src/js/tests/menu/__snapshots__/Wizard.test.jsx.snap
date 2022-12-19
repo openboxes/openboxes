@@ -119,6 +119,7 @@ exports[`wizard component should match snapshot 1`] = `
               >
                 <input
                   className="form-control form-control-xs  "
+                  data-testid="input"
                   disabled={true}
                   id="invoiceNumber"
                   onBlur={[Function]}
@@ -325,6 +326,7 @@ exports[`wizard component should match snapshot 1`] = `
               >
                 <input
                   className="form-control form-control-xs  "
+                  data-testid="input"
                   id="vendorInvoiceNumber"
                   onBlur={[Function]}
                   onChange={[Function]}
@@ -621,6 +623,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           >
             <input
               className="form-control form-control-xs  "
+              data-testid="input"
               disabled={true}
               id="invoiceNumber"
               onBlur={[Function]}
@@ -827,6 +830,7 @@ exports[`wizardPage component should match snapshot 1`] = `
           >
             <input
               className="form-control form-control-xs  "
+              data-testid="input"
               id="vendorInvoiceNumber"
               onBlur={[Function]}
               onChange={[Function]}

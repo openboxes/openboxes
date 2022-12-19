@@ -10,7 +10,7 @@ const StatusIndicator = ({ status, variant }) => {
     .join(' ');
 
   return (
-    <div className="d-flex align-items-center justify-content-between">
+    <div data-testid="status-indicator" className="d-flex align-items-center justify-content-between">
       <div className="d-flex justify-content-between align-items-center">
         <span className={`${variant}-circle status-circle`} />
         <span className="px-1">{statusToDisplay}</span>
