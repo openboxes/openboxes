@@ -72,6 +72,9 @@ plugins {
 
     // resolve a Windows-specific build issue
     id 'com.virgo47.ClasspathJar' version '1.0.0'
+
+    // enable `grails gradle autoLintGradle`
+    id 'nebula.lint' version '17.7.1'
 }
 
 // prevent warfile issues by applying this before `asset-pipeline`. OBGM-353
@@ -299,8 +302,16 @@ configurations {
             force 'org.apache.xmlbeans:xmlbeans:3.1.0'  // security patch, build fixes
             force 'org.checkerframework:checker-qual:3.12.0'  // use consistent version
             force 'org.dom4j:dom4j:2.1.3'  // security patch
+            force 'org.objenesis:objenesis:2.1'  // openjdk support
             force 'org.quartz-scheduler:quartz:2.3.2'  // security patch
         }
+    }
+}
+
+// app servers, other than jetty, expose this api directly
+if (targetWebServer() != 'jetty') {
+    configurations.configureEach {
+        exclude group: 'javax.servlet', module: 'javax.servlet-api'
     }
 }
 
@@ -321,6 +332,17 @@ dependencyCheck {
     format = 'ALL'
     junitFailOnCVSS = 11
     skipTestGroups = true
+}
+
+gradleLint {
+    alwaysRun = false
+    rules = [
+        'all-dependency',
+        'archaic-wrapper',
+        'duplicate-dependency-class',
+        'overridden-dependency-version',
+    ]
+    excludedRules = ['unused-exclude-by-dep']
 }
 
 manifest {
@@ -463,6 +485,9 @@ dependencies {
     implementation "io.sentry:sentry-logback:${sentryVersion}"
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
 
+    // incorporate latest timezone changes
+    implementation 'joda-time:joda-time:2.12.2'
+
     testCompile 'junit:junit:4.13.2'
 
     compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
@@ -480,7 +505,6 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-to-slf4j:${slf4jProvidedLog4j2Version}"
 
     implementation "org.apache.poi:poi:${poiVersion}"
-    implementation "org.apache.poi:poi-scratchpad:${poiVersion}"
 
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
@@ -608,7 +632,10 @@ dependencies {
     implementation 'org.grails.plugins:joda-time:2.1.0'
 
     // enable `import org.quartz.*`
-    compile 'org.grails.plugins:quartz:2.0.13'
+    compile('org.grails.plugins:quartz:2.0.13') {
+        exclude group: 'com.mchange'
+        exclude group: 'com.zaxxer'
+    }
 
     // list all scheduled jobs at e.g. http://localhost:8080/openboxes/quartz
     implementation('org.grails.plugins:quartz-monitor:1.3') {
@@ -669,9 +696,17 @@ dependencies {
     implementation 'org.slf4j:log4j-over-slf4j'  // log4j1 -> slf4j; cf. log4j-to-slf4j
     implementation 'org.slf4j:slf4j-api'  // slf4j itself
 
-    // enable `import spock.lang.*`
-    testCompile 'org.spockframework:spock-core:1.3-groovy-2.4'
-    testCompile 'org.spockframework:spock-spring:1.3-groovy-2.4'
+    /*
+     * Enable `import spock.lang.*`.
+     *
+     * N.B., these libraries needlessly duplicate Grails' imports.
+     */
+    testCompile('org.spockframework:spock-core:1.3-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    testCompile('org.spockframework:spock-spring:1.3-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
 
     // enable `import org.springframework.orm.hibernate5.*`
     implementation 'org.springframework:spring-orm'
