@@ -287,7 +287,11 @@ class Select extends Component {
             }}
             ref={fieldRef}
             classNamePrefix={classNamePrefix}
-            noOptionsMessage={() => (async ? 'Type to search' : 'No results found')}
+            loadingMessage={() => this.props.translate('react.default.loading.label', 'Loading...')}
+            noOptionsMessage={() => (async ?
+              this.props.translate('react.default.select.noResultsFound.label', 'No results found') :
+              this.props.translate('react.default.select.typeToSearch.label', 'Type to search'))
+          }
             onKeyDown={(event) => {
               switch (event.keyCode) {
                 case 37: /* arrow left */

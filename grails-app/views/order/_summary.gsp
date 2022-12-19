@@ -202,18 +202,18 @@
                                     disabled="${orderInstance?.status < OrderStatus.PLACED}"
                                     disabledMessage="Order must be placed in order to ship">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'lorry.png')}" />&nbsp;
-                                <warehouse:message code="order.shipOrder.label" default="Ship Order"/>
+                                <g:message code="order.shipOrder.label" default="Ship Order"/>
                             </g:link>
                         </div>
                         <g:supports activityCode="${ActivityCode.PLACE_ORDER}">
                             <div class="button-group">
                                 <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
-                                    <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
+                                    <g:message code="order.addComment.label" default="Add comment"/>
                                 </g:link>
                                 <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
-                                    <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
+                                    <g:message code="order.addDocument.label" default="Add document"/>
                                 </g:link>
                             </div>
                         </g:supports>
@@ -294,7 +294,7 @@
                             </g:link>
                             <g:link controller="order" action="download" id="${orderInstance?.id}" class="button" target="_blank">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
-                                <warehouse:message code="order.wizard.downloadOrder.label" default="Download Order"/>
+                                <g:message code="order.wizard.downloadOrder.label" default="Download Order"/>
                             </g:link>
                             <g:link controller="order" action="downloadOrderItems" id="${orderInstance?.id}" class="button" target="_blank">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" />&nbsp;
