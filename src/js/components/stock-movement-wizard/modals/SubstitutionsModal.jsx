@@ -32,7 +32,7 @@ const FIELDS = {
   substitutions: {
     type: ArrayField,
     getDynamicRowAttr: ({
-      rowValues, originalItem, loadingSubstitutions,
+      rowValues, originalItem, loadingSubstitutions, emptySubstitutions,
     }) => {
       let className = '';
       const rowDate = new Date(rowValues.minExpirationDate);
@@ -43,7 +43,7 @@ const FIELDS = {
       } else {
         className = 'font-weight-bold';
       }
-      return { className, loadingSubstitutions };
+      return { className, loadingSubstitutions, emptySubstitutions };
     },
     // eslint-disable-next-line react/prop-types
     addButton: ({ addRow }) => (
@@ -267,6 +267,7 @@ class SubstitutionsModal extends Component {
         }
 
         this.setState({
+          emptySubstitutions: !substitutions.length,
           loadingSubstitutions: false,
           formValues: {
             substitutions,
@@ -328,6 +329,7 @@ class SubstitutionsModal extends Component {
         validate={this.validate}
         initialValues={this.state.formValues}
         formProps={{
+          emptySubstitutions: this.state.emptySubstitutions,
           loadingSubstitutions: this.state.loadingSubstitutions,
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,

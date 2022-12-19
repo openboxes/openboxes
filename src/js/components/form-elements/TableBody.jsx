@@ -13,6 +13,11 @@ const TableBody = (props) => {
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
 
+  console.log(properties?.emptySubstitutions)
+  if (properties?.emptySubstitutions) {
+    return (<div>There is no data to load</div>);
+  }
+
   if (properties?.loadingSubstitutions) {
     return (<Spinner />);
   }
