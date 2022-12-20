@@ -34,8 +34,8 @@ const FIELDS = {
     getDynamicRowAttr: ({
       rowValues,
       originalItem,
-      loadingSubstitutions,
-      emptySubstitutions,
+      isLoading,
+      isEmptyData,
     }) => {
       let className = '';
       const rowDate = new Date(rowValues.minExpirationDate);
@@ -48,8 +48,8 @@ const FIELDS = {
       }
       return {
         className,
-        loadingSubstitutions,
-        emptySubstitutions,
+        isLoading,
+        isEmptyData,
       };
     },
     // eslint-disable-next-line react/prop-types
@@ -182,8 +182,8 @@ class SubstitutionsModal extends Component {
     const attr = { ...attributes, ...dynamicAttr };
 
     this.state = {
-      emptySubstitutions: true,
-      loadingSubstitutions: false,
+      isEmptyData: true,
+      isLoading: false,
       attr,
       formValues: {},
       originalItem: null,
@@ -256,7 +256,7 @@ class SubstitutionsModal extends Component {
   }
 
   fetchSubstitutions() {
-    this.setState({ loadingSubstitutions: true });
+    this.setState({ isLoading: true });
     const url = `/openboxes/api/stockMovements/${this.state.attr.lineItem.requisitionItemId}/substitutionItems`;
     return apiClient.get(url)
       .then((resp) => {
@@ -298,7 +298,7 @@ class SubstitutionsModal extends Component {
         }
 
         this.setState({
-          emptySubstitutions: !substitutions.length,
+          isEmptyData: !substitutions.length,
           formValues: {
             substitutions,
           },
@@ -307,7 +307,7 @@ class SubstitutionsModal extends Component {
       })
       .catch(err => err)
       .finally(() => this.setState({
-        loadingSubstitutions: false,
+        isLoading: false,
       }));
   }
 
@@ -367,8 +367,10 @@ class SubstitutionsModal extends Component {
         validate={this.validate}
         initialValues={this.state.formValues}
         formProps={{
-          emptySubstitutions: this.state.emptySubstitutions,
-          loadingSubstitutions: this.state.loadingSubstitutions,
+          isEmptyData: this.state.isEmptyData,
+          isLoading: this.state.isLoading,
+          emptyDataMessageId: 'react.stockMovement.noSubstitutionsAvailable.message',
+          defaultEmptyDataMessage: 'There are no substitutions available',
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,
           debouncedProductsFetch: this.debouncedProductsFetch,
