@@ -933,7 +933,7 @@ class ProductAvailabilityService {
             return
         }
 
-        // First update records that won't validate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
         String updateStatement = """
             UPDATE IGNORE product_availability
             SET product_code = '${primaryProduct.productCode}', 
@@ -945,41 +945,7 @@ class ProductAvailabilityService {
             "inventory item: ${obsoleteInventoryItem?.id}"
 
         // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
-        // Get all remaining obsolete product availabilities with obsolete inventory item
-        List<ProductAvailability> remainingPAs = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
-        remainingPAs?.each { ProductAvailability remainingPA ->
-            // Check if product availabilities are already existing for a product_availability_uniq_idx
-            ProductAvailability existingPA = ProductAvailability.createCriteria().get {
-                eq("location", remainingPA.location)
-                eq("productCode", primaryProduct.productCode)
-                eq("lotNumber", remainingPA.lotNumber)
-                eq("binLocationName", remainingPA.binLocationName)
-            }
-
-            // If exists, then add quantities from obsolete PA to the new main one
-            if (existingPA) {
-                existingPA.quantityOnHand += remainingPA.quantityOnHand
-                existingPA.quantityAllocated += remainingPA.quantityAllocated
-                existingPA.quantityNotPicked += remainingPA.quantityNotPicked
-                existingPA.quantityOnHold += remainingPA.quantityOnHold
-                existingPA. quantityAvailableToPromise += remainingPA.quantityAvailableToPromise
-                existingPA.save(flush: true)
-
-                remainingPA.quantityOnHand = 0
-                remainingPA.quantityAllocated = 0
-                remainingPA.quantityNotPicked = 0
-                remainingPA.quantityOnHold = 0
-                remainingPA. quantityAvailableToPromise = 0
-                remainingPA.save(flush: true)
-
-                return
-            }
-
-            // Otherwise swap product and inventory item on the remaining obsolete PA with primary ones
-            remainingPA.product = primaryProduct
-            remainingPA.productCode = primaryProduct.productCode
-            remainingPA.save(flush: true)
-        }
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, null)
     }
 
     /**
@@ -991,7 +957,7 @@ class ProductAvailabilityService {
             return
         }
 
-        // First update records that won't validate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
         String updateStatement = """
             UPDATE IGNORE product_availability
             SET product_code = '${primaryProduct.productCode}', 
@@ -1005,6 +971,14 @@ class ProductAvailabilityService {
             "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
 
         // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, primaryInventoryItem)
+    }
+
+    /**
+     * Used for product merge feature when initial update of product and inventory item was ignored due to the
+     * unique product_availability_uniq_idx violation.
+     * */
+    void processIgnoredProductAvailabilitiesOnProductMerge(Product primaryProduct, InventoryItem obsoleteInventoryItem, InventoryItem primaryInventoryItem) {
         // Get all remaining obsolete product availabilities with obsolete inventory item
         List<ProductAvailability> remainingPAs = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
         remainingPAs?.each { ProductAvailability remainingPA ->
@@ -1035,11 +1009,13 @@ class ProductAvailabilityService {
                 return
             }
 
-            // Otherwise swap product and inventory item on the remaining obsolete PA with primary ones
+            // Otherwise swap product (and inventory item) on the remaining obsolete PA with primary ones
             remainingPA.product = primaryProduct
             remainingPA.productCode = primaryProduct.productCode
-            remainingPA.inventoryItem = primaryInventoryItem
-            remainingPA.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
+            if (primaryInventoryItem) {
+                remainingPA.inventoryItem = primaryInventoryItem
+                remainingPA.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
+            }
             remainingPA.save(flush: true)
         }
     }
