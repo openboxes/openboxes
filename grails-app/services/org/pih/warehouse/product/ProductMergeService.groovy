@@ -122,21 +122,20 @@ class ProductMergeService {
          * */
 
         // 1. Copy Inventory items that are not already existing on the primary product (and InventorySnapshot change)
-        Set<InventoryItem> obsoleteInventoryItems = obsolete.inventoryItems
+        Set<InventoryItem> obsoleteInventoryItems = InventoryItem.findAllByProduct(obsolete)
         obsoleteInventoryItems?.each { InventoryItem obsoleteInventoryItem ->
             // Check if this lot already exists for the primary product
             InventoryItem primaryInventoryItem = InventoryItem.findByProductAndLotNumber(primary, obsoleteInventoryItem.lotNumber)
 
-            int inventorySnapshotsCount = InventorySnapshot.countByInventoryItem(obsoleteInventoryItem)
+            // int inventorySnapshotsCount = InventorySnapshot.countByInventoryItem(obsoleteInventoryItem)
             int productAvailabilitiesCount = ProductAvailability.countByInventoryItem(obsoleteInventoryItem)
             if (primaryInventoryItem) {
                 // if product inventory item already exists, then check if obsolete InventoryItem has InventorySnapshot
-                if (inventorySnapshotsCount > 0) {
-                    inventorySnapshotService.updateInventorySnapshots(primaryInventoryItem, obsoleteInventoryItem, primary)
-                }
+                // FIXME: Temporary disabled inventory snapshot update
+
                 // if product inventory item already exists, then check if obsolete InventoryItem has ProductAvailability
                 if (productAvailabilitiesCount > 0) {
-                    productAvailabilityService.updateProductAvailabilityOnMergeProduct(primaryInventoryItem, obsoleteInventoryItem, primary)
+                    productAvailabilityService.updateProductAvailabilityOnMergeProduct(primaryInventoryItem, obsoleteInventoryItem, primary, obsolete)
                 }
                 // if product inventory item already exists, then check if obsolete InventoryItem has PicklistItems
                 int picklistItemsCount = PicklistItem.countByInventoryItem(obsoleteInventoryItem)
@@ -149,27 +148,32 @@ class ProductMergeService {
 
             logProductMergeData(primary, obsolete, obsoleteInventoryItem)
 
-            // Swap inventory snapshot product for the records with inventory item that will have changed products
-            if (inventorySnapshotsCount) {
-                inventorySnapshotService.updateInventorySnapshots(obsoleteInventoryItem, primary)
-            }
-
-            // Swap product availability product for the records with inventory item that will have changed products
-            if (productAvailabilitiesCount) {
-                productAvailabilityService.updateProductAvailabilityOnMergeProduct(obsoleteInventoryItem, primary)
-            }
-
             // Swap product to primary
             obsoleteInventoryItem.product = primary
             obsoleteInventoryItem.disableRefresh = true
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteInventoryItem.save(flush: true)
+
+            // Swap inventory snapshot product for the records with inventory item that will have changed products
+            // FIXME: Temporary removed inventory snapshot update
+
+            // Swap product availability product for the records with inventory item that will have changed products
+            if (productAvailabilitiesCount) {
+                productAvailabilityService.updateProductAvailabilityOnMergeProduct(obsoleteInventoryItem, primary, obsolete)
+            }
         }
 
         // 2. Find all items with obsolete product and swap products and inventory items
 
         // 2.1 RequisitionItem
-        List<RequisitionItem> obsoleteRequisitionItems = RequisitionItem.findAllByProduct(obsolete)
+        List<RequisitionItem> obsoleteRequisitionItems = RequisitionItem.createCriteria().list {
+            or {
+                eq("product", obsolete)
+                inventoryItem {
+                    eq("product", obsolete)
+                }
+            }
+        }
         obsoleteRequisitionItems?.each { RequisitionItem obsoleteRequisitionItem ->
             logProductMergeData(primary, obsolete, obsoleteRequisitionItem)
 
@@ -178,16 +182,23 @@ class ProductMergeService {
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
             def obsoleteLotNumber = obsoleteRequisitionItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primary.inventoryItems?.find {
-                it.lotNumber == obsoleteLotNumber
+            def primaryInventoryItem = InventoryItem.findByProductAndLotNumber(primary, obsoleteLotNumber)
+            if (primaryInventoryItem) {
+                obsoleteRequisitionItem.inventoryItem = primaryInventoryItem
             }
-            obsoleteRequisitionItem.inventoryItem = primaryInventoryItem
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteRequisitionItem.save(flush: true)
         }
 
         // 2.2 ShipmentItem
-        List<ShipmentItem> obsoleteShipmentItems = ShipmentItem.findAllByProduct(obsolete)
+        List<ShipmentItem> obsoleteShipmentItems = ShipmentItem.createCriteria().list {
+            or {
+                eq("product", obsolete)
+                inventoryItem {
+                    eq("product", obsolete)
+                }
+            }
+        }
         obsoleteShipmentItems?.each { ShipmentItem obsoleteShipmentItem ->
             logProductMergeData(primary, obsolete, obsoleteShipmentItem)
 
@@ -196,16 +207,25 @@ class ProductMergeService {
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
             def obsoleteLotNumber = obsoleteShipmentItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primary.inventoryItems?.find {
-                it.lotNumber == obsoleteLotNumber
+            def primaryInventoryItem = InventoryItem.findByProductAndLotNumber(primary, obsoleteLotNumber)
+            if (primaryInventoryItem) {
+                obsoleteShipmentItem.inventoryItem = primaryInventoryItem
+                obsoleteShipmentItem.lotNumber = primaryInventoryItem?.lotNumber
+                obsoleteShipmentItem.expirationDate = primaryInventoryItem?.expirationDate
             }
-            obsoleteShipmentItem.inventoryItem = primaryInventoryItem
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteShipmentItem.save(flush: true)
         }
 
         // 2.3 OrderItem
-        List<OrderItem> obsoleteOrderItems = OrderItem.findAllByProduct(obsolete)
+        List<OrderItem> obsoleteOrderItems = OrderItem.createCriteria().list {
+            or {
+                eq("product", obsolete)
+                inventoryItem {
+                    eq("product", obsolete)
+                }
+            }
+        }
         obsoleteOrderItems?.each { OrderItem obsoleteOrderItem ->
             logProductMergeData(primary, obsolete, obsoleteOrderItem)
 
@@ -214,16 +234,23 @@ class ProductMergeService {
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
             def obsoleteLotNumber = obsoleteOrderItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primary.inventoryItems?.find {
-                it.lotNumber == obsoleteLotNumber
+            def primaryInventoryItem = InventoryItem.findByProductAndLotNumber(primary, obsoleteLotNumber)
+            if (primaryInventoryItem) {
+                obsoleteOrderItem.inventoryItem = primaryInventoryItem
             }
-            obsoleteOrderItem.inventoryItem = primaryInventoryItem
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteOrderItem.save(flush: true)
         }
 
         // 2.4 ReceiptItem
-        List<ReceiptItem> obsoleteReceiptItems = ReceiptItem.findAllByProduct(obsolete)
+        List<ReceiptItem> obsoleteReceiptItems = ReceiptItem.createCriteria().list {
+            or {
+                eq("product", obsolete)
+                inventoryItem {
+                    eq("product", obsolete)
+                }
+            }
+        }
         obsoleteReceiptItems?.each { ReceiptItem obsoleteReceiptItem ->
             logProductMergeData(primary, obsolete, obsoleteReceiptItem)
 
@@ -232,16 +259,25 @@ class ProductMergeService {
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
             def obsoleteLotNumber = obsoleteReceiptItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primary.inventoryItems?.find {
-                it.lotNumber == obsoleteLotNumber
+            def primaryInventoryItem = InventoryItem.findByProductAndLotNumber(primary, obsoleteLotNumber)
+            if (primaryInventoryItem) {
+                obsoleteReceiptItem.inventoryItem = primaryInventoryItem
+                obsoleteReceiptItem.lotNumber = primaryInventoryItem?.lotNumber
+                obsoleteReceiptItem.expirationDate = primaryInventoryItem?.expirationDate
             }
-            obsoleteReceiptItem.inventoryItem = primaryInventoryItem
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteReceiptItem.save(flush: true)
         }
 
         // 2.5 TransactionEntry
-        List<TransactionEntry> obsoleteTransactionEntries = TransactionEntry.findAllByProduct(obsolete)
+        List<TransactionEntry> obsoleteTransactionEntries = TransactionEntry.createCriteria().list {
+            or {
+                eq("product", obsolete)
+                inventoryItem {
+                    eq("product", obsolete)
+                }
+            }
+        }
         obsoleteTransactionEntries?.each { TransactionEntry obsoleteTransactionEntry ->
             logProductMergeData(primary, obsolete, obsoleteTransactionEntry)
 
@@ -250,10 +286,10 @@ class ProductMergeService {
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
             def obsoleteLotNumber = obsoleteTransactionEntry.inventoryItem?.lotNumber
-            def primaryInventoryItem = primary.inventoryItems?.find {
-                it.lotNumber == obsoleteLotNumber
+            InventoryItem primaryInventoryItem = InventoryItem.findByProductAndLotNumber(primary, obsoleteLotNumber)
+            if (primaryInventoryItem) {
+                obsoleteTransactionEntry.inventoryItem = primaryInventoryItem
             }
-            obsoleteTransactionEntry.inventoryItem = primaryInventoryItem
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteTransactionEntry.save(flush: true)
         }
