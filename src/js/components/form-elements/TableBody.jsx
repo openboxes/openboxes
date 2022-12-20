@@ -1,13 +1,16 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
 import TableRow from 'components/form-elements/TableRow';
 import Spinner from 'components/spinner/Spinner';
-
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 const TableBody = (props) => {
   const {
+    translate,
     fieldsConfig,
     properties,
     fields,
@@ -27,9 +30,11 @@ const TableBody = (props) => {
   }
 
   if (emptySubstitutions && !fields.length) {
-    return (<div>There is no data to load</div>);
+    return (translate(
+      'react.stockMovement.noSubstitutionsAvailable.message',
+      'There are no substitutions available',
+    ));
   }
-
 
   return (
     fields.map((field, index) => (
@@ -50,8 +55,12 @@ const TableBody = (props) => {
   );
 };
 
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
 /** @component */
-export default TableBody;
+export default connect(mapStateToProps)(TableBody);
 
 TableBody.propTypes = {
   fieldsConfig: PropTypes.shape({
