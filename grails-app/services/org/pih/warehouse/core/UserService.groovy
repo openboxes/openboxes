@@ -433,9 +433,4 @@ class UserService {
         user.dashboardConfig = stringConfig
         return user.deserializeDashboardConfig()
     }
-
-    def updateUserLocale(User user, Locale locale) {
-        user.setLocale(locale)
-        user.save(flush: true)
-    }
 }

@@ -299,6 +299,7 @@ class UserController {
      * Used by the locale selectors in the footer
      */
     //@CacheFlush(["megamenuCache"])
+    @Transactional
     def updateAuthUserLocale() {
 
         log.info "update auth user locale " + params
@@ -322,7 +323,8 @@ class UserController {
             // fetch an instance of authenticated user
             def userInstance = User.get(session?.user?.id)
             if (userInstance) {
-                userService.updateUserLocale(userInstance, locale)
+                userInstance.locale = locale
+                userInstance.save(flush: true)
 
                 session.locale = null
                 // update the reference to the user in the session
