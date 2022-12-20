@@ -182,6 +182,7 @@ class SubstitutionsModal extends Component {
     const attr = { ...attributes, ...dynamicAttr };
 
     this.state = {
+      emptySubstitutions: true,
       loadingSubstitutions: false,
       attr,
       formValues: {},
@@ -298,14 +299,16 @@ class SubstitutionsModal extends Component {
 
         this.setState({
           emptySubstitutions: !substitutions.length,
-          loadingSubstitutions: false,
           formValues: {
             substitutions,
           },
           originalItem,
         });
       })
-      .catch(err => err);
+      .catch(err => err)
+      .finally(() => this.setState({
+        loadingSubstitutions: false,
+      }));
   }
 
   validate(values) {

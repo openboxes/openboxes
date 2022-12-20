@@ -20,15 +20,19 @@ const TableBody = (props) => {
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
 
+  // properties for loading screen in substitution modal
   const {
     emptySubstitutions,
     loadingSubstitutions,
   } = properties;
 
+  // if substitution is still loading then spinner will be displayed within the table
   if (loadingSubstitutions) {
     return (<Spinner />);
   }
 
+  // if there is no data to display then message will be displayed
+  // fields.length is checked due to possibility of adding custom substitution
   if (emptySubstitutions && !fields.length) {
     return (translate(
       'react.stockMovement.noSubstitutionsAvailable.message',
