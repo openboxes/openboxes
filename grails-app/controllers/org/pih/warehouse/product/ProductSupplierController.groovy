@@ -264,7 +264,7 @@ class ProductSupplierController {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (productSupplierInstance) {
             try {
-                productSupplierInstance.delete(flush: true)
+                ProductSupplier.executeUpdate('delete ProductSupplier ps where ps.id = :id', [id: params.id])
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
