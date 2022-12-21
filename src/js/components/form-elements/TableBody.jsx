@@ -1,16 +1,46 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
+import { connect } from 'react-redux';
 
 import TableRow from 'components/form-elements/TableRow';
-
+import Spinner from 'components/spinner/Spinner';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 const TableBody = (props) => {
   const {
-    fieldsConfig, properties, fields, tableRef = () => {},
+    translate,
+    fieldsConfig,
+    properties,
+    fields,
+    tableRef = () => {
+    },
     addRow = (row = {}) => fields.push(row),
   } = props;
   const RowComponent = properties.subfield ? TableRow : fieldsConfig.rowComponent || TableRow;
+
+  // properties for loading screen in modal
+  const {
+    isEmptyData,
+    isLoading,
+    emptyDataMessageId,
+    defaultEmptyDataMessage,
+  } = properties;
+
+  // if data is still fetching then spinner will be displayed within the table
+  if (isLoading) {
+    return (<Spinner />);
+  }
+
+  // if there is no data to display then message will be displayed
+  // fields.length is checked due to possibility of adding custom data
+  if (isEmptyData && !fields.length) {
+    return (translate(
+      emptyDataMessageId,
+      defaultEmptyDataMessage,
+    ));
+  }
 
   return (
     fields.map((field, index) => (
@@ -31,8 +61,12 @@ const TableBody = (props) => {
   );
 };
 
+const mapStateToProps = state => ({
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+});
+
 /** @component */
-export default TableBody;
+export default connect(mapStateToProps)(TableBody);
 
 TableBody.propTypes = {
   fieldsConfig: PropTypes.shape({
