@@ -29,7 +29,7 @@
                         </g:else>
                         <span>
                             <a
-                                href='${createLink(action:"chooseLocation", id: location?.id)}'
+                                href='${createLink(action:"chooseLocation", id: location?.id, params:['targetUri':params.targetUri])}'
                                 class="element"
                                 style="${locationColorVariable}"
                             >
