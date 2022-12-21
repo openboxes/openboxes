@@ -893,44 +893,95 @@ class ProductAvailabilityService {
      * the same lot as obsolete product). Change product to primary for rows
      * with given inventory item
      * */
-    void updateProductAvailabilityOnMergeProduct(InventoryItem inventoryItem, Product product) {
-        if (!product?.id || !inventoryItem?.id) {
+    void updateProductAvailabilityOnMergeProduct(InventoryItem obsoleteInventoryItem, Product primaryProduct, Product obsoleteProduct) {
+        if (!obsoleteProduct?.id || !primaryProduct?.id || !obsoleteInventoryItem?.id) {
             return
         }
 
-        // FIXME: Temporary update ignore is due to the fact that we might hit product_availability_uniq_idx and in that case rows should be added
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
         String updateStatement = """
             UPDATE IGNORE product_availability
-            SET product_code = '${product.productCode}', 
-                product_id = '${product.id}' 
-            WHERE inventory_item_id = '${inventoryItem.id}';
+            SET product_code = '${primaryProduct.productCode}', 
+                product_id = '${primaryProduct.id}' 
+            WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
         """
         dataService.executeStatement(updateStatement)
-        log.info "Updated product availabilities for product: ${product?.productCode} and " +
-            "inventory item: ${inventoryItem?.id}"
+        log.info "Updated product availabilities for product: ${primaryProduct?.productCode} and " +
+            "inventory item: ${obsoleteInventoryItem?.id}"
+
+        // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, null)
     }
 
     /**
      * Used for product merge feature (when primary product *had* the same lot as obsolete)
      * Change product and inventory to primary for rows with given obsolete inventory item
      * */
-    void updateProductAvailabilityOnMergeProduct(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product product) {
-        if (!product?.id || !primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
+    void updateProductAvailabilityOnMergeProduct(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product primaryProduct, Product obsoleteProduct) {
+        if (!primaryProduct?.id || !primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
             return
         }
 
-        // FIXME: Temporary update ignore is due to the fact that we might hit product_availability_uniq_idx and
-        //  in that case rows should be added
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
         String updateStatement = """
             UPDATE IGNORE product_availability
-            SET product_code = '${product.productCode}', 
-                product_id = '${product.id}', 
-                invenotry_item_id = '${primaryInventoryItem.id}', 
-                lot_number = '${primaryInventoryItem.lotNumber ?: 'DEFAUL'}' 
+            SET product_code = '${primaryProduct.productCode}', 
+                product_id = '${primaryProduct.id}', 
+                inventory_item_id = '${primaryInventoryItem.id}', 
+                lot_number = '${primaryInventoryItem.lotNumber ?: 'DEFAULT'}' 
             WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
         """
         dataService.executeStatement(updateStatement)
-        log.info "Updated product availabilities for product: ${product?.productCode} and " +
+        log.info "Updated product availabilities for product: ${primaryProduct?.productCode} and " +
             "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
+
+        // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, primaryInventoryItem)
+    }
+
+    /**
+     * Used for product merge feature when initial update of product and inventory item was ignored due to the
+     * unique product_availability_uniq_idx violation.
+     * */
+    void processIgnoredProductAvailabilitiesOnProductMerge(Product primaryProduct, InventoryItem obsoleteInventoryItem, InventoryItem primaryInventoryItem) {
+        // Get all remaining obsolete product availabilities with obsolete inventory item
+        List<ProductAvailability> remainingPAs = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
+        remainingPAs?.each { ProductAvailability remainingPA ->
+            // Check if product availabilities are already existing for a product_availability_uniq_idx
+            ProductAvailability existingPA = ProductAvailability.createCriteria().get {
+                eq("location", remainingPA.location)
+                eq("productCode", primaryProduct.productCode)
+                eq("lotNumber", remainingPA.lotNumber)
+                eq("binLocationName", remainingPA.binLocationName)
+            }
+
+            // If exists, then add quantities from obsolete PA to the new main one
+            if (existingPA) {
+                existingPA.quantityOnHand += remainingPA.quantityOnHand
+                existingPA.quantityAllocated += remainingPA.quantityAllocated
+                existingPA.quantityNotPicked += remainingPA.quantityNotPicked
+                existingPA.quantityOnHold += remainingPA.quantityOnHold
+                existingPA. quantityAvailableToPromise += remainingPA.quantityAvailableToPromise
+                existingPA.save(flush: true)
+
+                remainingPA.quantityOnHand = 0
+                remainingPA.quantityAllocated = 0
+                remainingPA.quantityNotPicked = 0
+                remainingPA.quantityOnHold = 0
+                remainingPA. quantityAvailableToPromise = 0
+                remainingPA.save(flush: true)
+
+                return
+            }
+
+            // Otherwise swap product (and inventory item) on the remaining obsolete PA with primary ones
+            remainingPA.product = primaryProduct
+            remainingPA.productCode = primaryProduct.productCode
+            if (primaryInventoryItem) {
+                remainingPA.inventoryItem = primaryInventoryItem
+                remainingPA.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
+            }
+            remainingPA.save(flush: true)
+        }
     }
 }
