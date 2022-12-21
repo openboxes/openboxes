@@ -23,7 +23,7 @@
         <warehouse:message code="order.itemStatus.label" default="Item Status"/>
     </h2>
     <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
-        <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="${g.message(code: 'order.filterByNameOrCode.label', default: 'Filter by name or code')}"/>
+        <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="${g.message(code: 'order.filterByName.label', default: 'Filter by product name')}"/>
     </g:if>
     <g:if test="${orderInstance?.orderItems }">
         <table class="table table-bordered" id="order-items-status">

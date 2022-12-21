@@ -224,8 +224,8 @@
                         <div class="tabs tabs-ui">
                             <ul>
                                 <li><a href="#tabs-summary"><warehouse:message code="default.summary.label" default="Summary"/></a></li>
-                                <li><a href="#tabs-items"><warehouse:message code="order.itemStatus.label" default="Item Status"/></a></li>
-                                <li><a href="#tabs-itemDetails"><warehouse:message code="order.itemDetails.label" default="Item Details"/></a></li>
+                                <li><a href="#tabs-items"><g:message code="order.itemStatus.message" default="Item Status"/></a></li>
+                                <li><a href="#tabs-itemDetails"><g:message code="order.itemDetails.message" default="Item Details"/></a></li>
                                 <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                     <li><a href="#tabs-adjustments"><warehouse:message code="orderAdjustments.label"/></a></li>
                                     <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
