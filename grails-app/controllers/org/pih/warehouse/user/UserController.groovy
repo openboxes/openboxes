@@ -19,6 +19,7 @@ import org.pih.warehouse.core.User
 
 import javax.imageio.ImageIO as IIO
 import javax.swing.*
+import grails.gorm.transactions.Transactional
 import java.awt.*
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
@@ -295,6 +296,7 @@ class UserController {
      * Used by the locale selectors in the footer
      */
     //@CacheFlush(["megamenuCache"])
+    @Transactional
     def updateAuthUserLocale() {
 
         log.info "update auth user locale " + params
