@@ -71,7 +71,7 @@
                             <div class="filters-container">
                                 <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
                                 <div>
-                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByNameOrCode.label', default: 'Filter by name or code')}"/>
+                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByName.label', default: 'Filter by product name')}"/>
                                 </div>
                             </div>
                             <div class="button-group" style="margin-right: 5px;">
@@ -253,7 +253,7 @@
         </div>
     </div>
     <script type="text/javascript">
-        const CREATE_NEW = "Create New";
+        const CREATE_NEW = "${g.message(code: 'default.createNew.label', default: 'Create New')}";
 
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
@@ -326,7 +326,7 @@
               clearOrderAdjustments();
               loadOrderAdjustments();
               $('#orderItems').html('<option></option>').trigger('change');
-              $.notify("Successfully deleted item " + id, "success")
+              $.notify("${g.message(code: 'order.successDeleteItem.label', default: 'Successfully deleted item')} " + id, "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -349,7 +349,7 @@
             success: function () {
               clearOrderAdjustments();
               loadOrderAdjustments();
-              $.notify("Successfully deleted adjustment", "success")
+              $.notify("${g.message(code: 'order.successDeleteAdjustment.label', default: 'Successfully deleted adjustment')}", "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -443,13 +443,13 @@
           var budgetCode = $("#budgetCode").val();
           var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
-          if (!product) $("#product-suggest").notify("Required")
-          if (!quantity) $("#quantity").notify("Required")
-          if (!unitPrice) $("#unitPrice").notify("Required")
-          if (!quantityUom) $("#quantityUom_chosen").notify("Required")
-          if (!quantityPerUom) $("#quantityPerUom").notify("Required")
+          if (!product) $("#product-suggest").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!quantity) $("#quantity").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!unitPrice) $("#unitPrice").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!quantityUom) $("#quantityUom_chosen").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!quantityPerUom) $("#quantityPerUom").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!budgetCode && isAccountingRequired) {
-            $("#budgetCode").notify("Required")
+            $("#budgetCode").notify("${g.message(code: 'default.required.label', default: 'Required')}")
             return false
           }
 
@@ -465,13 +465,13 @@
           var description = $("#description").val();
           var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
-          if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
-          if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
-          if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
-          if (!description) $("#description").notify("Description required")
-          if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
+          if (!orderAdjustmentType) $("#orderAdjustmentType").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!(percentage || amount)) $("#amount").notify("${g.message(code: 'order.errors.amountOrPercentageRequired.label', default: 'Amount or percentage required')}")
+          if (!(percentage || amount)) $("#percentage").notify("${g.message(code: 'order.errors.amountOrPercentageRequired.label', default: 'Amount or percentage required')}")
+          if (!description) $("#description").notify("${g.message(code: 'order.errors.descriptionRequired.label', default: 'Description required')}")
+          if (!canManageAdjustments) $.notify("${g.message(code: 'errors.noPermissions.label', default: 'You do not have permissions to perform this action')}")
           if (!budgetCode && isAccountingRequired) {
-            $("#adjustmentBudgetCode").notify("Required")
+            $("#adjustmentBudgetCode").notify("${g.message(code: 'default.required.label', default: 'Required')}")
             return false
           }
 
@@ -508,7 +508,7 @@
                     $('#supplierCode').text('');
                     $('#manufacturerCode').text('');
                     $('#manufacturer').text('');
-                    $.notify("Successfully saved new item", "success")
+                    $.notify("${g.message(code: 'order.successItemSave.label', default: 'Successfully saved new item')}", "success")
                   },
                   error: function(jqXHR, textStatus, errorThrown) {
                     if (jqXHR.responseText) {
@@ -521,7 +521,7 @@
               }
             }
             else {
-              $.notify("Please enter a value for all required fields")
+              $.notify("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}");
             }
             return false
         }
@@ -536,7 +536,7 @@
                         clearOrderAdjustments();
                         loadOrderAdjustments();
                         clearOrderAdjustmentForm();
-                        $.notify("Successfully saved new adjustment", "success");
+                        $.notify("${g.message(code: 'order.successAdjustmentSave.label', default: 'Successfully saved new adjustment')}", "success");
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         if (jqXHR.responseText) {
@@ -547,7 +547,7 @@
                     }
                 });
             } else {
-                $.notify("Please enter a value for all required fields");
+                $.notify("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}");
             }
             return false;
         }
@@ -566,7 +566,8 @@
           $("#orderItemForm")[0].reset();
           $("#product-id").val("");
           $("#product-value").val("");
-          $("#productSupplier").html("");
+          $("#product-suggest").val("");
+          $("#productSupplier").html("").attr("disabled", true);
           clearSource();
           $("#quantityUom").val(null).trigger('change');
 
@@ -801,7 +802,7 @@
             autoOpen: false,
             modal: true,
             width: 800,
-            title: "Edit line item"
+            title: "${g.message(code: 'order.editItem.label', default: 'Edit line item')}"
           });
 
           $("#create-product-source-dialog").dialog({
@@ -940,7 +941,7 @@
                 success: function () {
                   $("#importTemplate").val('');
                   loadOrderItems();
-                  $.notify("Successfully added items", "success")
+                  $.notify("${g.message(code: 'order.successItemsAdd.label', default: 'Successfully added items')}", "success")
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                   $("#importTemplate").val('');

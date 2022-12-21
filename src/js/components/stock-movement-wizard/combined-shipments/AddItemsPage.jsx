@@ -424,7 +424,7 @@ class AddItemsPage extends Component {
 
       if (errors.lineItems[key]) {
         if (!alertMessage) {
-          alertMessage = `Following rows contain validation errors: Row ${key + 1}: ${item.productCode}`;
+          alertMessage = `${this.props.translate('react.stockMovement.errors.followingRowsContainValidationError.label', 'Following rows contain validation errors: Row')} ${key + 1}: ${item.productCode}`;
         } else {
           alertMessage += `, Row ${key + 1}: ${item.productCode}`;
         }

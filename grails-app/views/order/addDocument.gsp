@@ -54,10 +54,15 @@
 										code="document.type.label" /></label></td>
 								<td valign="top"
 									class="value ${hasErrors(bean: documentInstance, field: 'documentType', 'errors')}">
-										<g:select name="typeId" class="chzn-select-deselect" noSelection="['':'']"
-												  from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}"
-												  value="${documentInstance?.documentType?.id}"
-												  optionKey="id" optionValue="${{format.metadata(obj:it)}}"/>
+										<g:select
+											name="typeId"
+											class="chzn-select-deselect"
+											noSelection="['':'']"
+											from="${org.pih.warehouse.core.DocumentType.list().sort { it.name }}"
+											value="${documentInstance?.documentType?.id}"
+											optionKey="id" optionValue="${{format.metadata(obj:it)}}"
+											data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+										/>
 								</td>
 							</tr>
 							<tr class="prop">
