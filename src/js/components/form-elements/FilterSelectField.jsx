@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Overlay } from 'react-overlays';
 import { components } from 'react-select';
@@ -143,7 +144,7 @@ const FilterSelectField = (props) => {
     <Select
       name={attributes.id}
       {...attributes}
-      className={`filter-select ${className}`}
+      className={`filter-select ${JSON.stringify(attributes?.value)} ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
       classNamePrefix="filter-select"
       hideSelectedOptions={false}
       controlShouldRenderValue={!attributes.multi}
