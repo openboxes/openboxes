@@ -144,7 +144,7 @@ const FilterSelectField = (props) => {
     <Select
       name={attributes.id}
       {...attributes}
-      className={`filter-select ${JSON.stringify(attributes?.value)} ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
+      className={`filter-select ${!_.isEmpty(attributes?.value) ? 'filter-select-has-value' : ''} ${className}`}
       classNamePrefix="filter-select"
       hideSelectedOptions={false}
       controlShouldRenderValue={!attributes.multi}
