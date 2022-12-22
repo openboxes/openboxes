@@ -9,9 +9,11 @@
 **/ 
 package org.pih.warehouse.product
 
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.InventorySnapshot
+import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
+import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.receiving.ReceiptItem
@@ -20,7 +22,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 
 class ProductMergeService {
 
-    def inventorySnapshotService
+    def inventoryService
     def picklistService
     def productAvailabilityService
 
@@ -38,17 +40,18 @@ class ProductMergeService {
          * - ProductComponent (additionally, not mentioned in the ticket)
          *
          * === "Complex" relations ===
+         * - Transaction (with PRODUCT_INVENTORY and INVENTORY types)
          * - InventoryItem <-- find inventory items and replace product only for InventoryItems with lotNumber that are not exisitng for primary product
          *                     But if we're gonna use the InventoryItem from primary Product, then obsoleted InventoryItem relations should be updated accordingly.
          *                     (ShipmentItems, TransactionEntries and so on)
          * - InventorySnapshot <-- Adjusted during InventoryItems management for specific inventory items and products
          * - ProductAvailability <-- Adjusted during InventoryItems management for specific inventory items and products
+         * - TransactionEntry
          *
          * - RequisitionItem
          * - ShipmentItem
          * - OrderItem
          * - ReceiptItem
-         * - TransactionEntry
          *
          * === Ignored relations (see: https://pihemr.atlassian.net/browse/OBPIH-3187 description) ===
          * - Document
@@ -118,10 +121,33 @@ class ProductMergeService {
         }
 
         /**
-         * INVENTORY ITEMS PLUS "ITEM" RELATIONS
+         * TRANSACTIONS, INVENTORY ITEMS AND OTHER "ITEM" RELATIONS
          * */
 
-        // 1. Copy Inventory items that are not already existing on the primary product (and InventorySnapshot change)
+        // 1. Merge most recent obsolete and primary PRODUCT_INVENTORY or INVENTORY Transactions (Transaction
+        //    entries require to be moved to the primary transaction, because for stock card and product
+        //    availability calculations we always look into the most recent transaction with one of these two types).
+
+        // Move TransactionEntries for the most recent PRODUCT_INVENTORY or INVENTORY Transaction (if any
+        // one of these exists for both products)
+        TransactionType productInventoryType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        TransactionType inventoryType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
+        def transactionTypes = [productInventoryType, inventoryType]
+        Transaction obsoleteProductInventoryTransaction = inventoryService.getMostRecentTransactionByProductAndTypeIn(obsolete, transactionTypes)
+        Transaction primaryProductInventoryTransaction = inventoryService.getMostRecentTransactionByProductAndTypeIn(primary, transactionTypes)
+        if (obsoleteProductInventoryTransaction && primaryProductInventoryTransaction) {
+            // Refetch to avoid running into ConcurrentModificationException
+            def obsoleteProductInventoryEntries = TransactionEntry.findAllByTransaction(obsoleteProductInventoryTransaction)
+            obsoleteProductInventoryEntries?.each { TransactionEntry entry ->
+                moveTransactionEntry(
+                    entry,
+                    obsoleteProductInventoryTransaction,
+                    primaryProductInventoryTransaction
+                )
+            }
+        }
+
+        // 2. Copy Inventory items that are not already existing on the primary product (and InventorySnapshot change)
         Set<InventoryItem> primaryInventoryItems = InventoryItem.findAllByProduct(primary)
         Set<InventoryItem> obsoleteInventoryItems = InventoryItem.findAllByProduct(obsolete)
         obsoleteInventoryItems?.each { InventoryItem obsoleteInventoryItem ->
@@ -168,11 +194,29 @@ class ProductMergeService {
         // Refetch primary inventory items after inventory items manipulation
         primaryInventoryItems = InventoryItem.findAllByProduct(primary)
 
-        // 2. Find all items with obsolete product and swap products and inventory items
+        // 3. Swap data on the transaction entries
+        List<TransactionEntry> obsoleteTransactionEntries = getRelatedObjectsForProduct(TransactionEntry.createCriteria(), obsolete)
+        obsoleteTransactionEntries?.each { TransactionEntry obsoleteTransactionEntry ->
+            logProductMergeData(primary, obsolete, obsoleteTransactionEntry)
 
-        // 2.1 RequisitionItem
+            // Swap product
+            obsoleteTransactionEntry.product = primary
+
+            // Swap inventory item (in case the primary product had the same lot as obsolete)
+            def obsoleteLotNumber = obsoleteTransactionEntry.inventoryItem?.lotNumber
+            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            if (primaryInventoryItem) {
+                obsoleteTransactionEntry.inventoryItem = primaryInventoryItem
+            }
+            // Note: needs flush because of "User.locationRoles not processed by flush"
+            obsoleteTransactionEntry.save(flush: true)
+        }
+
+        // 4. Find all items with obsolete product and swap products and inventory items
+
+        // 4.1 RequisitionItem
         def requisitionItemCriteria = RequisitionItem.createCriteria()
-        List<RequisitionItem> obsoleteRequisitionItems = getObjectsWithObsoletedProduct(requisitionItemCriteria, obsolete)
+        List<RequisitionItem> obsoleteRequisitionItems = getRelatedObjectsForProduct(requisitionItemCriteria, obsolete)
         obsoleteRequisitionItems?.each { RequisitionItem obsoleteRequisitionItem ->
             logProductMergeData(primary, obsolete, obsoleteRequisitionItem)
 
@@ -189,9 +233,9 @@ class ProductMergeService {
             obsoleteRequisitionItem.save(flush: true)
         }
 
-        // 2.2 ShipmentItem
+        // 4.2 ShipmentItem
         def shipmentItemCriteria = ShipmentItem.createCriteria()
-        List<ShipmentItem> obsoleteShipmentItems = getObjectsWithObsoletedProduct(shipmentItemCriteria, obsolete)
+        List<ShipmentItem> obsoleteShipmentItems = getRelatedObjectsForProduct(shipmentItemCriteria, obsolete)
         obsoleteShipmentItems?.each { ShipmentItem obsoleteShipmentItem ->
             logProductMergeData(primary, obsolete, obsoleteShipmentItem)
 
@@ -210,9 +254,9 @@ class ProductMergeService {
             obsoleteShipmentItem.save(flush: true)
         }
 
-        // 2.3 OrderItem
+        // 4.3 OrderItem
         def orderItemCriteria = OrderItem.createCriteria()
-        List<OrderItem> obsoleteOrderItems = getObjectsWithObsoletedProduct(orderItemCriteria, obsolete)
+        List<OrderItem> obsoleteOrderItems = getRelatedObjectsForProduct(orderItemCriteria, obsolete)
         obsoleteOrderItems?.each { OrderItem obsoleteOrderItem ->
             logProductMergeData(primary, obsolete, obsoleteOrderItem)
 
@@ -229,9 +273,9 @@ class ProductMergeService {
             obsoleteOrderItem.save(flush: true)
         }
 
-        // 2.4 ReceiptItem
+        // 4.4 ReceiptItem
         def receiptItemCriteria = ReceiptItem.createCriteria()
-        List<ReceiptItem> obsoleteReceiptItems = getObjectsWithObsoletedProduct(receiptItemCriteria, obsolete)
+        List<ReceiptItem> obsoleteReceiptItems = getRelatedObjectsForProduct(receiptItemCriteria, obsolete)
         obsoleteReceiptItems?.each { ReceiptItem obsoleteReceiptItem ->
             logProductMergeData(primary, obsolete, obsoleteReceiptItem)
 
@@ -248,25 +292,6 @@ class ProductMergeService {
             }
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteReceiptItem.save(flush: true)
-        }
-
-        // 2.5 TransactionEntry
-        def transactionEntryCriteria = TransactionEntry.createCriteria()
-        List<TransactionEntry> obsoleteTransactionEntries = getObjectsWithObsoletedProduct(transactionEntryCriteria, obsolete)
-        obsoleteTransactionEntries?.each { TransactionEntry obsoleteTransactionEntry ->
-            logProductMergeData(primary, obsolete, obsoleteTransactionEntry)
-
-            // Swap product
-            obsoleteTransactionEntry.product = primary
-
-            // Swap inventory item (in case the primary product had the same lot as obsolete)
-            def obsoleteLotNumber = obsoleteTransactionEntry.inventoryItem?.lotNumber
-            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
-            if (primaryInventoryItem) {
-                obsoleteTransactionEntry.inventoryItem = primaryInventoryItem
-            }
-            // Note: needs flush because of "User.locationRoles not processed by flush"
-            obsoleteTransactionEntry.save(flush: true)
         }
 
         /**
@@ -292,18 +317,40 @@ class ProductMergeService {
     }
 
     /**
-     * For getting RequisitionItems, ShipmentItems, OrderItems, ReceiptItems, TransactionEntries, by obsolete product
+     * For getting RequisitionItems, ShipmentItems, OrderItems, ReceiptItems, TransactionEntries, by given product
      * under product or inventoryItem.product
      * */
-    def getObjectsWithObsoletedProduct(def criteria, Product obsolete) {
+    def getRelatedObjectsForProduct(def criteria, Product product) {
         criteria.list {
             or {
-                eq("product", obsolete)
+                eq("product", product)
                 inventoryItem {
-                    eq("product", obsolete)
+                    eq("product", product)
                 }
             }
         }
+    }
+
+    void moveTransactionEntry(TransactionEntry entry, Transaction fromTransaction, Transaction toTransaction) {
+        // Clone the entry from the obsolete transaction
+        TransactionEntry clonedEntry = new TransactionEntry(
+            quantity: entry.quantity,
+            product: entry.product,
+            inventoryItem: entry.inventoryItem,
+            binLocation: entry.binLocation,
+            reasonCode: entry.reasonCode,
+            comments: entry.comments
+        )
+
+        // Add cloned entry to the primary transaction
+        toTransaction.disableRefresh = true
+        toTransaction.addToTransactionEntries(clonedEntry)
+        toTransaction.save(flush: true)
+
+        // Remove cloned entry from obsolete transaction
+        fromTransaction.disableRefresh = true
+        fromTransaction.removeFromTransactionEntries(entry)
+        fromTransaction.save(flush: true)
     }
 
     void logProductMergeData(Product primary, Product obsolete, def relatedObject) {

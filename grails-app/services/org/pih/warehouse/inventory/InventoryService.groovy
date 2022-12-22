@@ -3370,4 +3370,27 @@ class InventoryService implements ApplicationContextAware {
         return availableItems
     }
 
+    /**
+     * Get most recent transaction for given product and with given type
+     * This is used by product merge feature to determine if both products (obsolete and primary) had transactions
+     * with specific type (in that case PRODUCT_INVENTORY or INVENTORY), to copy entries between the most
+     * recent transactions
+     * */
+    Transaction getMostRecentTransactionByProductAndTypeIn(Product product, List<TransactionType> transactionTypes) {
+        def transactions = Transaction.createCriteria().list {
+            'in'("transactionType", transactionTypes)
+            transactionEntries {
+                or {
+                    eq("product", product)
+                    inventoryItem {
+                        eq("product", product)
+                    }
+                }
+            }
+            order("transactionDate", "desc")
+            order("dateCreated", "desc")
+        }
+
+        return transactions.size() ? transactions.first() : null
+    }
 }
