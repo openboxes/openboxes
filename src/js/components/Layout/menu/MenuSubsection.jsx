@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -8,16 +8,14 @@ import useCheckRightSpace from 'hooks/useCheckRightSpace';
 
 
 const DropdownMenu = ({ section, active }) => {
-  const dropdownRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const shouldAlignLeft = useCheckRightSpace(dropdownRef, isOpen);
+  const { elementReference, setIsVisible, shouldAlignLeft } = useCheckRightSpace();
 
   return (
-    <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
+    <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} onMouseEnter={() => setIsVisible(true)} onMouseLeave={() => setIsVisible(false)}>
       <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
         {section.label}
       </a>
-      <div ref={dropdownRef} className={`dropdown-menu dropdown-menu-wrapper ${shouldAlignLeft ? 'dropdown-menu-left' : 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
+      <div ref={elementReference} className={`dropdown-menu dropdown-menu-wrapper ${shouldAlignLeft() ? 'dropdown-menu-left' : 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
         <div className="dropdown-menu-content dropdown-menu-subsections">
           {_.map(section.subsections, (subsection, subsectionKey) => (
             <div className="padding-8" key={subsectionKey}>
