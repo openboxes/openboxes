@@ -133,17 +133,24 @@ class ProductMergeService {
         TransactionType productInventoryType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
         TransactionType inventoryType = TransactionType.get(Constants.INVENTORY_TRANSACTION_TYPE_ID)
         def transactionTypes = [productInventoryType, inventoryType]
-        Transaction obsoleteProductInventoryTransaction = inventoryService.getMostRecentTransactionByProductAndTypeIn(obsolete, transactionTypes)
-        Transaction primaryProductInventoryTransaction = inventoryService.getMostRecentTransactionByProductAndTypeIn(primary, transactionTypes)
-        if (obsoleteProductInventoryTransaction && primaryProductInventoryTransaction) {
-            // Refetch to avoid running into ConcurrentModificationException
-            def obsoleteProductInventoryEntries = TransactionEntry.findAllByTransaction(obsoleteProductInventoryTransaction)
-            obsoleteProductInventoryEntries?.each { TransactionEntry entry ->
-                moveTransactionEntry(
-                    entry,
-                    obsoleteProductInventoryTransaction,
-                    primaryProductInventoryTransaction
-                )
+        List<Transaction> obsoleteTransactions = inventoryService.getMostRecentTransactionsForProductAndTypeByInventory(obsolete, transactionTypes)
+        List<Transaction> primaryTransactions = inventoryService.getMostRecentTransactionsForProductAndTypeByInventory(primary, transactionTypes)
+        if (obsoleteTransactions && primaryTransactions) {
+            obsoleteTransactions.each { Transaction obsoleteTransaction ->
+                Transaction primaryTransaction = primaryTransactions.find { it.inventory == obsoleteTransaction.inventory }
+                if (!primaryTransaction) {
+                    return
+                }
+
+                // Refetch to avoid running into ConcurrentModificationException
+                def obsoleteEntries = TransactionEntry.findAllByTransaction(obsoleteTransaction)
+                obsoleteEntries?.each { TransactionEntry entry ->
+                    moveTransactionEntry(
+                        entry,
+                        obsoleteTransaction,
+                        primaryTransaction
+                    )
+                }
             }
         }
 
@@ -332,22 +339,32 @@ class ProductMergeService {
     }
 
     void moveTransactionEntry(TransactionEntry entry, Transaction fromTransaction, Transaction toTransaction) {
-        // Clone the entry from the obsolete transaction
-        TransactionEntry clonedEntry = new TransactionEntry(
-            quantity: entry.quantity,
-            product: entry.product,
-            inventoryItem: entry.inventoryItem,
-            binLocation: entry.binLocation,
-            reasonCode: entry.reasonCode,
-            comments: entry.comments
-        )
+        // First check if the toTransaction has already entry with the same lot number and bin location
+        TransactionEntry sameEntry = toTransaction?.transactionEntries?.find { TransactionEntry it ->
+            it.inventoryItem?.lotNumber == entry?.inventoryItem?.lotNumber && it.binLocation?.id == entry.binLocation?.id
+        }
+        if (sameEntry) {
+            // If toTransaction has already the same entry, then sum quantities
+            sameEntry.quantity += entry.quantity
+            sameEntry.save(flush: true)
+        } else {
+            // Clone the entry from the obsolete transaction
+            TransactionEntry clonedEntry = new TransactionEntry(
+                quantity: entry.quantity,
+                product: entry.product,
+                inventoryItem: entry.inventoryItem,
+                binLocation: entry.binLocation,
+                reasonCode: entry.reasonCode,
+                comments: entry.comments
+            )
 
-        // Add cloned entry to the primary transaction
-        toTransaction.disableRefresh = true
-        toTransaction.addToTransactionEntries(clonedEntry)
-        toTransaction.save(flush: true)
+            // Add cloned entry to the primary transaction
+            toTransaction.disableRefresh = true
+            toTransaction.addToTransactionEntries(clonedEntry)
+            toTransaction.save(flush: true)
+        }
 
-        // Remove cloned entry from obsolete transaction
+        // Remove cloned/moved entry from obsolete transaction
         fromTransaction.disableRefresh = true
         fromTransaction.removeFromTransactionEntries(entry)
         fromTransaction.save(flush: true)

@@ -3371,13 +3371,14 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get most recent transaction for given product and with given type
+     * Get most recent transactions for given product and with given type (for each inventory)
      * This is used by product merge feature to determine if both products (obsolete and primary) had transactions
      * with specific type (in that case PRODUCT_INVENTORY or INVENTORY), to copy entries between the most
      * recent transactions
      * */
-    Transaction getMostRecentTransactionByProductAndTypeIn(Product product, List<TransactionType> transactionTypes) {
-        def transactions = Transaction.createCriteria().list {
+    List<Transaction> getMostRecentTransactionsForProductAndTypeByInventory(Product product, List<TransactionType> transactionTypes) {
+        Transaction.createCriteria().listDistinct {
+            groupProperty("inventory")
             'in'("transactionType", transactionTypes)
             transactionEntries {
                 or {
@@ -3390,7 +3391,5 @@ class InventoryService implements ApplicationContextAware {
             order("transactionDate", "desc")
             order("dateCreated", "desc")
         }
-
-        return transactions.size() ? transactions.first() : null
     }
 }
