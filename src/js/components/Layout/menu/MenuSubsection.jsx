@@ -7,25 +7,22 @@ import { RiArrowDropDownLine } from 'react-icons/ri';
 
 const DropdownMenu = ({ section, active }) => {
   const dropdownRef = useRef(null);
-  const [droppedDown, setDroppedDown] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const shouldAlignLeft = (ref) => {
-    if (!ref.current) {
-      return false;
-    }
-    const elementCoordinates = ref.current.getBoundingClientRect();
-    if (droppedDown) {
+  const shouldAlignLeft = () => {
+    if (dropdownRef.current && isOpen) {
+      const elementCoordinates = dropdownRef.current.getBoundingClientRect();
       return window.innerWidth > elementCoordinates.right + elementCoordinates.width;
     }
     return false;
   };
 
   return (
-    <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} onMouseEnter={() => setDroppedDown(true)} onMouseLeave={() => setDroppedDown(false)}>
+    <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
       <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
         {section.label}
       </a>
-      <div ref={dropdownRef} className={`dropdown-menu dropdown-menu-wrapper ${shouldAlignLeft(dropdownRef) ? 'dropdown-menu-left' : 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
+      <div ref={dropdownRef} className={`dropdown-menu dropdown-menu-wrapper ${shouldAlignLeft() ? 'dropdown-menu-left' : 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
         <div className="dropdown-menu-content dropdown-menu-subsections">
           {_.map(section.subsections, (subsection, subsectionKey) => (
             <div className="padding-8" key={subsectionKey}>
