@@ -3377,8 +3377,7 @@ class InventoryService implements ApplicationContextAware {
      * recent transactions
      * */
     List<Transaction> getMostRecentTransactionsForProductAndTypeByInventory(Product product, List<TransactionType> transactionTypes) {
-        Transaction.createCriteria().listDistinct {
-            groupProperty("inventory")
+        List<Transaction> transactions = Transaction.createCriteria().list {
             'in'("transactionType", transactionTypes)
             transactionEntries {
                 or {
@@ -3391,5 +3390,18 @@ class InventoryService implements ApplicationContextAware {
             order("transactionDate", "desc")
             order("dateCreated", "desc")
         }
+
+        // Return only recent transaction by distinct inventory. There is need to iterate, because .unique()
+        // in Groovy 1.7.8 is mutable and it orders by the closure if only one closure param is passed, hence
+        // doing: transactions?.unique { it?.inventory } might not always return list of *most recent* transactions
+        // within this inventory.
+        def results = []
+        transactions?.each { Transaction it ->
+            if (!results?.find { Transaction r -> r?.inventory?.id == it?.inventory?.id }) {
+                results << it
+            }
+        }
+
+        return results
     }
 }
