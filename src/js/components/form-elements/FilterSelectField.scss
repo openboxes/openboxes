@@ -5,6 +5,13 @@
   height: 36px;
   min-width: 200px;
 
+  &.filter-select-has-value > .filter-select__control {
+    border: 1px solid var(--blue-primary);
+    svg {
+      color: var(--blue-primary);
+    }
+  }
+
   .filter-select__control {
     display: flex;
     flex-direction: row;
