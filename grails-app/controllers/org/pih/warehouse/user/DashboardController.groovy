@@ -217,14 +217,17 @@ class DashboardController {
                 return
             }
 
+            if (warehouse.supports(ActivityCode.SUBMIT_REQUEST) && !warehouse.supports(ActivityCode.MANAGE_INVENTORY)) {
+                redirect(controller: 'dashboard', action: 'index')
+                return
+            }
+
             // Successfully logged in and selected a warehouse
             // Try to redirect to the previous action before session timeout
-            if (session.targetUri || params.targetUri) {
-                def targetUri = params.targetUri ?: session.targetUri
-                if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
-                    redirect(uri: targetUri)
-                    return
-                }
+            def targetUri = params.targetUri ?: session.targetUri
+            if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
+                redirect(uri: targetUri)
+                return
             }
             redirect(controller: 'dashboard', action: 'index')
             return

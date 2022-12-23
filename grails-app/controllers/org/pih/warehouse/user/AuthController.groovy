@@ -109,6 +109,7 @@ class AuthController {
 
                 if (session?.targetUri) {
                     redirect(uri: session.targetUri)
+                    session.targetUri = null
                     return
                 }
 
