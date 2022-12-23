@@ -137,18 +137,19 @@ class ProductMergeService {
         List<Transaction> primaryTransactions = inventoryService.getMostRecentTransactionsForProductAndTypeByInventory(primary, transactionTypes)
         if (obsoleteTransactions && primaryTransactions) {
             obsoleteTransactions.each { Transaction obsoleteTransaction ->
-                Transaction primaryTransaction = primaryTransactions.find { it.inventory == obsoleteTransaction.inventory }
+                Transaction primaryTransaction = primaryTransactions.find { it.inventory?.id == obsoleteTransaction.inventory?.id }
                 if (!primaryTransaction) {
                     return
                 }
 
-                // Refetch to avoid running into ConcurrentModificationException
-                def obsoleteEntries = TransactionEntry.findAllByTransaction(obsoleteTransaction)
+                // Refetch entries by obsolete transaction and product to avoid running into ConcurrentModificationException
+                def obsoleteEntries = TransactionEntry.findAllByTransactionAndProduct(obsoleteTransaction, obsolete)
                 obsoleteEntries?.each { TransactionEntry entry ->
                     moveTransactionEntry(
                         entry,
                         obsoleteTransaction,
-                        primaryTransaction
+                        primaryTransaction,
+                        primary
                     )
                 }
             }
@@ -338,13 +339,20 @@ class ProductMergeService {
         }
     }
 
-    void moveTransactionEntry(TransactionEntry entry, Transaction fromTransaction, Transaction toTransaction) {
-        // First check if the toTransaction has already entry with the same lot number and bin location
-        TransactionEntry sameEntry = toTransaction?.transactionEntries?.find { TransactionEntry it ->
-            it.inventoryItem?.lotNumber == entry?.inventoryItem?.lotNumber && it.binLocation?.id == entry.binLocation?.id
+    /**
+     * Moves TransactionEntry of obsolete product from one Transaction to another for primary product. In case
+     * both transactions have both obsolete and primary product or the same lot for these entries, then
+     * sum quantities of entries and remove obsolete one.
+     * */
+    void moveTransactionEntry(TransactionEntry entry, Transaction fromTransaction, Transaction toTransaction, Product primary) {
+        // First check if the toTransaction has already entry with the same lot number and bin location for primary product
+        TransactionEntry sameEntry = toTransaction?.transactionEntries?.find {
+            (it?.product?.id == primary?.id || it?.inventoryItem?.product?.id == primary?.id) &&
+            it?.inventoryItem?.lotNumber == entry?.inventoryItem?.lotNumber &&
+            it?.binLocation?.id == entry?.binLocation?.id
         }
         if (sameEntry) {
-            // If toTransaction has already the same entry, then sum quantities
+            // If toTransaction has already the same entry for primary product, then sum quantities
             sameEntry.quantity += entry.quantity
             sameEntry.save(flush: true)
         } else {
