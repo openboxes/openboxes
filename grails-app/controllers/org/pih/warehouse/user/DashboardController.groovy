@@ -69,14 +69,16 @@ class DashboardController {
             return
         }
 
-        def requisition = Requisition.findByRequestNumber(params.searchTerms)
-        if (requisition) {
+        List<Requisition> requisitions = Requisition.findAllByRequestNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (requisitions) {
+            Requisition requisition = requisitions.first()
             redirect(controller: "stockMovement", action: "show", id: requisition.id)
             return
         }
 
-        def shipment = Shipment.findByShipmentNumber(params.searchTerms)
-        if (shipment) {
+        List<Shipment> shipments = Shipment.findAllByShipmentNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (shipments) {
+            Shipment shipment = shipments.first()
             redirect(controller: "stockMovement", action: "show", id: shipment.returnOrder?.id ?: shipment.id)
             return
         }
@@ -86,8 +88,9 @@ class DashboardController {
             redirect(controller: "receipt", action: "show", id: receipt.id)
             return
         }
-        def order = Order.findByOrderNumber(params.searchTerms)
-        if (order) {
+        List<Order> orders = Order.findAllByOrderNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (orders) {
+            Order order = orders.first()
             if (order.isReturnOrder) {
                 redirect(controller: "stockMovement", action: "show", id: order.id)
                 return
