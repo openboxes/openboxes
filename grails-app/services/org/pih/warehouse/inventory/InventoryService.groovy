@@ -3371,14 +3371,10 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
-     * Get most recent transactions for given product and with given type (for each inventory)
-     * This is used by product merge feature to determine if both products (obsolete and primary) had transactions
-     * with specific type (in that case PRODUCT_INVENTORY or INVENTORY), to copy entries between the most
-     * recent transactions
+     * Get list of unique inventories that have TransactionEntries for given product
      * */
-    List<Transaction> getMostRecentTransactionsForProductAndTypeByInventory(Product product, List<TransactionType> transactionTypes) {
-        List<Transaction> transactions = Transaction.createCriteria().list {
-            'in'("transactionType", transactionTypes)
+    List<Inventory> getInventoriesWithTransactionsByProduct(Product product) {
+        List<Transaction> transactions = Transaction.createCriteria().listDistinct {
             transactionEntries {
                 or {
                     eq("product", product)
@@ -3387,21 +3383,8 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
             }
-            order("transactionDate", "desc")
-            order("dateCreated", "desc")
         }
 
-        // Return only recent transaction by distinct inventory. There is need to iterate, because .unique()
-        // in Groovy 1.7.8 is mutable and it orders by the closure if only one closure param is passed, hence
-        // doing: transactions?.unique { it?.inventory } might not always return list of *most recent* transactions
-        // within this inventory.
-        def results = []
-        transactions?.each { Transaction it ->
-            if (!results?.find { Transaction r -> r?.inventory?.id == it?.inventory?.id }) {
-                results << it
-            }
-        }
-
-        return results
+        return transactions?.collect { it.inventory }?.unique()
     }
 }
