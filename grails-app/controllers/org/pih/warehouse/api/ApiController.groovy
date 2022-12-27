@@ -57,12 +57,12 @@ class ApiController {
 
     @CacheFlush(["megamenuCache"])
     def chooseLocale = {
-        Locale locale = localizationService.getLocale(params.id)
-        if (!locale) {
+        Locale newLocale = localizationService.getLocale(params.id)
+        if (!newLocale) {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
-        session.user.locale = locale
-        render([status: 200, text: "Current language is ${locale}"])
+        session.locale = newLocale
+        render([status: 200, text: "Current language is ${newLocale}"])
     }
 
     def getMenuConfig = {
@@ -88,7 +88,9 @@ class ApiController {
         def localizationMode
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
-        if (session.useDebugLocale) {
+        // If current locale is equal to translation mode locale, we are in localization mode
+        boolean localizationModeEnabled = locale == new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
+        if (localizationModeEnabled) {
 
             localizationMode = [
                 "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
@@ -164,7 +166,7 @@ class ApiController {
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
         String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
-        boolean localizationModeEnabled = session.useDebugLocale ?: false
+        def translationModeLocale = grailsApplication.config.openboxes.locale.translationModeLocale
 
         render([
             data: [
@@ -197,7 +199,8 @@ class ApiController {
                 currencyCode         : currencyCode,
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
-                localizationModeEnabled : localizationModeEnabled
+                localizationModeEnabled : localizationModeEnabled,
+                translationModeLocale : translationModeLocale
             ],
         ] as JSON)
     }
