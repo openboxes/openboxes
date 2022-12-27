@@ -6,8 +6,8 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchShipmentStatusCodes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
-import apiClient from 'utils/apiClient';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
+import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
 const useInboundFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -30,15 +30,6 @@ const useInboundFilters = () => {
       dispatch(fetchShipmentStatusCodes());
     }
   }, []);
-  const fetchUserById = async (id) => {
-    const response = await apiClient(`/openboxes/api/generic/person/${id}`);
-    return response.data?.data;
-  };
-
-  const fetchLocationById = async (id) => {
-    const response = await apiClient(`/openboxes/api/locations/${id}`);
-    return response.data?.data;
-  };
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)

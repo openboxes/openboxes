@@ -6,8 +6,8 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import filterFields from 'components/purchaseOrder/FilterFields';
-import apiClient from 'utils/apiClient';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
+import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
 const usePurchaseOrderFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -37,16 +37,6 @@ const usePurchaseOrderFilters = () => {
     //  fetch only if !buyers || buyers.length === 0
     dispatch(fetchBuyers());
   }, []);
-
-  const fetchLocationById = async (id) => {
-    const response = await apiClient(`/openboxes/api/locations/${id}`);
-    return response.data?.data;
-  };
-
-  const fetchUserById = async (id) => {
-    const response = await apiClient(`/openboxes/api/generic/person/${id}`);
-    return response.data?.data;
-  };
 
   const clearFilterValues = () => {
     const { pathname } = history.location;

@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import filterFields from 'components/stock-list/FilterFields';
 import apiClient from 'utils/apiClient';
 import { transformFilterParams } from 'utils/list-utils';
+import { fetchLocationById } from 'utils/option-utils';
 
 const useStockListFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -19,11 +20,6 @@ const useStockListFilters = () => {
   const { currentLocation } = useSelector(state => ({
     currentLocation: state.session.currentLocation,
   }));
-
-  const fetchLocationById = async (id) => {
-    const response = await apiClient(`/openboxes/api/locations/${id}`);
-    return response.data?.data;
-  };
 
   useEffect(() => {
     apiClient.get('/openboxes/api/locations')

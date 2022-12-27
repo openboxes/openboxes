@@ -5,8 +5,12 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import filterFields from 'components/products/FilterFields';
-import apiClient from 'utils/apiClient';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
+import {
+  fetchProductsCatalogs,
+  fetchProductsCategories,
+  fetchProductsTags,
+} from 'utils/option-utils';
 
 const useProductFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -20,20 +24,6 @@ const useProductFilters = () => {
   const { currentLocation } = useSelector(state => ({
     currentLocation: state.session.currentLocation,
   }));
-  const fetchProductsCategories = async () => {
-    const response = await apiClient.get('/openboxes/api/categoryOptions');
-    return response.data.data;
-  };
-
-  const fetchProductsCatalogs = async () => {
-    const response = await apiClient.get('/openboxes/api/catalogOptions');
-    return response.data.data;
-  };
-
-  const fetchProductsTags = async () => {
-    const response = await apiClient.get('/openboxes/api/tagOptions');
-    return response.data.data;
-  };
 
   const clearFilterValues = () => {
     const { pathname } = history.location;

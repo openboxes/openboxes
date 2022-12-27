@@ -7,8 +7,8 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchRequisitionStatusCodes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
-import apiClient from 'utils/apiClient';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
+import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
 const useOutboundFilters = (isRequestsList) => {
   const [filterParams, setFilterParams] = useState({});
@@ -31,16 +31,6 @@ const useOutboundFilters = (isRequestsList) => {
       dispatch(fetchRequisitionStatusCodes());
     }
   }, []);
-
-  const fetchUserById = async (id) => {
-    const response = await apiClient(`/openboxes/api/generic/person/${id}`);
-    return response.data?.data;
-  };
-
-  const fetchLocationById = async (id) => {
-    const response = await apiClient(`/openboxes/api/locations/${id}`);
-    return response.data?.data;
-  };
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)

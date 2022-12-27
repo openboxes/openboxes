@@ -5,8 +5,8 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import filterFields from 'components/stock-transfer/list/FilterFields';
-import apiClient from 'utils/apiClient';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
+import { fetchUserById } from 'utils/option-utils';
 
 const useStockTransferFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -19,11 +19,6 @@ const useStockTransferFilters = () => {
     currentUser: state.session.user,
     currentLocation: state.session.currentLocation,
   }));
-
-  const fetchUserById = async (id) => {
-    const response = await apiClient(`/openboxes/api/generic/person/${id}`);
-    return response.data?.data;
-  };
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
