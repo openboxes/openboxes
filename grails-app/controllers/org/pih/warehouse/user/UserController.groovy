@@ -29,6 +29,7 @@ class UserController {
     MailService mailService
     def userService
     def locationService
+    def localizationService
 
     /**
      * Show index page - just a redirect to the list page.
@@ -266,32 +267,29 @@ class UserController {
 
 
     def disableLocalizationMode = {
-        session.useDebugLocale = false
-        if (!grailsApplication.config.openboxes.locale.custom.enabled) {
-            flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
-        }
-
+        // If we are in localization mode and want to change the language through the footer on React side
+        // we want to make sure we set the language to the clicked one, not for the previous locale
+        // we want to set the prev locale only if we disable localization mode through "Disable localization mode" button
+        Locale localeToSet = params?.localeToSet ? new Locale(params.localeToSet) : session?.prevLocale
+        session.locale = localeToSet
         def referer = request.getHeader("Referer")
         if (referer) {
             redirect(url: referer)
-        } else {
-            redirect(controller: "dashboard", action: "index")
+            return
         }
+        redirect(controller: "dashboard", action: "index")
     }
 
     def enableLocalizationMode = {
-        session.useDebugLocale = true
-        if (!grailsApplication.config.openboxes.locale.custom.enabled) {
-            flash.message = "${g.message(code: 'localization.invalid.custom.message')}"
-        }
-
+        // We want to store the previous locale, so we can go back to it when disabling localization mode through button
+        session.prevLocale = localizationService.getCurrentLocale()
+        session.locale = new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
         def referer = request.getHeader("Referer")
         if (referer) {
             redirect(url: referer)
-        } else {
-            redirect(controller: "dashboard", action: "index")
+            return
         }
-
+        redirect(controller: "dashboard", action: "index")
     }
 
     /**
@@ -302,40 +300,20 @@ class UserController {
     def updateAuthUserLocale = {
 
         log.info "update auth user locale " + params
-        log.info params.locale == 'debug'
-        if (params.locale == 'debug') {
-            session.useDebugLocale = true
-        } else {
-            session.useDebugLocale = false
-            // if no locale specified, do nothing
-            if (!params.locale) {
-                redirect(controller: "dashboard", action: "index")
-            }
-
-            // convert the passed locale parameter to an actual locale
-            Locale locale = new Locale(params.locale)
-
-            // if this isn't a valid locale, do nothing
-            if (!locale) {
-                redirect(controller: "dashboard", action: "index")
-            }
-
-            // fetch an instance of authenticated user
-            def userInstance = User.get(session?.user?.id)
-            if (userInstance) {
-                userInstance.locale = locale
-                userInstance.save(flush: true)
-
-                session.locale = null
-                // update the reference to the user in the session
-                session.user = User.get(userInstance.id)
-            }
-
-            // when user is anonymous (not logged in)
-            else {
-                session.locale = locale
-            }
+        // if no locale specified, do nothing
+        if (!params.locale) {
+            redirect(controller: "dashboard", action: "index")
         }
+
+        // convert the passed locale parameter to an actual locale
+        Locale locale = new Locale(params.locale)
+
+        // if this isn't a valid locale, do nothing
+        if (!locale) {
+            redirect(controller: "dashboard", action: "index")
+        }
+
+        session.locale = locale
 
         log.info "Redirecting to " + params?.targetUri
         if (params?.targetUri) {
