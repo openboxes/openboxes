@@ -1,4 +1,6 @@
 <%@ page defaultCodec="html" %>
+<g:set var="translationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)}" />
+<g:set var="localizationModeEnabled" value="${(session?.locale ?: session?.user?.locale) == translationModeLocale}" />
 <html>
 
 <head>
@@ -83,7 +85,7 @@
                                         </g:link>
                                     </li>
                                 </g:else>
-                                <g:if test="${session.useDebugLocale }">
+                                <g:if test="${localizationModeEnabled}">
                                     <li>
                                         <g:link controller="user" action="disableLocalizationMode">
                                             ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}

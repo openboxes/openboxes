@@ -20,15 +20,18 @@ class MessageTagLib {
     static namespace = "warehouse"
     def grailsApplication
     def messageSource
+    def localizationService
 
     def message = { attrs, body ->
 
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
+        Locale currentLocale = localizationService.getCurrentLocale()
+        boolean localizationModeEnabled = currentLocale == new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
 
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
         if (!databaseStoreEnabled) {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session.locale ?: session?.user?.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
             return
         }
@@ -36,16 +39,15 @@ class MessageTagLib {
         // Checks the database to see if there's a localization property for the given code
         if (session.user) {
             def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
+
             if (localization) {
-
                 def message = localization.text
-
                 // If there are arguments, we need to get the
                 if (attrs?.args) {
                     message = messageSource.getMessage(attrs.code, null, attrs.default, session?.user?.locale)
                 }
 
-                if (session.useDebugLocale) {
+                if (localizationModeEnabled) {
                     def resolvedMessage = MessageFormat.format(localization.text, attrs?.args?.toArray())
                     out << """${resolvedMessage}"""
                     return
@@ -58,7 +60,7 @@ class MessageTagLib {
         }
 
         // Display message in debug mode
-        if (session.useDebugLocale) {
+        if (localizationModeEnabled) {
             def locales = grailsApplication.config.openboxes.locale.supportedLocales
             def localized = [:]
             def message = ""

@@ -26,7 +26,9 @@
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
-    <g:if test="${session.useDebugLocale}">
+    <g:set var="translationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)}" />
+    <g:set var="localizationModeEnabled" value="${(session?.locale ?: session?.user?.locale) == translationModeLocale}" />
+    <g:if test="${localizationModeEnabled}">
         <script type="text/javascript">
             var _jipt = [];
             _jipt.push(['project', 'openboxes']);
@@ -95,7 +97,7 @@
             </a>
         </div>
     </g:if>
-    <g:if test="${session.useDebugLocale}">
+    <g:if test="${localizationModeEnabled}">
 
         <div id="debug-header" class="notice" style="margin: 10px;">
             <warehouse:message code="localization.custom.message"/>
@@ -188,7 +190,7 @@
         </div>
     </div>
 
-    <g:if test="${session.useDebugLocale}">
+    <g:if test="${localizationModeEnabled}">
         <g:render template="/common/localization"/>
     </g:if>
 
@@ -239,7 +241,7 @@
 </g:if>
 
 <!-- Localization -->
-<g:if test="${session.useDebugLocale}">
+<g:if test="${translationModeEnabled}">
     <script type="text/javascript">
         // Define the localization
         if(typeof openboxes === "undefined") openboxes = {};

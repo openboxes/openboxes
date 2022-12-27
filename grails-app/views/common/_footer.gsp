@@ -15,10 +15,17 @@
 		<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + '?' + (request.queryString?:'') }"/>
 		<g:each in="${grailsApplication.config.openboxes.locale.supportedLocales}" var="l">
 			<g:set var="locale" value="${new Locale(l)}"/>
-			<g:set var="selected" value="${locale == session?.user?.locale || locale == session?.locale }"/>
+			<g:set var="selected" value="${locale == (session?.locale ?: session?.user?.locale)}"/>
+            <g:set var="translationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)}" />
+            <g:set var="localizationModeEnabled" value="${(session?.locale ?: session?.user?.locale) == translationModeLocale}" />
+            %{-- If the locale is the translationModeLocale and localizationMode is active, create a link to disableLocalizationMode--}%
+            %{-- If the locale is the translationModeLocale and localizationMode is NOT active, create a link to enableLocalizationMode--}%
+            %{--If the locale is not the translationModeLocale, so the localizationMode is also inactive, create a regular link to change the language--}%
+            <g:set var="link" value="${(locale == translationModeLocale) ?
+                    (localizationModeEnabled ? createLink(controller: 'user', action: 'disableLocalizationMode') : createLink(controller: 'user', action: 'enableLocalizationMode'))
+                    : createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'targetUri':targetUri,'lang':locale?.language])}" />
             <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
-			<a class="${selected?'selected':''}" href="${createLink(controller: 'user', action: 'updateAuthUserLocale',
-				params: ['locale':locale,'targetUri':targetUri,'lang':locale?.language])}">
+			<a class="${selected?'selected':''}" href="${link}">
 				<!-- fetch the display for locale based on the current locale -->
 				${locale?.getDisplayName(locale ?: defaultLocale)}
 			</a>
@@ -29,7 +36,7 @@
 				params: ['locale':'debug','targetUri':targetUri])}">
 				<g:message code="admin.debug.label"/>:
 			</a>
-			<b>${session.useDebugLocale?"on":"off" }</b>
+			<b>${localizationModeEnabled ?"on":"off" }</b>
 		</g:isUserInRole>
         &nbsp;&nbsp; | &nbsp;&nbsp;
         <span>
