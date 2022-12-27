@@ -50,7 +50,6 @@ class RoleFilters {
     def static requestorOrManagerActions = [
             'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
             'dashboard'           : ['megamenu'],
-            'dashboardApi'        : ['breadcrumbsConfig'],
             'grails'              : ['errors'],
             'localizationApi'     : ['list'],
             'locationApi'         : ['list'],
@@ -64,7 +63,6 @@ class RoleFilters {
     def static authenticatedActions = [
             'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
             'dashboard'           : ['megamenu'],
-            'dashboardApi'        : ['breadcrumbsConfig'],
             'grails'              : ['errors'],
             'localizationApi'     : ['list'],
             'locationApi'         : ['list'],
