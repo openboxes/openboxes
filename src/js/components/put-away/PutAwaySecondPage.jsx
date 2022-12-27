@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
-import { fetchBreadcrumbsConfig, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { hideSpinner, showSpinner } from 'actions';
 import SplitLineModal from 'components/put-away/SplitLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
@@ -55,7 +55,6 @@ class PutAwaySecondPage extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     if (this.props.putAwayTranslationsFetched) {
       this.dataFetched = true;
       this.fetchBins();
@@ -75,24 +74,6 @@ class PutAwaySecondPage extends Component {
     if (nextProps.putAwayTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-       nextProps.initialValues.putAway &&
-       (
-         this.props.breadcrumbsConfig !== nextProps.breadcrumbsConfig ||
-        this.props.initialValues.putAway !== nextProps.initialValues.putAway)
-    ) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-      const { id, putawayNumber } = nextProps.initialValues.putAway;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: putawayNumber, url: actionUrl, id },
-      ]);
     }
   }
 
@@ -658,13 +639,12 @@ class PutAwaySecondPage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.putAway,
 });
 
 export default connect(
   mapStateToProps,
   {
-    showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig,
+    showSpinner, hideSpinner,
   },
 )(PutAwaySecondPage);
 
@@ -692,27 +672,4 @@ PutAwaySecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
-};
-
-PutAwaySecondPage.defaultProps = {
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

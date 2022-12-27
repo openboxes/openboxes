@@ -3,12 +3,10 @@ import _ from 'lodash';
 import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  FETCH_BREADCRUMBS_CONFIG,
   FETCH_MENU_CONFIG,
   FETCH_SESSION_INFO,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
-  UPDATE_BREADCRUMBS_PARAMS,
 } from 'actions/types';
 
 const initialState = {
@@ -69,8 +67,6 @@ const initialState = {
   pageSize: 50,
   logoUrl: '',
   supportedLocales: [],
-  breadcrumbsParams: [],
-  breadcrumbsConfig: [],
   currencyCode: '',
   localizedHelpScoutKey: '',
   isHelpScoutEnabled: false,
@@ -133,16 +129,6 @@ export default function (state = initialState, action) {
       return {
         ...state,
         userActionMenuOpen: action.payload,
-      };
-    case UPDATE_BREADCRUMBS_PARAMS:
-      return {
-        ...state,
-        breadcrumbsParams: action.payload,
-      };
-    case FETCH_BREADCRUMBS_CONFIG:
-      return {
-        ...state,
-        breadcrumbsConfig: action.payload,
       };
     default:
       return state;

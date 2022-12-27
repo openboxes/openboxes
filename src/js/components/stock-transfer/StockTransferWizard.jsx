@@ -7,11 +7,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import {
-  fetchBreadcrumbsConfig,
   fetchTranslations,
   hideSpinner,
   showSpinner,
-  updateBreadcrumbs,
 } from 'actions';
 import CreateStockTransfer from 'components/stock-transfer/CreateStockTransfer';
 import StockTransferCheckPage from 'components/stock-transfer/StockTransferCheckPage';
@@ -37,7 +35,6 @@ class StockTransferWizard extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'stockTransfer');
 
     if (this.props.stockTransferTranslationsFetched) {
@@ -45,14 +42,6 @@ class StockTransferWizard extends Component {
 
       this.fetchStockTransfer();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,18 +53,6 @@ class StockTransferWizard extends Component {
       this.dataFetched = true;
 
       this.fetchStockTransfer();
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
     }
   }
 
@@ -165,11 +142,10 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  breadcrumbsConfig: state.session.breadcrumbsConfig.stockTransfer,
 });
 
 export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(StockTransferWizard));
 
 StockTransferWizard.propTypes = {
@@ -190,27 +166,4 @@ StockTransferWizard.propTypes = {
   }).isRequired,
   /** React router's object used to manage session history */
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
-};
-
-StockTransferWizard.defaultProps = {
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };
