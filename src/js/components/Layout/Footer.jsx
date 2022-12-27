@@ -11,9 +11,21 @@ import Translate from 'utils/Translate';
 
 const Footer = ({
   // eslint-disable-next-line no-shadow
-  setActiveLanguage, changeCurrentLocale, locale, languages,
-  hostname, timezone, ipAddress, grailsVersion, appVersion,
-  branchName, buildNumber, environment, buildDate,
+  setLanguage,
+  changeLocale,
+  locale,
+  languages,
+  hostname,
+  timezone,
+  ipAddress,
+  grailsVersion,
+  appVersion,
+  branchName,
+  buildNumber,
+  environment,
+  buildDate,
+  localizationModeEnabled,
+  translationModeLocale,
 }) => (
   <div className="border-top align-self-end text-center py-2 w-100 footer">
     <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
@@ -27,21 +39,47 @@ const Footer = ({
     </div>
     <div className="d-flex flex-row justify-content-center mb-3 flex-wrap">
       <div className="mx-3"><Translate id="react.default.locale.label " defaultMessage="Locale" />: {' '}
-        { _.map(languages, language => (
-          <a
-            className={`${locale === language.code ? 'selected' : ''}`}
-            key={language.code}
-            href="#"
-            onClick={() => {
-              changeCurrentLocale(language.code);
-              setActiveLanguage(language.code);
-            }
-            }
-          >
-            <Translate id={`react.default.${language.name.toLowerCase()}.label`} /> {''}
-          </a>
-        ))
-        }
+        { _.map(languages, (language) => {
+          // When clicking on language that is a translation mode language, enable localization mode
+          if (language.code === translationModeLocale) {
+            return (
+              <a
+                className={`${locale === language.code ? 'selected' : ''}`}
+                key={language.code}
+                href="/openboxes/user/enableLocalizationMode"
+              >
+                <Translate id={`react.default.${language.name.toLowerCase()}.label`} /> {''}
+              </a>
+            );
+          }
+          // If we are in localization mode and we click on non-translation mode language,
+          // we want to disable the localization mode
+          if (localizationModeEnabled) {
+            return (
+              <a
+                className={`${locale === language.code ? 'selected' : ''}`}
+                key={language.code}
+                href={`/openboxes/user/disableLocalizationMode?localeToSet=${language.code}`}
+              >
+                <Translate id={`react.default.${language.name.toLowerCase()}.label`} /> {''}
+              </a>
+            );
+          }
+          // If we are not in localization mode and the language is not a translation mode language,
+          // we just want to change the language
+          return (
+            <button
+              className={`${locale === language.code ? 'selected' : ''}`}
+              key={language.code}
+              onClick={() => {
+                changeLocale(language.code);
+                setLanguage(language.code);
+              }}
+            >
+              <Translate id={`react.default.${language.name.toLowerCase()}.label`} /> {''}
+            </button>
+          );
+        })}
       </div> {'|'}
 
       <div className="mx-3"><Translate id="react.default.ipAddress.label " defaultMessage="IP Address" />: <b>{ipAddress}</b></div> {'|'}
@@ -64,15 +102,22 @@ const mapStateToProps = state => ({
   timezone: state.session.timezone,
   ipAddress: state.session.ipAddress,
   languages: getLanguages(state.localize),
+  localizationModeEnabled: state.session.localizationModeEnabled,
+  translationModeLocale: state.session.translationModeLocale,
 });
 
-export default connect(mapStateToProps, { changeCurrentLocale, setActiveLanguage })(Footer);
+const mapDispatchToProps = {
+  changeLocale: changeCurrentLocale,
+  setLanguage: setActiveLanguage,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Footer);
 
 Footer.propTypes = {
   languages: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  setActiveLanguage: PropTypes.func.isRequired,
+  setLanguage: PropTypes.func.isRequired,
   /** Function called to change the currently selected location */
-  changeCurrentLocale: PropTypes.func.isRequired,
+  changeLocale: PropTypes.func.isRequired,
   locale: PropTypes.string.isRequired,
   grailsVersion: PropTypes.string.isRequired,
   appVersion: PropTypes.string.isRequired,
@@ -83,4 +128,6 @@ Footer.propTypes = {
   hostname: PropTypes.string.isRequired,
   timezone: PropTypes.string.isRequired,
   ipAddress: PropTypes.string.isRequired,
+  localizationModeEnabled: PropTypes.bool.isRequired,
+  translationModeLocale: PropTypes.string.isRequired,
 };
