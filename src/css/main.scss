@@ -123,34 +123,6 @@ body {
   white-space: pre;
 }
 
-.breadcrumbs-container {
-  padding-left: 10px;
-  width: 100%;
-  height: 34px;
-  background-image: linear-gradient(white, $white-alpha);
-  justify-content: flex-start;
-  align-items: center;
-  line-height: 30px;
-  color: $gray-beta;
-  border-bottom: solid 1px $gray-alpha;
-  flex-wrap: wrap;
-
-  a {
-    text-decoration: none;
-    color: $gray-zeta;
-  }
-}
-
-.item-breadcrumbs {
-  margin-left: 10px;
-}
-
-@media (max-width: 600px) {
-  .item-breadcrumbs {
-    font-size: 0.5em;
-  }
-}
-
 .footer {
   bottom: 0;
   vertical-align: middle;

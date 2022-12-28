@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import AddItemsPage from 'components/invoice/AddItemsPage';
 import ConfirmInvoicePage from 'components/invoice/ConfirmInvoicePage';
 import CreateInvoicePage from 'components/invoice/CreateInvoicePage';
@@ -28,21 +28,12 @@ class InvoiceWizard extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'invoice');
 
     if (this.props.invoiceTranslationsFetched) {
       this.dataFetched = true;
       this.fetchInitialValues();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -53,18 +44,6 @@ class InvoiceWizard extends Component {
     if (nextProps.invoiceTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchInitialValues();
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
     }
   }
 
@@ -101,16 +80,6 @@ class InvoiceWizard extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
-    if (values.invoiceNumber && values.id) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: values.invoiceNumber, url: actionUrl, id: values.id },
-      ]);
-    }
   }
 
   /**
@@ -170,12 +139,11 @@ class InvoiceWizard extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   invoiceTranslationsFetched: state.session.fetchedTranslations.invoice,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.invoice,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(InvoiceWizard);
 
 InvoiceWizard.propTypes = {
@@ -193,28 +161,8 @@ InvoiceWizard.propTypes = {
   invoiceTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 InvoiceWizard.defaultProps = {
   initialValues: {},
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

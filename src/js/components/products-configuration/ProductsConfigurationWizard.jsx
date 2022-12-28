@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, updateBreadcrumbs } from 'actions';
+import { fetchTranslations } from 'actions';
 import ConfigureProductCategories from 'components/products-configuration/ConfigureProductCategories';
 import ConfigureProducts from 'components/products-configuration/ConfigureProducts';
 import ReviewCategories from 'components/products-configuration/ReviewCategories';
@@ -29,31 +29,12 @@ class ProductsConfigurationWizard extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'productsConfiguration');
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'productsConfiguration');
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
     }
   }
 
@@ -97,14 +78,13 @@ class ProductsConfigurationWizard extends Component {
 }
 
 const mapStateToProps = state => ({
-  breadcrumbsConfig: state.session.breadcrumbsConfig.productsConfiguration,
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
-  fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  fetchTranslations,
 })(ProductsConfigurationWizard);
 
 ProductsConfigurationWizard.propTypes = {
@@ -114,13 +94,6 @@ ProductsConfigurationWizard.propTypes = {
   initialValues: PropTypes.shape({
     categoriesImported: PropTypes.bool,
   }),
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
@@ -136,9 +109,4 @@ ProductsConfigurationWizard.propTypes = {
 
 ProductsConfigurationWizard.defaultProps = {
   initialValues: { categoriesImported: false },
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    actionUrl: '',
-  },
 };

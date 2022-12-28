@@ -539,11 +539,6 @@ class UrlMappings {
             action = [GET: "getSubdashboardKeys"]
         }
 
-        "/api/dashboard/breadcrumbsConfig"(parseRequest: true) {
-            controller = { "dashboardApi" }
-            action = [GET: "breadcrumbsConfig"]
-        }
-
         "/api/dashboard/inventoryByLotAndBin"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getInventoryByLotAndBin"]

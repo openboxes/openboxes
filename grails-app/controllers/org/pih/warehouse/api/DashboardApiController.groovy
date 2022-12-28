@@ -36,11 +36,6 @@ class DashboardApiController {
     }
 
     @Cacheable("dashboardCache")
-    def breadcrumbsConfig = {
-        render(grailsApplication.config.breadcrumbsConfig as JSON)
-    }
-
-    @Cacheable("dashboardCache")
     def getInventoryByLotAndBin = {
         Location location = Location.get(params.locationId)
         NumberData numberData = numberDataService.getInventoryByLotAndBin(location)
