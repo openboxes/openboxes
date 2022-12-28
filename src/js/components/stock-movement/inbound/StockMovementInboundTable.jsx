@@ -1,11 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { CancelToken } from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiDeleteBinLine,
   RiDownload2Line,
@@ -13,15 +10,12 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
-import stockMovementApi from 'api/services/StockMovementApi';
-import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_INCOMING_ITEMS } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
+import useInboundListTableData from 'hooks/useInboundListTableData';
 import ActionDots from 'utils/ActionDots';
-import exportFileFromAPI from 'utils/file-download-util';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -30,151 +24,24 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const StockMovementInboundTable = ({
   filterParams,
   translate,
-  fetchStatuses,
   shipmentStatuses,
-  isShipmentStatusesFetched,
   currentLocation,
-  showTheSpinner,
-  hideTheSpinner,
   isUserAdmin,
 }) => {
-  const [tableData, setTableData] = useState({
-    data: [],
-    pages: -1,
-    totalCount: 0,
-    currentParams: {},
-  });
-  const [loading, setLoading] = useState(true);
-
-  const tableRef = useRef(null);
-
-  // Cancel token/signal for fetching data
-  const sourceRef = useRef(CancelToken.source());
-
-  const fireFetchData = () => {
-    sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
-  };
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  useEffect(() => {
-    if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {
-      fetchStatuses();
-    }
-  }, []);
-
-  const exportStockMovements = () => {
-    exportFileFromAPI({
-      url: STOCK_MOVEMENT_API,
-      params: tableData.currentParams,
-    });
-  };
-
-  const exportAllIncomingItems = () => {
-    exportFileFromAPI({
-      url: STOCK_MOVEMENT_INCOMING_ITEMS,
-      params: tableData.currentParams,
-    });
-  };
+  const {
+    tableData,
+    tableRef,
+    loading,
+    onFetchHandler,
+    exportAllIncomingItems,
+    exportStockMovements,
+    deleteConfirmAlert,
+  } = useInboundListTableData(filterParams);
 
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
-
-  const onFetchHandler = useCallback(async (state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } : undefined;
-
-      const params = _.omitBy({
-        ...filterParams,
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        receiptStatusCode: filterParams.receiptStatusCode &&
-          filterParams.receiptStatusCode?.map(({ id }) => id),
-        origin: filterParams?.origin?.id,
-        destination: filterParams?.destination?.id,
-        requestedBy: filterParams.requestedBy?.id,
-        createdBy: filterParams.createdBy?.id,
-        updatedBy: filterParams.updatedBy?.id,
-        ...sortingParams,
-      }, (value) => {
-        if (typeof value === 'object' && _.isEmpty(value)) return true;
-        return !value;
-      });
-
-      // Fetch data
-      setLoading(true);
-      const config = {
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        params,
-        cancelToken: sourceRef.current?.token,
-      };
-      try {
-        const { data } = await stockMovementApi.getStockMovements(config);
-        setTableData({
-          data: data.data,
-          pages: Math.ceil(data.totalCount / state.pageSize),
-          totalCount: data.totalCount,
-          currentParams: params,
-        });
-      } catch {
-        await Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements')));
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [filterParams]);
-
-  const deleteReturnStockMovement = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockMovementApi.deleteStockMovement(id);
-      if (status === 204) {
-        const successMessage = translate(
-          'react.stockMovement.deleted.success.message.label',
-          'Stock Movement has been deleted successfully',
-        );
-        Alert.success(successMessage);
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const deleteConfirmAlert = (id) => {
-    const confirmButton = {
-      label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => deleteReturnStockMovement(id),
-    };
-    const cancelButton = {
-      label: translate('react.default.no.label', 'No'),
-    };
-    confirmAlert({
-      title: translate('react.default.areYouSure.label', 'Are you sure?'),
-      message: translate(
-        'react.stockMovement.areYouSure.label',
-        'Are you sure you want to delete this Stock Movement?',
-      ),
-      buttons: [confirmButton, cancelButton],
-    });
-  };
 
   // List of all actions for inbound Stock Movement rows
   const getActions = useCallback((row) => {
@@ -413,10 +280,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInbound
 StockMovementInboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
-  fetchStatuses: PropTypes.func.isRequired,
-  showTheSpinner: PropTypes.func.isRequired,
-  hideTheSpinner: PropTypes.func.isRequired,
-  isShipmentStatusesFetched: PropTypes.bool.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,

@@ -1,100 +1,33 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import { CancelToken } from 'axios';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiDeleteBinLine,
   RiInformationLine,
 } from 'react-icons/all';
-import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
-import { hideSpinner, showSpinner } from 'actions';
-import stockTransferApi from 'api/services/StockTransferApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import StockTransferStatus from 'components/stock-transfer/list/StockTransferStatus';
+import useStockTransferListTableData from 'hooks/useStockTransferListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import Translate from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
-const INITIAL_STATE = {
-  stockTransfersData: [],
-  loading: false,
-  pages: -1,
-  totalCount: 0,
-  currentParams: {},
-};
 
 
 const StockTransferListTable = ({
   filterParams,
-  currentLocation,
-  translate,
-  showTheSpinner,
-  hideTheSpinner,
   highestRole,
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [tableData, setTableData] = useState(INITIAL_STATE);
-  // Util ref for react-table to force the fetch of data
-  const tableRef = useRef(null);
-
-  // Cancel token/signal for fetching data
-  const sourceRef = useRef(CancelToken.source());
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
-  const fireFetchData = () => {
-    sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
-  };
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  const deleteStockTransfer = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockTransferApi.deleteStockTransfer(id);
-      if (status === 204) {
-        const successMessage = translate('react.stockTransfer.delete.success.label', 'Stock transfer has been deleted successfully');
-        Alert.success(successMessage);
-      }
-    } finally {
-      hideTheSpinner();
-      fireFetchData();
-    }
-  };
-
-  const deleteHandler = (id) => {
-    confirmAlert({
-      title: translate('react.default.areYouSure.label', 'Are you sure?'),
-      message: translate(
-        'react.stockTransfer.delete.confirm.label',
-        'Are you sure you want to delete this stock transfer?',
-      ),
-      buttons: [
-        {
-          label: translate('react.default.yes.label', 'Yes'),
-          onClick: () => deleteStockTransfer(id),
-        },
-        {
-          label: translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
-  };
+  const {
+    onFetchHandler,
+    deleteHandler,
+    loading,
+    tableData,
+    tableRef,
+  } = useStockTransferListTableData(filterParams);
 
   const actions = useMemo(() => [
     {
@@ -168,54 +101,6 @@ const StockTransferListTable = ({
     },
   ], [highestRole]);
 
-
-  const onFetchHandler = useCallback(async (tableState) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = tableState.sorted.length > 0 ?
-        {
-          sort: tableState.sorted[0].id,
-          order: tableState.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'dateCreated',
-          order: 'desc',
-        };
-
-      const params = _.omitBy({
-        location: currentLocation?.id,
-        offset: `${offset}`,
-        max: `${tableState.pageSize}`,
-        ...sortingParams,
-        ...filterParams,
-        createdBy: filterParams.createdBy?.id,
-        status: filterParams.status && filterParams.status.map(({ value }) => value),
-      }, _.isEmpty);
-
-      // Fetch data
-      setLoading(true);
-      try {
-        const config = {
-          params,
-          paramsSerializer: parameters => queryString.stringify(parameters),
-          cancelToken: sourceRef.current?.token,
-        };
-        const { data } = await stockTransferApi.getStockTransfers(config);
-        setTableData({
-          stockTransfersData: data.data,
-          totalCount: data.totalCount,
-          pages: Math.ceil(data.totalCount / tableState.pageSize),
-          currentParams: params,
-        });
-      } catch {
-        await Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [filterParams]);
-
-
   return (
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
@@ -242,23 +127,13 @@ const StockTransferListTable = ({
 
 const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  currentLocation: state.session.currentLocation,
 });
 
-const mapDispatchToProps = {
-  showTheSpinner: showSpinner,
-  hideTheSpinner: hideSpinner,
-};
 
-export default connect(mapStateToProps, mapDispatchToProps)(StockTransferListTable);
+export default connect(mapStateToProps)(StockTransferListTable);
 
 
 StockTransferListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
-  translate: PropTypes.func.isRequired,
-  currentLocation: PropTypes.shape({}).isRequired,
-  showTheSpinner: PropTypes.func.isRequired,
-  hideTheSpinner: PropTypes.func.isRequired,
   highestRole: PropTypes.string.isRequired,
 };
