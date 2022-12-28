@@ -88,9 +88,11 @@ class ApiController {
         def localizationMode
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
+        def translationModeLocale = grailsApplication.config.openboxes.locale.translationModeLocale
         // If current locale is equal to translation mode locale, we are in localization mode
-        boolean localizationModeEnabled = locale == new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
-        if (localizationModeEnabled) {
+        session.useDebugLocale = locale == new Locale(translationModeLocale)
+
+        if (session.useDebugLocale) {
 
             localizationMode = [
                 "label"      : messageSource.getMessage('localization.disable.label', emptyArgs, 'Disable translation mode', locale),
@@ -166,7 +168,7 @@ class ApiController {
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
         String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
-        def translationModeLocale = grailsApplication.config.openboxes.locale.translationModeLocale
+        boolean localizationModeEnabled = session.useDebugLocale ?: false
 
         render([
             data: [

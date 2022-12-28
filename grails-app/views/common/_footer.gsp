@@ -17,12 +17,11 @@
 			<g:set var="locale" value="${new Locale(l)}"/>
 			<g:set var="selected" value="${locale == (session?.locale ?: session?.user?.locale)}"/>
             <g:set var="translationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)}" />
-            <g:set var="localizationModeEnabled" value="${(session?.locale ?: session?.user?.locale) == translationModeLocale}" />
             %{-- If the locale is the translationModeLocale and localizationMode is active, create a link to disableLocalizationMode--}%
             %{-- If the locale is the translationModeLocale and localizationMode is NOT active, create a link to enableLocalizationMode--}%
             %{--If the locale is not the translationModeLocale, so the localizationMode is also inactive, create a regular link to change the language--}%
             <g:set var="link" value="${(locale == translationModeLocale) ?
-                    (localizationModeEnabled ? createLink(controller: 'user', action: 'disableLocalizationMode') : createLink(controller: 'user', action: 'enableLocalizationMode'))
+                    (session.useDebugLocale ? createLink(controller: 'user', action: 'disableLocalizationMode') : createLink(controller: 'user', action: 'enableLocalizationMode'))
                     : createLink(controller: 'user', action: 'updateAuthUserLocale', params: ['locale':locale,'targetUri':targetUri,'lang':locale?.language])}" />
             <g:set var="defaultLocale" value="${new Locale(grailsApplication.config.openboxes.locale.defaultLocale)}"/>
 			<a class="${selected?'selected':''}" href="${link}">
@@ -36,7 +35,7 @@
 				params: ['locale':'debug','targetUri':targetUri])}">
 				<g:message code="admin.debug.label"/>:
 			</a>
-			<b>${localizationModeEnabled ?"on":"off" }</b>
+			<b>${session.useDebugLocale ?"on":"off" }</b>
 		</g:isUserInRole>
         &nbsp;&nbsp; | &nbsp;&nbsp;
         <span>

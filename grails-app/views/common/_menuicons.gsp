@@ -1,6 +1,4 @@
 <%@page import="org.pih.warehouse.core.ActivityCode;"%>
-<g:set var="translationModeLocale" value="${new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)}" />
-<g:set var="localizationModeEnabled" value="${(session?.locale ?: session?.user?.locale) == translationModeLocale}" />
 <div class="d-none d-${breakPoint}-flex">
     <div class="menu-icon position-relative">
         <div class="tooltip2">
@@ -72,7 +70,7 @@
                         </span>
                         <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]" />
                     </g:link>
-                    <g:if test="${localizationModeEnabled}">
+                    <g:if test="${session?.useDebugLocale}">
                         <g:link controller="user" action="disableLocalizationMode" class="dropdown-item">
                             <span class="icon">
                                 <i class="ri-map-pin-line"></i>
@@ -135,7 +133,7 @@
                     </span>
                     <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]" />
                 </g:link>
-                <g:if test="${localizationModeEnabled}">
+                <g:if test="${session?.useDebugLocale}">
                     <g:link controller="user" action="disableLocalizationMode" class="dropdown-item">
                         <span class="icon">
                             <i class="ri-map-pin-line"></i>

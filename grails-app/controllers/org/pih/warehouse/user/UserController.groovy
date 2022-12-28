@@ -272,6 +272,7 @@ class UserController {
         // we want to set the prev locale only if we disable localization mode through "Disable localization mode" button
         Locale localeToSet = params?.localeToSet ? new Locale(params.localeToSet) : session?.prevLocale
         session.locale = localeToSet
+        session.useDebugLocale = false
         def referer = request.getHeader("Referer")
         if (referer) {
             redirect(url: referer)
@@ -284,6 +285,7 @@ class UserController {
         // We want to store the previous locale, so we can go back to it when disabling localization mode through button
         session.prevLocale = localizationService.getCurrentLocale()
         session.locale = new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
+        session.useDebugLocale = true
         def referer = request.getHeader("Referer")
         if (referer) {
             redirect(url: referer)
@@ -313,7 +315,12 @@ class UserController {
             redirect(controller: "dashboard", action: "index")
         }
 
+        // Change the locale
         session.locale = locale
+
+        // Check if chosen locale is equal to translation mode locale, if so, enable localization mode
+        def translationModeLocale = new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
+        session.useDebugLocale = locale == translationModeLocale
 
         log.info "Redirecting to " + params?.targetUri
         if (params?.targetUri) {
