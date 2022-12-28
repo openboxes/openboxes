@@ -43,7 +43,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   };
 
   const deleteOrder = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.delete(`/openboxes/api/purchaseOrders/${id}`)
       .then((res) => {
         if (res.status === 204) {
@@ -52,7 +52,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
         }
       })
       .finally(() => {
-        dispatch(hideSpinner);
+        dispatch(hideSpinner());
         fireFetchData();
       });
   };

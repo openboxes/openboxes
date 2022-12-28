@@ -45,7 +45,7 @@ const useStockListTableData = (filterParams) => {
 
 
   const deleteStocklists = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.delete(`/openboxes/api/stocklists/${id}`)
       .then((res) => {
         if (res.status === 204) {
@@ -56,7 +56,7 @@ const useStockListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const onClickDeleteStocklists = (id) => {
@@ -81,7 +81,7 @@ const useStockListTableData = (filterParams) => {
   };
 
   const clearStocklists = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.post(`/openboxes/api/stocklists/${id}/clear`)
       .then((res) => {
         if (res.status === 200) {
@@ -92,7 +92,7 @@ const useStockListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const onClickClearStocklists = (id) => {
@@ -117,7 +117,7 @@ const useStockListTableData = (filterParams) => {
   };
 
   const cloneStocklists = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.post(`/openboxes/api/stocklists/${id}/clone`)
       .then((res) => {
         if (res.status === 200) {
@@ -128,11 +128,11 @@ const useStockListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const publishStocklists = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.post(`/openboxes/api/stocklists/${id}/publish`)
       .then((res) => {
         if (res.status === 200) {
@@ -143,11 +143,11 @@ const useStockListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const unpublishStocklists = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.post(`/openboxes/api/stocklists/${id}/unpublish`)
       .then((res) => {
         if (res.status === 200) {
@@ -158,7 +158,7 @@ const useStockListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const onFetchHandler = useCallback((state) => {

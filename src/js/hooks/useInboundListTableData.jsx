@@ -34,7 +34,7 @@ const useInboundListTableData = (filterParams) => {
 
   useEffect(() => {
     if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {
-      dispatch(fetchShipmentStatusCodes);
+      dispatch(fetchShipmentStatusCodes());
     }
   }, []);
 
@@ -99,7 +99,7 @@ const useInboundListTableData = (filterParams) => {
   }, [filterParams]);
 
   const deleteReturnStockMovement = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.delete(`/openboxes/api/stockMovements/${id}`)
       .then((res) => {
         if (res.status === 204) {
@@ -111,7 +111,7 @@ const useInboundListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const deleteConfirmAlert = (id) => {

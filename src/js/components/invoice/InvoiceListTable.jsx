@@ -6,7 +6,6 @@ import {
   RiInformationLine,
   RiPencilLine,
 } from 'react-icons/all';
-import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
@@ -14,7 +13,7 @@ import InvoiceStatus from 'components/invoice/InvoiceStatus';
 import useInvoiceListTableData from 'hooks/useInvoiceListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
@@ -145,10 +144,7 @@ const InvoiceListTable = ({
 const mapStateToProps = state => ({
   supportedActivities: state.session.supportedActivities,
   highestRole: state.session.highestRole,
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  currencyCode: state.session.currencyCode,
   invoiceStatuses: state.invoices.statuses,
-  currentLocation: state.session.currentLocation,
 });
 
 

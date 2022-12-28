@@ -32,7 +32,7 @@ const useOutboundListTableData = (filterParams) => {
 
   useEffect(() => {
     if (!isRequisitionStatusesFetched || requisitionStatuses.length === 0) {
-      dispatch(fetchRequisitionStatusCodes);
+      dispatch(fetchRequisitionStatusCodes());
     }
   }, []);
 
@@ -98,7 +98,7 @@ const useOutboundListTableData = (filterParams) => {
   }, [filterParams]);
 
   const deleteStockMovement = (id) => {
-    dispatch(showSpinner);
+    dispatch(showSpinner());
     apiClient.delete(`/openboxes/api/stockMovements/${id}`)
       .then((res) => {
         if (res.status === 204) {
@@ -110,7 +110,7 @@ const useOutboundListTableData = (filterParams) => {
           fireFetchData();
         }
       })
-      .finally(() => dispatch(hideSpinner));
+      .finally(() => dispatch(hideSpinner()));
   };
 
   const deleteConfirmAlert = (id) => {

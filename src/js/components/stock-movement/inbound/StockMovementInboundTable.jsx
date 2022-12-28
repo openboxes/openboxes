@@ -11,7 +11,6 @@ import {
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import useInboundListTableData from 'hooks/useInboundListTableData';
@@ -261,20 +260,11 @@ const StockMovementInboundTable = ({
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   shipmentStatuses: state.shipmentStatuses.data,
-  isShipmentStatusesFetched: state.shipmentStatuses.fetched,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
 });
 
-const mapDispatchToProps = {
-  showSpinner,
-  hideSpinner,
-  fetchStatuses: fetchShipmentStatusCodes,
-  showTheSpinner: showSpinner,
-  hideTheSpinner: hideSpinner,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockMovementInboundTable);
+export default connect(mapStateToProps)(StockMovementInboundTable);
 
 
 StockMovementInboundTable.propTypes = {

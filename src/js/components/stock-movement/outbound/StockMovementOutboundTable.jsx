@@ -13,7 +13,6 @@ import {
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import useOutboundListTableData from 'hooks/useOutboundListTableData';
@@ -264,15 +263,7 @@ const mapStateToProps = state => ({
   isUserAdmin: state.session.isUserAdmin,
 });
 
-const mapDispatchToProps = {
-  showSpinner,
-  hideSpinner,
-  fetchStatuses: fetchRequisitionStatusCodes,
-  showTheSpinner: showSpinner,
-  hideTheSpinner: hideSpinner,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboundTable);
+export default connect(mapStateToProps)(StockMovementOutboundTable);
 
 
 StockMovementOutboundTable.propTypes = {

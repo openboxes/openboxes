@@ -17,7 +17,6 @@ import {
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import useStockListTableData from 'hooks/useStockListTableData';
@@ -259,12 +258,7 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
 });
 
-const mapDispatchToProps = {
-  showSpinner,
-  hideSpinner,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockListTable);
+export default connect(mapStateToProps)(StockListTable);
 
 
 StockListTable.propTypes = {

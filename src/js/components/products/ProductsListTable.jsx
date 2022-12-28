@@ -2,14 +2,12 @@ import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiDownload2Line } from 'react-icons/all';
-import { getTranslate } from 'react-localize-redux';
-import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import useProductsListTableData from 'hooks/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import Translate from 'utils/Translate';
 
 const ProductsListTable = ({
   filterParams,
@@ -125,12 +123,7 @@ const ProductsListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-});
-
-
-export default connect(mapStateToProps)(ProductsListTable);
+export default ProductsListTable;
 
 
 ProductsListTable.propTypes = {

@@ -17,7 +17,6 @@ import { RiCloseLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
@@ -356,19 +355,11 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencyCode: state.session.currencyCode,
-  currentLocation: state.session.currentLocation,
-  buyers: state.organizations.buyers,
   allStatuses: state.purchaseOrder.statuses,
-  isUserApprover: state.session.isUserApprover,
   locale: state.session.activeLanguage,
 });
 
-const mapDispatchToProps = {
-  showTheSpinner: showSpinner,
-  hideTheSpinner: hideSpinner,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PurchaseOrderListTable);
+export default connect(mapStateToProps)(PurchaseOrderListTable);
 
 
 PurchaseOrderListTable.propTypes = {
