@@ -20,7 +20,7 @@ import { connect } from 'react-redux';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
-import usePurchaseOrderListTableData from 'hooks/usePurchaseOrderListTableData';
+import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';

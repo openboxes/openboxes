@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
-import useStockListTableData from 'hooks/useStockListTableData';
+import useStockListTableData from 'hooks/list-pages/stock-list/useStockListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';

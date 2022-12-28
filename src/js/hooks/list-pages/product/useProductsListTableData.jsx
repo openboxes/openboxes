@@ -6,7 +6,7 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useSelector } from 'react-redux';
 
-import useTableData from 'hooks/useTableData';
+import useTableData from 'hooks/list-pages/useTableData';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 

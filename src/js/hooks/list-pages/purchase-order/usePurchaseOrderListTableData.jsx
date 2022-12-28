@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import useTableData from 'hooks/useTableData';
+import useTableData from 'hooks/list-pages/useTableData';
 import apiClient from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';

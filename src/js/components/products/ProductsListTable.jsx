@@ -5,7 +5,7 @@ import { RiDownload2Line } from 'react-icons/all';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
-import useProductsListTableData from 'hooks/useProductsListTableData';
+import useProductsListTableData from 'hooks/list-pages/product/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 

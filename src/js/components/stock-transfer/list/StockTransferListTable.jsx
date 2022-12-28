@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import StockTransferStatus from 'components/stock-transfer/list/StockTransferStatus';
-import useStockTransferListTableData from 'hooks/useStockTransferListTableData';
+import useStockTransferListTableData from 'hooks/list-pages/stock-transfer/useStockTransferListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';

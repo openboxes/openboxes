@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
-import useInvoiceListTableData from 'hooks/useInvoiceListTableData';
+import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
