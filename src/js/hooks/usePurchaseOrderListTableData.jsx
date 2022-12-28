@@ -4,7 +4,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
@@ -25,6 +25,8 @@ const usePurchaseOrderListTableData = (filterParams) => {
     isUserApprover: state.session.isUserApprover,
   }));
 
+  const dispatch = useDispatch();
+
   const {
     sourceRef, tableRef, fireFetchData,
   } = useTableData(filterParams);
@@ -41,7 +43,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   };
 
   const deleteOrder = (id) => {
-    showSpinner();
+    dispatch(showSpinner);
     apiClient.delete(`/openboxes/api/purchaseOrders/${id}`)
       .then((res) => {
         if (res.status === 204) {
@@ -50,7 +52,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
         }
       })
       .finally(() => {
-        hideSpinner();
+        dispatch(hideSpinner);
         fireFetchData();
       });
   };

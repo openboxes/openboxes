@@ -1,9 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiDeleteBinLine,
   RiDownload2Line,
@@ -19,15 +16,12 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import stockListApi from 'api/services/StockListApi';
-import { STOCKLIST_API, STOCKLIST_EXPORT } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
+import useStockListTableData from 'hooks/useStockListTableData';
 import ActionDots from 'utils/ActionDots';
-import exportFileFromAPI from 'utils/file-download-util';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -36,41 +30,24 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const StockListTable = ({
   filterParams,
-  hideSpinner: hideTheSpinner,
-  showSpinner: showTheSpinner,
   translate,
   highestRole,
 }) => {
-  const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  // Stored searching params for export case
-  const [currentParams, setCurrentParams] = useState({});
-  const [totalData, setTotalData] = useState(0);
-
-  const tableRef = useRef(null);
-
-  const fireFetchData = () => tableRef.current.fireFetchData();
-
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  const exportStockList = () => {
-    exportFileFromAPI({
-      url: STOCKLIST_API,
-      params: {
-        ...currentParams,
-      },
-    });
-  };
-
-  const exportStockListItems = (id) => {
-    exportFileFromAPI({
-      url: STOCKLIST_EXPORT(id),
-    });
-  };
+  const {
+    totalData,
+    tableRef,
+    tableData,
+    loading,
+    pages,
+    onFetchHandler,
+    exportStockList,
+    onClickClearStocklists,
+    onClickDeleteStocklists,
+    unpublishStocklists,
+    publishStocklists,
+    cloneStocklists,
+    exportStockListItems,
+  } = useStockListTableData(filterParams);
 
   const customActionFilter = ({ isPublished }, row) => {
     // skip actions that don't have isPublished property
@@ -78,170 +55,6 @@ const StockListTable = ({
     // show actions that have same boolean value in row and in action
     return row.original.isPublished === isPublished;
   };
-
-  const deleteStocklists = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockListApi.deleteStockList(id);
-      if (status === 204) {
-        Alert.success(translate(
-          'react.stocklists.delete.success.label',
-          'Stock List has been deleted successfully',
-        ));
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const onClickDeleteStocklists = (id) => {
-    const confirmButton = {
-      label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => deleteStocklists(id),
-    };
-    const cancelButton = {
-      label: translate('react.default.no.label', 'No'),
-    };
-    confirmAlert({
-      title: translate(
-        'react.stocklists.delete.confirm.title.label',
-        'Confirm delete of stock list',
-      ),
-      message: translate(
-        'react.stocklists.delete.confirm.message.label',
-        'Are you sure you want to delete this stock list ?',
-      ),
-      buttons: [confirmButton, cancelButton],
-    });
-  };
-
-  const clearStocklists = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockListApi.clearStockList(id);
-      if (status === 200) {
-        Alert.success(translate(
-          'react.stocklists.clear.success.label',
-          'Stock List has been cleared Stock List has been cloned successfully',
-        ));
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const onClickClearStocklists = (id) => {
-    const confirmButton = {
-      label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => clearStocklists(id),
-    };
-    const cancelButton = {
-      label: translate('react.default.no.label', 'No'),
-    };
-    confirmAlert({
-      title: translate(
-        'react.stocklists.clear.confirm.title.label',
-        'Confirm clear of stock list',
-      ),
-      message: translate(
-        'react.stocklists.clear.confirm.message.label',
-        'Are you sure you want to clear this stock list ?',
-      ),
-      buttons: [confirmButton, cancelButton],
-    });
-  };
-
-  const cloneStocklists = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockListApi.cloneStockList(id);
-      if (status === 200) {
-        Alert.success(translate(
-          'react.stocklists.clone.success.label',
-          'Stock List has been cloned successfully',
-        ));
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const publishStocklists = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockListApi.publishStockList(id);
-      if (status === 200) {
-        Alert.success(translate(
-          'react.stocklists.publish.success.label',
-          'Stock List has been published successfully',
-        ));
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const unpublishStocklists = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await stockListApi.unpublishStockList(id);
-      if (status === 200) {
-        Alert.success(translate(
-          'react.stocklists.unpublish.success.label',
-          'Stock List has been unpublished successfully',
-        ));
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const onFetchHandler = useCallback(async (state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } : undefined;
-
-      const { isPublished, ...otherFilterParams } = filterParams;
-      const params = _.omitBy({
-        ...otherFilterParams,
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        includeUnpublished: isPublished,
-        origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
-        destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
-        ...sortingParams,
-      }, (value) => {
-        if (typeof value === 'object' && _.isEmpty(value)) return true;
-        return !value;
-      });
-
-      // Fetch data
-      setLoading(true);
-      try {
-        const config = {
-          params,
-          paramsSerializer: parameters => queryString.stringify(parameters),
-        };
-        const { data } = await stockListApi.getStockLists(config);
-        setPages(Math.ceil(data.totalCount / state.pageSize));
-        setTotalData(data.totalCount);
-        setTableData(data.data);
-        // Store currently used params for export case
-        setCurrentParams(params);
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [filterParams]);
 
   // List of all actions for Stocklists rows
   const actions = useMemo(() => [
@@ -456,8 +269,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(StockListTable);
 
 StockListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
-  showSpinner: PropTypes.func.isRequired,
-  hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   highestRole: PropTypes.string.isRequired,
 };
