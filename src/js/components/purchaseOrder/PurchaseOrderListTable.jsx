@@ -38,11 +38,8 @@ const PurchaseOrderListTable = ({
   filterParams,
 }) => {
   const {
-    ordersData,
+    tableData,
     loading,
-    pages,
-    totalData,
-    totalPrice,
     tableRef,
     printOrder,
     cancelOrder,
@@ -285,7 +282,7 @@ const PurchaseOrderListTable = ({
     },
   ], [supportedActivities, highestRole, actions]);
 
-  const totalAmount = () => `${translate('react.purchaseOrder.totalAmount.label', 'Total amount')}: ${totalPrice.toLocaleString([locale, 'en'])} ${currencyCode}`;
+  const totalAmount = () => `${translate('react.purchaseOrder.totalAmount.label', 'Total amount')}: ${tableData.totalPrice.toLocaleString([locale, 'en'])} ${currencyCode}`;
 
   return (
     <div className="list-page-list-section">
@@ -333,11 +330,11 @@ const PurchaseOrderListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={ordersData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
-        pages={pages}
-        totalData={totalData}
+        pages={tableData.pages}
+        totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
         noDataText="No orders match the given criteria"
         footerComponent={() => (
@@ -368,7 +365,6 @@ PurchaseOrderListTable.propTypes = {
   highestRole: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
   currencyCode: PropTypes.string.isRequired,
-  // currentLocation: PropTypes.shape({}).isRequired,
   allStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     value: PropTypes.string,

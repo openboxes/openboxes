@@ -10,13 +10,13 @@ import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInvoiceListTableData = (filterParams) => {
-  const [invoiceData, setInvoiceData] = useState([]);
+  const [tableData, setTableData] = useState({
+    data: [],
+    pages: -1,
+    totalData: 0,
+  });
   const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  const [totalData, setTotalData] = useState(0);
-
   const { sourceRef, tableRef } = useTableData(filterParams);
-
   const { translate } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
@@ -56,16 +56,18 @@ const useInvoiceListTableData = (filterParams) => {
       })
         .then((res) => {
           setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setInvoiceData(res.data.data);
+          setTableData({
+            data: res.data.data,
+            pages: Math.ceil(res.data.totalCount / state.pageSize),
+            totalData: res.data.totalCount,
+          });
         })
         .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
     }
   }, [filterParams]);
 
   return {
-    tableRef, invoiceData, loading, totalData, pages, onFetchHandler,
+    tableRef, tableData, loading, onFetchHandler,
   };
 };
 

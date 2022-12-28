@@ -15,14 +15,13 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockListTableData = (filterParams) => {
   const { tableRef, fireFetchData } = useTableData(filterParams);
-
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState({
+    stockListData: [],
+    pages: -1,
+    totalCount: 0,
+    currentParams: {},
+  });
   const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  // Stored searching params for export case
-  const [currentParams, setCurrentParams] = useState({});
-  const [totalData, setTotalData] = useState(0);
-
   const dispatch = useDispatch();
   const { translate } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -32,7 +31,7 @@ const useStockListTableData = (filterParams) => {
     exportFileFromAPI({
       url: '/openboxes/api/stocklists',
       params: {
-        ...currentParams,
+        ...tableData.currentParams,
       },
     });
   };
@@ -192,21 +191,20 @@ const useStockListTableData = (filterParams) => {
       })
         .then((res) => {
           setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setTableData(res.data.data);
-          // Store currently used params for export case
-          setCurrentParams(params);
+          setTableData({
+            stockListData: res.data.data,
+            pages: Math.ceil(res.data.totalCount / state.pageSize),
+            totalCount: res.data.totalCount,
+            currentParams: params,
+          });
         });
     }
   }, [filterParams]);
 
   return {
-    totalData,
-    tableRef,
     tableData,
+    tableRef,
     loading,
-    pages,
     onFetchHandler,
     exportStockList,
     onClickClearStocklists,

@@ -25,7 +25,7 @@ const InvoiceListTable = ({
   invoiceStatuses,
 }) => {
   const {
-    tableRef, invoiceData, loading, totalData, pages, onFetchHandler,
+    tableRef, tableData, loading, onFetchHandler,
   } = useInvoiceListTableData(filterParams);
 
   // List of all actions for invoice rows
@@ -129,11 +129,11 @@ const InvoiceListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={invoiceData}
+        data={tableData.data}
         loading={loading}
-        totalData={totalData}
+        totalData={tableData.totalData}
         defaultPageSize={10}
-        pages={pages}
+        pages={tableData.pages}
         onFetchData={onFetchHandler}
         noDataText="No invoices match the given criteria"
       />

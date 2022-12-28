@@ -14,12 +14,15 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePurchaseOrderListTableData = (filterParams) => {
-  const [currentParams, setCurrentParams] = useState({});
-  const [ordersData, setOrdersData] = useState([]);
+  const [tableData, setTableData] = useState({
+    data: [],
+    pages: -1,
+    totalCount: 0,
+    currentParams: {},
+    totalPrice: 0,
+  });
   const [loading, setLoading] = useState(true);
-  const [totalData, setTotalData] = useState(0);
-  const [pages, setPages] = useState(-1);
-  const [totalPrice, setTotalPrice] = useState(0.0);
+
   const { translate, isUserApprover } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     isUserApprover: state.session.isUserApprover,
@@ -36,7 +39,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
       url: '/openboxes/api/purchaseOrders',
       filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
       params: {
-        ..._.omit(currentParams, 'offset', 'max'),
+        ..._.omit(tableData.currentParams, 'offset', 'max'),
         orderItems,
       },
     });
@@ -97,7 +100,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
       ));
       return;
     }
-    const order = ordersData.find(ord => ord.id === id);
+    const order = tableData.data.find(ord => ord.id === id);
     if (order && order.shipmentsCount > 0) {
       Alert.error(translate(
         'react.purchaseOrder.rollback.error.label',
@@ -124,7 +127,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   };
 
   const printOrder = (id) => {
-    const order = ordersData.find(ord => ord.id === id);
+    const order = tableData.data.find(ord => ord.id === id);
     if (order && order.status && order.status.toUpperCase() === 'PENDING') {
       Alert.error('Order must be placed in order to print');
       return;
@@ -175,23 +178,21 @@ const usePurchaseOrderListTableData = (filterParams) => {
       })
         .then((res) => {
           setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setOrdersData(res.data.data);
-          setTotalPrice(res.data.totalPrice);
-          // Store currently used params for export case
-          setCurrentParams(params);
+          setTableData({
+            data: res.data.data,
+            pages: Math.ceil(res.data.totalCount / state.pageSize),
+            totalCount: res.data.totalCount,
+            currentParams: params,
+            totalPrice: res.data.totalPrice,
+          });
         })
         .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))));
     }
   }, [filterParams]);
 
   return {
-    ordersData,
+    tableData,
     loading,
-    pages,
-    totalData,
-    totalPrice,
     tableRef,
     printOrder,
     cancelOrder,

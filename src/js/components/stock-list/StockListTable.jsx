@@ -33,11 +33,9 @@ const StockListTable = ({
   highestRole,
 }) => {
   const {
-    totalData,
-    tableRef,
     tableData,
+    tableRef,
     loading,
-    pages,
     onFetchHandler,
     exportStockList,
     onClickClearStocklists,
@@ -223,7 +221,7 @@ const StockListTable = ({
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <div>
           <Translate id="react.stocklists.label" defaultMessage="Stock Lists" />
-          <span className="ml-1">{`(${totalData})`}</span>
+          <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
         <Button
           label="react.default.button.export.label"
@@ -238,11 +236,11 @@ const StockListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData}
+        data={tableData.stockListData}
         loading={loading}
         defaultPageSize={10}
-        pages={pages}
-        totalData={totalData}
+        pages={tableData.pages}
+        totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
         noDataText={translate(
           'react.stocklists.empty.label',
