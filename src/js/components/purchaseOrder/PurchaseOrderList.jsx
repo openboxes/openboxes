@@ -8,7 +8,7 @@ import filterFields from 'components/purchaseOrder/FilterFields';
 import PurchaseOrderListFilters from 'components/purchaseOrder/PurchaseOrderListFilters';
 import PurchaseOrderListHeader from 'components/purchaseOrder/PurchaseOrderListHeader';
 import PurchaseOrderListTable from 'components/purchaseOrder/PurchaseOrderListTable';
-import usePurchaseOrderFilters from 'hooks/usePurchaseOrderFilters';
+import usePurchaseOrderFilters from 'hooks/list-pages/purchase-order/usePurchaseOrderFilters';
 
 
 const PurchaseOrderList = (props) => {

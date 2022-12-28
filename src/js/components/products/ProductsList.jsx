@@ -9,7 +9,7 @@ import filterFields from 'components/products/FilterFields';
 import ProductsListFilters from 'components/products/ProductsListFilters';
 import ProductsListHeader from 'components/products/ProductsListHeader';
 import ProductsListTable from 'components/products/ProductsListTable';
-import useProductFilters from 'hooks/useProductFilters';
+import useProductFilters from 'hooks/list-pages/product/useProductFilters';
 
 
 const ProductsList = (props) => {

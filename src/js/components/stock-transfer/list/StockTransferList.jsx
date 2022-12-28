@@ -9,7 +9,7 @@ import filterFields from 'components/stock-transfer/list/FilterFields';
 import StockTransferListFilters from 'components/stock-transfer/list/StockTransferListFilters';
 import StockTransferListHeader from 'components/stock-transfer/list/StockTransferListHeader';
 import StockTransferListTable from 'components/stock-transfer/list/StockTransferListTable';
-import useStockTransferFilters from 'hooks/useStockTransferFilters';
+import useStockTransferFilters from 'hooks/list-pages/stock-transfer/useStockTransferFilters';
 
 const StockTransferList = (props) => {
   const { setFilterValues, defaultFilterValues, filterParams } = useStockTransferFilters();

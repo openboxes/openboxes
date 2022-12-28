@@ -9,7 +9,7 @@ import filterFields from 'components/stock-movement/inbound/FilterFields';
 import StockMovementInboundFilters from 'components/stock-movement/inbound/StockMovementInboundFilters';
 import StockMovementInboundHeader from 'components/stock-movement/inbound/StockMovementInboundHeader';
 import StockMovementInboundTable from 'components/stock-movement/inbound/StockMovementInboundTable';
-import useInboundFilters from 'hooks/useInboundFilters';
+import useInboundFilters from 'hooks/list-pages/inbound/useInboundFilters';
 
 const StockMovementInboundList = (props) => {
   const {

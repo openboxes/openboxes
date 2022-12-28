@@ -9,7 +9,7 @@ import filterFields from 'components/stock-list/FilterFields';
 import StockListFilters from 'components/stock-list/StockListFilters';
 import StockListHeader from 'components/stock-list/StockListHeader';
 import StockListTable from 'components/stock-list/StockListTable';
-import useStockListFilters from 'hooks/useStockListFilters';
+import useStockListFilters from 'hooks/list-pages/stock-list/useStockListFilters';
 
 
 const StockList = (props) => {
