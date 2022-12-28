@@ -20,24 +20,26 @@
         <g:hiddenField name="parametersHash" value="${command?.generateParametersHash()}"/>
 
         <div class="box">
-            <h2><warehouse:message code="consumption.parameters.label" default="Parameters"/></h2>
+            <h2><g:message code="consumption.parameters.label" default="Parameters"/></h2>
 
             <div class="parameters">
 
                 <div class="filter-list-item">
                     <label>
-                        <warehouse:message code="consumption.fromLocations.label" default="Origin(s)"/>
+                        <g:message code="consumption.fromLocations.label" default="Origin(s)"/>
                     </label>
                     <g:selectLocation name="fromLocations" value="${command?.fromLocations?.id?:session?.warehouse?.id}"
                                       multiple="true" class="chzn-select-deselect"
                                       activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
                                       data-placeholder="${warehouse.message(code:'consumption.fromLocations.label', default:'Origins(s)')}"/>
 
-                    <div class="fade">NOTE: Using multiple Origin locations may provide inaccurate results.</div>
+                    <div class="fade">
+                        <g:message code="consumption.origin.note.label" default="NOTE: Using multiple Origin locations may provide inaccurate results" />
+                    </div>
                 </div>
                 <div class="filter-list-item">
                     <label>
-                        <warehouse:message code="consumption.afterDate.label" default="Consumed on or after"/>
+                        <g:message code="consumption.afterDate.label" default="Consumed on or after"/>
                     </label>
                     <div>
                         <g:jqueryDatePicker id="fromDate" name="fromDate" value="${command?.fromDate}" format="MM/dd/yyyy" cssClass="large" autocomplete="off"/>
@@ -45,7 +47,7 @@
                 </div>
                 <div class="filter-list-item">
                     <label>
-                        <warehouse:message code="consumption.beforeDate.label" default="Consumed on or before"/>
+                        <g:message code="consumption.beforeDate.label" default="Consumed on or before"/>
                     </label>
                     <div>
                         <g:jqueryDatePicker id="toDate" name="toDate" value="${command?.toDate}" format="MM/dd/yyyy" cssClass="large" autocomplete="off"/>
@@ -53,31 +55,48 @@
                 </div>
             </div>
 
-            <h2><warehouse:message code="consumption.filters.label" default="Filters"/></h2>
+            <h2><g:message code="default.filters.label" default="Filters"/></h2>
             <div class="filters">
 
                 <div class="filter-list">
 
                     <div class="filter-list-item">
                         <label>
-                            <warehouse:message code="consumption.categories.label" default="Categories"/>
+                            <g:message code="categories.label" default="Categories"/>
                         </label>
-                        <g:selectCategory name="selectedCategories" multiple="true" value="${command?.selectedCategories?.id}" class="chzn-select-deselect"/>
+                        <g:selectCategory
+                            name="selectedCategories"
+                            multiple="true"
+                            value="${command?.selectedCategories?.id}"
+                            class="chzn-select-deselect"
+                            data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                        />
                     </div>
                     <div class="filter-list-item">
                         <label>
-                            <warehouse:message code="consumption.tags.label" default="Tags"/>
+                            <g:message code="tags.label" default="Tags"/>
                         </label>
-                        <g:selectTags name="selectedTags" value="${command?.selectedTags?.id}" multiple="true" class="chzn-select-deselect"/>
+                        <g:selectTags
+                            name="selectedTags"
+                            value="${command?.selectedTags?.id}"
+                            multiple="true"
+                            class="chzn-select-deselect"
+                            data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                        />
                     </div>
                     <g:if test="${!command?.toLocations}">
                         <div class="filter-list-item">
                             <label>
-                                <warehouse:message code="consumption.toLocations.label" default="Destinations(s)"/>
+                                <g:message code="consumption.toLocations.label" default="Destinations(s)"/>
                             </label>
                             <div class="location-container">
-                                <g:selectLocation name="selectedLocations"
-                                                  value="${command?.selectedLocations?.id}" multiple="true" class="chzn-select-deselect"/>
+                                <g:selectLocation
+                                    name="selectedLocations"
+                                    value="${command?.selectedLocations?.id}"
+                                    multiple="true"
+                                    class="chzn-select-deselect"
+                                    data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                                />
                             </div>
 
                             <span class="fade"><g:message code="consumption.destinations.optional.message"/></span>
@@ -86,7 +105,7 @@
                     <g:elseif test="${command?.toLocations}">
                         <div class="filter-list-item">
                             <label>
-                                <warehouse:message code="consumption.toLocation.label" default="Destination(s)"/>
+                                <g:message code="consumption.toLocations.label" default="Destination(s)"/>
                             </label>
                             <div class="location-container">
                                 <g:selectLocationWithOptGroup name="selectedLocations" from="${command?.toLocations}"
@@ -97,12 +116,17 @@
                     </g:elseif>
                 </div>
             </div>
-            <h2><warehouse:message code="consumption.renderOptions.label" default="Render Options"/></h2>
+            <h2><g:message code="consumption.renderOptions.label" default="Render Options"/></h2>
             <div class="options">
 
                 <div class="filter-list-item">
-                    <label><warehouse:message code="consumption.additionalColumns.label" default="Additional columns (CSV only)"/></label>
-                    <select name="selectedProperties" multiple="true" class="chzn-select-deselect">
+                    <label><g:message code="consumption.additionalColumns.label" default="Additional columns (CSV only)"/></label>
+                    <select
+                        name="selectedProperties"
+                        multiple="true"
+                        class="chzn-select-deselect"
+                        data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                    >
 
                         <g:hasRoleFinance>
                             <g:set var="hasRoleFinance" value="${true}"/>
@@ -121,33 +145,39 @@
                 </div>
                 <div class="filter-list-item">
                     <label>
-                        <warehouse:message code="consumption.format.label" default="Format"/>
+                        <g:message code="consumption.format.label" default="Format"/>
                     </label>
                     <div>
-                        <label><g:radio name="format" value="html" checked="${params.format=='html'||!params.format}"/> HTML</label>
-                        <label><g:radio name="format" value="csv" checked="${false}" /> CSV</label>
+                        <label>
+                            <g:radio name="format" value="html" checked="${params.format=='html'||!params.format}"/>
+                            <g:message code="default.html.label" default="HTML" />
+                        </label>
+                        <label>
+                            <g:radio name="format" value="csv" checked="${false}" />
+                            <g:message code="default.csv.label" default="CSV" />
+                        </label>
                     </div>
                 </div>
                 <div class="filter-list-item">
                     <label>
-                        <warehouse:message code="consumption.options.label" default="Options"/>
+                        <g:message code="default.options.label" default="Options"/>
                     </label>
                     <div class="checkbox">
                         <g:checkBox name="includeQuantityOnHand" value="${command.includeQuantityOnHand}"/>
                         <label for="includeQuantityOnHand">
-                            <warehouse:message code="consumption.includeQuantityOnHand.label" default="Include quantity on hand"/>
+                            <g:message code="consumption.includeQuantityOnHand.label" default="Include quantity on hand"/>
                         </label>
                     </div>
                     <div class="checkbox">
                         <g:checkBox name="includeLocationBreakdown" value="${command.includeLocationBreakdown}"/>
                         <label for="includeLocationBreakdown">
-                            <warehouse:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
+                            <g:message code="consumption.includeLocationBreakdown.label" default="Include location breakdown in CSV"/>
                         </label>
                     </div>
                     <div class="checkbox">
                         <g:checkBox name="includeMonthlyBreakdown" value="${command.includeMonthlyBreakdown}"/>
                         <label for="includeMonthlyBreakdown">
-                            <warehouse:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown in CSV"/>
+                            <g:message code="consumption.includeMonthlyBreakdown.label" default="Include monthly breakdown in CSV"/>
                         </label>
                     </div>
                 </div>

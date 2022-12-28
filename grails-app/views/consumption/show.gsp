@@ -26,7 +26,7 @@
 
                 <div class="box">
                     <h2>
-                        ${warehouse.message(code:'consumption.label')} <small>(${command.rows?.keySet()?.size()} results)</small>
+                        ${warehouse.message(code:'consumption.label')} <small>(${command.rows?.keySet()?.size()} ${g.message(code: 'default.resultsLowerCase.label', default: 'results')})</small>
                     </h2>
 
                     <div >
@@ -43,7 +43,7 @@
                                     <th class="center"><warehouse:message code="consumption.total.label" default="Total Consumption"/></th>
                                     <th class="center"><warehouse:message code="consumption.totalConsumptionValue.label" default="Total Consumption Value"/></th>
                                     <th class="center"><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
-                                    <th class="center"><warehouse:message code="consumption.qoh.label" default="QoH"/></th>
+                                    <th class="center"><warehouse:message code="default.qoh.label" default="QoH"/></th>
                                     <th class="center"><warehouse:message code="consumption.months.label" default="Months remaining"/></th>
                                 </tr>
                             </thead>
@@ -120,7 +120,13 @@
                 "iDisplayLength": 100,
                 "bScrollInfinite": true,
                 "bScrollCollapse": true,
-                "sScrollY": '50vh'
+                "sScrollY": '50vh',
+                "oLanguage": {
+                  "sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
+                  "sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+                  "sInfo": "${g.message(code: 'default.dataTable.showingEntries.label', default: 'Showing _START_ to _END_ of _TOTAL_ entries')}",
+                  "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}"
+                }
             });
 
             $(".tabs").livequery(function(){
