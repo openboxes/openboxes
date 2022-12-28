@@ -1,10 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import { CancelToken } from 'axios';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiArrowGoBackLine,
   RiChat3Line,
@@ -20,16 +16,13 @@ import {
 import { RiCloseLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import purchaseOrderApi from 'api/services/PurchaseOrderApi';
-import { PURCHASE_ORDER_API } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
+import usePurchaseOrderListTableData from 'hooks/usePurchaseOrderListTableData';
 import ActionDots from 'utils/ActionDots';
-import exportFileFromAPI from 'utils/file-download-util';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -37,154 +30,29 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
 const PurchaseOrderListTable = ({
-  filterParams,
   supportedActivities,
   highestRole,
-  showTheSpinner,
-  hideTheSpinner,
   translate,
   currencyCode,
-  currentLocation,
   allStatuses,
-  isUserApprover,
   locale,
+  filterParams,
 }) => {
-  const [ordersData, setOrdersData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  const [totalData, setTotalData] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0.0);
-  // Stored searching params for export case
-  const [currentParams, setCurrentParams] = useState({});
+  const {
+    ordersData,
+    loading,
+    pages,
+    totalData,
+    totalPrice,
+    tableRef,
+    printOrder,
+    cancelOrder,
+    rollbackHandler,
+    deleteHandler,
+    downloadOrders,
+    onFetchHandler,
+  } = usePurchaseOrderListTableData(filterParams);
 
-  // Util ref for react-table to force the fetch of data
-  const tableRef = useRef(null);
-
-  // Cancel token/signal for fetching data
-  const sourceRef = useRef(CancelToken.source());
-
-  const fireFetchData = () => {
-    // Each time we fetch, we want to 'reset' the token/signal
-    sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
-  };
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams]);
-
-  // If orderItems is true, download orders line items details, else download orders
-  const downloadOrders = (orderItems) => {
-    exportFileFromAPI({
-      url: PURCHASE_ORDER_API,
-      filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
-      params: {
-        ..._.omit(currentParams, 'offset', 'max'),
-        orderItems,
-      },
-    });
-  };
-
-  const deleteOrder = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await purchaseOrderApi.deleteOrder(id);
-      if (status === 204) {
-        const successMessage = translate('react.purchaseOrder.delete.success.label', 'Purchase order has been deleted successfully');
-        Alert.success(successMessage);
-      }
-    } finally {
-      hideTheSpinner();
-      fireFetchData();
-    }
-  };
-
-  const deleteHandler = (id) => {
-    confirmAlert({
-      title: translate('react.default.areYouSure.label', 'Are you sure?'),
-      message: translate(
-        'react.purchaseOrder.delete.confirm.title.label',
-        'Are you sure you want to delete this purchase order?',
-      ),
-      buttons: [
-        {
-          label: translate('react.default.yes.label', 'Yes'),
-          onClick: () => deleteOrder(id),
-        },
-        {
-          label: translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
-  };
-
-  const rollbackOrder = async (id) => {
-    showTheSpinner();
-    try {
-      const { status } = await purchaseOrderApi.rollbackOrder(id);
-      if (status === 200) {
-        Alert.success(translate(
-          'react.purchaseOrder.rollback.success.label',
-          'Rollback of order status has been done successfully',
-        ));
-        fireFetchData();
-      }
-    } finally {
-      hideTheSpinner();
-    }
-  };
-
-  const rollbackHandler = (id) => {
-    if (!isUserApprover) {
-      Alert.error(translate(
-        'react.default.errors.noPermissions.label',
-        'You do not have permissions to perform this action',
-      ));
-      return;
-    }
-    const order = ordersData.find(ord => ord.id === id);
-    if (order && order.shipmentsCount > 0) {
-      Alert.error(translate(
-        'react.purchaseOrder.rollback.error.label',
-        'Cannot rollback order with associated shipments',
-      ));
-      return;
-    }
-    confirmAlert({
-      title: translate('react.default.areYouSure.label', 'Are you sure?'),
-      message: translate(
-        'react.purchaseOrder.rollback.confirm.title.label',
-        'Are you sure you want to rollback this order?',
-      ),
-      buttons: [
-        {
-          label: translate('react.default.yes.label', 'Yes'),
-          onClick: () => rollbackOrder(id),
-        },
-        {
-          label: translate('react.default.no.label', 'No'),
-        },
-      ],
-    });
-  };
-
-  const printOrder = (id) => {
-    const order = ordersData.find(ord => ord.id === id);
-    if (order && order.status && order.status.toUpperCase() === 'PENDING') {
-      Alert.error('Order must be placed in order to print');
-      return;
-    }
-    window.open(`/openboxes/order/print/${id}`, '_blank');
-  };
-
-  const cancelOrder = () => {
-    Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
-  };
 
   const getStatusTooltip = status => translate(
     `react.purchaseOrder.status.${status.toLowerCase()}.description.label`,
@@ -418,60 +286,6 @@ const PurchaseOrderListTable = ({
     },
   ], [supportedActivities, highestRole, actions]);
 
-  const onFetchHandler = useCallback(async (state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'dateOrdered',
-          order: 'desc',
-        };
-      const statusParam = filterParams.status &&
-        filterParams.status.map(status => status.value);
-      const params = {
-        ..._.omitBy({
-          offset: `${offset}`,
-          max: `${state.pageSize}`,
-          ...sortingParams,
-          ...filterParams,
-          status: statusParam,
-          origin: filterParams.origin && filterParams.origin.id,
-          orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-          createdBy: filterParams.createdBy && filterParams.createdBy.id,
-          destinationParty: filterParams.destinationParty?.id,
-        }, _.isEmpty),
-        destination: filterParams.destination?.id,
-      };
-
-      // Fetch data
-      setLoading(true);
-
-      const config = {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        cancelToken: sourceRef.current?.token,
-      };
-
-      try {
-        const { data } = await purchaseOrderApi.getOrders(config);
-        setPages(Math.ceil(data.totalCount / state.pageSize));
-        setTotalData(data.totalCount);
-        setOrdersData(data.data);
-        setTotalPrice(data.totalPrice);
-        // Store currently used params for export case
-        setCurrentParams(params);
-      } catch {
-        Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders')));
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [filterParams]);
-
   const totalAmount = () => `${translate('react.purchaseOrder.totalAmount.label', 'Total amount')}: ${totalPrice.toLocaleString([locale, 'en'])} ${currencyCode}`;
 
   return (
@@ -561,21 +375,14 @@ PurchaseOrderListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
   highestRole: PropTypes.string.isRequired,
-  showTheSpinner: PropTypes.func.isRequired,
-  hideTheSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   currencyCode: PropTypes.string.isRequired,
-  currentLocation: PropTypes.shape({}).isRequired,
+  // currentLocation: PropTypes.shape({}).isRequired,
   allStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     value: PropTypes.string,
     label: PropTypes.string,
     variant: PropTypes.string,
   })).isRequired,
-  isUserApprover: PropTypes.bool,
   locale: PropTypes.string.isRequired,
-};
-
-PurchaseOrderListTable.defaultProps = {
-  isUserApprover: false,
 };

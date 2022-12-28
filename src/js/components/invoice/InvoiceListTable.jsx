@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { CancelToken } from 'axios';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
@@ -15,6 +14,7 @@ import { connect } from 'react-redux';
 import invoiceApi from 'api/services/InvoiceApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
+import useTableData from 'hooks/useTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -28,7 +28,6 @@ const InvoiceListTable = ({
   highestRole,
   invoiceStatuses,
   translate,
-  currentLocation,
 }) => {
   const [invoiceData, setInvoiceData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,25 +35,29 @@ const InvoiceListTable = ({
   const [totalData, setTotalData] = useState(0);
   // Stored searching params for export case
 
+  const { setFilterParams, sourceRef, tableRef } = useTableData();
+
+  useEffect(() => setFilterParams(filterParams), [filterParams]);
+
   // Util ref for react-table to force the fetch of data
-  const tableRef = useRef(null);
+  // const tableRef = useRef(null);
 
   // Cancel token/signal for fetching data
-  const sourceRef = useRef(CancelToken.source());
+  // const sourceRef = useRef(CancelToken.source());
 
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
+  // useEffect(() => () => {
+  //   if (currentLocation?.id) {
+  //     sourceRef.current.cancel('Fetching canceled');
+  //   }
+  // }, [currentLocation?.id]);
 
-  const fireFetchData = () => {
-    sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
-  };
+  // const fireFetchData = () => {
+  //   sourceRef.current = CancelToken.source();
+  //   tableRef.current.fireFetchData();
+  // };
 
   // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams]);
+  // useEffect(() => fireFetchData(), [filterParams]);
 
 
   // List of all actions for invoice rows
@@ -243,7 +246,7 @@ InvoiceListTable.propTypes = {
     variant: PropTypes.string.isRequired,
   })).isRequired,
   translate: PropTypes.func.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }).isRequired,
+  // currentLocation: PropTypes.shape({
+  //   id: PropTypes.string.isRequired,
+  // }).isRequired,
 };
