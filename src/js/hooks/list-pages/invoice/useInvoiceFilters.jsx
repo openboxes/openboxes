@@ -4,18 +4,17 @@ import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import Alert from 'react-s-alert';
 
 import { fetchInvoiceStatuses, fetchInvoiceTypeCodes, fetchSuppliers } from 'actions';
 import filterFields from 'components/invoice/FilterFields';
-import apiClient from 'utils/apiClient';
 import { transformFilterParams } from 'utils/list-utils';
+import { fetchUserById } from 'utils/option-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 
 const useInvoiceFilters = ({ setFilterParams }) => {
   const {
-    statuses, suppliers, typeCodes, currentLocation, currentUser, translate,
+    statuses, suppliers, typeCodes, currentLocation, currentUser,
   } = useSelector(state => ({
     statuses: state.invoices.statuses,
     suppliers: state.organizations.suppliers,
@@ -28,19 +27,6 @@ const useInvoiceFilters = ({ setFilterParams }) => {
 
   const dispatch = useDispatch();
   const history = useHistory();
-
-  const fetchUserById = useCallback(async (id) => {
-    try {
-      const response = await apiClient.get(`/openboxes/api/generic/person/${id}`);
-      return response.data?.data;
-    } catch (e) {
-      Alert.error(translate(
-        'react.invoice.error.userFetching.label',
-        'Could not fetch user for createdBy filter',
-      ));
-    }
-    return null;
-  }, []);
 
   useEffect(() => {
     (async () => {
