@@ -6,10 +6,10 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchTranslations } from 'actions';
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
 import Button from 'components/form-elements/Button';
 import SearchField from 'components/form-elements/SearchField';
+import useTranslation from 'hooks/useTranslation';
 import { renderFormField } from 'utils/form-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -29,8 +29,6 @@ const FilterForm = ({
   onClear,
   ignoreClearFilters,
   currentLocation,
-  locale,
-  fetchButtonsTranslations,
   translate,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
@@ -61,9 +59,7 @@ const FilterForm = ({
     updateFilterParams({ ...defaultValues });
   }, [defaultValues]);
 
-  useEffect(() => {
-    fetchButtonsTranslations(locale, 'button');
-  }, [locale]);
+  useTranslation('button');
 
   // Calculate which object's values are not empty
   const countFilled = (values) => {
@@ -160,15 +156,10 @@ const FilterForm = ({
 
 const mapStateToProps = state => ({
   currentLocation: state.session.currentLocation,
-  locale: state.session.activeLanguage,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-const mapDispatchToProps = {
-  fetchButtonsTranslations: fetchTranslations,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(FilterForm);
+export default connect(mapStateToProps)(FilterForm);
 
 
 FilterForm.propTypes = {
@@ -186,8 +177,6 @@ FilterForm.propTypes = {
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
-  locale: PropTypes.string.isRequired,
-  fetchButtonsTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
 };
 

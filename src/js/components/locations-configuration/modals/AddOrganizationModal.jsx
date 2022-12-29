@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import { hideSpinner, showSpinner } from 'actions';
 import TextareaField from 'components/form-elements/TextareaField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
@@ -136,7 +136,7 @@ const mapStateToProps = state => ({
 });
 
 export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations,
+  showSpinner, hideSpinner,
 })(AddOrganizationModal));
 
 AddOrganizationModal.propTypes = {
