@@ -190,14 +190,14 @@ const useStockListTableData = (filterParams) => {
         paramsSerializer: parameters => queryString.stringify(parameters),
       })
         .then((res) => {
-          setLoading(false);
           setTableData({
             stockListData: res.data.data,
             pages: Math.ceil(res.data.totalCount / state.pageSize),
             totalCount: res.data.totalCount,
             currentParams: params,
           });
-        });
+        })
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 

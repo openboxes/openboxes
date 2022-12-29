@@ -177,7 +177,6 @@ const usePurchaseOrderListTableData = (filterParams) => {
         cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
-          setLoading(false);
           setTableData({
             data: res.data.data,
             pages: Math.ceil(res.data.totalCount / state.pageSize),
@@ -186,7 +185,8 @@ const usePurchaseOrderListTableData = (filterParams) => {
             totalPrice: res.data.totalPrice,
           });
         })
-        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))));
+        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))))
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 

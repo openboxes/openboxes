@@ -85,7 +85,6 @@ const useOutboundListTableData = (filterParams) => {
         cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
-          setLoading(false);
           setTableData({
             data: res.data.data,
             pages: Math.ceil(res.data.totalCount / state.pageSize),
@@ -93,7 +92,8 @@ const useOutboundListTableData = (filterParams) => {
             currentParams: params,
           });
         })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements'))));
+        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements'))))
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 

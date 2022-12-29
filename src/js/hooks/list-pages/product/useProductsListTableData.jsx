@@ -65,12 +65,9 @@ const useProductsListTableData = (filterParams) => {
             pages: Math.ceil(res.data.totalCount / tableState.pageSize),
             currentParams: params,
           });
-          setLoading(false);
         })
-        .catch(() => {
-          setLoading(false);
-          return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
-        });
+        .catch(() => Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products'))))
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 

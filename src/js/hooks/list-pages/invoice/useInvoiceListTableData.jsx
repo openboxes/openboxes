@@ -55,14 +55,14 @@ const useInvoiceListTableData = (filterParams) => {
         cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
-          setLoading(false);
           setTableData({
             data: res.data.data,
             pages: Math.ceil(res.data.totalCount / state.pageSize),
             totalData: res.data.totalCount,
           });
         })
-        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
+        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))))
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 

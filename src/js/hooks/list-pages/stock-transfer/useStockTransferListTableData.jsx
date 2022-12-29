@@ -101,12 +101,9 @@ const useStockTransferListTableData = (filterParams) => {
             pages: Math.ceil(res.data.totalCount / tableState.pageSize),
             currentParams: params,
           });
-          setLoading(false);
         })
-        .catch(() => {
-          setLoading(false);
-          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
-        });
+        .catch(() => Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers'))))
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 

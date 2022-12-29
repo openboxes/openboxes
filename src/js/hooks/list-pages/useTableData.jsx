@@ -14,13 +14,15 @@ const useTableData = (filterParams) => {
   }));
 
   const fireFetchData = () => {
+    // Each time we fetch, we want to 'reset' the token/signal
     sourceRef.current = CancelToken.source();
     tableRef.current.fireFetchData();
   };
 
+  // If filterParams change, refetch the data with applied filters
   useEffect(() => fireFetchData(), [filterParams]);
 
-  useEffect(() => {
+  useEffect(() => () => {
     if (currentLocation?.id) {
       sourceRef.current.cancel('Fetching canceled');
     }

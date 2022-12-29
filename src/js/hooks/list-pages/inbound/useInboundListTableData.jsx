@@ -86,7 +86,6 @@ const useInboundListTableData = (filterParams) => {
         cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
-          setLoading(false);
           setTableData({
             data: res.data.data,
             pages: Math.ceil(res.data.totalCount / state.pageSize),
@@ -94,7 +93,8 @@ const useInboundListTableData = (filterParams) => {
             currentParams: params,
           });
         })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements'))));
+        .catch(() => Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements'))))
+        .finally(() => setLoading(false));
     }
   }, [filterParams]);
 
