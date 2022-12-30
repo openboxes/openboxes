@@ -23,11 +23,11 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -89,21 +89,18 @@ const PurchaseOrderListTable = ({
     });
   };
 
-  const deleteOrder = (id) => {
+  const deleteOrder = async (id) => {
     showTheSpinner();
-    apiClient.delete(`/openboxes/api/purchaseOrders/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          hideTheSpinner();
-          const successMessage = translate('react.purchaseOrder.delete.success.label', 'Purchase order has been deleted successfully');
-          Alert.success(successMessage);
-          fireFetchData();
-        }
-      })
-      .catch(() => {
-        hideTheSpinner();
-        fireFetchData();
-      });
+    try {
+      const { status } = await purchaseOrderApi.deleteOrder(id);
+      if (status === 204) {
+        const successMessage = translate('react.purchaseOrder.delete.success.label', 'Purchase order has been deleted successfully');
+        Alert.success(successMessage);
+      }
+    } finally {
+      hideTheSpinner();
+      fireFetchData();
+    }
   };
 
   const deleteHandler = (id) => {
@@ -125,17 +122,15 @@ const PurchaseOrderListTable = ({
     });
   };
 
-  const rollbackOrder = (id) => {
-    apiClient.post(`/openboxes/api/purchaseOrders/${id}/rollback`)
-      .then((response) => {
-        if (response.status === 200) {
-          Alert.success(translate(
-            'react.purchaseOrder.rollback.success.label',
-            'Rollback of order status has been done successfully',
-          ));
-          fireFetchData();
-        }
-      });
+  const rollbackOrder = async (id) => {
+    const { status } = await purchaseOrderApi.rollbackOrder(id);
+    if (status === 200) {
+      Alert.success(translate(
+        'react.purchaseOrder.rollback.success.label',
+        'Rollback of order status has been done successfully',
+      ));
+      fireFetchData();
+    }
   };
 
   const rollbackHandler = (id) => {
@@ -417,7 +412,7 @@ const PurchaseOrderListTable = ({
     },
   ], [supportedActivities, highestRole, actions]);
 
-  const onFetchHandler = useCallback((state) => {
+  const onFetchHandler = useCallback(async (state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -448,21 +443,26 @@ const PurchaseOrderListTable = ({
 
       // Fetch data
       setLoading(true);
-      apiClient.get('/openboxes/api/purchaseOrders', {
+
+      const config = {
         params,
         paramsSerializer: parameters => queryString.stringify(parameters),
         cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setOrdersData(res.data.data);
-          setTotalPrice(res.data.totalPrice);
-          // Store currently used params for export case
-          setCurrentParams(params);
-        })
-        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))));
+      };
+
+      try {
+        const { data } = await purchaseOrderApi.getOrders(config);
+        setPages(Math.ceil(data.totalCount / state.pageSize));
+        setTotalData(data.totalCount);
+        setOrdersData(data.data);
+        setTotalPrice(data.totalPrice);
+        // Store currently used params for export case
+        setCurrentParams(params);
+      } catch {
+        Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders')));
+      } finally {
+        setLoading(false);
+      }
     }
   }, [filterParams]);
 

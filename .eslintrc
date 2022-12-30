@@ -46,7 +46,7 @@
           // Other external packages
           ["^@?\\w"],
           // Internal packages.
-          ["^(@|@company|@ui|components|utils|config|vendored-lib|actions|consts|reducers|hooks)(/.*|$)"],
+          ["^(@|@company|@ui|components|utils|config|vendored-lib|actions|consts|reducers|hooks|api)(/.*|$)"],
           // Side effect imports.
           ["^\\u0000"],
           // Parent imports. Put `..` last.
