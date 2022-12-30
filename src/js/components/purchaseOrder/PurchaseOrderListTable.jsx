@@ -33,6 +33,7 @@ import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { PURCHASE_ORDER_API } from 'api/urls';
 
 
 const PurchaseOrderListTable = ({
@@ -80,7 +81,7 @@ const PurchaseOrderListTable = ({
   // If orderItems is true, download orders line items details, else download orders
   const downloadOrders = (orderItems) => {
     exportFileFromAPI({
-      url: '/openboxes/api/purchaseOrders',
+      url: PURCHASE_ORDER_API,
       filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
       params: {
         ..._.omit(currentParams, 'offset', 'max'),
