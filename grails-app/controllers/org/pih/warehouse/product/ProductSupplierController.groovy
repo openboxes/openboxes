@@ -14,16 +14,18 @@ import grails.validation.ValidationException
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
+import org.springframework.dao.DataIntegrityViolationException
+
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import org.pih.warehouse.core.ProductPrice
 
-@Transactional
 class ProductSupplierController {
 
     def dataService
     def documentService
     def identifierService
+    def productSupplierService
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
@@ -264,10 +266,10 @@ class ProductSupplierController {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (productSupplierInstance) {
             try {
-                ProductSupplier.executeUpdate('delete ProductSupplier ps where ps.id = :id', [id: params.id])
+                productSupplierService.deleteProductSupplier(productSupplierInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
+            catch (DataIntegrityViolationException e) {
                 log.error("Unable to delete product supplier: " + e.message, e)
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
