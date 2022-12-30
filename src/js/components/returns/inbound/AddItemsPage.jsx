@@ -15,12 +15,11 @@ import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { debounceProductsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -68,38 +67,21 @@ const FIELDS = {
     ),
     fields: {
       product: {
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.inboundReturns.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '4',
         required: true,
-        attributes: {
-          className: 'text-left',
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          optionRenderer: option => (
-            <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.handlingIcons)}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">{option.label}</span>&nbsp;{renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
-          debouncedProductsFetch, updateRow, rowIndex, values,
+          updateRow, rowIndex, values, originId, focusField,
         }) => ({
-          loadOptions: debouncedProductsFetch,
+          locationId: originId,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantity');
+            }
+          },
           onBlur: () => updateRow(values, rowIndex),
         }),
       },
@@ -182,12 +164,6 @@ class AddItemsPage extends Component {
     this.confirmSave = this.confirmSave.bind(this);
     this.validate = this.validate.bind(this);
     this.updateRow = this.updateRow.bind(this);
-
-    this.debouncedProductsFetch = debounceProductsFetch(
-      this.props.debounceTime,
-      this.props.minSearchLength,
-      this.props.initialValues.origin.id,
-    );
   }
 
   componentDidMount() {
@@ -506,22 +482,22 @@ class AddItemsPage extends Component {
                   renderFormField(fieldConfig, fieldName, {
                     recipients: this.props.recipients,
                     removeItem: this.removeItem,
-                    debouncedProductsFetch: this.debouncedProductsFetch,
                     getSortOrder: this.getSortOrder,
                     updateRow: this.updateRow,
+                    originId: this.props.initialValues.origin.id,
                     values,
                   }))}
               </div>
               <div className="submit-buttons">
                 <button
-                  type="submit"
+                  type="button"
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
-                  type="submit"
+                  type="button"
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);
@@ -544,8 +520,6 @@ const mapStateToProps = state => ({
   recipients: state.users.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   inboundReturnsTranslationsFetched: state.session.fetchedTranslations.inboundReturns,
-  debounceTime: state.session.searchConfig.debounceTime,
-  minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
 });
 
@@ -567,8 +541,6 @@ AddItemsPage.propTypes = {
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   translate: PropTypes.func.isRequired,
   inboundReturnsTranslationsFetched: PropTypes.bool.isRequired,
-  debounceTime: PropTypes.number.isRequired,
-  minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   match: PropTypes.shape({
     params: PropTypes.shape({
