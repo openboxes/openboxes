@@ -124,13 +124,18 @@ const PurchaseOrderListTable = ({
   };
 
   const rollbackOrder = async (id) => {
-    const { status } = await purchaseOrderApi.rollbackOrder(id);
-    if (status === 200) {
-      Alert.success(translate(
-        'react.purchaseOrder.rollback.success.label',
-        'Rollback of order status has been done successfully',
-      ));
-      fireFetchData();
+    showTheSpinner();
+    try {
+      const { status } = await purchaseOrderApi.rollbackOrder(id);
+      if (status === 200) {
+        Alert.success(translate(
+          'react.purchaseOrder.rollback.success.label',
+          'Rollback of order status has been done successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      hideTheSpinner();
     }
   };
 
