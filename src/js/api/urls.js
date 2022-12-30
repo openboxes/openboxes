@@ -1,0 +1,10 @@
+// PURCHASE ORDER
+const PURCHASE_ORDER_API = '/openboxes/api/purchaseOrders';
+const PURCHASE_ORDER_DELETE = id => `${PURCHASE_ORDER_API}/${id}`;
+const PURCHASE_ORDER_ROLLBACK_ORDER = id => `${PURCHASE_ORDER_API}/${id}/rollback`;
+
+export default {
+  PURCHASE_ORDER_API,
+  PURCHASE_ORDER_DELETE,
+  PURCHASE_ORDER_ROLLBACK_ORDER,
+};
