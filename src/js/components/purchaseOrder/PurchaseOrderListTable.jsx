@@ -24,6 +24,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
+import { PURCHASE_ORDER_API } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
@@ -33,7 +34,6 @@ import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { PURCHASE_ORDER_API } from 'api/urls';
 
 
 const PurchaseOrderListTable = ({
