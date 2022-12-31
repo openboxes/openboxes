@@ -1,7 +1,4 @@
-import { useCallback, useState } from 'react';
-
 import _ from 'lodash';
-import queryString from 'query-string';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,14 +11,45 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockListTableData = (filterParams) => {
-  const { tableRef, fireFetchData } = useTableData(filterParams);
-  const [tableData, setTableData] = useState({
-    stockListData: [],
-    pages: -1,
-    totalCount: 0,
-    currentParams: {},
+  const url = '/openboxes/api/stocklists';
+  const messageId = 'react.stocklists.fetch.fail.label';
+  const defaultMessage = 'Unable to fetch stock transfers';
+  const getSortingParams = state => (state.sorted.length > 0 ?
+    {
+      sort: state.sorted[0].id,
+      order: state.sorted[0].desc ? 'desc' : 'asc',
+    } : undefined);
+  const getParams = (offset, currentLocation, state, sortingParams) => {
+    const { isPublished, ...otherFilterParams } = filterParams;
+    return _.omitBy({
+      ...otherFilterParams,
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      includeUnpublished: isPublished,
+      origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
+      destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
+      ...sortingParams,
+    }, (value) => {
+      if (typeof value === 'object' && _.isEmpty(value)) return true;
+      return !value;
+    });
+  };
+
+  const {
+    tableRef,
+    fireFetchData,
+    loading,
+    tableData,
+    onFetchHandler,
+  } = useTableData({
+    filterParams,
+    url,
+    messageId,
+    defaultMessage,
+    getSortingParams,
+    getParams,
   });
-  const [loading, setLoading] = useState(true);
+
   const dispatch = useDispatch();
   const { translate } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -159,47 +187,6 @@ const useStockListTableData = (filterParams) => {
       })
       .finally(() => dispatch(hideSpinner()));
   };
-
-  const onFetchHandler = useCallback((state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } : undefined;
-
-      const { isPublished, ...otherFilterParams } = filterParams;
-      const params = _.omitBy({
-        ...otherFilterParams,
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        includeUnpublished: isPublished,
-        origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
-        destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
-        ...sortingParams,
-      }, (value) => {
-        if (typeof value === 'object' && _.isEmpty(value)) return true;
-        return !value;
-      });
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/stocklists', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-      })
-        .then((res) => {
-          setTableData({
-            stockListData: res.data.data,
-            pages: Math.ceil(res.data.totalCount / state.pageSize),
-            totalCount: res.data.totalCount,
-            currentParams: params,
-          });
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [filterParams]);
 
   return {
     tableData,

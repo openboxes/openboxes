@@ -1,7 +1,4 @@
-import { useCallback, useState } from 'react';
-
 import _ from 'lodash';
-import queryString from 'query-string';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,14 +11,33 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePurchaseOrderListTableData = (filterParams) => {
-  const [tableData, setTableData] = useState({
-    data: [],
-    pages: -1,
-    totalCount: 0,
-    currentParams: {},
-    totalPrice: 0,
+  const url = '/openboxes/api/purchaseOrders';
+  const messageId = 'react.purchaseOrder.error.purchaseOrderList.label';
+  const defaultMessage = 'Unable to fetch purchase orders';
+  const getSortingParams = state => (state.sorted.length > 0 ?
+    {
+      sort: state.sorted[0].id,
+      order: state.sorted[0].desc ? 'desc' : 'asc',
+    } :
+    {
+      sort: 'dateOrdered',
+      order: 'desc',
+    });
+  const getParams = (offset, currentLocation, state, sortingParams) => ({
+    ..._.omitBy({
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      ...sortingParams,
+      ...filterParams,
+      status: filterParams.status &&
+        filterParams.status.map(status => status.value),
+      origin: filterParams.origin && filterParams.origin.id,
+      orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
+      createdBy: filterParams.createdBy && filterParams.createdBy.id,
+      destinationParty: filterParams.destinationParty?.id,
+    }, _.isEmpty),
+    destination: filterParams.destination?.id,
   });
-  const [loading, setLoading] = useState(true);
 
   const { translate, isUserApprover } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -31,8 +47,19 @@ const usePurchaseOrderListTableData = (filterParams) => {
   const dispatch = useDispatch();
 
   const {
-    sourceRef, tableRef, fireFetchData,
-  } = useTableData(filterParams);
+    tableRef,
+    fireFetchData,
+    loading,
+    onFetchHandler,
+    tableData,
+  } = useTableData({
+    filterParams,
+    url,
+    messageId,
+    defaultMessage,
+    getSortingParams,
+    getParams,
+  });
 
   const downloadOrders = (orderItems) => {
     exportFileFromAPI({
@@ -138,57 +165,6 @@ const usePurchaseOrderListTableData = (filterParams) => {
   const cancelOrder = () => {
     Alert.error(translate('react.default.featureNotSupported', 'This feature is not currently supported'));
   };
-
-
-  const onFetchHandler = useCallback((state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'dateOrdered',
-          order: 'desc',
-        };
-      const statusParam = filterParams.status &&
-        filterParams.status.map(status => status.value);
-      const params = {
-        ..._.omitBy({
-          offset: `${offset}`,
-          max: `${state.pageSize}`,
-          ...sortingParams,
-          ...filterParams,
-          status: statusParam,
-          origin: filterParams.origin && filterParams.origin.id,
-          orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-          createdBy: filterParams.createdBy && filterParams.createdBy.id,
-          destinationParty: filterParams.destinationParty?.id,
-        }, _.isEmpty),
-        destination: filterParams.destination?.id,
-      };
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/purchaseOrders', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setTableData({
-            data: res.data.data,
-            pages: Math.ceil(res.data.totalCount / state.pageSize),
-            totalCount: res.data.totalCount,
-            currentParams: params,
-            totalPrice: res.data.totalPrice,
-          });
-        })
-        .catch(() => Promise.reject(new Error(translate('react.purchaseOrder.error.purchaseOrderList.label', 'Unable to fetch purchase orders'))))
-        .finally(() => setLoading(false));
-    }
-  }, [filterParams]);
 
   return {
     tableData,

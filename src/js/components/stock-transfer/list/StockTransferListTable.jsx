@@ -113,7 +113,7 @@ const StockTransferListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData.stockTransfersData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
         pages={tableData.pages}

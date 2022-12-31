@@ -1,75 +1,50 @@
-import { useCallback, useState } from 'react';
-
 import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import queryString from 'query-string';
-import { getTranslate } from 'react-localize-redux';
-import { useSelector } from 'react-redux';
 
 import useTableData from 'hooks/list-pages/useTableData';
 import apiClient from 'utils/apiClient';
-import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useProductsListTableData = (filterParams) => {
-  const { tableRef } = useTableData(filterParams);
-  const [loading, setLoading] = useState(false);
-  const [tableData, setTableData] = useState({
-    productsData: [],
-    pages: -1,
-    totalCount: 0,
-    currentParams: {},
-  });
-
-  const { translate } = useSelector(state => ({
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  }));
-
-  const onFetchHandler = useCallback((tableState) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = tableState.sorted.length > 0 ?
-        {
-          sort: tableState.sorted[0].id,
-          order: tableState.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'lastUpdated',
-          order: 'desc',
-        };
-
-      const params = _.omitBy({
-        offset: `${offset}`,
-        max: `${tableState.pageSize}`,
-        ...sortingParams,
-        ...filterParams,
-        catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
-        categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
-        tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
-      }, (val) => {
-        if (typeof val === 'boolean') {
-          return !val;
-        }
-        return _.isEmpty(val);
-      });
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/products', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-      })
-        .then((res) => {
-          setTableData({
-            productsData: res.data.data,
-            totalCount: res.data.totalCount,
-            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-            currentParams: params,
-          });
-        })
-        .catch(() => Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products'))))
-        .finally(() => setLoading(false));
+  const url = '/openboxes/api/products';
+  const messageId = 'react.productsList.fetch.fail.label';
+  const defaultMessage = 'Unable to fetch products';
+  const getSortingParams = tableState => (tableState.sorted.length > 0 ?
+    {
+      sort: tableState.sorted[0].id,
+      order: tableState.sorted[0].desc ? 'desc' : 'asc',
+    } :
+    {
+      sort: 'lastUpdated',
+      order: 'desc',
+    });
+  const getParams = (offset, currentLocation, tableState, sortingParams) => _.omitBy({
+    offset: `${offset}`,
+    max: `${tableState.pageSize}`,
+    ...sortingParams,
+    ...filterParams,
+    catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
+    categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
+    tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
+  }, (val) => {
+    if (typeof val === 'boolean') {
+      return !val;
     }
-  }, [filterParams]);
+    return _.isEmpty(val);
+  });
+  const {
+    tableRef,
+    loading,
+    tableData,
+    onFetchHandler,
+  } = useTableData({
+    filterParams,
+    url,
+    messageId,
+    defaultMessage,
+    getSortingParams,
+    getParams,
+  });
 
   const exportProducts = (allProducts = false, withAttributes = false) => {
     const params = () => {

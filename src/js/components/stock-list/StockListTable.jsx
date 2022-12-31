@@ -236,7 +236,7 @@ const StockListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData.stockListData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
         pages={tableData.pages}

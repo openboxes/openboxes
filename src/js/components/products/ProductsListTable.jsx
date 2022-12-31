@@ -110,7 +110,7 @@ const ProductsListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData.productsData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
         pages={tableData.pages}

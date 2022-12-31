@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import _ from 'lodash';
-import queryString from 'query-string';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,14 +13,45 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useOutboundListTableData = (filterParams) => {
-  const { sourceRef, tableRef, fireFetchData } = useTableData(filterParams);
-  const [tableData, setTableData] = useState({
-    data: [],
-    pages: -1,
-    totalCount: 0,
-    currentParams: {},
+  const url = '/openboxes/api/stockMovements';
+  const messageId = 'react.stockMovement.outbound.fetching.error';
+  const defaultMessage = 'Unable to fetch outbound movements';
+  const getSortingParams = state => (state.sorted.length > 0 ?
+    {
+      sort: state.sorted[0].id,
+      order: state.sorted[0].desc ? 'desc' : 'asc',
+    } : undefined);
+  const getParams = (offset, currentLocation, state, sortingParams) => _.omitBy({
+    ...filterParams,
+    offset: `${offset}`,
+    max: `${state.pageSize}`,
+    requisitionStatusCode: filterParams.requisitionStatusCode &&
+              filterParams.requisitionStatusCode?.map(({ id }) => id),
+    requestType: filterParams?.requestType?.value,
+    origin: filterParams?.origin?.id,
+    destination: filterParams?.destination?.id,
+    requestedBy: filterParams.requestedBy?.id,
+    createdBy: filterParams.createdBy?.id,
+    updatedBy: filterParams.updatedBy?.id,
+    ...sortingParams,
+  }, (value) => {
+    if (typeof value === 'object' && _.isEmpty(value)) return true;
+    return !value;
   });
-  const [loading, setLoading] = useState(true);
+  const {
+    tableRef,
+    fireFetchData,
+    loading,
+    tableData,
+    onFetchHandler,
+  } = useTableData({
+    filterParams,
+    url,
+    messageId,
+    defaultMessage,
+    getSortingParams,
+    getParams,
+  });
 
   const dispatch = useDispatch();
   const { isRequisitionStatusesFetched, requisitionStatuses, translate } = useSelector(state => ({
@@ -49,53 +79,6 @@ const useOutboundListTableData = (filterParams) => {
       params: tableData.currentParams,
     });
   };
-
-  const onFetchHandler = useCallback((state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } : undefined;
-
-      const params = _.omitBy({
-        ...filterParams,
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        requisitionStatusCode: filterParams.requisitionStatusCode &&
-          filterParams.requisitionStatusCode?.map(({ id }) => id),
-        requestType: filterParams?.requestType?.value,
-        origin: filterParams?.origin?.id,
-        destination: filterParams?.destination?.id,
-        requestedBy: filterParams.requestedBy?.id,
-        createdBy: filterParams.createdBy?.id,
-        updatedBy: filterParams.updatedBy?.id,
-        ...sortingParams,
-      }, (value) => {
-        if (typeof value === 'object' && _.isEmpty(value)) return true;
-        return !value;
-      });
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/stockMovements', {
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        params,
-        cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setTableData({
-            data: res.data.data,
-            pages: Math.ceil(res.data.totalCount / state.pageSize),
-            totalCount: res.data.totalCount,
-            currentParams: params,
-          });
-        })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements'))))
-        .finally(() => setLoading(false));
-    }
-  }, [filterParams]);
 
   const deleteStockMovement = (id) => {
     dispatch(showSpinner());
