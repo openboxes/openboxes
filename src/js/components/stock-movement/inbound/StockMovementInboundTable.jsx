@@ -16,10 +16,10 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
+import stockMovementApi from 'api/services/StockMovementApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -91,7 +91,7 @@ const StockMovementInboundTable = ({
     status.toLowerCase(),
   );
 
-  const onFetchHandler = useCallback((state) => {
+  const onFetchHandler = useCallback(async (state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -119,38 +119,42 @@ const StockMovementInboundTable = ({
 
       // Fetch data
       setLoading(true);
-      apiClient.get('/openboxes/api/stockMovements', {
+      const config = {
         paramsSerializer: parameters => queryString.stringify(parameters),
         params,
         cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setLoading(false);
-          setTableData({
-            data: res.data.data,
-            pages: Math.ceil(res.data.totalCount / state.pageSize),
-            totalCount: res.data.totalCount,
-            currentParams: params,
-          });
-        })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements'))));
+      };
+      try {
+        const { data } = await stockMovementApi.getStockMovements(config);
+        setTableData({
+          data: data.data,
+          pages: Math.ceil(data.totalCount / state.pageSize),
+          totalCount: data.totalCount,
+          currentParams: params,
+        });
+      } catch {
+        Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements')));
+      } finally {
+        setLoading(false);
+      }
     }
   }, [filterParams]);
 
   const deleteReturnStockMovement = (id) => {
     showTheSpinner();
-    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          const successMessage = translate(
-            'react.stockMovement.deleted.success.message.label',
-            'Stock Movement has been deleted successfully',
-          );
-          Alert.success(successMessage);
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
+    try {
+      const { status } = stockMovementApi.deleteStockMovement(id);
+      if (status === 204) {
+        const successMessage = translate(
+          'react.stockMovement.deleted.success.message.label',
+          'Stock Movement has been deleted successfully',
+        );
+        Alert.success(successMessage);
+        fireFetchData();
+      }
+    } finally {
+      hideTheSpinner();
+    }
   };
 
   const deleteConfirmAlert = (id) => {
