@@ -13,7 +13,7 @@ const SearchInput = (props) => {
   };
 
   return (
-    <div data-testid="search-input-div" className="d-flex flex-row align-items-center justify-content-center search-input">
+    <div data-testid="search-input-div" className={`d-flex flex-row align-items-center justify-content-center search-input ${props.value ? 'search-input-has-value' : ''}`}>
       <RiSearchLine />
       <Input {...props} />
       {props.value &&

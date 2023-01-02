@@ -911,6 +911,15 @@ div.search-input {
   border: 1px solid var(--gray-300);
   border-radius: 2px;
 
+  &.search-input-has-value {
+    border: 1px solid var(--blue-primary);
+    button {
+      svg {
+        color: var(--blue-primary)
+      }
+    }
+  }
+
   input {
     flex: 1;
     height: 34px !important;
