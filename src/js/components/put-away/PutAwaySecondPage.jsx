@@ -131,21 +131,36 @@ class PutAwaySecondPage extends Component {
       Cell: (props) => {
         const itemIndex = props.index;
         const edit = _.get(this.state.putAway.putawayItems, `[${itemIndex}].edit`);
+        let disabledMessage;
+        let disabled = false;
+
+        if (this.isPutAwaysQuantityNegativeNumbers()) {
+          disabledMessage = this.props.translate(
+            'react.putAway.negativeQuantity.label',
+            'Quantity cannot be lower than 1',
+          );
+          disabled = true;
+        }
+
         if (edit) {
+          if (props.value > props.original.quantityAvailable) {
+            disabledMessage = this.props.translate(
+              'react.putAway.higherQuantity.label',
+              'Quantity cannot be higher than original putaway item quantity',
+            );
+            disabled = true;
+          }
           return (
             <Tooltip
-              html={this.props.translate(
-                'react.putAway.higherQuantity.label',
-                'Quantity cannot be higher than original putaway item quantity',
-              )}
-              disabled={props.value <= props.original.quantityAvailable}
+              html={disabledMessage}
+              disabled={!disabled}
               theme="transparent"
               arrow="true"
               delay="150"
               duration="250"
               hideDelay="50"
             >
-              <div className={props.value > props.original.quantityAvailable ? 'has-error' : ''}>
+              <div className={props.value > props.original.quantityAvailable || this.isPutAwaysQuantityNegativeNumbers() ? 'has-error' : ''}>
                 <input
                   type="number"
                   className="form-control form-control-xs"
@@ -162,13 +177,18 @@ class PutAwaySecondPage extends Component {
             </Tooltip>);
         }
 
+        if (props.original && props.value > props.original.quantityAvailable) {
+          disabledMessage = this.props.translate(
+            'react.putAway.higherQuantity.label',
+            'Quantity cannot be higher than original putaway item quantity',
+          );
+          disabled = true;
+        }
+
         return (
           <Tooltip
-            html={this.props.translate(
-              'react.putAway.higherQuantity.label',
-              'Quantity cannot be higher than original putaway item quantity',
-            )}
-            disabled={props.original && props.value <= props.original.quantityAvailable}
+            html={disabledMessage}
+            disabled={!disabled}
             theme="transparent"
             arrow="true"
             delay="150"
@@ -260,6 +280,16 @@ class PutAwaySecondPage extends Component {
   ];
 
   dataFetched = false;
+
+  isPutAwaysQuantityNegativeNumbers() {
+    if (this.state.putAway.putawayItems) {
+      const quantities = this.state.putAway.putawayItems.map(item => parseInt(item.quantity, 10));
+      const appropriateNumbers = quantities.filter(quantity =>
+        !Number.isNaN(quantity) && quantity > 0);
+      return appropriateNumbers.length !== quantities.length;
+    }
+    return false;
+  }
 
   /**
    * Changes the way od displaying table depending on after which element
@@ -541,16 +571,6 @@ class PutAwaySecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  isDisabled() {
-    if (this.state.putAway.putawayItems) {
-      const quantities = this.state.putAway.putawayItems.map(item => parseInt(item.quantity, 10));
-      const appropriateNumbers = quantities.filter(quantity =>
-        !Number.isNaN(quantity) && quantity > 0);
-      return appropriateNumbers.length !== quantities.length;
-    }
-    return false;
-  }
-
   render() {
     const {
       onExpandedChange, toggleTree,
@@ -567,7 +587,6 @@ class PutAwaySecondPage extends Component {
 
     return (
       <div className="putaway">
-        {console.log(this.isDisabled())}
         <div className="d-flex justify-content-between mb-2 putaway-buttons">
           <div>
             <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
@@ -613,7 +632,8 @@ class PutAwaySecondPage extends Component {
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                putawayItem.quantity > putawayItem.quantityAvailable)}
+                putawayItem.quantity > putawayItem.quantityAvailable) ||
+                this.isPutAwaysQuantityNegativeNumbers()}
             ><Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
           </span>
@@ -636,7 +656,7 @@ class PutAwaySecondPage extends Component {
         }
         <div className="submit-buttons">
           <button
-            disabled={this.isDisabled()}
+            disabled={this.isPutAwaysQuantityNegativeNumbers()}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
