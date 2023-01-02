@@ -19,7 +19,7 @@
         </tr>
         <tr class="prop">
             <td class="name">
-                <label><g:message code="transactionFact.minTransactionDate.label" default="Earliest Transaction"/></label>
+                <label><g:message code="transactions.minTransactionDate.label" default="Earliest Transaction"/></label>
             </td>
             <td>
                 <g:formatDate date="${minTransactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}"/>
@@ -27,7 +27,7 @@
         </tr>
         <tr class="prop">
             <td class="name">
-                <label><g:message code="transactionFact.maxTransactionDate.label" default="Latest Transaction"/></label>
+                <label><g:message code="transactions.maxTransactionDate.label" default="Latest Transaction"/></label>
             </td>
             <td>
                 <g:formatDate date="${maxTransactionDate}" format="${org.pih.warehouse.core.Constants.DEFAULT_DATE_TIME_FORMAT}"/>
@@ -35,7 +35,7 @@
         </tr>
         <tr class="prop">
             <td class="name">
-                <label>Previous Refresh</label>
+                <label><g:message code="transactions.previousRefresh.label" default="Previous Refresh"/></label>
             </td>
             <td class="value">
                 <span title="${previousFireTime}"><g:prettyDateFormat date="${previousFireTime}"/></span>
@@ -43,7 +43,7 @@
         </tr>
         <tr class="prop">
             <td class="name">
-                <label>Next Refresh</label>
+                <label><g:message code="transactions.nextRefresh.label" default="Next Refresh"/></label>
             </td>
             <td class="value">
                 <span title="${nextFireTime}"><g:prettyDateFormat date="${nextFireTime}"/></span>
