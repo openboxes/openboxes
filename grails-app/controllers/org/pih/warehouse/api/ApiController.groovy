@@ -57,12 +57,12 @@ class ApiController {
 
     @CacheFlush(["megamenuCache"])
     def chooseLocale = {
-        Locale newLocale = localizationService.getLocale(params.id)
-        if (!newLocale) {
+        Locale locale = localizationService.getLocale(params.id)
+        if (!locale) {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
-        session.locale = newLocale
-        render([status: 200, text: "Current language is ${newLocale}"])
+        session.locale = locale
+        render([status: 200, text: "Current language is ${locale}"])
     }
 
     def getMenuConfig = {
@@ -88,9 +88,7 @@ class ApiController {
         def localizationMode
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
-        def translationModeLocale = grailsApplication.config.openboxes.locale.translationModeLocale
-        // If current locale is equal to translation mode locale, we are in localization mode
-        session.useDebugLocale = locale == new Locale(translationModeLocale)
+        def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
 
         if (session.useDebugLocale) {
 
@@ -202,7 +200,7 @@ class ApiController {
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
                 localizationModeEnabled : localizationModeEnabled,
-                translationModeLocale : translationModeLocale
+                localizationModeLocale : localizationModeLocale
             ],
         ] as JSON)
     }

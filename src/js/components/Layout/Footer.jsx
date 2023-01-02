@@ -25,7 +25,7 @@ const Footer = ({
   environment,
   buildDate,
   localizationModeEnabled,
-  translationModeLocale,
+  localizationModeLocale,
 }) => (
   <div className="border-top align-self-end text-center py-2 w-100 footer">
     <div className="d-flex flex-row justify-content-center m-2 flex-wrap">
@@ -41,7 +41,7 @@ const Footer = ({
       <div className="mx-3"><Translate id="react.default.locale.label " defaultMessage="Locale" />: {' '}
         { _.map(languages, (language) => {
           // When clicking on language that is a translation mode language, enable localization mode
-          if (language.code === translationModeLocale) {
+          if (language.code === localizationModeLocale) {
             return (
               <a
                 className={`${locale === language.code ? 'selected' : ''}`}
@@ -59,7 +59,7 @@ const Footer = ({
               <a
                 className={`${locale === language.code ? 'selected' : ''}`}
                 key={language.code}
-                href={`/openboxes/user/disableLocalizationMode?localeToSet=${language.code}`}
+                href={`/openboxes/user/disableLocalizationMode?locale=${language.code}`}
               >
                 <Translate id={`react.default.${language.name.toLowerCase()}.label`} />
               </a>
@@ -103,7 +103,7 @@ const mapStateToProps = state => ({
   ipAddress: state.session.ipAddress,
   languages: getLanguages(state.localize),
   localizationModeEnabled: state.session.localizationModeEnabled,
-  translationModeLocale: state.session.translationModeLocale,
+  localizationModeLocale: state.session.localizationModeLocale,
 });
 
 const mapDispatchToProps = {
@@ -129,5 +129,5 @@ Footer.propTypes = {
   timezone: PropTypes.string.isRequired,
   ipAddress: PropTypes.string.isRequired,
   localizationModeEnabled: PropTypes.bool.isRequired,
-  translationModeLocale: PropTypes.string.isRequired,
+  localizationModeLocale: PropTypes.string.isRequired,
 };

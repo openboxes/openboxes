@@ -45,8 +45,8 @@ class UserService {
         }
 
         // Do not allow user to set his/her locale to translation mode locale
-        def translationModeLocale = new Locale(grailsApplication.config.openboxes.locale.translationModeLocale)
-        if (params.locale && new Locale(params.locale) == translationModeLocale) {
+        def localizationModeLocale = new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)
+        if (params.locale && new Locale(params.locale) == localizationModeLocale) {
             userInstance.errors.rejectValue("locale", "user.errors.cannotSetLocaleToTranslationLocale.message", "You cannot set your default locale for translation mode locale")
             throw new ValidationException("user.errors.cannotSetLocaleToTranslationLocale.message", userInstance.errors)
         }

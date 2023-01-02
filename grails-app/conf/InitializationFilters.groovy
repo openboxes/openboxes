@@ -21,6 +21,11 @@ class InitializationFilters {
 
                     // Only initialize session if a user has logged in.
                     if (session.user) {
+                        // Determine whether enable/disable localization mode
+                        def locale = session?.locale ?: session.user?.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
+                        def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
+                        // If current locale is equal to translation mode locale, we are in localization mode
+                        session.useDebugLocale = locale == new Locale(localizationModeLocale)
 
                         if (session.impersonateUserId && session.user.id != session.impersonateUserId) {
                             session.user = User.get(session.impersonateUserId)
