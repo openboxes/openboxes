@@ -208,7 +208,7 @@ const StockTransferListTable = ({
           currentParams: params,
         });
       } catch {
-        Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
+        await Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
       } finally {
         setLoading(false);
       }

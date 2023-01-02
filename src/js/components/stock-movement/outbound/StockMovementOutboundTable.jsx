@@ -19,6 +19,7 @@ import Alert from 'react-s-alert';
 
 import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
+import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
@@ -77,14 +78,14 @@ const StockMovementOutboundTable = ({
 
   const exportStockMovements = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements',
+      url: STOCK_MOVEMENT_API,
       params: tableData.currentParams,
     });
   };
 
   const exportPendingShipmentItems = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements/pendingRequisitionItems',
+      url: STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS,
       params: tableData.currentParams,
     });
   };
@@ -137,7 +138,7 @@ const StockMovementOutboundTable = ({
           currentParams: params,
         });
       } catch {
-        Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements')));
+        await Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements')));
       } finally {
         setLoading(false);
       }

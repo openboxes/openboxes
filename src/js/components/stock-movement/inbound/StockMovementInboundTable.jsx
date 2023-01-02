@@ -17,6 +17,7 @@ import Alert from 'react-s-alert';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
+import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_INCOMING_ITEMS } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
@@ -74,14 +75,14 @@ const StockMovementInboundTable = ({
 
   const exportStockMovements = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements',
+      url: STOCK_MOVEMENT_API,
       params: tableData.currentParams,
     });
   };
 
   const exportAllIncomingItems = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements/shippedItems',
+      url: STOCK_MOVEMENT_INCOMING_ITEMS,
       params: tableData.currentParams,
     });
   };
@@ -133,17 +134,17 @@ const StockMovementInboundTable = ({
           currentParams: params,
         });
       } catch {
-        Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements')));
+        await Promise.reject(new Error(translate('react.stockMovement.inbound.fetching.error', 'Unable to fetch inbound movements')));
       } finally {
         setLoading(false);
       }
     }
   }, [filterParams]);
 
-  const deleteReturnStockMovement = (id) => {
+  const deleteReturnStockMovement = async (id) => {
     showTheSpinner();
     try {
-      const { status } = stockMovementApi.deleteStockMovement(id);
+      const { status } = await stockMovementApi.deleteStockMovement(id);
       if (status === 204) {
         const successMessage = translate(
           'react.stockMovement.deleted.success.message.label',

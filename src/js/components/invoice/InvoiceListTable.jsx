@@ -187,7 +187,7 @@ const InvoiceListTable = ({
         setTotalData(data.totalCount);
         setInvoiceData(data.data);
       } catch {
-        Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices')));
+        await Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices')));
       } finally {
         setLoading(false);
       }

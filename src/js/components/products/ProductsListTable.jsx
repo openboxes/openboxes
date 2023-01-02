@@ -131,7 +131,7 @@ const ProductsListTable = ({
           currentParams: params,
         });
       } catch {
-        Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
+        await Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
       } finally {
         setLoading(false);
       }
