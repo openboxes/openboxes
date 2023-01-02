@@ -30,7 +30,7 @@
                         <div class="right">
                             <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">
                                 <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" style="vertical-align: middle"/>
-                                Download as CSV
+                                <g:message code="default.button.downloadAsCSV.label" default="Download as CSVs"/>
                             </g:link>
 
 
@@ -53,16 +53,16 @@
                         <table id="inventoryTable">
                             <thead>
                             <tr>
-                                <th class="center"><warehouse:message code="inventoryLevel.status.label"/></th>
-                                <th><warehouse:message code="product.productCode.label"/></th>
-                                <th><warehouse:message code="product.label"/></th>
-                                <th><warehouse:message code="category.label"/></th>
-                                <th class="left"><warehouse:message code="inventoryLevel.binLocation.label"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.status.label" default="Status"/></th>
+                                <th><warehouse:message code="product.productCode.label" default="Code"/></th>
+                                <th><warehouse:message code="product.label" default="Product"/></th>
+                                <th><warehouse:message code="category.label" default="Category"/></th>
+                                <th class="left"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location"/></th>
                                 <th class="left"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
-                                <th><warehouse:message code="product.unitOfMeasure.label"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label"/></th>
-                                <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label"/></th>
+                                <th><warehouse:message code="product.unitOfMeasure.label" default="Unit of measure"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label" default="Minimum quantity"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.reorderQuantity.label" default="Reorder quantity"/></th>
+                                <th class="center"><warehouse:message code="inventoryLevel.maximumQuantity.label" default="inventoryLevel.maximumQuantity.label"/></th>
                                 <th class="center border-right"><warehouse:message code="inventoryLevel.currentQuantity.label" default="Current quantity"/></th>
                                 <th class="center border-right"><warehouse:message code="default.quantityAvailableToPromise.label" default="Quantity ATP"/></th>
                                 <th><warehouse:message code="product.pricePerUnit.label" default="Price per unit"/></th>
@@ -172,8 +172,12 @@
                 "sScrollY": 500,
                 "sPaginationType": "two_button",
                 "oLanguage": {
-                    "sZeroRecords": "No records found",
-                    "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+                  "sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
+                  "sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+                  "sInfo": "${g.message(code: 'default.dataTable.showingEntries.label', default: 'Showing _START_ to _END_ of _TOTAL_ entries')}",
+                  "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+                  "sZeroRecords": "${g.message(code: 'default.dataTable.search.label', default: 'No records found')}",
+                  "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
                 },
                 "aLengthMenu": [
                     [5, 15, 25, 50, 100, 500, 1000, -1],
