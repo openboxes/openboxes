@@ -8,9 +8,9 @@ import { RiDownload2Line } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
+import productApi from 'api/services/ProductApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
-import apiClient from 'utils/apiClient';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -88,7 +88,7 @@ const ProductsListTable = ({
   ], []);
 
 
-  const onFetchHandler = useCallback((tableState) => {
+  const onFetchHandler = useCallback(async (tableState) => {
     if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
       const sortingParams = tableState.sorted.length > 0 ?
@@ -118,27 +118,27 @@ const ProductsListTable = ({
 
       // Fetch data
       setLoading(true);
-      apiClient.get('/openboxes/api/products', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-      })
-        .then((res) => {
-          setTableData({
-            productsData: res.data.data,
-            totalCount: res.data.totalCount,
-            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-            currentParams: params,
-          });
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-          return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
+      try {
+        const config = {
+          params,
+          paramsSerializer: parameters => queryString.stringify(parameters),
+        };
+        const { data } = await productApi.getProducts(config);
+        setTableData({
+          productsData: data.data,
+          totalCount: data.totalCount,
+          pages: Math.ceil(data.totalCount / tableState.pageSize),
+          currentParams: params,
         });
+      } catch {
+        Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
+      } finally {
+        setLoading(false);
+      }
     }
   }, [filterParams]);
 
-  const exportProducts = (allProducts = false, withAttributes = false) => {
+  const exportProducts = async (allProducts = false, withAttributes = false) => {
     const params = () => {
       if (allProducts) {
         return { format: 'csv' };
@@ -152,16 +152,15 @@ const ProductsListTable = ({
       };
     };
 
-    apiClient.get('/openboxes/api/products', {
+    const config = {
       params: params(),
       paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        const date = new Date();
-        const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
-        const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-        fileDownload(res.data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
-      });
+    };
+    const { data } = await productApi.getProducts(config);
+    const date = new Date();
+    const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
+    const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+    fileDownload(data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
   };
 
 

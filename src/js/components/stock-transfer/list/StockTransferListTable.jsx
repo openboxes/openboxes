@@ -14,10 +14,10 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import stockTransferApi from 'api/services/StockTransferApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import StockTransferStatus from 'components/stock-transfer/list/StockTransferStatus';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -63,21 +63,18 @@ const StockTransferListTable = ({
     fireFetchData();
   }, [filterParams]);
 
-  const deleteStockTransfer = (id) => {
+  const deleteStockTransfer = async (id) => {
     showTheSpinner();
-    apiClient.delete(`/openboxes/api/stockTransfers/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          hideTheSpinner();
-          const successMessage = translate('react.stockTransfer.delete.success.label', 'Stock transfer has been deleted successfully');
-          Alert.success(successMessage);
-          fireFetchData();
-        }
-      })
-      .catch(() => {
-        hideTheSpinner();
-        fireFetchData();
-      });
+    try {
+      const { status } = await stockTransferApi.deleteStockTransfer(id);
+      if (status === 204) {
+        const successMessage = translate('react.stockTransfer.delete.success.label', 'Stock transfer has been deleted successfully');
+        Alert.success(successMessage);
+      }
+    } finally {
+      hideTheSpinner();
+      fireFetchData();
+    }
   };
 
   const deleteHandler = (id) => {
@@ -172,7 +169,7 @@ const StockTransferListTable = ({
   ], [highestRole]);
 
 
-  const onFetchHandler = useCallback((tableState) => {
+  const onFetchHandler = useCallback(async (tableState) => {
     if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
       const sortingParams = tableState.sorted.length > 0 ?
@@ -197,24 +194,24 @@ const StockTransferListTable = ({
 
       // Fetch data
       setLoading(true);
-      apiClient.get('/openboxes/api/stockTransfers', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setTableData({
-            stockTransfersData: res.data.data,
-            totalCount: res.data.totalCount,
-            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-            currentParams: params,
-          });
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-          return Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
+      try {
+        const config = {
+          params,
+          paramsSerializer: parameters => queryString.stringify(parameters),
+          cancelToken: sourceRef.current?.token,
+        };
+        const { data } = await stockTransferApi.getStockTransfers(config);
+        setTableData({
+          stockTransfersData: data.data,
+          totalCount: data.totalCount,
+          pages: Math.ceil(data.totalCount / tableState.pageSize),
+          currentParams: params,
         });
+      } catch {
+        Promise.reject(new Error(translate('react.stockTransfer.fetch.fail.label', 'Unable to fetch stock transfers')));
+      } finally {
+        setLoading(false);
+      }
     }
   }, [filterParams]);
 

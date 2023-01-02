@@ -12,10 +12,10 @@ import {
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
+import invoiceApi from 'api/services/InvoiceApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -147,7 +147,7 @@ const InvoiceListTable = ({
   ], [supportedActivities, highestRole, invoiceStatuses]);
 
 
-  const onFetchHandler = useCallback((state) => {
+  const onFetchHandler = useCallback(async (state) => {
     if (!_.isEmpty(filterParams)) {
       const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
       const sortingParams = state.sorted.length > 0 ?
@@ -175,18 +175,22 @@ const InvoiceListTable = ({
 
       // Fetch data
       setLoading(true);
-      apiClient.get('/openboxes/api/invoices', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setInvoiceData(res.data.data);
-        })
-        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
+      try {
+        const config = {
+          params,
+          paramsSerializer: parameters => queryString.stringify(parameters),
+          cancelToken: sourceRef.current?.token,
+        };
+        const { data } = await invoiceApi.getInvoices(config);
+        setLoading(false);
+        setPages(Math.ceil(data.totalCount / state.pageSize));
+        setTotalData(data.totalCount);
+        setInvoiceData(data.data);
+      } catch {
+        Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices')));
+      } finally {
+        setLoading(false);
+      }
     }
   }, [filterParams]);
 
