@@ -6,15 +6,11 @@ const useInvoiceListTableData = (filterParams) => {
   const url = '/openboxes/api/invoices';
   const messageId = 'react.invoice.error.fetching.label';
   const defaultMessage = 'Unable to fetch invoices';
-  const getSortingParams = state => (state.sorted.length > 0 ?
-    {
-      sort: state.sorted[0].id,
-      order: state.sorted[0].desc ? 'desc' : 'asc',
-    } :
-    {
-      sort: 'dateInvoiced',
-      order: 'desc',
-    });
+  const defaultSorting = {
+    sort: 'dateInvoiced',
+    order: 'desc',
+  };
+
   const getParams = (offset, currentLocation, state, sortingParams) => _.omitBy({
     offset: `${offset}`,
     max: `${state.pageSize}`,
@@ -37,7 +33,7 @@ const useInvoiceListTableData = (filterParams) => {
     url,
     messageId,
     defaultMessage,
-    getSortingParams,
+    defaultSorting,
     getParams,
   });
 

@@ -14,8 +14,9 @@ const useTableData = ({
   url,
   messageId,
   defaultMessage,
-  getSortingParams,
   getParams,
+  onFetchedData,
+  defaultSorting,
 }) => {
   // Util ref for react-table to force the fetch of data
   const tableRef = useRef(null);
@@ -28,10 +29,12 @@ const useTableData = ({
     pages: -1,
     totalCount: 0,
     currentParams: {},
-    totalPrice: 0,
   });
 
-  const { currentLocation, translate } = useSelector(state => ({
+  const {
+    currentLocation,
+    translate,
+  } = useSelector(state => ({
     currentLocation: state.session.currentLocation,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
@@ -54,7 +57,10 @@ const useTableData = ({
   const onFetchHandler = useCallback((tableState) => {
     if (!_.isEmpty(filterParams)) {
       const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = getSortingParams(tableState);
+      const sortingParams = (tableState.sorted.length > 0 ? {
+        sort: tableState.sorted[0].id,
+        order: tableState.sorted[0].desc ? 'desc' : 'asc',
+      } : defaultSorting);
       const params = getParams(offset, currentLocation, tableState, sortingParams);
 
       // Fetch data
@@ -65,16 +71,13 @@ const useTableData = ({
         cancelToken: sourceRef.current?.token,
       })
         .then((res) => {
-          // totalPrice is not defined in all tables,
-          // but because of moving this function to the custom hook
-          // I put it here to make it more generic
           setTableData({
             data: res.data.data,
             totalCount: res.data.totalCount,
             pages: Math.ceil(res.data.totalCount / tableState.pageSize),
             currentParams: params,
-            totalPrice: res.data.totalPrice,
           });
+          if (onFetchedData) onFetchedData(res.data);
         })
         .catch(() => Promise.reject(new Error(translate(messageId, defaultMessage))))
         .finally(() => setLoading(false));

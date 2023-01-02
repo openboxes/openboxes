@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import { getTranslate } from 'react-localize-redux';
@@ -14,15 +16,11 @@ const usePurchaseOrderListTableData = (filterParams) => {
   const url = '/openboxes/api/purchaseOrders';
   const messageId = 'react.purchaseOrder.error.purchaseOrderList.label';
   const defaultMessage = 'Unable to fetch purchase orders';
-  const getSortingParams = state => (state.sorted.length > 0 ?
-    {
-      sort: state.sorted[0].id,
-      order: state.sorted[0].desc ? 'desc' : 'asc',
-    } :
-    {
-      sort: 'dateOrdered',
-      order: 'desc',
-    });
+  const [totalPrice, setTotalPrice] = useState(0);
+  const defaultSorting = {
+    sort: 'dateOrdered',
+    order: 'desc',
+  };
   const getParams = (offset, currentLocation, state, sortingParams) => ({
     ..._.omitBy({
       offset: `${offset}`,
@@ -57,8 +55,9 @@ const usePurchaseOrderListTableData = (filterParams) => {
     url,
     messageId,
     defaultMessage,
-    getSortingParams,
+    defaultSorting,
     getParams,
+    onFetchedData: data => setTotalPrice(data.totalPrice),
   });
 
   const downloadOrders = (orderItems) => {
@@ -167,7 +166,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   };
 
   return {
-    tableData,
+    tableData: { ...tableData, totalPrice },
     loading,
     tableRef,
     printOrder,

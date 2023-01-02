@@ -16,11 +16,6 @@ const useInboundListTableData = (filterParams) => {
   const url = '/openboxes/api/stockMovements';
   const messageId = 'react.stockMovement.inbound.fetching.error';
   const defaultMessage = 'Unable to fetch inbound movements';
-  const getSortingParams = state => (state.sorted.length > 0 ?
-    {
-      sort: state.sorted[0].id,
-      order: state.sorted[0].desc ? 'desc' : 'asc',
-    } : undefined);
   const getParams = (offset, currentLocation, state, sortingParams) => _.omitBy({
     ...filterParams,
     offset: `${offset}`,
@@ -48,7 +43,6 @@ const useInboundListTableData = (filterParams) => {
     url,
     messageId,
     defaultMessage,
-    getSortingParams,
     getParams,
   });
 

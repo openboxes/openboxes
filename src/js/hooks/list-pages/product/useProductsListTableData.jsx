@@ -9,15 +9,10 @@ const useProductsListTableData = (filterParams) => {
   const url = '/openboxes/api/products';
   const messageId = 'react.productsList.fetch.fail.label';
   const defaultMessage = 'Unable to fetch products';
-  const getSortingParams = tableState => (tableState.sorted.length > 0 ?
-    {
-      sort: tableState.sorted[0].id,
-      order: tableState.sorted[0].desc ? 'desc' : 'asc',
-    } :
-    {
-      sort: 'lastUpdated',
-      order: 'desc',
-    });
+  const defaultSorting = {
+    sort: 'lastUpdated',
+    order: 'desc',
+  };
   const getParams = (offset, currentLocation, tableState, sortingParams) => _.omitBy({
     offset: `${offset}`,
     max: `${tableState.pageSize}`,
@@ -42,7 +37,7 @@ const useProductsListTableData = (filterParams) => {
     url,
     messageId,
     defaultMessage,
-    getSortingParams,
+    defaultSorting,
     getParams,
   });
 

@@ -14,11 +14,7 @@ const useStockListTableData = (filterParams) => {
   const url = '/openboxes/api/stocklists';
   const messageId = 'react.stocklists.fetch.fail.label';
   const defaultMessage = 'Unable to fetch stock transfers';
-  const getSortingParams = state => (state.sorted.length > 0 ?
-    {
-      sort: state.sorted[0].id,
-      order: state.sorted[0].desc ? 'desc' : 'asc',
-    } : undefined);
+
   const getParams = (offset, currentLocation, state, sortingParams) => {
     const { isPublished, ...otherFilterParams } = filterParams;
     return _.omitBy({
@@ -46,7 +42,6 @@ const useStockListTableData = (filterParams) => {
     url,
     messageId,
     defaultMessage,
-    getSortingParams,
     getParams,
   });
 
