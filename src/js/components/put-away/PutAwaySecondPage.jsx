@@ -134,7 +134,7 @@ class PutAwaySecondPage extends Component {
         let disabledMessage;
         let disabled = false;
 
-        if (this.isPutAwaysQuantityNegativeNumbers()) {
+        if (props.value < 1) {
           disabledMessage = this.props.translate(
             'react.putAway.negativeQuantity.label',
             'Quantity cannot be lower than 1',
@@ -160,7 +160,9 @@ class PutAwaySecondPage extends Component {
               duration="250"
               hideDelay="50"
             >
-              <div className={props.value > props.original.quantityAvailable || this.isPutAwaysQuantityNegativeNumbers() ? 'has-error' : ''}>
+              <div className={props.value > props.original.quantityAvailable ||
+              props.value < 1 ? 'has-error' : ''}
+              >
                 <input
                   type="number"
                   className="form-control form-control-xs"
@@ -195,7 +197,7 @@ class PutAwaySecondPage extends Component {
             duration="250"
             hideDelay="50"
           >
-            <div className={props.original && props.value > props.original.quantityAvailable ? 'has-error' : ''}>
+            <div className={(props.original && props.value > props.original.quantityAvailable) || props.value < 1 ? 'has-error' : ''}>
               <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
             </div>
           </Tooltip>
@@ -283,10 +285,11 @@ class PutAwaySecondPage extends Component {
 
   isPutAwaysQuantityNegativeNumbers() {
     if (this.state.putAway.putawayItems) {
-      const quantities = this.state.putAway.putawayItems.map(item => parseInt(item.quantity, 10));
-      const appropriateNumbers = quantities.filter(quantity =>
-        !Number.isNaN(quantity) && quantity > 0);
-      return appropriateNumbers.length !== quantities.length;
+      const appropriateQuantities = this.state.putAway.putawayItems.filter((item) => {
+        const quantity = parseInt(item.quantity, 10);
+        return !Number.isNaN(quantity) && quantity > 0;
+      });
+      return appropriateQuantities.length !== this.state.putAway.putawayItems.length;
     }
     return false;
   }
@@ -656,7 +659,9 @@ class PutAwaySecondPage extends Component {
         }
         <div className="submit-buttons">
           <button
-            disabled={this.isPutAwaysQuantityNegativeNumbers()}
+            disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
+                putawayItem.quantity > putawayItem.quantityAvailable) ||
+              this.isPutAwaysQuantityNegativeNumbers()}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
