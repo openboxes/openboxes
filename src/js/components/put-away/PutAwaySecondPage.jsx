@@ -541,6 +541,16 @@ class PutAwaySecondPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  isDisabled() {
+    if (this.state.putAway.putawayItems) {
+      const quantities = this.state.putAway.putawayItems.map(item => parseInt(item.quantity, 10));
+      const appropriateNumbers = quantities.filter(quantity =>
+        !Number.isNaN(quantity) && quantity > 0);
+      return appropriateNumbers.length !== quantities.length;
+    }
+    return false;
+  }
+
   render() {
     const {
       onExpandedChange, toggleTree,
@@ -557,6 +567,7 @@ class PutAwaySecondPage extends Component {
 
     return (
       <div className="putaway">
+        {console.log(this.isDisabled())}
         <div className="d-flex justify-content-between mb-2 putaway-buttons">
           <div>
             <Translate id="react.putAway.showBy.label" defaultMessage="Show by" />:
@@ -625,6 +636,7 @@ class PutAwaySecondPage extends Component {
         }
         <div className="submit-buttons">
           <button
+            disabled={this.isDisabled()}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
