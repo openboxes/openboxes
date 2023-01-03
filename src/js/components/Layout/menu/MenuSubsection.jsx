@@ -4,27 +4,34 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 
-const DropdownMenu = ({ section, active }) => (
-  <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} >
-    <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
-      {section.label}
-    </a>
-    <div className={`dropdown-menu dropdown-menu-wrapper ${section.label === 'Reporting' && 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
-      <div className="dropdown-menu-content dropdown-menu-subsections">
-        {_.map(section.subsections, (subsection, subsectionKey) => (
-          <div className="padding-8" key={subsectionKey}>
-            {subsection.label && <span className="subsection-section-title">{subsection.label}</span>}
-            {_.map(subsection.menuItems, (menuItem, menuItemKey) => (
-              <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
-                {menuItem.label}
-              </a>
-            ))}
-          </div>
-        ))}
+import useCheckRightSpace from 'hooks/useCheckRightSpace';
+
+
+const DropdownMenu = ({ section, active }) => {
+  const { elementReference, setIsVisible, shouldAlignLeft } = useCheckRightSpace();
+
+  return (
+    <li className={`nav-item dropdown d-none d-md-flex justify-content-center align-items-center ${active && 'active-section'}`} onMouseEnter={() => setIsVisible(true)} onMouseLeave={() => setIsVisible(false)}>
+      <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" aria-haspopup="true" aria-expanded="false">
+        {section.label}
+      </a>
+      <div ref={elementReference} className={`dropdown-menu dropdown-menu-wrapper ${shouldAlignLeft() ? 'dropdown-menu-left' : 'dropdown-menu-right'}`} aria-labelledby="navbarDropdown">
+        <div className="dropdown-menu-content dropdown-menu-subsections">
+          {_.map(section.subsections, (subsection, subsectionKey) => (
+            <div className="padding-8" key={subsectionKey}>
+              {subsection.label && <span className="subsection-section-title">{subsection.label}</span>}
+              {_.map(subsection.menuItems, (menuItem, menuItemKey) => (
+                <a className="dropdown-item" key={menuItemKey} href={menuItem.href} target={menuItem.target}>
+                  {menuItem.label}
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  </li>
-);
+    </li>
+  );
+};
 
 const CollapseMenu = ({ section, active }) => {
   const id = `collapse-${section?.label?.replaceAll(' ', '-')}`;

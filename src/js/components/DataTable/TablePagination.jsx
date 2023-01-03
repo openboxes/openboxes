@@ -6,7 +6,6 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 
-import { fetchTranslations } from 'actions';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const TablePagination = (props) => {
@@ -106,10 +105,6 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-const mapDispatchToProps = {
-  fetchTranslations,
-};
-
 TablePagination.defaultProps = {
   totalData: undefined,
 };
@@ -129,4 +124,4 @@ TablePagination.propTypes = {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(TablePagination);
+export default connect(mapStateToProps)(TablePagination);

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
 import filterFields from 'components/invoice/FilterFields';
-import useInvoiceFilters from 'hooks/useInvoiceFilters';
+import useInvoiceFilters from 'hooks/list-pages/invoice/useInvoiceFilters';
 import { debounceUsersFetch } from 'utils/option-utils';
 
 const InvoiceListFilters = ({

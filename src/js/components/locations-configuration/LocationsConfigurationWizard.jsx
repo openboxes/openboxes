@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, updateBreadcrumbs } from 'actions';
+import { fetchTranslations } from 'actions';
 import Forecasting from 'components/locations-configuration/Forecasting';
 import LocationAddress from 'components/locations-configuration/LocationAddress';
 import LocationDetails from 'components/locations-configuration/LocationDetails';
@@ -35,31 +35,12 @@ class LocationsConfigurationWizard extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'locationsConfiguration');
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
     }
   }
 
@@ -98,36 +79,20 @@ class LocationsConfigurationWizard extends Component {
 }
 
 const mapStateToProps = state => ({
-  breadcrumbsConfig: state.session.breadcrumbsConfig.locationsConfiguration,
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
-  fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  fetchTranslations,
 })(LocationsConfigurationWizard);
 
 LocationsConfigurationWizard.propTypes = {
   locale: PropTypes.string.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
-};
-
-LocationsConfigurationWizard.defaultProps = {
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    actionUrl: '',
-  },
 };

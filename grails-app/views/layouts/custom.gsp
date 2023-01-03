@@ -138,6 +138,7 @@
                     <g:set var="locationColorVariable" value="--location-color: #${locationColor}"/>
                 </g:else>
                 <div class="tooltip2">
+                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
                     <button
                         class="btn-show-dialog location-chooser__button"
                         style="${locationColorVariable}"

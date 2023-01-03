@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import AddItemsPage from 'components/stock-movement-wizard/request/AddItemsPage';
 import CreateStockMovement from 'components/stock-movement-wizard/request/CreateStockMovement';
 import Wizard from 'components/wizard/Wizard';
@@ -29,7 +29,6 @@ class StockMovementsRequest extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.stockMovementTranslationsFetched) {
@@ -37,14 +36,6 @@ class StockMovementsRequest extends Component {
 
       this.fetchInitialValues();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -56,18 +47,6 @@ class StockMovementsRequest extends Component {
       this.dataFetched = true;
 
       this.fetchInitialValues();
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
     }
   }
 
@@ -142,16 +121,6 @@ class StockMovementsRequest extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
-    if (values.movementNumber && (values.id || values.stockMovementId)) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: values.movementNumber, url: actionUrl, id: values.id || values.stockMovementId },
-      ]);
-    }
   }
 
   /**
@@ -226,11 +195,10 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  breadcrumbsConfig: state.session.breadcrumbsConfig.request,
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(StockMovementsRequest);
 
 StockMovementsRequest.propTypes = {
@@ -250,28 +218,8 @@ StockMovementsRequest.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 StockMovementsRequest.defaultProps = {
   initialValues: {},
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

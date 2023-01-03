@@ -5,7 +5,6 @@ import { addTranslationForLanguage } from 'react-localize-redux';
 import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  FETCH_BREADCRUMBS_CONFIG,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -31,7 +30,6 @@ import {
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
-  UPDATE_BREADCRUMBS_PARAMS,
 } from 'actions/types';
 import apiClient, { parseResponse } from 'utils/apiClient';
 
@@ -393,42 +391,6 @@ export function fetchConfig(id) {
         payload: {
           data: res.data,
         },
-      });
-    });
-  };
-}
-
-function dispachBreadcrumbsParams(newData, dispatch) {
-  dispatch({
-    type: UPDATE_BREADCRUMBS_PARAMS,
-    payload: newData,
-  });
-}
-
-export function updateBreadcrumbs(listBreadcrumbsStep = [
-  {
-    label: null, defaultLabel: null, url: null, id: null,
-  },
-]) {
-  return (dispatch) => {
-    const breadcrumbsParams = [];
-    listBreadcrumbsStep.forEach((step) => {
-      breadcrumbsParams.push({
-        label: step.label || '',
-        defaultLabel: step.defaultLabel,
-        url: step.id ? `${step.url}${step.id}` : step.url || '',
-      });
-    });
-    dispachBreadcrumbsParams(breadcrumbsParams, dispatch);
-  };
-}
-
-export function fetchBreadcrumbsConfig() {
-  return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/breadcrumbsConfig').then((res) => {
-      dispatch({
-        type: FETCH_BREADCRUMBS_CONFIG,
-        payload: res.data,
       });
     });
   };
