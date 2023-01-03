@@ -20,10 +20,10 @@ export const INVOICE_API = '/openboxes/api/invoices';
 export const PRODUCT_API = '/openboxes/api/products';
 
 // STOCK LIST
-export const STOCK_LIST_API = '/openboxes/api/stocklists';
-export const STOCK_LIST_EXPORT = id => `${STOCK_LIST_API}/${id}/export`;
-export const STOCK_LIST_DELETE = id => `${STOCK_LIST_API}/${id}`;
-export const STOCK_LIST_CLEAR = id => `${STOCK_LIST_API}/${id}/clear`;
-export const STOCK_LIST_CLONE = id => `${STOCK_LIST_API}/${id}/clone`;
-export const STOCK_LIST_PUBLISH = id => `${STOCK_LIST_API}/${id}/publish`;
-export const STOCK_LIST_UNPUBLISH = id => `${STOCK_LIST_API}/${id}/unpublish`;
+export const STOCKLIST_API = '/openboxes/api/stocklists';
+export const STOCKLIST_EXPORT = id => `${STOCKLIST_API}/${id}/export`;
+export const STOCKLIST_DELETE = id => `${STOCKLIST_API}/${id}`;
+export const STOCKLIST_CLEAR = id => `${STOCKLIST_API}/${id}/clear`;
+export const STOCKLIST_CLONE = id => `${STOCKLIST_API}/${id}/clone`;
+export const STOCKLIST_PUBLISH = id => `${STOCKLIST_API}/${id}/publish`;
+export const STOCKLIST_UNPUBLISH = id => `${STOCKLIST_API}/${id}/unpublish`;

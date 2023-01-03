@@ -23,7 +23,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import stockListApi from 'api/services/StockListApi';
-import { STOCK_LIST_API, STOCK_LIST_EXPORT } from 'api/urls';
+import { STOCKLIST_API, STOCKLIST_EXPORT } from 'api/urls';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
 import ActionDots from 'utils/ActionDots';
@@ -59,7 +59,7 @@ const StockListTable = ({
 
   const exportStockList = () => {
     exportFileFromAPI({
-      url: STOCK_LIST_API,
+      url: STOCKLIST_API,
       params: {
         ...currentParams,
       },
@@ -68,7 +68,7 @@ const StockListTable = ({
 
   const exportStockListItems = (id) => {
     exportFileFromAPI({
-      url: STOCK_LIST_EXPORT(id),
+      url: STOCKLIST_EXPORT(id),
     });
   };
 
