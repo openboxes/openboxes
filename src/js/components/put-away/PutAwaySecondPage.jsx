@@ -283,17 +283,6 @@ class PutAwaySecondPage extends Component {
 
   dataFetched = false;
 
-  isPutAwaysQuantityNegativeNumbers() {
-    if (this.state.putAway.putawayItems) {
-      const appropriateQuantities = this.state.putAway.putawayItems.filter((item) => {
-        const quantity = parseInt(item.quantity, 10);
-        return !Number.isNaN(quantity) && quantity > 0;
-      });
-      return appropriateQuantities.length !== this.state.putAway.putawayItems.length;
-    }
-    return false;
-  }
-
   /**
    * Changes the way od displaying table depending on after which element
    * user wants to sort it by.
@@ -635,8 +624,8 @@ class PutAwaySecondPage extends Component {
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                putawayItem.quantity > putawayItem.quantityAvailable) ||
-                this.isPutAwaysQuantityNegativeNumbers()}
+                (putawayItem.quantity > putawayItem.quantityAvailable) ||
+                putawayItem.quantity < 1)}
             ><Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
           </span>
@@ -660,8 +649,7 @@ class PutAwaySecondPage extends Component {
         <div className="submit-buttons">
           <button
             disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                putawayItem.quantity > putawayItem.quantityAvailable) ||
-              this.isPutAwaysQuantityNegativeNumbers()}
+                (putawayItem.quantity > putawayItem.quantityAvailable) || putawayItem.quantity < 1)}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
