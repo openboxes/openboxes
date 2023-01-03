@@ -1,14 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { fetchBuyers, fetchPurchaseOrderStatuses, fetchTranslations } from 'actions';
+import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import filterFields from 'components/purchaseOrder/FilterFields';
 import PurchaseOrderListFilters from 'components/purchaseOrder/PurchaseOrderListFilters';
 import PurchaseOrderListHeader from 'components/purchaseOrder/PurchaseOrderListHeader';
 import PurchaseOrderListTable from 'components/purchaseOrder/PurchaseOrderListTable';
 import usePurchaseOrderFilters from 'hooks/list-pages/purchase-order/usePurchaseOrderFilters';
+import useTranslation from 'hooks/useTranslation';
 
 
 const PurchaseOrderList = (props) => {
@@ -16,10 +17,7 @@ const PurchaseOrderList = (props) => {
     defaultFilterValues, setFilterValues, filterParams, isCentralPurchasingEnabled,
   } = usePurchaseOrderFilters();
 
-  useEffect(() => {
-    props.fetchTranslations(props.locale, 'purchaseOrder');
-    props.fetchTranslations(props.locale, 'reactTable');
-  }, [props.locale]);
+  useTranslation('purchaseOrder', 'reactTable');
 
   return (
     <div className="d-flex flex-column list-page-main">
@@ -40,21 +38,17 @@ const PurchaseOrderList = (props) => {
 };
 
 const mapStateToProps = state => ({
-  locale: state.session.activeLanguage,
   buyers: state.organizations.buyers,
   statuses: state.purchaseOrder.statuses,
 });
 
 export default connect(mapStateToProps, {
-  fetchTranslations,
   fetchStatuses: fetchPurchaseOrderStatuses,
   fetchBuyerOrganizations: fetchBuyers,
 })(PurchaseOrderList);
 
 
 PurchaseOrderList.propTypes = {
-  locale: PropTypes.string.isRequired,
-  fetchTranslations: PropTypes.func.isRequired,
   statuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     value: PropTypes.string,

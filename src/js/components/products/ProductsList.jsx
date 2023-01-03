@@ -1,26 +1,21 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchTranslations } from 'actions';
 import filterFields from 'components/products/FilterFields';
 import ProductsListFilters from 'components/products/ProductsListFilters';
 import ProductsListHeader from 'components/products/ProductsListHeader';
 import ProductsListTable from 'components/products/ProductsListTable';
 import useProductFilters from 'hooks/list-pages/product/useProductFilters';
+import useTranslation from 'hooks/useTranslation';
 
 
-const ProductsList = (props) => {
+const ProductsList = () => {
   const {
     defaultFilterValues, setFilterValues, categories, catalogs, tags, filterParams,
   } = useProductFilters();
 
-  useEffect(() => {
-    props.fetchTranslations(props.locale, 'productsList');
-    props.fetchTranslations(props.locale, 'reactTable');
-  }, [props.locale]);
+  useTranslation('productsList', 'reactTable');
 
   return (
     <div className="d-flex flex-column list-page-main">
@@ -36,19 +31,4 @@ const ProductsList = (props) => {
   );
 };
 
-const mapStateToProps = state => ({
-  locale: state.session.activeLanguage,
-});
-
-const mapDispatchToProps = {
-  fetchTranslations,
-};
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ProductsList));
-
-
-ProductsList.propTypes = {
-  locale: PropTypes.string.isRequired,
-  fetchTranslations: PropTypes.func.isRequired,
-
-};
+export default withRouter(ProductsList);
