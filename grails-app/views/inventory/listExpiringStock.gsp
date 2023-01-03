@@ -171,7 +171,7 @@
                                                     ${quantityMap[inventoryItem]}
                                                 </td>
                                                 <td class="checkable center" >
-                                                    ${inventoryItem?.product?.unitOfMeasure?:"EA" }
+                                                    <g:message code="default.uom.${inventoryItem?.product?.unitOfMeasure?.toLowerCase()}.uppercase.label" default="EA"/>
                                                 </td>
                                             </tr>
                                         </g:each>
