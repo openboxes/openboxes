@@ -64,6 +64,23 @@ class SplitLineModal extends Component {
     }
   }
 
+  getErrorMessage() {
+    if (this.isNegativeQuantity()) {
+      return this.props.translate(
+        'react.putAway.negativeSumOfAll.label',
+        'Sum of all split items quantities cannot be lower than 1',
+      );
+    }
+    if (this.isQuantityHigherThanOriginalPutaway()) {
+      return this.props.translate(
+        'react.putAway.sumOfAll.label',
+        'Sum of all split items quantities cannot be higher than original putaway item quantity',
+      );
+    }
+    return '';
+  }
+
+
   /**
    * Saves split items added by user in this modal.
    * @public
@@ -132,10 +149,18 @@ class SplitLineModal extends Component {
    * higher than available one.
    * @public
    */
-  isValid() {
-    const qtySum = this.calculatePutAwayQty();
 
-    return qtySum <= _.toInteger(this.props.putawayItem.quantity);
+  isNegativeQuantity() {
+    return _.some(this.state.splitItems, items => _.toInteger(items.quantity) <= 0);
+  }
+
+  isQuantityHigherThanOriginalPutaway() {
+    const qtySum = this.calculatePutAwayQty();
+    return qtySum > _.toInteger(this.props.putawayItem.quantity);
+  }
+
+  isValid() {
+    return !this.isNegativeQuantity() && !this.isQuantityHigherThanOriginalPutaway();
   }
 
   /**
@@ -220,11 +245,7 @@ class SplitLineModal extends Component {
                   </td>
                   <td className="py-1 align-middle">
                     <Tooltip
-                      // eslint-disable-next-line max-len
-                      html={this.props.translate(
-                        'react.putAway.sumOfAll.label',
-                        'Sum of all split items quantities cannot be higher than original putaway item quantity',
-                      )}
+                      html={this.getErrorMessage()}
                       disabled={this.isValid()}
                       theme="transparent"
                       arrow="true"
@@ -237,10 +258,11 @@ class SplitLineModal extends Component {
                           type="number"
                           value={item.quantity}
                           onChange={value => this.setState({
-                            splitItems: update(this.state.splitItems, {
-                              [index]: { quantity: { $set: value } },
-                            }),
-                          })}
+                              splitItems: update(this.state.splitItems, {
+                                [index]: { quantity: { $set: value } },
+                              }),
+                            })
+                          }
                         />
                       </div>
                     </Tooltip>

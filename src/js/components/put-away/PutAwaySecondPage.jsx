@@ -132,28 +132,26 @@ class PutAwaySecondPage extends Component {
         const itemIndex = props.index;
         const edit = _.get(this.state.putAway.putawayItems, `[${itemIndex}].edit`);
         let disabledMessage;
-        let disabled = false;
 
         if (props.value < 1) {
           disabledMessage = this.props.translate(
             'react.putAway.negativeQuantity.label',
             'Quantity cannot be lower than 1',
           );
-          disabled = true;
+        }
+
+        if (props.original && props.value > props.original.quantityAvailable) {
+          disabledMessage = this.props.translate(
+            'react.putAway.higherQuantity.label',
+            'Quantity cannot be higher than original putaway item quantity',
+          );
         }
 
         if (edit) {
-          if (props.value > props.original.quantityAvailable) {
-            disabledMessage = this.props.translate(
-              'react.putAway.higherQuantity.label',
-              'Quantity cannot be higher than original putaway item quantity',
-            );
-            disabled = true;
-          }
           return (
             <Tooltip
               html={disabledMessage}
-              disabled={!disabled}
+              disabled={!disabledMessage}
               theme="transparent"
               arrow="true"
               delay="150"
@@ -179,18 +177,10 @@ class PutAwaySecondPage extends Component {
             </Tooltip>);
         }
 
-        if (props.original && props.value > props.original.quantityAvailable) {
-          disabledMessage = this.props.translate(
-            'react.putAway.higherQuantity.label',
-            'Quantity cannot be higher than original putaway item quantity',
-          );
-          disabled = true;
-        }
-
         return (
           <Tooltip
             html={disabledMessage}
-            disabled={!disabled}
+            disabled={!disabledMessage}
             theme="transparent"
             arrow="true"
             delay="150"
