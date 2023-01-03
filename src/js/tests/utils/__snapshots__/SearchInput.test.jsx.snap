@@ -2,7 +2,7 @@
 
 exports[`search input should match snapshot 1`] = `
 <div
-  className="d-flex flex-row align-items-center justify-content-center search-input"
+  className="d-flex flex-row align-items-center justify-content-center search-input "
   data-testid="search-input-div"
 >
   <svg
