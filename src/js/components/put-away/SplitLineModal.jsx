@@ -65,18 +65,20 @@ class SplitLineModal extends Component {
   }
 
   getErrorMessage() {
-    if (this.isNegativeQuantity()) {
-      return this.props.translate(
-        'react.putAway.negativeSumOfAll.label',
-        'Items quantity cannot be lower than 1',
-      );
-    }
     if (this.isQuantityHigherThanOriginalPutaway()) {
       return this.props.translate(
         'react.putAway.sumOfAll.label',
         'Sum of all split items quantities cannot be higher than original putaway item quantity',
       );
     }
+
+    if (this.isNegativeQuantity()) {
+      return this.props.translate(
+        'react.putAway.negativeSumOfAll.label',
+        'Items quantity cannot be lower than 1',
+      );
+    }
+    
     return '';
   }
 
@@ -246,14 +248,14 @@ class SplitLineModal extends Component {
                   <td className="py-1 align-middle">
                     <Tooltip
                       html={this.getErrorMessage()}
-                      disabled={this.isValid()}
+                      disabled={!this.isQuantityHigherThanOriginalPutaway() && item.quantity > 0}
                       theme="transparent"
                       arrow="true"
                       delay="150"
                       duration="250"
                       hideDelay="50"
                     >
-                      <div className={!this.isValid() ? 'has-error' : ''}>
+                      <div className={this.isQuantityHigherThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
                         <Input
                           type="number"
                           value={item.quantity}
