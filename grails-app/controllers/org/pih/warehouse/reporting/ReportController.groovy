@@ -40,7 +40,6 @@ class ReportController {
     def inventoryService
     def productService
     def reportService
-    def messageService
     def inventorySnapshotService
     def productAvailabilityService
     def stockMovementService
@@ -407,14 +406,6 @@ class ReportController {
         String locationId = params?.location?.id ?: session?.warehouse?.id
         Location location = Location.get(locationId)
 
-        List statuses = ["inStock", "outOfStock"].collect { status ->
-            String messageCode = "binLocationSummary.${status}.label"
-            String label = messageService.getMessage(messageCode)
-            [status: status, label: label]
-        }
-
-
-
         try {
             if (params.downloadAction == "downloadStockReport") {
                 def binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
@@ -457,7 +448,7 @@ class ReportController {
         [
                 location   : location,
                 elapsedTime: (System.currentTimeMillis() - startTime),
-                statuses   : statuses
+                statuses   : ["inStock", "outOfStock"]
         ]
 
     }
