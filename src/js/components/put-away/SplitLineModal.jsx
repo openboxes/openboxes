@@ -78,7 +78,7 @@ class SplitLineModal extends Component {
         'Items quantity cannot be lower than 1',
       );
     }
-    
+
     return '';
   }
 
