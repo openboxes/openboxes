@@ -2,17 +2,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="custom" />        
+        <meta name="layout" content="custom" />
         <title><warehouse:message code="inventory.expiredStock.label"/></title>
-    </head>    
+    </head>
 
 	<body>
 		<div class="body">
-       		
+
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-            
+
            	<div class="summary">
 				<h3 class="title"><warehouse:message code="inventory.expiredStock.label"/></h3>
 			</div>
@@ -33,23 +33,23 @@
 						<div class="button-group">
 							<a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createOutboundTransfer")}">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'package_go.png')}"/>
-								&nbsp;<g:message code="inventory.outgoingTransfer.label" />
+								&nbsp;<g:message code="inventory.outgoingTransfer.label" default="Transfer out" />
 							</a>
 
 							<a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createExpired")}">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'hourglass.png')}"/>
-								&nbsp;<warehouse:message code="inventory.inventoryExpired.label"/>
+								&nbsp;<warehouse:message code="inventory.inventoryExpired.label" default="Mark as expired"/>
 							</a>
 
 							<a href="javascript:void(0);" class="button button-action" data-action="${g.createLink(controller: "inventory", action: "createConsumed")}">
 								<img src="${createLinkTo(dir:'images/icons/silk',file:'package_white.png')}" />
-								&nbsp;<warehouse:message code="inventory.inventoryConsumed.label"/>
+								&nbsp;<warehouse:message code="inventory.inventoryConsumed.label" default="Mark as consumed"/>
 							</a>
 						</div>
 
 						<g:link params="[format:'csv',category:params.category]" controller="${controllerName}" action="${actionName}" class="button">
 							<img src="${createLinkTo(dir:'images/icons/silk',file:'disk.png')}" alt="${warehouse.message(code: 'default.button.download.label') }" style="vertical-align: middle"/>
-							&nbsp; <g:message code="default.button.downloadAsCsv.label" default="Download as CSV"/>
+							&nbsp; <g:message code="default.button.downloadAsCSV.label" default="Download as CSV"/>
 						</g:link>
 					</div>
 				</div>
@@ -70,11 +70,11 @@
                                 <warehouse:message code="default.filters.label" default="Filters"/>
                             </h2>
 		          			<div class="filter-list-item">
-		           				<label><warehouse:message code="category.label"/></label>            			
+		           				<label><warehouse:message code="category.label"/></label>
 				           		<g:select name="category" class="chzn-select-deselect"
 												from="${categories}"
-												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}" 
-												noSelection="['': warehouse.message(code:'default.all.label')]" />   
+												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}"
+												noSelection="['': warehouse.message(code:'default.all.label')]" />
 							</div>
 							<div class="filter-list-item">
 								<button name="filter" class="button icon search">
@@ -84,14 +84,14 @@
                             <div class="clear"></div>
 						</div>
 
-		
+
 		            </g:form>
 				</div>
 				<div class="yui-u">
 
 		            <div class="box">
                         <h2>
-                            <warehouse:message code="inventoryItems.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
+                            <warehouse:message code="inventoryItem.expired.label" default="Expired inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
                         </h2>
 
 
@@ -195,7 +195,7 @@
 						return false;
 					}
 				);
-				
+
 				$(".toggleCheckbox").click(function(event) {
                     $(':checkbox').not(this).prop('checked', this.checked);
 				});
