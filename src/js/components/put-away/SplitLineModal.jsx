@@ -68,7 +68,7 @@ class SplitLineModal extends Component {
     if (this.isNegativeQuantity()) {
       return this.props.translate(
         'react.putAway.negativeSumOfAll.label',
-        'Sum of all split items quantities cannot be lower than 1',
+        'Items quantity cannot be lower than 1',
       );
     }
     if (this.isQuantityHigherThanOriginalPutaway()) {
