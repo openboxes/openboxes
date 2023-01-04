@@ -71,7 +71,7 @@
                             <div class="filters-container">
                                 <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
                                 <div>
-                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByName.label', default: 'Filter by product name')}"/>
+                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProductName.label', default: 'Filter by product name')}"/>
                                 </div>
                             </div>
                             <div class="button-group" style="margin-right: 5px;">
