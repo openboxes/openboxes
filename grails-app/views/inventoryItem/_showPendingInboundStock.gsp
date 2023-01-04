@@ -1,5 +1,5 @@
 <div class="box dialog">
-    <h2><warehouse:message code="stockCard.pending.label" args="[g.message(code: 'default.inbound.label')]" /></h2>
+    <h2><warehouse:message code="stockCard.pendingInbound.label"/></h2>
 
     <g:form method="GET" action="showStockCard">
         <g:hiddenField name="product.id" value="${product?.id }"/>
@@ -26,7 +26,8 @@
                         ${warehouse.message(code: 'order.orderDate.label')}
                     </th>
                     <th>
-                        ${warehouse.message(code: 'shipping.shipDate.label')} or
+                        ${warehouse.message(code: 'shipping.shipDate.label')}
+                        ${warehouse.message(code: 'default.or.label', default: 'or')}
                         <div style="color: darkgrey">
                             ${warehouse.message(code: 'shipping.expectedShippingDate.label')}
                         </div>
@@ -43,13 +44,20 @@
             <tbody>
                 <g:each var="entry" in="${itemsMap}" status="status">
                     <g:set var="item" value="${entry.key }"/>
-                    <g:set var="shipmentType" value="${entry.value.type=='Purchase Order' ? '' : item?.shipmentType}"
-                    />
+                    <g:set var="shipmentType" value="${entry.value.type=='Purchase Order' ? '' : item?.shipmentType}" />
 
                     <tr class="${(status%2==0)?'even':'odd' } prop">
                         <td><g:getShipmentTypeIcon shipmentType="${shipmentType}" /></td>
                         <td style="width: 10%;" nowrap="nowrap">
-                            ${entry.value["type"]}
+                            <g:if test="${entry.value['type']=='Stock Movement'}">
+                                <g:message code="stockMovement.label" default="Stock Movement" />
+                            </g:if>
+                            <g:elseif test="${entry.value['type']=='Purchase Order'}">
+                                <g:message code="purchaseOrder.label" default="Purchase Order" />
+                            </g:elseif>
+                            <g:else>
+                                ${entry.value["type"]}
+                            </g:else>
                         </td>
                         <td class="center">
                             <g:if test="${entry.value['type']=='Stock Movement'}">
@@ -79,7 +87,12 @@
                             ${entry.value['type']=='Stock Movement' ? item?.origin?.name : item?.order?.origin?.name}
                         </td>
                         <td>
-                            ${entry.value['type']=='Stock Movement' ? item?.currentStatus : item?.order?.status}
+                            <g:if test="${entry.value['type']=='Stock Movement'}">
+                                <format:metadata obj="${item?.currentStatus}"/>
+                            </g:if>
+                            <g:else>
+                                <format:metadata obj="${item?.order?.status}"/>
+                            </g:else>
                         </td>
                         <td>
                             <g:if test="${entry.value['type']=='Purchase Order'}">

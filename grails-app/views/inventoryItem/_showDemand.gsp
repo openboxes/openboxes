@@ -22,8 +22,7 @@
 
 <div id="demand-table">
     <div class="message information">
-        Totals and monthly averages are for the time period specified. The default time period is 12 months,
-        excluding the current month and any month before the oldest request.
+        <g:message code="forecasting.demand.warning.message" />
     </div>
     <g:formRemote name="demand" onLoading="showLoading()" onComplete="hideLoading()"
                   url="[controller: 'inventoryItem', action: 'showDemand', params: [id: commandInstance?.product?.id, from: 0]]"
@@ -40,7 +39,13 @@
                               class="chzn-select-deselect location-picker-width" noSelection="['null':'All']"
                               from="${destinations}" />
 
-            <g:submitButton id="refresh-btn" name="Refresh data" value="Refresh data" class="button" style="margin-left: 10px;" />
+            <g:submitButton
+                id="refresh-btn"
+                name="Refresh data"
+                value="${g.message(code: 'default.refreshData.label', default:'Refresh Data')}"
+                class="button"
+                style="margin-left: 10px;"
+            />
         </div>
     </g:formRemote>
     <div class="box">
@@ -53,7 +58,7 @@
                     <th><warehouse:message code="requisition.monthIssued.label" default="Month issued"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
-                    <th class="center middle"><warehouse:message code="requisitionItem.quantityDemand.label" default="Demand"/></th>
+                    <th class="center middle"><warehouse:message code="forecasting.demand.label" default="Demand"/></th>
                 </tr>
             </thead>
             <tbody>
@@ -188,7 +193,7 @@
 
             <tfoot>
                 <tr>
-                    <th><warehouse:message code="default.monthly.label" default="Monthly"/></th>
+                    <th><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityRequested/numberOfMonths}" maxFractionDigits="0"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityIssued/numberOfMonths}" maxFractionDigits="0"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityDemand/numberOfMonths}" maxFractionDigits="0"/></th>

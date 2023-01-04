@@ -62,6 +62,7 @@
                     </td>
                     <td class="value" id="demand">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                         <g:message code="default.month.perMonth.label" default="per month" />
                     </td>
                 </tr>
                 <tr class="prop">
@@ -70,6 +71,7 @@
                     </td>
                     <td class="value" id="onHandMonths">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                        <g:message code="default.month.months.label" default="months" />
                     </td>
                 </tr>
                 <tr class="prop">
@@ -78,6 +80,7 @@
                     </td>
                     <td class="value" id="stockoutDays">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
+                        <g:message code="product.details.days.label" default="days" />
                     </td>
                 </tr>
             </g:if>
@@ -398,14 +401,14 @@
 
       fetchData("${request.contextPath}/json/getForecastingData", data,
         function (data) {
-          $('#onHandMonths').html(data.onHandMonths.toFixed(1) + " months");
-          $('#demand').html(data.monthlyDemand + " per month");
+          $('#onHandMonths').prepend(data.onHandMonths.toFixed(1)).children().remove(".spinner")
+          $('#demand').prepend(data.monthlyDemand).children().remove(".spinner")
         }
       );
 
       fetchData("${request.contextPath}/json/getStockoutData", data,
         function (data) {
-          $('#stockoutDays').html(data.stockoutDays + " days");
+          $('#stockoutDays').prepend(data.stockoutDays).children().remove(".spinner")
         }
       )
 

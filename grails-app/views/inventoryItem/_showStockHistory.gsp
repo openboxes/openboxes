@@ -199,7 +199,12 @@
             </div>
         </div>
     </h2>
-    <input type="text" id="stockHistoryFilter" class="text large" placeholder="Filter by serial number or lot number"/>
+    <input
+        type="text"
+        id="stockHistoryFilter"
+        class="text large"
+        placeholder="${g.message(code: 'inventory.stockHistory.search.label', default: 'Filter by serial number or lot number')}"
+    />
     <table id="stockHistoryTable" class="stockHistory">
         <thead>
             <tr class="odd">
@@ -219,7 +224,8 @@
                     ${warehouse.message(code: 'transaction.label')}
                 </th>
                 <th>
-                    ${warehouse.message(code: 'default.originOrDestination.label', default: "Origin / Destination")}
+                    ${warehouse.message(code: 'default.origin.label', default: "Origin")}&nbsp;/&nbsp;
+                    ${warehouse.message(code: 'order.destination.label', default: "Destination")}
                 </th>
                 <th class="border-right">
                     ${warehouse.message(code: 'default.reference.label')}
@@ -235,16 +241,16 @@
                 </th>
 
                 <th class="border-right center" width="7%">
-                    ${warehouse.message(code: 'transaction.count.label', default: 'Count')}
+                    ${warehouse.message(code: 'default.count.label', default: 'Count')}
                 </th>
                 <th class="border-right center" width="7%">
-                    ${warehouse.message(code: 'transaction.credit.label', default: 'Credit')}
+                    ${warehouse.message(code: 'default.credit.label', default: 'Credit')}
                 </th>
                 <th class="border-right center" width="7%">
-                    ${warehouse.message(code: 'transaction.debit.label', default: 'Debit')}
+                    ${warehouse.message(code: 'default.debit.label', default: 'Debit')}
                 </th>
                 <th class="center" width="7%">
-                    ${warehouse.message(code: 'stockCard.balance.label', default: 'Balance')}
+                    ${warehouse.message(code: 'report.quantityBalance.label', default: 'Balance')}
                 </th>
             </tr>
         </thead>

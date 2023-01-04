@@ -75,11 +75,11 @@
 						</g:link>
 						<g:link controller='inventoryItem' action='showRecordInventory' params="['product.id':productInstance?.id]" class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
-							${warehouse.message(code: 'product.button.record.label', default: 'Record stock')}
+							${warehouse.message(code: 'inventory.record.label', default: 'Record stock')}
 						</g:link>
 						<g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-							${warehouse.message(code: 'product.button.edit.label', default: 'Edit product', args:['product'])}
+							${warehouse.message(code: 'default.edit.label', args:[g.message(code: 'product.label', 'product')])}
 						</g:link>
 						<g:isUserManager>
 							<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]" class="button">
@@ -89,7 +89,7 @@
 						</g:isUserManager>
 						<g:link controller="stocklistManagement" action="index" id="${productInstance?.id}" class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'application_side_list.png')}"/>&nbsp;
-							${warehouse.message(code: 'button.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
+							${warehouse.message(code: 'default.manage.label', default: 'Manage stock lists', args:[warehouse.message(code:'requisitionTemplates.label')])}
 						</g:link>
 					</div>
 
@@ -98,7 +98,7 @@
 							<g:link controller="product" action="createProductSnapshot" id="${productInstance?.id}" class="button"
 									onclick="return confirm('${warehouse.message(code: 'default.button.confirm.message', default: 'Are you sure?')}');">
 								<img src="${resource(dir: 'images/icons/silk', file: 'camera.png')}"/>&nbsp;
-								<warehouse:message code="product.createSnapshot.label" default="Create Snapshot"/>
+								<warehouse:message code="default.create.label" default="Create Snapshot" args="[g.message(code: 'snapshot.label', default:' Snapshot')]"/>
 							</g:link>
 							<g:link controller="migration" action="migrateProduct" id="${productInstance?.id}" class="button"
 									onclick="return confirm('${warehouse.message(code: 'default.button.confirm.message', default: 'Are you sure?')}');">
