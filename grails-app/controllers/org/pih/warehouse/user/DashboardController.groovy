@@ -78,6 +78,10 @@ class DashboardController {
 
         List<Shipment> shipments = Shipment.findAllByShipmentNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
         if (shipments) {
+            // sort in descending order list of shipments based on a shipment dateCreated value or returnOrder dateCreated of that shipments
+            shipments = shipments.sort {a,b ->
+                (b.returnOrder?.dateCreated ?: b.dateCreated) <=> (a.returnOrder?.dateCreated ?: a.dateCreated)
+            }
             Shipment shipment = shipments.first()
             redirect(controller: "stockMovement", action: "show", id: shipment.returnOrder?.id ?: shipment.id)
             return
