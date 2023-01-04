@@ -12,18 +12,24 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockListTableData = (filterParams) => {
-  const messageId = 'react.stocklists.fetch.fail.label';
+  const errorMessageId = 'react.stocklists.fetch.fail.label';
   const defaultMessage = 'Unable to fetch stock transfers';
 
-  const getParams = (offset, currentLocation, state, sortingParams) => {
-    const { isPublished, ...otherFilterParams } = filterParams;
+  const getParams = ({
+    offset,
+    state,
+    sortingParams,
+  }) => {
+    const {
+      isPublished, origin, destination, ...otherFilterParams
+    } = filterParams;
     return _.omitBy({
       ...otherFilterParams,
       offset: `${offset}`,
       max: `${state.pageSize}`,
       includeUnpublished: isPublished,
-      origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
-      destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
+      origin: origin && origin.map(({ id }) => id),
+      destination: destination && destination.map(({ id }) => id),
       ...sortingParams,
     }, (value) => {
       if (typeof value === 'object' && _.isEmpty(value)) return true;
@@ -40,7 +46,7 @@ const useStockListTableData = (filterParams) => {
   } = useTableData({
     filterParams,
     url: STOCKLIST_API,
-    messageId,
+    errorMessageId,
     defaultMessage,
     getParams,
   });

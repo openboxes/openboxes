@@ -14,28 +14,36 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePurchaseOrderListTableData = (filterParams) => {
-  const messageId = 'react.purchaseOrder.error.purchaseOrderList.label';
+  const errorMessageId = 'react.purchaseOrder.error.purchaseOrderList.label';
   const defaultMessage = 'Unable to fetch purchase orders';
   const [totalPrice, setTotalPrice] = useState(0);
   const defaultSorting = {
     sort: 'dateOrdered',
     order: 'desc',
   };
-  const getParams = (offset, currentLocation, state, sortingParams) => ({
-    ..._.omitBy({
-      offset: `${offset}`,
-      max: `${state.pageSize}`,
-      ...sortingParams,
-      ...filterParams,
-      status: filterParams.status &&
-        filterParams.status.map(status => status.value),
-      origin: filterParams.origin && filterParams.origin.id,
-      orderedBy: filterParams.orderedBy && filterParams.orderedBy.id,
-      createdBy: filterParams.createdBy && filterParams.createdBy.id,
-      destinationParty: filterParams.destinationParty?.id,
-    }, _.isEmpty),
-    destination: filterParams.destination?.id,
-  });
+  const getParams = ({
+    offset,
+    state,
+    sortingParams,
+  }) => {
+    const {
+      status, origin, orderedBy, createdBy, destinationParty, destination,
+    } = filterParams;
+    return {
+      ..._.omitBy({
+        offset: `${offset}`,
+        max: `${state.pageSize}`,
+        ...sortingParams,
+        ...filterParams,
+        status: status && status.map(statusElement => statusElement.value),
+        origin: origin?.id,
+        orderedBy: orderedBy?.id,
+        createdBy: createdBy?.id,
+        destinationParty: destinationParty?.id,
+      }, _.isEmpty),
+      destination: destination?.id,
+    };
+  };
 
   const { translate, isUserApprover } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
@@ -53,7 +61,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
   } = useTableData({
     filterParams,
     url: PURCHASE_ORDER_API,
-    messageId,
+    errorMessageId,
     defaultMessage,
     defaultSorting,
     getParams,

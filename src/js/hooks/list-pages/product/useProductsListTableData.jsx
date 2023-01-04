@@ -7,26 +7,33 @@ import { PRODUCT_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
 
 const useProductsListTableData = (filterParams) => {
-  const messageId = 'react.productsList.fetch.fail.label';
+  const errorMessageId = 'react.productsList.fetch.fail.label';
   const defaultMessage = 'Unable to fetch products';
   const defaultSorting = {
     sort: 'lastUpdated',
     order: 'desc',
   };
-  const getParams = (offset, currentLocation, tableState, sortingParams) => _.omitBy({
-    offset: `${offset}`,
-    max: `${tableState.pageSize}`,
-    ...sortingParams,
-    ...filterParams,
-    catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
-    categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
-    tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
-  }, (val) => {
-    if (typeof val === 'boolean') {
-      return !val;
-    }
-    return _.isEmpty(val);
-  });
+  const getParams = ({
+    offset,
+    state,
+    sortingParams,
+  }) => {
+    const { catalogId, categoryId, tagId } = filterParams;
+    return _.omitBy({
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      ...sortingParams,
+      ...filterParams,
+      catalogId: catalogId && catalogId.map(({ id }) => id),
+      categoryId: categoryId && categoryId.map(({ id }) => id),
+      tagId: tagId && tagId.map(({ id }) => id),
+    }, (val) => {
+      if (typeof val === 'boolean') {
+        return !val;
+      }
+      return _.isEmpty(val);
+    });
+  };
   const {
     tableRef,
     loading,
@@ -35,7 +42,7 @@ const useProductsListTableData = (filterParams) => {
   } = useTableData({
     filterParams,
     url: PRODUCT_API,
-    messageId,
+    errorMessageId,
     defaultMessage,
     defaultSorting,
     getParams,

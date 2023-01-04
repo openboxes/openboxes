@@ -14,26 +14,34 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useOutboundListTableData = (filterParams) => {
-  const messageId = 'react.stockMovement.outbound.fetching.error';
+  const errorMessageId = 'react.stockMovement.outbound.fetching.error';
   const defaultMessage = 'Unable to fetch outbound movements';
 
-  const getParams = (offset, currentLocation, state, sortingParams) => _.omitBy({
-    ...filterParams,
-    offset: `${offset}`,
-    max: `${state.pageSize}`,
-    requisitionStatusCode: filterParams.requisitionStatusCode &&
-              filterParams.requisitionStatusCode?.map(({ id }) => id),
-    requestType: filterParams?.requestType?.value,
-    origin: filterParams?.origin?.id,
-    destination: filterParams?.destination?.id,
-    requestedBy: filterParams.requestedBy?.id,
-    createdBy: filterParams.createdBy?.id,
-    updatedBy: filterParams.updatedBy?.id,
-    ...sortingParams,
-  }, (value) => {
-    if (typeof value === 'object' && _.isEmpty(value)) return true;
-    return !value;
-  });
+  const getParams = ({
+    offset,
+    state,
+    sortingParams,
+  }) => {
+    const {
+      requisitionStatusCode, requestType, origin, destination, requestedBy, createdBy, updatedBy,
+    } = filterParams;
+    return _.omitBy({
+      ...filterParams,
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      requisitionStatusCode: requisitionStatusCode && requisitionStatusCode.map(({ id }) => id),
+      requestType: requestType?.value,
+      origin: origin?.id,
+      destination: destination?.id,
+      requestedBy: requestedBy?.id,
+      createdBy: createdBy?.id,
+      updatedBy: updatedBy?.id,
+      ...sortingParams,
+    }, (value) => {
+      if (typeof value === 'object' && _.isEmpty(value)) return true;
+      return !value;
+    });
+  };
   const {
     tableRef,
     fireFetchData,
@@ -43,7 +51,7 @@ const useOutboundListTableData = (filterParams) => {
   } = useTableData({
     filterParams,
     url: STOCK_MOVEMENT_API,
-    messageId,
+    errorMessageId,
     defaultMessage,
     getParams,
   });
@@ -56,7 +64,7 @@ const useOutboundListTableData = (filterParams) => {
   }));
 
   useEffect(() => {
-    if (!isRequisitionStatusesFetched || requisitionStatuses.length === 0) {
+    if (!isRequisitionStatusesFetched || !requisitionStatuses.length) {
       dispatch(fetchRequisitionStatusCodes());
     }
   }, []);

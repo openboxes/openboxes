@@ -12,7 +12,7 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 const useTableData = ({
   filterParams,
   url,
-  messageId,
+  errorMessageId,
   defaultMessage,
   getParams,
   onFetchedData,
@@ -61,8 +61,12 @@ const useTableData = ({
         sort: tableState.sorted[0].id,
         order: tableState.sorted[0].desc ? 'desc' : 'asc',
       } : defaultSorting);
-      const params = getParams(offset, currentLocation, tableState, sortingParams);
-
+      const params = getParams({
+        offset,
+        currentLocation,
+        state: tableState,
+        sortingParams,
+      });
       // Fetch data
       setLoading(true);
       apiClient.get(url, {
@@ -77,9 +81,10 @@ const useTableData = ({
             pages: Math.ceil(res.data.totalCount / tableState.pageSize),
             currentParams: params,
           });
-          if (onFetchedData) onFetchedData(res.data);
+          // eslint-disable-next-line no-unused-expressions
+          onFetchedData?.(res.data);
         })
-        .catch(() => Promise.reject(new Error(translate(messageId, defaultMessage))))
+        .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultMessage))))
         .finally(() => setLoading(false));
     }
   }, [filterParams]);

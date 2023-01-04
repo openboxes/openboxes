@@ -11,21 +11,29 @@ import useTableData from 'hooks/list-pages/useTableData';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockTransferListTableData = (filterParams) => {
-  const messageId = 'react.stockTransfer.fetch.fail.label';
+  const errorMessageId = 'react.stockTransfer.fetch.fail.label';
   const defaultMessage = 'Unable to fetch stock transfers';
   const defaultSorting = {
     sort: 'dateCreated',
     order: 'desc',
   };
-  const getParams = (offset, currentLocation, tableState, sortingParams) => _.omitBy({
-    location: currentLocation?.id,
-    offset: `${offset}`,
-    max: `${tableState.pageSize}`,
-    ...sortingParams,
-    ...filterParams,
-    createdBy: filterParams.createdBy?.id,
-    status: filterParams.status && filterParams.status.map(({ value }) => value),
-  }, _.isEmpty);
+  const getParams = ({
+    offset,
+    currentLocation,
+    state,
+    sortingParams,
+  }) => {
+    const { createdBy, status } = filterParams;
+    return _.omitBy({
+      location: currentLocation?.id,
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      ...sortingParams,
+      ...filterParams,
+      createdBy: createdBy?.id,
+      status: status && status.map(({ value }) => value),
+    }, _.isEmpty);
+  };
 
   const {
     tableRef,
@@ -36,7 +44,7 @@ const useStockTransferListTableData = (filterParams) => {
   } = useTableData({
     filterParams,
     url: STOCK_TRANSFER_API,
-    messageId,
+    errorMessageId,
     defaultMessage,
     defaultSorting,
     getParams,

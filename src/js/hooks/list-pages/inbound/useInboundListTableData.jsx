@@ -14,24 +14,32 @@ import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInboundListTableData = (filterParams) => {
-  const messageId = 'react.stockMovement.inbound.fetching.error';
+  const errorMessageId = 'react.stockMovement.inbound.fetching.error';
   const defaultMessage = 'Unable to fetch inbound movements';
-  const getParams = (offset, currentLocation, state, sortingParams) => _.omitBy({
-    ...filterParams,
-    offset: `${offset}`,
-    max: `${state.pageSize}`,
-    receiptStatusCode: filterParams.receiptStatusCode &&
-              filterParams.receiptStatusCode?.map(({ id }) => id),
-    origin: filterParams?.origin?.id,
-    destination: filterParams?.destination?.id,
-    requestedBy: filterParams.requestedBy?.id,
-    createdBy: filterParams.createdBy?.id,
-    updatedBy: filterParams.updatedBy?.id,
-    ...sortingParams,
-  }, (value) => {
-    if (typeof value === 'object' && _.isEmpty(value)) return true;
-    return !value;
-  });
+  const getParams = ({
+    offset,
+    state,
+    sortingParams,
+  }) => {
+    const {
+      receiptStatusCode, origin, destination, requestedBy, createdBy, updatedBy,
+    } = filterParams;
+    return _.omitBy({
+      ...filterParams,
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      receiptStatusCode: receiptStatusCode && receiptStatusCode.map(({ id }) => id),
+      origin: origin?.id,
+      destination: destination?.id,
+      requestedBy: requestedBy?.id,
+      createdBy: createdBy?.id,
+      updatedBy: updatedBy?.id,
+      ...sortingParams,
+    }, (value) => {
+      if (typeof value === 'object' && _.isEmpty(value)) return true;
+      return !value;
+    });
+  };
   const {
     tableRef,
     fireFetchData,
@@ -41,7 +49,7 @@ const useInboundListTableData = (filterParams) => {
   } = useTableData({
     filterParams,
     url: STOCK_MOVEMENT_API,
-    messageId,
+    errorMessageId,
     defaultMessage,
     getParams,
   });
@@ -55,7 +63,7 @@ const useInboundListTableData = (filterParams) => {
 
 
   useEffect(() => {
-    if (!isShipmentStatusesFetched || shipmentStatuses.length === 0) {
+    if (!isShipmentStatusesFetched || !shipmentStatuses.length) {
       dispatch(fetchShipmentStatusCodes());
     }
   }, []);
