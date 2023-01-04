@@ -96,11 +96,11 @@
                 <div class="button-group right">
                     <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
-                        <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
+                        <warehouse:message code="order.addComment.label" default="Add comment"/>
                     </g:link>
                     <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
-                        <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
+                        <warehouse:message code="order.addDocument.label" default="Add document"/>
                     </g:link>
                     <g:link controller="putAway" action="generatePdf" id="${orderInstance?.id}" class="button" target="_blank">
                         <img src="${resource(dir: 'images/icons', file: 'pdf.png')}" />&nbsp;
@@ -143,11 +143,11 @@
                             <div class="button-group">
                                 <g:link controller="order" action="addComment" id="${orderInstance?.id}" class="button">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
-                                    <warehouse:message code="order.wizard.addComment.label" default="Add comment"/>
+                                    <warehouse:message code="order.addComment.label" default="Add comment"/>
                                 </g:link>
                                 <g:link controller="order" action="addDocument" id="${orderInstance?.id}" class="button">
                                     <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
-                                    <warehouse:message code="order.wizard.addDocument.label" default="Add document"/>
+                                    <warehouse:message code="order.addDocument.label" default="Add document"/>
                                 </g:link>
                             </div>
                         </g:supports>
