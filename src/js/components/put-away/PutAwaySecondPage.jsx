@@ -24,6 +24,10 @@ import 'react-table/react-table.css';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
+function isInvalid(quantity, quantityAvailable) {
+  return (quantity > quantityAvailable) || quantity < 1;
+}
+
 /**
  * The second page of put-away where user can choose put-away bin, split a line
  * or generate put-away list(pdf). It can be sorted either by shipment or by product.
@@ -35,6 +39,8 @@ class PutAwaySecondPage extends Component {
     this.fetchItems = this.fetchItems.bind(this);
     this.editItem = this.editItem.bind(this);
     const columns = this.getColumns();
+    this.isQuantityHigherThanOriginal = props?.value > props.original?.quantityAvailable;
+    this.isQuantityLowerThan1 = props?.value < 1;
 
     const {
       initialValues:
@@ -98,6 +104,7 @@ class PutAwaySecondPage extends Component {
    * Returns an array of columns which are passed to the table.
    * @public
    */
+
   getColumns = () => [
     {
       Header: <Translate id="react.putAway.code.label" defaultMessage="Code" />,
@@ -133,14 +140,14 @@ class PutAwaySecondPage extends Component {
         const edit = _.get(this.state.putAway.putawayItems, `[${itemIndex}].edit`);
         let disabledMessage;
 
-        if (props.value < 1) {
+        if (this.isQuantityLowerThan1) {
           disabledMessage = this.props.translate(
             'react.putAway.negativeQuantity.label',
             'Quantity cannot be lower than 1',
           );
         }
 
-        if (props.original && props.value > props.original.quantityAvailable) {
+        if (this.isQuantityHigherThanOriginal) {
           disabledMessage = this.props.translate(
             'react.putAway.higherQuantity.label',
             'Quantity cannot be higher than original putaway item quantity',
@@ -158,9 +165,7 @@ class PutAwaySecondPage extends Component {
               duration="250"
               hideDelay="50"
             >
-              <div className={props.value > props.original.quantityAvailable ||
-              props.value < 1 ? 'has-error' : ''}
-              >
+              <div className={this.isQuantityHigherThanOriginal || this.isQuantityLowerThan1 ? 'has-error' : ''}>
                 <input
                   type="number"
                   className="form-control form-control-xs"
@@ -187,7 +192,7 @@ class PutAwaySecondPage extends Component {
             duration="250"
             hideDelay="50"
           >
-            <div className={(props.original && props.value > props.original.quantityAvailable) || props.value < 1 ? 'has-error' : ''}>
+            <div className={isInvalid(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
               <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
             </div>
           </Tooltip>
@@ -460,6 +465,7 @@ class PutAwaySecondPage extends Component {
    * Save put-away and go to next page.
    * @public
    */
+
   nextPage() {
     if (_.some(this.state.putAway.putawayItems, putawayItem =>
       putawayItem.quantity > putawayItem.quantityAvailable)) {
@@ -614,8 +620,7 @@ class PutAwaySecondPage extends Component {
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                (putawayItem.quantity > putawayItem.quantityAvailable) ||
-                putawayItem.quantity < 1)}
+                isInvalid(putawayItem.quantity, putawayItem.quantityAvailable))}
             ><Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
           </span>
@@ -639,7 +644,7 @@ class PutAwaySecondPage extends Component {
         <div className="submit-buttons">
           <button
             disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                (putawayItem.quantity > putawayItem.quantityAvailable) || putawayItem.quantity < 1)}
+                isInvalid(putawayItem.quantity, putawayItem.quantityAvailable))}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
@@ -663,6 +668,11 @@ export default connect(
   },
 )(PutAwaySecondPage);
 
+PutAwaySecondPage.defaultProps = {
+  original: {},
+};
+
+
 PutAwaySecondPage.propTypes = {
   /** Function called when data is loading */
   showSpinner: PropTypes.func.isRequired,
@@ -677,6 +687,9 @@ PutAwaySecondPage.propTypes = {
     pivotBy: PropTypes.arrayOf(PropTypes.shape({})),
     expanded: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
+  original: PropTypes.shape({
+    quantityAvailable: PropTypes.number,
+  }),
   match: PropTypes.shape({
     params: PropTypes.shape({
       putAwayId: PropTypes.string,
