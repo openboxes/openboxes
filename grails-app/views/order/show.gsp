@@ -281,19 +281,25 @@
                 });
             });
 
-            function filterTableItems(cellIndex, filterValue, tableRows) {
+            function filterTableItems(cellsIndex, filterValue, tableRows) {
               // Loop through all table rows, and hide those who don't match the search query
               $.each(tableRows, function(index, currentRow) {
                 // If filter matches text value then we display, otherwise hide
-                const txtValue = $(currentRow)
-                  .find("td")
-                  .eq(cellIndex)
-                  .text();
-                if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+
+                // Make one string from cells values at given indexes
+                const txtValue = cellsIndex.reduce((acc, index) => {
+                  const cellValue = $(currentRow)
+                    .find("td")
+                    .eq(index)
+                    .text();
+                  return acc + cellValue
+                }, '');
+                // If concated string includes the filter value, show the row, otherwise hide
+                if (txtValue.toUpperCase().includes(filterValue)) {
                   $(currentRow).show();
-                } else {
-                  $(currentRow).hide();
+                  return;
                 }
+                $(currentRow).hide();
               });
             }
         </script>
