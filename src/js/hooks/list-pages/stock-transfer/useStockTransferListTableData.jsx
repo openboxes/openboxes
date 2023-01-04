@@ -5,12 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import stockTransferApi from 'api/services/StockTransferApi';
+import { STOCK_TRANSFER_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
-import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockTransferListTableData = (filterParams) => {
-  const url = '/openboxes/api/stockTransfers';
   const messageId = 'react.stockTransfer.fetch.fail.label';
   const defaultMessage = 'Unable to fetch stock transfers';
   const defaultSorting = {
@@ -35,7 +35,7 @@ const useStockTransferListTableData = (filterParams) => {
     onFetchHandler,
   } = useTableData({
     filterParams,
-    url,
+    url: STOCK_TRANSFER_API,
     messageId,
     defaultMessage,
     defaultSorting,
@@ -47,19 +47,18 @@ const useStockTransferListTableData = (filterParams) => {
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
 
-  const deleteStockTransfer = (id) => {
+  const deleteStockTransfer = async (id) => {
     dispatch(showSpinner());
-    apiClient.delete(`/openboxes/api/stockTransfers/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          dispatch(hideSpinner());
-          const successMessage = translate('react.stockTransfer.delete.success.label', 'Stock transfer has been deleted successfully');
-          Alert.success(successMessage);
-        }
-      }).finally(() => {
-        dispatch(hideSpinner());
-        fireFetchData();
-      });
+    try {
+      const { status } = await stockTransferApi.deleteStockTransfer(id);
+      if (status === 204) {
+        const successMessage = translate('react.stockTransfer.delete.success.label', 'Stock transfer has been deleted successfully');
+        Alert.success(successMessage);
+      }
+    } finally {
+      dispatch(hideSpinner());
+      fireFetchData();
+    }
   };
 
   const deleteHandler = (id) => {

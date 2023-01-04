@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import stockListApi from 'api/services/StockListApi';
+import { STOCKLIST_API, STOCKLIST_EXPORT } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
-import apiClient from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockListTableData = (filterParams) => {
-  const url = '/openboxes/api/stocklists';
   const messageId = 'react.stocklists.fetch.fail.label';
   const defaultMessage = 'Unable to fetch stock transfers';
 
@@ -39,7 +39,7 @@ const useStockListTableData = (filterParams) => {
     onFetchHandler,
   } = useTableData({
     filterParams,
-    url,
+    url: STOCKLIST_API,
     messageId,
     defaultMessage,
     getParams,
@@ -52,7 +52,7 @@ const useStockListTableData = (filterParams) => {
 
   const exportStockList = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stocklists',
+      url: STOCKLIST_API,
       params: {
         ...tableData.currentParams,
       },
@@ -61,24 +61,25 @@ const useStockListTableData = (filterParams) => {
 
   const exportStockListItems = (id) => {
     exportFileFromAPI({
-      url: `/openboxes/api/stocklists/${id}/export`,
+      url: STOCKLIST_EXPORT(id),
     });
   };
 
 
-  const deleteStocklists = (id) => {
+  const deleteStocklists = async (id) => {
     dispatch(showSpinner());
-    apiClient.delete(`/openboxes/api/stocklists/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          Alert.success(translate(
-            'react.stocklists.delete.success.label',
-            'Stock List has been deleted successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => dispatch(hideSpinner()));
+    try {
+      const { status } = await stockListApi.deleteStockList(id);
+      if (status === 204) {
+        Alert.success(translate(
+          'react.stocklists.delete.success.label',
+          'Stock List has been deleted successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
   const onClickDeleteStocklists = (id) => {
@@ -102,19 +103,20 @@ const useStockListTableData = (filterParams) => {
     });
   };
 
-  const clearStocklists = (id) => {
+  const clearStocklists = async (id) => {
     dispatch(showSpinner());
-    apiClient.post(`/openboxes/api/stocklists/${id}/clear`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.clear.success.label',
-            'Stock List has been cleared Stock List has been cloned successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => dispatch(hideSpinner()));
+    try {
+      const { status } = await stockListApi.clearStockList(id);
+      if (status === 200) {
+        Alert.success(translate(
+          'react.stocklists.clear.success.label',
+          'Stock List has been cleared Stock List has been cloned successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
   const onClickClearStocklists = (id) => {
@@ -138,49 +140,52 @@ const useStockListTableData = (filterParams) => {
     });
   };
 
-  const cloneStocklists = (id) => {
+  const cloneStocklists = async (id) => {
     dispatch(showSpinner());
-    apiClient.post(`/openboxes/api/stocklists/${id}/clone`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.clone.success.label',
-            'Stock List has been cloned successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => dispatch(hideSpinner()));
+    try {
+      const { status } = await stockListApi.cloneStockList(id);
+      if (status === 200) {
+        Alert.success(translate(
+          'react.stocklists.clone.success.label',
+          'Stock List has been cloned successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
-  const publishStocklists = (id) => {
+  const publishStocklists = async (id) => {
     dispatch(showSpinner());
-    apiClient.post(`/openboxes/api/stocklists/${id}/publish`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.publish.success.label',
-            'Stock List has been published successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => dispatch(hideSpinner()));
+    try {
+      const { status } = await stockListApi.publishStockList(id);
+      if (status === 200) {
+        Alert.success(translate(
+          'react.stocklists.publish.success.label',
+          'Stock List has been published successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
-  const unpublishStocklists = (id) => {
+  const unpublishStocklists = async (id) => {
     dispatch(showSpinner());
-    apiClient.post(`/openboxes/api/stocklists/${id}/unpublish`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.unpublish.success.label',
-            'Stock List has been unpublished successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => dispatch(hideSpinner()));
+    try {
+      const { status } = await stockListApi.unpublishStockList(id);
+      if (status === 200) {
+        Alert.success(translate(
+          'react.stocklists.unpublish.success.label',
+          'Stock List has been unpublished successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
   return {

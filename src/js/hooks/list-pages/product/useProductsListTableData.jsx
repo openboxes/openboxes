@@ -2,11 +2,11 @@ import fileDownload from 'js-file-download';
 import _ from 'lodash';
 import queryString from 'query-string';
 
+import productApi from 'api/services/ProductApi';
+import { PRODUCT_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
-import apiClient from 'utils/apiClient';
 
 const useProductsListTableData = (filterParams) => {
-  const url = '/openboxes/api/products';
   const messageId = 'react.productsList.fetch.fail.label';
   const defaultMessage = 'Unable to fetch products';
   const defaultSorting = {
@@ -34,14 +34,14 @@ const useProductsListTableData = (filterParams) => {
     onFetchHandler,
   } = useTableData({
     filterParams,
-    url,
+    url: PRODUCT_API,
     messageId,
     defaultMessage,
     defaultSorting,
     getParams,
   });
 
-  const exportProducts = (allProducts = false, withAttributes = false) => {
+  const exportProducts = async (allProducts = false, withAttributes = false) => {
     const params = () => {
       if (allProducts) {
         return { format: 'csv' };
@@ -55,16 +55,15 @@ const useProductsListTableData = (filterParams) => {
       };
     };
 
-    apiClient.get('/openboxes/api/products', {
+    const config = {
       params: params(),
       paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        const date = new Date();
-        const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
-        const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-        fileDownload(res.data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
-      });
+    };
+    const { data } = await productApi.getProducts(config);
+    const date = new Date();
+    const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
+    const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
+    fileDownload(data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
   };
   return {
     tableData, tableRef, loading, onFetchHandler, exportProducts,

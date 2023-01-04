@@ -7,13 +7,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import purchaseOrderApi from 'api/services/PurchaseOrderApi';
+import { PURCHASE_ORDER_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
-import apiClient from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePurchaseOrderListTableData = (filterParams) => {
-  const url = '/openboxes/api/purchaseOrders';
   const messageId = 'react.purchaseOrder.error.purchaseOrderList.label';
   const defaultMessage = 'Unable to fetch purchase orders';
   const [totalPrice, setTotalPrice] = useState(0);
@@ -52,7 +52,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
     tableData,
   } = useTableData({
     filterParams,
-    url,
+    url: PURCHASE_ORDER_API,
     messageId,
     defaultMessage,
     defaultSorting,
@@ -62,7 +62,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
 
   const downloadOrders = (orderItems) => {
     exportFileFromAPI({
-      url: '/openboxes/api/purchaseOrders',
+      url: PURCHASE_ORDER_API,
       filename: orderItems ? 'OrdersLineDetails.csv' : 'Orders',
       params: {
         ..._.omit(tableData.currentParams, 'offset', 'max'),
@@ -71,19 +71,18 @@ const usePurchaseOrderListTableData = (filterParams) => {
     });
   };
 
-  const deleteOrder = (id) => {
+  const deleteOrder = async (id) => {
     dispatch(showSpinner());
-    apiClient.delete(`/openboxes/api/purchaseOrders/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          const successMessage = translate('react.purchaseOrder.delete.success.label', 'Purchase order has been deleted successfully');
-          Alert.success(successMessage);
-        }
-      })
-      .finally(() => {
-        dispatch(hideSpinner());
-        fireFetchData();
-      });
+    try {
+      const { status } = await purchaseOrderApi.deleteOrder(id);
+      if (status === 204) {
+        const successMessage = translate('react.purchaseOrder.delete.success.label', 'Purchase order has been deleted successfully');
+        Alert.success(successMessage);
+      }
+    } finally {
+      dispatch(hideSpinner());
+      fireFetchData();
+    }
   };
 
   const deleteHandler = (id) => {
@@ -105,17 +104,20 @@ const usePurchaseOrderListTableData = (filterParams) => {
     });
   };
 
-  const rollbackOrder = (id) => {
-    apiClient.post(`/openboxes/api/purchaseOrders/${id}/rollback`)
-      .then((response) => {
-        if (response.status === 200) {
-          Alert.success(translate(
-            'react.purchaseOrder.rollback.success.label',
-            'Rollback of order status has been done successfully',
-          ));
-          fireFetchData();
-        }
-      });
+  const rollbackOrder = async (id) => {
+    dispatch(showSpinner());
+    try {
+      const { status } = await purchaseOrderApi.rollbackOrder(id);
+      if (status === 200) {
+        Alert.success(translate(
+          'react.purchaseOrder.rollback.success.label',
+          'Rollback of order status has been done successfully',
+        ));
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
   const rollbackHandler = (id) => {

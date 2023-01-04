@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
+import { INVOICE_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
 
 const useInvoiceListTableData = (filterParams) => {
-  const url = '/openboxes/api/invoices';
   const messageId = 'react.invoice.error.fetching.label';
   const defaultMessage = 'Unable to fetch invoices';
   const defaultSorting = {
@@ -30,7 +30,7 @@ const useInvoiceListTableData = (filterParams) => {
     onFetchHandler,
   } = useTableData({
     filterParams,
-    url,
+    url: INVOICE_API,
     messageId,
     defaultMessage,
     defaultSorting,

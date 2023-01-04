@@ -7,13 +7,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchShipmentStatusCodes, hideSpinner, showSpinner } from 'actions';
+import stockMovementApi from 'api/services/StockMovementApi';
+import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_INCOMING_ITEMS } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
-import apiClient from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInboundListTableData = (filterParams) => {
-  const url = '/openboxes/api/stockMovements';
   const messageId = 'react.stockMovement.inbound.fetching.error';
   const defaultMessage = 'Unable to fetch inbound movements';
   const getParams = (offset, currentLocation, state, sortingParams) => _.omitBy({
@@ -40,7 +40,7 @@ const useInboundListTableData = (filterParams) => {
     onFetchHandler,
   } = useTableData({
     filterParams,
-    url,
+    url: STOCK_MOVEMENT_API,
     messageId,
     defaultMessage,
     getParams,
@@ -62,32 +62,33 @@ const useInboundListTableData = (filterParams) => {
 
   const exportStockMovements = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements',
+      url: STOCK_MOVEMENT_API,
       params: tableData.currentParams,
     });
   };
 
   const exportAllIncomingItems = () => {
     exportFileFromAPI({
-      url: '/openboxes/api/stockMovements/shippedItems',
+      url: STOCK_MOVEMENT_INCOMING_ITEMS,
       params: tableData.currentParams,
     });
   };
 
-  const deleteReturnStockMovement = (id) => {
+  const deleteReturnStockMovement = async (id) => {
     dispatch(showSpinner());
-    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          const successMessage = translate(
-            'react.stockMovement.deleted.success.message.label',
-            'Stock Movement has been deleted successfully',
-          );
-          Alert.success(successMessage);
-          fireFetchData();
-        }
-      })
-      .finally(() => dispatch(hideSpinner()));
+    try {
+      const { status } = await stockMovementApi.deleteStockMovement(id);
+      if (status === 204) {
+        const successMessage = translate(
+          'react.stockMovement.deleted.success.message.label',
+          'Stock Movement has been deleted successfully',
+        );
+        Alert.success(successMessage);
+        fireFetchData();
+      }
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
   const deleteConfirmAlert = (id) => {
