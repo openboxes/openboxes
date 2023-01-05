@@ -113,6 +113,8 @@ const GlobalSearch = ({
           classNamePrefix="app-global-search"
           autoFocus
           openMenuOnClick={false}
+          loadingMessage={() => translate('react.default.loading.label', 'Loading...')}
+          noOptionsMessage={() => translate('react.default.noOptions.label', 'No options')}
           loadOptions={searchItems}
           onKeyDown={onKeyPressHandler}
           onChange={onOptionSelectedHandler}

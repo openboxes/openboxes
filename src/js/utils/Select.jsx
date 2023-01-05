@@ -47,7 +47,7 @@ const Menu = (props) => {
               role="button"
               tabIndex={0}
             >
-              <span><i className="fa fa-plus pr-2" />{props.selectProps.createNewFromModalLabel}</span>
+              <span><i className="fa fa-plus pr-2" /><Translate id={props.selectProps.createNewFromModalLabel} defaultMessage={props.selectProps.defaultMessage} /></span>
             </div>
           }
           {props.children}
@@ -65,6 +65,7 @@ Menu.propTypes = {
     createNewFromModal: PropTypes.bool.isRequired,
     newOptionModalOpen: PropTypes.func.isRequired,
     createNewFromModalLabel: PropTypes.string.isRequired,
+    defaultMessage: PropTypes.string.isRequired,
   }).isRequired,
 };
 
@@ -101,7 +102,6 @@ class Select extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.getTooltipHtml = this.getTooltipHtml.bind(this);
   }
-
   getTooltipHtml() {
     const {
       multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
@@ -348,7 +348,6 @@ class Select extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
-
 
 export default connect(mapStateToProps)(Select);
 

@@ -91,7 +91,8 @@ const FIELDS = {
     defaultMessage: 'Destination',
     attributes: {
       createNewFromModal: true,
-      createNewFromModalLabel: 'Add Destination',
+      createNewFromModalLabel: 'react.stockMovement.addDestination.label',
+      defaultMessage: 'Add Destination',
       required: true,
       async: true,
       showValueTooltip: true,
