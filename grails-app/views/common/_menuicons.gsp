@@ -70,7 +70,7 @@
                         </span>
                         <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]" />
                     </g:link>
-                    <g:if test="${session?.useDebugLocale }">
+                    <g:if test="${session?.useDebugLocale}">
                         <g:link controller="user" action="disableLocalizationMode" class="dropdown-item">
                             <span class="icon">
                                 <i class="ri-map-pin-line"></i>
@@ -133,7 +133,7 @@
                     </span>
                     <g:message code="default.edit.label" args="[g.message(code:'user.profile.label')]" />
                 </g:link>
-                <g:if test="${session?.useDebugLocale }">
+                <g:if test="${session?.useDebugLocale}">
                     <g:link controller="user" action="disableLocalizationMode" class="dropdown-item">
                         <span class="icon">
                             <i class="ri-map-pin-line"></i>

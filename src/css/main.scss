@@ -137,6 +137,24 @@ body {
   div {
     a {
       color: $gray-delta;
+      padding: 1px;
+    }
+
+    button {
+      color: $gray-delta;
+      background: none;
+      border: none;
+      padding: 1px;
+
+      &:focus {
+        background: none;
+        border: none;
+        outline: 0;
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }

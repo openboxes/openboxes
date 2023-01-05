@@ -61,7 +61,7 @@ class ApiController {
         if (!locale) {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
-        session.user.locale = locale
+        session.locale = locale
         render([status: 200, text: "Current language is ${locale}"])
     }
 
@@ -88,6 +88,8 @@ class ApiController {
         def localizationMode
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
+        def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
+
         if (session.useDebugLocale) {
 
             localizationMode = [
@@ -197,7 +199,8 @@ class ApiController {
                 currencyCode         : currencyCode,
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
-                localizationModeEnabled : localizationModeEnabled
+                localizationModeEnabled : localizationModeEnabled,
+                localizationModeLocale : localizationModeLocale
             ],
         ] as JSON)
     }

@@ -50,7 +50,7 @@
                                     </g:link>
                                 </li>
                             </g:else>
-                            <g:if test="${session.useDebugLocale }">
+                            <g:if test="${session?.useDebugLocale}">
                                 <li>
                                     <g:link controller="user" action="disableDebugMode">
                                         ${warehouse.message(code:'debug.disable.label', default: 'Disable debug mode')}

@@ -64,12 +64,12 @@ module.exports = {
     rules: [
       {
         enforce: 'pre',
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'eslint-loader',
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         use: ['cache-loader', 'babel-loader?presets[]=@babel/react&presets[]=@babel/env'],
         include: SRC,
         exclude: /node_modules/,

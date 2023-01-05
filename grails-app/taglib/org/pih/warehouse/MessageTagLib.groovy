@@ -28,7 +28,7 @@ class MessageTagLib {
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
         if (!databaseStoreEnabled) {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
             return
         }
@@ -37,9 +37,7 @@ class MessageTagLib {
         if (session.user) {
             def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
-
                 def message = localization.text
-
                 // If there are arguments, we need to get the
                 if (attrs?.args) {
                     message = messageSource.getMessage(attrs.code, null, attrs.default, session?.user?.locale)

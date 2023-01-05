@@ -72,6 +72,7 @@ const initialState = {
   isHelpScoutEnabled: false,
   loading: false,
   localizationModeEnabled: false,
+  localizationModeLocale: 'ach',
 };
 
 export default function (state = initialState, action) {
@@ -110,6 +111,7 @@ export default function (state = initialState, action) {
         isHelpScoutEnabled: _.get(action, 'payload.data.data.isHelpScoutEnabled'),
         loading: false,
         localizationModeEnabled: _.get(action, 'payload.data.data.localizationModeEnabled', false),
+        localizationModeLocale: _.get(action, 'payload.data.data.localizationModeLocale', 'ach'),
       };
     case FETCH_MENU_CONFIG:
       return {
