@@ -222,7 +222,13 @@
 			"oLanguage": {
 				"sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
 				"sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
-				"sInfo": "${g.message(code: 'default.dataTable.showingEntries.label', default: 'Showing _START_ to _END_ of _TOTAL_ entries')}",
+				"sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
+						"_START_" +
+						" ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
+						"_END_" +
+						" ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
+						"_TOTAL_" +
+						" ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
 				"sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
 				"sZeroRecords": "${g.message(code: 'default.dataTable.search.label', default: 'No records found')}",
 				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}"
