@@ -12,7 +12,7 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockTransferListTableData = (filterParams) => {
   const errorMessageId = 'react.stockTransfer.fetch.fail.label';
-  const defaultMessage = 'Unable to fetch stock transfers';
+  const defaultErrorMessage = 'Unable to fetch stock transfers';
   const defaultSorting = {
     sort: 'dateCreated',
     order: 'desc',
@@ -45,7 +45,7 @@ const useStockTransferListTableData = (filterParams) => {
     filterParams,
     url: STOCK_TRANSFER_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     defaultSorting,
     getParams,
   });

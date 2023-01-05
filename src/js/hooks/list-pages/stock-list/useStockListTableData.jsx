@@ -13,7 +13,7 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useStockListTableData = (filterParams) => {
   const errorMessageId = 'react.stocklists.fetch.fail.label';
-  const defaultMessage = 'Unable to fetch stock transfers';
+  const defaultErrorMessage = 'Unable to fetch stock transfers';
 
   const getParams = ({
     offset,
@@ -47,7 +47,7 @@ const useStockListTableData = (filterParams) => {
     filterParams,
     url: STOCKLIST_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     getParams,
   });
 

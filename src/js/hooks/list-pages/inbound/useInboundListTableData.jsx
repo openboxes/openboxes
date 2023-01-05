@@ -15,7 +15,7 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInboundListTableData = (filterParams) => {
   const errorMessageId = 'react.stockMovement.inbound.fetching.error';
-  const defaultMessage = 'Unable to fetch inbound movements';
+  const defaultErrorMessage = 'Unable to fetch inbound movements';
   const getParams = ({
     offset,
     state,
@@ -50,7 +50,7 @@ const useInboundListTableData = (filterParams) => {
     filterParams,
     url: STOCK_MOVEMENT_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     getParams,
   });
 

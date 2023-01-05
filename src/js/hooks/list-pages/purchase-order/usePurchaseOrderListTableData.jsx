@@ -15,7 +15,7 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePurchaseOrderListTableData = (filterParams) => {
   const errorMessageId = 'react.purchaseOrder.error.purchaseOrderList.label';
-  const defaultMessage = 'Unable to fetch purchase orders';
+  const defaultErrorMessage = 'Unable to fetch purchase orders';
   const [totalPrice, setTotalPrice] = useState(0);
   const defaultSorting = {
     sort: 'dateOrdered',
@@ -62,7 +62,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
     filterParams,
     url: PURCHASE_ORDER_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     defaultSorting,
     getParams,
     onFetchedData: data => setTotalPrice(data.totalPrice),

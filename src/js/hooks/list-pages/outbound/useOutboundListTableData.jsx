@@ -15,7 +15,7 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useOutboundListTableData = (filterParams) => {
   const errorMessageId = 'react.stockMovement.outbound.fetching.error';
-  const defaultMessage = 'Unable to fetch outbound movements';
+  const defaultErrorMessage = 'Unable to fetch outbound movements';
 
   const getParams = ({
     offset,
@@ -52,7 +52,7 @@ const useOutboundListTableData = (filterParams) => {
     filterParams,
     url: STOCK_MOVEMENT_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     getParams,
   });
 

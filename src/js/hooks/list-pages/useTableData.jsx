@@ -13,7 +13,7 @@ const useTableData = ({
   filterParams,
   url,
   errorMessageId,
-  defaultMessage,
+  defaultErrorMessage,
   getParams,
   onFetchedData,
   defaultSorting,
@@ -81,10 +81,11 @@ const useTableData = ({
             pages: Math.ceil(res.data.totalCount / tableState.pageSize),
             currentParams: params,
           });
-          // eslint-disable-next-line no-unused-expressions
-          onFetchedData?.(res.data);
+          if (onFetchedData) {
+            onFetchedData(res.data);
+          }
         })
-        .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultMessage))))
+        .catch(() => Promise.reject(new Error(translate(errorMessageId, defaultErrorMessage))))
         .finally(() => setLoading(false));
     }
   }, [filterParams]);

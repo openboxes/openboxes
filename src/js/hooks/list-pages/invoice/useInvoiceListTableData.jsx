@@ -5,7 +5,7 @@ import useTableData from 'hooks/list-pages/useTableData';
 
 const useInvoiceListTableData = (filterParams) => {
   const errorMessageId = 'react.invoice.error.fetching.label';
-  const defaultMessage = 'Unable to fetch invoices';
+  const defaultErrorMessage = 'Unable to fetch invoices';
   const defaultSorting = {
     sort: 'dateInvoiced',
     order: 'desc',
@@ -41,7 +41,7 @@ const useInvoiceListTableData = (filterParams) => {
     filterParams,
     url: INVOICE_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     defaultSorting,
     getParams,
   });

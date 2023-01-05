@@ -8,7 +8,7 @@ import useTableData from 'hooks/list-pages/useTableData';
 
 const useProductsListTableData = (filterParams) => {
   const errorMessageId = 'react.productsList.fetch.fail.label';
-  const defaultMessage = 'Unable to fetch products';
+  const defaultErrorMessage = 'Unable to fetch products';
   const defaultSorting = {
     sort: 'lastUpdated',
     order: 'desc',
@@ -43,7 +43,7 @@ const useProductsListTableData = (filterParams) => {
     filterParams,
     url: PRODUCT_API,
     errorMessageId,
-    defaultMessage,
+    defaultErrorMessage,
     defaultSorting,
     getParams,
   });
