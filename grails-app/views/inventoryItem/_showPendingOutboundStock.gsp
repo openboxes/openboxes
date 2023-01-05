@@ -1,5 +1,5 @@
 <div class="box dialog">
-    <h2><warehouse:message code="stockCard.pendingOutbound.label"/></h2>
+    <h2><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></h2>
 
     <g:form method="GET" action="showStockCard">
         <g:hiddenField name="product.id" value="${product?.id }"/>
