@@ -92,7 +92,7 @@ const NO_STOCKLIST_FIELDS = {
           locationId: originId,
           onExactProductSelected: ({ product }) => {
             if (focusField && product) {
-              focusField(rowIndex, 'quantityRequested');
+              focusField(rowIndex, 'quantityRequested', { enable: true });
             }
           },
         }),

@@ -17,7 +17,7 @@ const Option = option => (
 const SelectedValue = option => (
   <span className="d-flex align-items-center">
     <span className="text-truncate">{option.label}</span>
-    &nbsp;{renderHandlingIcons(option ? option.handlingIcons : [])}
+    &nbsp;{renderHandlingIcons(option?.handlingIcons)}
   </span>
 );
 
@@ -27,6 +27,7 @@ const ProductSelect = ({
   const selectRef = useRef(null);
   const [isExactMatch, setIsExactMatch] = useState(false);
   const [loadedOptions, setLoadedOptions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const {
     debounceTime, minSearchLength,
   } = useSelector(state => ({
@@ -47,11 +48,22 @@ const ProductSelect = ({
   };
 
   useEffect(() => {
-    if (isExactMatch && loadedOptions.length > 0) {
-      const exactMatchProduct = loadedOptions.find(product => product.exactMatch);
+    if (isExactMatch && loadedOptions.length && searchTerm) {
+      const exactMatches = loadedOptions.filter(product => product.exactMatch);
+      let exactMatchProduct = null;
+
+      if (exactMatches.length === 1) {
+        [exactMatchProduct] = exactMatches;
+      } else if (exactMatches.length > 1) {
+        // if there are more than one exact match
+        // then select one that matches productCode with search string
+        const matchedByProductCode = exactMatches
+          .find(({ productCode }) => productCode === searchTerm);
+        if (matchedByProductCode) exactMatchProduct = matchedByProductCode;
+      }
 
       if (onExactProductSelected) {
-        onExactProductSelected({ isExactMatch, product: exactMatchProduct });
+        onExactProductSelected({ product: exactMatchProduct });
       }
       if (exactMatchProduct) {
         selectRef.current.select.select.setValue(exactMatchProduct);
@@ -60,11 +72,12 @@ const ProductSelect = ({
       setIsExactMatch(false);
       setLoadedOptions([]);
     }
-  }, [isExactMatch, loadedOptions]);
+  }, [isExactMatch, loadedOptions, searchTerm]);
 
   const loadProductOptions = (searchString, callback) =>
     debouncedProductsFetch(searchString, (resultOptions) => {
       setLoadedOptions(resultOptions);
+      setSearchTerm(searchString);
       callback(resultOptions);
     });
 
@@ -78,7 +91,10 @@ const ProductSelect = ({
       async
       options={[]}
       loadOptions={loadProductOptions}
-      onMenuClose={() => setLoadedOptions([])}
+      onMenuClose={() => {
+        setLoadedOptions([]);
+        setSearchTerm('');
+      }}
       filterOption={item => (item)}
       onEnterPress={onEnterPress}
       optionRenderer={Option}
