@@ -190,7 +190,7 @@
                 "_TOTAL_" +
                 " ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
               "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
-              "sZeroRecords": "${g.message(code: 'default.dataTable.search.label', default: 'No records found')}",
+              "sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
               "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
               "sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
                 "_MAX_" +

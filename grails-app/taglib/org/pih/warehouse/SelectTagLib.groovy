@@ -136,7 +136,6 @@ class SelectTagLib {
             [id: it.id, name: it.tag, productCount: it?.products?.size()]
         }
         attrs.from = tags
-        attrs['data-placeholder'] = g.message(code: "tags.select.label", default: "Select tags")
         attrs.multiple = true
         attrs.value = attrs.value
         attrs.optionKey = "id"
@@ -149,7 +148,6 @@ class SelectTagLib {
         def catalogs = ProductCatalog.list(sort: "name").collect {
             [id: it.id, name: it.name, productCount: it?.productCatalogItems?.size()]
         }
-        attrs['data-placeholder'] = g.message(code: "catalogs.select.label", default: "Select catalogs")
         attrs.from = catalogs
         attrs.multiple = true
         attrs.value = attrs.value
