@@ -24,7 +24,7 @@ import 'react-table/react-table.css';
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
-function isInvalid(quantity, quantityAvailable) {
+function hasValidationError(quantity, quantityAvailable) {
   return (quantity > quantityAvailable) || quantity < 1;
 }
 
@@ -39,8 +39,6 @@ class PutAwaySecondPage extends Component {
     this.fetchItems = this.fetchItems.bind(this);
     this.editItem = this.editItem.bind(this);
     const columns = this.getColumns();
-    this.isQuantityHigherThanOriginal = props?.value > props.original?.quantityAvailable;
-    this.isQuantityLowerThan1 = props?.value < 1;
 
     const {
       initialValues:
@@ -140,17 +138,17 @@ class PutAwaySecondPage extends Component {
         const edit = _.get(this.state.putAway.putawayItems, `[${itemIndex}].edit`);
         let disabledMessage;
 
-        if (this.isQuantityLowerThan1) {
+        if (props?.value < 1) {
           disabledMessage = this.props.translate(
             'react.putAway.negativeQuantity.label',
-            'Quantity cannot be lower than 1',
+            'Quantity cannot be less than 1',
           );
         }
 
-        if (this.isQuantityHigherThanOriginal) {
+        if (props?.value > props.original?.quantityAvailable) {
           disabledMessage = this.props.translate(
             'react.putAway.higherQuantity.label',
-            'Quantity cannot be higher than original putaway item quantity',
+            'Quantity cannot be greater than original putaway item quantity',
           );
         }
 
@@ -165,7 +163,7 @@ class PutAwaySecondPage extends Component {
               duration="250"
               hideDelay="50"
             >
-              <div className={this.isQuantityHigherThanOriginal || this.isQuantityLowerThan1 ? 'has-error' : ''}>
+              <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
                 <input
                   type="number"
                   className="form-control form-control-xs"
@@ -192,7 +190,7 @@ class PutAwaySecondPage extends Component {
             duration="250"
             hideDelay="50"
           >
-            <div className={isInvalid(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
+            <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
               <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
             </div>
           </Tooltip>
@@ -620,7 +618,7 @@ class PutAwaySecondPage extends Component {
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                isInvalid(putawayItem.quantity, putawayItem.quantityAvailable))}
+                hasValidationError(putawayItem.quantity, putawayItem.quantityAvailable))}
             ><Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
           </span>
@@ -644,7 +642,7 @@ class PutAwaySecondPage extends Component {
         <div className="submit-buttons">
           <button
             disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                isInvalid(putawayItem.quantity, putawayItem.quantityAvailable))}
+                hasValidationError(putawayItem.quantity, putawayItem.quantityAvailable))}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
