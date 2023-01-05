@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useParams, withRouter } from 'react-router-dom';
 
 import MenuItem from 'components/Layout/menu/MenuItem';
 import MenuSection from 'components/Layout/menu/MenuSection';
@@ -11,6 +11,8 @@ import MenuSubsection from 'components/Layout/menu/MenuSubsection';
 
 
 const Menu = ({ menuConfig, location }) => {
+  const params = useParams();
+
   const getAllMenuUrls = () => Object.entries(menuConfig).reduce((acc, [, section]) => {
     if (!acc[section.label]) {
       if (section.href) {
@@ -38,12 +40,25 @@ const Menu = ({ menuConfig, location }) => {
 
   const checkActiveSection = (menuUrls, path) => {
     const { pathname, search } = path;
+    // removing custom params from URL fe. stockMovementId
+    const pathParams = _.drop(Object.values(params), 2);
+    const pathnameWithoutParams =
+      pathParams
+        .reduce((prev, curr) => prev.replace(curr, ''), pathname)
+        .replace(/\/$/, '');
     const matchedPath = Object.keys(menuUrls)
       .find((section) => {
         // find matching URL from sections
         const foundURL = menuUrls[section].find((url) => {
           const [sectionPath, sectionSearch] = url.split('?');
-          if (sectionPath !== pathname) return false;
+          if (sectionPath !== pathnameWithoutParams) {
+            return false;
+          }
+          // if found matching pathname and url contains 'create'
+          // it means that we are on form page
+          if (sectionPath.includes('create')) {
+            return true;
+          }
           // if found matching pathname
           // then check if all parameters of section path match with current path parameters
           if (sectionSearch) {
