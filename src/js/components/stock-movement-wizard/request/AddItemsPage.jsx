@@ -17,12 +17,10 @@ import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
-import SelectField from 'components/form-elements/SelectField';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { debounceProductsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -48,37 +46,11 @@ function addButton({
 
 const FIELDS = {
   product: {
-    type: SelectField,
+    type: ProductSelectField,
     label: 'react.stockMovement.requestedProduct.label',
     defaultMessage: 'Requested product',
     headerAlign: 'left',
     flexWidth: '9',
-    attributes: {
-      async: true,
-      openOnClick: false,
-      autoload: false,
-      filterOptions: options => options,
-      cache: false,
-      options: [],
-      showValueTooltip: true,
-      className: 'text-left',
-      optionRenderer: option => (
-        <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-          {option.label}
-          &nbsp;
-          {renderHandlingIcons(option.handlingIcons)}
-        </strong>
-      ),
-      valueRenderer: option => (
-        <span className="d-flex align-items-center">
-          <span className="text-truncate">
-            {option.label}
-          </span>
-          &nbsp;
-          {renderHandlingIcons(option ? option.handlingIcons : [])}
-        </span>
-      ),
-    },
   },
   quantityOnHand: {
     type: LabelField,
@@ -222,11 +194,16 @@ const NO_STOCKLIST_FIELDS = {
         fieldKey: '',
         flexWidth: '9.5',
         getDynamicAttr: ({
-          debouncedProductsFetch, rowIndex, rowCount, updateProductData, values,
+          rowIndex, rowCount, updateProductData, values, originId, focusField,
         }) => ({
           onChange: value => updateProductData(value, values, rowIndex),
-          loadOptions: debouncedProductsFetch,
           autoFocus: rowIndex === rowCount - 1,
+          locationId: originId,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityRequested');
+            }
+          },
         }),
       },
       quantityOnHand: FIELDS.quantityOnHand,
@@ -256,11 +233,16 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         ...FIELDS.product,
         fieldKey: 'disabled',
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
+          locationId: originId,
           disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityRequested');
+            }
+          },
         }),
       },
       quantityAllowed: FIELDS.quantityAllowed,
@@ -288,11 +270,16 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         ...FIELDS.product,
         fieldKey: 'disabled',
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
+          locationId: originId,
           disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityRequested');
+            }
+          },
         }),
       },
       demandPerReplenishmentPeriod: FIELDS.demandPerReplenishmentPeriod,
@@ -313,11 +300,16 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
         ...FIELDS.product,
         fieldKey: 'disabled',
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
+          locationId: originId,
           disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityOnHand');
+            }
+          },
         }),
       },
       quantityAllowed: {
@@ -388,11 +380,16 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         fieldKey: 'disabled',
         flexWidth: '2',
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
+          locationId: originId,
           disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityOnHand');
+            }
+          },
         }),
       },
       demandPerReplenishmentPeriod: {
@@ -490,11 +487,16 @@ const REQUEST_FROM_WARD_FIELDS = {
         fieldKey: 'disabled',
         flexWidth: '2.4',
         getDynamicAttr: ({
-          debouncedProductsFetch, rowIndex, rowCount, updateProductData, values, newItem,
+          rowIndex, rowCount, updateProductData, values, newItem, originId, focusField,
         }) => ({
+          locationId: originId,
           onChange: value => updateProductData(value, values, rowIndex),
-          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityOnHand');
+            }
+          },
         }),
       },
       monthlyDemand: {
@@ -618,12 +620,6 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
-
-    this.debouncedProductsFetch = debounceProductsFetch(
-      this.props.debounceTime,
-      this.props.minSearchLength,
-      this.props.initialValues.origin.id,
-    );
   }
 
   componentDidMount() {
@@ -1589,7 +1585,7 @@ class AddItemsPage extends Component {
                   renderFormField(fieldConfig, fieldName, {
                     stocklist: values.stocklist,
                     removeItem: this.removeItem,
-                    debouncedProductsFetch: this.debouncedProductsFetch,
+                    originId: this.props.initialValues.origin.id,
                     getSortOrder: this.getSortOrder,
                     newItemAdded: this.newItemAdded,
                     newItem: this.state.newItem,
@@ -1633,8 +1629,6 @@ class AddItemsPage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
-  debounceTime: state.session.searchConfig.debounceTime,
-  minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
@@ -1671,8 +1665,6 @@ AddItemsPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
-  debounceTime: PropTypes.number.isRequired,
-  minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,

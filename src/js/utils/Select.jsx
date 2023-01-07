@@ -276,7 +276,10 @@ class Select extends Component {
             isClearable={clearable}
             title=""
             delimiter={delimiter}
-            onMenuClose={multi ? () => this.sortOptionsByChecked(options, value) : null}
+            onMenuClose={() => {
+              if (multi) this.sortOptionsByChecked(options, value);
+              if (this.props.onMenuClose) this.props.onMenuClose();
+            }}
             value={value}
             onChange={this.handleChange}
             components={{
@@ -357,6 +360,7 @@ Select.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string,
     PropTypes.shape({}), PropTypes.any]),
   onChange: PropTypes.func,
+  onMenuClose: PropTypes.func,
   multi: PropTypes.bool,
   clearable: PropTypes.bool,
   async: PropTypes.bool,
@@ -384,6 +388,7 @@ Select.propTypes = {
 Select.defaultProps = {
   value: undefined,
   onChange: null,
+  onMenuClose: null,
   multi: false,
   clearable: true,
   async: false,
