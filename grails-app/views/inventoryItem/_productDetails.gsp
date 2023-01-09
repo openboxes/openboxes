@@ -71,7 +71,7 @@
                     </td>
                     <td class="value" id="onHandMonths">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-                        <g:message code="default.month.months.label" default="months" />
+                        ${g.message(code: "default.time.unit.months.label", default: "Months").toLowerCase()}
                     </td>
                 </tr>
                 <tr class="prop">
@@ -80,7 +80,7 @@
                     </td>
                     <td class="value" id="stockoutDays">
                         <img class="spinner" src="${createLinkTo(dir:'images/spinner.gif')}" class="middle"/>
-                        <g:message code="product.details.days.label" default="days" />
+                        <g:message code="default.days.label" default="Days" />
                     </td>
                 </tr>
             </g:if>

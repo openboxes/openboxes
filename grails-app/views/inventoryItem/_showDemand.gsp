@@ -42,7 +42,11 @@
             <g:submitButton
                 id="refresh-btn"
                 name="Refresh data"
-                value="${g.message(code: 'default.refreshData.label', default:'Refresh Data')}"
+                value="${g.message(
+                        code: 'default.refresh.label',
+                        args: [g.message(code: 'default.data.label', default: 'Data')],
+                        default:'Refresh Data'
+                )}"
                 class="button"
                 style="margin-left: 10px;"
             />
@@ -58,7 +62,7 @@
                     <th><warehouse:message code="requisition.monthIssued.label" default="Month issued"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityRequested.label"/></th>
                     <th class="center middle"><warehouse:message code="requisitionItem.quantityIssued.label" default="Issued"/></th>
-                    <th class="center middle"><warehouse:message code="forecasting.demand.label" default="Demand"/></th>
+                    <th class="center middle"><warehouse:message code="requisitionItem.quantityDemand.label" default="Demand"/></th>
                 </tr>
             </thead>
             <tbody>
@@ -193,7 +197,7 @@
 
             <tfoot>
                 <tr>
-                    <th><warehouse:message code="consumption.monthly.label" default="Monthly"/></th>
+                    <th><warehouse:message code="default.monthly.label" default="Monthly"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityRequested/numberOfMonths}" maxFractionDigits="0"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityIssued/numberOfMonths}" maxFractionDigits="0"/></th>
                     <th class="center"><g:formatNumber number="${totalQuantityDemand/numberOfMonths}" maxFractionDigits="0"/></th>

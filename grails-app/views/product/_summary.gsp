@@ -75,11 +75,11 @@
 						</g:link>
 						<g:link controller='inventoryItem' action='showRecordInventory' params="['product.id':productInstance?.id]" class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'calculator.png')}" />&nbsp;
-							${warehouse.message(code: 'inventory.record.label', default: 'Record stock')}
+							${warehouse.message(code: 'inventory.record.label', default: 'Record Stock')}
 						</g:link>
 						<g:link controller='product' action='edit' id='${productInstance?.id }' class="button">
 							<img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-							${warehouse.message(code: 'default.edit.label', args:[g.message(code: 'product.label', 'product')])}
+							${warehouse.message(code: 'default.edit.label', args:[g.message(code: 'product.label', 'Product')])}
 						</g:link>
 						<g:isUserManager>
 							<g:link controller="inventoryItem" action="showLotNumbers" params="['product.id': productInstance?.id]" class="button">

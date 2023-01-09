@@ -22,27 +22,27 @@
                     <warehouse:message code="default.duration.label" default="Duration"/></label>
             </td>
             <td class="value middle">
-                <g:set var="monthLabel" value="${g.message(code: 'default.month.label', default: 'month')}" />
-                <g:set var="monthsLabel" value="${g.message(code: 'default.month.months.label', default: 'months')}" />
-                <g:set var="yearsLabel" value="${g.message(code: 'default.year.years', default: 'years')}" />
+                <g:set var="monthLabel" value="${g.message(code: 'default.time.unit.month.label', default: 'Month').toLowerCase()}" />
+                <g:set var="monthsLabel" value="${g.message(code: 'default.time.unit.months.label', default: 'Months').toLowerCase()}" />
+                <g:set var="yearsLabel" value="${g.message(code: 'default.time.unit.years.label', default: 'Years').toLowerCase()}" />
                 <g:select
                     id="numMonths"
                     name="numMonths"
                     value="${params.numMonths?:1}"
                     class="chzn-select-deselect"
                     from="[
-                      1: g.message(code: 'default.month.last.label', args: [1, monthLabel]),
-                      2: g.message(code: 'default.month.last.label', args: [2, monthsLabel]),
-                      3: g.message(code: 'default.month.last.label', args: [3, monthsLabel]),
-                      6: g.message(code: 'default.month.last.label', args: [6, monthsLabel]),
-                      9: g.message(code: 'default.month.last.label', args: [9, monthsLabel]),
-                      12: g.message(code: 'default.month.last.label', args: [12, monthsLabel]),
-                      18: g.message(code: 'default.month.last.label', args: [18, monthsLabel]),
-                      24: g.message(code: 'default.month.last.label', args: [2, yearsLabel]),
-                      36: g.message(code: 'default.month.last.label', args: [3, yearsLabel]),
-                      48: g.message(code: 'default.month.last.label', args: [4, yearsLabel]),
-                      60: g.message(code: 'default.month.last.label', args: [5, yearsLabel]),
-                      120: g.message(code: 'default.month.last.label', args: [10, yearsLabel])
+                      1: g.message(code: 'default.last.label', args: [1, monthLabel]),
+                      2: g.message(code: 'default.last.label', args: [2, monthsLabel]),
+                      3: g.message(code: 'default.last.label', args: [3, monthsLabel]),
+                      6: g.message(code: 'default.last.label', args: [6, monthsLabel]),
+                      9: g.message(code: 'default.last.label', args: [9, monthsLabel]),
+                      12: g.message(code: 'default.last.label', args: [12, monthsLabel]),
+                      18: g.message(code: 'default.last.label', args: [18, monthsLabel]),
+                      24: g.message(code: 'default.last.label', args: [2, yearsLabel]),
+                      36: g.message(code: 'default.last.label', args: [3, yearsLabel]),
+                      48: g.message(code: 'default.last.label', args: [4, yearsLabel]),
+                      60: g.message(code: 'default.last.label', args: [5, yearsLabel]),
+                      120: g.message(code: 'default.last.label', args: [10, yearsLabel])
                     ]"
                     optionKey="key"
                     optionValue="value"

@@ -72,7 +72,7 @@
             </li>
 			<li><a href="${request.contextPath}/inventoryItem/showStockHistory/${commandInstance?.product?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
             <li><a href="${request.contextPath}/inventoryItem/showCurrentStockAllLocations/${commandInstance?.product?.id}"><warehouse:message code="locations.all.label" default="All Locations"/></a></li>
-			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.sources.label" default="Sources"/></a></li>
+			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.productSuppliers.label" default="Product Sources"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showAssociatedProducts/${commandInstance?.product?.id}"><warehouse:message code="productAssociations.label" default="Product Associations"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showPendingInbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingInbound.label" default="Pending Inbound"/></a></li>
 			<li><a id="showPendingOutboundTabLink" href="${request.contextPath}/inventoryItem/showPendingOutbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></a></li>
