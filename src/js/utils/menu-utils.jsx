@@ -24,14 +24,22 @@ export const checkActiveSection = ({
       // find matching URL from sections
       const foundURL = menuUrls[section].find((url) => {
         const [sectionPath, sectionSearch] = url.split('?');
-        if (sectionPath !== pathnameWithoutParams) {
+        if (!pathnameWithoutParams.includes(sectionPath.replace(/\/index$/, ''))) {
           return false;
         }
         // if found matching pathname
         // then check if all parameters of section path match with current path parameters
         if (sectionSearch) {
-          const { direction, ...otherParams } = mapQueryParamsToObject(sectionSearch);
-          return Object.values(otherParams).every(param => search.includes(param));
+          const {
+            direction,
+            ...otherParams
+          } = mapQueryParamsToObject(search.substring(1, search.length));
+          // if direction is not specified
+          // then compare current url with sectionPath without direction
+          if (!direction) {
+            return Object.values(otherParams).every(param => search.includes(param));
+          }
+          return sectionSearch.split('&').every(param => search.includes(param));
         }
         return true;
       });
