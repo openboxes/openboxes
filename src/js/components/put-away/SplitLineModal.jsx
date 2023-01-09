@@ -65,17 +65,17 @@ class SplitLineModal extends Component {
   }
 
   getErrorMessage() {
-    if (this.isQuantityHigherThanOriginalPutaway()) {
+    if (this.isQuantityGreaterThanOriginalPutaway()) {
       return this.props.translate(
         'react.putAway.sumOfAll.label',
-        'Sum of all split items quantities cannot be higher than original putaway item quantity',
+        'Sum of all split items quantities cannot be greater than original putaway item quantity',
       );
     }
 
     if (this.isNegativeQuantity()) {
       return this.props.translate(
         'react.putAway.negativeSumOfAll.label',
-        'Items quantity cannot be lower than 1',
+        'Items quantity cannot be less than 1',
       );
     }
 
@@ -156,13 +156,13 @@ class SplitLineModal extends Component {
     return _.some(this.state.splitItems, items => _.toInteger(items.quantity) <= 0);
   }
 
-  isQuantityHigherThanOriginalPutaway() {
+  isQuantityGreaterThanOriginalPutaway() {
     const qtySum = this.calculatePutAwayQty();
     return qtySum > _.toInteger(this.props.putawayItem.quantity);
   }
 
   isValid() {
-    return !this.isNegativeQuantity() && !this.isQuantityHigherThanOriginalPutaway();
+    return !this.isNegativeQuantity() && !this.isQuantityGreaterThanOriginalPutaway();
   }
 
   /**
@@ -248,14 +248,14 @@ class SplitLineModal extends Component {
                   <td className="py-1 align-middle">
                     <Tooltip
                       html={this.getErrorMessage()}
-                      disabled={!this.isQuantityHigherThanOriginalPutaway() && item.quantity > 0}
+                      disabled={!this.isQuantityGreaterThanOriginalPutaway() && item.quantity > 0}
                       theme="transparent"
                       arrow="true"
                       delay="150"
                       duration="250"
                       hideDelay="50"
                     >
-                      <div className={this.isQuantityHigherThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
+                      <div className={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
                         <Input
                           type="number"
                           value={item.quantity}
