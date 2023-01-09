@@ -38,13 +38,20 @@ const Menu = ({ menuConfig, location }) => {
     return acc;
   }, {});
 
+  const mapQueryParamsToObject = queryParams => (queryParams ? queryParams
+    .split('&')
+    .reduce((acc, param) => {
+      const [key, value] = param.split('=');
+      return { ...acc, [key]: value };
+    }, {}) : {});
+
   const checkActiveSection = (menuUrls, path) => {
     const { pathname, search } = path;
     // removing custom params from URL fe. stockMovementId
     const pathParams = _.drop(Object.values(params), 2);
     const pathnameWithoutParams =
       pathParams
-        .reduce((prev, curr) => prev.replace(curr, ''), pathname)
+        .reduce((acc, param) => acc.replace(param, ''), pathname)
         .replace(/\/$/, '');
     const matchedPath = Object.keys(menuUrls)
       .find((section) => {
@@ -54,16 +61,11 @@ const Menu = ({ menuConfig, location }) => {
           if (sectionPath !== pathnameWithoutParams) {
             return false;
           }
-          // if found matching pathname and url contains 'create'
-          // it means that we are on form page
-          if (sectionPath.includes('create')) {
-            return true;
-          }
+          const { direction, ...otherParams } = mapQueryParamsToObject(sectionSearch);
           // if found matching pathname
           // then check if all parameters of section path match with current path parameters
           if (sectionSearch) {
-            const searchParams = sectionSearch.split('&');
-            return search && searchParams.every(param => search.includes(param));
+            return Object.values(otherParams).every(param => search.includes(param));
           }
           return true;
         });
@@ -71,6 +73,7 @@ const Menu = ({ menuConfig, location }) => {
       });
     return matchedPath || 'Dashboard';
   };
+
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);
   const activeSection = useMemo(() =>
     checkActiveSection(allMenuUrls, location), [allMenuUrls, location]);
