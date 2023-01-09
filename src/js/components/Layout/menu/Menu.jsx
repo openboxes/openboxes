@@ -61,10 +61,10 @@ const Menu = ({ menuConfig, location }) => {
           if (sectionPath !== pathnameWithoutParams) {
             return false;
           }
-          const { direction, ...otherParams } = mapQueryParamsToObject(sectionSearch);
           // if found matching pathname
           // then check if all parameters of section path match with current path parameters
           if (sectionSearch) {
+            const { direction, ...otherParams } = mapQueryParamsToObject(sectionSearch);
             return Object.values(otherParams).every(param => search.includes(param));
           }
           return true;
