@@ -17,7 +17,8 @@ $ mysql -u root -p -e 'create database openboxes default charset utf8;'
 
 ## Grant permissions to new database user
 ```
-$ mysql -u root -p -e 'grant all on openboxes.* to openboxes@localhost identified by "<password>";'
+$ mysql -u root -p -e 'CREATE USER openboxes@localhost identified by "<password>";'
+$ mysql -u root -p -e 'grant all on openboxes.* to openboxes@localhost;'
 ```
 !!! note
     For security reasons, you will want to set a good password.  These values should be used in the 
