@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchInvoiceStatuses, fetchInvoiceTypeCodes, fetchSuppliers } from 'actions';
 import filterFields from 'components/invoice/FilterFields';
+import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchUserById } from 'utils/option-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -22,56 +23,63 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
+    shouldRebuildParams: state.filterForm.shouldRebuildParams,
   }));
   const [defaultValues, setDefaultValues] = useState({});
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const dispatch = useDispatch();
   const history = useHistory();
 
-  useEffect(() => {
-    (async () => {
-      // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
-      // but currentLocation doesn't change
-      if (currentLocation?.id) {
-        const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
-          if (!acc[key]) return { ...acc, [key]: '' };
-          return acc;
-        }, {});
-        const queryProps = queryString.parse(history.location.search);
+  const clearFilterValues = () => {
+    const { pathname } = history.location;
+    history.push({ pathname });
+  };
 
-        // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
-        if (queryProps.status) {
-          initialEmptyValues.status = statuses
-            .find(({ value }) => value === queryProps.status);
-        }
-        if (queryProps.vendor) {
-          initialEmptyValues.vendor = suppliers.find(({ value }) => value === queryProps.vendor);
-        }
-        if (queryProps.invoiceTypeCode) {
-          initialEmptyValues.invoiceTypeCode =
-            typeCodes.find(({ value }) => value === queryProps.invoiceTypeCode);
-        }
-        if (queryProps.dateInvoiced) {
-          initialEmptyValues.dateInvoiced = queryProps.dateInvoiced;
-        }
-        if (queryProps.createdBy) {
-          initialEmptyValues.createdBy = queryProps.createdBy === currentUser?.id
-            ? currentUser
-            : await fetchUserById(queryProps.createdBy);
-        }
+  const initializeDefaultFilterValues = async () => {
+    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
+    // but currentLocation doesn't change
+    const initialEmptyValues = Object.keys(filterFields).reduce((acc, key) => {
+      if (!acc[key]) return { ...acc, [key]: '' };
+      return acc;
+    }, {});
+    const queryProps = queryString.parse(history.location.search);
 
-        setDefaultValues({
-          ...initialEmptyValues,
-          buyerOrganization: {
-            id: currentLocation?.organization?.id,
-            value: currentLocation?.organization?.id,
-            name: currentLocation?.organization?.name,
-            label: currentLocation?.organization?.name,
-          },
-        });
-      }
-    })();
-  }, [currentLocation?.id]);
+    // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
+    if (queryProps.status) {
+      initialEmptyValues.status = statuses
+        .find(({ value }) => value === queryProps.status);
+    }
+    if (queryProps.vendor) {
+      initialEmptyValues.vendor = suppliers.find(({ value }) => value === queryProps.vendor);
+    }
+    if (queryProps.invoiceTypeCode) {
+      initialEmptyValues.invoiceTypeCode =
+          typeCodes.find(({ value }) => value === queryProps.invoiceTypeCode);
+    }
+    if (queryProps.dateInvoiced) {
+      initialEmptyValues.dateInvoiced = queryProps.dateInvoiced;
+    }
+    if (queryProps.createdBy) {
+      initialEmptyValues.createdBy = queryProps.createdBy === currentUser?.id
+        ? currentUser
+        : await fetchUserById(queryProps.createdBy);
+    }
+
+    setDefaultValues({
+      ...initialEmptyValues,
+      buyerOrganization: {
+        id: currentLocation?.organization?.id,
+        value: currentLocation?.organization?.id,
+        name: currentLocation?.organization?.name,
+        label: currentLocation?.organization?.name,
+      },
+    });
+    setFiltersInitialized(true);
+  };
+
+  // Custom hook for changing location/filters rebuilding logic
+  useCommonFiltersCleaner({ initializeDefaultFilterValues, clearFilterValues, filtersInitialized });
 
   useEffect(() => {
     // If statuses or invoice type codes not yet in store, fetch them

@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchShipmentStatusCodes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
+import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
@@ -95,22 +96,8 @@ const useInboundFilters = () => {
     setFiltersInitialized(true);
   };
 
-
-  useEffect(() => {
-    // Don't clear the query params while doing first filter initialization
-    // clear the filters only when changing location, but not refreshing page
-    if (filtersInitialized) {
-      clearFilterValues();
-    }
-  }, [currentLocation?.id]);
-
-  useEffect(() => {
-    // Avoid unnecessary re-fetches if getAppContext triggers fetching session info
-    // but currentLocation doesn't change
-    if (currentLocation?.id) {
-      initializeDefaultFilterValues();
-    }
-  }, [currentLocation.id]);
+  // Custom hook for changing location/filters rebuilding logic
+  useCommonFiltersCleaner({ clearFilterValues, filtersInitialized, initializeDefaultFilterValues });
 
   const selectFiltersForMyStockMovements = () => {
     const currentUserValue = {

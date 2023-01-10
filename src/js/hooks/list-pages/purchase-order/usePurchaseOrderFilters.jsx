@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
 import filterFields from 'components/purchaseOrder/FilterFields';
+import usePurchaseOrderFiltersCleaner from 'hooks/list-pages/purchase-order/usePurchaseOrderFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
@@ -17,14 +18,13 @@ const usePurchaseOrderFilters = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const {
-    supportedActivities, buyers, currentLocation, statuses, currentUser, loading,
+    supportedActivities, buyers, currentLocation, statuses, currentUser,
   } = useSelector(state => ({
     supportedActivities: state.session.supportedActivities,
     buyers: state.organizations.buyers,
     currentLocation: state.session.currentLocation,
     statuses: state.purchaseOrder.statuses,
     currentUser: state.session.user,
-    loading: state.session.loading,
   }));
 
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
@@ -105,19 +105,12 @@ const usePurchaseOrderFilters = () => {
     setFiltersInitialized(true);
   };
 
-  useEffect(() => {
-    // Don't clear the query params while doing first filter initialization
-    // clear the filters only when changing location, but not refreshing page
-    if (filtersInitialized) {
-      clearFilterValues();
-    }
-  }, [currentLocation?.id]);
-
-  useEffect(() => {
-    if (currentLocation?.id && buyers && !loading) {
-      initializeDefaultFilterValues();
-    }
-  }, [currentLocation.id, buyers, loading]);
+  // Custom hook for changing location/filters rebuilding logic
+  usePurchaseOrderFiltersCleaner({
+    clearFilterValues,
+    initializeDefaultFilterValues,
+    filtersInitialized,
+  });
 
   const setFilterValues = (values) => {
     const filterAccessors = {

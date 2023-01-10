@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import filterFields from 'components/products/FilterFields';
+import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchProductsCatalogs,
@@ -21,9 +22,6 @@ const useProductFilters = () => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const history = useHistory();
-  const { currentLocation } = useSelector(state => ({
-    currentLocation: state.session.currentLocation,
-  }));
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
@@ -88,19 +86,8 @@ const useProductFilters = () => {
     setFiltersInitialized(true);
   };
 
-  useEffect(() => {
-    // Don't clear the query params while doing first filter initialization
-    // clear the filters only when changing location, but not refreshing page
-    if (filtersInitialized) {
-      clearFilterValues();
-    }
-  }, [currentLocation?.id]);
-
-  useEffect(() => {
-    if (currentLocation?.id) {
-      initializeDefaultFilterValues();
-    }
-  }, [currentLocation?.id]);
+  // Custom hook for changing location/filters rebuilding logic
+  useCommonFiltersCleaner({ filtersInitialized, initializeDefaultFilterValues, clearFilterValues });
 
   const setFilterValues = (values) => {
     const filterAccessors = {
