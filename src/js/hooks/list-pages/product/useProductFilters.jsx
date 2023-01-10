@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import queryString from 'query-string';
-import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import filterFields from 'components/products/FilterFields';

@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { REBUILD_FILTER_FORM_PARAMS, FILTER_FORM_PARAMS_BUILT } from 'actions/types';
+import { FILTER_FORM_PARAMS_BUILT, REBUILD_FILTER_FORM_PARAMS } from 'actions/types';
 
 const initialState = {
   shouldRebuildParams: false,
