@@ -27,10 +27,9 @@ const PreviewIndicator = props => (
       <div className="row">
         <div className="col col-3 graph-preview">{props.children}</div>
         <div className="col col-6">
-          {
-            <span>{_.truncate(props.translate(props.title, props.title), { length: 25, omission: '...' }) }</span>
-          }
-
+          <span className="w-100 text-overflow-ellipsis text-nowrap text-left">
+            {props.translate(props.title, props.title)}
+          </span>
         </div>
         <div className="col col-3">
           <span

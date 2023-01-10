@@ -13,7 +13,6 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/dashboard/Dashboard.scss';
 
-/* global _ */
 
 const options = {
   responsive: true,
@@ -122,8 +121,8 @@ const NumberCard = SortableElement(({
             {translate(cardTitle, cardTitle)}
           </span>
           <span className="result-card"> {cardNumberType === 'number' ? cardNumberLocale : `${cardNumberLocale} ${currencyCode}`} </span>
-          <span className="subtitle-card">
-            {_.truncate(translate(cardSubtitle, cardSubtitle), { length: 22 })}
+          <span className="subtitle-card text-overflow-ellipsis text-nowrap">
+            {translate(cardSubtitle, cardSubtitle)}
           </span>
         </div>
         {

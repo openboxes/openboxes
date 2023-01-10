@@ -62,7 +62,7 @@ class FilterComponent extends Component {
   render() {
     return (
       <div className="data-filter">
-        { this.props.locationFilter === true ?
+        { this.props.locationFilter &&
           <select
             className="location-filter custom-select"
             size="1"
@@ -85,8 +85,8 @@ class FilterComponent extends Component {
             })}
 
           </select>
- : null }
-        { this.props.timeFilter === true ?
+        }
+        { this.props.timeFilter &&
           <select
             className="time-filter custom-select"
             onChange={e => this.handleChange(e, this.props.cardId, this.props.loadIndicator)}
@@ -94,14 +94,60 @@ class FilterComponent extends Component {
             defaultValue={this.state.timeFrame}
             id="timeFrameSelector"
           >
-            <option value="1">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.month.label', 'Month')}</option>
-            <option value="3">{this.props.translate(this.props.label[0], this.props.label[1])} 3 {this.props.translate('react.dashboard.timeFilter.months.label', 'Months')}</option>
-            <option value="6">{this.props.translate(this.props.label[0], this.props.label[1])} 6 {this.props.translate('react.dashboard.timeFilter.months.label', 'Months')}</option>
-            <option value="12">{this.props.translate(this.props.label[0], this.props.label[1])} {this.props.translate('react.dashboard.timeFilter.year.label', 'Year')}</option>
-            { this.props.timeLimit === 24 ?
-              <option value="24">{this.props.translate(this.props.label[0], this.props.label[1])} 2 {this.props.translate('react.dashboard.timeFilter.years.label', 'Years')}</option>
-            : null }
-          </select> : null
+            <option value="1">
+              {this.props.translate(
+                this.props.label[0],
+                this.props.label[1],
+              {
+                number: '',
+                timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
+              },
+            )}
+            </option>
+            <option value="3">
+              {this.props.translate(
+                this.props.label[0],
+                this.props.label[1],
+                {
+                  number: 3,
+                  timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
+                },
+              )}
+            </option>
+            <option value="6">
+              {this.props.translate(
+                this.props.label[0],
+                this.props.label[1],
+                {
+                  number: 6,
+                  timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
+                },
+              )}
+            </option>
+            <option value="12">
+              {this.props.translate(
+                this.props.label[0],
+                this.props.label[1],
+                {
+                  number: '',
+                  timeUnit: this.props.translate('react.dashboard.timeFilter.year.label', 'Year'),
+                },
+              )}
+            </option>
+            {
+              this.props.timeLimit === 24 &&
+              <option value="24">
+                {this.props.translate(
+                  this.props.label[0],
+                  this.props.label[1],
+                  {
+                    number: 2,
+                    timeUnit: this.props.translate('react.dashboard.timeFilter.years.label', 'Years'),
+                  },
+                )}
+              </option>
+            }
+          </select>
         }
         {this.props.yearTypeFilter && (
           <select
@@ -151,7 +197,8 @@ const GraphCard = SortableElement(({
   hideDraghandle,
 }) => {
   let graph;
-  let label = ['react.dashboard.timeFilter.last.label', 'last'];
+  // eslint-disable-next-line no-template-curly-in-string
+  let label = ['react.dashboard.timeFilter.last.label', 'last ${0} ${1}'];
 
   const translateDataLabels = (listLabels) => {
     const listTranslated = listLabels.map(labelToTranslate =>
@@ -173,7 +220,8 @@ const GraphCard = SortableElement(({
         onElementsClick={elements => handleChartClick(elements)}
       />
     );
-    label = ['react.dashboard.timeFilter.next.label', 'next'];
+    // eslint-disable-next-line no-template-curly-in-string
+    label = ['react.dashboard.timeFilter.next.label', 'next ${0} ${1}'];
   } else if (cardType === 'bar') {
     graph = <Bar data={data} options={options} />;
   } else if (cardType === 'doughnut') {
