@@ -475,6 +475,12 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+      const stockMovementDestination = ${stockMovement?.destination == currentLocation} ? 'inbound' : 'outbound'
+         const matchingMenuSection = $("#" + stockMovementDestination).get(0);
+         const matchingMenuSectionCollapsable = $("#" + stockMovementDestination + "-collapsed").get(0);
+         if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
+         if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
+
         $(".tabs").tabs({
             cookie : {
                 expires : 1

@@ -130,7 +130,7 @@
     const foundSection = matchingHref && menuConfigValues.find(it => it.value.includes(matchingHref))
 
       // Assign active-section class to matched section
-      if (foundSection) {
+      if (foundSection && foundSection.name !== 'inbound' && foundSection.name !== 'outbound') {
         const matchingMenuSection = $("#" + foundSection?.name).get(0);
         const matchingMenuSectionCollapsable = $("#" + foundSection?.name + "-collapsed").get(0);
         if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
