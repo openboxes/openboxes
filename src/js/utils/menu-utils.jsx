@@ -37,7 +37,7 @@ export const checkActiveSection = ({
           // if direction is not specified
           // then compare current url with sectionPath without direction
           if (!direction) {
-            return Object.values(otherParams).every(param => search.includes(param));
+            return Object.values(otherParams).every(param => sectionSearch.includes(param));
           }
           return sectionSearch.split('&').every(param => search.includes(param));
         }
