@@ -124,6 +124,7 @@
                 "oLanguage": {
                   "sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
                   "sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+                  "sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
                   "sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
                     "_START_" +
                     " ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
