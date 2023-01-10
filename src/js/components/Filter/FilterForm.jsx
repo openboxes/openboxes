@@ -184,6 +184,7 @@ FilterForm.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   translate: PropTypes.func.isRequired,
+  setShouldRebuildFilterValues: PropTypes.func.isRequired,
 };
 
 FilterForm.defaultProps = {
