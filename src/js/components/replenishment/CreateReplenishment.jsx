@@ -148,7 +148,7 @@ function validate(values) {
 
   _.forEach(values.requirements, (item, key) => {
     if (item.quantity) {
-      if (item.quantity < 0) {
+      if (item.quantity < 1) {
         errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
       }
       if (item.quantity > item.quantityAvailable) {
