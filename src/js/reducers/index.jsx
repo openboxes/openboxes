@@ -2,6 +2,7 @@ import { localizeReducer } from 'react-localize-redux';
 import { combineReducers } from 'redux';
 
 import currenciesReducer from 'reducers/currenciesReducer';
+import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   shipmentStatuses: shipmentStatusCodes,
   requisitionStatuses: requisitionStatusCodes,
   stockTransfer: stockTransferReducer,
+  filterForm: filterFormReducer,
 });
 
 export default rootReducer;
