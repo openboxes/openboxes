@@ -1046,7 +1046,7 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
-                  type="button"
+                  type="submit"
                   onClick={() => {
                     if (!invalid) {
                       this.nextPage(values);
