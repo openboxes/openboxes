@@ -131,7 +131,10 @@
                     " ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
                     "_TOTAL_" +
                     " ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
-                  "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}"
+                  "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+                  "sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
+                                    "_MAX_" +
+                                    " ${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"
                 }
             });
 
