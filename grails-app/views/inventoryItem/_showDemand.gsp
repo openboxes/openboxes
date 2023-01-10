@@ -22,8 +22,7 @@
 
 <div id="demand-table">
     <div class="message information">
-        Totals and monthly averages are for the time period specified. The default time period is 12 months,
-        excluding the current month and any month before the oldest request.
+        <g:message code="forecasting.demand.warning.message" />
     </div>
     <g:formRemote name="demand" onLoading="showLoading()" onComplete="hideLoading()"
                   url="[controller: 'inventoryItem', action: 'showDemand', params: [id: commandInstance?.product?.id, from: 0]]"
@@ -40,7 +39,17 @@
                               class="chzn-select-deselect location-picker-width" noSelection="['null':'All']"
                               from="${destinations}" />
 
-            <g:submitButton id="refresh-btn" name="Refresh data" value="Refresh data" class="button" style="margin-left: 10px;" />
+            <g:submitButton
+                id="refresh-btn"
+                name="Refresh data"
+                value="${g.message(
+                        code: 'default.refresh.label',
+                        args: [g.message(code: 'default.data.label', default: 'Data')],
+                        default:'Refresh Data'
+                )}"
+                class="button"
+                style="margin-left: 10px;"
+            />
         </div>
     </g:formRemote>
     <div class="box">

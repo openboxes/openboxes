@@ -27,7 +27,7 @@
 <div class="box">
     <h2>
         <div>
-            <warehouse:message code="product.sources.label" default="Product Sources"/>
+            <warehouse:message code="product.productSuppliers.label" default="Product Sources"/>
             <div class="show-all button">
                 ${warehouse.message(code: 'default.showAll.label')}
             </div>

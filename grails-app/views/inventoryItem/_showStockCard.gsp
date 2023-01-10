@@ -65,14 +65,14 @@
 </style>
 
 <g:if test="${commandInstance?.inventoryLevel?.status == InventoryStatus.SUPPORTED }">
-    <div id="transactionLogTabs" class="tabs">
+    <div id="transactionLogTabs" class="tabs" data-moreBtn="${g.message(code: 'default.more.label', default: 'More')}">
 		<ul class="-primary">
             <li><a href="${request.contextPath}/inventoryItem/showCurrentStock/${commandInstance?.product?.id}"
                    id="current-stock-tab"><warehouse:message code="inventory.listInStock.label" default="In stock"/></a>
             </li>
 			<li><a href="${request.contextPath}/inventoryItem/showStockHistory/${commandInstance?.product?.id}"><warehouse:message code="inventory.stockHistory.label"/></a></li>
-            <li><a href="${request.contextPath}/inventoryItem/showCurrentStockAllLocations/${commandInstance?.product?.id}"><warehouse:message code="inventory.currentStockAllLocations.label" default="All Locations"/></a></li>
-			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.sources.label" default="Sources"/></a></li>
+            <li><a href="${request.contextPath}/inventoryItem/showCurrentStockAllLocations/${commandInstance?.product?.id}"><warehouse:message code="locations.all.label" default="All Locations"/></a></li>
+			<li><a href="${request.contextPath}/inventoryItem/showSuppliers/${commandInstance?.product?.id}"><warehouse:message code="product.productSuppliers.label" default="Product Sources"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showAssociatedProducts/${commandInstance?.product?.id}"><warehouse:message code="productAssociations.label" default="Product Associations"/></a></li>
 			<li><a href="${request.contextPath}/inventoryItem/showPendingInbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingInbound.label" default="Pending Inbound"/></a></li>
 			<li><a id="showPendingOutboundTabLink" href="${request.contextPath}/inventoryItem/showPendingOutbound/${commandInstance?.product?.id}"><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></a></li>
@@ -105,16 +105,16 @@
 		const primaryItems = container.querySelectorAll('.-primary > li:not(.-more)')
 		let secondary, secondaryItems, allItems, moreLi, moreBtn
 
-		// insert "more" button and duplicate the list
-		primary.insertAdjacentHTML('beforeend', `
-		  <li class="ui-state-default ui-corner-top -more">
+		const buttonElement = `
+		<li class="ui-state-default ui-corner-top -more">
 			<button type="button" aria-haspopup="true" aria-expanded="false" class="more-button">
-			  More <span>&darr;</span>
-			</button>
-			<ul class="-secondary">
+			` +  container.getAttribute('data-moreBtn')  + `<span>&darr;</span>` +
+			`<ul class="-secondary">
 			</ul>
 		  </li>
-		`)
+		`;
+		// insert "more" button and duplicate the list
+		primary.insertAdjacentHTML('beforeend', buttonElement)
 
 		const adjustTab = () => {
 			$('.-secondary').empty()
