@@ -69,7 +69,7 @@ class MessageTagLib {
             def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
 
             def image = (!hasOthers) ? 'decline' : 'accept'
 
@@ -80,7 +80,7 @@ class MessageTagLib {
         // Display message normally
         else {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
         }
     }

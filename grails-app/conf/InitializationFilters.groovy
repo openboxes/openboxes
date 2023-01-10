@@ -8,6 +8,7 @@
  * You must not remove this notice, or any other, from this software.
  **/
 import org.pih.warehouse.core.User
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class InitializationFilters {
     def locationService
@@ -26,6 +27,9 @@ class InitializationFilters {
                         def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
                         // If current locale is equal to translation mode locale, we are in localization mode
                         session.useDebugLocale = locale == new Locale(localizationModeLocale)
+                        // We want to set the locale for grails (equivalent to passing ?lang as param)
+                        // so grails' g:message "understands" current language so that is translatable with the crowdin
+                        RCU.getLocaleResolver(request).setLocale(request, response, locale)
 
                         if (session.impersonateUserId && session.user.id != session.impersonateUserId) {
                             session.user = User.get(session.impersonateUserId)
