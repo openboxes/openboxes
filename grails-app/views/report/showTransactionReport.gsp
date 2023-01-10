@@ -76,24 +76,28 @@
 								<label>
 									<warehouse:message code="report.location.label"/>
 								</label>
-								<g:selectLocation class="chzn-select-deselect filter"
-												  id="locationId"
-												  name="location.id"
-												  activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
-												  noSelection="['':'']"
-												  maxChars="75"
-												  groupBy="locationType"
-												  value="${command?.location?.id}"/>
+								<g:selectLocation
+									class="chzn-select-deselect filter"
+									id="locationId"
+									name="location.id"
+									activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
+									noSelection="['':'']"
+									maxChars="75"
+									groupBy="locationType"
+									value="${command?.location?.id}"
+								/>
 							</div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="category.label"/></label>
 								<p>
-									<g:selectCategory id="category"
-													  class="chzn-select-deselect filter"
-													  data-placeholder="Select a category"
-													  name="category"
-													  noSelection="['':'']"
-													  value="${params?.category?.id?:command?.rootCategory?.id}"/>
+									<g:selectCategory
+										id="category"
+									    class="chzn-select-deselect filter"
+									    data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
+									    name="category"
+									    noSelection="['':'']"
+									    value="${params?.category?.id?:command?.rootCategory?.id}"
+									/>
 								</p>
 								<p>
 									<label>
@@ -112,7 +116,8 @@
 										name="tags"
 									    id="tags"
 									    value="${params?.tags}"
-									    multiple="true"
+										data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
+										multiple="true"
 									    class="chzn-select-deselect"
 									/>
 								</p>
@@ -122,10 +127,11 @@
 								<p>
 									<g:selectCatalogs
 										id="catalogs"
-									    name="catalogs"
+										name="catalogs"
 										noSelection="['null':'']"
 									    value="${params?.catalogs}"
-									    class="chzn-select-deselect"
+										data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
+										class="chzn-select-deselect"
 									/>
 								</p>
 							</div>
@@ -230,7 +236,7 @@
 						"_TOTAL_" +
 						" ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
 				"sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
-				"sZeroRecords": "${g.message(code: 'default.dataTable.search.label', default: 'No records found')}",
+				"sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
 				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
 				"sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
 						"_MAX_" +

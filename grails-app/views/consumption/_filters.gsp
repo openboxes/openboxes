@@ -69,7 +69,7 @@
                             multiple="true"
                             value="${command?.selectedCategories?.id}"
                             class="chzn-select-deselect"
-                            data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                            data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
                         />
                     </div>
                     <div class="filter-list-item">
@@ -81,7 +81,7 @@
                             value="${command?.selectedTags?.id}"
                             multiple="true"
                             class="chzn-select-deselect"
-                            data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                            data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
                         />
                     </div>
                     <g:if test="${!command?.toLocations}">
@@ -95,7 +95,7 @@
                                     value="${command?.selectedLocations?.id}"
                                     multiple="true"
                                     class="chzn-select-deselect"
-                                    data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                                    data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
                                 />
                             </div>
 
@@ -125,7 +125,7 @@
                         name="selectedProperties"
                         multiple="true"
                         class="chzn-select-deselect"
-                        data-placeholder="${g.message(code:'default.selectSomeOptions.label', default: 'Select Some Options')}"
+                        data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
                     >
 
                         <g:hasRoleFinance>

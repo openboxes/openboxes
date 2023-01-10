@@ -1,12 +1,11 @@
 <table id="dialogDataTable" class="dataTable">
     <thead>
         <tr>
-            <th><g:message code="default.date.label"/></th>
-            <th><g:message code="default.time.label"/></th>
-            <th><g:message code="transaction.transactionType.label"/></th>
-            <th><g:message code="transactionType.transactionCode.label"
-                           default="Transaction Code"/></th>
-            <th><g:message code="default.quantity.label"/></th>
+            <th><g:message code="default.date.label" default="Date"/></th>
+            <th><g:message code="default.time.label" default="Time"/></th>
+            <th><g:message code="transaction.transactionType.label" default="Type"/></th>
+            <th><g:message code="transactionType.transactionCode.label" default="Transaction Code"/></th>
+            <th><g:message code="default.quantity.label" default="Quantity"/></th>
             <th><g:message code="default.balance.label" default="Balance"/></th>
         </tr>
     </thead>
@@ -15,11 +14,11 @@
     </tbody>
     <tfoot>
     <tr>
-        <th><g:message code="default.date.label"/></th>
-        <th><g:message code="default.time.label"/></th>
-        <th><g:message code="transaction.transactionType.label"/></th>
+        <th><g:message code="default.date.label" default="Date"/></th>
+        <th><g:message code="default.time.label" default="Time"/></th>
+        <th><g:message code="transaction.transactionType.label" default="Type"/></th>
         <th><g:message code="transactionType.transactionCode.label" default="Transaction Code"/></th>
-        <th><g:message code="default.quantity.label"/></th>
+        <th><g:message code="default.quantity.label" default="Quantity"/></th>
         <th><g:message code="default.balance.label" default="Balance"/></th>
     </tr>
     </tfoot>
@@ -59,8 +58,18 @@
                 $("#endDate").val();
             },
             "oLanguage": {
-                "sZeroRecords": "No records found",
-                "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+              "sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
+              "sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+              "sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
+                "_START_" +
+                " ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
+                "_END_" +
+                " ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
+                "_TOTAL_" +
+                " ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
+              "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+              "sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
+              "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
             },
             "aoColumns": [
                 {"mData": "transactionDate" },
