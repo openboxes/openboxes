@@ -1,44 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import fileDownload from 'js-file-download';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
 import { RiDownload2Line } from 'react-icons/all';
-import { getTranslate } from 'react-localize-redux';
-import { connect } from 'react-redux';
 
-import productApi from 'api/services/ProductApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
+import useProductsListTableData from 'hooks/list-pages/product/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-const INITIAL_STATE = {
-  productsData: [],
-  pages: -1,
-  totalCount: 0,
-  currentParams: {},
-};
-
+import Translate from 'utils/Translate';
 
 const ProductsListTable = ({
   filterParams,
-  translate,
 }) => {
-  // Util ref for react-table to force the fetch of data
-  const tableRef = useRef(null);
-  const fireFetchData = () => {
-    tableRef.current.fireFetchData();
-  };
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  const [loading, setLoading] = useState(false);
-  const [tableData, setTableData] = useState(INITIAL_STATE);
-
+  const {
+    tableData,
+    tableRef,
+    loading,
+    onFetchHandler,
+    exportProducts,
+  } = useProductsListTableData(filterParams);
 
   // Columns for react-table
   const columns = useMemo(() => [
@@ -87,83 +67,6 @@ const ProductsListTable = ({
     },
   ], []);
 
-
-  const onFetchHandler = useCallback(async (tableState) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = tableState.sorted.length > 0 ?
-        {
-          sort: tableState.sorted[0].id,
-          order: tableState.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'lastUpdated',
-          order: 'desc',
-        };
-
-      const params = _.omitBy({
-        offset: `${offset}`,
-        max: `${tableState.pageSize}`,
-        ...sortingParams,
-        ...filterParams,
-        catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
-        categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
-        tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
-      }, (val) => {
-        if (typeof val === 'boolean') {
-          return !val;
-        }
-        return _.isEmpty(val);
-      });
-
-      // Fetch data
-      setLoading(true);
-      try {
-        const config = {
-          params,
-          paramsSerializer: parameters => queryString.stringify(parameters),
-        };
-        const { data } = await productApi.getProducts(config);
-        setTableData({
-          productsData: data.data,
-          totalCount: data.totalCount,
-          pages: Math.ceil(data.totalCount / tableState.pageSize),
-          currentParams: params,
-        });
-      } catch {
-        await Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [filterParams]);
-
-  const exportProducts = async (allProducts = false, withAttributes = false) => {
-    const params = () => {
-      if (allProducts) {
-        return { format: 'csv' };
-      }
-      if (withAttributes) {
-        return { format: 'csv', includeAttributes: true };
-      }
-      return {
-        ..._.omit(tableData.currentParams, ['offset', 'max']),
-        format: 'csv',
-      };
-    };
-
-    const config = {
-      params: params(),
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    };
-    const { data } = await productApi.getProducts(config);
-    const date = new Date();
-    const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
-    const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-    fileDownload(data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
-  };
-
-
   return (
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
@@ -207,7 +110,7 @@ const ProductsListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData.productsData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
         pages={tableData.pages}
@@ -220,15 +123,9 @@ const ProductsListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-});
-
-
-export default connect(mapStateToProps)(ProductsListTable);
+export default ProductsListTable;
 
 
 ProductsListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
-  translate: PropTypes.func.isRequired,
 };
