@@ -22,7 +22,9 @@ import {
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
+  FILTER_FORM_PARAMS_BUILT,
   HIDE_SPINNER,
+  REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   RESET_INDICATORS,
@@ -518,3 +520,16 @@ export function fetchStockTransferStatuses() {
     });
   };
 }
+
+export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
+  // if flag is true, we want to trigger the rebuild of filter form params
+  if (flag) {
+    return dispatch({
+      type: REBUILD_FILTER_FORM_PARAMS,
+    });
+  }
+  // otherwise we want to unmark it to the "standby" (false) position
+  return dispatch({
+    type: FILTER_FORM_PARAMS_BUILT,
+  });
+};

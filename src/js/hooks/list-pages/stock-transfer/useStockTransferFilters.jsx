@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import filterFields from 'components/stock-transfer/list/FilterFields';
+import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchUserById } from 'utils/option-utils';
 
@@ -14,11 +15,15 @@ const useStockTransferFilters = () => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const history = useHistory();
-  const { statuses, currentUser, currentLocation } = useSelector(state => ({
+  const {
+    statuses, currentUser,
+  } = useSelector(state => ({
     statuses: state.stockTransfer.statuses,
     currentUser: state.session.user,
     currentLocation: state.session.currentLocation,
+    shouldRebuildParams: state.filterForm.shouldRebuildParams,
   }));
+
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
@@ -52,19 +57,8 @@ const useStockTransferFilters = () => {
     setFiltersInitialized(true);
   };
 
-  useEffect(() => {
-    // Don't clear the query params while doing first filter initialization
-    // clear the filters only when changing location, but not refreshing page
-    if (filtersInitialized) {
-      clearFilterValues();
-    }
-  }, [currentLocation?.id]);
-
-  useEffect(() => {
-    if (currentLocation?.id) {
-      initializeDefaultFilterValues();
-    }
-  }, [currentLocation?.id]);
+  // Custom hook for changing location/filters rebuilding logic
+  useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
 
   const setFilterValues = (values) => {
     const filterAccessors = {

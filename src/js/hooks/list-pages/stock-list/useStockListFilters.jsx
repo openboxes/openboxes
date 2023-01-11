@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
-import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import filterFields from 'components/stock-list/FilterFields';
+import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import apiClient from 'utils/apiClient';
 import { transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById } from 'utils/option-utils';
@@ -16,10 +16,6 @@ const useStockListFilters = () => {
 
   const [locations, setLocations] = useState([]);
   const history = useHistory();
-
-  const { currentLocation } = useSelector(state => ({
-    currentLocation: state.session.currentLocation,
-  }));
 
   useEffect(() => {
     apiClient.get('/openboxes/api/locations')
@@ -69,19 +65,8 @@ const useStockListFilters = () => {
     setFiltersInitialized(true);
   };
 
-  useEffect(() => {
-    // Don't clear the query params while doing first filter initialization
-    // clear the filters only when changing location, but not refreshing page
-    if (filtersInitialized) {
-      clearFilterValues();
-    }
-  }, [currentLocation?.id]);
-
-  useEffect(() => {
-    if (currentLocation?.id) {
-      initializeDefaultFilterValues();
-    }
-  }, [currentLocation?.id]);
+  // Custom hook for changing location/filters rebuilding logic
+  useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
 
   const setFilterValues = (values) => {
     const filterAccessors = {

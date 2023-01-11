@@ -6,6 +6,7 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
+import { setShouldRebuildFilterParams } from 'actions';
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
 import Button from 'components/form-elements/Button';
 import SearchField from 'components/form-elements/SearchField';
@@ -30,6 +31,7 @@ const FilterForm = ({
   ignoreClearFilters,
   currentLocation,
   translate,
+  setShouldRebuildFilterValues,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -91,7 +93,7 @@ const FilterForm = ({
         }
         return { ...acc, [key]: '' };
       }, {});
-    updateFilterParams(clearedFilterList);
+    setShouldRebuildFilterValues(true);
     form.reset(clearedFilterList);
   };
 
@@ -159,7 +161,11 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps)(FilterForm);
+const mapDispatchToProps = {
+  setShouldRebuildFilterValues: setShouldRebuildFilterParams,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FilterForm);
 
 
 FilterForm.propTypes = {
@@ -178,6 +184,7 @@ FilterForm.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   translate: PropTypes.func.isRequired,
+  setShouldRebuildFilterValues: PropTypes.func.isRequired,
 };
 
 FilterForm.defaultProps = {
