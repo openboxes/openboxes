@@ -123,5 +123,7 @@
         </div>
     </div>
 </div>
+<g:render template="/dashboard/activeSection" model="[section: 'requisitionTemplate']"/>
 </body>
 </html>
+

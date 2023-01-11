@@ -475,24 +475,6 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-
-      const setActiveSection = (sectionName) => {
-        const matchingMenuSection = $("#" + sectionName).get(0);
-        const matchingMenuSectionCollapsable = $("#" + sectionName + "-collapsed").get(0);
-        if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
-        if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
-      };
-
-      const menuConfigValues = $(".menu-config-value").toArray();
-        menuConfigValues.forEach(config => {
-          const matchingMenuSection = $("#" + config.name).get(0);
-          const matchingMenuSectionCollapsable = $("#" + config.name + "collapsed").get(0);
-          if (matchingMenuSection) matchingMenuSection.classList.remove('active-section');
-          if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.remove('active-section');
-        });
-      const sectionName = ${stockMovement?.destination == currentLocation} ? 'inbound' : 'outbound';
-      setActiveSection(sectionName);
-
         $(".tabs").tabs({
             cookie : {
                 expires : 1
@@ -501,6 +483,7 @@
         });
     });
 </script>
+<g:render template="/dashboard/activeSection" model="[section: stockMovement?.destination == currentLocation ? 'inbound' : 'outbound']"/>
 
 </body>
 </html>

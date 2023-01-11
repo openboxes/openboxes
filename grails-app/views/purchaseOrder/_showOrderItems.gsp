@@ -1100,6 +1100,7 @@
 	</td>
 </tr>
 </script>
+<g:render template="/dashboard/activeSection" model="[section: 'purchasing']"/>
 <script id="adjustmentsRowTemplate" type="x-jquery-tmpl">
 <tr id="{{= id}}" tabindex="{{= index}}" class="{{if isCanceled }} canceled-item {{/if}}">
 	<td class="left middle">

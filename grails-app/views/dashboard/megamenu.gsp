@@ -99,62 +99,30 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-    function getHrefs(value) {
-      return [...value.matchAll(/href=[/A-z0-9=&_?]*[,}]/g)]
-        .map(href => href[0].replaceAll(/([,}]$|href=|\/index)*/g, ''))
-    }
-
-    function getCommonPartLength(href, matchingHref) {
-      const [longerHref, shorterHref] = [href, matchingHref].sort((a, b) => a.length - b.length)
-      const splittedLongerHref = longerHref.split('/')
-        return shorterHref.split('/').reduce((prev, curr, index, iterations) => {
-          if (splittedLongerHref[index] !== curr) iterations.splice(1)
-          if (splittedLongerHref[index] === curr) return prev + 1;
-          return prev;
-        }, 0)
-    }
-
     const path = window.location.pathname
     const menuConfigValues = $(".menu-config-value").toArray();
-    menuConfigValues[8].value += 'href=/openboxes/inventoryItem/showStockCard,';
-    const matchingHref = menuConfigValues.reduce((configAcc, section) => {
-      const maxSection = getHrefs(section.value).reduce((hrefAcc, href) => {
-        if (getCommonPartLength(href, path) > hrefAcc.maxLength) {
-          return { maxLength: getCommonPartLength(href, path), section: href };
+    const matchingSection = menuConfigValues.find(it => it.value.includes(path))
+    // Assign active-section class to matched section
+    if (matchingSection) {
+      const matchingMenuSection = $("#" + matchingSection?.name).get(0);
+      const matchingMenuSectionCollapsable = $("#" + matchingSection?.name + "-collapsed").get(0);
+      if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
+      if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
+    }
+    function repositionNavDropdowns() {
+      const dropdownRightClass = "dropdown-menu-right";
+      const itemDropdowns = $(".navbar-nav .dropdown-menu").toArray();
+      itemDropdowns.forEach(dropdown => {
+        const rect = dropdown.getBoundingClientRect();
+        if ([...dropdown.classList].includes(dropdownRightClass) && window.innerWidth > rect.right + rect.width) {
+          dropdown.classList.remove(dropdownRightClass)
         }
-        return hrefAcc;
-      }, { maxLength: 2, section: null })
-      if (maxSection.maxLength > configAcc.maxLength) {
-        return maxSection;
-      }
-      return configAcc;
-    }, { maxLength: 2, section: null }).section;
-
-    const foundSection = matchingHref && menuConfigValues.find(it => it.value.includes(matchingHref))
-
-      // Assign active-section class to matched section
-      if (foundSection) {
-        const matchingMenuSection = $("#" + foundSection?.name).get(0);
-        const matchingMenuSectionCollapsable = $("#" + foundSection?.name + "-collapsed").get(0);
-        if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
-        if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
-      }
-
-
-      function repositionNavDropdowns() {
-        const dropdownRightClass = "dropdown-menu-right";
-        const itemDropdowns = $(".navbar-nav .dropdown-menu").toArray();
-        itemDropdowns.forEach(dropdown => {
-          const rect = dropdown.getBoundingClientRect();
-          if ([...dropdown.classList].includes(dropdownRightClass) && window.innerWidth > rect.right + rect.width) {
-            dropdown.classList.remove(dropdownRightClass)
-          }
-          if (window.innerWidth < rect.right) {
-            dropdown.classList.add(dropdownRightClass);
-          }
-        })
-      }
-      repositionNavDropdowns();
-      addEventListener("resize", repositionNavDropdowns);
-    });
+        if (window.innerWidth < rect.right) {
+          dropdown.classList.add(dropdownRightClass);
+        }
+      })
+    }
+    repositionNavDropdowns();
+    addEventListener("resize", repositionNavDropdowns);
+  });
 </script>

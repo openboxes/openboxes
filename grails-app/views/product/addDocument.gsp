@@ -77,5 +77,6 @@
 		</g:uploadForm>
 	</div>
 </div>
+<g:render template="/dashboard/activeSection" model="[section: 'products']"/>
 </body>
 </html>

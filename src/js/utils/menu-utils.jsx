@@ -1,11 +1,5 @@
 import _ from 'lodash';
-
-export const mapQueryParamsToObject = queryParams => (queryParams ? queryParams
-  .split('&')
-  .reduce((acc, param) => {
-    const [key, value] = param.split('=');
-    return { ...acc, [key]: value };
-  }, {}) : {});
+import queryString from 'query-string';
 
 export const checkActiveSection = ({
   menuUrls,
@@ -24,16 +18,23 @@ export const checkActiveSection = ({
       // find matching URL from sections
       const foundURL = menuUrls[section].find((url) => {
         const [sectionPath, sectionSearch] = url.split('?');
+        // if current pathname is longer than section path and pathname doesn't end with '/'
+        // it means that we didn't match the whole url section
+        if (pathnameWithoutParams.length > sectionPath.length && pathnameWithoutParams[sectionPath.length] !== '/') {
+          return false;
+        }
+        // if current pathname doesn't contain section path
+        // it means that pathname doesn't match section
         if (!pathnameWithoutParams.includes(sectionPath.replace(/\/index$/, ''))) {
           return false;
         }
         // if found matching pathname
         // then check if all parameters of section path match with current path parameters
-        if (sectionSearch) {
+        if (!_.isEmpty(sectionSearch)) {
           const {
             direction,
             ...otherParams
-          } = mapQueryParamsToObject(search.substring(1, search.length));
+          } = queryString.parse(search.substring(1, search.length));
           // if direction is not specified
           // then compare current url with sectionPath without direction
           if (!direction) {
@@ -45,6 +46,11 @@ export const checkActiveSection = ({
       });
       return !!foundURL;
     });
+
+  if (pathname.includes('partialReceiving')) {
+    return 'Inbound';
+  }
+
   return matchedPath || 'Dashboard';
 };
 

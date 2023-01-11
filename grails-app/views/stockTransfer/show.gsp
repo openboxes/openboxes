@@ -109,6 +109,8 @@
     </div>
 </div>
 
+<g:render template="/dashboard/activeSection" model="[section: 'inventory']"/>
+
 <script>
   $(document).ready(function() {
     $(".tabs").tabs({

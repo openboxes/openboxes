@@ -25,5 +25,6 @@
     <script src="${createLinkTo(dir:'js/product/', file:'controllers.js')}"></script>
     <script src="${createLinkTo(dir:'js/product/', file:'filters.js')}"></script>
     <script src="${createLinkTo(dir:'js/product/', file:'services.js')}"></script>
+
 </body>
 </html>

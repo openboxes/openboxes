@@ -78,6 +78,7 @@
 				</tfoot>
 			</table>
 		</g:uploadForm>
+		<g:render template="/dashboard/activeSection" model="[section: session.warehouse == stockMovementInstance.getDestination() ? 'inbound' : 'outbound']"/>
 	</div>
 </div>
 </body>

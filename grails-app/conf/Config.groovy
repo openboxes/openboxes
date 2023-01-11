@@ -1354,7 +1354,7 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/create", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/purchaseOrder/list"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],

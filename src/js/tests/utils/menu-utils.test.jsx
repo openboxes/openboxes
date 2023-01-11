@@ -1,27 +1,4 @@
-import { checkActiveSection, getAllMenuUrls, mapQueryParamsToObject } from 'utils/menu-utils';
-
-describe('mapQueryParamsToObject', () => {
-  it('should return empty object when query params is empty', () => {
-    expect(mapQueryParamsToObject('')).toStrictEqual({});
-  });
-
-  it('should return mapped query params when there is only one param', () => {
-    const queryParams = 'destination=inbound';
-    const mappedObject = {
-      destination: 'inbound',
-    };
-    expect(mapQueryParamsToObject(queryParams)).toStrictEqual(mappedObject);
-  });
-
-  it('should return mapped query params when there is more than one param', () => {
-    const queryParams = 'destination=inbound&testKey=testValue';
-    const mappedObject = {
-      destination: 'inbound',
-      testKey: 'testValue',
-    };
-    expect(mapQueryParamsToObject(queryParams)).toStrictEqual(mappedObject);
-  });
-});
+import { checkActiveSection, getAllMenuUrls } from 'utils/menu-utils';
 
 describe('getAllMenuUrls', () => {
   it('should return section with url', () => {

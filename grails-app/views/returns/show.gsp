@@ -385,7 +385,7 @@
         </div>
     </div>
 </div>
-
+<g:render template="/dashboard/activeSection" model="[section: stockMovement?.destination == currentLocation ? 'inbound' : 'outbound']"/>
 <script type="text/javascript">
     $(document).ready(function() {
         $(".tabs").tabs({
