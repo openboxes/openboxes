@@ -116,7 +116,7 @@
 										name="tags"
 									    id="tags"
 									    value="${params?.tags}"
-										data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
+										data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
 										multiple="true"
 									    class="chzn-select-deselect"
 									/>
@@ -130,7 +130,7 @@
 										name="catalogs"
 										noSelection="['null':'']"
 									    value="${params?.catalogs}"
-										data-placeholder="${g.message(code: "default.selectOptions.label", default: "Select Options")}"
+										data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
 										class="chzn-select-deselect"
 									/>
 								</p>
