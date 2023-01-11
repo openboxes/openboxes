@@ -21,6 +21,7 @@ import LoadingNumbers from 'components/dashboard/LoadingNumbers';
 import NumberCard from 'components/dashboard/NumberCard';
 import UnarchiveIndicators from 'components/dashboard/UnarchiveIndicators';
 import apiClient from 'utils/apiClient';
+import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -91,7 +92,11 @@ const SortableNumberCards = SortableContainer(({ data, personalDashboardActive }
 const ArchiveIndicator = ({ hideArchive }) => (
   <div className={hideArchive ? 'archive-div hide-archive' : 'archive-div'}>
     <span>
-      Archive indicator <i className="fa fa-archive" />
+      <Translate
+        id="react.dashboard.archive.label"
+        defaultMessage="Archive indicator"
+      />
+      <i className="fa fa-archive ml-2" />
     </span>
   </div>
 );
@@ -117,7 +122,7 @@ const ConfigurationsList = ({
           <li className={`configs-list-item ${activeConfig === key ? 'active' : ''}`} key={key}>
             <button onClick={() => loadConfigData(key)}>
               <i className="fa fa-bar-chart" aria-hidden="true" />
-              {value.name}
+              <Translate id={`react.dashboard.${key}.label`} defaultMessage={value.name} />
             </button>
           </li>
           ))}
@@ -126,10 +131,19 @@ const ConfigurationsList = ({
         (activeConfig === 'personal' && configModified) ?
           <div className="update-section">
             <div className="division-line" />
-            <span> <i className="fa fa-info-circle" aria-hidden="true" />The dashboard layout has been edited</span>
+            <span>
+              <i className="fa fa-info-circle" aria-hidden="true" />
+              <Translate
+                id="react.dashboard.hasBeenEdited.message"
+                defaultMessage="The dashboard layout has been edited"
+              />
+            </span>
             <button onClick={updateConfig} >
               <i className="fa fa-floppy-o" aria-hidden="true" />
-              Save configuration
+              <Translate
+                id="react.dashboard.saveConfiguration.label"
+                defaultMessage="Save configuration"
+              />
             </button>
           </div>
         : null
