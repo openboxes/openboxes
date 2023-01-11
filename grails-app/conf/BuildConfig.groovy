@@ -126,9 +126,12 @@ grails.project.dependency.resolution = {
         test("com.icegreen:greenmail:1.5.10") { excludes "junit" }
 
         // Required for GPars
+        build "org.codehaus.gpars:gpars:0.12"  // otherwise early build chain uses 0.9
         compile "org.codehaus.gpars:gpars:0.12"
         compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
+
+        compile 'org.quartz-scheduler:quartz:2.1.7'
 
         // Unknown
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }

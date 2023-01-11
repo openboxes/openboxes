@@ -132,6 +132,11 @@ grails.validateable.packages = [
         'org.pih.warehouse.shipment',
 ]
 
+// make all quartz threads 'nice'
+org.quartz.scheduler.instanceName = 'CommonQuartzPool'
+org.quartz.scheduler.skipUpdateCheck = true
+org.quartz.threadPool.threadPriority = Thread.MIN_PRIORITY
+
 // Default URL
 grails.serverURL = "http://localhost:8080/${appName}"
 

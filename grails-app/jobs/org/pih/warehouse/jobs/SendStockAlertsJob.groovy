@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.jobs
 
-import groovyx.gpars.GParsPool
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
@@ -19,6 +18,7 @@ import org.quartz.JobExecutionContext
 class SendStockAlertsJob {
 
     def concurrent = false
+    def gparsService
     def grailsApplication
     def locationService
     def notificationService
@@ -37,7 +37,7 @@ class SendStockAlertsJob {
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Send stock alerts: " + context.mergedJobDataMap)
-            GParsPool.withPool {
+            gparsService.withPool('SendStockAlerts') {
                 def depotLocations = locationService.getDepots()
                 depotLocations.eachParallel { Location location ->
                     if (location.active && location.supports(ActivityCode.ENABLE_NOTIFICATIONS)) {
