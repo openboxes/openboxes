@@ -110,7 +110,7 @@ class FilterComponent extends Component {
                 this.props.label[1],
                 {
                   number: 3,
-                  timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
+                  timeUnit: this.props.translate('react.dashboard.timeFilter.months.label', 'Months'),
                 },
               )}
             </option>
@@ -120,7 +120,7 @@ class FilterComponent extends Component {
                 this.props.label[1],
                 {
                   number: 6,
-                  timeUnit: this.props.translate('react.dashboard.timeFilter.month.label', 'Month'),
+                  timeUnit: this.props.translate('react.dashboard.timeFilter.months.label', 'Months'),
                 },
               )}
             </option>
