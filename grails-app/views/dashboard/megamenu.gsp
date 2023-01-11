@@ -100,37 +100,40 @@
 <script type="text/javascript">
   $(document).ready(function () {
     function getHrefs(value) {
-      return [...value.matchAll(/href=[/A-z0-9]*[,}]/g)]
+      return [...value.matchAll(/href=[/A-z0-9=&_?]*[,}]/g)]
         .map(href => href[0].replaceAll(/([,}]$|href=|\/index)*/g, ''))
     }
 
     function getCommonPartLength(href, matchingHref) {
       const [longerHref, shorterHref] = [href, matchingHref].sort((a, b) => a.length - b.length)
-        return [...shorterHref].reduce((prev, curr, index) => {
-          if (longerHref[index] === curr) return prev + 1;
+      const splittedLongerHref = longerHref.split('/')
+        return shorterHref.split('/').reduce((prev, curr, index, iterations) => {
+          if (splittedLongerHref[index] !== curr) iterations.splice(1)
+          if (splittedLongerHref[index] === curr) return prev + 1;
           return prev;
         }, 0)
     }
 
     const path = window.location.pathname
     const menuConfigValues = $(".menu-config-value").toArray();
+    menuConfigValues[8].value += 'href=/openboxes/inventoryItem/showStockCard,';
     const matchingHref = menuConfigValues.reduce((configAcc, section) => {
       const maxSection = getHrefs(section.value).reduce((hrefAcc, href) => {
         if (getCommonPartLength(href, path) > hrefAcc.maxLength) {
-          return { maxLength: getCommonPartLength(href, path), section: href }
+          return { maxLength: getCommonPartLength(href, path), section: href };
         }
         return hrefAcc;
-      }, { maxLength: 11, section: null })
+      }, { maxLength: 2, section: null })
       if (maxSection.maxLength > configAcc.maxLength) {
         return maxSection;
       }
       return configAcc;
-    }, { maxLength: 11, section: null }).section;
+    }, { maxLength: 2, section: null }).section;
 
     const foundSection = matchingHref && menuConfigValues.find(it => it.value.includes(matchingHref))
 
       // Assign active-section class to matched section
-      if (foundSection && foundSection.name !== 'inbound' && foundSection.name !== 'outbound') {
+      if (foundSection) {
         const matchingMenuSection = $("#" + foundSection?.name).get(0);
         const matchingMenuSectionCollapsable = $("#" + foundSection?.name + "-collapsed").get(0);
         if (matchingMenuSection) matchingMenuSection.classList.add('active-section');

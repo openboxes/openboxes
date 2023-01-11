@@ -475,11 +475,23 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-      const stockMovementDestination = ${stockMovement?.destination == currentLocation} ? 'inbound' : 'outbound'
-         const matchingMenuSection = $("#" + stockMovementDestination).get(0);
-         const matchingMenuSectionCollapsable = $("#" + stockMovementDestination + "-collapsed").get(0);
-         if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
-         if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
+
+      const setActiveSection = (sectionName) => {
+        const matchingMenuSection = $("#" + sectionName).get(0);
+        const matchingMenuSectionCollapsable = $("#" + sectionName + "-collapsed").get(0);
+        if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
+        if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
+      };
+
+      const menuConfigValues = $(".menu-config-value").toArray();
+        menuConfigValues.forEach(config => {
+          const matchingMenuSection = $("#" + config.name).get(0);
+          const matchingMenuSectionCollapsable = $("#" + config.name + "collapsed").get(0);
+          if (matchingMenuSection) matchingMenuSection.classList.remove('active-section');
+          if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.remove('active-section');
+        });
+      const sectionName = ${stockMovement?.destination == currentLocation} ? 'inbound' : 'outbound';
+      setActiveSection(sectionName);
 
         $(".tabs").tabs({
             cookie : {
