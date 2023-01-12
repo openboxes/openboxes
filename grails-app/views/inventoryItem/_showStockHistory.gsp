@@ -271,7 +271,11 @@
                 <g:each var="month" in="${year.value}">
                     <tr class="monthRow border-top ${isCurrentYear ? 'currentYear' : ''}">
                         <td colspan="14" class="icon  ${isCurrentYear ? 'active' : ''}">
-                            ${new java.text.DateFormatSymbols().months[(month.key).toInteger()]} ${year.key}
+                            <g:message
+                                code="month.${(month.key).toInteger() + 1}.label"
+                                default="${new java.text.DateFormatSymbols().months[(month.key).toInteger()]}"
+                            />
+                            ${year.key}
                         </td>
                     </tr>
                     <g:each var="stockHistoryEntry" in="${month.value}">

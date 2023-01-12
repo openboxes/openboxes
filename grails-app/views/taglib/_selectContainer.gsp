@@ -1,4 +1,4 @@
-<select id="shipmentContainer" name="shipmentContainer" class="chzn-select-deselect">
+<select id="shipmentContainer" name="shipmentContainer" class="chzn-select-deselect" data-placeholder="${attrs['data-placeholder']}">
 	<option value="null"></option>
 	<g:each var="shipmentInstance" in="${attrs?.from }">
 		<g:set var="expectedShippingDate" value="${prettyDateFormat(date: shipmentInstance?.expectedShippingDate)}"/>
