@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { useParams, withRouter } from 'react-router-dom';
 
@@ -10,9 +9,8 @@ import MenuItem from 'components/Layout/menu/MenuItem';
 import MenuSection from 'components/Layout/menu/MenuSection';
 import MenuSubsection from 'components/Layout/menu/MenuSubsection';
 import { checkActiveSection, getAllMenuUrls } from 'utils/menu-utils';
-import { translateWithDefaultMessage } from 'utils/Translate';
 
-const Menu = ({ menuConfig, location, translate }) => {
+const Menu = ({ menuConfig, location }) => {
   const params = useParams();
 
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);
@@ -21,7 +19,6 @@ const Menu = ({ menuConfig, location, translate }) => {
       menuUrls: allMenuUrls,
       path: location,
       params,
-      translate,
     }), [allMenuUrls, location]);
 
   return (
@@ -68,7 +65,6 @@ const Menu = ({ menuConfig, location, translate }) => {
 
 const mapStateToProps = state => ({
   menuConfig: state.session.menuConfig,
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default withRouter(connect(mapStateToProps)(Menu));
@@ -95,6 +91,5 @@ Menu.propTypes = {
     pathname: PropTypes.string,
     search: PropTypes.string,
   }).isRequired,
-  translate: PropTypes.func.isRequired,
   menuConfig: PropTypes.arrayOf(sectionPropTypes).isRequired,
 };
