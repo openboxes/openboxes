@@ -41,7 +41,7 @@ const Menu = ({ menuConfig, location }) => {
                 <MenuSubsection
                   section={section}
                   key={`${section.label}-menu-subsection`}
-                  active={activeSection === section.label}
+                  active={activeSection === section.id}
                 />
               );
             }
@@ -50,7 +50,7 @@ const Menu = ({ menuConfig, location }) => {
                 <MenuItem
                   section={section}
                   key={`${section.label}-menuItem`}
-                  active={activeSection === section.label}
+                  active={activeSection === section.id}
                 />
               );
             }

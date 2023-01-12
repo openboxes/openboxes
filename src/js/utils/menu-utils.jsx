@@ -47,10 +47,10 @@ export const checkActiveSection = ({
       return !!foundURL;
     });
   if (pathname.includes('partialReceiving')) {
-    return 'Inbound';
+    return 'inbound';
   }
 
-  return matchedPath || 'Dashboard';
+  return matchedPath || 'dashboard';
 };
 
 export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)
@@ -66,13 +66,13 @@ export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)
         return {
           ...acc,
           // eslint-disable-next-line max-len
-          [section.label]: section.subsections.flatMap(subsection => subsection.menuItems.map(item => item.href)),
+          [section.id]: section.subsections.flatMap(subsection => subsection.menuItems.map(item => item.href)),
         };
       }
       if (section.menuItems) {
         return {
           ...acc,
-          [section.label]: section.menuItems.flatMap(({ href }) => href),
+          [section.id]: section.menuItems.flatMap(({ href }) => href),
         };
       }
     }
