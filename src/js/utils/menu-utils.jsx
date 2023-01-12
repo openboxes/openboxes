@@ -46,7 +46,6 @@ export const checkActiveSection = ({
       });
       return !!foundURL;
     });
-
   if (pathname.includes('partialReceiving')) {
     return 'Inbound';
   }
@@ -60,7 +59,7 @@ export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)
       if (section.href) {
         return {
           ...acc,
-          [section.label]: [section.href],
+          [section.id]: [section.href],
         };
       }
       if (section.subsections) {

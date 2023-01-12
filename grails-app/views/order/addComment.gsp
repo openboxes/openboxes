@@ -78,6 +78,6 @@
 			</div>
 		</div>
 	</div>
-	<g:render template="/dashboard/activeSection" model="[section: orderInstance.orderType.name == 'Putaway Order' ? 'inbound' : orderInstance.orderType.name == 'Outbound' ? 'outbound' : 'purchasing']"/>
+	<g:render template="/dashboard/activeSection" model="[section: orderInstance?.orderType?.isPutawayOrder() ? 'inbound' : 'purchasing']"/>
 </body>
 </html>
