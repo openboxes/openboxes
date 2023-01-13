@@ -27,19 +27,19 @@
 			</div>
 		</g:hasErrors>
 
-		<div class="dialog" >			
+		<div class="dialog" >
 			<g:form action="addToShipmentPost">
 					<table class="box">
-					
+
 						<tr class="prop">
 							<td class="name">
 								<label>${warehouse.message(code:'container.label') }</label>
 							</td>
 							<td class="value">
 								<g:selectContainer name="shipmentContainerKey"
-									noSelection="${['null':warehouse.message(code:'shipping.selectContainer.label')]}" 
+									noSelection="${['null':warehouse.message(code:'shipping.selectContainer.label')]}"
 									from="${shipments}"
-									optionKey="id" optionValue="name" groupBy="shipment"/>	
+									optionKey="id" optionValue="name" groupBy="shipment"/>
 							</td>
 						</tr>
 						<tr class="prop">
@@ -59,15 +59,15 @@
 											<th class="center"><warehouse:message code="inventory.qtyOnHand.label"/></th>
 											<th class="center" style="border-left: 1px solid lightgrey;"><warehouse:message code="inventory.qtyToShip.label"/></th>
 										</tr>
-									</thead>						
+									</thead>
 									<g:set var="listStatus" value="${0 }"/>
 									<g:set var="rowStatus" value="${0 }"/>
 									<g:set var="itemsGroupedByProduct" value="${commandInstance?.items?.groupBy { it.product } }"/>
 									<g:each var="product" in="${itemsGroupedByProduct.keySet() }" status="i">
-										<g:set var="items" value="${itemsGroupedByProduct[product]?.sort { it?.inventoryItem?.expirationDate } }"/>			
-										<tbody>	
+										<g:set var="items" value="${itemsGroupedByProduct[product]?.sort { it?.inventoryItem?.expirationDate } }"/>
+										<tbody>
 											<g:each var="item" in="${items}" status="j">
-												
+
 													<tr class="${rowStatus++%2?'even':'odd' } prop">
 														<g:if test="${j==0 }">
 															<td rowspan="${items.size() }" class="name" style="border-right: 1px solid lightgrey;">
@@ -104,7 +104,7 @@
 														</td>
 														<td class="center middle" style="border-left: 1px solid lightgrey; padding: 0">
 															<g:if test="${item?.quantityOnHand > 0 }">
-																<g:textField name="items[${listStatus }].quantity" size="10" style="text-align: center;" 
+																<g:textField name="items[${listStatus }].quantity" size="10" style="text-align: center;"
 																	value="${item?.quantity }" autocomplete="off" class="text"/>
 															</g:if>
 															<g:else>
@@ -112,18 +112,18 @@
 															</g:else>
 														</td>
 													</tr>
-													<g:set var="listStatus" value="${listStatus+1 }"/>												
-											</g:each>					
+													<g:set var="listStatus" value="${listStatus+1 }"/>
+											</g:each>
 											<g:unless test="${itemsGroupedByProduct[product]}">
 												<tr class="${rowStatus++%2?'even':'odd' } prop">
 													<td colspan="6">
 														<h2>
 															<format:product product="${product}"/>
 														</h2>
-													</td>				
+													</td>
 													<td style="border-left: 1px solid lightgrey;" colspan="1">
-													
-													</td>					
+
+													</td>
 												</tr>
 											</g:unless>
 										</g:each>
@@ -137,21 +137,21 @@
 													</button>
 													&nbsp;
 													<g:link controller="inventory" action="browse" id="${shipmentInstance?.id}"><warehouse:message code="default.button.cancel.label"/></g:link>
-												</div>																
+												</div>
 											</td>
 										</tr>
-									</tfoot>	
-								</table>	
+									</tfoot>
+								</table>
 							</td>
-						</tr>						
-					</table>								
-					
+						</tr>
+					</table>
+
 			</g:form>
 		</div>
 	</div>
-	
+
 	<script>
-		$(document).ready(function() {	
+		$(document).ready(function() {
 			$("form:not(.filter) :input:visible:enabled:first").focus();
 		});
 	</script>
