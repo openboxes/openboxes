@@ -246,6 +246,13 @@ class PickPage extends Component {
 
       this.fetchAllData(false);
     }
+    // If session version (it could change when changing the language) is not equal to
+    // reason codes reducer session version, refetch the reason codes, because it could mean,
+    // that we might have wrong labels stored for reason codes,
+    // as language could be changed "in the mean time"
+    if (nextProps.sessionVersion !== nextProps.reasonCodesSessionVersion) {
+      this.props.fetchReasonCodes(this.props.sessionVersion);
+    }
   }
 
   setPickPageItems(response, startIndex) {
@@ -283,7 +290,7 @@ class PickPage extends Component {
   fetchAllData(forceFetch) {
     this.props.showSpinner();
     if (!this.props.reasonCodesFetched || forceFetch) {
-      this.props.fetchReasonCodes();
+      this.props.fetchReasonCodes(this.props.sessionVersion);
     }
 
     this.fetchPickPageData();
@@ -765,6 +772,8 @@ const mapStateToProps = state => ({
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  sessionVersion: state.session.sessionVersion,
+  reasonCodesSessionVersion: state.reasonCodes.sessionVersion,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -798,4 +807,6 @@ PickPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
+  sessionVersion: PropTypes.string.isRequired,
+  reasonCodesSessionVersion: PropTypes.string.isRequired,
 };

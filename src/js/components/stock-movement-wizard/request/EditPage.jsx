@@ -1014,6 +1014,13 @@ class EditItemsPage extends Component {
 
       this.fetchAllData(false);
     }
+    // If session version (it could change when changing the language) is not equal to
+    // reason codes reducer session version, refetch the reason codes, because it could mean,
+    // that we might have wrong labels stored for reason codes,
+    // as language could be changed "in the mean time"
+    if (nextProps.sessionVersion !== nextProps.reasonCodesSessionVersion) {
+      this.props.fetchReasonCodes(this.props.sessionVersion);
+    }
   }
 
   setEditPageItems(response, startIndex) {
@@ -1120,7 +1127,7 @@ class EditItemsPage extends Component {
     this.props.showSpinner();
 
     if (!this.props.reasonCodesFetched || forceFetch) {
-      this.props.fetchReasonCodes();
+      this.props.fetchReasonCodes(this.props.sessionVersion);
     }
 
     this.fetchEditPageData().then((resp) => {
@@ -1635,6 +1642,8 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   supportedActivities: state.session.supportedActivities,
+  sessionVersion: state.session.sessionVersion,
+  reasonCodesSessionVersion: state.reasonCodes.sessionVersion,
 });
 
 export default connect(mapStateToProps, {
@@ -1667,4 +1676,6 @@ EditItemsPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  sessionVersion: PropTypes.string.isRequired,
+  reasonCodesSessionVersion: PropTypes.string.isRequired,
 };
