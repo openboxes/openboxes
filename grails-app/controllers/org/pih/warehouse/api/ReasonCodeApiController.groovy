@@ -17,6 +17,7 @@ class ReasonCodeApiController {
 
     def locationService
     def messageSource
+    def localizationService
 
     def list = {
 
@@ -50,8 +51,7 @@ class ReasonCodeApiController {
     }
 
     ReasonCodeCommand getReasonCode(ReasonCode reasonCodeEnum) {
-        Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
-        Locale locale = session?.user?.locale ?: defaultLocale
+        Locale locale = localizationService.getCurrentLocale();
         ReasonCodeCommand reasonCode = new ReasonCodeCommand()
         reasonCode.id = reasonCodeEnum.name()
         reasonCode.name = messageSource.getMessage("enum.ReasonCode.${reasonCodeEnum.name()}", null, null, locale)
