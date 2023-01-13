@@ -15,7 +15,13 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInvoiceFilters = ({ setFilterParams }) => {
   const {
-    statuses, suppliers, typeCodes, currentLocation, currentUser,
+    statuses,
+    suppliers,
+    typeCodes,
+    currentLocation,
+    currentUser,
+    sessionVersion,
+    invoiceSessionVersion,
   } = useSelector(state => ({
     statuses: state.invoices.statuses,
     suppliers: state.organizations.suppliers,
@@ -24,6 +30,8 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     currentUser: state.session.user,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
+    sessionVersion: state.session.sessionVersion,
+    invoiceSessionVersion: state.invoices.sessionVersion,
   }));
   const [defaultValues, setDefaultValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -82,18 +90,21 @@ const useInvoiceFilters = ({ setFilterParams }) => {
   useCommonFiltersCleaner({ initializeDefaultFilterValues, clearFilterValues, filtersInitialized });
 
   useEffect(() => {
-    // If statuses or invoice type codes not yet in store, fetch them
-    if (!statuses || !statuses.length) {
-      dispatch(fetchInvoiceStatuses());
+    // If no statuses yet fetched or session version (it could change when changing the language)
+    // is not equal to invoice session version, refetch the statuses, because it could mean,
+    // that we might have wrong labels stored for statuses,
+    // as language could be changed "in the mean time"
+    if (!statuses || !statuses.length || sessionVersion !== invoiceSessionVersion) {
+      dispatch(fetchInvoiceStatuses(sessionVersion));
     }
     if (!typeCodes || !typeCodes.length) {
-      dispatch(fetchInvoiceTypeCodes());
+      dispatch(fetchInvoiceTypeCodes(sessionVersion));
     }
 
     // TODO: If editing organizations is in React,
     //  fetch only if length === 0, as edit would should force refetch anyway
     dispatch(fetchSuppliers());
-  }, []);
+  }, [sessionVersion]);
 
   const setFilterValues = useCallback((values) => {
     const filterAccessors = {

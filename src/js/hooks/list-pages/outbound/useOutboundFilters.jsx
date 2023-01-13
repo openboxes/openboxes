@@ -19,19 +19,31 @@ const useOutboundFilters = (isRequestsList) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const {
-    isRequisitionStatusesFetched, requisitionStatuses, currentLocation, currentUser,
+    isRequisitionStatusesFetched,
+    requisitionStatuses,
+    currentLocation,
+    currentUser,
+    sessionVersion,
+    outboundSessionVersion,
   } = useSelector(state => ({
     isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
     requisitionStatuses: state.requisitionStatuses.data,
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
+    sessionVersion: state.session.sessionVersion,
+    outboundSessionVersion: state.requisitionStatuses.sessionVersion,
   }));
 
   useEffect(() => {
-    if (!isRequisitionStatusesFetched || !requisitionStatuses.length) {
+    // If no statuses yet fetched or session version (it could change when changing the language)
+    // is not equal to outbound session version, refetch the statuses, because it could mean,
+    // that we might have wrong labels stored for statuses,
+    // as language could be changed "in the mean time"
+    // eslint-disable-next-line max-len
+    if (!isRequisitionStatusesFetched || !requisitionStatuses.length || sessionVersion !== outboundSessionVersion) {
       dispatch(fetchRequisitionStatusCodes());
     }
-  }, []);
+  }, [sessionVersion]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)

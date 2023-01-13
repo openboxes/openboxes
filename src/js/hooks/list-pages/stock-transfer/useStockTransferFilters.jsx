@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { fetchStockTransferStatuses } from 'actions';
 import filterFields from 'components/stock-transfer/list/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -16,13 +17,19 @@ const useStockTransferFilters = () => {
 
   const history = useHistory();
   const {
-    statuses, currentUser,
+    statuses,
+    currentUser,
+    sessionVersion,
+    stockTransferSessionVersion,
   } = useSelector(state => ({
     statuses: state.stockTransfer.statuses,
     currentUser: state.session.user,
     currentLocation: state.session.currentLocation,
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
+    sessionVersion: state.session.sessionVersion,
+    stockTransferSessionVersion: state.stockTransfer.sessionVersion,
   }));
+  const dispatch = useDispatch();
 
 
   const clearFilterValues = () => {
@@ -56,6 +63,16 @@ const useStockTransferFilters = () => {
     setDefaultFilterValues({ ...defaultValues });
     setFiltersInitialized(true);
   };
+
+  useEffect(() => {
+    // If no statuses yet fetched or session version (it could change when changing the language)
+    // is not equal to invoice session version, refetch the statuses, because it could mean,
+    // that we might have wrong labels stored for statuses,
+    // as language could be changed "in the mean time"
+    if (!statuses || !statuses.length || sessionVersion !== stockTransferSessionVersion) {
+      dispatch(fetchStockTransferStatuses(sessionVersion));
+    }
+  }, [sessionVersion]);
 
   // Custom hook for changing location/filters rebuilding logic
   useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
