@@ -63,13 +63,16 @@ export function hideUserActions() {
   };
 }
 
-export function fetchReasonCodes() {
+export function fetchReasonCodes(sessionVersion) {
   const url = '/openboxes/api/reasonCodes';
   return (dispatch) => {
     apiClient.get(url).then((res) => {
       dispatch({
         type: FETCH_REASONCODES,
-        payload: res.data,
+        payload: {
+          data: res.data.data,
+          sessionVersion,
+        },
       });
     });
   };
@@ -398,12 +401,15 @@ export function fetchConfig(id) {
   };
 }
 
-export function fetchPurchaseOrderStatuses() {
+export function fetchPurchaseOrderStatuses(sessionVersion) {
   return (dispatch) => {
     apiClient.get('/openboxes/api/orderSummaryStatus').then((res) => {
       dispatch({
         type: FETCH_PURCHASE_ORDER_STATUSES,
-        payload: res.data.data,
+        payload: {
+          statuses: res.data.data,
+          sessionVersion,
+        },
       });
     });
   };
@@ -463,12 +469,15 @@ export function fetchBuyers(active = false) {
   };
 }
 
-export function fetchInvoiceStatuses() {
+export function fetchInvoiceStatuses(sessionVersion) {
   return (dispatch) => {
     apiClient.get('/openboxes/api/invoiceStatuses').then((res) => {
       dispatch({
         type: FETCH_INVOICE_STATUSES,
-        payload: res.data.data,
+        payload: {
+          statuses: res.data.data,
+          sessionVersion,
+        },
       });
     });
   };
@@ -485,13 +494,16 @@ export function fetchInvoiceTypeCodes() {
   };
 }
 
-export function fetchShipmentStatusCodes() {
+export function fetchShipmentStatusCodes(sessionVersion) {
   return (dispatch) => {
     apiClient.get('/openboxes/api/stockMovements/shipmentStatusCodes')
       .then((res) => {
         dispatch({
           type: FETCH_SHIPMENT_STATUS_CODES,
-          payload: res.data.data,
+          payload: {
+            statuses: res.data.data,
+            sessionVersion,
+          },
         });
       });
   };
@@ -510,12 +522,15 @@ export function fetchRequisitionStatusCodes() {
   };
 }
 
-export function fetchStockTransferStatuses() {
+export function fetchStockTransferStatuses(sessionVersion) {
   return (dispatch) => {
     apiClient.get('/openboxes/api/stockTransfers/statusOptions').then((res) => {
       dispatch({
         type: FETCH_STOCK_TRANSFER_STATUSES,
-        payload: res.data.data,
+        payload: {
+          statuses: res.data.data,
+          sessionVersion,
+        },
       });
     });
   };
