@@ -6,22 +6,28 @@ import { connect } from 'react-redux';
 import { fetchStockTransferStatuses } from 'actions';
 import StatusIndicator from 'utils/StatusIndicator';
 
-const StockTransferStatus = ({ status, allStatuses, fetchStatuses }) => {
+const StockTransferStatus = ({
+  status,
+  allStatuses,
+  fetchStatuses,
+  sessionVersion,
+}) => {
   // Circle is by default set as primary (blue)
   const [circle, setCircle] = useState('primary');
+  const [statusLabel, setStatusLabel] = useState('');
   const findStatusCircle = (statusProp) => {
     // Example ids: "PENDING", "PRIMARY"
     const matchedStatus = allStatuses?.length > 0 &&
-      allStatuses.find(stat => stat.id === statusProp);
+      allStatuses.find(stat => stat.label === statusProp);
     if (matchedStatus && matchedStatus.variant) {
       setCircle(matchedStatus.variant);
+      setStatusLabel(matchedStatus.label);
     }
   };
   // Fetch all stock transfer statuses
   useEffect(() => {
-    // If statuses not yet in store, fetch them
-    if (!allStatuses || allStatuses.length === 0) {
-      fetchStatuses();
+    if (!allStatuses || !allStatuses.length) {
+      fetchStatuses(sessionVersion);
     }
   }, []);
 
@@ -30,12 +36,14 @@ const StockTransferStatus = ({ status, allStatuses, fetchStatuses }) => {
     findStatusCircle(status);
   }, [allStatuses, status]);
 
-  return (<StatusIndicator status={status} variant={circle} />);
+  return (<StatusIndicator status={statusLabel} variant={circle} />);
 };
 
 const mapStateToProps = state => ({
   // All possible stock transfer statuses from store
   allStatuses: state.stockTransfer.statuses,
+  sessionVersion: state.session.sessionVersion,
+  stockTransferSessionVersion: state.stockTransfer.sessionVersion,
 });
 
 const mapDispatchToProps = {
@@ -54,4 +62,5 @@ StockTransferStatus.propTypes = {
     variant: PropTypes.string.isRequired,
   })).isRequired,
   fetchStatuses: PropTypes.func.isRequired,
+  sessionVersion: PropTypes.string.isRequired,
 };
