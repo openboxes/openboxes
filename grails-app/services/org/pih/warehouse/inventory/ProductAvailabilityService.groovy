@@ -9,13 +9,17 @@
 **/
 package org.pih.warehouse.inventory
 
+import grails.orm.HibernateCriteriaBuilder
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.hibernate.Criteria
+import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Projections
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
@@ -26,6 +30,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductSummary
 import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
@@ -792,9 +797,8 @@ class ProductAvailabilityService {
             }
         }
 
-        def paginationParams = searchTerms ? [:] : [max: command.maxResults, offset: command.offset]
 
-        def products = Product.createCriteria().list(paginationParams) {
+        List<Product> products = Product.createCriteria().list() {
             eq("active", true)
             and {
                 if (categories) {
@@ -820,29 +824,64 @@ class ProductAvailabilityService {
             }
         }
 
-        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : []
+        // Take a list of Ids of found products for another query
+        List<String> productIds = []
+        if (products) {
+            productIds = products*.id
+        }
+
+        List<BrowseInventory> browseInventoryList = BrowseInventory.createCriteria().list() {
+            and {
+                'in'("product.id", productIds ?: [null])
+                eq("location", command.location)
+            }
+
+            /**
+             I couldn't get the access to the products via
+                      product {
+                          'in'("categories", ...)
+                   }
+             like it is done for example for the productCatalogItems->productCatalog in the query above.
+             I suppose it's a matter of accesing such fields if the domain we are accessing has a view or a table,
+             because when checking it for ProductSummary view, I also couldn't get such access, but for example for
+             the ProductAvailibility it was working fine, so is for Product (because they are tables I suppose)
+
+             If we can somehow access those properties from BrowseInventory view, we could probably move all the logic from the query
+             above (the Product's one) here, so that we have only one query, which should improve the performance
+
+             For now I rely on the above's query and just take the products that were included in the first query
+             **/
+        }
+
 
         def items = []
 
-        products.each { Product product ->
-            def quantity = quantityMap[product] ?: 0
-
-            if (product.productType && !product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE_NO_STOCK)) {
-                if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
-                    return
-                } else if (quantity == 0) {
+        browseInventoryList.each { BrowseInventory browseInventory ->
+            Product product = browseInventory?.product
+            // If product's supportedActivities doesn't contain SEARCHABLE_NO_STOCK and its quantityOnHand is 0, filter out the product
+            // If it doesn't have SEARCHABLE_NO_STOCK and SEARCHABLE also filter out the product
+            if (product?.productType && !product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE_NO_STOCK)) {
+                if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE) || browseInventory.quantityOnHand <= 0) {
                     return
                 }
             }
 
             items << [
-                id   : product.id,
-                product: product,
-                quantityOnHand: quantity
+                    id   : product.id,
+                    product: product,
+                    quantityOnHand: browseInventory.quantityOnHand
             ]
         }
 
-        return searchTerms ? items : new PagedResultList(items, products.totalCount)
+        // Find the max index for pagination to avoid IndexOutOfBound exception
+        // If the size of items is > than the amount of results we want to get, we are safe,
+        // otherwise, we want to set the maxIndex, as the last index of our list
+        Integer lastIndex = items.size() - 1
+        Integer maxIndex = items.size() > command.maxResults ? (command.maxResults + command.offset - 1) : lastIndex
+
+        // If the counted above maxIndex is higher than items size, take last index as max
+        def results = items ? items[command.offset..(maxIndex < items.size() ? maxIndex : lastIndex)] : []
+        return searchTerms ? items : new PagedResultList(results, items.size())
     }
 
     List<ProductAvailability> getStockTransferCandidates(Location location) {
