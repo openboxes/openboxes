@@ -3,7 +3,6 @@ import { FETCH_SHIPMENT_STATUS_CODES } from 'actions/types';
 const initialState = {
   data: [],
   fetched: false,
-  sessionVersion: 0,
 };
 
 export default function (state = initialState, action) {
@@ -11,9 +10,8 @@ export default function (state = initialState, action) {
     case FETCH_SHIPMENT_STATUS_CODES:
       if (action.payload) {
         return {
-          data: action.payload.statuses,
+          data: action.payload,
           fetched: true,
-          sessionVersion: action.payload.sessionVersion,
         };
       }
       return state;

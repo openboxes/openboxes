@@ -2,7 +2,6 @@ import { FETCH_PURCHASE_ORDER_STATUSES } from 'actions/types';
 
 const initialState = {
   statuses: [],
-  sessionVersion: 0,
 };
 
 export default function purchaseOrderReducer(state = initialState, action) {
@@ -10,8 +9,7 @@ export default function purchaseOrderReducer(state = initialState, action) {
     case FETCH_PURCHASE_ORDER_STATUSES:
       return {
         ...state,
-        statuses: action.payload.statuses,
-        sessionVersion: action.payload.sessionVersion,
+        statuses: action.payload,
       };
     default:
       return state;

@@ -3,7 +3,6 @@ import { FETCH_REQUISITION_STATUS_CODES } from 'actions/types';
 const initialState = {
   data: [],
   fetched: false,
-  sessionVersion: 0,
 };
 
 export default function (state = initialState, action) {
@@ -13,7 +12,6 @@ export default function (state = initialState, action) {
         return {
           data: action.payload,
           fetched: true,
-          sessionVersion: action.payload.sessionVersion,
         };
       }
       return state;

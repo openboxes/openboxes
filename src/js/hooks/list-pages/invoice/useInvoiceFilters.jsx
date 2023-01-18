@@ -20,8 +20,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     typeCodes,
     currentLocation,
     currentUser,
-    sessionVersion,
-    invoiceSessionVersion,
+    currentLocale,
   } = useSelector(state => ({
     statuses: state.invoices.statuses,
     suppliers: state.organizations.suppliers,
@@ -30,8 +29,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     currentUser: state.session.user,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
-    sessionVersion: state.session.sessionVersion,
-    invoiceSessionVersion: state.invoices.sessionVersion,
+    currentLocale: state.session.activeLanguage,
   }));
   const [defaultValues, setDefaultValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -90,21 +88,17 @@ const useInvoiceFilters = ({ setFilterParams }) => {
   useCommonFiltersCleaner({ initializeDefaultFilterValues, clearFilterValues, filtersInitialized });
 
   useEffect(() => {
-    // If no statuses yet fetched or session version (it could change when changing the language)
-    // is not equal to invoice session version, refetch the statuses, because it could mean,
-    // that we might have wrong labels stored for statuses,
-    // as language could be changed "in the mean time"
-    if (!statuses || !statuses.length || sessionVersion !== invoiceSessionVersion) {
-      dispatch(fetchInvoiceStatuses(sessionVersion));
-    }
-    if (!typeCodes || !typeCodes.length) {
-      dispatch(fetchInvoiceTypeCodes(sessionVersion));
-    }
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchInvoiceStatuses());
+    dispatch(fetchInvoiceTypeCodes());
+  }, [currentLocale]);
 
+  useEffect(() => {
     // TODO: If editing organizations is in React,
     //  fetch only if length === 0, as edit would should force refetch anyway
     dispatch(fetchSuppliers());
-  }, [sessionVersion]);
+  }, []);
 
   const setFilterValues = useCallback((values) => {
     const filterAccessors = {

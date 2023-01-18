@@ -21,28 +21,19 @@ const useInboundFilters = () => {
     currentLocation,
     shipmentStatuses,
     currentUser,
-    isShipmentStatusesFetched,
-    sessionVersion,
-    inboundSessionVersion,
+    currentLocale,
   } = useSelector(state => ({
     currentLocation: state.session.currentLocation,
     shipmentStatuses: state.shipmentStatuses.data,
     currentUser: state.session.user,
-    isShipmentStatusesFetched: state.shipmentStatuses.fetched,
-    sessionVersion: state.session.sessionVersion,
-    inboundSessionVersion: state.shipmentStatuses.sessionVersion,
+    currentLocale: state.session.activeLanguage,
   }));
 
   useEffect(() => {
-    // If no statuses yet fetched or session version (it could change when changing the language)
-    // is not equal to inbound session version, refetch the statuses, because it could mean,
-    // that we might have wrong labels stored for statuses,
-    // as language could be changed "in the mean time"
-    // eslint-disable-next-line max-len
-    if (!isShipmentStatusesFetched || !shipmentStatuses.length || sessionVersion !== inboundSessionVersion) {
-      dispatch(fetchShipmentStatusCodes(sessionVersion));
-    }
-  }, [sessionVersion]);
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchShipmentStatusCodes());
+  }, [currentLocale]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)

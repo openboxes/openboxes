@@ -1014,12 +1014,10 @@ class EditItemsPage extends Component {
 
       this.fetchAllData(false);
     }
-    // If session version (it could change when changing the language) is not equal to
-    // reason codes reducer session version, refetch the reason codes, because it could mean,
-    // that we might have wrong labels stored for reason codes,
-    // as language could be changed "in the mean time"
-    if (nextProps.sessionVersion !== nextProps.reasonCodesSessionVersion) {
-      this.props.fetchReasonCodes(this.props.sessionVersion);
+
+    // If we change the language, refetch the reason codes
+    if (nextProps.currentLocale !== this.props.currentLocale) {
+      this.props.fetchReasonCodes();
     }
   }
 
@@ -1125,10 +1123,8 @@ class EditItemsPage extends Component {
    */
   fetchAllData(forceFetch) {
     this.props.showSpinner();
-
-    if (!this.props.reasonCodesFetched || forceFetch) {
-      this.props.fetchReasonCodes(this.props.sessionVersion);
-    }
+    // TODO: When having full React, fetch only if not fetched yet or language changed
+    this.props.fetchReasonCodes();
 
     this.fetchEditPageData().then((resp) => {
       const { statusCode } = resp.data.data;
@@ -1635,15 +1631,13 @@ class EditItemsPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   supportedActivities: state.session.supportedActivities,
-  sessionVersion: state.session.sessionVersion,
-  reasonCodesSessionVersion: state.reasonCodes.sessionVersion,
+  currentLocale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps, {
@@ -1664,8 +1658,6 @@ EditItemsPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
-  /** Indicator if reason codes' data is fetched */
-  reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   translate: PropTypes.func.isRequired,
@@ -1676,6 +1668,5 @@ EditItemsPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
-  sessionVersion: PropTypes.string.isRequired,
-  reasonCodesSessionVersion: PropTypes.string.isRequired,
+  currentLocale: PropTypes.string.isRequired,
 };

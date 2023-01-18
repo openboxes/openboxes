@@ -73,7 +73,6 @@ const initialState = {
   loading: false,
   localizationModeEnabled: false,
   localizationModeLocale: 'ach',
-  sessionVersion: 0,
 };
 
 export default function (state = initialState, action) {
@@ -113,7 +112,6 @@ export default function (state = initialState, action) {
         loading: false,
         localizationModeEnabled: _.get(action, 'payload.data.data.localizationModeEnabled', false),
         localizationModeLocale: _.get(action, 'payload.data.data.localizationModeLocale', 'ach'),
-        sessionVersion: state.sessionVersion + 1,
       };
     case FETCH_MENU_CONFIG:
       return {
@@ -123,7 +121,7 @@ export default function (state = initialState, action) {
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload, loading: true };
     case CHANGE_CURRENT_LOCALE:
-      return { ...state, activeLanguage: action.payload, sessionVersion: state.sessionVersion + 1 };
+      return { ...state, activeLanguage: action.payload };
     case TRANSLATIONS_FETCHED:
       return {
         ...state,

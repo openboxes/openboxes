@@ -3,7 +3,6 @@ import { FETCH_INVOICE_STATUSES, FETCH_INVOICE_TYPE_CODES } from 'actions/types'
 const initialState = {
   statuses: [],
   typeCodes: [],
-  sessionVersion: 0,
 };
 
 export default function invoiceReducer(state = initialState, action) {
@@ -11,14 +10,12 @@ export default function invoiceReducer(state = initialState, action) {
     case FETCH_INVOICE_STATUSES:
       return {
         ...state,
-        statuses: action.payload.statuses,
-        sessionVersion: action.payload.sessionVersion,
+        statuses: action.payload,
       };
     case FETCH_INVOICE_TYPE_CODES:
       return {
         ...state,
-        typeCodes: action.payload.typeCodes,
-        sessionVersion: action.payload.sessionVersion,
+        typeCodes: action.payload,
       };
     default:
       return state;

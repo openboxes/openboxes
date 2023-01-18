@@ -10,7 +10,6 @@ const StockTransferStatus = ({
   status,
   allStatuses,
   fetchStatuses,
-  sessionVersion,
 }) => {
   // Circle is by default set as primary (blue)
   const [circle, setCircle] = useState('primary');
@@ -26,9 +25,8 @@ const StockTransferStatus = ({
   };
   // Fetch all stock transfer statuses
   useEffect(() => {
-    if (!allStatuses || !allStatuses.length) {
-      fetchStatuses(sessionVersion);
-    }
+    // TODO: When having full React, fetch only if not fetched yet or length is 0
+    fetchStatuses();
   }, []);
 
   // If statuses change or status (status prop can change when filter/sort data) find circle
@@ -42,7 +40,6 @@ const StockTransferStatus = ({
 const mapStateToProps = state => ({
   // All possible stock transfer statuses from store
   allStatuses: state.stockTransfer.statuses,
-  sessionVersion: state.session.sessionVersion,
   stockTransferSessionVersion: state.stockTransfer.sessionVersion,
 });
 
@@ -62,5 +59,4 @@ StockTransferStatus.propTypes = {
     variant: PropTypes.string.isRequired,
   })).isRequired,
   fetchStatuses: PropTypes.func.isRequired,
-  sessionVersion: PropTypes.string.isRequired,
 };

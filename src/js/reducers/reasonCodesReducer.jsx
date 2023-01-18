@@ -5,7 +5,6 @@ import { FETCH_REASONCODES } from 'actions/types';
 const initialState = {
   data: [],
   fetched: false,
-  sessionVersion: 0,
 };
 
 export default function (state = initialState, action) {
@@ -19,7 +18,6 @@ export default function (state = initialState, action) {
           ...state,
           data: reasonCodes,
           fetched: true,
-          sessionVersion: action.payload.sessionVersion,
         };
       }
       return state;

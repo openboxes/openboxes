@@ -246,12 +246,10 @@ class PickPage extends Component {
 
       this.fetchAllData(false);
     }
-    // If session version (it could change when changing the language) is not equal to
-    // reason codes reducer session version, refetch the reason codes, because it could mean,
-    // that we might have wrong labels stored for reason codes,
-    // as language could be changed "in the mean time"
-    if (nextProps.sessionVersion !== nextProps.reasonCodesSessionVersion) {
-      this.props.fetchReasonCodes(this.props.sessionVersion);
+
+    // If we change the language, refetch the reason codes
+    if (nextProps.currentLocale !== this.props.currentLocale) {
+      this.props.fetchReasonCodes();
     }
   }
 
@@ -289,9 +287,8 @@ class PickPage extends Component {
    */
   fetchAllData(forceFetch) {
     this.props.showSpinner();
-    if (!this.props.reasonCodesFetched || forceFetch) {
-      this.props.fetchReasonCodes(this.props.sessionVersion);
-    }
+    // TODO: When having full React, fetch only if not fetched yet or language changed
+    this.props.fetchReasonCodes();
 
     this.fetchPickPageData();
     if (!this.props.isPaginated) {
@@ -766,14 +763,12 @@ class PickPage extends Component {
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   hasBinLocationSupport: state.session.currentLocation.hasBinLocationSupport,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
-  sessionVersion: state.session.sessionVersion,
-  reasonCodesSessionVersion: state.reasonCodes.sessionVersion,
+  currentLocale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps, { showSpinner, hideSpinner, fetchReasonCodes })(PickPage);
@@ -794,8 +789,6 @@ PickPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
-  /** Indicator if reason codes' data is fetched */
-  reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
@@ -807,6 +800,5 @@ PickPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
-  sessionVersion: PropTypes.string.isRequired,
-  reasonCodesSessionVersion: PropTypes.string.isRequired,
+  currentLocale: PropTypes.string.isRequired,
 };

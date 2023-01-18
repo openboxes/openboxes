@@ -19,15 +19,13 @@ const useStockTransferFilters = () => {
   const {
     statuses,
     currentUser,
-    sessionVersion,
-    stockTransferSessionVersion,
+    currentLocale
   } = useSelector(state => ({
     statuses: state.stockTransfer.statuses,
     currentUser: state.session.user,
     currentLocation: state.session.currentLocation,
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
-    sessionVersion: state.session.sessionVersion,
-    stockTransferSessionVersion: state.stockTransfer.sessionVersion,
+    currentLocale: state.session.activeLanguage,
   }));
   const dispatch = useDispatch();
 
@@ -65,14 +63,10 @@ const useStockTransferFilters = () => {
   };
 
   useEffect(() => {
-    // If no statuses yet fetched or session version (it could change when changing the language)
-    // is not equal to invoice session version, refetch the statuses, because it could mean,
-    // that we might have wrong labels stored for statuses,
-    // as language could be changed "in the mean time"
-    if (!statuses || !statuses.length || sessionVersion !== stockTransferSessionVersion) {
-      dispatch(fetchStockTransferStatuses(sessionVersion));
-    }
-  }, [sessionVersion]);
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchStockTransferStatuses());
+  }, [currentLocale]);
 
   // Custom hook for changing location/filters rebuilding logic
   useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });
