@@ -772,6 +772,7 @@ class SendMovementPage extends Component {
 
   handleValidationErrors(error) {
     if (error.response.status === 400) {
+      // FIXME: Refactor this error massage handling to get prettier default errorMessage fallback
       let alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
       if (alertMessage === '') {
         alertMessage = _.get(error, 'response.data.errorMessage', '');
