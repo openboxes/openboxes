@@ -107,7 +107,4 @@
   <changeSet id="1580848680306-30" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
     <sqlFile path="views/order-item-details.sql"/>
   </changeSet>
-  <changeSet id="1580848680306-31" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
-    <sqlFile path="views/browse-inventory.sql"/>
-  </changeSet>
 </databaseChangeLog>
