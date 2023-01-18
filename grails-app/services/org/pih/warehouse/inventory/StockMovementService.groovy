@@ -1213,7 +1213,10 @@ class StockMovementService {
                 requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
                         requisitionItem?.product?.productCode,
                 ].toArray(), errorMessage)
-                throw new ValidationException(errorMessage, requisitionItem.errors)
+
+                // Throw checked exception with ValidationException cause to not rollback deleted picklist while throwing unchecked exception
+                // See: https://pihemr.atlassian.net/browse/OBPIH-5318
+                throw new Exception(errorMessage, new ValidationException(errorMessage, requisitionItem.errors))
             }
         }
     }
