@@ -144,12 +144,8 @@ class LocationDataService {
         }
         def locationType = null
         if (params.locationType) {
-            locationType = LocationType.createCriteria().get {
-                or {
-                    eq('name', params.locationType)
-                    like('name', params.locationType + "%")
-                }
-            }
+            // Find by name with like, but value more the exact match
+            locationType = LocationType.findByNameOrNameIlike(params.locationType, params.locationType + "%")
         }
 
         def currentLocationType = location.locationType
