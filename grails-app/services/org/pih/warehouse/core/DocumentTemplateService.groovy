@@ -25,6 +25,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Shipment
 
 class DocumentTemplateService {
@@ -47,6 +48,9 @@ class DocumentTemplateService {
         context.putVar("invoiceItems", shipmentInstance?.shipmentItems)
         context.putVar("datePrinted", Constants.EUROPEAN_DATE_FORMATTER.format(new Date()))
         context.putVar("requisition", shipmentInstance?.requisition)
+        context.putVar("approvedRequisitionItems", shipmentInstance?.requisition?.requisitionItems?.findAll {
+            it.status == RequisitionItemStatus.APPROVED
+        })
         context.putVar("origin", shipmentInstance?.origin)
         context.putVar("destination", shipmentInstance?.destination)
         context.putVar("originRequisitionCount", requisitionService.getRequisitionCountInCurrentFiscalYear(shipmentInstance?.origin))

@@ -684,7 +684,7 @@ class SelectTagLib {
                 writer.println()
 
                 from.eachWithIndex { el, i ->
-                    if (el.properties[groupBy].equals(optGroup)) {
+                    if (el.properties[groupBy]?.id == optGroup?.id) {
 
                         def keyValue = null
                         writer << '<option '
