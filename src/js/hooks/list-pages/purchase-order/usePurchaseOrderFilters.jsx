@@ -18,25 +18,33 @@ const usePurchaseOrderFilters = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const {
-    supportedActivities, buyers, currentLocation, statuses, currentUser,
+    supportedActivities,
+    buyers,
+    currentLocation,
+    statuses,
+    currentUser,
+    currentLocale,
   } = useSelector(state => ({
     supportedActivities: state.session.supportedActivities,
     buyers: state.organizations.buyers,
     currentLocation: state.session.currentLocation,
     statuses: state.purchaseOrder.statuses,
     currentUser: state.session.user,
+    currentLocale: state.session.activeLanguage,
   }));
 
   const isCentralPurchasingEnabled = supportedActivities.includes('ENABLE_CENTRAL_PURCHASING');
-
   useEffect(() => {
-    if (!statuses || !statuses.length) {
-      dispatch(fetchPurchaseOrderStatuses());
-    }
     // TODO: If editing organizations is in React,
     //  fetch only if !buyers || buyers.length === 0
     dispatch(fetchBuyers());
   }, []);
+
+  useEffect(() => {
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchPurchaseOrderStatuses());
+  }, [currentLocale]);
 
   const clearFilterValues = () => {
     const { pathname } = history.location;
