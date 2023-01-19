@@ -305,8 +305,7 @@ class OrderController {
                 try {
                     orderService.deleteOrder(orderInstance)
                     flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
-                }
-                catch (org.springframework.dao.DataIntegrityViolationException e) {
+                } catch (org.springframework.dao.DataIntegrityViolationException e) {
                     flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.orderNumber])}"
                 }
             } else {
@@ -315,6 +314,7 @@ class OrderController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
         }
+
         if (orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()) {
             redirect(controller: "purchaseOrder", action: "list")
         } else if (orderInstance.orderType.code == Constants.PUTAWAY_ORDER) {
@@ -754,19 +754,21 @@ class OrderController {
             orderItem.productSupplier = productSupplier
         }
 
+        if (!order.save(flush:true)) {
+            throw new ValidationException("Order is invalid", order.errors)
+        }
+
         try {
-            if (!order.save(flush:true)) {
-                throw new ValidationException("Order is invalid", order.errors)
-            }
             if (order.status >= OrderStatus.PLACED) {
                 orderService.updateProductPackage(orderItem)
                 orderService.updateProductUnitPrice(orderItem)
             }
-
         } catch (Exception e) {
             log.error("Error " + e.message, e)
             render(status: 500, text: "Not saved")
+            return
         }
+
         render (status: 200, text: "Successfully added order item")
     }
 

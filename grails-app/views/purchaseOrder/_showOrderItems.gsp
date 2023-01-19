@@ -512,7 +512,16 @@
                   },
                   error: function(jqXHR, textStatus, errorThrown) {
                     if (jqXHR.responseText) {
-                      $.notify(jqXHR.responseText, "error");
+                      try {
+                        let data = JSON.parse(jqXHR.responseText);
+                        if (data.errorMessages.length > 0) {
+                          $.notify(data.errorMessages.join("\n"), "error");
+                        } else {
+                          $.notify(data.errorMessage, "error");
+                        }
+                      } catch (e) {
+                        $.notify(jqXHR.responseText, "error");
+                      }
                     } else {
                       $.notify("Error saving your item");
                     }

@@ -787,6 +787,7 @@ class StockMovementService {
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
+                        quantityRequested               : stockMovementItem.quantityRequested,
                         comments                        : stockMovementItem.comments,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
@@ -794,7 +795,14 @@ class StockMovementService {
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
                 ]
             } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-                def demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
+                def demand
+                // if request FROM Ward then pull demand from origin to ward
+                if (requisition?.destination?.isWard()) {
+                    demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
+                } else {
+                    // if request is NOT FROM Ward, then pull demand outgoing FROM destination to all other locations
+                    demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
+                }
                 return [
                         id                              : stockMovementItem.id,
                         product                         : stockMovementItem.product,
