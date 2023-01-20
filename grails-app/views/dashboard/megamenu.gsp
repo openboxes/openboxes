@@ -1,7 +1,7 @@
-<%@ page import="grails.converters.JSON"%>
 <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
     <ul class="d-flex align-items-center navbar-nav mr-auto flex-wrap align-items-stretch">
         <g:set var="breakPoint" value="md" />
+        <g:hiddenField id="menuSectionUrlParts" name="menuSectionUrlParts" value="${menuSectionsUrlParts}"/>
         <g:each var="menuItem" in="${menu}">
             <g:if test="${menuItem?.href}">
                 <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-flex">
@@ -102,8 +102,8 @@
   $(document).ready(function () {
     const path = window.location.pathname
     const menuConfigValues = $(".menu-config-value").toArray();
-    const urlPartsWithSectionConfig = "${(grailsApplication.config.openboxes.menuSectionsUrlParts as JSON)}";
-    const parsedUrlPartsWithSection = JSON.parse(urlPartsWithSectionConfig.replace(/&quot;/g,'"'));
+    const urlPartsWithSection = $("#menuSectionUrlParts").val();
+    const parsedUrlPartsWithSection = JSON.parse(urlPartsWithSection);
 
     const matchSection = () => {
       // match the whole url
