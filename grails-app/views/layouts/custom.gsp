@@ -636,6 +636,17 @@
       });
 
     });
+
+    const applyActiveSection = (section) => {
+        const matchingMenuSection = $("#" + section?.name).get(0);
+        const matchingMenuSectionCollapsable = $("#" + section?.name + "-collapsed").get(0);
+        if (matchingMenuSection) {
+          matchingMenuSection.classList.add('active-section');
+        }
+        if (matchingMenuSectionCollapsable) {
+          matchingMenuSectionCollapsable.classList.add('active-section');
+        }
+    }
 </script>
 
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.scannerDetection.enabled)}">
@@ -733,6 +744,5 @@
     </g:if>
 </g:if>
 <r:layoutResources/>
-
 </body>
 </html>

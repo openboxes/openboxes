@@ -386,7 +386,6 @@ openboxes.dashboard.newsSummary.newsItems = []
 openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
-
 openboxes {
     dashboard {
         yearTypes {
@@ -1297,6 +1296,18 @@ openboxes.expirationDate.minValue = new Date("01/01/2000")
 openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 
 // Global megamenu configuration
+
+openboxes.menuSectionsUrlParts = [
+    inventory: ["inventory", "inventoryItem"],
+    products: ["product"],
+    purchasing: ["order", "purchaseOrder"],
+    invoicing: ["invoice"],
+    requisitionTemplate: ["requisitionTemplate"],
+    // for inbound / outbound the same url is used,
+    // so it is underlined directly from stockMovement/show.gsp
+    injectedDirectly: ["stockMovement"]
+]
+
 // TODO: Clean up and add all missing message.properties
 openboxes {
     megamenu {

@@ -98,7 +98,6 @@
 		</g:link>
 	</div>
 </g:elseif>
-<g:render template="/dashboard/activeSection" model="[section: 'products']"/>
 <script>
 	$(window).load(function(){
 		const container = document.querySelector('.tabs')

@@ -197,6 +197,5 @@
       $("#orderNumber").focus();
     });
 </script>
-<g:render template="/dashboard/activeSection" model="[section: 'purchasing']"/>
 </body>
 </html>

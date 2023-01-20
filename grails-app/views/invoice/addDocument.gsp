@@ -108,6 +108,5 @@
         </div>
     </div>
 </div>
-<g:render template="/dashboard/activeSection" model="[section: 'invoicing']"/>
 </body>
 </html>

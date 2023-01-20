@@ -78,8 +78,18 @@
 				</tfoot>
 			</table>
 		</g:uploadForm>
-		<g:render template="/dashboard/activeSection" model="[section: session.warehouse == stockMovementInstance.getDestination() ? 'inbound' : 'outbound']"/>
 	</div>
 </div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		const menuConfigValues = $(".menu-config-value").toArray();
+		const stockMovementDirection = ${session.warehouse == stockMovementInstance.getDestination()}? 'inbound' : 'outbound';
+		const foundSection = menuConfigValues.find(it => stockMovementDirection === it.name)
+		applyActiveSection(foundSection)
+	});
+</script>
+
 </body>
 </html>

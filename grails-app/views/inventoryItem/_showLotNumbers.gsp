@@ -111,7 +111,6 @@
 
 			</tbody>
 		</table>
-			<g:render template="/dashboard/activeSection" model="[section: 'products']"/>
 		</g:form>
 </div>
 

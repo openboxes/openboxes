@@ -1,3 +1,4 @@
+<%@ page import="grails.converters.JSON"%>
 <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
     <ul class="d-flex align-items-center navbar-nav mr-auto flex-wrap align-items-stretch">
         <g:set var="breakPoint" value="md" />
@@ -101,14 +102,33 @@
   $(document).ready(function () {
     const path = window.location.pathname
     const menuConfigValues = $(".menu-config-value").toArray();
-    const matchingSection = menuConfigValues.find(it => it.value.includes(path))
-    // Assign active-section class to matched section
-    if (matchingSection) {
-      const matchingMenuSection = $("#" + matchingSection?.name).get(0);
-      const matchingMenuSectionCollapsable = $("#" + matchingSection?.name + "-collapsed").get(0);
-      if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
-      if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
-    }
+    const urlPartsWithSectionConfig = "${(grailsApplication.config.openboxes.menuSectionsUrlParts as JSON)}";
+    const parsedUrlPartsWithSection = JSON.parse(urlPartsWithSectionConfig.replace(/&quot;/g,'"'));
+
+    const matchSection = () => {
+      // match the whole url
+      const exactMatch = menuConfigValues.find(it => it.value.includes(path))
+
+      if(exactMatch) {
+        return exactMatch;
+      }
+
+      // check if current section exists in object with wrongly underlined urls
+      const sectionFromJson = Object.keys(parsedUrlPartsWithSection).find(sectionName => {
+        return !!parsedUrlPartsWithSection[sectionName].some(section => path.includes(section));
+      })
+
+      if (sectionFromJson) {
+        return menuConfigValues.find(it => it.name === sectionFromJson);
+      }
+
+      return null;
+    };
+
+    const matchingSection = matchSection();
+
+    applyActiveSection(matchingSection);
+
     function repositionNavDropdowns() {
       const dropdownRightClass = "dropdown-menu-right";
       const itemDropdowns = $(".navbar-nav .dropdown-menu").toArray();

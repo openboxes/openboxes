@@ -251,6 +251,5 @@
 
 			});
 		</script>
-	<g:render template="/dashboard/activeSection" model="[section: 'inventory']"/>
 	</body>
 </html>
