@@ -1298,7 +1298,7 @@ openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 // Global megamenu configuration
 
 openboxes.menuSectionsUrlParts = [
-    inventory: ["inventory", "inventoryItem"],
+    inventory: ["inventory", "inventoryItem", "stockTransfer"],
     products: ["product"],
     purchasing: ["order", "purchaseOrder"],
     invoicing: ["invoice"],
