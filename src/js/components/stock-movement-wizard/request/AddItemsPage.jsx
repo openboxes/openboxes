@@ -1297,7 +1297,6 @@ class AddItemsPage extends Component {
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
                   if (this.state.isRequestFromWard) {
-                    this.props.updateBreadcrumbs([]);
                     this.props.history.push('/openboxes/');
                   } else {
                     window.location = '/openboxes/stockMovement/list?direction=INBOUND';

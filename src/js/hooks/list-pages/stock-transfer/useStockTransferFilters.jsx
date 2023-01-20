@@ -19,7 +19,7 @@ const useStockTransferFilters = () => {
   const {
     statuses,
     currentUser,
-    currentLocale
+    currentLocale,
   } = useSelector(state => ({
     statuses: state.stockTransfer.statuses,
     currentUser: state.session.user,
