@@ -9,11 +9,11 @@
     </head>
     <body>
         <div class="body">
-        
+
             <g:if test="${flash.message}">
 	            <div class="message">${flash.message}</div>
-            </g:if>		
-			
+            </g:if>
+
 	<div class="yui-gf">
 		<div class="yui-u first">
 			<table>
@@ -31,29 +31,29 @@
 		</div>
 		<div class="yui-u">
 			<g:autoSuggest id="product-search" name="product" jsonUrl="${request.contextPath }/json/findProductByName" />
-			
+
 			${inventoryLevels?.size() } items
 			<table>
 				<thead>
 					<tr>
 						<td>
-						
+
 						</td>
 					</tr>
 				</thead>
 				<tbody>
 					<g:each in="${inventoryLevels }" var="inventoryLevel">
 						<tr>
-							<td>									
+							<td>
 								${inventoryLevel?.product }
 							</td>
-							<td>									
+							<td>
 								${inventoryLevel?.minimumQuantity }
 							</td>
-							<td>									
+							<td>
 								${inventoryLevel?.maximumQuantity }
 							</td>
-							<td>									
+							<td>
 								${inventoryLevel?.reorderQuantity }
 							</td>
 						</tr>
@@ -62,11 +62,10 @@
 			</table>
 		</div>
 	</div>
-</div>                        
+</div>
 <script type="text/javascript">
 
 $(document).ready(function() {
-
 
 	$("#product-search").autocomplete({
 		select: function(event, ui) {
@@ -77,7 +76,7 @@ $(document).ready(function() {
 });
 
 
-</script>        
+</script>
 
 
     </body>

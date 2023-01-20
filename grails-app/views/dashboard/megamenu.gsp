@@ -1,6 +1,7 @@
 <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
     <ul class="d-flex align-items-center navbar-nav mr-auto flex-wrap align-items-stretch">
         <g:set var="breakPoint" value="md" />
+        <g:hiddenField id="menuSectionUrlParts" name="menuSectionUrlParts" value="${menuSectionsUrlParts}"/>
         <g:each var="menuItem" in="${menu}">
             <g:if test="${menuItem?.href}">
                 <li id="${menuItem?.id}" class="nav-item dropdown align-items-center d-flex">
@@ -99,33 +100,49 @@
 
 <script type="text/javascript">
   $(document).ready(function () {
-      const path = window.location.pathname
-      const menuConfigValues = $(".menu-config-value").toArray();
-      const matchingSection = menuConfigValues.find(it => it.value.includes(path))
+    const path = window.location.pathname
+    const menuConfigValues = $(".menu-config-value").toArray();
+    const urlPartsWithSection = $("#menuSectionUrlParts").val();
+    const parsedUrlPartsWithSection = JSON.parse(urlPartsWithSection);
 
-      // Assign active-section class to matched section
-      if (matchingSection) {
-        const matchingMenuSection = $("#" + matchingSection?.name).get(0);
-        const matchingMenuSectionCollapsable = $("#" + matchingSection?.name + "-collapsed").get(0);
-        if (matchingMenuSection) matchingMenuSection.classList.add('active-section');
-        if (matchingMenuSectionCollapsable) matchingMenuSectionCollapsable.classList.add('active-section');
+    const matchSection = () => {
+      // match the whole url
+      const exactMatch = menuConfigValues.find(it => it.value.includes(path))
+
+      if(exactMatch) {
+        return exactMatch;
       }
 
+      // check if current section exists in object with wrongly underlined urls
+      const sectionFromJson = Object.keys(parsedUrlPartsWithSection).find(sectionName => {
+        return !!parsedUrlPartsWithSection[sectionName].some(section => path.includes(section));
+      })
 
-      function repositionNavDropdowns() {
-        const dropdownRightClass = "dropdown-menu-right";
-        const itemDropdowns = $(".navbar-nav .dropdown-menu").toArray();
-        itemDropdowns.forEach(dropdown => {
-          const rect = dropdown.getBoundingClientRect();
-          if ([...dropdown.classList].includes(dropdownRightClass) && window.innerWidth > rect.right + rect.width) {
-            dropdown.classList.remove(dropdownRightClass)
-          }
-          if (window.innerWidth < rect.right) {
-            dropdown.classList.add(dropdownRightClass);
-          }
-        })
+      if (sectionFromJson) {
+        return menuConfigValues.find(it => it.name === sectionFromJson);
       }
-      repositionNavDropdowns();
-      addEventListener("resize", repositionNavDropdowns);
-    });
+
+      return null;
+    };
+
+    const matchingSection = matchSection();
+
+    applyActiveSection(matchingSection);
+
+    function repositionNavDropdowns() {
+      const dropdownRightClass = "dropdown-menu-right";
+      const itemDropdowns = $(".navbar-nav .dropdown-menu").toArray();
+      itemDropdowns.forEach(dropdown => {
+        const rect = dropdown.getBoundingClientRect();
+        if ([...dropdown.classList].includes(dropdownRightClass) && window.innerWidth > rect.right + rect.width) {
+          dropdown.classList.remove(dropdownRightClass)
+        }
+        if (window.innerWidth < rect.right) {
+          dropdown.classList.add(dropdownRightClass);
+        }
+      })
+    }
+    repositionNavDropdowns();
+    addEventListener("resize", repositionNavDropdowns);
+  });
 </script>
