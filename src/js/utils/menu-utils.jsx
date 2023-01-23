@@ -29,6 +29,7 @@ export const checkActiveSection = ({
         if (!pathnameWithoutParams.includes(sectionPath.replace(/\/index$/, ''))) {
           return false;
         }
+
         // if found matching pathname
         // then check if all parameters of section path match with current path parameters
         if (!_.isEmpty(sectionSearch)) {
@@ -36,6 +37,7 @@ export const checkActiveSection = ({
             direction,
             ...otherParams
           } = queryString.parse(search.substring(1, search.length));
+
           // if direction is not specified
           // then compare current url with sectionPath without direction
           if (!direction) {
@@ -47,6 +49,10 @@ export const checkActiveSection = ({
       });
       return !!foundURL;
     });
+
+  if (pathnameWithoutParams.includes('verifyRequest')) {
+    return search && search.split('=')[1].toLowerCase();
+  }
 
   // check if url match section parts from config
   const matchingFromSectionsUrlParts = Object.keys(menuSectionsUrlParts).find(sectionName =>

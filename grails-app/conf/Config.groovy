@@ -1303,7 +1303,6 @@ openboxes.menuSectionsUrlParts = [
     products: ["product"],
     purchasing: ["purchaseOrder"],
     invoicing: ["invoice"],
-    inbound: ["partialReceiving"],
     outbound: ["verifyRequest"],
     requisitionTemplate: ["requisitionTemplate"],
     configuration: ["locationsConfiguration"],
