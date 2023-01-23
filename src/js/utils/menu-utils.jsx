@@ -5,6 +5,7 @@ export const checkActiveSection = ({
   menuUrls,
   path,
   params,
+  menuSectionsUrlParts,
 }) => {
   const { pathname, search } = path;
   // removing custom params from URL fe. stockMovementId
@@ -46,11 +47,14 @@ export const checkActiveSection = ({
       });
       return !!foundURL;
     });
-  if (pathname.includes('partialReceiving')) {
-    return 'inbound';
-  }
 
-  return matchedPath || 'dashboard';
+  // check if url match section parts from config
+  const matchingFromSectionsUrlParts = Object.keys(menuSectionsUrlParts).find(sectionName =>
+    !!menuSectionsUrlParts[sectionName].some(section => pathname.includes(section)));
+
+
+  // if matched path not found then use matching from section url parts
+  return matchedPath || matchingFromSectionsUrlParts || 'dashboard';
 };
 
 export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)

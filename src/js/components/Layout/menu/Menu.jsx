@@ -10,7 +10,7 @@ import MenuSection from 'components/Layout/menu/MenuSection';
 import MenuSubsection from 'components/Layout/menu/MenuSubsection';
 import { checkActiveSection, getAllMenuUrls } from 'utils/menu-utils';
 
-const Menu = ({ menuConfig, location }) => {
+const Menu = ({ menuConfig, location, menuSectionsUrlParts }) => {
   const params = useParams();
 
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);
@@ -19,6 +19,7 @@ const Menu = ({ menuConfig, location }) => {
       menuUrls: allMenuUrls,
       path: location,
       params,
+      menuSectionsUrlParts,
     }), [allMenuUrls, location]);
 
   return (
@@ -65,6 +66,7 @@ const Menu = ({ menuConfig, location }) => {
 
 const mapStateToProps = state => ({
   menuConfig: state.session.menuConfig,
+  menuSectionsUrlParts: state.session.menuSectionsUrlParts,
 });
 
 export default withRouter(connect(mapStateToProps)(Menu));
@@ -91,5 +93,6 @@ Menu.propTypes = {
     pathname: PropTypes.string,
     search: PropTypes.string,
   }).isRequired,
+  menuSectionsUrlParts: PropTypes.arrayOf(PropTypes.object).isRequired,
   menuConfig: PropTypes.arrayOf(sectionPropTypes).isRequired,
 };

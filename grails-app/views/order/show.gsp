@@ -273,6 +273,12 @@
 
         <script>
             $(document).ready(function() {
+
+              const menuConfigValues = $(".menu-config-value").toArray();
+              const stockMovementDirection = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
+              const foundSection = menuConfigValues.find(it => stockMovementDirection === it.name)
+              applyActiveSection(foundSection)
+
                 $(".tabs").tabs({
                     cookie: {
                         expires: 1

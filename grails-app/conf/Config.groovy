@@ -1301,12 +1301,15 @@ openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 openboxes.menuSectionsUrlParts = [
     inventory: ["inventory", "inventoryItem", "stockTransfer"],
     products: ["product"],
-    purchasing: ["order", "purchaseOrder"],
+    purchasing: ["purchaseOrder"],
     invoicing: ["invoice"],
+    inbound: ["partialReceiving"],
+    outbound: ["verifyRequest"],
     requisitionTemplate: ["requisitionTemplate"],
-    // for inbound / outbound the same url is used,
+    configuration: ["locationsConfiguration"],
+    // for inbound / outbound and purchasing / putaway the same url is used,
     // so it is underlined directly from stockMovement/show.gsp
-    injectedDirectly: ["stockMovement"]
+    injectedDirectly: ["stockMovement", "order"]
 ]
 
 // TODO: Clean up and add all missing message.properties
