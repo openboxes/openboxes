@@ -438,7 +438,7 @@
 
                             <td class="border-right middle">
                                 <div class="line">
-                                    <span>
+                                    <span class="d-flex">
                                         <g:if test="${stockHistoryEntry?.binLocation}">
                                             <g:if test="${stockHistoryEntry?.binLocation?.zone}">
                                                 <span class="line-base" title="${stockHistoryEntry?.binLocation?.zone?.name}">
