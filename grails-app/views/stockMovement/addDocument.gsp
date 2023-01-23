@@ -84,10 +84,8 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 
-		const menuConfigValues = $(".menu-config-value").toArray();
 		const stockMovementDirection = ${session.warehouse == stockMovementInstance.getDestination()}? 'inbound' : 'outbound';
-		const foundSection = menuConfigValues.find(it => stockMovementDirection === it.name)
-		applyActiveSection(foundSection)
+		applyActiveSection(stockMovementDirection)
 	});
 </script>
 

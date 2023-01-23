@@ -55,8 +55,10 @@ export const checkActiveSection = ({
   }
 
   // check if url match section parts from config
-  const matchingFromSectionsUrlParts = Object.keys(menuSectionsUrlParts).find(sectionName =>
-    !!menuSectionsUrlParts[sectionName].some(section => pathname.includes(section)));
+  const matchingFromSectionsUrlParts = menuSectionsUrlParts &&
+    Object.keys(menuSectionsUrlParts)
+      .find(sectionName => !!menuSectionsUrlParts[sectionName]
+        .some(section => pathname.includes(section)));
 
 
   // if matched path not found then use matching from section url parts
