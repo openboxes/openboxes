@@ -93,6 +93,16 @@ Menu.propTypes = {
     pathname: PropTypes.string,
     search: PropTypes.string,
   }).isRequired,
-  menuSectionsUrlParts: PropTypes.arrayOf(PropTypes.object).isRequired,
+  menuSectionsUrlParts: PropTypes.shape({
+    inventory: PropTypes.arrayOf(PropTypes.string),
+    products: PropTypes.arrayOf(PropTypes.string),
+    purchasing: PropTypes.arrayOf(PropTypes.string),
+    invoicing: PropTypes.arrayOf(PropTypes.string),
+    inbound: PropTypes.arrayOf(PropTypes.string),
+    outbound: PropTypes.arrayOf(PropTypes.string),
+    requisitionTemplate: PropTypes.arrayOf(PropTypes.string),
+    configuration: PropTypes.arrayOf(PropTypes.string),
+    injectedDirectly: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
   menuConfig: PropTypes.arrayOf(sectionPropTypes).isRequired,
 };

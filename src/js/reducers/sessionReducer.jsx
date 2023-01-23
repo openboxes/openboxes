@@ -24,7 +24,7 @@ const initialState = {
   isUserApprover: false,
   supportedActivities: [],
   menuConfig: [],
-  menuSectionsUrlParts: [],
+  menuSectionsUrlParts: {},
   activeLanguage: '',
   fetchedTranslations: {
     default: false,
