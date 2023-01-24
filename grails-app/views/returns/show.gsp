@@ -388,10 +388,8 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-      const menuConfigValues = $(".menu-config-value").toArray();
-      const stockMovementDirection = ${stockMovement?.destination == currentLocation} ? 'inbound' : 'outbound';
-      const foundSection = menuConfigValues.find(it => stockMovementDirection === it.name)
-      applyActiveSection(foundSection)
+      const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
+      applyActiveSection(stockMovementDirection);
 
         $(".tabs").tabs({
             cookie : {

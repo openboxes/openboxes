@@ -81,7 +81,7 @@
 <script>
 	$(document).ready(function() {
 		const orderType = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
-		applyActiveSection(orderType)
+		applyActiveSection(orderType);
 	});
 </script>
 </body>

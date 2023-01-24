@@ -84,8 +84,8 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 
-		const stockMovementDirection = ${session.warehouse == stockMovementInstance.getDestination()}? 'inbound' : 'outbound';
-		applyActiveSection(stockMovementDirection)
+		const stockMovementDirection = ${session?.warehouse?.id == stockMovementInstance?.destination?.id}? 'inbound' : 'outbound';
+		applyActiveSection(stockMovementDirection);
 	});
 </script>
 

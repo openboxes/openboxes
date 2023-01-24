@@ -479,8 +479,8 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-      const stockMovementDirection = ${stockMovement?.destination == currentLocation} ? 'inbound' : 'outbound';
-      applyActiveSection(stockMovementDirection)
+      const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
+      applyActiveSection(stockMovementDirection);
 
         $(".tabs").tabs({
             cookie : {

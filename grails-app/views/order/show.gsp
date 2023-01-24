@@ -275,7 +275,7 @@
             $(document).ready(function() {
 
               const orderType = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
-              applyActiveSection(orderType)
+              applyActiveSection(orderType);
 
                 $(".tabs").tabs({
                     cookie: {

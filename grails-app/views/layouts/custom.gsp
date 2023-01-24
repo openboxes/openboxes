@@ -637,12 +637,12 @@
 
     });
 
-    const applyActiveSection = (section) => {
+    const applyActiveSection = (sectionName) => {
       const menuConfigValues = $(".menu-config-value").toArray();
-      const foundSection = menuConfigValues.find(it => section === it.name)
+      const section = menuConfigValues.find(it => sectionName === it.name);
 
-      const matchingMenuSection = $("#" + foundSection?.name).get(0);
-      const matchingMenuSectionCollapsable = $("#" + foundSection?.name + "-collapsed").get(0);
+      const matchingMenuSection = $("#" + section?.name).get(0);
+      const matchingMenuSectionCollapsable = $("#" + section?.name + "-collapsed").get(0);
 
       if (matchingMenuSection) {
         matchingMenuSection.classList.add('active-section');

@@ -197,9 +197,6 @@ class StockMovementVerifyRequest extends Component {
             },
           };
 
-          const { pathname } = this.props.history.location;
-          this.props.history.replace({ pathname, search: `direction=${resp?.origin?.id === this.props.currentLocation?.id ? 'OUTBOUND' : 'INBOUND'}` });
-
           let currentPage = 1;
           switch (values.statusCode) {
             case 'REQUESTED':
@@ -282,10 +279,6 @@ StockMovementVerifyRequest.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
-  history: PropTypes.shape({
-    replace: PropTypes.func,
-    location: PropTypes.string,
-  }).isRequired,
 };
 
 StockMovementVerifyRequest.defaultProps = {

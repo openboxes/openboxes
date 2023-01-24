@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import queryString from 'query-string';
 
+// TODO: Base this util only on the menuSectionsUrlParts parameter taken from config
 export const checkActiveSection = ({
   menuUrls,
   path,
@@ -50,16 +51,11 @@ export const checkActiveSection = ({
       return !!foundURL;
     });
 
-  if (pathnameWithoutParams.includes('verifyRequest')) {
-    return search && search.split('=')[1].toLowerCase();
-  }
-
   // check if url match section parts from config
   const matchingFromSectionsUrlParts = menuSectionsUrlParts &&
     Object.keys(menuSectionsUrlParts)
       .find(sectionName => !!menuSectionsUrlParts[sectionName]
         .some(section => pathname.includes(section)));
-
 
   // if matched path not found then use matching from section url parts
   return matchedPath || matchingFromSectionsUrlParts || 'dashboard';
