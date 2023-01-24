@@ -456,10 +456,12 @@
                                     <g:if test="${stockHistoryEntry?.isInternal}">
                                         <span>&nbsp;&rsaquo;&nbsp;</span>
                                         <g:if test="${stockHistoryEntry?.destinationBinLocation}">
-                                            <span>
+                                            <span class="line-base" title="${stockHistoryEntry?.destinationBinLocation?.zone?.name}">
                                                 <g:if test="${stockHistoryEntry?.destinationBinLocation?.zone}">
                                                     ${stockHistoryEntry?.destinationBinLocation?.zone?.name}
                                                 </g:if>
+                                            </span>
+                                            <span class="line-extension" title="${stockHistoryEntry?.destinationBinLocation?.name}">
                                                 ${stockHistoryEntry?.destinationBinLocation?.name}
                                             </span>
                                         </g:if>
