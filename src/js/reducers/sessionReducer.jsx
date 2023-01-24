@@ -24,6 +24,7 @@ const initialState = {
   isUserApprover: false,
   supportedActivities: [],
   menuConfig: [],
+  menuSectionsUrlParts: {},
   activeLanguage: '',
   fetchedTranslations: {
     default: false,
@@ -117,6 +118,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         menuConfig: _.get(action, 'payload.data.data.menuConfig'),
+        menuSectionsUrlParts: _.get(action, 'payload.data.data.menuSectionsUrlParts'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload, loading: true };

@@ -1,10 +1,12 @@
 import _ from 'lodash';
 import queryString from 'query-string';
 
+// TODO: Base this util only on the menuSectionsUrlParts parameter taken from config
 export const checkActiveSection = ({
   menuUrls,
   path,
   params,
+  menuSectionsUrlParts,
 }) => {
   const { pathname, search } = path;
   // removing custom params from URL fe. stockMovementId
@@ -28,6 +30,7 @@ export const checkActiveSection = ({
         if (!pathnameWithoutParams.includes(sectionPath.replace(/\/index$/, ''))) {
           return false;
         }
+
         // if found matching pathname
         // then check if all parameters of section path match with current path parameters
         if (!_.isEmpty(sectionSearch)) {
@@ -35,6 +38,7 @@ export const checkActiveSection = ({
             direction,
             ...otherParams
           } = queryString.parse(search.substring(1, search.length));
+
           // if direction is not specified
           // then compare current url with sectionPath without direction
           if (!direction) {
@@ -46,11 +50,15 @@ export const checkActiveSection = ({
       });
       return !!foundURL;
     });
-  if (pathname.includes('partialReceiving')) {
-    return 'inbound';
-  }
 
-  return matchedPath || 'dashboard';
+  // check if url match section parts from config
+  const matchingFromSectionsUrlParts = menuSectionsUrlParts &&
+    Object.keys(menuSectionsUrlParts)
+      .find(sectionName => !!menuSectionsUrlParts[sectionName]
+        .some(section => pathname.includes(section)));
+
+  // if matched path not found then use matching from section url parts
+  return matchedPath || matchingFromSectionsUrlParts || 'dashboard';
 };
 
 export const getAllMenuUrls = menuConfig => Object.entries(menuConfig)

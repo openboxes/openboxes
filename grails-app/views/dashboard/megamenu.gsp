@@ -127,7 +127,7 @@
 
     const matchingSection = matchSection();
 
-    applyActiveSection(matchingSection);
+    applyActiveSection(matchingSection?.name);
 
     function repositionNavDropdowns() {
       const dropdownRightClass = "dropdown-menu-right";

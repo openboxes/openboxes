@@ -10,7 +10,7 @@ import MenuSection from 'components/Layout/menu/MenuSection';
 import MenuSubsection from 'components/Layout/menu/MenuSubsection';
 import { checkActiveSection, getAllMenuUrls } from 'utils/menu-utils';
 
-const Menu = ({ menuConfig, location }) => {
+const Menu = ({ menuConfig, location, menuSectionsUrlParts }) => {
   const params = useParams();
 
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);
@@ -19,6 +19,7 @@ const Menu = ({ menuConfig, location }) => {
       menuUrls: allMenuUrls,
       path: location,
       params,
+      menuSectionsUrlParts,
     }), [allMenuUrls, location]);
 
   return (
@@ -65,6 +66,7 @@ const Menu = ({ menuConfig, location }) => {
 
 const mapStateToProps = state => ({
   menuConfig: state.session.menuConfig,
+  menuSectionsUrlParts: state.session.menuSectionsUrlParts,
 });
 
 export default withRouter(connect(mapStateToProps)(Menu));
@@ -90,6 +92,17 @@ Menu.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string,
     search: PropTypes.string,
+  }).isRequired,
+  menuSectionsUrlParts: PropTypes.shape({
+    inventory: PropTypes.arrayOf(PropTypes.string),
+    products: PropTypes.arrayOf(PropTypes.string),
+    purchasing: PropTypes.arrayOf(PropTypes.string),
+    invoicing: PropTypes.arrayOf(PropTypes.string),
+    inbound: PropTypes.arrayOf(PropTypes.string),
+    outbound: PropTypes.arrayOf(PropTypes.string),
+    requisitionTemplate: PropTypes.arrayOf(PropTypes.string),
+    configuration: PropTypes.arrayOf(PropTypes.string),
+    injectedDirectly: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   menuConfig: PropTypes.arrayOf(sectionPropTypes).isRequired,
 };
