@@ -38,7 +38,7 @@ class LocationDataService {
             Location location = params.id ? Location.findById(params.id) : null
             Location parentLocation = params.parentLocation ? Location.findByName(params.parentLocation) : null
             LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
-            LocationType locationType = params.locationType ? LocationType.findByNameLike(params.locationType + "%") : null
+            LocationType locationType = params.locationType ? LocationType.findByIdOrName(params.locationType, params.locationType) : null
             List<Organization> organizations = params.organization ? Organization.findAllByCodeOrName(params.organization, params.organization) : null
 
             if (params.id && !location) {
@@ -144,8 +144,7 @@ class LocationDataService {
         }
         def locationType = null
         if (params.locationType) {
-            // Find by name with like, but value more the exact match
-            locationType = LocationType.findByNameOrNameIlike(params.locationType, params.locationType + "%")
+            locationType = LocationType.findByIdOrName(params.locationType, params.locationType)
         }
 
         def currentLocationType = location.locationType

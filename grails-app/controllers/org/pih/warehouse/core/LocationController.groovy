@@ -150,7 +150,15 @@ class LocationController {
 
                 def parentLocation = locationInstance.parentLocation
                 if (parentLocation) {
+                    locationInstance.parentLocation = null
                     parentLocation.removeFromLocations(locationInstance)
+                    parentLocation.save(flush: true)
+                }
+                def zone = locationInstance.zone
+                if (zone) {
+                    locationInstance.zone = null
+                    zone.removeFromLocations(locationInstance)
+                    zone.save(flush: true)
                 }
 
                 locationInstance.delete(flush: true)
