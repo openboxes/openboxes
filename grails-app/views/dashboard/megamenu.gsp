@@ -102,32 +102,36 @@
   $(document).ready(function () {
     const path = window.location.pathname
     const menuConfigValues = $(".menu-config-value").toArray();
-    const urlPartsWithSection = $("#menuSectionUrlParts").val();
-    const parsedUrlPartsWithSection = JSON.parse(urlPartsWithSection);
+    // Menu can be empty for locations without manage inventory and with submit request
+    // in this case we don't want to search for active menu section
+    if (menuConfigValues?.length) {
+      const urlPartsWithSection = $("#menuSectionUrlParts").val();
+      const parsedUrlPartsWithSection = JSON.parse(urlPartsWithSection);
 
-    const matchSection = () => {
-      // match the whole url
-      const exactMatch = menuConfigValues.find(it => it.value.includes(path))
+      const matchSection = () => {
+        // match the whole url
+        const exactMatch = menuConfigValues.find(it => it.value.includes(path))
 
-      if(exactMatch) {
-        return exactMatch;
-      }
+        if (exactMatch) {
+          return exactMatch;
+        }
 
-      // check if current section exists in object with wrongly underlined urls
-      const sectionFromJson = Object.keys(parsedUrlPartsWithSection).find(sectionName => {
-        return !!parsedUrlPartsWithSection[sectionName].some(section => path.includes(section));
-      })
+        // check if current section exists in object with wrongly underlined urls
+        const sectionFromJson = Object.keys(parsedUrlPartsWithSection).find(sectionName => {
+          return !!parsedUrlPartsWithSection[sectionName].some(section => path.includes(section));
+        })
 
-      if (sectionFromJson) {
-        return menuConfigValues.find(it => it.name === sectionFromJson);
-      }
+        if (sectionFromJson) {
+          return menuConfigValues.find(it => it.name === sectionFromJson);
+        }
 
-      return null;
-    };
+        return null;
+      };
 
-    const matchingSection = matchSection();
+      const matchingSection = matchSection();
 
-    applyActiveSection(matchingSection?.name);
+      applyActiveSection(matchingSection?.name);
+    }
 
     function repositionNavDropdowns() {
       const dropdownRightClass = "dropdown-menu-right";
