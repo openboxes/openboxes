@@ -224,8 +224,12 @@ class OutboundStockMovement implements Serializable {
         boolean isDestination = destination?.id == currentLocation.id
         boolean canOriginManageInventory = origin?.supports(ActivityCode.MANAGE_INVENTORY)
         boolean isCentralPurchasingEnabled = currentLocation?.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
-
-        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder))
+        return (
+                (canOriginManageInventory && isOrigin) ||
+                (!canOriginManageInventory && isDestination) ||
+                (isCentralPurchasingEnabled && isFromOrder) ||
+                (isDestination && electronicType)
+        )
     }
 
     Boolean isEditAuthorized(Location currentLocation) {
