@@ -278,7 +278,7 @@ const PurchaseOrderListTable = ({
       className: 'text-right',
       headerClassName: 'justify-content-end',
       sortable: false,
-      minWidth: 230,
+      minWidth: 260,
     },
   ], [supportedActivities, highestRole, actions]);
 
