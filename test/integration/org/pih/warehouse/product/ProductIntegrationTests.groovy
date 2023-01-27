@@ -117,7 +117,7 @@ class ProductIntegrationTests extends GroovyTestCase {
         def productType = DbHelper.findOrCreateProductType("Default")
         def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
 
-        def synonym = new Synonym(name: "new synonym")
+        def synonym = new Synonym(name: "new synonym", classification: SynonymClassification.DISPLAY_NAME)
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
@@ -143,7 +143,7 @@ class ProductIntegrationTests extends GroovyTestCase {
         def productType = DbHelper.findOrCreateProductType("Default")
         def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
 
-        def synonym = new Synonym(name: "new synonym")
+        def synonym = new Synonym(name: "new synonym", classification: SynonymClassification.DISPLAY_NAME)
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
@@ -167,7 +167,7 @@ class ProductIntegrationTests extends GroovyTestCase {
         def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
         def product2 = new Product(name: "new product 2", category: category, productType: productType).save(flush: true, failOnError: true)
 
-        def synonym = new Synonym(name: "new synonym")
+        def synonym = new Synonym(name: "new synonym", classification: SynonymClassification.DISPLAY_NAME)
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
