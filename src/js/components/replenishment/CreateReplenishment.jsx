@@ -145,7 +145,6 @@ const FIELD = {
 function validate(values) {
   const errors = {};
   errors.requirements = [];
-
   _.forEach(values.requirements, (item, key) => {
     if (item.quantity) {
       if (item.quantity < 1) {
@@ -154,6 +153,10 @@ function validate(values) {
       if (item.quantity > item.quantityAvailable) {
         errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
       }
+      return;
+    }
+    if (item.checked) {
+      errors.requirements[key] = { quantity: 'react.replenishment.error.emptyQtyToTransfer.label' };
     }
   });
   const anyRowSelected = _.find(values.requirements, row => row.checked);
