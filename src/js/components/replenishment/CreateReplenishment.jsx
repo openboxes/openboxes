@@ -146,19 +146,21 @@ function validate(values) {
   const errors = {};
   errors.requirements = [];
   _.forEach(values.requirements, (item, key) => {
-    // error shouldn't be added to fields which are not checked
-    if (item.checked) {
-      if (item.quantity) {
-        if (item.quantity < 1) {
-          errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
-        }
-        if (item.quantity > item.quantityAvailable) {
-          errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
-        }
-        return;
-      }
-      errors.requirements[key] = { quantity: 'react.replenishment.error.emptyQtyToTransfer.label' };
+    // If item not checked, we don't want to validate
+    if (!item.checked) {
+      return;
     }
+    // If item checked, validate
+    if (item.quantity) {
+      if (item.quantity < 1) {
+        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
+      }
+      if (item.quantity > item.quantityAvailable) {
+        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
+      }
+      return;
+    }
+    errors.requirements[key] = { quantity: 'react.replenishment.error.emptyQtyToTransfer.label' };
   });
 
   const anyRowSelected = _.find(values.requirements, row => row.checked);
