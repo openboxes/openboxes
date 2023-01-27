@@ -22,9 +22,6 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
-import org.springframework.web.servlet.support.RequestContextUtils as RCU
-
-import javax.servlet.http.HttpServletRequest
 import java.text.SimpleDateFormat
 /**
  * @author jmiranda*

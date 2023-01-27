@@ -41,7 +41,6 @@ class ProductController {
     def documentService
     def inventoryService
     def barcodeService
-    def localizationService
     UploadService uploadService
 
     static allowedMethods = [save: "POST", update: "POST"]
