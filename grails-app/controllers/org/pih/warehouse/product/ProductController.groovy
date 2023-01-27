@@ -41,6 +41,7 @@ class ProductController {
     def documentService
     def inventoryService
     def barcodeService
+    def localizationService
     UploadService uploadService
 
     static allowedMethods = [save: "POST", update: "POST"]
@@ -992,10 +993,15 @@ class ProductController {
      */
     def addSynonymToProduct = {
         println "addSynonymToProduct() " + params
-        def product = Product.get(params.id)
-        if (product) {
-            product.addToSynonyms(new Synonym(name: params.synonym, locale: RCU.getLocale(request)))
-            product.save(flush: true, failOnError: true)
+        Product product = null
+        // Getting locale from RCU, because unable to inject localizationService to productService (session scope)
+        Locale locale = RCU.getLocale(request)
+        try {
+            product = productService.addSynonymToProduct(params.id, params.classification, params.synonym, locale)
+        } catch (IllegalArgumentException e) {
+            // If adding a synonym fails, we still want to return the product to the view
+            product = Product.read(params.id)
+            flash.error = e.message
         }
         render(template: 'productSynonyms', model: [productInstance: product])
     }

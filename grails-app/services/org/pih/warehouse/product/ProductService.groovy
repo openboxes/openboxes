@@ -17,11 +17,14 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
+import javax.servlet.http.HttpServletRequest
 import java.text.SimpleDateFormat
 /**
  * @author jmiranda*
@@ -1370,5 +1373,17 @@ class ProductService {
 
             importProducts(products)
         }
+    }
+
+    Product addSynonymToProduct(String productId, String classificationName, String synonymValue, Locale locale) {
+        Product product = Product.get(productId)
+        SynonymClassification classification = classificationName ? SynonymClassification.valueOf(classificationName) : SynonymClassification.DISPLAY_NAME
+        if (!synonymValue) {
+            throw new IllegalArgumentException("Synonym can't be an empty string")
+        }
+        Synonym synonym = new Synonym(name: synonymValue, locale: locale, classification: classification)
+        product.addToSynonyms(synonym)
+        product.save(flush: true, failOnError: true)
+        return product
     }
 }
