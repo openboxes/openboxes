@@ -379,7 +379,10 @@
                                         <g:elseif test="${shipment?.isFromReturnOrder}">
                                             <g:link controller="stockMovement" action="show" id="${shipment?.id}">
                                                 <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
-                                                    ${shipment?.returnOrder?.orderType?.name}
+                                                    <g:message
+                                                        code="order.orderType.code.${shipment?.returnOrder?.orderType?.code}"
+                                                        default="${shipment?.returnOrder?.orderType?.name}"
+                                                    />
                                                     &rsaquo;
                                                     ${shipment?.shipmentNumber}
                                                 </div>
@@ -409,7 +412,10 @@
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order }">
                                             <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
-                                                    ${stockHistoryEntry?.transaction?.order?.orderType?.name}
+                                                    <g:message
+                                                        code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
+                                                        default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
+                                                    />
                                                     &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
                                                 </div>
