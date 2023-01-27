@@ -419,7 +419,6 @@ class ConfirmInvoicePage extends Component {
                   }))}
               </div>
               <div className="submit-buttons">
-                {console.log(this.state.values)}
                 <button
                   className="btn btn-outline-primary btn-form btn-xs"
                   onClick={() => this.props.previousPage(this.state.values)}
