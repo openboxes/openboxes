@@ -150,17 +150,17 @@ function validate(values) {
     if (!item.checked) {
       return;
     }
-    // If item checked, validate
-    if (item.quantity) {
-      if (item.quantity < 1) {
-        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
-      }
-      if (item.quantity > item.quantityAvailable) {
-        errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
-      }
+    if (!item.quantity) {
+      errors.requirements[key] = { quantity: 'react.replenishment.error.emptyQtyToTransfer.label' };
       return;
     }
-    errors.requirements[key] = { quantity: 'react.replenishment.error.emptyQtyToTransfer.label' };
+    if (item.quantity < 1) {
+      errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
+      return;
+    }
+    if (item.quantity > item.quantityAvailable) {
+      errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.greaterThanQATP.label' };
+    }
   });
 
   const anyRowSelected = _.find(values.requirements, row => row.checked);
