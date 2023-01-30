@@ -17,11 +17,12 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ReportUtil
-
 import java.text.SimpleDateFormat
 /**
  * @author jmiranda*
@@ -1370,5 +1371,21 @@ class ProductService {
 
             importProducts(products)
         }
+    }
+
+    Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
+        Product product = Product.get(productId)
+        if (!localeName) {
+            throw new IllegalArgumentException("You must provide a locale")
+        }
+        Locale locale = new Locale(localeName)
+        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
+        if (!synonymValue) {
+            throw new IllegalArgumentException("Synonym can't be an empty string")
+        }
+        Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
+        product.addToSynonyms(synonym)
+        product.save(flush: true, failOnError: true)
+        return product
     }
 }

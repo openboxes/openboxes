@@ -6,6 +6,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.inventory.InventoryStatus
 import testutils.DbHelper
 
@@ -117,7 +118,7 @@ class ProductIntegrationTests extends GroovyTestCase {
         def productType = DbHelper.findOrCreateProductType("Default")
         def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
 
-        def synonym = new Synonym(name: "new synonym")
+        def synonym = new Synonym(name: "new synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
@@ -143,7 +144,7 @@ class ProductIntegrationTests extends GroovyTestCase {
         def productType = DbHelper.findOrCreateProductType("Default")
         def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
 
-        def synonym = new Synonym(name: "new synonym")
+        def synonym = new Synonym(name: "new synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
@@ -167,7 +168,7 @@ class ProductIntegrationTests extends GroovyTestCase {
         def product1 = new Product(name: "new product 1", category: category, productType: productType).save(flush: true, failOnError: true)
         def product2 = new Product(name: "new product 2", category: category, productType: productType).save(flush: true, failOnError: true)
 
-        def synonym = new Synonym(name: "new synonym")
+        def synonym = new Synonym(name: "new synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
         product1.addToSynonyms(synonym)
         product1.save(flush: true)
 
