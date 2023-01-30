@@ -154,7 +154,7 @@ const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
-  flexWidth: '0.5',
+  flexWidth: '1',
   fieldKey: '',
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
