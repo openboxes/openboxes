@@ -1,6 +1,6 @@
-package org.pih.warehouse.product
+package org.pih.warehouse.core
 
-enum SynonymClassification {
+enum SynonymTypeCode {
     DISPLAY_NAME,
     BRAND_NAME,
     ALTERNATE_NAME

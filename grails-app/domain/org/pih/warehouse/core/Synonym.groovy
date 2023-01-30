@@ -11,8 +11,6 @@ package org.pih.warehouse.core
 
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.SynonymClassification
-
 
 class Synonym implements Serializable {
 
@@ -37,7 +35,7 @@ class Synonym implements Serializable {
     String id
     String name
     Locale locale
-    SynonymClassification classification
+    SynonymTypeCode synonymTypeCode
     Date dateCreated
     Date lastUpdated
     User createdBy
@@ -52,7 +50,7 @@ class Synonym implements Serializable {
     static constraints = {
         name(nullable: false, maxSize: 255)
         locale(nullable: true)
-        classification(nullable: false)
+        synonymTypeCode(nullable: false)
         updatedBy(nullable: true)
         createdBy(nullable: true)
     }

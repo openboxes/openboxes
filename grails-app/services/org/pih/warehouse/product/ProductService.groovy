@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -1372,13 +1373,17 @@ class ProductService {
         }
     }
 
-    Product addSynonymToProduct(String productId, String classificationName, String synonymValue, Locale locale) {
+    Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Product product = Product.get(productId)
-        SynonymClassification classification = classificationName ? SynonymClassification.valueOf(classificationName) : SynonymClassification.DISPLAY_NAME
+        if (!localeName) {
+            throw new IllegalArgumentException("You must provide a locale")
+        }
+        Locale locale = new Locale(localeName)
+        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.DISPLAY_NAME
         if (!synonymValue) {
             throw new IllegalArgumentException("Synonym can't be an empty string")
         }
-        Synonym synonym = new Synonym(name: synonymValue, locale: locale, classification: classification)
+        Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
         product.addToSynonyms(synonym)
         product.save(flush: true, failOnError: true)
         return product

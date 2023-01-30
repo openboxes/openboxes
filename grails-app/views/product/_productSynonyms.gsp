@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.product.SynonymClassification" %>
+<%@ page import="org.pih.warehouse.core.SynonymTypeCode" %>
 <div id="synonyms">
     <div class="box">
         <g:if test="${flash.message}">
@@ -31,7 +31,7 @@
                             ${synonym.locale}
                         </td>
                         <td class="middle">
-                            ${g.message(code: 'enum.SynonymClassification.' + synonym.classification)}
+                            ${g.message(code: 'enum.SynonymTypeCode.' + synonym.synonymTypeCode)}
                         </td>
                         <td class="middle">
                             <g:remoteLink controller="product" action="deleteSynonym" update="synonyms" class="button"
@@ -68,9 +68,9 @@
                                     data-placeholder="Select a locale"
                                 />
                                 <g:select
-                                    name="classification"
-                                    from="${SynonymClassification.list()}"
-                                    optionValue="${{ g.message(code: "enum.SynonymClassification." + it ) }}"
+                                    name="synonymTypeCode"
+                                    from="${SynonymTypeCode.list()}"
+                                    optionValue="${{ g.message(code: "enum.SynonymTypeCode." + it ) }}"
                                     noSelection="['':'']"
                                     data-placeholder="Select a classification"
                                     class="chzn-select-deselect"

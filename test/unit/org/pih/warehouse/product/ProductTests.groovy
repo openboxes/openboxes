@@ -12,8 +12,8 @@ package org.pih.warehouse.product
 import grails.test.*
 import org.junit.Ignore
 import org.junit.Test
-import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.inventory.InventoryItem
 
 
@@ -86,7 +86,7 @@ class ProductTests extends GrailsUnitTestCase {
     @Test
     void addToSynonyms_shouldAddNewSynonym() {
         def product = new Product(name: "Product 1")
-        product.addToSynonyms(new Synonym(synonym: "synonym", classification: SynonymClassification.DISPLAY_NAME))
+        product.addToSynonyms(new Synonym(synonym: "synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME))
         product.save(flush: true)
         assertEquals 1, product.synonyms.size()
     }

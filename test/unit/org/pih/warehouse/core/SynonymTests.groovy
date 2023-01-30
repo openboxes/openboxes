@@ -10,12 +10,10 @@
 package org.pih.warehouse.core
 
 import grails.test.GrailsUnitTestCase
-import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.SynonymClassification
 import org.springframework.context.ApplicationEvent
 
 class SynonymTests extends GrailsUnitTestCase {
@@ -25,8 +23,8 @@ class SynonymTests extends GrailsUnitTestCase {
         //mockForConstraintsTests(Synonym)
         def product1 = new Product(name: "new product", category: new Category(name: "new category"))
         def product2 = new Product(name: "product with no synonyms", category: new Category(name: "new category"))
-        def synonym1 = new Synonym(name: "new synonym 1", product:product1, classification: SynonymClassification.DISPLAY_NAME)
-        def synonym2 = new Synonym(name: "new synonym 2", product:product1, classification: SynonymClassification.DISPLAY_NAME)
+        def synonym1 = new Synonym(name: "new synonym 1", product:product1, synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
+        def synonym2 = new Synonym(name: "new synonym 2", product:product1, synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
         def category = new Category(name: "new category")
 
         mockDomain(Synonym, [synonym1,synonym2])
@@ -45,7 +43,7 @@ class SynonymTests extends GrailsUnitTestCase {
 
     @Test
     void validate_shouldPassValidation() {
-        def synonym = new Synonym(name: "a synonym", product: new Product(), classification: SynonymClassification.DISPLAY_NAME)
+        def synonym = new Synonym(name: "a synonym", product: new Product(), synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
         assertTrue synonym.validate()
         println synonym.errors
         assertTrue !synonym.hasErrors()
@@ -64,7 +62,7 @@ class SynonymTests extends GrailsUnitTestCase {
     void addSynonym() {
         def product = Product.findByName("new product")
         assertNotNull(product)
-        product.addToSynonyms(new Synonym(name: "new synonym", classification: SynonymClassification.DISPLAY_NAME))
+        product.addToSynonyms(new Synonym(name: "new synonym", synonymTypeCode: SynonymTypeCode.DISPLAY_NAME))
         product.save(flush: true)
         assertEquals 1, product.synonyms.size()
 

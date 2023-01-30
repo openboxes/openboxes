@@ -993,10 +993,8 @@ class ProductController {
     def addSynonymToProduct = {
         println "addSynonymToProduct() " + params
         Product product = null
-        // Getting locale from RCU, because unable to inject localizationService to productService (session scope)
-        Locale locale = RCU.getLocale(request)
         try {
-            product = productService.addSynonymToProduct(params.id, params.classification, params.synonym, locale)
+            product = productService.addSynonymToProduct(params.id, params.synonymTypeCode, params.synonym, params.locale)
         } catch (IllegalArgumentException e) {
             // If adding a synonym fails, we still want to return the product to the view
             product = Product.read(params.id)

@@ -6,11 +6,11 @@
     <changeSet author="kchelstowski" id="270120231015-0">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="synonym" columnName="classification" />
+                <columnExists tableName="synonym" columnName="synonym_type_code" />
             </not>
         </preConditions>
         <addColumn tableName="synonym">
-            <column name="classification" type="VARCHAR(100)" defaultValue="DISPLAY_NAME"/>
+            <column name="synonym_type_code" type="VARCHAR(100)" defaultValue="DISPLAY_NAME"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>
