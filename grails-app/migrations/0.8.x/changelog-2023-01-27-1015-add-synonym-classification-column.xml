@@ -10,7 +10,7 @@
             </not>
         </preConditions>
         <addColumn tableName="synonym">
-            <column name="synonym_type_code" type="VARCHAR(100)" defaultValue="DISPLAY_NAME"/>
+            <column name="synonym_type_code" type="VARCHAR(100)" defaultValue="ALTERNATE_NAME"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

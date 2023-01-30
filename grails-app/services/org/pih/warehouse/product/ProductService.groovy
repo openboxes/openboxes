@@ -1379,7 +1379,7 @@ class ProductService {
             throw new IllegalArgumentException("You must provide a locale")
         }
         Locale locale = new Locale(localeName)
-        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.DISPLAY_NAME
+        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
         if (!synonymValue) {
             throw new IllegalArgumentException("Synonym can't be an empty string")
         }

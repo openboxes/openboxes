@@ -65,14 +65,14 @@
                                     name="locale"
                                     noSelection="['':'']"
                                     class="chzn-select-deselect"
-                                    data-placeholder="Select a locale"
+                                    data-placeholder="${g.message(code: 'synonym.selectLocale.placeholder.label', default: 'Select a locale')}"
                                 />
                                 <g:select
                                     name="synonymTypeCode"
                                     from="${SynonymTypeCode.list()}"
                                     optionValue="${{ g.message(code: "enum.SynonymTypeCode." + it ) }}"
                                     noSelection="['':'']"
-                                    data-placeholder="Select a classification"
+                                    data-placeholder="${g.message(code: 'synonym.synonymTypeCode.placeholder.label', default: 'Select a classification')}"
                                     class="chzn-select-deselect"
                                 />
                                 <input
@@ -82,7 +82,7 @@
                                     value=""
                                     size="80"
                                     class="medium text"
-                                    placeholder="Type the synonym here"
+                                    placeholder="${g.message(code: 'synonym.typeSynonym.placeholder.label', default: 'Type the synonym here')}"
                                 />
                                 <button  class="button">
                                     <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
