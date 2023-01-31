@@ -62,6 +62,8 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
             url: obj.url,
             label: obj.label,
             color: obj.color,
+            hasTranslatedName: obj.hasTranslatedName,
+            originalName: obj.value,
           }
         ))))
         .catch(() => callback([]));
