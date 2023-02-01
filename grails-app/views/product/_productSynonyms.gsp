@@ -90,7 +90,22 @@
                                 </button>
                             </div>
                         </g:formRemote>
-
+                    </td>
+                    <td>
+                       <div class="d-flex">
+                           <g:link
+                               class="button"
+                               controller="product"
+                               action="exportSynonymTemplate"
+                               params="[productCode: productInstance.productCode ]"
+                           >
+                               <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                <g:message
+                                    code="default.download.label"
+                                    args="[ g.message(code: 'default.template.label', 'Template') ]"
+                                />
+                           </g:link>
+                       </div>
                     </td>
 
                 </tr>

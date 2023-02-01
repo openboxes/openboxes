@@ -255,7 +255,7 @@
                                 </label>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadTemplate" params="[template:'productSynonyms.xls']">
+                                <g:link controller="product" action="exportSynonymTemplate">
                                     <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                                 </g:link>
                             </td>

@@ -805,6 +805,24 @@ class ProductController {
     }
 
     /**
+     * Export Synonym Template Excel
+     */
+    def exportSynonymTemplate = {
+        List<Map> objects = [[]]
+        // return a template with filled in product code
+        if (params.productCode) {
+            objects = [ ['product': [ 'productCode': params.productCode ]] ]
+        }
+        def data = dataService.transformObjects(objects, Synonym.PROPERTIES)
+
+
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader 'Content-disposition', "attachment; filename=\"productSynonyms.xls\""
+        documentService.generateExcel(response.outputStream, data)
+        response.outputStream.flush()
+    }
+
+    /**
      * Renders form to begin the import process
      */
     def importAsCsv = {}
