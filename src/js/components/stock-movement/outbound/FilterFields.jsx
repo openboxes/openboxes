@@ -11,6 +11,7 @@ export default {
       defaultPlaceholder: 'Requisition Status',
       showLabelTooltip: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ requisitionStatuses }) => ({
       options: requisitionStatuses,
