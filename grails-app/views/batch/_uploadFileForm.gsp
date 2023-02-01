@@ -260,6 +260,9 @@
                                 </g:link>
                             </td>
                             <td>
+                                <g:link controller="batch" action="downloadExcel" params="[type:'Synonym']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.data.label')]"/>
+                                </g:link>
                             </td>
                         </tr>
                         <tr>
