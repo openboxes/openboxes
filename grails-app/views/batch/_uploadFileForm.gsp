@@ -250,6 +250,21 @@
                         <tr>
                             <td>
                                 <label>
+                                    <g:radio name="type" value="productSynonym" checked="${params.type=='productSynonym'}"/>
+                                    <warehouse:message code="synonym.productSynonyms.label" default="Product Synonyms"/>
+                                </label>
+                            </td>
+                            <td>
+                                <g:link controller="batch" action="downloadTemplate" params="[template:'productSynonyms.xls']">
+                                    <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
+                                </g:link>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
                                     <g:radio name="type" value="outboundStockMovement" checked="${params.type=='outboundStockMovement'}"/>
                                     <warehouse:message code="import.outboundStockMovement.label" default="Stock Movements (Outbound)"/>
                                 </label>

@@ -1373,8 +1373,7 @@ class ProductService {
         }
     }
 
-    Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
-        Product product = Product.get(productId)
+    Product addSynonymToProduct(Product product, String synonymTypeCodeName, String synonymValue, String localeName) {
         if (!localeName) {
             throw new IllegalArgumentException("You must provide a locale")
         }

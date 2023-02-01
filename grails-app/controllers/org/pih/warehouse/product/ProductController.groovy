@@ -992,12 +992,10 @@ class ProductController {
      */
     def addSynonymToProduct = {
         println "addSynonymToProduct() " + params
-        Product product = null
+        Product product = Product.read(params.id)
         try {
-            product = productService.addSynonymToProduct(params.id, params.synonymTypeCode, params.synonym, params.locale)
+            productService.addSynonymToProduct(product, params.synonymTypeCode, params.synonym, params.locale)
         } catch (IllegalArgumentException e) {
-            // If adding a synonym fails, we still want to return the product to the view
-            product = Product.read(params.id)
             flash.error = e.message
         }
         render(template: 'productSynonyms', model: [productInstance: product])
