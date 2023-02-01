@@ -1079,8 +1079,10 @@ class JsonController {
                     type : product.class,
                     url  : request.contextPath + "/" + type + "/redirect/" + product.id,
                     value: product.name,
-                    label: product.productCode + " " + product.name + " " + quantity,
-                    color: product.color
+                    label: product.productCode + " " + (product.translatedName ?: product.name) + " " + quantity,
+                    color: product.color,
+                    // Do not remove double negation even if IDE recommends this - we want to convert string/null to boolean
+                    hasTranslatedName: !!product.translatedName
             ]
         }
         render json.findAll { it != null } as JSON
