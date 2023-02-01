@@ -43,7 +43,7 @@ class ModalWrapper extends Component {
     const { defaultTitleMessage } = this.props;
 
     return (
-      <div className={this.props.wrapperClassName ?? ''}>
+      <div className={this.props.wrapperClassName}>
         <button
           type="button"
           className={`btn-xs ${this.props.btnOpenClassName}`}
