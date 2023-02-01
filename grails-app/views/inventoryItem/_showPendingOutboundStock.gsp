@@ -1,5 +1,5 @@
 <div class="box dialog">
-    <h2><warehouse:message code="stockCard.pending.label" args="[g.message(code: 'default.outbound.label')]" /></h2>
+    <h2><warehouse:message code="stockCard.pendingOutbound.label" default="Pending Outbound"/></h2>
 
     <g:form method="GET" action="showStockCard">
         <g:hiddenField name="product.id" value="${product?.id }"/>
@@ -51,7 +51,7 @@
                         </g:if>
                     </td>
                     <td class="center">
-                        ${item?.status}
+                        <format:metadata obj="${item?.status}" />
                     </td>
                     <td class="center">
                         <g:link controller="stockMovement" action="show" id="${item?.id}">

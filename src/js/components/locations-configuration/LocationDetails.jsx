@@ -81,7 +81,8 @@ const FIELDS = {
     defaultMessage: 'Organization',
     attributes: {
       createNewFromModal: true,
-      createNewFromModalLabel: 'Add new Organization',
+      createNewFromModalLabel: 'react.locationsConfiguration.organizationModal.title.label',
+      defaultMessage: 'Add new Organization',
       async: true,
       required: true,
       showValueTooltip: true,
@@ -109,7 +110,8 @@ const FIELDS = {
     defaultMessage: 'Location Group',
     attributes: {
       createNewFromModal: true,
-      createNewFromModalLabel: 'Add new Location Group',
+      createNewFromModalLabel: 'react.locationsConfiguration.locationGroup.locationModal.title.label',
+      defaultMessage: 'Add new Location Group',
       async: true,
       showValueTooltip: true,
       openOnClick: false,

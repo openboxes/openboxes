@@ -352,6 +352,11 @@ class EditItemsPage extends Component {
 
       this.fetchAllData(false);
     }
+
+    // If we change the language, refetch the reason codes
+    if (nextProps.currentLocale !== this.props.currentLocale) {
+      this.props.fetchReasonCodes();
+    }
   }
 
   setEditPageItems(response, startIndex) {
@@ -445,10 +450,7 @@ class EditItemsPage extends Component {
    */
   fetchAllData(forceFetch) {
     this.props.showSpinner();
-
-    if (!this.props.reasonCodesFetched || forceFetch) {
-      this.props.fetchReasonCodes();
-    }
+    this.props.fetchReasonCodes();
 
     this.fetchEditPageData().then((resp) => {
       const { statusCode } = resp.data.data;
@@ -995,12 +997,12 @@ class EditItemsPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  currentLocale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps, {
@@ -1023,8 +1025,6 @@ EditItemsPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
-  /** Indicator if reason codes' data is fetched */
-  reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   translate: PropTypes.func.isRequired,
@@ -1034,4 +1034,5 @@ EditItemsPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
+  currentLocale: PropTypes.string.isRequired,
 };

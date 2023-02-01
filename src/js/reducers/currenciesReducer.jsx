@@ -10,8 +10,8 @@ const initialState = {
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_CURRENCIES:
-      if (action.payload.data !== undefined) {
-        const currencies = _.map(action.payload.data.data, currency => (
+      if (action.payload !== undefined) {
+        const currencies = _.map(action.payload.data, currency => (
           { id: currency.id, name: currency.name }
         ));
         return { ...state, data: currencies, fetched: true };

@@ -1229,7 +1229,7 @@ class ProductService {
 
     def searchProductDtos(String[] terms) {
         def query = """
-            select 
+            select distinct
             product.id, 
             product.name, 
             product.product_code as productCode, 
@@ -1238,6 +1238,14 @@ class ProductService {
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
             product.lot_and_expiry_control as lotAndExpiryControl,
+            # Return whether search term returns an exact match
+            ifnull(
+                product.product_code = '${terms.join(" ")}' or 
+                product.upc = '${terms.join(" ")}' or 
+                product.ndc = '${terms.join(" ")}' or 
+                product_supplier.supplier_code = '${terms.join(" ")}' or
+                product_supplier.manufacturer_code = '${terms.join(" ")}', false
+            ) as exactMatch,
             (
                 select max(pc.color) 
                 from product_catalog_item pci 
@@ -1274,10 +1282,11 @@ class ProductService {
                 or lower(product_supplier.manufacturer_name) like '${it}%' 
                 or lower(product_supplier.supplier_code) like '${it}%'
                 or lower(product_supplier.supplier_name) like '${it}%'""" }.join(" or ")}
-                or manufacturer.id is not null  # when the condition is added to the join, we still need to check if there were any results
+                # when the condition is added to the join, we still need to check if there were any results
+                or manufacturer.id is not null  
                 or supplier.id is not null
                 or inventory_item.id is not null)
-            group by product.id, product.name, productCode, coldChain, controlledSubstance, hazardousMaterial, reconditioned, productColor"""
+            order by productCode"""
         } else {
             query += " where product.active = 1 "
         }

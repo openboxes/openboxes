@@ -71,7 +71,7 @@
                             <div class="filters-container">
                                 <label class="name"><warehouse:message code="inventory.filterByProduct.label"/></label>
                                 <div>
-                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="Filter by name or code"/>
+                                    <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProductName.label', default: 'Filter by product name')}"/>
                                 </div>
                             </div>
                             <div class="button-group" style="margin-right: 5px;">
@@ -158,17 +158,23 @@
                             </tbody>
                             <tfoot>
                                 <td>
-                                    <g:selectOrderAdjustmentTypes name="orderAdjustmentType.id"
-                                                                  id="orderAdjustmentType"
-                                                                  class="select2"
-                                                                  noSelection="['':'']"/>
+                                    <g:selectOrderAdjustmentTypes
+                                        name="orderAdjustmentType.id"
+                                        id="orderAdjustmentType"
+                                        class="select2"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                                 <td>
-                                    <g:selectOrderItems name="orderItem.id"
-                                                        id="orderItems"
-                                                        orderId="${order?.id}"
-                                                        class="select2"
-                                                        noSelection="['':'']"/>
+                                    <g:selectOrderItems
+                                        name="orderItem.id"
+                                        id="orderItems"
+                                        orderId="${order?.id}"
+                                        class="select2"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                                 <td>
                                     <g:textField name="description" id="description" class="large text"/>
@@ -183,11 +189,14 @@
                                     <g:textArea name="comments" id="comments"/>
                                 </td>
                                 <td>
-                                    <g:selectBudgetCode name="budgetCode"
-                                                        id="adjustmentBudgetCode"
-                                                        class="select2"
-                                                        active="true"
-                                                        noSelection="['':'']"/>
+                                    <g:selectBudgetCode
+                                        name="budgetCode"
+                                        id="adjustmentBudgetCode"
+                                        class="select2"
+                                        active="true"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                                 <td class="center middle">
                                     <button type="button" class="button" onclick="saveOrderAdjustment()">
@@ -217,7 +226,7 @@
                             params="[id:order?.id]"
                             class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'resultset_previous.png')}" />&nbsp;
-                        <warehouse:message code="default.back.label" default="Back"/>
+                        <g:message code="default.back.label" default="Back"/>
                     </g:link>
                 </div>
                 <div class="right">
@@ -244,12 +253,12 @@
         </div>
     </div>
     <script type="text/javascript">
-        const CREATE_NEW = "Create New";
+        const CREATE_NEW = "${g.message(code: 'default.createNew.label', default: 'Create New')}";
 
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
           if (isFormDirty()) {
-            $.notify("Please save item before proceeding");
+            $.notify("${g.message(code: 'order.errors.saveItem.message', default: 'Please save item before proceeding')}");
             return false;
           } else {
             // This seems to be the best way to proceed after stopping propagation
@@ -317,7 +326,7 @@
               clearOrderAdjustments();
               loadOrderAdjustments();
               $('#orderItems').html('<option></option>').trigger('change');
-              $.notify("Successfully deleted item " + id, "success")
+              $.notify("${g.message(code: 'order.successDeleteItem.label', default: 'Successfully deleted item')} " + id, "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -340,7 +349,7 @@
             success: function () {
               clearOrderAdjustments();
               loadOrderAdjustments();
-              $.notify("Successfully deleted adjustment", "success")
+              $.notify("${g.message(code: 'order.successDeleteAdjustment.label', default: 'Successfully deleted adjustment')}", "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -434,13 +443,13 @@
           var budgetCode = $("#budgetCode").val();
           var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
-          if (!product) $("#product-suggest").notify("Required")
-          if (!quantity) $("#quantity").notify("Required")
-          if (!unitPrice) $("#unitPrice").notify("Required")
-          if (!quantityUom) $("#quantityUom_chosen").notify("Required")
-          if (!quantityPerUom) $("#quantityPerUom").notify("Required")
+          if (!product) $("#product-suggest").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!quantity) $("#quantity").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!unitPrice) $("#unitPrice").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!quantityUom) $("#quantityUom_chosen").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!quantityPerUom) $("#quantityPerUom").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!budgetCode && isAccountingRequired) {
-            $("#budgetCode").notify("Required")
+            $("#budgetCode").notify("${g.message(code: 'default.required.label', default: 'Required')}")
             return false
           }
 
@@ -456,13 +465,13 @@
           var description = $("#description").val();
           var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
-          if (!orderAdjustmentType) $("#orderAdjustmentType").notify("Required")
-          if (!(percentage || amount)) $("#amount").notify("Amount or percentage required")
-          if (!(percentage || amount)) $("#percentage").notify("Amount or percentage required")
-          if (!description) $("#description").notify("Description required")
-          if (!canManageAdjustments) $.notify("You do not have permissions to perform this action")
+          if (!orderAdjustmentType) $("#orderAdjustmentType").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!(percentage || amount)) $("#amount").notify("${g.message(code: 'order.errors.amountOrPercentageRequired.label', default: 'Amount or percentage required')}")
+          if (!(percentage || amount)) $("#percentage").notify("${g.message(code: 'order.errors.amountOrPercentageRequired.label', default: 'Amount or percentage required')}")
+          if (!description) $("#description").notify("${g.message(code: 'order.errors.descriptionRequired.label', default: 'Description required')}")
+          if (!canManageAdjustments) $.notify("${g.message(code: 'errors.noPermissions.label', default: 'You do not have permissions to perform this action')}")
           if (!budgetCode && isAccountingRequired) {
-            $("#adjustmentBudgetCode").notify("Required")
+            $("#adjustmentBudgetCode").notify("${g.message(code: 'default.required.label', default: 'Required')}")
             return false
           }
 
@@ -499,11 +508,20 @@
                     $('#supplierCode').text('');
                     $('#manufacturerCode').text('');
                     $('#manufacturer').text('');
-                    $.notify("Successfully saved new item", "success")
+                    $.notify("${g.message(code: 'order.successItemSave.label', default: 'Successfully saved new item')}", "success")
                   },
                   error: function(jqXHR, textStatus, errorThrown) {
                     if (jqXHR.responseText) {
-                      $.notify(jqXHR.responseText, "error");
+                      try {
+                        let data = JSON.parse(jqXHR.responseText);
+                        if (data.errorMessages.length > 0) {
+                          $.notify(data.errorMessages.join("\n"), "error");
+                        } else {
+                          $.notify(data.errorMessage, "error");
+                        }
+                      } catch (e) {
+                        $.notify(jqXHR.responseText, "error");
+                      }
                     } else {
                       $.notify("Error saving your item");
                     }
@@ -512,7 +530,7 @@
               }
             }
             else {
-              $.notify("Please enter a value for all required fields")
+              $.notify("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}");
             }
             return false
         }
@@ -527,7 +545,7 @@
                         clearOrderAdjustments();
                         loadOrderAdjustments();
                         clearOrderAdjustmentForm();
-                        $.notify("Successfully saved new adjustment", "success");
+                        $.notify("${g.message(code: 'order.successAdjustmentSave.label', default: 'Successfully saved new adjustment')}", "success");
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         if (jqXHR.responseText) {
@@ -538,7 +556,7 @@
                     }
                 });
             } else {
-                $.notify("Please enter a value for all required fields");
+                $.notify("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}");
             }
             return false;
         }
@@ -557,7 +575,8 @@
           $("#orderItemForm")[0].reset();
           $("#product-id").val("");
           $("#product-value").val("");
-          $("#productSupplier").html("");
+          $("#product-suggest").val("");
+          $("#productSupplier").html("").attr("disabled", true);
           clearSource();
           $("#quantityUom").val(null).trigger('change');
 
@@ -792,7 +811,7 @@
             autoOpen: false,
             modal: true,
             width: 800,
-            title: "Edit line item"
+            title: "${g.message(code: 'order.editItem.label', default: 'Edit line item')}"
           });
 
           $("#create-product-source-dialog").dialog({
@@ -931,7 +950,7 @@
                 success: function () {
                   $("#importTemplate").val('');
                   loadOrderItems();
-                  $.notify("Successfully added items", "success")
+                  $.notify("${g.message(code: 'order.successItemsAdd.label', default: 'Successfully added items')}", "success")
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                   $("#importTemplate").val('');

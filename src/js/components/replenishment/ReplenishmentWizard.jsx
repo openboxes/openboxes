@@ -7,11 +7,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import {
-  fetchBreadcrumbsConfig,
   fetchTranslations,
   hideSpinner,
   showSpinner,
-  updateBreadcrumbs,
 } from 'actions';
 import CreateReplenishment from 'components/replenishment/CreateReplenishment';
 import ReplenishmentCheckPage from 'components/replenishment/ReplenishmentCheckPage';
@@ -36,7 +34,6 @@ class ReplenishmentWizard extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'replenishment');
 
     if (this.props.replenishmentTranslationsFetched) {
@@ -44,14 +41,6 @@ class ReplenishmentWizard extends Component {
 
       this.fetchReplenishment();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,30 +53,33 @@ class ReplenishmentWizard extends Component {
 
       this.fetchReplenishment();
     }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
-    }
   }
 
-  getStepList() {
-    return [this.props.translate('react.replenishment.createReplenishment.label', 'Create Replenishment'),
+  get stepList() {
+    return [
+      this.props.translate('react.replenishment.createReplenishment.label', 'Create Replenishment'),
       this.props.translate('react.replenishment.startReplenishment.label', 'Start Replenishment'),
       this.props.translate('react.replenishment.checkReplenishment.label', 'Check Replenishment'),
     ];
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { replenishment } = this.state;
-    return replenishment ? `Replenishment - ${replenishment.replenishmentNumber}` : '';
+    if (replenishment?.replenishmentNumber) {
+      return [
+        {
+          text: this.props.translate('react.binReplenishment.label', 'Bin replenishment'),
+          color: '#000000',
+          delimeter: ' | ',
+        },
+        {
+          text: replenishment.replenishmentNumber,
+          color: '#000000',
+          delimeter: '',
+        },
+      ];
+    }
+    return '';
   }
 
   updateWizardValues(page, replenishment) {
@@ -117,19 +109,15 @@ class ReplenishmentWizard extends Component {
     const { page, replenishment } = this.state;
     const { location, history, match } = this.props;
     const locationId = location.id;
-    const title = this.getWizardTitle();
-    const additionalTitle = null;
     const pageList = [CreateReplenishment, ReplenishmentSecondPage, ReplenishmentCheckPage];
-    const stepList = this.getStepList();
 
     if (_.get(location, 'id')) {
       return (
         <Wizard
           pageList={pageList}
-          stepList={stepList}
+          stepList={this.stepList}
           initialValues={replenishment}
-          title={title}
-          additionalTitle={additionalTitle}
+          title={this.wizardTitle}
           currentPage={page}
           prevPage={page === 1 ? 1 : page - 1}
           updateWizardValues={this.updateWizardValues}
@@ -149,11 +137,10 @@ const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   replenishmentTranslationsFetched: state.session.fetchedTranslations.replenishment,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  breadcrumbsConfig: state.session.breadcrumbsConfig.replenishment,
 });
 
 export default withRouter(connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(ReplenishmentWizard));
 
 ReplenishmentWizard.propTypes = {
@@ -170,25 +157,4 @@ ReplenishmentWizard.propTypes = {
     params: PropTypes.shape({ replenishmentId: PropTypes.string }),
   }).isRequired,
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
-};
-
-ReplenishmentWizard.defaultProps = {
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

@@ -18,6 +18,7 @@ const Input = ({
 
   return (
     <input
+      data-testid="input"
       type="text"
       ref={fieldRef}
       onKeyPress={(event) => {

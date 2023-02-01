@@ -3262,6 +3262,8 @@ table.dataTable th {
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;
+    word-wrap: break-word;
+    max-width: 100px;
 }
 
 #dataTable_processing { height: 60px; }
@@ -3509,8 +3511,13 @@ table.pvtTable tr th { background-color: #ddd; }
     color: black !important;
 }
 
+.navbar-nav .dropdown-menu {
+    visibility: hidden;
+}
+
 .dropdown:hover .dropdown-menu {
     display: block;
+    visibility: visible;
     color: black !important;
 }
 
@@ -3539,7 +3546,6 @@ table.pvtTable tr th { background-color: #ddd; }
     border-radius: 4px;
 }
 
-.navbar .dropdown-menu span,
 .navbar .subsection-title {
     font-weight: 700;
     font-size: 14px;
@@ -3555,6 +3561,7 @@ table.pvtTable tr th { background-color: #ddd; }
     font-size: 15px;
     padding: 0 16px !important;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .nav-item a:hover,

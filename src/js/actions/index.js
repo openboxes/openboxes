@@ -5,7 +5,6 @@ import { addTranslationForLanguage } from 'react-localize-redux';
 import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  FETCH_BREADCRUMBS_CONFIG,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -15,7 +14,6 @@ import {
   FETCH_INVOICE_TYPE_CODES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
-  FETCH_ORGANIZATIONS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
@@ -24,7 +22,9 @@ import {
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
+  FILTER_FORM_PARAMS_BUILT,
   HIDE_SPINNER,
+  REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   RESET_INDICATORS,
@@ -32,7 +32,6 @@ import {
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
-  UPDATE_BREADCRUMBS_PARAMS,
 } from 'actions/types';
 import apiClient, { parseResponse } from 'utils/apiClient';
 
@@ -64,46 +63,39 @@ export function hideUserActions() {
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchReasonCodes() {
   const url = '/openboxes/api/reasonCodes';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_REASONCODES,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_REASONCODES,
+        payload: res.data,
+      });
+    });
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchCurrencies() {
   const url = '/openboxes/api/unitOfMeasure/currencies';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_CURRENCIES,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_CURRENCIES,
+        payload: res.data,
+      });
+    });
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
-export function fetchOrganizations() {
-  const url = '/openboxes/api/organizations';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_ORGANIZATIONS,
-    payload: request,
-  };
-}
-
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchUsers() {
   const url = '/openboxes/api/persons';
-  const request = apiClient.get(url, { params: { status: true } });
-  return {
-    type: FETCH_USERS,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url, { params: { status: true } }).then((res) => {
+      dispatch({
+        type: FETCH_USERS,
+        payload: res.data,
+      });
+    });
   };
 }
 
@@ -119,14 +111,15 @@ export async function fetchSessionInfo() {
   };
 }
 
-// TODO: refactor this to pass payload inside dispatch instead of request
 export function fetchMenuConfig() {
   const url = '/openboxes/api/getMenuConfig';
-  const request = apiClient.get(url);
-
-  return {
-    type: FETCH_MENU_CONFIG,
-    payload: request,
+  return (dispatch) => {
+    apiClient.get(url).then((res) => {
+      dispatch({
+        type: FETCH_MENU_CONFIG,
+        payload: res,
+      });
+    });
   };
 }
 
@@ -405,42 +398,6 @@ export function fetchConfig(id) {
   };
 }
 
-function dispachBreadcrumbsParams(newData, dispatch) {
-  dispatch({
-    type: UPDATE_BREADCRUMBS_PARAMS,
-    payload: newData,
-  });
-}
-
-export function updateBreadcrumbs(listBreadcrumbsStep = [
-  {
-    label: null, defaultLabel: null, url: null, id: null,
-  },
-]) {
-  return (dispatch) => {
-    const breadcrumbsParams = [];
-    listBreadcrumbsStep.forEach((step) => {
-      breadcrumbsParams.push({
-        label: step.label || '',
-        defaultLabel: step.defaultLabel,
-        url: step.id ? `${step.url}${step.id}` : step.url || '',
-      });
-    });
-    dispachBreadcrumbsParams(breadcrumbsParams, dispatch);
-  };
-}
-
-export function fetchBreadcrumbsConfig() {
-  return (dispatch) => {
-    apiClient.get('/openboxes/api/dashboard/breadcrumbsConfig').then((res) => {
-      dispatch({
-        type: FETCH_BREADCRUMBS_CONFIG,
-        payload: res.data,
-      });
-    });
-  };
-}
-
 export function fetchPurchaseOrderStatuses() {
   return (dispatch) => {
     apiClient.get('/openboxes/api/orderSummaryStatus').then((res) => {
@@ -563,3 +520,16 @@ export function fetchStockTransferStatuses() {
     });
   };
 }
+
+export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
+  // if flag is true, we want to trigger the rebuild of filter form params
+  if (flag) {
+    return dispatch({
+      type: REBUILD_FILTER_FORM_PARAMS,
+    });
+  }
+  // otherwise we want to unmark it to the "standby" (false) position
+  return dispatch({
+    type: FILTER_FORM_PARAMS_BUILT,
+  });
+};

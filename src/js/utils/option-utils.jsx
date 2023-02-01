@@ -84,6 +84,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             lotAndExpiryControl: obj.lotAndExpiryControl,
             label: `${obj.productCode} - ${obj.name}`,
             color: obj.color,
+            exactMatch: obj.exactMatch,
           }
         ))))
         .catch(() => callback([]));
@@ -188,3 +189,27 @@ export const organizationsFetch = (roleTypes = ['ROLE_SUPPLIER'], active = false
       return null;
     });
 
+export const fetchUserById = async (id) => {
+  const response = await apiClient(`/openboxes/api/generic/person/${id}`);
+  return response.data?.data;
+};
+
+export const fetchLocationById = async (id) => {
+  const response = await apiClient(`/openboxes/api/locations/${id}`);
+  return response.data?.data;
+};
+
+export const fetchProductsCategories = async () => {
+  const response = await apiClient.get('/openboxes/api/categoryOptions');
+  return response.data.data;
+};
+
+export const fetchProductsCatalogs = async () => {
+  const response = await apiClient.get('/openboxes/api/catalogOptions');
+  return response.data.data;
+};
+
+export const fetchProductsTags = async () => {
+  const response = await apiClient.get('/openboxes/api/tagOptions');
+  return response.data.data;
+};

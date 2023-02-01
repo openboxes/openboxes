@@ -28,7 +28,7 @@
 		<div class="dialog">
 			<g:render template="summary" model="[orderInstance:orderInstance]" />
 			<div class="box">
-				<h2><warehouse:message code="order.orderAjustments.label" default="Order Adjustments"/></h2>
+				<h2><g:message code="order.adjustments.label" default="Order Adjustments"/></h2>
 				<g:form name="orderAdjustmentForm" action="saveAdjustment">
 					<g:hiddenField name="id" value="${orderAdjustment?.id}" />
 					<g:hiddenField id="isAccountingRequired" name="isAccountingRequired" value="${isAccountingRequired}">
@@ -90,12 +90,15 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="orderAdjustment.budgetCode.label"/></label></td>
 								<td valign="top" class="value">
-									<g:selectBudgetCode name="budgetCode"
-														id="budgetCode"
-														value="${orderAdjustment.budgetCode?.id}"
-														class="select2"
-														active="true"
-														noSelection="['':'']"/>
+									<g:selectBudgetCode
+											name="budgetCode"
+											id="budgetCode"
+											value="${orderAdjustment.budgetCode?.id}"
+											class="select2"
+											active="true"
+											noSelection="['':'']"
+											data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+									/>
 								</td>
 							</tr>
 						</tbody>

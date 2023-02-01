@@ -26,6 +26,7 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
                     'F': 'associatedProduct.name',
                     'G': 'conversion',
                     'H': 'comments',
+                    'I': 'hasMutualAssociation',
             ]
     ]
 
@@ -38,6 +39,7 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
             "associatedProduct.name"        : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "conversion"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_INT, defaultValue: null]),
             "comments"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "hasMutualAssociation"          : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: "no"]),
     ]
 
 

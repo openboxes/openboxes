@@ -26,6 +26,14 @@
     <link rel="stylesheet" href="${createLinkTo(dir:'css',file:'footable.css')}" type="text/css" media="all" />
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 
+    <g:if test="${session.useDebugLocale}">
+        <script type="text/javascript">
+            var _jipt = [];
+            _jipt.push(['project', 'openboxes']);
+        </script>
+        <script type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>
+    </g:if>
+
     <!-- Include javascript files -->
     <g:javascript library="application"/>
 
@@ -130,6 +138,7 @@
                     <g:set var="locationColorVariable" value="--location-color: #${locationColor}"/>
                 </g:else>
                 <div class="tooltip2">
+                    <g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
                     <button
                         class="btn-show-dialog location-chooser__button"
                         style="${locationColorVariable}"
@@ -165,15 +174,7 @@
                 </button>
             </div>
             <div class="collapse navbar-collapse w-100" id="navbarToggler">
-                <div id="navbarSupportedContent" class="menu-wrapper flex-grow-1">
-                    <g:include controller="dashboard" action="megamenu" params="[locationId:session?.warehouse?.id,userId:session?.user?.id]"/>
-                    <div id="loader" style="display:none; position: absolute; right: 0; top: 0" class="right notice">
-                        ${g.message(code: 'default.loading.label')}
-                    </div>
-                </div>
-                <div class="d-flex align-items-center justify-content-end navbar-icons">
-                    <g:render template="/common/menuicons" model="[confMenu: grailsApplication.config.openboxes.megamenu.configuration]" />
-                </div>
+                <g:include controller="dashboard" action="megamenu" />
             </div>
         </div>
     </g:if>
@@ -635,6 +636,21 @@
       });
 
     });
+
+    const applyActiveSection = (sectionName) => {
+      const menuConfigValues = $(".menu-config-value").toArray();
+      const section = menuConfigValues.find(it => sectionName === it.name);
+
+      const matchingMenuSection = $("#" + section?.name).get(0);
+      const matchingMenuSectionCollapsable = $("#" + section?.name + "-collapsed").get(0);
+
+      if (matchingMenuSection) {
+        matchingMenuSection.classList.add('active-section');
+      }
+      if (matchingMenuSectionCollapsable) {
+        matchingMenuSectionCollapsable.classList.add('active-section');
+      }
+    }
 </script>
 
 <g:if test="${session.user && Boolean.valueOf(grailsApplication.config.openboxes.scannerDetection.enabled)}">
@@ -732,6 +748,5 @@
     </g:if>
 </g:if>
 <r:layoutResources/>
-
 </body>
 </html>

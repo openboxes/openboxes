@@ -9,6 +9,7 @@ import StatusIndicator from 'utils/StatusIndicator';
 const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
   // Circle is by default set as primary (blue)
   const [circle, setCircle] = useState('primary');
+  const [statusLabel, setStatusLabel] = useState('');
   const findStatusCircle = (statusProp) => {
     // Example ids: "PENDING", "PRIMARY"
     const matchedStatus = allStatuses &&
@@ -16,6 +17,7 @@ const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
       allStatuses.find(stat => stat.id === statusProp);
     if (matchedStatus && matchedStatus.variant) {
       setCircle(matchedStatus.variant);
+      setStatusLabel(matchedStatus.label);
     }
   };
   // Fetch all PO statuses
@@ -31,7 +33,7 @@ const PurchaseOrderStatus = ({ status, allStatuses, fetchStatuses }) => {
     findStatusCircle(status);
   }, [allStatuses, status]);
 
-  return (<StatusIndicator status={status} variant={circle} />);
+  return (<StatusIndicator status={statusLabel} variant={circle} />);
 };
 
 const mapStateToProps = state => ({

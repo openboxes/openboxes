@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import AddItemsPage from 'components/stock-movement-wizard/inbound/AddItemsPage';
 import CreateStockMovement from 'components/stock-movement-wizard/inbound/CreateStockMovement';
 import SendMovementPage from 'components/stock-movement-wizard/inbound/SendMovementPage';
@@ -31,21 +31,12 @@ class StockMovements extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
       this.fetchInitialValues();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -57,18 +48,6 @@ class StockMovements extends Component {
       this.dataFetched = true;
       this.fetchInitialValues();
     }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
-    }
   }
 
   /**
@@ -76,14 +55,14 @@ class StockMovements extends Component {
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
    */
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.movementNumber && !values.trackingNumber) {
       return '';
     }
     return [
       {
-        text: 'Stock Movement',
+        text: this.props.translate('react.stockMovement.label', 'Stock Movement'),
         color: '#000000',
         delimeter: ' | ',
       },
@@ -115,7 +94,7 @@ class StockMovements extends Component {
     ];
   }
 
-  getAdditionalWizardTitle() {
+  get additionalWizardTitle() {
     const { currentPage, values } = this.state;
     const shipped = values.shipped ? 'SHIPPED' : '';
     const received = values.received ? 'RECEIVED' : '';
@@ -129,28 +108,21 @@ class StockMovements extends Component {
     return null;
   }
 
-  updateWizardValues(currentPage, values) {
-    this.setState({ currentPage, values });
-    if (values.movementNumber && (values.id || values.stockMovementId)) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: values.movementNumber, url: actionUrl, id: values.id || values.stockMovementId },
-      ]);
-    }
-  }
-
   /**
    * Returns array of form steps.
    * @public
    */
-  stepList = [
-    this.props.translate('react.stockMovement.create.label', 'Create'),
-    this.props.translate('react.stockMovement.addItems.label', 'Add items'),
-    this.props.translate('react.stockMovement.send.label', 'Send')];
+  get stepList() {
+    return [
+      this.props.translate('react.stockMovement.create.label', 'Create'),
+      this.props.translate('react.stockMovement.addItems.label', 'Add items'),
+      this.props.translate('react.stockMovement.send.label', 'Send'),
+    ];
+  }
+
+  updateWizardValues(currentPage, values) {
+    this.setState({ currentPage, values });
+  }
 
   /**
    * Returns array of form's components.
@@ -217,16 +189,14 @@ class StockMovements extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const title = this.getWizardTitle();
-    const additionalTitle = this.getAdditionalWizardTitle();
 
     return (
       <Wizard
         pageList={this.pageList}
         stepList={this.stepList}
         initialValues={values}
-        title={title}
-        additionalTitle={additionalTitle}
+        title={this.wizardTitle}
+        additionalTitle={this.additionalWizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}
@@ -238,12 +208,11 @@ class StockMovements extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.inbound,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(StockMovements);
 
 StockMovements.propTypes = {
@@ -263,28 +232,8 @@ StockMovements.propTypes = {
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   fetchTranslations: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {
   initialValues: {},
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

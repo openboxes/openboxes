@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`alert message should match snapshot 1`] = `
+<div
+  className=" alert alert-warning"
+  data-testid="alert-message"
+  onClick={[Function]}
+  role="presentation"
+  style={
+    {
+      "cursor": "pointer",
+      "whiteSpace": "pre-line",
+    }
+  }
+>
+  <i
+    className="fa fa-exclamation-circle pr-2"
+  />
+  test message
+</div>
+`;

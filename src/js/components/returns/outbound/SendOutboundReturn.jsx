@@ -246,7 +246,6 @@ class SendMovementPage extends Component {
   fetchOutboundReturn() {
     this.props.showSpinner();
     const url = `/openboxes/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
-
     return apiClient.get(url)
       .then((resp) => {
         const outboundReturn = parseResponse(resp.data.data);

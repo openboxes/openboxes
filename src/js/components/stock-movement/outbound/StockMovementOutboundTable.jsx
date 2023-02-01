@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { CancelToken } from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiArrowRightSLine,
   RiDeleteBinLine,
@@ -15,14 +12,11 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
-import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
+import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
-import exportFileFromAPI from 'utils/file-download-util';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -31,152 +25,28 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const StockMovementOutboundTable = ({
   filterParams,
   translate,
-  fetchStatuses,
   requisitionStatuses,
-  isRequisitionStatusesFetched,
   currentLocation,
-  showTheSpinner,
-  hideTheSpinner,
   isRequestsOpen,
   isUserAdmin,
 }) => {
-  const [tableData, setTableData] = useState({
-    data: [],
-    pages: -1,
-    totalCount: 0,
-    currentParams: {},
-  });
-  const [loading, setLoading] = useState(true);
-
-  const tableRef = useRef(null);
-
-  // Cancel token/signal for fetching data
-  const sourceRef = useRef(CancelToken.source());
-
-  const fireFetchData = () => {
-    sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
-  };
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  useEffect(() => {
-    if (!isRequisitionStatusesFetched || requisitionStatuses.length === 0) {
-      fetchStatuses();
-    }
-  }, []);
-
-  const exportStockMovements = () => {
-    exportFileFromAPI({
-      url: '/openboxes/api/stockMovements',
-      params: tableData.currentParams,
-    });
-  };
-
-  const exportPendingShipmentItems = () => {
-    exportFileFromAPI({
-      url: '/openboxes/api/stockMovements/pendingRequisitionItems',
-      params: tableData.currentParams,
-    });
-  };
+  const {
+    tableData,
+    tableRef,
+    loading,
+    onFetchHandler,
+    exportStockMovements,
+    exportPendingShipmentItems,
+    deleteConfirmAlert,
+  } = useOutboundListTableData(filterParams);
 
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
 
-  const onFetchHandler = (state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } : undefined;
-
-      const params = _.omitBy({
-        ...filterParams,
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        requisitionStatusCode: filterParams.requisitionStatusCode &&
-          filterParams.requisitionStatusCode?.map(({ id }) => id),
-        requestType: filterParams?.requestType?.value,
-        origin: filterParams?.origin?.id,
-        destination: filterParams?.destination?.id,
-        requestedBy: filterParams.requestedBy?.id,
-        createdBy: filterParams.createdBy?.id,
-        updatedBy: filterParams.updatedBy?.id,
-        ...sortingParams,
-      }, (value) => {
-        if (typeof value === 'object' && _.isEmpty(value)) return true;
-        return !value;
-      });
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/stockMovements', {
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        params,
-        cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setLoading(false);
-          setTableData({
-            data: res.data.data,
-            pages: Math.ceil(res.data.totalCount / state.pageSize),
-            totalCount: res.data.totalCount,
-            currentParams: params,
-          });
-        })
-        .catch(() => Promise.reject(new Error(translate('react.stockMovement.outbound.fetching.error', 'Unable to fetch outbound movements'))));
-    }
-  };
-
-  const deleteStockMovement = (id) => {
-    showTheSpinner();
-    apiClient.delete(`/openboxes/api/stockMovements/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          const successMessage = translate(
-            'react.stockMovement.deleted.success.message.label',
-            'Stock Movement has been deleted successfully',
-          );
-          Alert.success(successMessage);
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
-  };
-
-  const deleteConfirmAlert = (id) => {
-    const confirmButton = {
-      label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => deleteStockMovement(id),
-    };
-    const cancelButton = {
-      label: translate('react.default.no.label', 'No'),
-    };
-    confirmAlert({
-      title: translate('react.default.areYouSure.label', 'Are you sure?'),
-      message: translate(
-        'react.stockMovement.areYouSure.label',
-        'Are you sure you want to delete this Stock Movement?',
-      ),
-      buttons: [confirmButton, cancelButton],
-    });
-  };
-
   // List of all actions for outbound Stock Movement rows
-  const getActions = (row) => {
+  const getActions = useCallback((row) => {
     const {
       isPending, isReturn, order, origin, isReceived, isPartiallyReceived, currentStatus,
     } = row.original;
@@ -223,10 +93,10 @@ const StockMovementOutboundTable = ({
       }
     }
     return actions;
-  };
+  }, []);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -242,7 +112,7 @@ const StockMovementOutboundTable = ({
         />),
     },
     {
-      Header: '# items',
+      Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,
       accessor: 'lineItemCount',
       fixed: 'left',
       className: 'active-circle d-flex justify-content-center',
@@ -253,7 +123,7 @@ const StockMovementOutboundTable = ({
         <TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
-      Header: 'Status',
+      Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       fixed: 'left',
       width: 150,
@@ -271,7 +141,7 @@ const StockMovementOutboundTable = ({
       },
     },
     {
-      Header: 'Identifier',
+      Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
       accessor: 'identifier',
       fixed: 'left',
       minWidth: 100,
@@ -279,7 +149,7 @@ const StockMovementOutboundTable = ({
         <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
     },
     {
-      Header: 'Name',
+      Header: <Translate id="react.stockMovement.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       minWidth: 250,
       sortable: false,
@@ -301,37 +171,37 @@ const StockMovementOutboundTable = ({
         </TableCell>),
     },
     {
-      Header: 'Destination',
+      Header: <Translate id="react.stockMovement.destination.label" defaultMessage="Destination" />,
       accessor: 'destination.name',
       minWidth: 250,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Stocklist',
+      Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
       minWidth: 150,
       Cell: row => (<TableCell {...row} tooltip defaultValue="None" />),
     },
     {
-      Header: 'Requested by',
+      Header: <Translate id="react.stockMovement.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy.name',
       minWidth: 250,
       sortable: false,
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
-      Header: 'Date Requested',
+      Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
     {
-      Header: 'Date Created',
+      Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
       Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
     },
-  ];
+  ], [requisitionStatuses]);
 
   return (
     <div className="list-page-list-section">
@@ -389,29 +259,16 @@ const StockMovementOutboundTable = ({
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   requisitionStatuses: state.requisitionStatuses.data,
-  isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
 });
 
-const mapDispatchToProps = {
-  showSpinner,
-  hideSpinner,
-  fetchStatuses: fetchRequisitionStatusCodes,
-  showTheSpinner: showSpinner,
-  hideTheSpinner: hideSpinner,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockMovementOutboundTable);
+export default connect(mapStateToProps)(StockMovementOutboundTable);
 
 
 StockMovementOutboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   translate: PropTypes.func.isRequired,
-  fetchStatuses: PropTypes.func.isRequired,
-  showTheSpinner: PropTypes.func.isRequired,
-  hideTheSpinner: PropTypes.func.isRequired,
-  isRequisitionStatusesFetched: PropTypes.bool.isRequired,
   isRequestsOpen: PropTypes.bool.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({

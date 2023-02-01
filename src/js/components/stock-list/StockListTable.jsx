@@ -1,9 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
-import { confirmAlert } from 'react-confirm-alert';
 import {
   RiDeleteBinLine,
   RiDownload2Line,
@@ -19,14 +16,11 @@ import {
 } from 'react-icons/all';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
-import { hideSpinner, showSpinner } from 'actions';
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
+import useStockListTableData from 'hooks/list-pages/stock-list/useStockListTableData';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
-import exportFileFromAPI from 'utils/file-download-util';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -35,41 +29,22 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const StockListTable = ({
   filterParams,
-  hideSpinner: hideTheSpinner,
-  showSpinner: showTheSpinner,
   translate,
   highestRole,
 }) => {
-  const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  // Stored searching params for export case
-  const [currentParams, setCurrentParams] = useState({});
-  const [totalData, setTotalData] = useState(0);
-
-  const tableRef = useRef(null);
-
-  const fireFetchData = () => tableRef.current.fireFetchData();
-
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  const exportStockList = () => {
-    exportFileFromAPI({
-      url: '/openboxes/api/stocklists',
-      params: {
-        ...currentParams,
-      },
-    });
-  };
-
-  const exportStockListItems = (id) => {
-    exportFileFromAPI({
-      url: `/openboxes/api/stocklists/${id}/export`,
-    });
-  };
+  const {
+    tableData,
+    tableRef,
+    loading,
+    onFetchHandler,
+    exportStockList,
+    onClickClearStocklists,
+    onClickDeleteStocklists,
+    unpublishStocklists,
+    publishStocklists,
+    cloneStocklists,
+    exportStockListItems,
+  } = useStockListTableData(filterParams);
 
   const customActionFilter = ({ isPublished }, row) => {
     // skip actions that don't have isPublished property
@@ -78,165 +53,8 @@ const StockListTable = ({
     return row.original.isPublished === isPublished;
   };
 
-  const deleteStocklists = (id) => {
-    showTheSpinner();
-    apiClient.delete(`/openboxes/api/stocklists/${id}`)
-      .then((res) => {
-        if (res.status === 204) {
-          Alert.success(translate(
-            'react.stocklists.delete.success.label',
-            'Stock List has been deleted successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
-  };
-
-  const onClickDeleteStocklists = (id) => {
-    const confirmButton = {
-      label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => deleteStocklists(id),
-    };
-    const cancelButton = {
-      label: translate('react.default.no.label', 'No'),
-    };
-    confirmAlert({
-      title: translate(
-        'react.stocklists.delete.confirm.title.label',
-        'Confirm delete of stock list',
-      ),
-      message: translate(
-        'react.stocklists.delete.confirm.message.label',
-        'Are you sure you want to delete this stock list ?',
-      ),
-      buttons: [confirmButton, cancelButton],
-    });
-  };
-
-  const clearStocklists = (id) => {
-    showTheSpinner();
-    apiClient.post(`/openboxes/api/stocklists/${id}/clear`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.clear.success.label',
-            'Stock List has been cleared Stock List has been cloned successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
-  };
-
-  const onClickClearStocklists = (id) => {
-    const confirmButton = {
-      label: translate('react.default.yes.label', 'Yes'),
-      onClick: () => clearStocklists(id),
-    };
-    const cancelButton = {
-      label: translate('react.default.no.label', 'No'),
-    };
-    confirmAlert({
-      title: translate(
-        'react.stocklists.clear.confirm.title.label',
-        'Confirm clear of stock list',
-      ),
-      message: translate(
-        'react.stocklists.clear.confirm.message.label',
-        'Are you sure you want to clear this stock list ?',
-      ),
-      buttons: [confirmButton, cancelButton],
-    });
-  };
-
-  const cloneStocklists = (id) => {
-    showTheSpinner();
-    apiClient.post(`/openboxes/api/stocklists/${id}/clone`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.clone.success.label',
-            'Stock List has been cloned successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
-  };
-
-  const publishStocklists = (id) => {
-    showTheSpinner();
-    apiClient.post(`/openboxes/api/stocklists/${id}/publish`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.publish.success.label',
-            'Stock List has been published successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
-  };
-
-  const unpublishStocklists = (id) => {
-    showTheSpinner();
-    apiClient.post(`/openboxes/api/stocklists/${id}/unpublish`)
-      .then((res) => {
-        if (res.status === 200) {
-          Alert.success(translate(
-            'react.stocklists.unpublish.success.label',
-            'Stock List has been unpublished successfully',
-          ));
-          fireFetchData();
-        }
-      })
-      .finally(() => hideTheSpinner());
-  };
-
-  const onFetchHandler = (state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } : undefined;
-
-      const { isPublished, ...otherFilterParams } = filterParams;
-      const params = _.omitBy({
-        ...otherFilterParams,
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        includeUnpublished: isPublished,
-        origin: filterParams.origin && filterParams.origin.map(({ id }) => id),
-        destination: filterParams.destination && filterParams.destination.map(({ id }) => id),
-        ...sortingParams,
-      }, (value) => {
-        if (typeof value === 'object' && _.isEmpty(value)) return true;
-        return !value;
-      });
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/stocklists', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-      })
-        .then((res) => {
-          setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setTableData(res.data.data);
-          // Store currently used params for export case
-          setCurrentParams(params);
-        });
-    }
-  };
-
   // List of all actions for Stocklists rows
-  const actions = [
+  const actions = useMemo(() => [
     {
       defaultLabel: 'Show stock list',
       label: 'react.stocklists.show.label',
@@ -310,10 +128,10 @@ const StockListTable = ({
       onClick: onClickDeleteStocklists,
       minimumRequiredRole: 'Admin',
     },
-  ];
+  ], []);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -329,7 +147,7 @@ const StockListTable = ({
         />),
     },
     {
-      Header: 'Status',
+      Header: <Translate id="react.stocklists.column.status.label" defaultMessage="Status" />,
       accessor: 'isPublished',
       fixed: 'left',
       width: 150,
@@ -340,7 +158,7 @@ const StockListTable = ({
         />),
     },
     {
-      Header: 'Name',
+      Header: <Translate id="react.stocklists.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
@@ -352,58 +170,58 @@ const StockListTable = ({
         />),
     },
     {
-      Header: 'Origin',
+      Header: <Translate id="react.stocklists.filters.origin.label" defaultMessage="Origin" />,
       accessor: 'origin',
       minWidth: 250,
       fixed: 'left',
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Destination',
+      Header: <Translate id="react.stocklists.filters.destination.label" defaultMessage="Destination" />,
       accessor: 'destination',
       minWidth: 250,
       fixed: 'left',
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Requisition items',
+      Header: <Translate id="react.stocklists.column.requisitionItems.label" defaultMessage="Requisition items" />,
       accessor: 'requisitionItemCount',
       sortable: false,
       minWidth: 150,
     },
     {
-      Header: 'Requested by',
+      Header: <Translate id="react.stocklists.column.requestedBy.label" defaultMessage="Requested by" />,
       accessor: 'requestedBy',
       minWidth: 250,
     },
     {
-      Header: 'Created by',
+      Header: <Translate id="react.stocklists.column.createdBy.label" defaultMessage="Created by" />,
       accessor: 'createdBy',
       minWidth: 250,
     },
     {
-      Header: 'Updated by',
+      Header: <Translate id="react.stocklists.column.updatedBy.label" defaultMessage="Updated by" />,
       accessor: 'updatedBy',
       minWidth: 250,
     },
     {
-      Header: 'Date Created',
+      Header: <Translate id="react.stocklists.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
     },
     {
-      Header: 'Last Updated',
+      Header: <Translate id="react.stocklists.column.lastUpdated.label" defaultMessage="Last Updated" />,
       accessor: 'lastUpdated',
       width: 150,
     },
-  ];
+  ], [highestRole]);
 
   return (
     <div className="list-page-list-section">
       <div className="title-text p-3 d-flex justify-content-between align-items-center">
         <div>
           <Translate id="react.stocklists.label" defaultMessage="Stock Lists" />
-          <span className="ml-1">{`(${totalData})`}</span>
+          <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
         <Button
           label="react.default.button.export.label"
@@ -418,11 +236,11 @@ const StockListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
-        pages={pages}
-        totalData={totalData}
+        pages={tableData.pages}
+        totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
         noDataText={translate(
           'react.stocklists.empty.label',
@@ -438,18 +256,11 @@ const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
 });
 
-const mapDispatchToProps = {
-  showSpinner,
-  hideSpinner,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockListTable);
+export default connect(mapStateToProps)(StockListTable);
 
 
 StockListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
-  showSpinner: PropTypes.func.isRequired,
-  hideSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
   highestRole: PropTypes.string.isRequired,
 };

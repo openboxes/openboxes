@@ -76,50 +76,63 @@
 								<label>
 									<warehouse:message code="report.location.label"/>
 								</label>
-								<g:selectLocation class="chzn-select-deselect filter"
-												  id="locationId"
-												  name="location.id"
-												  activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
-												  noSelection="['':'']"
-												  maxChars="75"
-												  groupBy="locationType"
-												  value="${command?.location?.id}"/>
+								<g:selectLocation
+									class="chzn-select-deselect filter"
+									id="locationId"
+									name="location.id"
+									activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"
+									noSelection="['':'']"
+									maxChars="75"
+									groupBy="locationType"
+									value="${command?.location?.id}"
+								/>
 							</div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="category.label"/></label>
 								<p>
-									<g:selectCategory id="category"
-													  class="chzn-select-deselect filter"
-													  data-placeholder="Select a category"
-													  name="category"
-													  noSelection="['':'']"
-													  value="${params?.category?.id?:command?.rootCategory?.id}"/>
+									<g:selectCategory
+										id="category"
+									    class="chzn-select-deselect filter"
+									    data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
+									    name="category"
+									    noSelection="['':'']"
+									    value="${params?.category?.id?:command?.rootCategory?.id}"
+									/>
 								</p>
 								<p>
 									<label>
 										<g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="true"/>
-										${warehouse.message(code:'search.includeCategoryChildren.label', default: 'Include all products in all subcategories.')}
+										${warehouse.message(
+											code:'report.search.includeCategoryChildren.label',
+											default: 'Include all products in all subcategories',
+										)}
 									</label>
 								</p>
 							</div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="tag.label"/></label>
 								<p>
-									<g:selectTags name="tags"
-												  id="tags"
-												  value="${params?.tags}"
-												  multiple="true"
-												  class="chzn-select-deselect"/>
+									<g:selectTags
+										name="tags"
+									    id="tags"
+									    value="${params?.tags}"
+										data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+										multiple="true"
+									    class="chzn-select-deselect"
+									/>
 								</p>
 							</div>
 							<div class="filter-list-item">
 								<label><warehouse:message code="catalogs.name.label"/></label>
 								<p>
-									<g:selectCatalogs id="catalogs"
-													  name="catalogs" noSelection="['null':'']"
-													  value="${params?.catalogs}"
-													  style="width:100%;"
-													  class="chzn-select-deselect"/>
+									<g:selectCatalogs
+										id="catalogs"
+										name="catalogs"
+										noSelection="['null':'']"
+									    value="${params?.catalogs}"
+										data-placeholder="${g.message(code: 'default.selectOptions.label', default: 'Select Options')}"
+										class="chzn-select-deselect"
+									/>
 								</p>
 							</div>
 						</div>
@@ -145,34 +158,34 @@
 			<div class="yui-u">
 				<div class="box">
 					<h2>
-						${warehouse.message(code:'report.transactionReport.label', default: "Transaction Report")}
+						${warehouse.message(code:'report.transactionReport.title', default: "Transaction Report")}
 					</h2>
 
                     <table id="transactionReport" class="dataTable">
                         <thead>
                         <tr>
-                            <th><warehouse:message code="product.productCode.label"/></th>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="category.label"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening"/></th>
+                            <th><warehouse:message code="product.productCode.label" default="Code" /></th>
+                            <th><warehouse:message code="product.label" default="Product" /></th>
+                            <th><warehouse:message code="category.label" default="Category" /></th>
+                            <th class="center"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></th>
                             <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
                             <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing"/></th>
+                            <th class="center"><warehouse:message code="report.transaction.adjustments.label" default="Adjustments"/></th>
+                            <th class="center"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></th>
                         </tr>
                         </thead>
                         <tbody>
                         </tbody>
                         <tfoot>
                         <tr>
-                            <th><warehouse:message code="product.productCode.label"/></th>
-                            <th><warehouse:message code="product.label"/></th>
-                            <th><warehouse:message code="category.label"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.openingBalance.label" default="Opening"/></th>
+							<th><warehouse:message code="product.productCode.label" default="Code" /></th>
+							<th><warehouse:message code="product.label" default="Product" /></th>
+							<th><warehouse:message code="category.label" default="Category" /></th>
+                            <th class="center"><warehouse:message code="report.transaction.openingBalance.label" default="Opening"/></th>
                             <th class="center"><warehouse:message code="default.credits.label" default="Credits"/></th>
                             <th class="center"><warehouse:message code="default.debits.label" default="Debits"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.adjustments.label" default="Adjustments"/></th>
-                            <th class="center"><warehouse:message code="transactionReport.closingBalance.label" default="Closing"/></th>
+                            <th class="center"><warehouse:message code="report.transaction.adjustments.label" default="Adjustments"/></th>
+                            <th class="center"><warehouse:message code="report.transaction.closingBalance.label" default="Closing"/></th>
                         </tr>
                         </tfoot>
                     </table>
@@ -200,18 +213,41 @@
     	$('#transactionReport').dataTable().fnDestroy();
 	}
 
-	function initializeDataTable() {
-		var options = {
+	function initializeDataTable(validated) {
+    	const baseOptions = {
+    		"bJQueryUI": true,
 			"bDestroy": true,
 			"bProcessing": true,
 			"iDisplayLength": 100,
 			"bSearch": false,
 			"bScrollCollapse": true,
-			"bJQueryUI": true,
 			"bAutoWidth": true,
 			"bScrollInfinite": true,
 			"sScrollY": 500,
 			"sPaginationType": "two_button",
+			"oLanguage": {
+				"sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
+				"sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+				"sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
+						"_START_" +
+						" ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
+						"_END_" +
+						" ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
+						"_TOTAL_" +
+						" ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
+				"sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+				"sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
+				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
+				"sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
+						"_MAX_" +
+						" ${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"
+			},
+			"aLengthMenu": [
+				[5, 15, 25, 50, 100, 500, 1000, -1],
+				[5, 15, 25, 50, 100, 500, 1000, "All"]
+			],
+		}
+		const dataOptions = {
 			"sAjaxSource": "${request.contextPath}/json/getTransactionReport",
 			"fnServerParams": function ( data ) {
 				data.push({ name: "location.id", value: $("#locationId").val() });
@@ -249,14 +285,6 @@
 					}
 				})
 			},
-			"oLanguage": {
-				"sZeroRecords": "No records found",
-				"sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
-			},
-			"aLengthMenu": [
-				[5, 15, 25, 50, 100, 500, 1000, -1],
-				[5, 15, 25, 50, 100, 500, 1000, "All"]
-			],
 			"aoColumns": [
 				{"mData": "Code"},
 				{"mData": "Name", "sWidth": "250px"},
@@ -292,9 +320,9 @@
 			    }
             	return nRow;
 	          }
-
 		};
 
+		const options = validated ? { ...baseOptions, ...dataOptions } : baseOptions
 		$('#transactionReport').dataTable(options);
 	}
 
@@ -302,7 +330,7 @@
 	$(document).ready(function() {
 
 		$(".loading").hide();
-		$('#transactionReport').dataTable({"bJQueryUI": true});
+		initializeDataTable(false);
 
 		$(".submit-button").click(function(event){
 			event.preventDefault();
@@ -332,7 +360,7 @@
 			}
 
 			if (validated) {
-				initializeDataTable();
+				initializeDataTable(true);
 			}
 		});
 

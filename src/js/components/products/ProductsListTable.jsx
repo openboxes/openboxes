@@ -1,49 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import fileDownload from 'js-file-download';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
 import { RiDownload2Line } from 'react-icons/all';
-import { getTranslate } from 'react-localize-redux';
-import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
-import apiClient from 'utils/apiClient';
+import useProductsListTableData from 'hooks/list-pages/product/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
-
-const INITIAL_STATE = {
-  productsData: [],
-  pages: -1,
-  totalCount: 0,
-  currentParams: {},
-};
-
+import Translate from 'utils/Translate';
 
 const ProductsListTable = ({
   filterParams,
-  translate,
 }) => {
-  // Util ref for react-table to force the fetch of data
-  const tableRef = useRef(null);
-  const fireFetchData = () => {
-    tableRef.current.fireFetchData();
-  };
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => {
-    fireFetchData();
-  }, [filterParams]);
-
-  const [loading, setLoading] = useState(false);
-  const [tableData, setTableData] = useState(INITIAL_STATE);
-
+  const {
+    tableData,
+    tableRef,
+    loading,
+    onFetchHandler,
+    exportProducts,
+  } = useProductsListTableData(filterParams);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
-      Header: 'Active',
+      Header: <Translate id="react.productsList.column.active.label" defaultMessage="Active" />,
       accessor: 'active',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -55,7 +35,7 @@ const ProductsListTable = ({
         />),
     },
     {
-      Header: 'Code',
+      Header: <Translate id="react.productsList.column.code.label" defaultMessage="Code" />,
       accessor: 'productCode',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -63,7 +43,7 @@ const ProductsListTable = ({
       maxWidth: 150,
     },
     {
-      Header: 'Name',
+      Header: <Translate id="react.productsList.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       className: 'active-circle',
       headerClassName: 'header',
@@ -72,98 +52,20 @@ const ProductsListTable = ({
       minWidth: 200,
     },
     {
-      Header: 'Category',
+      Header: <Translate id="react.productsList.filters.category.label" defaultMessage="Category" />,
       accessor: 'category',
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
-      Header: 'Updated by',
+      Header: <Translate id="react.productsList.column.updatedBy.label" defaultMessage="Updated by" />,
       accessor: 'updatedBy',
     },
     {
-      Header: 'Last updated',
+      Header: <Translate id="react.productsList.column.lastUpdated.label" defaultMessage="Last updated" />,
       accessor: 'lastUpdated',
       maxWidth: 200,
     },
-  ];
-
-
-  const onFetchHandler = (tableState) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = tableState.page > 0 ? (tableState.page) * tableState.pageSize : 0;
-      const sortingParams = tableState.sorted.length > 0 ?
-        {
-          sort: tableState.sorted[0].id,
-          order: tableState.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'lastUpdated',
-          order: 'desc',
-        };
-
-      const params = _.omitBy({
-        offset: `${offset}`,
-        max: `${tableState.pageSize}`,
-        ...sortingParams,
-        ...filterParams,
-        catalogId: filterParams.catalogId && filterParams.catalogId.map(({ id }) => id),
-        categoryId: filterParams.categoryId && filterParams.categoryId.map(({ id }) => id),
-        tagId: filterParams.tagId && filterParams.tagId.map(({ id }) => id),
-      }, (val) => {
-        if (typeof val === 'boolean') {
-          return !val;
-        }
-        return _.isEmpty(val);
-      });
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/products', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-      })
-        .then((res) => {
-          setTableData({
-            productsData: res.data.data,
-            totalCount: res.data.totalCount,
-            pages: Math.ceil(res.data.totalCount / tableState.pageSize),
-            currentParams: params,
-          });
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-          return Promise.reject(new Error(translate('react.productsList.fetch.fail.label', 'Unable to fetch products')));
-        });
-    }
-  };
-
-  const exportProducts = (allProducts = false, withAttributes = false) => {
-    const params = () => {
-      if (allProducts) {
-        return { format: 'csv' };
-      }
-      if (withAttributes) {
-        return { format: 'csv', includeAttributes: true };
-      }
-      return {
-        ..._.omit(tableData.currentParams, ['offset', 'max']),
-        format: 'csv',
-      };
-    };
-
-    apiClient.get('/openboxes/api/products', {
-      params: params(),
-      paramsSerializer: parameters => queryString.stringify(parameters),
-    })
-      .then((res) => {
-        const date = new Date();
-        const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
-        const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-        fileDownload(res.data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
-      });
-  };
-
+  ], []);
 
   return (
     <div className="list-page-list-section">
@@ -208,7 +110,7 @@ const ProductsListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={tableData.productsData}
+        data={tableData.data}
         loading={loading}
         defaultPageSize={10}
         pages={tableData.pages}
@@ -221,15 +123,9 @@ const ProductsListTable = ({
   );
 };
 
-const mapStateToProps = state => ({
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-});
-
-
-export default connect(mapStateToProps)(ProductsListTable);
+export default ProductsListTable;
 
 
 ProductsListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
-  translate: PropTypes.func.isRequired,
 };

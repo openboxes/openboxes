@@ -3,12 +3,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
+import { setShouldRebuildFilterParams } from 'actions';
 import FilterVisibilityToggler from 'components/Filter/FilterVisibilityToggler';
 import Button from 'components/form-elements/Button';
 import SearchField from 'components/form-elements/SearchField';
+import useTranslation from 'hooks/useTranslation';
 import { renderFormField } from 'utils/form-utils';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/Filter/FilterStyles.scss';
 
@@ -17,6 +21,7 @@ const FilterForm = ({
   filterFields,
   updateFilterParams,
   searchFieldPlaceholder,
+  searchFieldDefaultPlaceholder,
   searchFieldId,
   formProps,
   defaultValues,
@@ -25,6 +30,8 @@ const FilterForm = ({
   onClear,
   ignoreClearFilters,
   currentLocation,
+  translate,
+  setShouldRebuildFilterValues,
 }) => {
   const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
@@ -42,7 +49,7 @@ const FilterForm = ({
   const searchField = {
     type: SearchField,
     attributes: {
-      placeholder: searchFieldPlaceholder,
+      placeholder: translate(searchFieldPlaceholder, searchFieldDefaultPlaceholder),
       filterElement: true,
       onKeyPress: submitOnEnter,
     },
@@ -54,10 +61,21 @@ const FilterForm = ({
     updateFilterParams({ ...defaultValues });
   }, [defaultValues]);
 
+  useTranslation('button');
+
   // Calculate which object's values are not empty
   const countFilled = (values) => {
-    setAmountFilled(Object.values(values)
-      .filter((value) => {
+    setAmountFilled(Object.entries(values)
+      .filter(([key, value]) => {
+        // Ignore accounting for filter that is disabled
+        const dynamicAttributes = _.invoke(filterFields, `${key}.getDynamicAttr`, formProps);
+        const attributes = _.get(filterFields, `${key}.attributes`);
+        if (dynamicAttributes?.disabled || attributes?.disabled) return false;
+
+        // Ignore filter that is not specified in filterFields config
+        // and that is not a search field
+        if (!filterFields[key] && key !== searchFieldId) return false;
+        // evaluate filter value
         if (typeof value === 'object') return !_.isEmpty(value);
         return !!value;
       }).length);
@@ -75,7 +93,7 @@ const FilterForm = ({
         }
         return { ...acc, [key]: '' };
       }, {});
-    updateFilterParams(clearedFilterList);
+    setShouldRebuildFilterValues(true);
     form.reset(clearedFilterList);
   };
 
@@ -140,16 +158,22 @@ const FilterForm = ({
 
 const mapStateToProps = state => ({
   currentLocation: state.session.currentLocation,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps)(FilterForm);
+const mapDispatchToProps = {
+  setShouldRebuildFilterValues: setShouldRebuildFilterParams,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FilterForm);
 
 
 FilterForm.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
   updateFilterParams: PropTypes.func.isRequired,
   onClear: PropTypes.func,
-  searchFieldPlaceholder: PropTypes.string,
+  searchFieldPlaceholder: PropTypes.string.isRequired,
+  searchFieldDefaultPlaceholder: PropTypes.string,
   formProps: PropTypes.shape({}),
   searchFieldId: PropTypes.string,
   defaultValues: PropTypes.shape({}),
@@ -159,10 +183,12 @@ FilterForm.propTypes = {
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  translate: PropTypes.func.isRequired,
+  setShouldRebuildFilterValues: PropTypes.func.isRequired,
 };
 
 FilterForm.defaultProps = {
-  searchFieldPlaceholder: 'Search',
+  searchFieldDefaultPlaceholder: 'Search',
   searchFieldId: 'searchTerm',
   formProps: {},
   defaultValues: {},

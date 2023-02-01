@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
-import { fetchBreadcrumbsConfig, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { hideSpinner, showSpinner } from 'actions';
 import SplitLineModal from 'components/put-away/SplitLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
@@ -23,6 +23,10 @@ import 'react-table/react-table.css';
 
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
+
+function hasValidationError(quantity, quantityAvailable) {
+  return (quantity > quantityAvailable) || quantity < 1;
+}
 
 /**
  * The second page of put-away where user can choose put-away bin, split a line
@@ -55,7 +59,6 @@ class PutAwaySecondPage extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     if (this.props.putAwayTranslationsFetched) {
       this.dataFetched = true;
       this.fetchBins();
@@ -75,24 +78,6 @@ class PutAwaySecondPage extends Component {
     if (nextProps.putAwayTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
-    }
-
-    if (nextProps.breadcrumbsConfig &&
-       nextProps.initialValues.putAway &&
-       (
-         this.props.breadcrumbsConfig !== nextProps.breadcrumbsConfig ||
-        this.props.initialValues.putAway !== nextProps.initialValues.putAway)
-    ) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-      const { id, putawayNumber } = nextProps.initialValues.putAway;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: putawayNumber, url: actionUrl, id },
-      ]);
     }
   }
 
@@ -117,6 +102,7 @@ class PutAwaySecondPage extends Component {
    * Returns an array of columns which are passed to the table.
    * @public
    */
+
   getColumns = () => [
     {
       Header: <Translate id="react.putAway.code.label" defaultMessage="Code" />,
@@ -150,21 +136,34 @@ class PutAwaySecondPage extends Component {
       Cell: (props) => {
         const itemIndex = props.index;
         const edit = _.get(this.state.putAway.putawayItems, `[${itemIndex}].edit`);
+        let disabledMessage;
+
+        if (props?.value < 1) {
+          disabledMessage = this.props.translate(
+            'react.putAway.negativeQuantity.label',
+            'Quantity cannot be less than 1',
+          );
+        }
+
+        if (props?.value > props.original?.quantityAvailable) {
+          disabledMessage = this.props.translate(
+            'react.putAway.higherQuantity.label',
+            'Quantity cannot be greater than original putaway item quantity',
+          );
+        }
+
         if (edit) {
           return (
             <Tooltip
-              html={this.props.translate(
-                'react.putAway.higherQuantity.label',
-                'Quantity cannot be higher than original putaway item quantity',
-              )}
-              disabled={props.value <= props.original.quantityAvailable}
+              html={disabledMessage}
+              disabled={!disabledMessage}
               theme="transparent"
               arrow="true"
               delay="150"
               duration="250"
               hideDelay="50"
             >
-              <div className={props.value > props.original.quantityAvailable ? 'has-error' : ''}>
+              <div className={hasValidationError(props?.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
                 <input
                   type="number"
                   className="form-control form-control-xs"
@@ -183,18 +182,15 @@ class PutAwaySecondPage extends Component {
 
         return (
           <Tooltip
-            html={this.props.translate(
-              'react.putAway.higherQuantity.label',
-              'Quantity cannot be higher than original putaway item quantity',
-            )}
-            disabled={props.original && props.value <= props.original.quantityAvailable}
+            html={disabledMessage}
+            disabled={!disabledMessage}
             theme="transparent"
             arrow="true"
             delay="150"
             duration="250"
             hideDelay="50"
           >
-            <div className={props.original && props.value > props.original.quantityAvailable ? 'has-error' : ''}>
+            <div className={hasValidationError(props.value, props.original?.quantityAvailable) ? 'has-error' : ''}>
               <span>{props.value ? props.value.toLocaleString('en-US') : props.value}</span>
             </div>
           </Tooltip>
@@ -467,6 +463,7 @@ class PutAwaySecondPage extends Component {
    * Save put-away and go to next page.
    * @public
    */
+
   nextPage() {
     if (_.some(this.state.putAway.putawayItems, putawayItem =>
       putawayItem.quantity > putawayItem.quantityAvailable)) {
@@ -621,7 +618,7 @@ class PutAwaySecondPage extends Component {
               onClick={() => this.savePutAways(this.state.putAway)}
               className="btn btn-outline-secondary btn-xs"
               disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
-                putawayItem.quantity > putawayItem.quantityAvailable)}
+                hasValidationError(putawayItem.quantity, putawayItem.quantityAvailable))}
             ><Translate id="react.default.button.save.label" defaultMessage="Save" />
             </button>
           </span>
@@ -644,6 +641,8 @@ class PutAwaySecondPage extends Component {
         }
         <div className="submit-buttons">
           <button
+            disabled={_.some(this.state.putAway.putawayItems, putawayItem =>
+                hasValidationError(putawayItem.quantity, putawayItem.quantityAvailable))}
             type="button"
             onClick={() => this.nextPage()}
             className="btn btn-outline-primary btn-form float-right btn-xs"
@@ -658,15 +657,19 @@ class PutAwaySecondPage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   putAwayTranslationsFetched: state.session.fetchedTranslations.putAway,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.putAway,
 });
 
 export default connect(
   mapStateToProps,
   {
-    showSpinner, hideSpinner, updateBreadcrumbs, fetchBreadcrumbsConfig,
+    showSpinner, hideSpinner,
   },
 )(PutAwaySecondPage);
+
+PutAwaySecondPage.defaultProps = {
+  original: {},
+};
+
 
 PutAwaySecondPage.propTypes = {
   /** Function called when data is loading */
@@ -682,6 +685,9 @@ PutAwaySecondPage.propTypes = {
     pivotBy: PropTypes.arrayOf(PropTypes.shape({})),
     expanded: PropTypes.arrayOf(PropTypes.shape({})),
   }).isRequired,
+  original: PropTypes.shape({
+    quantityAvailable: PropTypes.number,
+  }),
   match: PropTypes.shape({
     params: PropTypes.shape({
       putAwayId: PropTypes.string,
@@ -692,27 +698,4 @@ PutAwaySecondPage.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   putAwayTranslationsFetched: PropTypes.bool.isRequired,
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
-};
-
-PutAwaySecondPage.defaultProps = {
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

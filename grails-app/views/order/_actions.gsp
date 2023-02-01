@@ -79,7 +79,7 @@
 								disabled="${orderInstance?.status < OrderStatus.PLACED}"
 								disabledMessage="Order must be placed in order to print.">
 							<img src="${createLinkTo(dir: 'images/icons', file: 'pdf.png')}" class="middle"/>&nbsp;
-							<warehouse:message code="order.print.label" default="Print order"/>
+							<g:message code="order.print.label" default="Print order"/>
 						</g:link>
 					</div>
 					<g:if test="${orderInstance?.isPlaced()}">

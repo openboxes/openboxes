@@ -8,22 +8,22 @@
         <thead>
             <tr class="odd">
                 <th class="left" style="">
-                    <warehouse:message code="default.actions.label"/>
+                    <warehouse:message code="default.actions.label" default="Actions"/>
                 </th>
                 <th>
-                    <warehouse:message code="inventory.binLocation.label" default="Bin Location"/>
+                    <warehouse:message code="inventoryItem.binLocation.label" default="Bin Location"/>
                 </th>
                 <th>
-                    <warehouse:message code="default.lotSerialNo.label"/>
+                    <warehouse:message code="default.lotSerialNo.label" default="Lot/Serial No"/>
                 </th>
                 <th>
-                    <warehouse:message code="default.expires.label"/>
+                    <warehouse:message code="default.expires.label" default="Expires"/>
                 </th>
                 <th>
-                    <warehouse:message code="stockCard.qtyOnHand.label"/>
+                    <warehouse:message code="stockCard.qtyOnHand.label" default="On Hand"/>
                 </th>
                 <th>
-                    <warehouse:message code="stockCard.qtyAvailable.label"/>
+                    <warehouse:message code="stockCard.qtyAvailable.label" default="Available"/>
                 </th>
                 <th>
                 </th>

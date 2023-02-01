@@ -22,8 +22,31 @@
                     <warehouse:message code="default.duration.label" default="Duration"/></label>
             </td>
             <td class="value middle">
-                <g:select id="numMonths" name="numMonths" value="${params.numMonths?:1}" class="chzn-select-deselect"
-                          from="[1:'Last 1 month', 2:'Last 2 months',3:'Last 3 months',6:'Last 6 months',9:'Last 9 months',12:'Last 12 months',18:'Last 18 months',24:'Last 2 years',36:'Last 3 years',48:'Last 4 years',60:'Last 5 years',60:'Last 5 years',120:'Last 10 years']" optionKey="key" optionValue="value"></g:select>
+                <g:set var="monthLabel" value="${g.message(code: 'default.time.unit.month.label', default: 'Month').toLowerCase()}" />
+                <g:set var="monthsLabel" value="${g.message(code: 'default.time.unit.months.label', default: 'Months').toLowerCase()}" />
+                <g:set var="yearsLabel" value="${g.message(code: 'default.time.unit.years.label', default: 'Years').toLowerCase()}" />
+                <g:select
+                    id="numMonths"
+                    name="numMonths"
+                    value="${params.numMonths?:1}"
+                    class="chzn-select-deselect"
+                    from="[
+                      1: g.message(code: 'default.last.label', args: [1, monthLabel]),
+                      2: g.message(code: 'default.last.label', args: [2, monthsLabel]),
+                      3: g.message(code: 'default.last.label', args: [3, monthsLabel]),
+                      6: g.message(code: 'default.last.label', args: [6, monthsLabel]),
+                      9: g.message(code: 'default.last.label', args: [9, monthsLabel]),
+                      12: g.message(code: 'default.last.label', args: [12, monthsLabel]),
+                      18: g.message(code: 'default.last.label', args: [18, monthsLabel]),
+                      24: g.message(code: 'default.last.label', args: [2, yearsLabel]),
+                      36: g.message(code: 'default.last.label', args: [3, yearsLabel]),
+                      48: g.message(code: 'default.last.label', args: [4, yearsLabel]),
+                      60: g.message(code: 'default.last.label', args: [5, yearsLabel]),
+                      120: g.message(code: 'default.last.label', args: [10, yearsLabel])
+                    ]"
+                    optionKey="key"
+                    optionValue="value"
+                />
             </td>
         </tr>
         <tr class="prop">
@@ -105,6 +128,18 @@
             </td>
             <td class="value">
                 <table id="inventorySnapshotsTable" class="dataTable">
+                    <thead>
+                        <tr>
+                            <th><g:message code="default.date.label" default="Date" /></th>
+                            <th><g:message code="product.code.label" default="Product Code" /></th>
+                            <th><g:message code="location.binLocation.label" default="Bin Location" /></th>
+                            <th><g:message code="inventory.lotNumber.label" default="Lot Number" /></th>
+                            <th><g:message code="inventory.expires.label" default="Expiration Date" /></th>
+                            <th><g:message code="default.qoh.label" default="QoH" /></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
                     <tfoot>
                     <th colspan="5" class="right"><g:message code="default.total.label"/></th>
                     <th></th>
@@ -259,13 +294,33 @@
           "bJQueryUI": true,
           "iDisplayLength": -1,
           "aoColumns": [
-            {"mData": "date", sTitle: "Date"},
-            {"mData": "productCode", sTitle: "Product Code"},
-            {"mData": "binLocation", sTitle: "Bin Location"},
-            {"mData": "lotNumber", sTitle: "Lot Number"},
-            {"mData": "expirationDate", sTitle: "Expiration Date"},
-            {"mData": "quantityOnHand", sTitle: "QoH"},
+            {"mData": "date"},
+            {"mData": "productCode"},
+            {"mData": "binLocation"},
+            {"mData": "lotNumber"},
+            {"mData": "expirationDate"},
+            {"mData": "quantityOnHand"},
           ],
+          "oLanguage": {
+            "sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
+            "sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+            "sLengthMenu": "${g.message(code: 'default.dataTable.show.label', 'Show')}"
+              + " _MENU_ "
+              + "${g.message(code: 'default.dataTable.entries.label', 'entries')}",
+            "sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
+              "_START_" +
+              " ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
+              "_END_" +
+              " ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
+              "_TOTAL_" +
+              " ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
+            "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+            "sZeroRecords": "${g.message(code: 'default.dataTable.search.label', default: 'No records found')}",
+            "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
+            "sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')}"
+              + " _MAX_ "
+              + "${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"
+          },
           "aaSorting": [[ 4, "desc" ]],
           "fnFooterCallback": function (nRow, aaData, iStart, iEnd, aiDisplay) {
             console.log(aaData);

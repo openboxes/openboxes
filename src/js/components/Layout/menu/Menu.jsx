@@ -3,75 +3,37 @@ import React, { useMemo } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useParams, withRouter } from 'react-router-dom';
 
 import MenuItem from 'components/Layout/menu/MenuItem';
 import MenuSection from 'components/Layout/menu/MenuSection';
 import MenuSubsection from 'components/Layout/menu/MenuSubsection';
+import { checkActiveSection, getAllMenuUrls } from 'utils/menu-utils';
 
+const Menu = ({ menuConfig, location, menuSectionsUrlParts }) => {
+  const params = useParams();
 
-const Menu = ({ menuConfig, location }) => {
-  const getAllMenuUrls = () => Object.entries(menuConfig).reduce((acc, [, section]) => {
-    if (!acc[section.label]) {
-      if (section.href) {
-        return {
-          ...acc,
-          [section.label]: [section.href],
-        };
-      }
-      if (section.subsections) {
-        return {
-          ...acc,
-          // eslint-disable-next-line max-len
-          [section.label]: section.subsections.flatMap(subsection => subsection.menuItems.map(item => item.href)),
-        };
-      }
-      if (section.menuItems) {
-        return {
-          ...acc,
-          [section.label]: section.menuItems.flatMap(({ href }) => href),
-        };
-      }
-    }
-    return acc;
-  }, {});
-
-  const checkActiveSection = (menuUrls, path) => {
-    const { pathname, search } = path;
-    const matchedPath = Object.keys(menuUrls)
-      .find((section) => {
-        // find matching URL from sections
-        const foundURL = menuUrls[section].find((url) => {
-          const [sectionPath, sectionSearch] = url.split('?');
-          if (sectionPath !== pathname) return false;
-          // if found matching pathname
-          // then check if all parameters of section path match with current path parameters
-          if (sectionSearch) {
-            const searchParams = sectionSearch.split('&');
-            return search && searchParams.every(param => search.includes(param));
-          }
-          return true;
-        });
-        return !!foundURL;
-      });
-    return matchedPath || 'Dashboard';
-  };
   const allMenuUrls = useMemo(() => getAllMenuUrls(menuConfig), [menuConfig]);
   const activeSection = useMemo(() =>
-    checkActiveSection(allMenuUrls, location), [allMenuUrls, location]);
+    checkActiveSection({
+      menuUrls: allMenuUrls,
+      path: location,
+      params,
+      menuSectionsUrlParts,
+    }), [allMenuUrls, location]);
 
   return (
     <div className="menu-wrapper" id="navbarSupportedContent">
       <ul className="d-flex align-items-center navbar-nav mr-auto flex-wrap">
         { _.chain(menuConfig)
-          .filter(section => section.label !== 'Configuration')
+          .filter(section => section.id !== 'configuration')
           .map((section) => {
             if (section.href) {
               return (
                 <MenuSection
                   section={section}
                   key={`${section.label}-menu-section`}
-                  active={activeSection === section.label}
+                  active={activeSection === section.id}
                 />
               );
             }
@@ -80,7 +42,7 @@ const Menu = ({ menuConfig, location }) => {
                 <MenuSubsection
                   section={section}
                   key={`${section.label}-menu-subsection`}
-                  active={activeSection === section.label}
+                  active={activeSection === section.id}
                 />
               );
             }
@@ -89,7 +51,7 @@ const Menu = ({ menuConfig, location }) => {
                 <MenuItem
                   section={section}
                   key={`${section.label}-menuItem`}
-                  active={activeSection === section.label}
+                  active={activeSection === section.id}
                 />
               );
             }
@@ -104,6 +66,7 @@ const Menu = ({ menuConfig, location }) => {
 
 const mapStateToProps = state => ({
   menuConfig: state.session.menuConfig,
+  menuSectionsUrlParts: state.session.menuSectionsUrlParts,
 });
 
 export default withRouter(connect(mapStateToProps)(Menu));
@@ -129,6 +92,17 @@ Menu.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string,
     search: PropTypes.string,
+  }).isRequired,
+  menuSectionsUrlParts: PropTypes.shape({
+    inventory: PropTypes.arrayOf(PropTypes.string),
+    products: PropTypes.arrayOf(PropTypes.string),
+    purchasing: PropTypes.arrayOf(PropTypes.string),
+    invoicing: PropTypes.arrayOf(PropTypes.string),
+    inbound: PropTypes.arrayOf(PropTypes.string),
+    outbound: PropTypes.arrayOf(PropTypes.string),
+    requisitionTemplate: PropTypes.arrayOf(PropTypes.string),
+    configuration: PropTypes.arrayOf(PropTypes.string),
+    injectedDirectly: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   menuConfig: PropTypes.arrayOf(sectionPropTypes).isRequired,
 };

@@ -41,7 +41,7 @@
                     <div class="yui-u first">
                         <div id="details" class="box">
                             <h2>
-                                <warehouse:message code="order.orderHeader.label" default="Order Header"/>
+                                <g:message code="order.header.label" default="Order Header"/>
                             </h2>
                             <table>
                                 <tbody>
@@ -224,8 +224,8 @@
                         <div class="tabs tabs-ui">
                             <ul>
                                 <li><a href="#tabs-summary"><warehouse:message code="default.summary.label" default="Summary"/></a></li>
-                                <li><a href="#tabs-items"><warehouse:message code="order.itemStatus.label" default="Item Status"/></a></li>
-                                <li><a href="#tabs-itemDetails"><warehouse:message code="order.itemDetails.label" default="Item Details"/></a></li>
+                                <li><a href="#tabs-items"><g:message code="order.itemStatus.message" default="Item Status"/></a></li>
+                                <li><a href="#tabs-itemDetails"><g:message code="order.itemDetails.message" default="Item Details"/></a></li>
                                 <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
                                     <li><a href="#tabs-adjustments"><warehouse:message code="orderAdjustments.label"/></a></li>
                                     <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
@@ -273,6 +273,10 @@
 
         <script>
             $(document).ready(function() {
+
+              const orderType = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
+              applyActiveSection(orderType);
+
                 $(".tabs").tabs({
                     cookie: {
                         expires: 1
@@ -281,19 +285,25 @@
                 });
             });
 
-            function filterTableItems(cellIndex, filterValue, tableRows) {
+            function filterTableItems(cellsIndex, filterValue, tableRows) {
               // Loop through all table rows, and hide those who don't match the search query
               $.each(tableRows, function(index, currentRow) {
                 // If filter matches text value then we display, otherwise hide
-                const txtValue = $(currentRow)
-                  .find("td")
-                  .eq(cellIndex)
-                  .text();
-                if (txtValue.toUpperCase().indexOf(filterValue) > -1) {
+
+                // Make one string from cells values at given indexes
+                const txtValue = cellsIndex.reduce((acc, index) => {
+                  const cellValue = $(currentRow)
+                    .find("td")
+                    .eq(index)
+                    .text();
+                  return acc + cellValue
+                }, '');
+                // If concated string includes the filter value, show the row, otherwise hide
+                if (txtValue.toUpperCase().includes(filterValue)) {
                   $(currentRow).show();
-                } else {
-                  $(currentRow).hide();
+                  return;
                 }
+                $(currentRow).hide();
               });
             }
         </script>

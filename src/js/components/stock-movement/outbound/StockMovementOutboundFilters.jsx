@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -15,22 +15,29 @@ const StockMovementOutboundFilters = ({
   filterFields,
   defaultValues,
 }) => {
-  const fetchUsers = debounceUsersFetch(debounceTime, minSearchLength);
-  // eslint-disable-next-line max-len
-  const fetchLocations = debounceLocationsFetch(
-    debounceTime,
-    minSearchLength,
-    [],
-    true,
-    false,
-    false,
+  const fetchUsers = useCallback(
+    debounceUsersFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
+
+  const fetchLocations = useCallback(
+    debounceLocationsFetch(
+      debounceTime,
+      minSearchLength,
+      [],
+      true,
+      false,
+      false,
+    ),
+    [debounceTime, minSearchLength],
   );
 
   return (
     <div className="d-flex flex-column list-page-filters">
       <FilterForm
         searchFieldId="q"
-        searchFieldPlaceholder="Search by requisition number, name etc."
+        searchFieldPlaceholder="react.stockMovement.search.placeholder.label"
+        searchFieldDefaultPlaceholder="Search by requisition number, name etc."
         filterFields={filterFields}
         defaultValues={defaultValues}
         ignoreClearFilters={['origin', 'direction', 'sourceType']}

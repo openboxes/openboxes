@@ -8,9 +8,9 @@
         <table class="zebra">
             <tr>
                 <th></th>
-                <th><g:message code="document.name.label"/></th>
-                <th><g:message code="documentType.label"/></th>
-                <th><g:message code="document.contentType.label"/></th>
+                <th><warehouse:message code="document.name.label"/></th>
+                <th><warehouse:message code="documentType.label"/></th>
+                <th><warehouse:message code="document.contentType.label"/></th>
                 <th></th>
             </tr>
             <tbody>
@@ -71,7 +71,7 @@
             <table class="zebra">
                 <tr>
                     <th style="width:3%"></th>
-                    <th><g:message code="default.name.label"/></th>
+                    <th><warehouse:message code="default.name.label"/></th>
                     <th><warehouse:message code="document.url.label" default="URL" /></th>
                     <th colspan="5"></th>
                 </tr>

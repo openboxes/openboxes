@@ -5,6 +5,13 @@
   height: 36px;
   min-width: 200px;
 
+  &.filter-select-has-value > .filter-select__control {
+    border: 1px solid var(--blue-primary);
+    svg {
+      color: var(--blue-primary);
+    }
+  }
+
   .filter-select__control {
     display: flex;
     flex-direction: row;
@@ -86,6 +93,12 @@
     box-shadow: 0px 0px 0px 1px rgba(152, 161, 179, 0.1), 0px 15px 35px -5px rgba(17, 24, 38, 0.2), 0px 5px 15px rgba(0, 0, 0, 0.08);
     border-radius: 4px;
 
+    .option-label {
+      max-width: 500px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+
     .filter-select__option--is-selected {
       background: #FFFFFF;
       color: var(--blue-700);
@@ -107,5 +120,6 @@
     border-radius: 4px;
     position: absolute;
     z-index: 3;
+    min-width: 150px;
   }
 }

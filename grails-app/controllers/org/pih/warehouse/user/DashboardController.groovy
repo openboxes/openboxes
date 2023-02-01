@@ -11,8 +11,8 @@ package org.pih.warehouse.user
 
 import grails.converters.JSON
 import grails.plugin.springcache.annotations.CacheFlush
-import grails.plugin.springcache.annotations.Cacheable
 import org.apache.commons.lang.StringEscapeUtils
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -35,12 +35,12 @@ class DashboardController {
 
     def inventoryService
     def dashboardService
-    def productService
     def userService
     def sessionFactory
     def grailsApplication
     def locationService
     def userAgentIdentService
+    def megamenuService
 
     def showCacheStatistics = {
         def statistics = sessionFactory.statistics
@@ -69,14 +69,16 @@ class DashboardController {
             return
         }
 
-        def requisition = Requisition.findByRequestNumber(params.searchTerms)
-        if (requisition) {
+        List<Requisition> requisitions = Requisition.findAllByRequestNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (requisitions) {
+            Requisition requisition = requisitions.first()
             redirect(controller: "stockMovement", action: "show", id: requisition.id)
             return
         }
 
-        def shipment = Shipment.findByShipmentNumber(params.searchTerms)
-        if (shipment) {
+        List<Shipment> shipments = Shipment.findAllByShipmentNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (shipments) {
+            Shipment shipment = shipments.first()
             redirect(controller: "stockMovement", action: "show", id: shipment.returnOrder?.id ?: shipment.id)
             return
         }
@@ -86,8 +88,9 @@ class DashboardController {
             redirect(controller: "receipt", action: "show", id: receipt.id)
             return
         }
-        def order = Order.findByOrderNumber(params.searchTerms)
-        if (order) {
+        List<Order> orders = Order.findAllByOrderNumber(params.searchTerms, [sort: 'dateCreated', order: 'desc'])
+        if (orders) {
+            Order order = orders.first()
             if (order.isReturnOrder) {
                 redirect(controller: "stockMovement", action: "show", id: order.id)
                 return
@@ -149,13 +152,29 @@ class DashboardController {
         render results as JSON
     }
 
-    @Cacheable("megamenuCache")
     def megamenu = {
+        Location location = Location.get(session.warehouse?.id)
+        if (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST)) {
+            return [ menu: [] ]
+        }
+
+        Map menuConfig = grailsApplication.config.openboxes.megamenu;
+        User user = User.get(session?.user?.id)
+
+        if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
+            menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
+        }
+        List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
+
+        // Separate configuration section from the rest of the megamenu since it will be rendered separately as menuicon
+        def indexOfConfigurationSection = translatedMenu.findIndexOf{ it?.id == 'configuration' }
+        def configurationSection = indexOfConfigurationSection > 0 ? translatedMenu.remove(indexOfConfigurationSection) : null
+
         [
-                isSuperuser           : userService.isSuperuser(session?.user),
-                megamenuConfig        : grailsApplication.config.openboxes.megamenu,
-                quickCategories       : productService.quickCategories,
-                categories            : productService.rootCategory.categories.groupBy { it.parentCategory?.id },
+                menu                    : translatedMenu,
+                configurationSection    : configurationSection,
+                megamenuConfig          : grailsApplication.config.openboxes.megamenu,
+                menuSectionsUrlParts    : grailsApplication.config.openboxes.menuSectionsUrlParts as JSON
         ]
     }
 
@@ -202,14 +221,17 @@ class DashboardController {
                 return
             }
 
+            if (warehouse.supports(ActivityCode.SUBMIT_REQUEST) && !warehouse.supports(ActivityCode.MANAGE_INVENTORY)) {
+                redirect(controller: 'dashboard', action: 'index')
+                return
+            }
+
             // Successfully logged in and selected a warehouse
             // Try to redirect to the previous action before session timeout
-            if (session.targetUri || params.targetUri) {
-                def targetUri = params.targetUri ?: session.targetUri
-                if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
-                    redirect(uri: targetUri)
-                    return
-                }
+            def targetUri = params.targetUri ?: session.targetUri
+            if (targetUri && !targetUri.contains("chooseLocation") && !targetUri.contains("errors")) {
+                redirect(uri: targetUri)
+                return
             }
             redirect(controller: 'dashboard', action: 'index')
             return

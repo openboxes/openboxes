@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -15,7 +15,10 @@ const StockTransferListFilters = ({
   filterFields,
   defaultValues,
 }) => {
-  const debouncedUsersFetch = debounceUsersFetch(debounceTime, minSearchLength);
+  const debouncedUsersFetch = useCallback(
+    debounceUsersFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
 
   return (
     <div className="d-flex flex-column list-page-filters">
@@ -27,7 +30,8 @@ const StockTransferListFilters = ({
           debouncedUsersFetch,
         }}
         defaultValues={defaultValues}
-        searchFieldPlaceholder="Search by transfer number"
+        searchFieldPlaceholder="react.stockTransfer.filters.searchField.placeholder.label"
+        searchFieldDefaultPlaceholder="Search by transfer number"
         searchFieldId="q"
         allowEmptySubmit
         hidden={false}

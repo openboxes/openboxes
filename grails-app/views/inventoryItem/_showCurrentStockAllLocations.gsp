@@ -13,7 +13,7 @@
     <h2>
         <div>
             <g:message code="inventory.currentStock.label" default="Current Stock"/>
-            <small><g:message code="default.allLocations.label" default="All Locations"/></small>
+            <small><g:message code="locations.all.label" default="All Locations"/></small>
             <div class="download-button">
                 <g:link controller="inventoryItem" action="showCurrentStockAllLocations" params="[download:true]" id="${commandInstance.product.id}" class="button">
                     <img src="${createLinkTo(dir:'images/icons/silk',file: 'page_excel.png')}" />
@@ -51,7 +51,7 @@
                         <tr class="prop header">
                             <td>
                                 ${locationGroupEntry.key?:g.message(code:'default.none.label', default: "No location group")}
-                                <small>(${locations.size()} locations)</small>
+                                <small>(${locations.size()} <g:message code="locations.label" default="Locations" />)</small>
                             </td>
                             <td>
 

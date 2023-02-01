@@ -63,7 +63,10 @@ class ReplenishmentApiController {
 
         picklistService.createPicklist(order)
 
-        render(status: 201, text: order.id)
+        replenishment = Replenishment.createFromOrder(order)
+
+        response.status = 201
+        render([data: replenishment?.toJson()] as JSON)
     }
 
     def update = {

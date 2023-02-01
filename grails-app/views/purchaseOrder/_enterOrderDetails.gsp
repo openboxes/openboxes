@@ -36,7 +36,7 @@
 			<div class="dialog">
                 <g:render template="/order/summary" model="[orderInstance:order,currentState:'editOrder']"/>
                 <div class="box">
-                    <h2><warehouse:message code="order.header.label" default="Order Header"/></h2>
+                    <h2><g:message code="order.header.label" default="Order Header"/></h2>
                     <table>
                         <tbody>
 
@@ -65,8 +65,14 @@
                                     <warehouse:message code="order.origin.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'origin','errors')}'>
-                                    <g:selectOrderSupplier name="origin.id" class="chzn-select-deselect"
-                                                           optionKey="id" value="${order?.origin?.id}" noSelection="['':'']"/>
+                                    <g:selectOrderSupplier
+                                        name="origin.id"
+                                        class="chzn-select-deselect"
+                                        optionKey="id"
+                                        value="${order?.origin?.id}"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                             </tr>
                             <tr class='prop'>
@@ -120,7 +126,7 @@
                     </table>
                 </div>
                 <div class="box">
-                    <h2><warehouse:message code="order.terms.label" default="Order Terms" /></h2>
+                    <h2><g:message code="order.terms.label" default="Order Terms" /></h2>
 
                     <table>
                         <tbody>
@@ -129,7 +135,13 @@
                                     <label for="paymentMethodType.id"><warehouse:message code="order.paymentMethodType.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'paymentMethodType','errors')}'>
-                                    <g:selectPaymentMethodType name="paymentMethodType.id" value="${order?.paymentMethodType?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
+                                    <g:selectPaymentMethodType
+                                        name="paymentMethodType.id"
+                                        value="${order?.paymentMethodType?.id}"
+                                        class="chzn-select-deselect"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                             </tr>
                             <tr class='prop'>
@@ -137,14 +149,25 @@
                                     <label for="paymentTerm.id"><warehouse:message code="order.paymentTerm.label"/></label>
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'paymentTerm','errors')}'>
-                                    <g:selectPaymentTerm name="paymentTerm.id" value="${order?.paymentTerm?.id}" class="chzn-select-deselect" noSelection="['':'']"/>
+                                    <g:selectPaymentTerm
+                                        name="paymentTerm.id"
+                                        value="${order?.paymentTerm?.id}"
+                                        class="chzn-select-deselect"
+                                        noSelection="['':'']"
+                                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                                    />
                                 </td>
                             </tr>
                             <tr class='prop'>
                                 <td class='name middle'><label for='currencyCode'><warehouse:message code="order.currencyCode.label"/></label></td>
                                 <td valign='top'
                                     class='value ${hasErrors(bean:order,field:'currency','errors')}'>
-                                    <g:selectCurrency name="currencyCode" class="chzn-select-deselect" value="${order?.currencyCode}" noSelection="['':'']"/>
+                                    <g:selectCurrency
+                                        name="currencyCode"
+                                        class="chzn-select-deselect"
+                                        value="${order?.currencyCode}"
+                                        noSelection="['':'']"
+                                    />
                                 </td>
                             </tr>
                             <g:if test="${order?.currencyCode && order?.currencyCode!=grailsApplication.config.openboxes.locale.defaultCurrencyCode}">

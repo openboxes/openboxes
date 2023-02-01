@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { AutoSizer, InfiniteLoader, List } from 'react-virtualized';
 
 import TableRow from 'components/form-elements/TableRow';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 
 class TableBodyVirtualized extends Component {
@@ -131,7 +133,7 @@ class TableBodyVirtualized extends Component {
     }
     return (
       <div key={key} style={style}>
-        Loading...
+        {this.props.translate('react.default.loading.label', 'Loading...')}
       </div>
     );
   }
@@ -181,6 +183,7 @@ class TableBodyVirtualized extends Component {
 
 const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default connect(mapStateToProps, {})(TableBodyVirtualized);
@@ -197,6 +200,7 @@ TableBodyVirtualized.propTypes = {
   addRow: PropTypes.func,
   tableRef: PropTypes.func,
   pageSize: PropTypes.number.isRequired,
+  translate: PropTypes.func.isRequired,
 };
 
 TableBodyVirtualized.defaultProps = {

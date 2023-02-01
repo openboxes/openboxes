@@ -61,7 +61,7 @@ class ApiController {
         if (!locale) {
             throw new ObjectNotFoundException(params.id, Locale.class.toString())
         }
-        session.user.locale = locale
+        session.locale = locale
         render([status: 200, text: "Current language is ${locale}"])
     }
 
@@ -74,13 +74,14 @@ class ApiController {
         }
 
         Map menuConfig = grailsApplication.config.openboxes.megamenu;
+        Map menuSectionsUrlParts = grailsApplication.config.openboxes.menuSectionsUrlParts;
         User user = User.get(session?.user?.id)
 
         if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
             menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
         }
         List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
-        render([data: [menuConfig: translatedMenu]] as JSON)
+        render([data: [menuConfig: translatedMenu, menuSectionsUrlParts: menuSectionsUrlParts]] as JSON)
     }
 
     def getAppContext = {
@@ -88,6 +89,8 @@ class ApiController {
         def localizationMode
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
+        def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
+
         if (session.useDebugLocale) {
 
             localizationMode = [
@@ -164,6 +167,8 @@ class ApiController {
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
         String localizedHelpScoutKey = helpScoutService.localizedHelpScoutKey
         boolean isHelpScoutEnabled = grailsApplication.config.openboxes.helpscout.widget.enabled
+        boolean localizationModeEnabled = session.useDebugLocale ?: false
+
         render([
             data: [
                 user                 : user,
@@ -195,6 +200,8 @@ class ApiController {
                 currencyCode         : currencyCode,
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
+                localizationModeEnabled : localizationModeEnabled,
+                localizationModeLocale : localizationModeLocale
             ],
         ] as JSON)
     }

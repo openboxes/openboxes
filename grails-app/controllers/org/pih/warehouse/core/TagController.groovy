@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import org.pih.warehouse.product.Product
+import grails.plugin.springcache.annotations.CacheFlush
 
 class TagController {
 
@@ -30,11 +31,12 @@ class TagController {
         return [tagInstance: tagInstance]
     }
 
+    @CacheFlush("selectTagsCache")
     def save = {
         def tagInstance = new Tag(params)
         if (tagInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
-            redirect(action: "list", id: tagInstance.id)
+            redirect(action: "edit", id: tagInstance.id)
         } else {
             render(view: "create", model: [tagInstance: tagInstance])
         }
@@ -60,6 +62,7 @@ class TagController {
         }
     }
 
+    @CacheFlush("selectTagsCache")
     def update = {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
@@ -85,6 +88,7 @@ class TagController {
         }
     }
 
+    @CacheFlush("selectTagsCache")
     def delete = {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
@@ -106,10 +110,7 @@ class TagController {
         }
     }
 
-    def doSomething = {
-        println "do something " + params
-    }
-
+    @CacheFlush("selectTagsCache")
     def addToProducts = {
         println "add to products " + params
         Tag tag = Tag.get(params.id)
@@ -139,6 +140,7 @@ class TagController {
 
     }
 
+    @CacheFlush("selectTagsCache")
     def removeFromProducts = {
         println "remove from products " + params
         Tag tag = Tag.get(params.id)

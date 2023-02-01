@@ -28,7 +28,7 @@ class MessageTagLib {
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
         if (!databaseStoreEnabled) {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
             return
         }
@@ -37,9 +37,7 @@ class MessageTagLib {
         if (session.user) {
             def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
-
                 def message = localization.text
-
                 // If there are arguments, we need to get the
                 if (attrs?.args) {
                     message = messageSource.getMessage(attrs.code, null, attrs.default, session?.user?.locale)
@@ -47,21 +45,7 @@ class MessageTagLib {
 
                 if (session.useDebugLocale) {
                     def resolvedMessage = MessageFormat.format(localization.text, attrs?.args?.toArray())
-                    out << """
-								${resolvedMessage}
-								<img class='open-localization-dialog'
-									data-id="${localization.id}"
-									data-code="${localization.code}" 
-									data-locale="${localization.locale}" 
-									data-message="${message}" 
-									data-resolved-message="${resolvedMessage}" 
-									data-message="${localization.text}" 
-									data-args="${attrs.args}" 
-									data-localized="" 
-									src="${
-                        createLinkTo(dir: 'images/icons/silk', file: 'database.png')
-                    }"/>
-							"""
+                    out << """${resolvedMessage}"""
                     return
                 } else {
                     message = MessageFormat.format(localization.text, attrs?.args?.toArray())
@@ -85,32 +69,18 @@ class MessageTagLib {
             def hasOthers = localized.values().findAll { word -> word != localized['en'] }
 
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
 
             def image = (!hasOthers) ? 'decline' : 'accept'
 
             message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
             def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
-            out << """
-					${resolvedMessage}
-					<img class='open-localization-dialog'
-						data-code="${attrs.code}" 
-						data-locale="${attrs.locale}" 
-						data-args="${attrs?.args?.join(',')}" 
-						data-resolved-message="${resolvedMessage}" 
-						data-message="${message}" 
-						data-localized="${localized}" 
-						src="${
-                createLinkTo(dir: 'images/icons/silk', file: image + '.png')
-            }" title="${attrs.code} = ${localized}"/>
-					
-				"""
-
+            out << """${resolvedMessage}"""
         }
         // Display message normally
         else {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.user?.locale ?: session.locale ?: defaultLocale
+            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
             out << defaultTagLib.message.call(attrs)
         }
     }

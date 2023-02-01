@@ -8,6 +8,7 @@ const AlertMessage = ({
   if (show) {
     return (
       <div
+        data-testid="alert-message"
         className={`${className} alert ${danger ? 'alert-danger' : 'alert-warning'}`}
         style={{ cursor: close ? 'pointer' : 'default', whiteSpace: 'pre-line' }}
         role="presentation"

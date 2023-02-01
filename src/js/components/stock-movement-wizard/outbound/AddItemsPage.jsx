@@ -16,12 +16,11 @@ import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { debounceProductsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -79,44 +78,23 @@ const NO_STOCKLIST_FIELDS = {
     ),
     fields: {
       product: {
+        type: ProductSelectField,
         fieldKey: 'disabled',
-        type: SelectField,
         label: 'react.stockMovement.requestedProduct.label',
         defaultMessage: 'Requested product',
         headerAlign: 'left',
         flexWidth: '9.5',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.handlingIcons)}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount,
+          fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
           disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
           autoFocus: rowIndex === rowCount - 1,
+          locationId: originId,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityRequested', { enable: true });
+            }
+          },
         }),
       },
       quantityRequested: {
@@ -199,43 +177,22 @@ const STOCKLIST_FIELDS = {
     fields: {
       product: {
         fieldKey: 'disabled',
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.stockMovement.requestedProduct.label',
         defaultMessage: 'Requested product',
         headerAlign: 'left',
         flexWidth: '9',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          optionRenderer: option => (
-            <strong style={{ color: option.color ? option.color : 'black' }} className="d-flex align-items-center">
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-        },
         getDynamicAttr: ({
-          fieldValue, debouncedProductsFetch, rowIndex, rowCount, newItem,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
           disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
           autoFocus: newItem && rowIndex === rowCount - 1,
+          locationId: originId,
+          onExactProductSelected: ({ product }) => {
+            if (focusField && product) {
+              focusField(rowIndex, 'quantityRequested');
+            }
+          },
         }),
       },
       quantityAllowed: {
@@ -307,19 +264,13 @@ class AddItemsPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
-
-    this.debouncedProductsFetch = debounceProductsFetch(
-      this.props.debounceTime,
-      this.props.minSearchLength,
-      this.props.initialValues.origin.id,
-    );
   }
 
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
 
-      this.fetchAllData(false);
+      this.fetchAllData();
     }
   }
 
@@ -327,7 +278,7 @@ class AddItemsPage extends Component {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
-      this.fetchAllData(false);
+      this.fetchAllData();
     }
   }
 
@@ -559,14 +510,10 @@ class AddItemsPage extends Component {
 
   /**
    * Fetches all required data.
-   * @param {boolean} forceFetch
    * @public
    */
-  fetchAllData(forceFetch) {
-    if (!this.props.recipientsFetched || forceFetch) {
-      this.props.fetchUsers();
-    }
-
+  fetchAllData() {
+    this.props.fetchUsers();
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
@@ -826,7 +773,7 @@ class AddItemsPage extends Component {
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => this.fetchAllData(true),
+          onClick: () => this.fetchAllData(),
         },
         {
           label: this.props.translate('react.default.no.label', 'No'),
@@ -1077,7 +1024,7 @@ class AddItemsPage extends Component {
                   stocklist: values.stocklist,
                   recipients: this.props.recipients,
                   removeItem: this.removeItem,
-                  debouncedProductsFetch: this.debouncedProductsFetch,
+                  originId: this.props.initialValues.origin.id,
                   getSortOrder: this.getSortOrder,
                   newItemAdded: this.newItemAdded,
                   newItem: this.state.newItem,
@@ -1095,7 +1042,7 @@ class AddItemsPage extends Component {
               </div>
               <div className="submit-buttons">
                 <button
-                  type="submit"
+                  type="button"
                   disabled={invalid || showOnly}
                   onClick={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
@@ -1127,11 +1074,8 @@ class AddItemsPage extends Component {
 
 const mapStateToProps = state => ({
   recipients: state.users.data,
-  recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
-  debounceTime: state.session.searchConfig.debounceTime,
-  minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   isPaginated: state.session.isPaginated,
@@ -1165,12 +1109,8 @@ AddItemsPage.propTypes = {
   fetchUsers: PropTypes.func.isRequired,
   /** Array of available recipients  */
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  /** Indicator if recipients' data is fetched */
-  recipientsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
-  debounceTime: PropTypes.number.isRequired,
-  minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   /** Return true if pagination is enabled */
   isPaginated: PropTypes.bool.isRequired,

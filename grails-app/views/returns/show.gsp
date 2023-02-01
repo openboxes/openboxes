@@ -130,7 +130,7 @@
                                 <g:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipment?.status?:stockMovement?.statusCode}"/>
+                                <format:metadata obj="${stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode}"/>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -385,9 +385,12 @@
         </div>
     </div>
 </div>
-
 <script type="text/javascript">
     $(document).ready(function() {
+
+      const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
+      applyActiveSection(stockMovementDirection);
+
         $(".tabs").tabs({
             cookie : {
                 expires : 1

@@ -31,14 +31,25 @@
                         <div class="prop">
                             <div class="filter-list-item">
                                 <label>${warehouse.message(code:'location.label')}</label>
-                                <g:selectLocation id="location" name="location.id" class="chzn-select-deselect"
-                                                  value="${params?.location?.id?:session?.warehouse?.id}" noSelection="['':'']" data-placeholder=" " />
+                                <g:selectLocation
+                                    id="location"
+                                    name="location.id"
+                                    class="chzn-select-deselect"
+                                    value="${params?.location?.id?:session?.warehouse?.id}"
+                                    noSelection="['':'']"
+                                    data-placeholder=" "
+                                />
                             </div>
                             <div class="filter-list-item">
                                 <label>${warehouse.message(code:'default.status.label')}</label>
-                                <g:select name="status" class="chzn-select-deselect" from="${statuses}"
-                                    optionKey="status" optionValue="${{ it.label }}" value="${params.status}"
-                                    noSelection="['':g.message(code:'default.all.label')]" data-placeholder=" " />
+                                <g:select
+                                    name="status"
+                                    class="chzn-select-deselect"
+                                    from="${statuses}"
+                                    optionValue="${{g.message(code: 'binLocationSummary.' + it + '.label', default: it)}}"
+                                    value="${params.status}"
+                                    noSelection="['':g.message(code:'default.all.label')]" data-placeholder=" "
+                                />
                             </div>
                         </div>
                         <div class="buttons">
@@ -169,8 +180,21 @@
                 } );
             },
             "oLanguage": {
-                //"sZeroRecords": "No records found",
-                "sProcessing": "Loading <img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "
+              "sEmptyTable": "${g.message(code: 'default.dataTable.noData.label', default: 'No data available in table')}",
+              "sInfoEmpty": "${g.message(code: 'default.dataTable.showingZeroEntries.label', default: 'Showing 0 to 0 of 0 entries')}",
+              "sInfo": "${g.message(code: 'default.dataTable.showing.label', 'Showing')} " +
+                "_START_" +
+                " ${g.message(code: 'default.dataTable.to.label', default: 'to')} " +
+                "_END_" +
+                " ${g.message(code: 'default.dataTable.of.label', default: 'of')} " +
+                "_TOTAL_" +
+                " ${g.message(code: 'default.dataTable.entries.label', default: 'entries')}",
+              "sSearch": "${g.message(code: 'default.dataTable.search.label', default: 'Search:')}",
+              "sZeroRecords": "${g.message(code: 'default.dataTable.noRecordsFound.label', default: 'No records found')}",
+              "sProcessing": "<img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> ${g.message(code: 'default.loading.label', default: 'Loading...')}",
+              "sInfoFiltered": "(${g.message(code: 'default.dataTable.filteredFrom.label', default: 'filtered from')} " +
+                "_MAX_" +
+                " ${g.message(code: 'default.dataTable.totalEntries.label', default: 'total entries')})"
             },
             "aLengthMenu": [
                 [5, 15, 25, 100, 1000, -1],
@@ -210,7 +234,6 @@
         $("#refresh-btn").click(function(event) {
             event.preventDefault();
             var dataTable = $("#binLocationReportTable").dataTable();
-            console.log(dataTable);
             dataTable.fnDraw();
         });
     });

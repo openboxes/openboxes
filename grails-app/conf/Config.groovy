@@ -386,7 +386,6 @@ openboxes.dashboard.newsSummary.newsItems = []
 openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
-
 openboxes {
     dashboard {
         yearTypes {
@@ -949,108 +948,6 @@ openboxes {
     }
 }
 
-//Breadcrumbs configuration
-breadcrumbsConfig {
-        inbound {
-            actionLabel = "react.stockMovement.inbound.create.label"
-            defaultActionLabel = "Create Inbound"
-            listLabel = "react.stockMovement.label"
-            defaultListLabel = "Stock Movement"
-            actionUrl = "/${appName}/stockMovement/createInbound/"
-            listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
-        }
-        outbound {
-            actionLabel = "react.stockMovement.outbound.create.label"
-            defaultActionLabel = "Create Outbound"
-            listLabel = "react.stockMovement.label"
-            defaultListLabel = "Stock Movement"
-            actionUrl = "/${appName}/stockMovement/createOutbound/"
-            listUrl = "/${appName}/stockMovement/list?direction=OUTBOUND"
-        }
-        request {
-            actionLabel = "react.stockMovement.request.create.label"
-            defaultActionLabel = "Create Request"
-            listLabel = "react.stockMovement.label"
-            defaultListLabel = "Stock Movement"
-            actionUrl = "/${appName}/stockMovement/createRequest/"
-            listUrl = "/${appName}/stockMovement/list?direction=INBOUND"
-        }
-        verifyRequest {
-            actionLabel = "react.stockMovement.request.verify.label"
-            defaultActionLabel = "Verify Request"
-            listLabel = "react.stockMovement.label"
-            defaultListLabel = "Stock Movement"
-            actionUrl = "/${appName}/stockMovement/list"
-            listUrl = "/${appName}/stockMovement/list"
-        }
-        putAway {
-            actionLabel = "react.putAway.createPutAway.label"
-            defaultActionLabel = "Create Putaway"
-            listLabel = "react.breadcrumbs.order.label"
-            defaultListLabel = "Order"
-            actionUrl = "/${appName}/putAway/create/"
-            listUrl = "/${appName}/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
-        }
-        combinedShipments {
-            actionLabel = "shipmentFromPO.label"
-            defaultActionLabel = "Ship from PO"
-            listLabel = "react.stockMovement.label"
-            defaultListLabel = "Stock Movement"
-            actionUrl = "/${appName}/stockMovement/createCombinedShipments/"
-            listUrl   = "/${appName}/stockMovement/list?direction=INBOUND"
-        }
-        invoice {
-            actionLabel = "react.invoice.create.label"
-            defaultActionLabel = "Create"
-            listLabel = "react.invoice.label"
-            defaultListLabel = "Invoice"
-            actionUrl = "/${appName}/invoice/create/"
-            listUrl   = "/${appName}/invoice/list/"
-        }
-        stockTransfer {
-            actionLabel = "react.stockTransfer.createStockTransfer.label"
-            defaultActionLabel = "Create Stock Transfer"
-            listLabel = "react.stockTransfer.label"
-            defaultListLabel = "Stock Transfer"
-            actionUrl = "/${appName}/stockTransfer/create/"
-            listUrl = "/"
-        }
-        replenishment {
-            actionLabel = "react.replenishment.createReplenishment.label"
-            defaultActionLabel = "Create Replenishment"
-            listLabel = "react.replenishment.label"
-            defaultListLabel = "Replenishment"
-            actionUrl = "/${appName}/replenishment/create/"
-            listUrl = "/"
-        }
-        outboundReturns {
-            actionLabel = "react.outboundReturns.createReturn.label"
-            defaultActionLabel = "Create Outbound Return"
-            listLabel = "react.outboundReturns.label"
-            defaultListLabel = "Outbound Returns"
-            actionUrl = "/${appName}/stockTransfer/createOutboundReturn/"
-            listUrl = "/"
-        }
-        inboundReturns {
-            actionLabel = "react.inboundReturns.createReturn.label"
-            defaultActionLabel = "Create Inbound Return"
-            listLabel = "react.inboundReturns.label"
-            defaultListLabel = "Inbound Returns"
-            actionUrl = "/${appName}/stockTransfer/createInboundReturn/"
-            listUrl = "/"
-        }
-        productsConfiguration {
-            actionLabel = "productsConfiguration.label"
-            defaultActionLabel = "Categories and Products Configuration"
-            actionUrl = "/${appName}/productsConfiguration/index"
-        }
-        locationsConfiguration {
-            actionLabel = "locationsConfiguration.label"
-            defaultActionLabel = "Locations Configuration"
-            actionUrl = "/${appName}/locationsConfiguration/create"
-        }
-}
-
 // OpenBoxes identifier config
 openboxes.identifier.separator = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.numeric = Constants.RANDOM_IDENTIFIER_NUMERIC_CHARACTERS
@@ -1129,7 +1026,7 @@ openboxes.security.rbac.rules = [
         [controller: 'stockTransfer', actions: ['eraseStockTransfer'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
         [controller: 'stockMovementItemApi', actions: ['eraseItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
         [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
-        [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
+        [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
         [controller: 'glAccount', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
@@ -1374,7 +1271,8 @@ openboxes.stockCard.consumption.reasonCodes = [ReasonCode.STOCKOUT, ReasonCode.L
 // Localization configuration - default and supported locales
 openboxes.locale.custom.enabled = false
 openboxes.locale.defaultLocale = 'en'
-openboxes.locale.supportedLocales = ['ar','de','en','es','fr','it','pt','fi','zh']
+openboxes.locale.localizationModeLocale = 'ach'
+openboxes.locale.supportedLocales = ['ar','ach','de','en','es','fr','it','pt','fi','zh']
 
 // Currency configuration
 openboxes.locale.defaultCurrencyCode = "USD"
@@ -1399,6 +1297,20 @@ openboxes.expirationDate.minValue = new Date("01/01/2000")
 openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 
 // Global megamenu configuration
+
+openboxes.menuSectionsUrlParts = [
+    inventory: ["inventory", "inventoryItem", "stockTransfer"],
+    products: ["product"],
+    purchasing: ["purchaseOrder"],
+    invoicing: ["invoice"],
+    outbound: ["verifyRequest"],
+    requisitionTemplate: ["requisitionTemplate"],
+    configuration: ["locationsConfiguration"],
+    // for inbound / outbound and purchasing / putaway the same url is used,
+    // so it is underlined directly from stockMovement/show.gsp
+    injectedDirectly: ["stockMovement", "order"]
+]
+
 // TODO: Clean up and add all missing message.properties
 openboxes {
     megamenu {
@@ -1442,7 +1354,7 @@ openboxes {
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
                         [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/list"],
-                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/index"]
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/create"]
                     ]
                 ]
             ]
@@ -1456,7 +1368,7 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/create", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/purchaseOrder/list"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],
@@ -1521,7 +1433,7 @@ openboxes {
         }
         outbound {
             enabled = true
-            label = "outbound.label"
+            label = "default.outbound.label"
             defaultLabel = "Outbound"
             requiredActivitiesAny = [ActivityCode.SEND_STOCK]
             subsections = [
@@ -1550,7 +1462,7 @@ openboxes {
         }
         reporting {
             enabled = true
-            label = "reporting.label"
+            label = "report.label"
             defaultLabel = "Reporting"
             subsections = [
                 [
@@ -1564,7 +1476,7 @@ openboxes {
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/${appName}/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/${appName}/report/showCycleCountReport"],
                         [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/${appName}/inventory/show"],
-                        [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/${appName}/report/showOnOrderReport"]
+                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/${appName}/report/showOnOrderReport"]
                     ]
                 ],
                 [
@@ -1573,7 +1485,7 @@ openboxes {
                         menuItems: [
                             [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/${appName}/report/showForecastReport"],
                             [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/${appName}/inventory/reorderReport"],
-                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstandng Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", supplementalRoles: [RoleType.ROLE_FINANCE]],
+                            [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstanding Report", href: "/${appName}/report/amountOutstandingOnOrdersReport", supplementalRoles: [RoleType.ROLE_FINANCE]],
                         ]
                 ],
                 [
@@ -1673,7 +1585,7 @@ openboxes {
                     ]
                 ],
                 [
-                    label: "parties.label",
+                    label: "locations.label",
                     defaultLabel: "Locations",
                     menuItems: [
                         [label: "locations.label", defaultLabel: "Locations", href: "/${appName}/location/list"],

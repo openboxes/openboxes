@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import AddItemsPage from 'components/returns/outbound/AddItemsPage';
 import CreateOutboundReturn from 'components/returns/outbound/CreateOutboundReturn';
 import PickPage from 'components/returns/outbound/PickPage';
@@ -28,7 +28,6 @@ class OutboundReturns extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'outboundReturns');
 
     if (this.props.outboundReturnsTranslationsFetched) {
@@ -36,14 +35,6 @@ class OutboundReturns extends Component {
 
       this.fetchInitialValues();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -56,21 +47,9 @@ class OutboundReturns extends Component {
 
       this.fetchInitialValues();
     }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
-    }
   }
 
-  getStepList() {
+  get stepList() {
     return [
       this.props.translate('react.outboundReturns.create.label', 'Create'),
       this.props.translate('react.outboundReturns.addItems.label', 'Add items'),
@@ -79,7 +58,7 @@ class OutboundReturns extends Component {
     ];
   }
 
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.stockTransferNumber || !values.origin || !values.destination) {
       return '';
@@ -87,7 +66,7 @@ class OutboundReturns extends Component {
 
     return [
       {
-        text: 'Outbound Return',
+        text: ` ${this.props.translate('react.outboundReturns.outboundReturn.label', 'Outbound Return')} `,
         color: '#000000',
         delimeter: ' | ',
       },
@@ -99,7 +78,7 @@ class OutboundReturns extends Component {
       {
         text: values.origin.name,
         color: '#004d40',
-        delimeter: ' to ',
+        delimeter: ` ${this.props.translate('react.default.to.label', 'to')} `,
       },
       {
         text: values.destination.name,
@@ -170,32 +149,20 @@ class OutboundReturns extends Component {
         },
       },
     });
-    if (values.stockTransferNumber && values.id) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: values.stockTransferNumber, url: actionUrl, id: values.id },
-      ]);
-    }
   }
 
   render() {
     const { values, currentPage } = this.state;
-    const title = this.getWizardTitle();
     const pageList = [CreateOutboundReturn, AddItemsPage, PickPage, SendOutboundReturns];
-    const stepList = this.getStepList();
     const { location, history, match } = this.props;
     const locationId = location.id;
 
     return (
       <Wizard
         pageList={pageList}
-        stepList={stepList}
+        stepList={this.stepList}
         initialValues={values}
-        title={title}
+        title={this.wizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         additionalProps={{
@@ -208,7 +175,6 @@ class OutboundReturns extends Component {
 }
 
 const mapStateToProps = state => ({
-  breadcrumbsConfig: state.session.breadcrumbsConfig.outboundReturns,
   locale: state.session.activeLanguage,
   location: state.session.currentLocation,
   outboundReturnsTranslationsFetched: state.session.fetchedTranslations.outboundReturns,
@@ -216,7 +182,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(OutboundReturns);
 
 OutboundReturns.propTypes = {
@@ -232,16 +198,6 @@ OutboundReturns.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
@@ -257,12 +213,4 @@ OutboundReturns.propTypes = {
 
 OutboundReturns.defaultProps = {
   initialValues: {},
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

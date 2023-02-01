@@ -259,6 +259,8 @@ class AddItemsPage extends Component {
     this.props.showSpinner();
     this.confirmSave = this.confirmSave.bind(this);
     this.validate = this.validate.bind(this);
+    this.validateWithAlertMessage = this.validateWithAlertMessage.bind(this);
+    this.isValidForSave = this.isValidForSave.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
@@ -280,7 +282,7 @@ class AddItemsPage extends Component {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
 
-      this.fetchAllData(false);
+      this.fetchAllData();
     }
   }
 
@@ -288,7 +290,7 @@ class AddItemsPage extends Component {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
-      this.fetchAllData(false);
+      this.fetchAllData();
     }
   }
 
@@ -362,11 +364,10 @@ class AddItemsPage extends Component {
   dataFetched = false;
 
 
-  validate(values) {
+  validate(values, ignoreLotAndExpiry) {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
-    let alertMessage = '';
 
     _.forEach(values.lineItems, (item, key) => {
       if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
@@ -384,9 +385,6 @@ class AddItemsPage extends Component {
       }
       if (moment().startOf('day').diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.pastDate.label' };
-      }
-      if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
-        errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
       }
       const splitItems = _.filter(values.lineItems, lineItem =>
         lineItem.referenceId === item.referenceId);
@@ -409,31 +407,52 @@ class AddItemsPage extends Component {
         item && item.quantityAvailable < _.toInteger(item.quantityRequested)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.higherQuantity.label' };
       }
-      if (!_.isNil(item.product) && item.product.lotAndExpiryControl) {
-        if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
-          errors.lineItems[key] = {
-            expirationDate: LOT_AND_EXPIRY_ERROR,
-            lotNumber: LOT_AND_EXPIRY_ERROR,
-          };
-        } else if (!item.expirationDate) {
-          errors.lineItems[key] = { expirationDate: LOT_AND_EXPIRY_ERROR };
-        } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
-          errors.lineItems[key] = { lotNumber: LOT_AND_EXPIRY_ERROR };
+      if (!ignoreLotAndExpiry) {
+        if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+          errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
+        }
+        if (!_.isNil(item.product) && item.product.lotAndExpiryControl) {
+          if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+            errors.lineItems[key] = {
+              expirationDate: LOT_AND_EXPIRY_ERROR,
+              lotNumber: LOT_AND_EXPIRY_ERROR,
+            };
+          } else if (!item.expirationDate) {
+            errors.lineItems[key] = { expirationDate: LOT_AND_EXPIRY_ERROR };
+          } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
+            errors.lineItems[key] = { lotNumber: LOT_AND_EXPIRY_ERROR };
+          }
         }
       }
+    });
 
-      if (errors.lineItems[key]) {
+    return errors;
+  }
+
+  validateWithAlertMessage(values) {
+    const errors = this.validate(values);
+    let alertMessage = '';
+
+    _.forEach(errors.lineItems, (error, index) => {
+      if (error) {
+        const { productCode } = values.lineItems[index];
         if (!alertMessage) {
-          alertMessage = `Following rows contain validation errors: Row ${key + 1}: ${item.productCode}`;
+          alertMessage = `${this.props.translate('react.stockMovement.errors.followingRowsContainValidationError.label', 'Following rows contain validation errors: Row')} ${index + 1}: ${productCode}`;
         } else {
-          alertMessage += `, Row ${key + 1}: ${item.productCode}`;
+          alertMessage += `, Row ${index + 1}: ${productCode}`;
         }
       }
     });
 
     const { showAlert } = this.state;
     this.setState({ alertMessage, showAlert: showAlert && !alertMessage ? false : showAlert });
+
     return errors;
+  }
+
+  isValidForSave(values) {
+    const errors = this.validate(values, true);
+    return !errors.lineItems || errors.lineItems.every(_.isEmpty);
   }
 
   /**
@@ -486,14 +505,10 @@ class AddItemsPage extends Component {
 
   /**
    * Fetches all required data.
-   * @param {boolean} forceFetch
    * @public
    */
-  fetchAllData(forceFetch) {
-    if (!this.props.recipientsFetched || forceFetch) {
-      this.props.fetchUsers();
-    }
-
+  fetchAllData() {
+    this.props.fetchUsers();
     this.fetchAddItemsPageData();
     if (!this.props.isPaginated) {
       this.fetchLineItems();
@@ -562,7 +577,7 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(formValues) {
-    const errors = this.validate(formValues).lineItems;
+    const errors = this.validateWithAlertMessage(formValues).lineItems;
     if (errors.length) {
       this.setState({ showAlert: true });
       return;
@@ -712,7 +727,7 @@ class AddItemsPage extends Component {
    */
   saveAndExit(formValues) {
     if (formValues.lineItems.length > 0) {
-      const errors = this.validate(formValues).lineItems;
+      const errors = this.validateWithAlertMessage(formValues).lineItems;
       if (!errors.length) {
         this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
           .then(() => {
@@ -813,7 +828,7 @@ class AddItemsPage extends Component {
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: () => this.fetchAllData(true),
+          onClick: () => this.fetchAllData(),
         },
         {
           label: this.props.translate('react.default.no.label', 'No'),
@@ -988,7 +1003,7 @@ class AddItemsPage extends Component {
               </button>
               <button
                 type="button"
-                disabled={invalid}
+                disabled={!this.isValidForSave(values)}
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
@@ -996,7 +1011,7 @@ class AddItemsPage extends Component {
               </button>
               <button
                 type="button"
-                disabled={invalid}
+                disabled={!this.isValidForSave(values)}
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
@@ -1060,7 +1075,6 @@ class AddItemsPage extends Component {
 
 const mapStateToProps = state => ({
   recipients: state.users.data,
-  recipientsFetched: state.users.fetched,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   debounceTime: state.session.searchConfig.debounceTime,
@@ -1096,8 +1110,6 @@ AddItemsPage.propTypes = {
   fetchUsers: PropTypes.func.isRequired,
   /** Array of available recipients  */
   recipients: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  /** Indicator if recipients' data is fetched */
-  recipientsFetched: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   stockMovementTranslationsFetched: PropTypes.bool.isRequired,
   debounceTime: PropTypes.number.isRequired,

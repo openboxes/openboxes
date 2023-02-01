@@ -148,7 +148,7 @@ function validate(values) {
 
   _.forEach(values.requirements, (item, key) => {
     if (item.quantity) {
-      if (item.quantity < 0) {
+      if (item.quantity < 1) {
         errors.requirements[key] = { quantity: 'react.replenishment.error.quantity.label' };
       }
       if (item.quantity > item.quantityAvailable) {
@@ -285,8 +285,8 @@ class CreateReplenishment extends Component {
     apiClient.post(url, flattenRequest(payload))
       .then((response) => {
         this.props.hideSpinner();
-        this.props.history.push(`/openboxes/replenishment/create/${response.data}`);
-        this.props.nextPage(this.state.values);
+        this.props.history.push(`/openboxes/replenishment/create/${response.data?.data?.id}`);
+        this.props.nextPage(response.data?.data);
       })
       .catch(() => this.props.hideSpinner());
   }

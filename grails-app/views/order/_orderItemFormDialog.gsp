@@ -25,13 +25,16 @@
                     <label for="dlgProductSupplier"><warehouse:message code="productSupplier.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <g:selectProductSupplier id="dlgProductSupplier"
-                                             name="productSupplier"
-                                             product="${orderItem.product}"
-                                             supplier="${orderItem?.order?.originParty}"
-                                             value="${orderItem?.productSupplier?.id}"
-                                             class="select2"
-                                             noSelection="['':'']" />
+                    <g:selectProductSupplier
+                        id="dlgProductSupplier"
+                        name="productSupplier"
+                        product="${orderItem.product}"
+                        supplier="${orderItem?.order?.originParty}"
+                        value="${orderItem?.productSupplier?.id}"
+                        class="select2"
+                        noSelection="['':'']"
+                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                    />
                 </td>
             </tr>
             <tr class="prop hidden" id="dlgSourceCodeRow">
@@ -182,13 +185,16 @@
                     <label for="dlgProductSupplier"><warehouse:message code="productSupplier.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <g:selectProductSupplier id="dlgProductSupplier"
-                                             name="productSupplier"
-                                             product="${orderItem.product}"
-                                             supplier="${orderItem?.order?.originParty}"
-                                             value="${orderItem?.productSupplier?.id}"
-                                             class="select2"
-                                             noSelection="['':'']" />
+                    <g:selectProductSupplier
+                        id="dlgProductSupplier"
+                        name="productSupplier"
+                        product="${orderItem.product}"
+                        supplier="${orderItem?.order?.originParty}"
+                        value="${orderItem?.productSupplier?.id}"
+                        class="select2"
+                        noSelection="['':'']"
+                        data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
+                    />
                 </td>
             </tr>
             <tr class="prop hidden" id="dlgSourceCodeRow">
@@ -350,7 +356,7 @@
     </table>
 </g:form>
 <script>
-    const CREATE_NEW = "Create New";
+    const CREATE_NEW = "${g.message(code: 'default.createNew.label', default: 'Create New')}";
 
   function validateForm() {
     var budgetCode = $("#dlgBudgetCode").val();
@@ -451,7 +457,11 @@
               if (jqXHR.responseText) {
                 try {
                   let data = JSON.parse(jqXHR.responseText);
-                  $.notify(data.errorMessage, "error");
+                  if (data.errorMessages.length > 0) {
+                    $.notify(data.errorMessages.join("\n"), "error");
+                  } else {
+                    $.notify(data.errorMessage, "error");
+                  }
                 } catch (e) {
                   $.notify(jqXHR.responseText, "error");
                 }

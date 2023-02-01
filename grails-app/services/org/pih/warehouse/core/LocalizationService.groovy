@@ -64,9 +64,15 @@ class LocalizationService {
      * Gets the current locale or return default locale.
      */
     Locale getCurrentLocale() {
-        // fetch the locale of the current user; if there isn't one, use the default locale
-        return (RequestContextHolder.currentRequestAttributes().getSession().user?.locale ?:
-                new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en"))
+        // First search for session locale, if none set, then search for user's default locale, otherwise get the default locale
+        def session = RequestContextHolder.currentRequestAttributes().getSession()
+        if (session?.locale) {
+            return session.locale
+        }
+        if (session?.user?.locale) {
+            return session.user.locale
+        }
+        return new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
     }
 
     /**

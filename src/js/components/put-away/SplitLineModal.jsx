@@ -64,6 +64,25 @@ class SplitLineModal extends Component {
     }
   }
 
+  getErrorMessage() {
+    if (this.isQuantityGreaterThanOriginalPutaway()) {
+      return this.props.translate(
+        'react.putAway.sumOfAll.label',
+        'Sum of all split items quantities cannot be greater than original putaway item quantity',
+      );
+    }
+
+    if (this.isNegativeQuantity()) {
+      return this.props.translate(
+        'react.putAway.negativeSumOfAll.label',
+        'Items quantity cannot be less than 1',
+      );
+    }
+
+    return '';
+  }
+
+
   /**
    * Saves split items added by user in this modal.
    * @public
@@ -132,10 +151,18 @@ class SplitLineModal extends Component {
    * higher than available one.
    * @public
    */
-  isValid() {
-    const qtySum = this.calculatePutAwayQty();
 
-    return qtySum <= _.toInteger(this.props.putawayItem.quantity);
+  isNegativeQuantity() {
+    return _.some(this.state.splitItems, items => _.toInteger(items.quantity) <= 0);
+  }
+
+  isQuantityGreaterThanOriginalPutaway() {
+    const qtySum = this.calculatePutAwayQty();
+    return qtySum > _.toInteger(this.props.putawayItem.quantity);
+  }
+
+  isValid() {
+    return !this.isNegativeQuantity() && !this.isQuantityGreaterThanOriginalPutaway();
   }
 
   /**
@@ -220,27 +247,24 @@ class SplitLineModal extends Component {
                   </td>
                   <td className="py-1 align-middle">
                     <Tooltip
-                      // eslint-disable-next-line max-len
-                      html={this.props.translate(
-                        'react.putAway.sumOfAll.label',
-                        'Sum of all split items quantities cannot be higher than original putaway item quantity',
-                      )}
-                      disabled={this.isValid()}
+                      html={this.getErrorMessage()}
+                      disabled={!this.isQuantityGreaterThanOriginalPutaway() && item.quantity > 0}
                       theme="transparent"
                       arrow="true"
                       delay="150"
                       duration="250"
                       hideDelay="50"
                     >
-                      <div className={!this.isValid() ? 'has-error' : ''}>
+                      <div className={this.isQuantityGreaterThanOriginalPutaway() || item.quantity <= 0 ? 'has-error' : ''}>
                         <Input
                           type="number"
                           value={item.quantity}
                           onChange={value => this.setState({
-                            splitItems: update(this.state.splitItems, {
-                              [index]: { quantity: { $set: value } },
-                            }),
-                          })}
+                              splitItems: update(this.state.splitItems, {
+                                [index]: { quantity: { $set: value } },
+                              }),
+                            })
+                          }
                         />
                       </div>
                     </Tooltip>

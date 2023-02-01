@@ -249,11 +249,11 @@ class ReplenishmentSecondPage extends Component {
       apiClient.post(url, flattenRequest(payload))
         .then(() => {
           this.props.hideSpinner();
-          this.props.nextPage(this.state.values);
+          this.props.nextPage(this.state.values.replenishment);
         })
         .catch(() => this.props.hideSpinner());
     } else {
-      this.props.nextPage(this.state.values);
+      this.props.nextPage(this.state.values.replenishment);
     }
   }
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { fetchBreadcrumbsConfig, fetchTranslations, hideSpinner, showSpinner, updateBreadcrumbs } from 'actions';
+import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import AddItemsPage from 'components/stock-movement-wizard/outbound/AddItemsPage';
 import CreateStockMovement from 'components/stock-movement-wizard/outbound/CreateStockMovement';
 import EditPage from 'components/stock-movement-wizard/outbound/EditPage';
@@ -33,7 +33,6 @@ class StockMovements extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBreadcrumbsConfig();
     this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.stockMovementTranslationsFetched) {
@@ -41,14 +40,6 @@ class StockMovements extends Component {
 
       this.fetchInitialValues();
     }
-
-    const {
-      actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-    } = this.props.breadcrumbsConfig;
-    this.props.updateBreadcrumbs([
-      { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-      { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-    ]);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -61,25 +52,13 @@ class StockMovements extends Component {
 
       this.fetchInitialValues();
     }
-
-    if (nextProps.breadcrumbsConfig &&
-      nextProps.breadcrumbsConfig !== this.props.breadcrumbsConfig) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = nextProps.breadcrumbsConfig;
-
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-      ]);
-    }
   }
 
   /**
    * Returns array of form steps.
    * @public
    */
-  getStepList() {
+  get stepList() {
     let stepList = [];
     if (this.props.hasPackingSupport) {
       stepList = [this.props.translate('react.stockMovement.create.label', 'Create'),
@@ -102,7 +81,7 @@ class StockMovements extends Component {
    * Returns array of form's components.
    * @public
    */
-  getPageList() {
+  get pageList() {
     let formList = [];
     if (this.props.hasPackingSupport) {
       formList = [
@@ -130,14 +109,14 @@ class StockMovements extends Component {
    * tracking number given by user on the last step, description and stock list if chosen.
    * @public
    */
-  getWizardTitle() {
+  get wizardTitle() {
     const { values } = this.state;
     if (!values.movementNumber && !values.trackingNumber) {
       return '';
     }
     return [
       {
-        text: 'Stock Movement',
+        text: this.props.translate('react.stockMovement.label', 'Stock Movement'),
         color: '#000000',
         delimeter: ' | ',
       },
@@ -149,7 +128,7 @@ class StockMovements extends Component {
       {
         text: values.origin.name,
         color: '#004d40',
-        delimeter: ' to ',
+        delimeter: ` ${this.props.translate('react.default.to.label', 'to')} `,
       },
       {
         text: values.destination.name,
@@ -169,15 +148,15 @@ class StockMovements extends Component {
     ];
   }
 
-  getAdditionalWizardTitle() {
+  get additionalWizardTitle() {
     const { currentPage, values } = this.state;
-    const shipped = values.shipped ? 'SHIPPED' : '';
-    const received = values.received ? 'RECEIVED' : '';
+    const shipped = values.shipped ? this.props.translate('react.stockMovement.status.shipped.label', 'SHIPPED') : '';
+    const received = values.received ? this.props.translate('react.stockMovement.status.received.label', 'RECEIVED') : '';
     if ((this.props.hasPackingSupport && currentPage === 6) ||
       (!this.props.hasPackingSupport && currentPage === 5)) {
       return (
         <span className="shipment-status float-right">
-          {`${shipped || received || 'PENDING'}`}
+          {`${shipped || received || this.props.translate('react.stockMovement.status.pending.label', 'PENDING')}`}
         </span>
       );
     }
@@ -186,16 +165,6 @@ class StockMovements extends Component {
 
   updateWizardValues(currentPage, values) {
     this.setState({ currentPage, values });
-    if (values.movementNumber && (values.id || values.stockMovementId)) {
-      const {
-        actionLabel, defaultActionLabel, actionUrl, listLabel, defaultListLabel, listUrl,
-      } = this.props.breadcrumbsConfig;
-      this.props.updateBreadcrumbs([
-        { label: listLabel, defaultLabel: defaultListLabel, url: listUrl },
-        { label: actionLabel, defaultLabel: defaultActionLabel, url: actionUrl },
-        { label: values.movementNumber, url: actionUrl, id: values.id || values.stockMovementId },
-      ]);
-    }
   }
 
   dataFetched = false;
@@ -274,19 +243,15 @@ class StockMovements extends Component {
   render() {
     const { values, currentPage } = this.state;
     const { currentLocation } = this.props;
-    const title = this.getWizardTitle();
-    const additionalTitle = this.getAdditionalWizardTitle();
-    const pageList = this.getPageList();
-    const stepList = this.getStepList();
     const showOnly = values.origin && values.origin.id !== currentLocation.id;
 
     return (
       <Wizard
-        pageList={pageList}
-        stepList={stepList}
+        pageList={this.pageList}
+        stepList={this.stepList}
         initialValues={values}
-        title={title}
-        additionalTitle={additionalTitle}
+        title={this.wizardTitle}
+        additionalTitle={this.additionalWizardTitle}
         currentPage={currentPage}
         prevPage={currentPage === 1 ? 1 : currentPage - 1}
         updateWizardValues={this.updateWizardValues}
@@ -302,11 +267,10 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   currentLocation: state.session.currentLocation,
-  breadcrumbsConfig: state.session.breadcrumbsConfig.outbound,
 });
 
 export default connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchTranslations, updateBreadcrumbs, fetchBreadcrumbsConfig,
+  showSpinner, hideSpinner, fetchTranslations,
 })(StockMovements);
 
 StockMovements.propTypes = {
@@ -331,28 +295,8 @@ StockMovements.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
-  // Labels and url with translation
-  breadcrumbsConfig: PropTypes.shape({
-    actionLabel: PropTypes.string.isRequired,
-    defaultActionLabel: PropTypes.string.isRequired,
-    listLabel: PropTypes.string.isRequired,
-    defaultListLabel: PropTypes.string.isRequired,
-    listUrl: PropTypes.string.isRequired,
-    actionUrl: PropTypes.string.isRequired,
-  }),
-  // Method to update breadcrumbs data
-  updateBreadcrumbs: PropTypes.func.isRequired,
-  fetchBreadcrumbsConfig: PropTypes.func.isRequired,
 };
 
 StockMovements.defaultProps = {
   initialValues: {},
-  breadcrumbsConfig: {
-    actionLabel: '',
-    defaultActionLabel: '',
-    listLabel: '',
-    defaultListLabel: '',
-    listUrl: '',
-    actionUrl: '',
-  },
 };

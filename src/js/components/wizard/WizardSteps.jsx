@@ -13,6 +13,7 @@ const WizardSteps = props => (
         <div
           key={index}
           className={`step-container ${props.currentStep === index + 1 ? 'active' : ''}`}
+          data-testid={props.currentStep === index + 1 ? 'active' : 'inactive'}
         >
           <div
             className={props.showStepNumber ? 'circle filled' : 'circle'}

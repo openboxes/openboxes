@@ -129,9 +129,12 @@
 			<div class="action-menu-item">
 				<g:link controller="product" action="delete" id="${productInstance.id}"
 						onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" alt="${warehouse.message(code: 'default.button.delete.label') }"
-						style="vertical-align: middle" />&nbsp;
-					<warehouse:message code="product.delete.label" default="Delete product"/>
+					<img src="${createLinkTo(dir:'images/icons/silk',file:'bin.png')}" style="vertical-align: middle" />&nbsp;
+					<warehouse:message
+						code="default.delete.label"
+						args="[g.message(code: 'product.label', default: 'Product')]"
+						default="Delete Product"
+					/>
 				</g:link>
 			</div>
 			<div class="action-menu-item">

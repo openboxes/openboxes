@@ -43,6 +43,13 @@ class UserService {
             // Needed to bypass the password == passwordConfirm validation
             userInstance.passwordConfirm = userInstance.password
         }
+
+        // Do not allow user to set his/her locale to translation mode locale
+        def localizationModeLocale = new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)
+        if (params.locale && new Locale(params.locale) == localizationModeLocale) {
+            userInstance.errors.rejectValue("locale", "user.errors.cannotSetLocaleToTranslationLocale.message", "You cannot set your default locale for translation mode locale")
+            throw new ValidationException("user.errors.cannotSetLocaleToTranslationLocale.message", userInstance.errors)
+        }
         // If a non-admin user edits their profile they will not have access to
         // the roles or location roles, so we need to prevent the updateRoles
         // method from being called.

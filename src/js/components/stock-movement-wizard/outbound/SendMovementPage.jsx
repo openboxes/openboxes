@@ -772,7 +772,11 @@ class SendMovementPage extends Component {
 
   handleValidationErrors(error) {
     if (error.response.status === 400) {
-      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      // FIXME: Refactor this error massage handling to get prettier default errorMessage fallback
+      let alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      if (alertMessage === '') {
+        alertMessage = _.get(error, 'response.data.errorMessage', '');
+      }
       this.setState({ alertMessage, showAlert: true });
 
       return Promise.reject(error);
@@ -883,7 +887,7 @@ class SendMovementPage extends Component {
                       <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
                     </button> }
                 </span>
-                <div className="form-title"><Translate id="react.attribute.options.label" defaultMessage="Sending options" /></div>
+                <div className="form-title"><Translate id="react.stockMovement.sendingOptions.label" defaultMessage="Sending options" /></div>
                 {_.map(SHIPMENT_FIELDS, (fieldConfig, fieldName) =>
                   renderFormField(fieldConfig, fieldName, {
                     shipmentTypes: this.state.shipmentTypes,

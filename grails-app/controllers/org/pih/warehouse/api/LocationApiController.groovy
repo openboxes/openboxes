@@ -241,7 +241,15 @@ class LocationApiController extends BaseDomainApiController {
         }
         def parentLocation = existingLocation.parentLocation
         if (parentLocation) {
+            existingLocation.parentLocation = null
             parentLocation.removeFromLocations(existingLocation)
+            parentLocation.save(flush: true)
+        }
+        def zone = existingLocation.zone
+        if (zone) {
+            existingLocation.zone = null
+            zone.removeFromLocations(existingLocation)
+            zone.save(flush: true)
         }
         existingLocation.delete(flush: true)
 

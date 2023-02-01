@@ -199,7 +199,12 @@
             </div>
         </div>
     </h2>
-    <input type="text" id="stockHistoryFilter" class="text large" placeholder="Filter by serial number or lot number"/>
+    <input
+        type="text"
+        id="stockHistoryFilter"
+        class="text large"
+        placeholder="${g.message(code: 'inventory.stockHistory.search.label', default: 'Filter by serial number or lot number')}"
+    />
     <table id="stockHistoryTable" class="stockHistory">
         <thead>
             <tr class="odd">
@@ -219,7 +224,8 @@
                     ${warehouse.message(code: 'transaction.label')}
                 </th>
                 <th>
-                    ${warehouse.message(code: 'default.originOrDestination.label', default: "Origin / Destination")}
+                    ${warehouse.message(code: 'default.origin.label', default: "Origin")}&nbsp;/&nbsp;
+                    ${warehouse.message(code: 'order.destination.label', default: "Destination")}
                 </th>
                 <th class="border-right">
                     ${warehouse.message(code: 'default.reference.label')}
@@ -235,16 +241,16 @@
                 </th>
 
                 <th class="border-right center" width="7%">
-                    ${warehouse.message(code: 'transaction.count.label', default: 'Count')}
+                    ${warehouse.message(code: 'default.count.label', default: 'Count')}
                 </th>
                 <th class="border-right center" width="7%">
-                    ${warehouse.message(code: 'transaction.credit.label', default: 'Credit')}
+                    ${warehouse.message(code: 'default.credit.label', default: 'Credit')}
                 </th>
                 <th class="border-right center" width="7%">
-                    ${warehouse.message(code: 'transaction.debit.label', default: 'Debit')}
+                    ${warehouse.message(code: 'default.debit.label', default: 'Debit')}
                 </th>
                 <th class="center" width="7%">
-                    ${warehouse.message(code: 'stockCard.balance.label', default: 'Balance')}
+                    ${warehouse.message(code: 'report.quantityBalance.label', default: 'Balance')}
                 </th>
             </tr>
         </thead>
@@ -265,7 +271,11 @@
                 <g:each var="month" in="${year.value}">
                     <tr class="monthRow border-top ${isCurrentYear ? 'currentYear' : ''}">
                         <td colspan="14" class="icon  ${isCurrentYear ? 'active' : ''}">
-                            ${new java.text.DateFormatSymbols().months[(month.key).toInteger()]} ${year.key}
+                            <g:message
+                                code="month.${(month.key).toInteger() + 1}.label"
+                                default="${new java.text.DateFormatSymbols().months[(month.key).toInteger()]}"
+                            />
+                            ${year.key}
                         </td>
                     </tr>
                     <g:each var="stockHistoryEntry" in="${month.value}">
@@ -373,7 +383,10 @@
                                         <g:elseif test="${shipment?.isFromReturnOrder}">
                                             <g:link controller="stockMovement" action="show" id="${shipment?.id}">
                                                 <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
-                                                    ${shipment?.returnOrder?.orderType?.name}
+                                                    <g:message
+                                                        code="order.orderType.code.${shipment?.returnOrder?.orderType?.code}"
+                                                        default="${shipment?.returnOrder?.orderType?.name}"
+                                                    />
                                                     &rsaquo;
                                                     ${shipment?.shipmentNumber}
                                                 </div>
@@ -403,7 +416,10 @@
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order }">
                                             <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
-                                                    ${stockHistoryEntry?.transaction?.order?.orderType?.name}
+                                                    <g:message
+                                                        code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
+                                                        default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
+                                                    />
                                                     &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
                                                 </div>
@@ -428,7 +444,7 @@
 
                             <td class="border-right middle">
                                 <div class="line">
-                                    <span>
+                                    <span class="d-flex">
                                         <g:if test="${stockHistoryEntry?.binLocation}">
                                             <g:if test="${stockHistoryEntry?.binLocation?.zone}">
                                                 <span class="line-base" title="${stockHistoryEntry?.binLocation?.zone?.name}">
@@ -446,10 +462,12 @@
                                     <g:if test="${stockHistoryEntry?.isInternal}">
                                         <span>&nbsp;&rsaquo;&nbsp;</span>
                                         <g:if test="${stockHistoryEntry?.destinationBinLocation}">
-                                            <span>
+                                            <span class="line-base" title="${stockHistoryEntry?.destinationBinLocation?.zone?.name}">
                                                 <g:if test="${stockHistoryEntry?.destinationBinLocation?.zone}">
                                                     ${stockHistoryEntry?.destinationBinLocation?.zone?.name}
                                                 </g:if>
+                                            </span>
+                                            <span class="line-extension" title="${stockHistoryEntry?.destinationBinLocation?.name}">
                                                 ${stockHistoryEntry?.destinationBinLocation?.name}
                                             </span>
                                         </g:if>

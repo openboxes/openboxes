@@ -16,7 +16,7 @@ const StockMovementOutboundHeader = ({ showMyStockMovements, isRequestsOpen }) =
             defaultMessage="Request List"
           />)
           : (<Translate
-            id="react.stockMovement.Outbound.list.label"
+            id="react.stockMovement.outbound.list.label"
             defaultMessage="Outbound Movement List"
           />)
       }

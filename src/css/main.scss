@@ -123,34 +123,6 @@ body {
   white-space: pre;
 }
 
-.breadcrumbs-container {
-  padding-left: 10px;
-  width: 100%;
-  height: 34px;
-  background-image: linear-gradient(white, $white-alpha);
-  justify-content: flex-start;
-  align-items: center;
-  line-height: 30px;
-  color: $gray-beta;
-  border-bottom: solid 1px $gray-alpha;
-  flex-wrap: wrap;
-
-  a {
-    text-decoration: none;
-    color: $gray-zeta;
-  }
-}
-
-.item-breadcrumbs {
-  margin-left: 10px;
-}
-
-@media (max-width: 600px) {
-  .item-breadcrumbs {
-    font-size: 0.5em;
-  }
-}
-
 .footer {
   bottom: 0;
   vertical-align: middle;
@@ -165,6 +137,24 @@ body {
   div {
     a {
       color: $gray-delta;
+      padding: 1px;
+    }
+
+    button {
+      color: $gray-delta;
+      background: none;
+      border: none;
+      padding: 1px;
+
+      &:focus {
+        background: none;
+        border: none;
+        outline: 0;
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }
@@ -203,6 +193,23 @@ body {
 .filter-group {
   font-size: 14px;
   min-width: 200px;
+}
+
+.filter-form {
+  .filter-group {
+    min-width: unset;
+  }
+  .filter-select {
+    min-width: unset!important;
+
+    .filter-select__placeholder, .filter-select__single-value {
+      position: relative !important;
+      transform: unset;
+      -webkit-transform: unset;
+      margin-left: -12px;
+      order: 1;
+    }
+  }
 }
 
 .flex-1 {
@@ -458,10 +465,12 @@ body {
 }
 
 .has-error .form-control,
-.has-error .react-select__control {
+.has-error .react-select__control,
+.has-error > input {
   border: 2px solid $red-beta;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  border-radius: 4px;
 }
 
 .has-error .form-control:focus {
@@ -900,7 +909,6 @@ div.crossed-out .table-inner-row:before {
   color: #FFFFFF;
 }
 
-
 // Overriding built-in tooltip-style (react-tippy)
 .tippy-tooltip {
   padding: 0 !important;
@@ -921,6 +929,15 @@ div.search-input {
   background: #FFFFFF;
   border: 1px solid var(--gray-300);
   border-radius: 2px;
+
+  &.search-input-has-value {
+    border: 1px solid var(--blue-primary);
+    button {
+      svg {
+        color: var(--blue-primary)
+      }
+    }
+  }
 
   input {
     flex: 1;

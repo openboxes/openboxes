@@ -3,7 +3,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="custom" />
 	<g:set var="entityName" value="${warehouse.message(code: 'default.comment.label', default: 'Comment').toLowerCase()}" />
-	<title><warehouse:message code="default.add.label" args="[entityName]" /></title>	
+	<title><warehouse:message code="default.add.label" args="[entityName]" /></title>
 </head>
 
 <body>
@@ -38,8 +38,17 @@
 								<td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" /></label></td>
 								<td valign="top" class="value ${hasErrors(bean: commentInstance, field: 'recipient', 'errors')}">
 									<div style="width:300px">
-										<g:select id="recipient.id" class="chzn-select-deselect" name='recipient.id' noSelection="${['':'Select one ...']}"
-												  from='${org.pih.warehouse.core.User.list()}' optionKey="id" optionValue="name" value="${commentInstance?.recipient?.id }"></g:select>
+										<g:select
+											id="recipient.id"
+											class="chzn-select-deselect"
+											name='recipient.id'
+											noSelection="['':'']"
+											from='${org.pih.warehouse.core.User.list()}'
+											optionKey="id"
+											optionValue="name"
+											value="${commentInstance?.recipient?.id }"
+											data-placeholder="${g.message(code: 'default.selectOne.label', default: 'Select one...')}"
+										/>
 									</div>
 								</td>
 							</tr>
@@ -69,5 +78,11 @@
 			</div>
 		</div>
 	</div>
+<script>
+	$(document).ready(function() {
+		const orderType = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
+		applyActiveSection(orderType);
+	});
+</script>
 </body>
 </html>

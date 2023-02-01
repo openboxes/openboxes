@@ -3,12 +3,10 @@ import _ from 'lodash';
 import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
-  FETCH_BREADCRUMBS_CONFIG,
   FETCH_MENU_CONFIG,
   FETCH_SESSION_INFO,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
-  UPDATE_BREADCRUMBS_PARAMS,
 } from 'actions/types';
 
 const initialState = {
@@ -26,6 +24,7 @@ const initialState = {
   isUserApprover: false,
   supportedActivities: [],
   menuConfig: [],
+  menuSectionsUrlParts: {},
   activeLanguage: '',
   fetchedTranslations: {
     default: false,
@@ -69,12 +68,12 @@ const initialState = {
   pageSize: 50,
   logoUrl: '',
   supportedLocales: [],
-  breadcrumbsParams: [],
-  breadcrumbsConfig: [],
   currencyCode: '',
   localizedHelpScoutKey: '',
   isHelpScoutEnabled: false,
   loading: false,
+  localizationModeEnabled: false,
+  localizationModeLocale: 'ach',
 };
 
 export default function (state = initialState, action) {
@@ -112,11 +111,14 @@ export default function (state = initialState, action) {
         localizedHelpScoutKey: _.get(action, 'payload.data.data.localizedHelpScoutKey'),
         isHelpScoutEnabled: _.get(action, 'payload.data.data.isHelpScoutEnabled'),
         loading: false,
+        localizationModeEnabled: _.get(action, 'payload.data.data.localizationModeEnabled', false),
+        localizationModeLocale: _.get(action, 'payload.data.data.localizationModeLocale', 'ach'),
       };
     case FETCH_MENU_CONFIG:
       return {
         ...state,
         menuConfig: _.get(action, 'payload.data.data.menuConfig'),
+        menuSectionsUrlParts: _.get(action, 'payload.data.data.menuSectionsUrlParts'),
       };
     case CHANGE_CURRENT_LOCATION:
       return { ...state, currentLocation: action.payload, loading: true };
@@ -131,16 +133,6 @@ export default function (state = initialState, action) {
       return {
         ...state,
         userActionMenuOpen: action.payload,
-      };
-    case UPDATE_BREADCRUMBS_PARAMS:
-      return {
-        ...state,
-        breadcrumbsParams: action.payload,
-      };
-    case FETCH_BREADCRUMBS_CONFIG:
-      return {
-        ...state,
-        breadcrumbsConfig: action.payload,
       };
     default:
       return state;

@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { fetchTranslations } from 'actions';
+import useTranslation from 'hooks/useTranslation';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 
 // eslint-disable-next-line no-shadow
-const ResettingInstanceInfoPage = ({ locale, history, fetchTranslations }) => {
+const ResettingInstanceInfoPage = ({ history }) => {
   const [resettingInstanceCommand, setResettingInstanceCommand] = useState('');
 
-  useEffect(() => {
-    fetchTranslations(locale, 'resetInstance');
-  }, [locale]);
+  useTranslation('resetInstance');
 
   useEffect(() => {
     apiClient.get('/openboxes/api/resettingInstance/command').then((response) => {
@@ -45,18 +42,8 @@ const ResettingInstanceInfoPage = ({ locale, history, fetchTranslations }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  locale: state.session.activeLanguage,
-});
-
-const mapDispatchToProps = {
-  fetchTranslations,
-};
-
 ResettingInstanceInfoPage.propTypes = {
-  locale: PropTypes.string.isRequired,
-  fetchTranslations: PropTypes.func.isRequired,
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResettingInstanceInfoPage));
+export default withRouter(ResettingInstanceInfoPage);

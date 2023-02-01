@@ -1,0 +1,1170 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`wizard component should match snapshot 1`] = `
+<div
+  className="content-wrap"
+  data-testid="content-wrap"
+>
+  <div
+    className="panel-heading movement-number"
+    data-testid="wizardTitle"
+  >
+    <div>
+      <span
+        style={
+          {
+            "color": undefined,
+          }
+        }
+      >
+        <span
+          style={
+            {
+              "color": "black",
+            }
+          }
+        />
+      </span>
+    </div>
+  </div>
+  <div
+    className="steps-main-box"
+  >
+    <div
+      className="steps-inside-wrapper"
+    >
+      <div
+        className="step-container active"
+        data-testid="active"
+      >
+        <div
+          className="circle"
+          disabled={true}
+          onClick={[Function]}
+          onKeyPress={[Function]}
+          role="button"
+          tabIndex="0"
+        />
+        <div
+          className="step-name"
+        >
+          Create
+        </div>
+      </div>
+      <div
+        className="step-container "
+        data-testid="inactive"
+      >
+        <div
+          className="circle"
+          disabled={true}
+          onClick={[Function]}
+          onKeyPress={[Function]}
+          role="button"
+          tabIndex="0"
+        />
+        <div
+          className="step-name"
+        >
+          Add items
+        </div>
+      </div>
+      <div
+        className="step-container "
+        data-testid="inactive"
+      >
+        <div
+          className="circle"
+          disabled={true}
+          onClick={[Function]}
+          onKeyPress={[Function]}
+          role="button"
+          tabIndex="0"
+        />
+        <div
+          className="step-name"
+        >
+          Confirm
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="panel panel-primary"
+  >
+    <div
+      className="panel-body m-4"
+      data-testid="wizardPage"
+    >
+      <form
+        onSubmit={[Function]}
+      >
+        <div
+          className="classic-form with-description"
+        >
+          <div
+            className="mt-2  mb-0 mx-1 form-group   "
+          >
+            <div
+              className="row"
+            >
+              <label
+                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                htmlFor="invoiceNumber"
+              >
+                Invoice number
+              </label>
+              <div
+                className="form-element-container col-md-4 col-7"
+              >
+                <input
+                  className="form-control form-control-xs  "
+                  data-testid="input"
+                  disabled={true}
+                  id="invoiceNumber"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  onDragStart={[Function]}
+                  onFocus={[Function]}
+                  onKeyDown={[Function]}
+                  onKeyPress={[Function]}
+                  onKeyUp={[Function]}
+                  onWheel={[Function]}
+                  type="text"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-2 hidden"
+              />
+              <div
+                className="help-block"
+                style={
+                  {
+                    "float": "left",
+                  }
+                }
+              >
+                
+              </div>
+            </div>
+          </div>
+          <div
+            className="mt-2  mb-0 mx-1 form-group required  "
+          >
+            <div
+              className="row"
+            >
+              <label
+                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                htmlFor="vendor"
+              >
+                Vendor
+              </label>
+              <div
+                className="form-element-container col-md-4 col-7"
+              >
+                <div
+                  id="select-id_1-container"
+                >
+                  <div
+                    className=""
+                    style={
+                      {
+                        "display": "inline",
+                      }
+                    }
+                    title=" "
+                  >
+                    <div
+                      className="css-1pcexqc-container select-xs undefined"
+                      id="select-id_1"
+                      onKeyDown={[Function]}
+                    >
+                      <div
+                        className="css-bg1rzq-control react-select__control"
+                        onMouseDown={[Function]}
+                        onTouchEnd={[Function]}
+                      >
+                        <div
+                          className="css-1hwfws3 react-select__value-container"
+                        >
+                          <div
+                            className="css-151xaom-placeholder react-select__placeholder"
+                          />
+                          <div
+                            className="css-1g6gooi"
+                          >
+                            <div
+                              className="react-select__input"
+                              style={
+                                {
+                                  "display": "inline-block",
+                                }
+                              }
+                            >
+                              <input
+                                aria-autocomplete="list"
+                                autoCapitalize="none"
+                                autoComplete="off"
+                                autoCorrect="off"
+                                disabled={false}
+                                id="react-select-2-input"
+                                onBlur={[Function]}
+                                onChange={[Function]}
+                                onFocus={[Function]}
+                                spellCheck="false"
+                                style={
+                                  {
+                                    "background": 0,
+                                    "border": 0,
+                                    "boxSizing": "content-box",
+                                    "color": "inherit",
+                                    "fontSize": "inherit",
+                                    "label": "input",
+                                    "opacity": 1,
+                                    "outline": 0,
+                                    "padding": 0,
+                                    "width": "1px",
+                                  }
+                                }
+                                tabIndex="0"
+                                type="text"
+                                value=""
+                              />
+                              <div
+                                style={
+                                  {
+                                    "height": 0,
+                                    "left": 0,
+                                    "overflow": "scroll",
+                                    "position": "absolute",
+                                    "top": 0,
+                                    "visibility": "hidden",
+                                    "whiteSpace": "pre",
+                                  }
+                                }
+                              >
+                                
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className="css-1wy0on6 react-select__indicators"
+                        >
+                          <span
+                            className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                          />
+                          <div
+                            aria-hidden="true"
+                            className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
+                            onMouseDown={[Function]}
+                            onTouchEnd={[Function]}
+                          >
+                            <svg
+                              aria-hidden="true"
+                              className="css-19bqh2r"
+                              focusable="false"
+                              height={20}
+                              viewBox="0 0 20 20"
+                              width={20}
+                            >
+                              <path
+                                d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <input
+                        name="select-id_1"
+                        type="hidden"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-2 hidden"
+              />
+              <div
+                className="help-block"
+                style={
+                  {
+                    "float": "left",
+                  }
+                }
+              >
+                
+              </div>
+            </div>
+          </div>
+          <div
+            className="mt-2  mb-0 mx-1 form-group required  "
+          >
+            <div
+              className="row"
+            >
+              <label
+                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                htmlFor="vendorInvoiceNumber"
+              >
+                Vendor Invoice Number
+              </label>
+              <div
+                className="form-element-container col-md-4 col-7"
+              >
+                <input
+                  className="form-control form-control-xs  "
+                  data-testid="input"
+                  id="vendorInvoiceNumber"
+                  onBlur={[Function]}
+                  onChange={[Function]}
+                  onDragStart={[Function]}
+                  onFocus={[Function]}
+                  onKeyDown={[Function]}
+                  onKeyPress={[Function]}
+                  onKeyUp={[Function]}
+                  onWheel={[Function]}
+                  type="text"
+                  value=""
+                />
+              </div>
+            </div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-2 hidden"
+              />
+              <div
+                className="help-block"
+                style={
+                  {
+                    "float": "left",
+                  }
+                }
+              >
+                
+              </div>
+            </div>
+          </div>
+          <div
+            className="mt-2  mb-0 mx-1 form-group required  "
+          >
+            <div
+              className="row"
+            >
+              <label
+                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                htmlFor="dateInvoiced"
+              >
+                Invoice Date
+              </label>
+              <div
+                className="form-element-container col-md-4 col-7"
+              >
+                <div
+                  className="date-field"
+                >
+                  <div>
+                    <div
+                      className="react-datepicker-wrapper"
+                    >
+                      <div
+                        className="react-datepicker__input-container"
+                      >
+                        <input
+                          autoComplete="off"
+                          className="form-control form-control-xs "
+                          disabled={false}
+                          id="dateInvoiced"
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onClick={[Function]}
+                          onFocus={[Function]}
+                          onKeyDown={[Function]}
+                          readOnly={false}
+                          type="text"
+                          value=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-2 hidden"
+              />
+              <div
+                className="help-block"
+                style={
+                  {
+                    "float": "left",
+                  }
+                }
+              >
+                
+              </div>
+            </div>
+          </div>
+          <div
+            className="mt-2  mb-0 mx-1 form-group required  "
+          >
+            <div
+              className="row"
+            >
+              <label
+                className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+                htmlFor="currencyUom"
+              >
+                Currency
+              </label>
+              <div
+                className="form-element-container col-md-4 col-7"
+              >
+                <div
+                  id="select-id_2-container"
+                >
+                  <div
+                    className=""
+                    style={
+                      {
+                        "display": "inline",
+                      }
+                    }
+                    title=" "
+                  >
+                    <div
+                      className="css-1pcexqc-container select-xs undefined"
+                      id="select-id_2"
+                      onKeyDown={[Function]}
+                    >
+                      <div
+                        className="css-bg1rzq-control react-select__control"
+                        onMouseDown={[Function]}
+                        onTouchEnd={[Function]}
+                      >
+                        <div
+                          className="css-1hwfws3 react-select__value-container"
+                        >
+                          <div
+                            className="css-151xaom-placeholder react-select__placeholder"
+                          />
+                          <div
+                            className="css-1g6gooi"
+                          >
+                            <div
+                              className="react-select__input"
+                              style={
+                                {
+                                  "display": "inline-block",
+                                }
+                              }
+                            >
+                              <input
+                                aria-autocomplete="list"
+                                autoCapitalize="none"
+                                autoComplete="off"
+                                autoCorrect="off"
+                                disabled={false}
+                                id="react-select-3-input"
+                                onBlur={[Function]}
+                                onChange={[Function]}
+                                onFocus={[Function]}
+                                spellCheck="false"
+                                style={
+                                  {
+                                    "background": 0,
+                                    "border": 0,
+                                    "boxSizing": "content-box",
+                                    "color": "inherit",
+                                    "fontSize": "inherit",
+                                    "label": "input",
+                                    "opacity": 1,
+                                    "outline": 0,
+                                    "padding": 0,
+                                    "width": "1px",
+                                  }
+                                }
+                                tabIndex="0"
+                                type="text"
+                                value=""
+                              />
+                              <div
+                                style={
+                                  {
+                                    "height": 0,
+                                    "left": 0,
+                                    "overflow": "scroll",
+                                    "position": "absolute",
+                                    "top": 0,
+                                    "visibility": "hidden",
+                                    "whiteSpace": "pre",
+                                  }
+                                }
+                              >
+                                
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className="css-1wy0on6 react-select__indicators"
+                        >
+                          <span
+                            className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                          />
+                          <div
+                            aria-hidden="true"
+                            className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
+                            onMouseDown={[Function]}
+                            onTouchEnd={[Function]}
+                          >
+                            <svg
+                              aria-hidden="true"
+                              className="css-19bqh2r"
+                              focusable="false"
+                              height={20}
+                              viewBox="0 0 20 20"
+                              width={20}
+                            >
+                              <path
+                                d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <input
+                        name="select-id_2"
+                        type="hidden"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-2 hidden"
+              />
+              <div
+                className="help-block"
+                style={
+                  {
+                    "float": "left",
+                  }
+                }
+              >
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="submit-buttons"
+        >
+          <button
+            className="btn btn-outline-primary float-right btn-xs"
+            type="submit"
+          >
+            Next
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`wizardPage component should match snapshot 1`] = `
+<div
+  className="panel-body m-4"
+  data-testid="wizardPage"
+>
+  <form
+    onSubmit={[Function]}
+  >
+    <div
+      className="classic-form with-description"
+    >
+      <div
+        className="mt-2  mb-0 mx-1 form-group   "
+      >
+        <div
+          className="row"
+        >
+          <label
+            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+            htmlFor="invoiceNumber"
+          >
+            Invoice number
+          </label>
+          <div
+            className="form-element-container col-md-4 col-7"
+          >
+            <input
+              className="form-control form-control-xs  "
+              data-testid="input"
+              disabled={true}
+              id="invoiceNumber"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onDragStart={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyPress={[Function]}
+              onKeyUp={[Function]}
+              onWheel={[Function]}
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-md-2 hidden"
+          />
+          <div
+            className="help-block"
+            style={
+              {
+                "float": "left",
+              }
+            }
+          >
+            
+          </div>
+        </div>
+      </div>
+      <div
+        className="mt-2  mb-0 mx-1 form-group required  "
+      >
+        <div
+          className="row"
+        >
+          <label
+            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+            htmlFor="vendor"
+          >
+            Vendor
+          </label>
+          <div
+            className="form-element-container col-md-4 col-7"
+          >
+            <div
+              id="select-id_5-container"
+            >
+              <div
+                className=""
+                style={
+                  {
+                    "display": "inline",
+                  }
+                }
+                title=" "
+              >
+                <div
+                  className="css-1pcexqc-container select-xs undefined"
+                  id="select-id_5"
+                  onKeyDown={[Function]}
+                >
+                  <div
+                    className="css-bg1rzq-control react-select__control"
+                    onMouseDown={[Function]}
+                    onTouchEnd={[Function]}
+                  >
+                    <div
+                      className="css-1hwfws3 react-select__value-container"
+                    >
+                      <div
+                        className="css-151xaom-placeholder react-select__placeholder"
+                      />
+                      <div
+                        className="css-1g6gooi"
+                      >
+                        <div
+                          className="react-select__input"
+                          style={
+                            {
+                              "display": "inline-block",
+                            }
+                          }
+                        >
+                          <input
+                            aria-autocomplete="list"
+                            autoCapitalize="none"
+                            autoComplete="off"
+                            autoCorrect="off"
+                            disabled={false}
+                            id="react-select-6-input"
+                            onBlur={[Function]}
+                            onChange={[Function]}
+                            onFocus={[Function]}
+                            spellCheck="false"
+                            style={
+                              {
+                                "background": 0,
+                                "border": 0,
+                                "boxSizing": "content-box",
+                                "color": "inherit",
+                                "fontSize": "inherit",
+                                "label": "input",
+                                "opacity": 1,
+                                "outline": 0,
+                                "padding": 0,
+                                "width": "1px",
+                              }
+                            }
+                            tabIndex="0"
+                            type="text"
+                            value=""
+                          />
+                          <div
+                            style={
+                              {
+                                "height": 0,
+                                "left": 0,
+                                "overflow": "scroll",
+                                "position": "absolute",
+                                "top": 0,
+                                "visibility": "hidden",
+                                "whiteSpace": "pre",
+                              }
+                            }
+                          >
+                            
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="css-1wy0on6 react-select__indicators"
+                    >
+                      <span
+                        className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                      />
+                      <div
+                        aria-hidden="true"
+                        className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
+                        onMouseDown={[Function]}
+                        onTouchEnd={[Function]}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="css-19bqh2r"
+                          focusable="false"
+                          height={20}
+                          viewBox="0 0 20 20"
+                          width={20}
+                        >
+                          <path
+                            d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <input
+                    name="select-id_5"
+                    type="hidden"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-md-2 hidden"
+          />
+          <div
+            className="help-block"
+            style={
+              {
+                "float": "left",
+              }
+            }
+          >
+            
+          </div>
+        </div>
+      </div>
+      <div
+        className="mt-2  mb-0 mx-1 form-group required  "
+      >
+        <div
+          className="row"
+        >
+          <label
+            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+            htmlFor="vendorInvoiceNumber"
+          >
+            Vendor Invoice Number
+          </label>
+          <div
+            className="form-element-container col-md-4 col-7"
+          >
+            <input
+              className="form-control form-control-xs  "
+              data-testid="input"
+              id="vendorInvoiceNumber"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onDragStart={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyPress={[Function]}
+              onKeyUp={[Function]}
+              onWheel={[Function]}
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-md-2 hidden"
+          />
+          <div
+            className="help-block"
+            style={
+              {
+                "float": "left",
+              }
+            }
+          >
+            
+          </div>
+        </div>
+      </div>
+      <div
+        className="mt-2  mb-0 mx-1 form-group required  "
+      >
+        <div
+          className="row"
+        >
+          <label
+            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+            htmlFor="dateInvoiced"
+          >
+            Invoice Date
+          </label>
+          <div
+            className="form-element-container col-md-4 col-7"
+          >
+            <div
+              className="date-field"
+            >
+              <div>
+                <div
+                  className="react-datepicker-wrapper"
+                >
+                  <div
+                    className="react-datepicker__input-container"
+                  >
+                    <input
+                      autoComplete="off"
+                      className="form-control form-control-xs "
+                      disabled={false}
+                      id="dateInvoiced"
+                      onBlur={[Function]}
+                      onChange={[Function]}
+                      onClick={[Function]}
+                      onFocus={[Function]}
+                      onKeyDown={[Function]}
+                      readOnly={false}
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-md-2 hidden"
+          />
+          <div
+            className="help-block"
+            style={
+              {
+                "float": "left",
+              }
+            }
+          >
+            
+          </div>
+        </div>
+      </div>
+      <div
+        className="mt-2  mb-0 mx-1 form-group required  "
+      >
+        <div
+          className="row"
+        >
+          <label
+            className="col-md-2 col-7 col-form-label col-form-label-xs text-center  text-md-right"
+            htmlFor="currencyUom"
+          >
+            Currency
+          </label>
+          <div
+            className="form-element-container col-md-4 col-7"
+          >
+            <div
+              id="select-id_6-container"
+            >
+              <div
+                className=""
+                style={
+                  {
+                    "display": "inline",
+                  }
+                }
+                title=" "
+              >
+                <div
+                  className="css-1pcexqc-container select-xs undefined"
+                  id="select-id_6"
+                  onKeyDown={[Function]}
+                >
+                  <div
+                    className="css-bg1rzq-control react-select__control"
+                    onMouseDown={[Function]}
+                    onTouchEnd={[Function]}
+                  >
+                    <div
+                      className="css-1hwfws3 react-select__value-container"
+                    >
+                      <div
+                        className="css-151xaom-placeholder react-select__placeholder"
+                      />
+                      <div
+                        className="css-1g6gooi"
+                      >
+                        <div
+                          className="react-select__input"
+                          style={
+                            {
+                              "display": "inline-block",
+                            }
+                          }
+                        >
+                          <input
+                            aria-autocomplete="list"
+                            autoCapitalize="none"
+                            autoComplete="off"
+                            autoCorrect="off"
+                            disabled={false}
+                            id="react-select-7-input"
+                            onBlur={[Function]}
+                            onChange={[Function]}
+                            onFocus={[Function]}
+                            spellCheck="false"
+                            style={
+                              {
+                                "background": 0,
+                                "border": 0,
+                                "boxSizing": "content-box",
+                                "color": "inherit",
+                                "fontSize": "inherit",
+                                "label": "input",
+                                "opacity": 1,
+                                "outline": 0,
+                                "padding": 0,
+                                "width": "1px",
+                              }
+                            }
+                            tabIndex="0"
+                            type="text"
+                            value=""
+                          />
+                          <div
+                            style={
+                              {
+                                "height": 0,
+                                "left": 0,
+                                "overflow": "scroll",
+                                "position": "absolute",
+                                "top": 0,
+                                "visibility": "hidden",
+                                "whiteSpace": "pre",
+                              }
+                            }
+                          >
+                            
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="css-1wy0on6 react-select__indicators"
+                    >
+                      <span
+                        className="css-bgvzuu-indicatorSeparator react-select__indicator-separator"
+                      />
+                      <div
+                        aria-hidden="true"
+                        className="css-16pqwjk-indicatorContainer react-select__indicator react-select__dropdown-indicator"
+                        onMouseDown={[Function]}
+                        onTouchEnd={[Function]}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="css-19bqh2r"
+                          focusable="false"
+                          height={20}
+                          viewBox="0 0 20 20"
+                          width={20}
+                        >
+                          <path
+                            d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <input
+                    name="select-id_6"
+                    type="hidden"
+                    value=""
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="row"
+        >
+          <div
+            className="col-md-2 hidden"
+          />
+          <div
+            className="help-block"
+            style={
+              {
+                "float": "left",
+              }
+            }
+          >
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="submit-buttons"
+    >
+      <button
+        className="btn btn-outline-primary float-right btn-xs"
+        type="submit"
+      >
+        Next
+      </button>
+    </div>
+  </form>
+</div>
+`;
+
+exports[`wizardSteps component should match snapshot 1`] = `
+<div
+  className="steps-main-box"
+>
+  <div
+    className="steps-inside-wrapper"
+  >
+    <div
+      className="step-container active"
+      data-testid="active"
+    >
+      <div
+        className="circle"
+        disabled={true}
+        onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
+      >
+        firstTestStep
+      </div>
+    </div>
+    <div
+      className="step-container "
+      data-testid="inactive"
+    >
+      <div
+        className="circle"
+        disabled={true}
+        onClick={[Function]}
+        onKeyPress={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+      <div
+        className="step-name"
+      >
+        secondTestStep
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`wizardTitle component should match snapshot 1`] = `
+<div
+  className="panel-heading movement-number"
+  data-testid="wizardTitle"
+>
+  <div>
+    <span
+      style={
+        {
+          "color": undefined,
+        }
+      }
+    >
+      <span
+        style={
+          {
+            "color": "black",
+          }
+        }
+      />
+    </span>
+  </div>
+</div>
+`;

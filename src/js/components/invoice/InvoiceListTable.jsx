@@ -1,23 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 
-import { CancelToken } from 'axios';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import queryString from 'query-string';
 import {
   RiFileLine,
   RiInformationLine,
   RiPencilLine,
 } from 'react-icons/all';
-import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
+import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
 import ActionDots from 'utils/ActionDots';
-import apiClient from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
-import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
 
@@ -27,38 +23,13 @@ const InvoiceListTable = ({
   supportedActivities,
   highestRole,
   invoiceStatuses,
-  translate,
-  currentLocation,
 }) => {
-  const [invoiceData, setInvoiceData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pages, setPages] = useState(-1);
-  const [totalData, setTotalData] = useState(0);
-  // Stored searching params for export case
-
-  // Util ref for react-table to force the fetch of data
-  const tableRef = useRef(null);
-
-  // Cancel token/signal for fetching data
-  const sourceRef = useRef(CancelToken.source());
-
-  useEffect(() => () => {
-    if (currentLocation?.id) {
-      sourceRef.current.cancel('Fetching canceled');
-    }
-  }, [currentLocation?.id]);
-
-  const fireFetchData = () => {
-    sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
-  };
-
-  // If filterParams change, refetch the data with applied filters
-  useEffect(() => fireFetchData(), [filterParams]);
-
+  const {
+    tableRef, tableData, loading, onFetchHandler,
+  } = useInvoiceListTableData(filterParams);
 
   // List of all actions for invoice rows
-  const actions = [
+  const actions = useMemo(() => [
     {
       label: 'react.invoice.viewDetails.label',
       defaultLabel: 'View Invoice Details',
@@ -66,7 +37,7 @@ const InvoiceListTable = ({
       href: '/openboxes/invoice/show',
     },
     {
-      label: 'react.purchaseOrder.addDocument.label',
+      label: 'react.invoice.addDocument.label',
       defaultLabel: 'Add document',
       leftIcon: <RiFileLine />,
       href: '/openboxes/invoice/addDocument',
@@ -77,10 +48,10 @@ const InvoiceListTable = ({
       leftIcon: <RiPencilLine />,
       href: '/openboxes/invoice/create',
     },
-  ];
+  ], []);
 
   // Columns for react-table
-  const columns = [
+  const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
@@ -95,7 +66,7 @@ const InvoiceListTable = ({
         />),
     },
     {
-      Header: '# items',
+      Header: <Translate id="react.invoice.column.itemCount.label" defaultMessage="# items" />,
       accessor: 'itemCount',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -103,7 +74,7 @@ const InvoiceListTable = ({
       Cell: row => (<TableCell {...row} defaultValue={0} className="items-count-circle" />),
     },
     {
-      Header: 'Status',
+      Header: <Translate id="react.invoice.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       width: 250,
       Cell: (row) => {
@@ -113,83 +84,38 @@ const InvoiceListTable = ({
       },
     },
     {
-      Header: 'Invoice Type',
+      Header: <Translate id="react.invoice.typeCode.label" defaultMessage="Invoice Type" />,
       accessor: 'invoiceTypeCode',
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Invoice Number',
+      Header: <Translate id="react.invoice.column.invoiceNumber.label" defaultMessage="Invoice Number" />,
       accessor: 'invoiceNumber',
       sortable: false,
       Cell: row => <TableCell {...row} link={`/openboxes/invoice/show/${row.original.id}`} />,
     },
     {
-      Header: 'Vendor',
+      Header: <Translate id="react.invoice.vendor.label" defaultMessage="Vendor" />,
       accessor: 'partyCode',
     },
     {
-      Header: 'Vendor invoice number',
+      Header: <Translate id="react.invoice.column.vendorInvoiceNumber" defaultMessage="Vendor invoice number" />,
       accessor: 'vendorInvoiceNumber',
       minWidth: 200,
       Cell: row => (<TableCell {...row} tooltip />),
     },
     {
-      Header: 'Total Value',
+      Header: <Translate id="react.invoice.column.totalValue" defaultMessage="Total Value" />,
       accessor: 'totalValue',
       headerClassName: 'text-left',
       sortable: false,
     },
     {
-      Header: 'Currency',
+      Header: <Translate id="react.invoice.column.currency" defaultMessage="Currency" />,
       accessor: 'currency',
       className: 'text-left',
     },
-  ];
-
-
-  const onFetchHandler = (state) => {
-    if (!_.isEmpty(filterParams)) {
-      const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-      const sortingParams = state.sorted.length > 0 ?
-        {
-          sort: state.sorted[0].id,
-          order: state.sorted[0].desc ? 'desc' : 'asc',
-        } :
-        {
-          sort: 'dateInvoiced',
-          order: 'desc',
-        };
-
-
-      const params = _.omitBy({
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        ...sortingParams,
-        ...filterParams,
-        status: filterParams.status && filterParams.status.value,
-        invoiceTypeCode: filterParams.invoiceTypeCode && filterParams.invoiceTypeCode.id,
-        vendor: filterParams.vendor && filterParams.vendor.id,
-        createdBy: filterParams.createdBy && filterParams.createdBy.id,
-        buyerOrganization: filterParams.buyerOrganization && filterParams.buyerOrganization.id,
-      }, _.isEmpty);
-
-      // Fetch data
-      setLoading(true);
-      apiClient.get('/openboxes/api/invoices', {
-        params,
-        paramsSerializer: parameters => queryString.stringify(parameters),
-        cancelToken: sourceRef.current?.token,
-      })
-        .then((res) => {
-          setLoading(false);
-          setPages(Math.ceil(res.data.totalCount / state.pageSize));
-          setTotalData(res.data.totalCount);
-          setInvoiceData(res.data.data);
-        })
-        .catch(() => Promise.reject(new Error(translate('react.invoice.error.fetching.label', 'Unable to fetch invoices'))));
-    }
-  };
-
+  ], [supportedActivities, highestRole, invoiceStatuses]);
 
   return (
     <div className="list-page-list-section">
@@ -203,11 +129,11 @@ const InvoiceListTable = ({
         sortable
         ref={tableRef}
         columns={columns}
-        data={invoiceData}
+        data={tableData.data}
         loading={loading}
-        totalData={totalData}
+        totalData={tableData.totalCount}
         defaultPageSize={10}
-        pages={pages}
+        pages={tableData.pages}
         onFetchData={onFetchHandler}
         noDataText="No invoices match the given criteria"
       />
@@ -218,10 +144,7 @@ const InvoiceListTable = ({
 const mapStateToProps = state => ({
   supportedActivities: state.session.supportedActivities,
   highestRole: state.session.highestRole,
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  currencyCode: state.session.currencyCode,
   invoiceStatuses: state.invoices.statuses,
-  currentLocation: state.session.currentLocation,
 });
 
 
@@ -238,8 +161,4 @@ InvoiceListTable.propTypes = {
     label: PropTypes.string.isRequired,
     variant: PropTypes.string.isRequired,
   })).isRequired,
-  translate: PropTypes.func.isRequired,
-  currentLocation: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-  }).isRequired,
 };

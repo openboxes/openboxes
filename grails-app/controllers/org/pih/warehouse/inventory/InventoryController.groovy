@@ -138,6 +138,8 @@ class InventoryController {
         command.location = command?.location ?: Location.get(session.warehouse.id)
         def category = params.categoryId ? Category.get(params.categoryId) : productService.getRootCategory()
         command.category = category?.id ? category : null
+        command.catalogs = params.catalogs ? command.catalogs : null
+        command.tags = params.tags ? command.tags : null
         command.maxResults = params?.max as Integer
         command.offset = params?.offset as Integer
         command.searchResults = productAvailabilityService.searchProducts(command)
@@ -1258,11 +1260,7 @@ class InventoryController {
                 if (!transaction?.hasErrors() && transaction?.validate()) {
                     transaction.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
-                    if (productIds.size() > 1) {
-                        redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
-                    } else {
-                        redirect(controller: "inventoryItem", action: "showStockCard", id: productIds)
-                    }
+                    redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
                 }
             } catch (ValidationException e) {
                 log.debug("caught validation exception " + e)

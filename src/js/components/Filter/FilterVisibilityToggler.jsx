@@ -6,31 +6,25 @@ import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/all';
 import BadgeCount from 'components/Filter/BadgeCount';
 import Translate from 'utils/Translate';
 
-const FilterVisibilityToggler = ({ filtersHidden, amountFilled, setFiltersHidden }) => (
-  <button
-    className="d-flex align-items-center hide-filters-button"
-    type="button"
-    onClick={() => setFiltersHidden(!filtersHidden)}
-  >
-    {filtersHidden ?
-      <React.Fragment>
-        <span className="hide-filters-label">
-          <Translate id="react.showFilters.label" defaultMessage="Show Filters" />
-        </span>
-        <BadgeCount count={amountFilled} />
-        <RiArrowDownSLine />
-      </React.Fragment>
-      :
-      <React.Fragment>
-        <span className="hide-filters-label">
-          <Translate id="react.hideFilters.label" defaultMessage="Hide Filters" />
-        </span>
-        <BadgeCount count={amountFilled} />
-        <RiArrowUpSLine />
-      </React.Fragment>
-      }
-  </button>
-);
+const FilterVisibilityToggler = ({ filtersHidden, amountFilled, setFiltersHidden }) => {
+  const labelAttributes = filtersHidden
+    ? { id: 'react.button.showFilters.label', defaultMessage: 'Show Filters' }
+    : { id: 'react.button.hideFilters.label', defaultMessage: 'Hide Filters' };
+
+  return (
+    <button
+      className="d-flex align-items-center hide-filters-button"
+      type="button"
+      onClick={() => setFiltersHidden(!filtersHidden)}
+    >
+      <span className="hide-filters-label">
+        <Translate {...labelAttributes} />
+      </span>
+      { amountFilled > 0 && <BadgeCount count={amountFilled} />}
+      { filtersHidden ? <RiArrowDownSLine /> : <RiArrowUpSLine /> }
+    </button>
+  );
+};
 
 export default FilterVisibilityToggler;
 
