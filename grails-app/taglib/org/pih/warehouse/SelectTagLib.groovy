@@ -335,6 +335,7 @@ class SelectTagLib {
     def selectContainer = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
         attrs.from = shipmentService.getPendingShipments(currentLocation)
+        attrs['data-placeholder'] = attrs['data-placeholder'] ?: g.message(code: 'default.selectAnOption.label', default: 'Select an Option')
         out << render(template: '/taglib/selectContainer', model: [attrs: attrs])
 
     }
@@ -683,7 +684,7 @@ class SelectTagLib {
                 writer.println()
 
                 from.eachWithIndex { el, i ->
-                    if (el.properties[groupBy].equals(optGroup)) {
+                    if (el.properties[groupBy]?.id == optGroup?.id) {
 
                         def keyValue = null
                         writer << '<option '

@@ -14,7 +14,11 @@ export default function (state = initialState, action) {
         const reasonCodes = _.map(action.payload.data, reasonCode => (
           { value: reasonCode.id, id: reasonCode.id, label: reasonCode.name }
         ));
-        return { ...state, data: reasonCodes, fetched: true };
+        return {
+          ...state,
+          data: reasonCodes,
+          fetched: true,
+        };
       }
       return state;
     default:

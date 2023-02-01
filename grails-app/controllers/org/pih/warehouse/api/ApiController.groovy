@@ -74,13 +74,14 @@ class ApiController {
         }
 
         Map menuConfig = grailsApplication.config.openboxes.megamenu;
+        Map menuSectionsUrlParts = grailsApplication.config.openboxes.menuSectionsUrlParts;
         User user = User.get(session?.user?.id)
 
         if (userService.hasHighestRole(user, session?.warehouse?.id, RoleType.ROLE_AUTHENTICATED)) {
             menuConfig = grailsApplication.config.openboxes.requestorMegamenu;
         }
         List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
-        render([data: [menuConfig: translatedMenu]] as JSON)
+        render([data: [menuConfig: translatedMenu, menuSectionsUrlParts: menuSectionsUrlParts]] as JSON)
     }
 
     def getAppContext = {

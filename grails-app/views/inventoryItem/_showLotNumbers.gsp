@@ -111,6 +111,6 @@
 
 			</tbody>
 		</table>
-	</g:form>
+		</g:form>
 </div>
 

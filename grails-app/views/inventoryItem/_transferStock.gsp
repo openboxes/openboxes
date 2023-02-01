@@ -71,7 +71,7 @@
                 <td>
                     <g:selectLocation id="transferTo-${inventoryItem?.id}" name="otherLocation.id" class="chzn-select-deselect trigger-change"
                                       noSelection="['null':'']"
-                                      data-placeholder="Choose where stock is being transferred to ..."
+                                      data-placeholder="${g.message(code: 'inventoryItem.chooseStockTransfer.label', default: 'Choose where stock is being transferred to ...')}"
                                       data-url="${request.contextPath}/inventoryItem/refreshBinLocation"
                                       data-target="#transferTo-binLocation"
                                       value=""/>

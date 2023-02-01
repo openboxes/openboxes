@@ -80,5 +80,14 @@
 		</g:uploadForm>
 	</div>
 </div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		const stockMovementDirection = ${session?.warehouse?.id == stockMovementInstance?.destination?.id}? 'inbound' : 'outbound';
+		applyActiveSection(stockMovementDirection);
+	});
+</script>
+
 </body>
 </html>

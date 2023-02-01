@@ -150,7 +150,7 @@ class FormatTagLib {
             // use the locale specified in the tag if it exists, otherwise use the user locale if it exists, otherwise use the system default locale
             // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
+            Locale locale = attrs.containsKey('locale') ? attrs.locale : (session?.locale ?: session?.user?.locale) ?: defaultLocale
 
             // handle String; localize the string directly
             if (attrs.obj instanceof String) {

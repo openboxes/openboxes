@@ -13,7 +13,12 @@
             <tbody>
                 <g:each var="document" in="${productInstance.documents.findAll { !it.fileUri } }">
                     <tr>
-                        <td>${document?.filename} (<g:link controller="document" action="download" id="${document.id}">download</g:link>)</td>
+                        <td>
+                            ${document?.filename}
+                            (<g:link controller="document" action="download" id="${document.id}">
+                                <g:message code="default.button.download.label" default="Download" />
+                            </g:link>)
+                        </td>
                         <td><format:metadata obj="${document?.documentType}"/></td>
                         <td>${document.contentType}</td>
                         <td class="right">

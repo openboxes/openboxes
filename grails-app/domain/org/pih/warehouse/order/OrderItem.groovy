@@ -138,7 +138,8 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         requestedBy(nullable: true)
         quantity(nullable: false, min: 1)
         quantityUom(nullable: true)
-        quantityPerUom(nullable: false)
+        // Validate quantity per uom != 0 (value as boolean, to catch 0, 0.0 and '')
+        quantityPerUom(nullable: false, validator: { value -> value as boolean } )
         productPackage(nullable: true)
         unitPrice(nullable: true)
         orderItemStatusCode(nullable: true)
@@ -220,11 +221,11 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Integer getQuantityShipped() {
-        return quantityShippedInStandardUom / quantityPerUom
+        return quantityShippedInStandardUom / (quantityPerUom?:1)
     }
 
     Integer getQuantityReceived() {
-        return quantityReceivedInStandardUom / quantityPerUom
+        return quantityReceivedInStandardUom / (quantityPerUom?:1)
     }
 
     Integer getQuantityCanceled() {
@@ -232,7 +233,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Integer getQuantityInShipments() {
-        return quantityInShipmentsInStandardUom / quantityPerUom
+        return quantityInShipmentsInStandardUom / (quantityPerUom?:1)
     }
 
     String getOrderItemType() {
@@ -369,7 +370,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Integer getQuantityInvoiced() {
-        return quantityInvoicedInStandardUom / quantityPerUom
+        return quantityInvoicedInStandardUom / (quantityPerUom?:1)
     }
 
     def totalQuantityPicked() {

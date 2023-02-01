@@ -18,19 +18,22 @@ const useInboundFilters = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const {
-    currentLocation, shipmentStatuses, currentUser, isShipmentStatusesFetched,
+    currentLocation,
+    shipmentStatuses,
+    currentUser,
+    currentLocale,
   } = useSelector(state => ({
     currentLocation: state.session.currentLocation,
     shipmentStatuses: state.shipmentStatuses.data,
     currentUser: state.session.user,
-    isShipmentStatusesFetched: state.shipmentStatuses.fetched,
+    currentLocale: state.session.activeLanguage,
   }));
 
   useEffect(() => {
-    if (!isShipmentStatusesFetched || !shipmentStatuses.length) {
-      dispatch(fetchShipmentStatusCodes());
-    }
-  }, []);
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchShipmentStatusCodes());
+  }, [currentLocale]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)

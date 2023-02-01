@@ -139,7 +139,7 @@ export default connect(mapStateToProps)(GlobalSearch);
 
 GlobalSearch.propTypes = {
   visible: PropTypes.bool,
-  renderButton: PropTypes.func.isRequired,
+  renderButton: PropTypes.func,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   className: PropTypes.string,
@@ -147,6 +147,7 @@ GlobalSearch.propTypes = {
 };
 
 GlobalSearch.defaultProps = {
+  renderButton: undefined,
   visible: false,
   className: '',
 };

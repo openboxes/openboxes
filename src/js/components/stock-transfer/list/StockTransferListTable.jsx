@@ -20,6 +20,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 const StockTransferListTable = ({
   filterParams,
   highestRole,
+  statuses,
 }) => {
   const {
     onFetchHandler,
@@ -77,7 +78,10 @@ const StockTransferListTable = ({
       accessor: 'status',
       className: 'active-circle d-flex',
       headerClassName: 'header',
-      Cell: row => <StockTransferStatus status={row.original.status} />,
+      Cell: (row) => {
+        const label = statuses?.find(status => status.id === row.original.status)?.label;
+        return (<StockTransferStatus status={label ?? row.original.status} />);
+      },
       maxWidth: 250,
     },
     {
@@ -99,7 +103,7 @@ const StockTransferListTable = ({
       className: 'd-flex align-items-center',
       Cell: row => <TableCell {...row} tooltip />,
     },
-  ], [highestRole]);
+  ], [highestRole, statuses]);
 
   return (
     <div className="list-page-list-section">
@@ -127,6 +131,7 @@ const StockTransferListTable = ({
 
 const mapStateToProps = state => ({
   highestRole: state.session.highestRole,
+  statuses: state.stockTransfer.statuses,
 });
 
 
@@ -136,4 +141,10 @@ export default connect(mapStateToProps)(StockTransferListTable);
 StockTransferListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
   highestRole: PropTypes.string.isRequired,
+  statuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    variant: PropTypes.string.isRequired,
+  })).isRequired,
 };

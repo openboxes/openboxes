@@ -273,6 +273,10 @@
 
         <script>
             $(document).ready(function() {
+
+              const orderType = ${orderInstance.orderType.isPutawayOrder()} ? 'inbound' : 'purchasing';
+              applyActiveSection(orderType);
+
                 $(".tabs").tabs({
                     cookie: {
                         expires: 1
