@@ -43,7 +43,7 @@ class ModalWrapper extends Component {
     const { defaultTitleMessage } = this.props;
 
     return (
-      <div>
+      <div className={this.props.wrapperClassName ?? ''}>
         <button
           type="button"
           className={`btn-xs ${this.props.btnOpenClassName}`}
@@ -164,6 +164,9 @@ ModalWrapper.propTypes = {
   btnContainerClassName: PropTypes.string,
   btnContainerStyle: PropTypes.shape({}),
 
+  /** Wrapper properties */
+  wrapperClassName: PropTypes.string,
+
   /** Save button properties */
   btnSaveText: PropTypes.string,
   btnSaveDefaultText: PropTypes.string,
@@ -209,6 +212,8 @@ ModalWrapper.defaultProps = {
 
   btnContainerClassName: 'btn-group float-right',
   btnContainerStyle: {},
+
+  wrapperClassName: null,
 
   btnSaveText: 'react.default.button.save.label',
   btnSaveDefaultText: 'Save',

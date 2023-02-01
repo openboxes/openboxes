@@ -241,6 +241,7 @@ class EditLineModal extends Component {
         validate={this.validate}
         initialValues={this.state.formValues}
         fields={FIELDS}
+        wrapperClassName={this.props.wrapperClassName}
         formProps={{
           shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
           debouncedProductsFetch: this.debouncedProductsFetch,

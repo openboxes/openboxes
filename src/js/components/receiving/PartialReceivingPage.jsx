@@ -298,7 +298,7 @@ const TABLE_FIELDS = {
         }),
       },
       edit: {
-        type: params => (params.subfield ? <EditLineModal {...params} /> : null),
+        type: params => (params.subfield ? <EditLineModal {...params} wrapperClassName="edit-button-cell" /> : null),
         fieldKey: '',
         flexWidth: '0.9',
         label: '',
