@@ -49,7 +49,7 @@ class GlAccountController {
             // If the glAccount is associated with ANY product, do not allow to deactivate it
             Product productAssociated = Product.findByGlAccount(glAccount)
             if (productAssociated && !params.active) {
-                flash.message = g.message(code: 'glAccount.associatedProducts.error.label', default: 'You can\'t deactivate a GL Account that is associated with any products')
+                flash.message = g.message(code: 'glAccount.associatedProducts.error.label', default: 'This GL account is linked to an active product and cannot be deactivated.')
                 redirect(action: "list")
                 return
             }
