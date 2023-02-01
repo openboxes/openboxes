@@ -287,4 +287,9 @@ EditLineModal.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
+  wrapperClassName: PropTypes.string,
+};
+
+EditLineModal.defaultProps = {
+  wrapperClassName: null,
 };
