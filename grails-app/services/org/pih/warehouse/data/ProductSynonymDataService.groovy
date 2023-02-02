@@ -39,7 +39,7 @@ class ProductSynonymDataService {
 
         command.data.each{ params ->
             Product product = Product.findByProductCode(params['product.productCode'])
-            productService.addSynonymToProduct(product, params['synonymTypeCode'], params['synonym.name'], params['locale'])
+            productService.addSynonymToProduct(product.id, params['synonymTypeCode'], params['synonym.name'], params['locale'])
         }
     }
 

@@ -1013,10 +1013,12 @@ class ProductController {
      */
     def addSynonymToProduct = {
         println "addSynonymToProduct() " + params
-        Product product = Product.read(params.id)
+        Product product = null
         try {
-            productService.addSynonymToProduct(product, params.synonymTypeCode, params.synonym, params.locale)
+            product = productService.addSynonymToProduct(params.id, params.synonymTypeCode, params.synonym, params.locale)
         } catch (IllegalArgumentException e) {
+            // If adding a synonym fails, we still want to return the product to the view
+            product = Product.read(params.id)
             flash.error = e.message
         }
         render(template: 'productSynonyms', model: [productInstance: product])
@@ -1140,16 +1142,15 @@ class ProductController {
                 flash.error = "Please upload a non-empty file"
                 redirect(controller: 'product', action: 'edit', id: params['product.id'])
                 return
-            } else {
-                try {
-                    command.filename = uploadFile.originalFilename
-                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                    uploadFile.transferTo(localFile)
-                } catch (Exception e) {
-                    flash.error = "Unable to upload file due to exception: " + e.message
-                    redirect(controller: 'product', action: 'edit', id: params['product.id'])
-                    return
-                }
+            }
+            try {
+                command.filename = uploadFile.originalFilename
+                localFile = uploadService.createLocalFile(uploadFile.originalFilename)
+                uploadFile.transferTo(localFile)
+            } catch (Exception e) {
+                flash.error = "Unable to upload file due to exception: " + e.message
+                redirect(controller: 'product', action: 'edit', id: params['product.id'])
+                return
             }
 
             def excelImporter = new ProductSynonymExcelImporter(localFile.absolutePath)
