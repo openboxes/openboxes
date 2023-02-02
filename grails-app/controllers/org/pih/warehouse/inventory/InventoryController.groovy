@@ -825,10 +825,13 @@ class InventoryController {
             def status = inventoryItem.status
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
+            String currentLocale = session?.locale?.toString()?.toUpperCase()
+            def productNameWithTranslation = "${product?.name} ${product?.translatedName ? "(${currentLocale}: ${product?.translatedName})" : ''}"
+
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(productNameWithTranslation) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
