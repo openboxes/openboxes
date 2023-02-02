@@ -1614,7 +1614,10 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => this.submitRequest(values.lineItems)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={invalid}
+                  disabled={invalid ||
+                    !_.some(values.lineItems, item =>
+                      item.product && _.parseInt(item.quantityRequested))
+                }
                 ><Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
                 </button>
               </div>

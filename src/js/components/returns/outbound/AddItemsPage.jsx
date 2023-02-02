@@ -548,6 +548,9 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
+                  disabled={
+                  !_.some(values.returnItems, item => _.parseInt(item.quantity) && item.checked)
+                }
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
                 </button>
