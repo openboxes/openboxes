@@ -12,6 +12,7 @@ export default {
       showLabelTooltip: true,
       options: [],
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ shipmentStatuses }) => ({
       options: shipmentStatuses,

@@ -12,6 +12,7 @@ export default {
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ categories }) => ({
       options: categories,
@@ -35,6 +36,7 @@ export default {
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ catalogs }) => ({
       options: catalogs,
@@ -50,6 +52,7 @@ export default {
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ tags }) => ({
       options: tags,
