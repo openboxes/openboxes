@@ -127,12 +127,15 @@ class ReportController {
 
     def binLocationCsvRow = { binLocation ->
         String csv = ""
+        String currentLocale = session?.locale?.toString()?.toUpperCase()
+        def productNameWithTranslation = "${binLocation?.product?.name} ${binLocation?.product?.translatedName ? "(${currentLocale}: ${binLocation?.product?.translatedName})" : ''}"
+
         if (binLocation) {
             String defaultBinLocation = g.message(code: 'default.label')
             String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
             csv += binLocation.status + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(productNameWithTranslation) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.tagsToString()) + ","
