@@ -92,19 +92,30 @@
                         </g:formRemote>
                     </td>
                     <td>
-                       <div class="d-flex">
+                       <div class="d-flex flex-wrap">
                            <g:link
-                               class="button"
+                               class="button mr-2"
                                controller="product"
                                action="exportSynonymTemplate"
-                               params="[productCode: productInstance.productCode ]"
+                               params="[productCode: productInstance.productCode]"
                            >
-                               <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                               <img src="${createLinkTo(dir:'images/icons/silk',file: 'page_excel.png')}" />&nbsp;
                                 <g:message
                                     code="default.download.label"
                                     args="[ g.message(code: 'default.template.label', 'Template') ]"
                                 />
                            </g:link>
+                           <g:uploadForm controller="product" action="importProductSynonyms">
+                               <button class="button" type="submit">
+                                   <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                   <g:message
+                                       code="default.import.label"
+                                       args="[ g.message(code: 'default.template.label', 'Template') ]"
+                                   />
+                               </button>
+                               <input name="file" type="file" required />
+                               <g:hiddenField name="product.id" value="${productInstance.id}"/>
+                           </g:uploadForm>
                        </div>
                     </td>
 

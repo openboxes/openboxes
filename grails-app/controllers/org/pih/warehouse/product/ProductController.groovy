@@ -25,8 +25,11 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.ProductSynonymExcelImporter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 import javax.activation.MimetypesFileTypeMap
@@ -1121,6 +1124,49 @@ class ProductController {
             redirect(action: "list")
         }
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
+    }
+
+    def importProductSynonyms = { ImportDataCommand command ->
+
+        log.info params
+        log.info command.location
+
+        if (request.method == "POST") {
+            File localFile = null
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
+            CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file")
+
+            if (uploadFile?.empty) {
+                flash.error = "Please upload a non-empty file"
+                redirect(controller: 'product', action: 'edit', id: params['product.id'])
+                return
+            } else {
+                try {
+                    command.filename = uploadFile.originalFilename
+                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
+                    uploadFile.transferTo(localFile)
+                } catch (Exception e) {
+                    flash.error = "Unable to upload file due to exception: " + e.message
+                    redirect(controller: 'product', action: 'edit', id: params['product.id'])
+                    return
+                }
+            }
+
+            def excelImporter = new ProductSynonymExcelImporter(localFile.absolutePath)
+            command.data = excelImporter.data
+
+            command.errors = null
+            excelImporter.validateData(command)
+
+            if (command.errors.allErrors) {
+                flash.error = "Failed to import template due to validation errors"
+            } else {
+                flash.message = "Succesfully imported product synonyms"
+                excelImporter.importData(command)
+            }
+        }
+
+        redirect(controller: 'product', action: 'edit', id: params['product.id'])
     }
 }
 
