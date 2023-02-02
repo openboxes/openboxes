@@ -496,7 +496,6 @@ class AddItemsPage extends Component {
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                {!_.some(values.returnItems, item => item.product && _.parseInt(item.quantity))}
                 <button
                   type="submit"
                   onClick={() => {
