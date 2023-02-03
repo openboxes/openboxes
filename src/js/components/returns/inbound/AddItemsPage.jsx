@@ -504,7 +504,9 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.returnItems, item => !_.isEmpty(item))}
+                  disabled={
+                    !_.some(values.returnItems, item => item.product && _.parseInt(item.quantity))
+                  }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>
