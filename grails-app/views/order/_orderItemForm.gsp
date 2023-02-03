@@ -45,7 +45,7 @@
         <input type="number" id="quantityPerUom" name="quantityPerUom" class="text required" placeholder="${g.message(code: 'default.qtyPerUom.label', default: 'Qty per UoM')}" style="width: 100px"/>
     </td>
     <td class="center middle">
-        <input type="text" id="unitPrice" required name="unitPrice" size="2" class="text required" placeholder="${g.message(code: 'default.pricePerUom.label', default: 'Price per UoM')}" style="width: 100px"/>
+        <g:decimalNumberField id="unitPrice" name="unitPrice" required="true" placeholder="${g.message(code: 'default.pricePerUom.label', default: 'Price per UoM')}" style="width: 100px" />
     </td>
     <td class="center middle">
     </td>

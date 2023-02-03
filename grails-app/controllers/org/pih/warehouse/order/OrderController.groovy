@@ -27,11 +27,9 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.util.LocalizationUtil
 import org.springframework.web.multipart.MultipartFile
 
 import java.math.RoundingMode
-import java.text.NumberFormat
 
 class OrderController {
     def orderService
@@ -741,8 +739,7 @@ class OrderController {
             }
         }
         if (!orderItem) {
-            NumberFormat format = NumberFormat.getNumberInstance(LocalizationUtil.localizationService.currentLocale)
-            params.unitPrice = format.parse(params.unitPrice)
+            params.unitPrice = new BigDecimal(params.unitPrice)
             orderItem = new OrderItem(params)
             order.addToOrderItems(orderItem)
         }
