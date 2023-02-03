@@ -553,7 +553,11 @@ class ReportController {
                     sw.append("QoH Total").append(",")
                     sw.append("Quantity Available Total")
                     sw.append("\n")
+                    String currentLocale = session?.locale?.toString()?.toUpperCase()
+
                     command.entries.each { entry ->
+                        def productNameWithTranslation = "${entry.key?.name} ${entry.key?.translatedName ? "(${currentLocale}: ${entry.key?.translatedName})" : ''}"
+
                         if (entry.key) {
                             def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
                             def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
@@ -562,7 +566,7 @@ class ReportController {
                             }?.join(",")
 
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (productNameWithTranslation ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
@@ -601,17 +605,17 @@ class ReportController {
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
         String dateFormat = grailsApplication.config.openboxes.expirationDate.format
-
+        String currentLocale = session?.locale?.toString()?.toUpperCase()
         List rows = binLocations.collect { row ->
-
             // Required in order to avoid lazy initialization exception that occurs because all
             // of the querying / session work that was done above was executed in worker threads
             Product product = Product.load(row?.product?.id)
+            def productNameWithTranslation = "${product?.name} ${product?.translatedName ? "(${currentLocale}: ${product?.translatedName})" : ''}"
 
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
             Map dataRow = params.print ? [
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            "Product name"        : row?.product.name ?: "",
+                            "Product name"        : productNameWithTranslation ?: "",
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                             "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),

@@ -771,13 +771,17 @@ class InventoryController {
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = inventoryLevel?.statusMessage(quantity ?: 0)
+
             if (!statusMessage) {
                 def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
                 statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
             }
+            String currentLocale = session?.locale?.toString()?.toUpperCase()
+            def productNameWithTranslation = "${product?.name} ${product?.translatedName ? "(${currentLocale}: ${product?.translatedName})" : ''}"
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(productNameWithTranslation ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
