@@ -776,12 +776,10 @@ class InventoryController {
                 def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
                 statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
             }
-            String currentLocale = session?.locale?.toString()?.toUpperCase()
-            def productNameWithTranslation = "${product?.name} ${product?.translatedName ? "(${currentLocale}: ${product?.translatedName})" : ''}"
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(productNameWithTranslation ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.formattedTranslatedName ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
@@ -829,13 +827,10 @@ class InventoryController {
             def status = inventoryItem.status
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
-            String currentLocale = session?.locale?.toString()?.toUpperCase()
-            def productNameWithTranslation = "${product?.name} ${product?.translatedName ? "(${currentLocale}: ${product?.translatedName})" : ''}"
-
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(productNameWithTranslation) + ","
+            csv += StringEscapeUtils.escapeCsv(product.formattedTranslatedName) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","

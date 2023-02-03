@@ -677,9 +677,10 @@ class ReportService implements ApplicationContextAware {
             def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
             def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
             def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+            Product product = Product.findByProductCode(it.productCode)
             [
                     productCode          : it.productCode,
-                    productName          : it.productName,
+                    productName          : product?.formattedTranslatedName ?: it.productName,
                     qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
                     qtyShippedNotReceived: qtyShippedNotReceived ?: '',
                     totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,

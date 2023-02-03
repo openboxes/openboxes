@@ -34,6 +34,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.validation.Errors
+import org.springframework.web.context.request.RequestContextHolder
 
 import java.sql.Timestamp
 import java.text.NumberFormat
@@ -2625,10 +2626,12 @@ class InventoryService implements ApplicationContextAware {
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
+        def session = RequestContextHolder.currentRequestAttributes().getSession()
+
         products.each { product ->
             def csvrow = [
                     'Product code'     : product.productCode ?: '',
-                    'Product'          : product.name,
+                    'Product'          : product?.formattedTranslatedName,
                     'UOM'              : product.unitOfMeasure,
                     'Generic product'  : product?.genericProduct?.name ?: "",
                     'Category'         : product?.category?.name,

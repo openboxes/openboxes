@@ -57,7 +57,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
-import org.springframework.web.context.request.RequestContextHolder
 
 class StockMovementService {
 
@@ -2729,7 +2728,6 @@ class StockMovementService {
     }
 
     List buildStockMovementItemList(StockMovement stockMovement) {
-        String currentLocale = RequestContextHolder.currentRequestAttributes().getSession().locale?.toString()?.toUpperCase()
 
         // We need to create at least one row to ensure an empty template
         if (stockMovement?.lineItems?.empty) {
@@ -2737,12 +2735,11 @@ class StockMovementService {
         }
 
         def lineItems = stockMovement.lineItems.collect {it ->
-            def productNameWithTranslation = "${it?.product?.name} ${it?.product?.translatedName ? "(${currentLocale}: ${it?.product?.translatedName})" : ''}"
 
             return [
                     "Requisition item id"            : it?.id ?: "",
                     "Product code (required)"     : it?.product?.productCode ?: "",
-                    "Product name"                  : productNameWithTranslation ?: "",
+                    "Product name"                  : it?.product?.formattedTranslatedName ?: "",
                     "Pack level 1"                   : it?.palletName ?: "",
                     "Pack level 2"                      : it?.boxName ?: "",
                     "Lot number"                    : it?.lotNumber ?: "",

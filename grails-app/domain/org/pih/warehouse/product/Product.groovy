@@ -244,7 +244,8 @@ class Product implements Comparable, Serializable {
                          "applicationTagLib",
                          "handlingIcons",
                          "uoms",
-                         "translatedName"
+                         "translatedName",
+                         "formattedTranslatedName"
     ]
 
     static hasMany = [
@@ -678,6 +679,11 @@ class Product implements Comparable, Serializable {
 
     List getUoms() {
        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+    }
+
+    String getFormattedTranslatedName() {
+        String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
+        return "${name} ${translatedName ? "(${localeTag}: ${translatedName})" : ''}"
     }
 
     String getTranslatedName() {
