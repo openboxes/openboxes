@@ -133,7 +133,7 @@ class ReportController {
             String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
             csv += binLocation.status + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.formattedTranslatedName) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.translatedNameWithLocalCode) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.tagsToString()) + ","
@@ -486,7 +486,7 @@ class ReportController {
                     def isOrderItem = it instanceof OrderItem
                     csv << [
                             productCode  : it.product?.productCode,
-                            productName  : it.product?.formattedTranslatedName,
+                            productName  : it.product?.translatedNameWithLocalCode,
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
@@ -561,7 +561,7 @@ class ReportController {
                             }?.join(",")
 
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.formattedTranslatedName ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.translatedNameWithLocalCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
@@ -609,7 +609,7 @@ class ReportController {
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
             Map dataRow = params.print ? [
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            "Product name"        : product.formattedTranslatedName ?: "",
+                            "Product name"        : product.translatedNameWithLocalCode ?: "",
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                             "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),

@@ -680,7 +680,7 @@ class ReportService implements ApplicationContextAware {
             Product product = Product.findByProductCode(it.productCode)
             [
                     productCode          : it.productCode,
-                    productName          : product?.formattedTranslatedName ?: it.productName,
+                    productName          : product?.translatedNameWithLocalCode ?: it.productName,
                     qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
                     qtyShippedNotReceived: qtyShippedNotReceived ?: '',
                     totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,

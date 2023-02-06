@@ -2739,7 +2739,7 @@ class StockMovementService {
             return [
                     "Requisition item id"            : it?.id ?: "",
                     "Product code (required)"     : it?.product?.productCode ?: "",
-                    "Product name"                  : it?.product?.formattedTranslatedName ?: "",
+                    "Product name"                  : it?.product?.translatedNameWithLocalCode ?: "",
                     "Pack level 1"                   : it?.palletName ?: "",
                     "Pack level 2"                      : it?.boxName ?: "",
                     "Lot number"                    : it?.lotNumber ?: "",
