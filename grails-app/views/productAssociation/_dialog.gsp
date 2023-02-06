@@ -22,7 +22,9 @@
                 <td class="value ">
                     <div id="product">
                         ${productAssociation?.product?.productCode}
-                        <format:product product="${productAssociation?.product}"/>
+                        <span title="${productAssociation?.product?.translatedName ? productAssociation?.product?.name : null}">
+                            ${productAssociation?.product?.translatedName ?: productAssociation?.product?.name }
+                        </span>
                     </div>
                 </td>
             </tr>

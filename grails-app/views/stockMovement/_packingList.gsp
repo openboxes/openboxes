@@ -84,7 +84,9 @@
                     </td>
                     <td class="product">
                         <g:link controller="inventoryItem" action="showStockCard" id="${shipmentItem?.inventoryItem?.product?.id}">
-                            <format:product product="${shipmentItem?.inventoryItem?.product}"/>
+                            <span title="${shipmentItem?.inventoryItem?.product?.translatedName ? shipmentItem?.inventoryItem?.product?.name : null}">
+                                ${shipmentItem?.inventoryItem?.product?.translatedName ?: shipmentItem?.inventoryItem?.product?.name }
+                            </span>
                             <g:renderHandlingIcons product="${shipmentItem?.inventoryItem?.product}" />
                         </g:link>
                     </td>

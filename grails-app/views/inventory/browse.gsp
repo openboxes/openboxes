@@ -109,7 +109,9 @@
 														<td>
 															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}" style="color: ${searchResult?.product?.color}">
 																${searchResult?.product?.productCode}
-																${searchResult?.product?.name}
+																<span title="${searchResult?.product?.translatedName ? searchResult?.product?.name : null}">
+																	${searchResult?.product?.translatedName ?: searchResult?.product?.name}
+																</span>
 																<g:renderHandlingIcons product="${searchResult?.product}" />
 														   	</g:link>
 														</td>

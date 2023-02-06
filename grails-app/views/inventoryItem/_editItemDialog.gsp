@@ -16,7 +16,9 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label><warehouse:message code="product.label" /></label></td>
 					<td valign="top" class="value">
-						<format:product product="${inventoryItem?.product}"/>
+						<span title="${inventoryItem?.product?.translatedName ? inventoryItem?.product?.name : null}">
+							${inventoryItem?.product?.translatedName ?: inventoryItem?.product?.name }
+						</span>
 					</td>
 				</tr>
 				<g:if test="${binLocation}">

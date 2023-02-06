@@ -72,7 +72,9 @@
                                 <td>
                                     <g:link controller="inventoryItem" action="showStockCard"
                                             style="color: ${requisitionItem?.product?.color}" id="${requisitionItem?.product?.id}">
-                                        ${requisitionItem?.product?.name}
+                                        <span title="${requisitionItem?.product?.translatedName ? requisitionItem?.product?.name : null}">
+                                            ${requisitionItem?.product?.translatedName ?: requisitionItem?.product?.name }
+                                        </span>
                                     </g:link>
                                 </td>
                                 <td>
