@@ -48,7 +48,14 @@ const ProductsListTable = ({
       className: 'active-circle',
       headerClassName: 'header',
       sortable: false,
-      Cell: row => <TableCell {...row} tooltip link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`} />,
+      Cell: row =>
+        (<TableCell
+          {...row}
+          value={row.original.translatedName ?? row.value}
+          tooltip
+          tooltipLabel={row.value}
+          link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`}
+        />),
       minWidth: 200,
     },
     {

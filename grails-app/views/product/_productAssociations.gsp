@@ -33,8 +33,7 @@
 
                         <td>
                             <g:link controller="product" action="edit" id="${productAssociation?.associatedProduct?.id}">
-                                ${fieldValue(bean: productAssociation?.associatedProduct, field: "productCode")}
-                                ${fieldValue(bean: productAssociation?.associatedProduct, field: "name")}
+                                <g:translatedProductName product="${productAssociation?.associatedProduct}" showProductCode="${true}" />
                             </g:link>
                         </td>
 

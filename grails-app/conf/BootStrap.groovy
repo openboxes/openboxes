@@ -265,6 +265,7 @@ class BootStrap {
                 handlingIcons       : product.handlingIcons,
                 lotAndExpiryControl : product.lotAndExpiryControl,
                 active              : product.active,
+                translatedName      : product.translatedName,
             ]
         }
 

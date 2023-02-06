@@ -48,7 +48,10 @@
                             <g:hiddenField name="product.id" value="${productInstance?.id}"/>
                             <g:select name="displayProduct.id" class="chzn-select-deselect"
                                       from="${[productInstance]}"
-                                      optionKey="id" value="${productInstance}" disabled="true"/>
+                                      optionKey="id" value="${productInstance}" disabled="true"
+                                      optionValue="${{it?.translatedName ?: it?.name}}"
+                                      title="${productInstance?.translatedName ? productInstance.name : null}"
+                            />
                         </g:else>
                     </td>
                 </tr>
