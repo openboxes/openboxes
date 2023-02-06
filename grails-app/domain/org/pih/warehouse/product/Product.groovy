@@ -683,7 +683,7 @@ class Product implements Comparable, Serializable {
 
     String getTranslatedNameWithLocaleCode() {
         String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
-        return "${name} ${translatedName ? "(${localeTag}: ${translatedName})" : ''}"
+        return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
     String getTranslatedName() {
