@@ -2734,18 +2734,17 @@ class StockMovementService {
             stockMovement?.lineItems.add(new StockMovementItem())
         }
 
-        def lineItems = stockMovement.lineItems.collect {it ->
-
-            return [
-                    "Requisition item id"            : it?.id ?: "",
-                    "Product code (required)"     : it?.product?.productCode ?: "",
-                    "Product name"                  : it?.product?.translatedNameWithLocalCode ?: "",
-                    "Pack level 1"                   : it?.palletName ?: "",
-                    "Pack level 2"                      : it?.boxName ?: "",
-                    "Lot number"                    : it?.lotNumber ?: "",
-                    "Expiration date (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
-                    "Quantity (required)"        : it?.quantityRequested ?: "",
-                    "Recipient id"                  : it?.recipient?.id ?: ""
+        def lineItems = stockMovement.lineItems.collect {
+            [
+                "Requisition item id"            : it?.id ?: "",
+                "Product code (required)"     : it?.product?.productCode ?: "",
+                "Product name"                  : it?.product?.translatedNameWithLocalCode ?: "",
+                "Pack level 1"                   : it?.palletName ?: "",
+                "Pack level 2"                      : it?.boxName ?: "",
+                "Lot number"                    : it?.lotNumber ?: "",
+                "Expiration date (MM/dd/yyyy)": it?.expirationDate ? it?.expirationDate?.format("MM/dd/yyyy") : "",
+                "Quantity (required)"        : it?.quantityRequested ?: "",
+                "Recipient id"                  : it?.recipient?.id ?: ""
             ]
         }
         return lineItems
