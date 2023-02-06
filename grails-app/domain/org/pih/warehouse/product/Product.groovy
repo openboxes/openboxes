@@ -245,7 +245,7 @@ class Product implements Comparable, Serializable {
                          "handlingIcons",
                          "uoms",
                          "translatedName",
-                         "translatedNameWithLocalCode"
+                         "translatedNameWithLocaleCode"
     ]
 
     static hasMany = [
@@ -681,7 +681,7 @@ class Product implements Comparable, Serializable {
        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
-    String getTranslatedNameWithLocalCode() {
+    String getTranslatedNameWithLocaleCode() {
         String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
         return "${name} ${translatedName ? "(${localeTag}: ${translatedName})" : ''}"
     }

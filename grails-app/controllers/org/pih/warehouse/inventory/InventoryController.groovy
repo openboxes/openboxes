@@ -779,7 +779,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocalCode ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocaleCode ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
@@ -830,7 +830,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product.translatedNameWithLocalCode) + ","
+            csv += StringEscapeUtils.escapeCsv(product.translatedNameWithLocaleCode) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
