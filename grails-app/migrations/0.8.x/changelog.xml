@@ -154,4 +154,5 @@
     <include file="0.8.x/changelog-2022-08-09-1100-alter-table-party-add-active-column.xml" />
     <include file="0.8.x/changelog-2022-09-02-1200-add-default-product-type.xml" />
     <include file="0.8.x/changelog-2023-01-27-1015-add-synonym-classification-column.xml" />
+    <include file="0.8.x/changelog-2023-02-01-0900-add-active-column-to-gl-accounts.xml" />
 </databaseChangeLog>

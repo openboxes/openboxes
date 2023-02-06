@@ -8,6 +8,7 @@
 * You must not remove this notice, or any other, from this software.
 **/
 package org.pih.warehouse.core
+import org.pih.warehouse.product.Product
 
 class GlAccountController {
 
@@ -45,6 +46,13 @@ class GlAccountController {
     def update = {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {
+            // If the glAccount is associated with ANY product, do not allow to deactivate it
+            Product productAssociated = Product.findByGlAccount(glAccount)
+            if (productAssociated && !params.active) {
+                flash.message = g.message(code: 'glAccount.associatedProducts.error.label', default: 'This GL account is linked to an active product and cannot be deactivated.')
+                redirect(action: "list")
+                return
+            }
             glAccount.properties = params
             if (!glAccount.hasErrors() && glAccount.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), glAccount.id])}"

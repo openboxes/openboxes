@@ -39,6 +39,8 @@
                     <thead>
                         <tr>
 
+                            <g:sortableColumn property="active" title="${g.message(code: 'glAccount.active.label', default: 'Active')}" />
+
                             <g:sortableColumn property="id" title="${warehouse.message(code: 'glAccount.id.label', default: 'Id')}" />
 
                             <g:sortableColumn property="code" title="${warehouse.message(code: 'glAccount.code.label', default: 'Code')}" />
@@ -58,6 +60,19 @@
                     <tbody>
                     <g:each in="${glAccounts}" status="i" var="glAccount">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+
+                            <td>
+                                <g:if test="${glAccount?.active}">
+                                    <span class="active">
+                                        <g:message code="default.yes.label" default="Yes" />
+                                    </span>
+                                </g:if>
+                                <g:else>
+                                    <span class="inactive">
+                                        <g:message code="default.no.label" default="No" />
+                                    </span>
+                                </g:else>
+                            </td>
 
                             <td><g:link action="edit" id="${glAccount.id}">${fieldValue(bean: glAccount, field: "id")}</g:link></td>
 

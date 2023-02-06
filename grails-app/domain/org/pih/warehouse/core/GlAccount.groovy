@@ -39,6 +39,7 @@ class GlAccount implements Serializable {
     Date lastUpdated
     User createdBy
     User updatedBy
+    Boolean active = true
 
     static mapping = {
         id generator: 'uuid'
@@ -52,5 +53,6 @@ class GlAccount implements Serializable {
         glAccountType(nullable: false)
         updatedBy(nullable: true)
         createdBy(nullable: true)
+        active(nullable: false)
     }
 }

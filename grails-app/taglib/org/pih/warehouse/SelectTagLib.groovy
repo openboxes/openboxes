@@ -276,7 +276,7 @@ class SelectTagLib {
     }
 
     def selectGlAccount = { attrs, body ->
-        attrs.from = GlAccount.list()
+        attrs.from = GlAccount.findAllByActive(true)
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code + " " + it.description }
         out << g.select(attrs)

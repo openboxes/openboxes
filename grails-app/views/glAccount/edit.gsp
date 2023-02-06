@@ -44,6 +44,15 @@
                         <tbody>
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                    <label for="active"><g:message code="glAccount.active.label" default="Active"/></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: glAccount, field: 'active', 'errors')}">
+                                    <g:checkBox name="active" value="${glAccount?.active}" id="active" />
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                     <label for="code"><warehouse:message code="glAccount.code.label" default="Code" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: glAccount, field: 'code', 'errors')}">
