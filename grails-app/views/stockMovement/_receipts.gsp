@@ -50,9 +50,7 @@
                 </td>
                 <td>
                     <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
-                        <span title="${receiptItem?.product?.translatedName ? receiptItem?.product?.name : null}">
-                            ${receiptItem?.product?.translatedName ?: receiptItem?.product?.name }
-                        </span>
+                        <g:translatedProductName product="${receiptItem?.product}" />
                     </g:link>
                 </td>
                 <td>

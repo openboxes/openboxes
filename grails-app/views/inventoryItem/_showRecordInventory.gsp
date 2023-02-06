@@ -13,9 +13,7 @@
 							<label><warehouse:message code="product.label"/></label>
 						</td>
 						<td>
-							<span title="${commandInstance?.product?.translatedName ? commandInstance?.product?.name : null}">
-								${commandInstance?.product?.translatedName ?: commandInstance?.product?.name }
-							</span>
+							<g:translatedProductName product="${commandInstance?.product}" />
 						</td>
 					</tr>
 					<tr class="prop">

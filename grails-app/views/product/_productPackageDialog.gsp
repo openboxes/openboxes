@@ -7,9 +7,7 @@
 				<tr class="prop">
 					<td class="name"><label><warehouse:message code="product.label"/></label></td>
 					<td class="value">
-						<span title="${productInstance?.translatedName ? productInstance?.name : null}">
-							${productInstance?.translatedName ?: productInstance?.name }
-						</span>
+						<g:translatedProductName product="${productInstance}" />
 					</td>
 				</tr>
 			</g:if>

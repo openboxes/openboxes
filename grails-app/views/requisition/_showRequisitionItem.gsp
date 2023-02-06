@@ -82,9 +82,7 @@
         <g:if test="${requisitionItem?.isCanceled()}">
             <div class="canceled">
                 <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                    <span title="${requisitionItem?.product?.translatedName ? requisitionItem?.product?.name : null}">
-                        ${requisitionItem?.product?.translatedName ?: requisitionItem?.product?.name }
-                    </span>
+                    <g:translatedProductName product="${requisitionItem?.product}" />
                     <g:renderHandlingIcons product="${requisitionItem?.product}" />
                 </g:link>
             </div>
@@ -92,18 +90,14 @@
         <g:elseif test="${requisitionItem?.isSubstituted()}">
             <div class="canceled">
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <span title="${requisitionItem?.product?.translatedName ? requisitionItem?.product?.name : null}">
-                    ${requisitionItem?.product?.translatedName ?: requisitionItem?.product?.name }
-                </span>
+                <g:translatedProductName product="${requisitionItem?.product}" />
                 <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
                     <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
-                        <span title="${substitutionItem?.product?.translatedName ? substitutionItem?.product?.name : null}">
-                            ${substitutionItem?.product?.translatedName ?: substitutionItem?.product?.name }
-                        </span>
+                        <g:translatedProductName product="${substitutionItem?.product}" />
                         <g:renderHandlingIcons product="${substitutionItem?.product}" />
                     </g:link>
                 </div>
@@ -111,9 +105,7 @@
         </g:elseif>
         <g:else>
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <span title="${requisitionItem?.product?.translatedName ? requisitionItem?.product?.name : null}">
-                    ${requisitionItem?.product?.translatedName ?: requisitionItem?.product?.name }
-                </span>
+                <g:translatedProductName product="${requisitionItem?.product}" />
                 <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
         </g:else>

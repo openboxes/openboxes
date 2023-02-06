@@ -21,10 +21,7 @@
                 </td>
                 <td class="value ">
                     <div id="product">
-                        ${productAssociation?.product?.productCode}
-                        <span title="${productAssociation?.product?.translatedName ? productAssociation?.product?.name : null}">
-                            ${productAssociation?.product?.translatedName ?: productAssociation?.product?.name }
-                        </span>
+                        <g:translatedProductName product="${productAssociation?.product}" showProductCode="${true}" />
                     </div>
                 </td>
             </tr>
