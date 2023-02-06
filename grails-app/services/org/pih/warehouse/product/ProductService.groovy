@@ -326,7 +326,15 @@ class ProductService {
                 }
             }
             or {
-                if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                if (params.name) {
+                    ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                    synonyms {
+                        and {
+                            ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                            eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                        }
+                    }
+                }
                 if (params.description) ilike("description", params.description + "%")
                 if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
                 if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
@@ -1197,6 +1205,12 @@ class ProductService {
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
+                        synonyms {
+                           and {
+                               ilike("name", "%" + term)
+                               eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                           }
+                        }
                         ilike("description", "%" + term)
                         ilike("upc", term)
                         ilike("ndc", term)
@@ -1260,6 +1274,8 @@ class ProductService {
             query += """
             left outer join product_supplier 
                 on product.id = product_supplier.product_id
+            left outer join synonym 
+                on product.id = synonym.product_id
             left outer join party manufacturer 
                 on product_supplier.manufacturer_id = manufacturer.id 
                 and (${terms.collect { "lower(manufacturer.name) like '${it}%'" }.join(" or ")}) # adding the conditions to join will allow MySQL to optimize the query
@@ -1272,6 +1288,7 @@ class ProductService {
             where product.active = 1 and (${terms.collect {"""
                 lower(product.name) like '%${it}%' 
                 or lower(product.product_code) like '${it}%' 
+                or (synonym.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' and synonym.name like '%${it}%')
                 or lower(product.description) like '%${it}%'
                 or lower(product.upc) like '${it}%' 
                 or lower(product.ndc) like '${it}%'
