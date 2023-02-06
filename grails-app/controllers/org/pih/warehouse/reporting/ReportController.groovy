@@ -127,12 +127,13 @@ class ReportController {
 
     def binLocationCsvRow = { binLocation ->
         String csv = ""
+
         if (binLocation) {
             String defaultBinLocation = g.message(code: 'default.label')
             String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
             csv += binLocation.status + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.translatedNameWithLocaleCode) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.tagsToString()) + ","
@@ -485,7 +486,7 @@ class ReportController {
                     def isOrderItem = it instanceof OrderItem
                     csv << [
                             productCode  : it.product?.productCode,
-                            productName  : it.product?.name,
+                            productName  : it.product?.translatedNameWithLocaleCode,
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
@@ -508,7 +509,6 @@ class ReportController {
             def location = Location.get(session.warehouse.id)
             def data = reportService.getOnOrderSummary(location)
             if (data) {
-
                 def sw = new StringWriter()
                 def csv = new CSVWriter(sw, {
                     "Code" { it.productCode }
@@ -550,7 +550,9 @@ class ReportController {
                     sw.append("QoH Total").append(",")
                     sw.append("Quantity Available Total")
                     sw.append("\n")
+
                     command.entries.each { entry ->
+
                         if (entry.key) {
                             def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
                             def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
@@ -559,7 +561,7 @@ class ReportController {
                             }?.join(",")
 
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.translatedNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
@@ -600,7 +602,6 @@ class ReportController {
         String dateFormat = grailsApplication.config.openboxes.expirationDate.format
 
         List rows = binLocations.collect { row ->
-
             // Required in order to avoid lazy initialization exception that occurs because all
             // of the querying / session work that was done above was executed in worker threads
             Product product = Product.load(row?.product?.id)
@@ -608,7 +609,7 @@ class ReportController {
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
             Map dataRow = params.print ? [
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            "Product name"        : row?.product.name ?: "",
+                            "Product name"        : product.translatedNameWithLocaleCode ?: "",
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                             "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),

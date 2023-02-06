@@ -2728,6 +2728,7 @@ class StockMovementService {
     }
 
     List buildStockMovementItemList(StockMovement stockMovement) {
+
         // We need to create at least one row to ensure an empty template
         if (stockMovement?.lineItems?.empty) {
             stockMovement?.lineItems.add(new StockMovementItem())
@@ -2737,7 +2738,7 @@ class StockMovementService {
             [
                 "Requisition item id"            : it?.id ?: "",
                 "Product code (required)"     : it?.product?.productCode ?: "",
-                "Product name"                  : it?.product?.name ?: "",
+                "Product name"                  : it?.product?.translatedNameWithLocaleCode ?: "",
                 "Pack level 1"                   : it?.palletName ?: "",
                 "Pack level 2"                      : it?.boxName ?: "",
                 "Lot number"                    : it?.lotNumber ?: "",

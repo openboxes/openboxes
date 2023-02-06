@@ -2625,10 +2625,11 @@ class InventoryService implements ApplicationContextAware {
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
+
         products.each { product ->
             def csvrow = [
                     'Product code'     : product.productCode ?: '',
-                    'Product'          : product.name,
+                    'Product'          : product?.translatedNameWithLocaleCode,
                     'UOM'              : product.unitOfMeasure,
                     'Generic product'  : product?.genericProduct?.name ?: "",
                     'Category'         : product?.category?.name,
