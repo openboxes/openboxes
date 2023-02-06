@@ -55,4 +55,11 @@ class Synonym implements Serializable {
         createdBy(nullable: true)
     }
 
+    static PROPERTIES = [
+            "Product Code"           : "product.productCode",
+            "Class of synonym"       : "synonymTypeCode",
+            "Locale"                 : "locale",
+            "Synonym name"           : "name",
+    ]
+
 }
