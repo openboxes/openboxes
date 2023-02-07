@@ -9,13 +9,15 @@
  **/
 package org.pih.warehouse.order
 
+import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.springframework.context.ApplicationListener
 
+@Transactional
 class RefreshOrderSummaryEventService implements ApplicationListener<RefreshOrderSummaryEvent> {
 
-    boolean transactional = true
-    def grailsApplication
+    GrailsApplication grailsApplication
     def orderService
 
     void onApplicationEvent(RefreshOrderSummaryEvent event) {

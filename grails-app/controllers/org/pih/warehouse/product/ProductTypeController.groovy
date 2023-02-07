@@ -9,7 +9,7 @@
 **/
 package org.pih.warehouse.product
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.springframework.dao.DataIntegrityViolationException
 
 class ProductTypeController {
@@ -117,7 +117,7 @@ class ProductTypeController {
     }
 
     def delete() {
-        if (params.id == ConfigurationHolder.config.openboxes.identifier.defaultProductType.id) {
+        if (params.id == Holders.config.openboxes.identifier.defaultProductType.id) {
             flash.message = "${warehouse.message(code: 'productType.cannotDeleteDefaultProductType.message')}"
             redirect(action: "list", id: params.id)
             return

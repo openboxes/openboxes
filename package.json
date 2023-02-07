@@ -125,7 +125,6 @@
     "babel-preset-es2015": "6.24.1",
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-1": "6.24.1",
-    "cache-loader": "4.1.0",
     "browserslist": "4.21.2",
     "cache-loader": "4.1.0",
     "css-loader": "3.6.0",

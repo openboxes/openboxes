@@ -2,7 +2,6 @@ package org.pih.warehouse.api
 
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
@@ -265,7 +264,7 @@ class StockMovement implements Validateable{
         if (electronicType) {
             User user = AuthService.currentUser.get()
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
-            def userService = ApplicationHolder.application.mainContext.getBean("userService")
+            def userService = Holders.grailsApplication.mainContext.getBean("userService")
             if (!userService.isUserInRole(user, accessRule?.accessRules?.minimumRequiredRole)) {
                 throw new IllegalAccessException("You don't have minimum required role to perform this action")
             }

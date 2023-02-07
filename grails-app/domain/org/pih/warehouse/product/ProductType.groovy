@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.product
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+import grails.util.Holders
 
 class ProductType {
 
@@ -42,7 +42,7 @@ class ProductType {
 
     static namedQueries = {
         defaultProductType {
-            eq("id", CH.config.openboxes.identifier.defaultProductType.id)
+            eq("id", Holders.config.openboxes.identifier.defaultProductType.id)
         }
     }
 

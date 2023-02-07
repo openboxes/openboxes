@@ -14,7 +14,8 @@ import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentType;
+import org.pih.warehouse.shipping.ShipmentType
+import testutils.DbHelper
 
 import static org.junit.Assert.*
 import grails.test.*
@@ -24,7 +25,6 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import testutils.DbHelper
 
 @Ignore
 class ShipmentItemTests extends GroovyTestCase {

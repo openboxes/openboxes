@@ -11,7 +11,8 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.Product
-import grails.plugin.springcache.annotations.CacheFlush
+// TODO: Fix CacheFlush
+// import grails.plugin.springcache.annotations.CacheFlush
 
 @Transactional
 class TagController {
@@ -33,7 +34,7 @@ class TagController {
         return [tagInstance: tagInstance]
     }
 
-    @CacheFlush("selectTagsCache")
+    //  @CacheFlush("selectTagsCache")
     def save() {
         def tagInstance = new Tag(params)
         if (tagInstance.save(flush: true)) {
@@ -64,7 +65,7 @@ class TagController {
         }
     }
 
-    @CacheFlush("selectTagsCache")
+    //  @CacheFlush("selectTagsCache")
     def update() {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
@@ -90,7 +91,7 @@ class TagController {
         }
     }
 
-    @CacheFlush("selectTagsCache")
+    //  @CacheFlush("selectTagsCache")
     def delete() {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
@@ -112,7 +113,7 @@ class TagController {
         }
     }
 
-    @CacheFlush("selectTagsCache")
+    //  @CacheFlush("selectTagsCache")
     def addToProducts() {
         println "add to products " + params
         Tag tag = Tag.get(params.id)
@@ -142,7 +143,7 @@ class TagController {
 
     }
 
-    @CacheFlush("selectTagsCache")
+    //  @CacheFlush("selectTagsCache")
     def removeFromProducts() {
         println "remove from products " + params
         Tag tag = Tag.get(params.id)

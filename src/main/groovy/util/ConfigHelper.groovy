@@ -8,7 +8,6 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package util
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import grails.util.Holders
 import org.springframework.boot.info.GitProperties
@@ -69,7 +68,7 @@ class ConfigHelper {
     }
 
     static findAccessRule(String controllerName, String actionName) {
-        def rules = ConfigurationHolder.config.openboxes.security.rbac.rules
+        def rules = Holders.config.openboxes.security.rbac.rules
 
         ArrayList<Closure> filters = [
             { it.controller == controllerName && it.actions.contains(actionName) },
