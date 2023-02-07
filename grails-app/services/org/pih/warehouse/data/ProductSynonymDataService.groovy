@@ -17,6 +17,7 @@ import org.pih.warehouse.product.Product
 class ProductSynonymDataService {
 
     def productService
+    def grailsApplication
 
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
@@ -28,6 +29,7 @@ class ProductSynonymDataService {
                     command.errors.reject("Row ${index + 1}: '${columnName?.toLowerCase()}' is required")
                 }
             }
+
             if (params['product.productCode']) {
                 Product product = Product.findByProductCode(params['product.productCode'])
                 if (!product) {
@@ -41,6 +43,18 @@ class ProductSynonymDataService {
                     SynonymTypeCode.valueOf(params['synonymTypeCode']);
                 } catch (IllegalArgumentException ex) {
                     command.errors.reject("Row ${index + 1}: Synonym type code '${params['synonymTypeCode']} does not exist")
+                }
+            }
+
+            if (params['locale']) {
+                List<String> supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales
+                String foundLocale = supportedLocales.find {
+                    it.toLowerCase() == params['locale']?.toLowerCase() || new Locale(it).displayName?.toLowerCase() == params['locale']?.toLowerCase()
+                }
+                if (foundLocale) {
+                    params['locale'] = foundLocale
+                } else {
+                    command.errors.reject("Row ${index + 1}: Locale '${params['locale']}' is not a supported locale")
                 }
             }
         }
