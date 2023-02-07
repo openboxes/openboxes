@@ -157,6 +157,13 @@
                     },
                 } );
             },
+            "fnRowCallback": function( nRow, aData ) {
+                $('td:eq(1)', nRow).text(aData?.translatedProductName ?? aData?.productName);
+                // If we display translated name, we want to have tooltip with original name of the product
+                if (aData?.translatedProductName) {
+                  $('td:eq(1)', nRow).attr('title', aData?.productName);
+                }
+            },
             "oLanguage": {
                 //"sZeroRecords": "No records found",
                 "sProcessing": "Loading <img alt='spinner' src='${request.contextPath}/images/spinner.gif' /> Loading... "

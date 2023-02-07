@@ -133,7 +133,7 @@
 												</td>
 												<td class="checkable">
                                                     <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-                                                        <format:product product="${inventoryItem?.product}"/>
+														<g:translatedProductName product="${inventoryItem?.product}" />
                                                     </g:link>
 												</td>
 												<td class="checkable">

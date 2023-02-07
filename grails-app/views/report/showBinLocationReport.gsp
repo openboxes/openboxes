@@ -218,9 +218,14 @@
             "bUseRendered": false,
             "aaSorting": [[ 3, "desc" ], [4, "desc"]],
             "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                const productLabel = aData?.translatedProductName ?? aData?.productName;
                 $('td:eq(1)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' + aData["productCode"] + '</a>');
-                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' + aData["productName"] + ' ' +
+                $('td:eq(2)', nRow).html('<a href="${request.contextPath}/inventoryItem/showStockCard/' + aData["id"] + '">' + productLabel + ' ' +
                   renderHandlingIcons(aData) +  '</a>');
+                // If we display translated name, we want to have tooltip with original name of the product
+                if (aData?.translatedProductName) {
+                  $('td:eq(2)', nRow).attr('title', aData?.productName);
+                }
                 if (aData["lotStatus"] === "RECALLED") {
                   $(nRow).removeClass().css('backgroundColor', '#ffcccb').attr("title", "This lot has been recalled");
                 }

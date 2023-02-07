@@ -1364,6 +1364,7 @@ class JsonController {
                     status                      : g.message(code: "binLocationSummary.${it.status}.label"),
                     productCode                 : it.product?.productCode,
                     productName                 : it?.product?.name,
+                    translatedProductName       : it?.product?.translatedName,
                     productGroup                : it?.product?.genericProduct?.name,
                     category                    : it?.product?.category?.name,
                     lotNumber                   : it?.inventoryItem?.lotNumber,
@@ -1393,6 +1394,7 @@ class JsonController {
             [
                     productCode  : it.product?.productCode,
                     productName  : it.product?.name,
+                    translatedProductName : it.product?.translatedName,
                     qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                     qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                     orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
