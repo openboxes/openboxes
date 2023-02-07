@@ -16,7 +16,6 @@ class RoleInterceptor {
 
     // this interceptor depends on SecurityInterceptor
     int order = LOWEST_PRECEDENCE
-
     def static changeActions = ['delete', 'create', 'add', 'process', 'save',
                                 'update', 'importData', 'receive', 'showRecordInventory', 'withdraw', 'cancel', 'change', 'toggle', 'exportAsCsv']
     def static changeControllers = ['createProductFromTemplate']
@@ -33,13 +32,11 @@ class RoleInterceptor {
         'location'     : ['edit'],
         'shipper'      : ['create'],
         'locationGroup': ['create'],
-        'locationType' : ['create'],
-        '*'            : ['remove']
+        'locationType' : ['create']
     ]
 
     def static superuserControllers = []
     def static superuserActions = [
-        '*'                         : ['delete'],
         'console'                   : ['index', 'execute'],
         'inventory'                 : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
         'inventoryItem'             : ['adjustStock', 'transferStock'],
@@ -57,7 +54,6 @@ class RoleInterceptor {
     def static requestorOrManagerActions = [
         'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
         'dashboard'           : ['megamenu'],
-        'dashboardApi'        : ['breadcrumbsConfig'],
         'grails'              : ['errors'],
         'localizationApi'     : ['list'],
         'locationApi'         : ['list'],
@@ -71,7 +67,6 @@ class RoleInterceptor {
     def static authenticatedActions = [
         'api'                 : ['getAppContext', 'getRequestTypes', 'getMenuConfig'],
         'dashboard'           : ['megamenu'],
-        'dashboardApi'        : ['breadcrumbsConfig'],
         'grails'              : ['errors'],
         'localizationApi'     : ['list'],
         'locationApi'         : ['list'],
@@ -85,6 +80,39 @@ class RoleInterceptor {
     }
 
     boolean before() {
+
+        def rules = grailsApplication.config.openboxes.security.rbac.rules
+        def rule = rules.find { it.controller == controllerName && it.actions.contains(actionName) ||
+            it.controller == controllerName && it.actions.contains("*") ||
+            it.controller == "*" && it.actions.contains("*")
+        }
+
+        if (!rule) {
+            log.info "No rule for ${controllerName}:${actionName} -> allow anonymous"
+        } else {
+            log.info "Found rule matching controller ${controllerName}, action ${actionName}: " + rule
+            def minimumRequiredRole = rule.accessRules?.minimumRequiredRole
+            def supplementalRoles = rule.accessRules?.supplementalRoles ?: []
+
+            Boolean isAnonymous = minimumRequiredRole == RoleType.ROLE_ANONYMOUS
+
+            Boolean isMinimumRequiredRole = true
+            if (session.user && minimumRequiredRole) {
+                isMinimumRequiredRole = userService.isUserInRole(session.user, minimumRequiredRole)
+            }
+
+            Boolean isUserInRole = true
+            if (session.user && supplementalRoles.size() > 0) {
+                isUserInRole = userService.isUserInRole(session.user, supplementalRoles)
+            }
+
+            if (isAnonymous || (session.user && isMinimumRequiredRole && isUserInRole)) {
+                log.info "User has access to ${controllerName}.${actionName}"
+                return true
+            }
+            redirect(controller: "errors", action: "handleForbidden")
+            return false
+        }
 
         // Anonymous
         if (SecurityInterceptor.actionsWithAuthUserNotRequired.contains(actionName) || actionName == "chooseLocation" ||

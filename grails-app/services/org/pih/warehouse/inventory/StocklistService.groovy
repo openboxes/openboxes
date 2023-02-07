@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.core.Attachment
@@ -25,7 +26,7 @@ class StocklistService {
     def mailService
     def pdfRenderingService
     def documentService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     Stocklist getStocklist(String id) {
         Requisition requisition = Requisition.findByIdAndIsTemplate(id, true)
@@ -123,7 +124,7 @@ class StocklistService {
         def sw = new StringWriter()
 
         if (requisitionItems) {
-            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+            def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
 
             sw.append(g.message(code: 'product.code.label')).append(",")
             sw.append(g.message(code: 'product.description.label')).append(",")

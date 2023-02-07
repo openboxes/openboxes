@@ -16,7 +16,7 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
-import org.grails.plugins.csv.CSVWriter
+import grails.plugins.csv.CSVWriter
 
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.

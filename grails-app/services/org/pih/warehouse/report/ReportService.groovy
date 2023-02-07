@@ -16,11 +16,9 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.DefaultHttpClient
 import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.invoice.InvoiceType
@@ -40,7 +38,6 @@ import java.text.NumberFormat
 class ReportService implements ApplicationContextAware {
 
     def dataService
-    def inventoryService
     def dashboardService
 
     GrailsApplication grailsApplication

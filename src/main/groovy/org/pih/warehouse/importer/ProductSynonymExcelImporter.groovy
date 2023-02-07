@@ -9,8 +9,9 @@
  **/
 package org.pih.warehouse.importer
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.grails.plugins.excelimport.ExcelImportUtils
+import grails.util.Holders
+import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class ProductSynonymExcelImporter extends AbstractExcelImporter {
 
@@ -26,23 +27,21 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            "product.productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "synonymTypeCode"           : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "locale"                    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "synonym.name"              : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "product.productCode"       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "synonymTypeCode"           : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "locale"                    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            "synonym.name"              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
 
     ProductSynonymExcelImporter(String fileName) {
         super(fileName)
-    }
-
-    def getDataService() {
-        return ApplicationHolder.getApplication().getMainContext().getBean("productSynonymDataService")
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        dataService = Holders.grailsApplication.mainContext.getBean("productSynonymDataService")
     }
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {

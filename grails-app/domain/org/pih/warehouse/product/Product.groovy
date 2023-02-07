@@ -13,7 +13,6 @@ import grails.util.Holders
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.MessageTagLib
 import org.pih.warehouse.auth.AuthService
@@ -32,7 +31,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 /**
  * An product is an instance of a generic.  For instance,

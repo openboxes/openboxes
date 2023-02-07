@@ -1,7 +1,7 @@
 package org.pih.warehouse.order
 
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.junit.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.IdentifierGeneratorTypeCode
@@ -23,7 +23,7 @@ class OrderServiceTests extends GroovyTestCase {
 		DbHelper.findOrCreateLocation('Destination', locationType)
 		DbHelper.findOrCreateAdminUser('Justin', 'Miranda', 'justin.miranda@gmail.com', 'justin.miranda', 'password', true)
 
-		ConfigurationHolder.config.openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.RANDOM
+		Holders.config.openboxes.identifier.purchaseOrder.generatorType = IdentifierGeneratorTypeCode.RANDOM
 	}
 
 	@Test
