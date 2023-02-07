@@ -260,7 +260,7 @@ class IdentifierService {
             throw new IllegalArgumentException("Missing product type")
         }
 
-        def defaultProductTypeId = ConfigurationHolder.config.openboxes.identifier.defaultProductType.id
+        def defaultProductTypeId = Holders.config.openboxes.identifier.defaultProductType.id
         if (!productType.code && productType.id != defaultProductTypeId) {
             throw new IllegalArgumentException("Can only generate sequential product code without specified product type code " +
                 "for default product type with id: ${defaultProductTypeId}")

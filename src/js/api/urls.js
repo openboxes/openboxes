@@ -1,4 +1,4 @@
-const API = '/openboxes/api';
+const API = '/api';
 const GENERIC_API = `${API}/generic`;
 
 // PURCHASE ORDER

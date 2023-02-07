@@ -331,6 +331,8 @@ openboxes:
             format: '$\{productTypeCode}$\{delimiter}$\{sequenceNumber}' # single quote for curly braces escape character
             properties:
                 productTypeCode: "code"
+        defaultProductType:
+            id: "DEFAULT"
 
     order:
         orderStatusPropertyMap:
@@ -339,7 +341,7 @@ openboxes:
     purchaseOrder:
         editableProperties:
             status: "PLACED"
-            deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
+            deny: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitOfMeasure"]
 
 
     # OpenBoxes default line printer port
@@ -461,6 +463,11 @@ openboxes:
             retryOnError: false
             maxRetryAttempts: 3
 
+        # Refresh order summary snapshots
+        refreshOrderSummaryJob:
+            enabled: true
+            cronExpression: "0 0 2 * * ?" # at 02:00:00am every day
+
         # Refresh product availability materialized view
         refreshProductAvailabilityJob:
             enabled: true
@@ -545,7 +552,8 @@ openboxes:
         custom:
             enabled: false
         defaultLocale: 'en'
-        supportedLocales: ['ar', 'en', 'fr', 'de', 'it', 'es', 'pt', 'fi']
+        localizationModeLocale: 'ach'
+        supportedLocales: ['ar','ach','de','en','es','fr','it','pt','fi','zh']
         # Currency configuration
         defaultCurrencyCode: "USD"
         defaultCurrencySymbol: '\$'
@@ -569,7 +577,7 @@ openboxes:
 
     # Allow users to customize logo image url as well as label
     logo:
-        url: "https://openboxes.com/img/logo_30.png"
+        url: "/openboxes/images/logo/openboxes_logo_40x40.jpg"
         label: ""
     report:
         logo:

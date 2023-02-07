@@ -1,6 +1,6 @@
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
@@ -13,11 +13,11 @@ class RefreshOrderSummaryJob {
 
     static triggers = {
         cron name: 'refreshOrderSummaryJobCronTrigger',
-                cronExpression: ConfigurationHolder.config.openboxes.jobs.refreshOrderSummaryJob.cronExpression
+                cronExpression: Holders.config.openboxes.jobs.refreshOrderSummaryJob.cronExpression
     }
 
     def execute(JobExecutionContext context) {
-        Boolean enabled = ConfigurationHolder.config.openboxes.jobs.refreshOrderSummaryJob.enabled
+        Boolean enabled = Holders.config.openboxes.jobs.refreshOrderSummaryJob.enabled
         if (enabled) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing order summary: " + context.mergedJobDataMap)

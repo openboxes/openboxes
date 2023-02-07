@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.order
 
-import grails.orm.PagedResultList
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -17,7 +16,6 @@ import grails.util.Holders
 import java.math.RoundingMode
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
-import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
@@ -1220,7 +1218,7 @@ class OrderService {
             return [:]
         }
 
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         def orderSummaryList =  OrderSummary.findAllByIdInList(orderIds)
         def results = orderSummaryList.inject([:]) { map, OrderSummary orderSummary ->
             map << [(orderSummary?.id): g.message(code: "enum.OrderSummaryStatus.${orderSummary?.derivedStatus}")]

@@ -29,8 +29,50 @@ openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
 openboxes.purchasing.updateUnitPrice.enabled = false
 openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEFINED_PRICE
 
+openboxes.security.rbac.rules = [
+    [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+    [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
+    [controller: '*', actions: ['removeItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    // We probably need a way to handle wildcard in actions as well
+    //[controller: '*', actions: ['remove*'], access: [RoleType.ROLE_SUPERUSER]],
+    //[controller: '*', actions: ['delete*'], access: [RoleType.ROLE_SUPERUSER]]
+    // ... otherwise we'll need to include explicit rules for everything
+    [controller: 'order', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'order', actions: ['removeOrderItem'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    [controller: 'order', actions: ['deleteDocument'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN ]],
+    [controller: 'invoice', actions: ['eraseInvoice'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    [controller: 'invoiceApi', actions: ['removeItem'],  accessRules: [  minimumRequiredRole: RoleType.ROLE_MANAGER, supplementalRoles: [RoleType.ROLE_INVOICE] ]],
+    [controller: 'stockTransfer', actions: ['eraseStockTransfer'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
+    [controller: 'stockMovementItemApi', actions: ['eraseItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
+    [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+    [controller: 'glAccount', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+    [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+    [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
+    [controller: 'purchaseOrderApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+    [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_APPROVER]]],
+    [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
+    [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+    // Other controller actions that might need explicit rules
+    //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
+]
 
 // Global megamenu configuration
+
+openboxes.menuSectionsUrlParts = [
+    inventory: ["inventory", "inventoryItem", "stockTransfer"],
+    products: ["product"],
+    purchasing: ["purchaseOrder"],
+    invoicing: ["invoice"],
+    outbound: ["verifyRequest"],
+    requisitionTemplate: ["requisitionTemplate"],
+    configuration: ["locationsConfiguration"],
+    // for inbound / outbound and purchasing / putaway the same url is used,
+    // so it is underlined directly from stockMovement/show.gsp
+    injectedDirectly: ["stockMovement", "order"]
+]
+
+// TODO: Clean up and add all missing message.properties
 openboxes {
     megamenu {
         dashboard {
@@ -40,8 +82,8 @@ openboxes {
             href = "/dashboard/index"
         }
         analytics {
-            enabled = true
-            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
+            enabled = false
+            minimumRequiredRole = RoleType.ROLE_ADMIN
             label = "analytics.label"
             defaultLabel = "Analytics"
             menuItems = [
@@ -73,7 +115,7 @@ openboxes {
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/batch/importData?type=inventory&execution=e1s1"],
                         [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/list"],
-                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/index"]
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/create"]
                     ]
                 ]
             ]
@@ -87,8 +129,8 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
-                        [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/order/list?orderType=PURCHASE_ORDER"],
+                        [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/purchaseOrder/create", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
+                        [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/purchaseOrder/list"],
                         [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/supplier/list"],
                         [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/stockMovement/createCombinedShipments?direction=INBOUND"],
                         [label: "dashboard.supplierDashboard.label", defaultLabel: "Supplier Dashboard", href: "/dashboard/supplier"]
@@ -98,7 +140,7 @@ openboxes {
         }
         invoicing {
             enabled = true
-            requiredRole = [RoleType.ROLE_INVOICE]
+            supplementalRoles = [RoleType.ROLE_INVOICE]
             label = "react.invoicing.label"
             defaultLabel = "Invoicing"
             subsections = [
@@ -133,15 +175,26 @@ openboxes {
                     defaultLabel: "Putaways",
                     requiredActivitiesAll: ActivityCode.binTrackingList(),
                     menuItems: [
-                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putAway/index"],
+                        [label: "react.putAway.createPutAway.label", defaultLabel: "Create Putaway", href: "/putAway/create"],
                         [label: "react.putAway.list.label", defaultLabel: "List Putaways", href: "/order/list?orderType=PUTAWAY_ORDER&status=PENDING"]
+                    ]
+                ],
+                [
+                    // DEPRECATED!
+                    label: "receiving.label",
+                    defaultLabel: "Receiving",
+                    enabled: false,
+                    menuItems: [
+                        [label: "shipping.createIncomingShipment.label", defaultLabel: "Create inbound shipment", href: "/createShipmentWorkflow/createShipment?type=INCOMING"],
+                        [label: "shipping.listIncoming.label", defaultLabel: "List Inbound Shipments", href: "/shipment/list?type=incoming"],
+                        [label: "default.all.label", defaultLabel: "All", href: "/shipment/list?type=incoming"],
                     ]
                 ]
             ]
         }
         outbound {
             enabled = true
-            label = "outbound.label"
+            label = "default.outbound.label"
             defaultLabel = "Outbound"
             requiredActivitiesAny = [ActivityCode.SEND_STOCK]
             subsections = [
@@ -151,14 +204,26 @@ openboxes {
                     menuItems: [
                         [label: "outbound.create.label", defaultLabel: "Create Outbound Movements", href: "/stockMovement/createOutbound?direction=OUTBOUND"],
                         [label: "outbound.list.label", defaultLabel: "List Outbound Movements", href: "/stockMovement/list?direction=OUTBOUND"],
+                        [label: "requests.list.label", defaultLabel: "List Requests", href: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"],
                         [label: "outboundReturns.create.label", defaultLabel: "Create Outbound Return", href: "/stockTransfer/createOutboundReturn"]
+                    ]
+                ],
+                [
+                    // DEPRECATED!
+                    label: "shipping.label",
+                    defaultLabel: "Shipping",
+                    enabled: false,
+                    menuItems: [
+                        [label: "shipping.createOutgoingShipment.label", defaultLabel: "Create outbound shipment", href: "/createShipmentWorkflow/createShipment?type=OUTGOING"],
+                        [label: "shipping.listOutgoing.label", defaultLabel: "List Outbound Shipments", href: "/shipment/list?type=outgoing"],
+                        [label: "default.all.label", defaultLabel: "All", href: "/shipment/list?type=outgoing"],
                     ]
                 ]
             ]
         }
         reporting {
             enabled = true
-            label = "reporting.label"
+            label = "report.label"
             defaultLabel = "Reporting"
             subsections = [
                 [
@@ -172,7 +237,7 @@ openboxes {
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/report/showInventoryByLocationReport"],
                         [label: "report.cycleCount.label", defaultLabel: "Cycle Count Report", href: "/report/showCycleCountReport"],
                         [label: "report.baselineQohReport.label", defaultLabel: "Baseline QoH Report", href: "/inventory/show"],
-                        [label: "report.onOrderReport.label", defaultLabel: "Order Report", href: "/report/showOnOrderReport"]
+                        [label: "report.onOrderReport.label", defaultLabel: "On Order Report", href: "/report/showOnOrderReport"]
                     ]
                 ],
                 [
@@ -181,6 +246,7 @@ openboxes {
                     menuItems: [
                         [label: "report.forecastReport.label", defaultLabel: "Forecast Report", href: "/report/showForecastReport"],
                         [label: "report.reorderReport.label", defaultLabel: "Reorder Report", href: "/inventory/reorderReport"],
+                        [label: "report.amountOutstandingReport.label", defaultLabel: "Amount Outstanding Report", href: "/report/amountOutstandingOnOrdersReport", supplementalRoles: [RoleType.ROLE_FINANCE]],
                     ]
                 ],
                 [
@@ -218,12 +284,12 @@ openboxes {
                     label: "", // No label
                     defaultLabel: "", // No label
                     menuItems: [
-                        [label: "product.create.label", defaultLabel: "Create product", href: "/product/create"],
+                        [label: "product.create.label", defaultLabel: "Create product", href: "/product/create", minimumRequiredRole: RoleType.ROLE_ADMIN],
                         [label: "products.list.label", defaultLabel: "List Products", href: "/product/list"],
-                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/product/batchEdit"],
-                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/product/importAsCsv"],
-                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv"],
-                        [label: "productType.label", defaultLabel: "Product Type", href: "/productType/list", requiredRole: [RoleType.ROLE_SUPERUSER]]
+                        [label: "product.batchEdit.label", defaultLabel: "Batch edit product", href: "/product/batchEdit", minimumRequiredRole: RoleType.ROLE_ADMIN],
+                        [label: "product.importAsCsv.label", defaultLabel: "Import products", href: "/product/importAsCsv", minimumRequiredRole: RoleType.ROLE_ADMIN],
+                        [label: "product.exportAsCsv.label", defaultLabel: "Export products", href: "/product/exportAsCsv", minimumRequiredRole: RoleType.ROLE_ADMIN],
+                        [label: "productType.label", defaultLabel: "Product Type", href: "/productType/list", minimumRequiredRole: RoleType.ROLE_SUPERUSER]
                     ]
                 ],
                 [
@@ -257,12 +323,12 @@ openboxes {
             defaultLabel = "Stock Lists"
             menuItems = [
                 [label: "requisitionTemplates.list.label", defaultLabel: "List stock lists", href: "/requisitionTemplate/list"],
-                [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/requisitionTemplate/create"],
+                [label: "requisitionTemplates.create.label", defaultLabel: "Create stock list", href: "/requisitionTemplate/create", minimumRequiredRole: RoleType.ROLE_ADMIN],
             ]
         }
         configuration {
             enabled = true
-            requiredRole = [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]
+            minimumRequiredRole = RoleType.ROLE_ADMIN
             label = "configuration.label"
             defaultLabel = "Configuration"
             subsections = [
@@ -280,7 +346,7 @@ openboxes {
                     ]
                 ],
                 [
-                    label: "parties.label",
+                    label: "locations.label",
                     defaultLabel: "Locations",
                     menuItems: [
                         [label: "locations.label", defaultLabel: "Locations", href: "/location/list"],
@@ -309,14 +375,14 @@ openboxes {
                     label: "default.other.label",
                     defaultLabel: "Other",
                     menuItems: [
-                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/budgetCode/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/budgetCode/list"],
                         [label: "containerTypes.label", defaultLabel: "Container Types", href: "/containerType/list"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/document/list"],
                         [label: "documentTypes.label", defaultLabel: "Document Types", href: "/documentType/list"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/eventType/list"],
-                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/glAccountType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/glAccount/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
-                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/orderAdjustmentType/list", requiredRole: [RoleType.ROLE_ADMIN, RoleType.ROLE_SUPERUSER]],
+                        [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/glAccountType/list"],
+                        [label: "glAccount.label", defaultLabel: "GL Account", href: "/glAccount/list"],
+                        [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/orderAdjustmentType/list"],
                         [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/paymentMethodType/list"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/paymentTerm/list"],
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/preferenceType/list"],
@@ -339,32 +405,30 @@ openboxes {
             ]
         }
 
-        orders {
-            enabled = true
-            label = "orders.label"
-            defaultLabel = "Orders"
-        }
-        stockRequest {
-            enabled = true
-            label = "stockRequests.label"
-            defaultLabel = "Stock Requests"
-        }
-        stockMovement {
-            enabled = true
-            label = "stockMovements.label"
-            defaultLabel = "Stock Movements"
-        }
-        putaways {
-            enabled = true
-            label = "putaways.label"
-            defaultLabel = "Putaways"
-        }
-
         // deprecated megamenu configuration
         requisitions {
             enabled = false
             label = "requisitions.label"
             defaultLabel = "Requisitions"
+            subsections = [
+                [
+                    label: "requisition.list.label",
+                    defaultLabel: "List Requisitions",
+                    menuItems: [
+                        [label: "requisition.allIncoming.label", defaultLabel: "All", href: "/requisition/list"],
+                        // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
+                    ],
+                ],
+                [
+                    label: "requisition.create.subsection.label",
+                    defaultLabel: "Create Requisitions",
+                    menuItems: [
+                        [label: "requisition.create.stock.label", defaultLabel: "Create stock requisition", href: "/requisition/chooseTemplate?type=STOCK"],
+                        [label: "requisition.create.nonstock.label", defaultLabel: "Create non-stock requisition", href: "/requisition/create?type=NON_STOCK"],
+                        [label: "requisition.create.adhoc.stock.label", defaultLabel: "Create adhoc stock requisition", href: "/requisition/create?type=ADHOC"],
+                    ]
+                ]
+            ]
         }
         shipping {
             enabled = false
@@ -376,11 +440,35 @@ openboxes {
             label = "receiving.label"
             defaultLabel = "Receiving"
         }
+
+        orders {
+            enabled = true
+            label = "orders.label"
+            defaultLabel = "Orders"
+        }
+
+        stockRequest {
+            enabled = true
+            label = "stockRequests.label"
+            defaultLabel = "Stock Requests"
+        }
+
+        stockMovement {
+            enabled = true
+            label = "stockMovements.label"
+            defaultLabel = "Stock Movements"
+        }
+
+        putaways {
+            enabled = true
+            label = "putaways.label"
+            defaultLabel = "Putaways"
+        }
     }
     requestorMegamenu {
         request {
             enabled = true
-            requiredRole = [RoleType.ROLE_REQUESTOR]
+            supplementalRoles = [RoleType.ROLE_REQUESTOR]
             label = "default.inbound.label"
             defaultLabel = "Inbound"
             subsections = [
@@ -398,208 +486,229 @@ openboxes {
 }
 
 openboxes {
+    dashboard {
+        yearTypes {
+            fiscalYear {
+                start = "07/01" // format: MM/DD, For PIH and the Govt of Dominica fiscal year start July 1
+                end = "06/30" // format: MM/DD
+                labelYearPrefix = "FY "
+                yearFormat = "yy"
+            }
+            calendarYear {
+                start = "01/01"
+                end = "12/31"
+                labelYearPrefix = ""
+                yearFormat = "yyyy"
+            }
+        }
+    }
+}
+
+openboxes {
     dashboardConfig {
+        mainDashboardId = "mainDashboard"
         dashboards {
-            personal {
-                name = "My Dashboard"
-                filters {}
-                widgets = [
-                    [
-                        widgetId: "inventoryByLotAndBin",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "receivingBin",
-                        order: 2
-                    ],
-                    [
-                        widgetId: "inProgressShipments",
-                        order: 3
-                    ],
-                    [
-                        widgetId: "inProgressPutaways",
-                        order: 4
-                    ],
+            mainDashboard {
+                personal {
+                    name = "My Dashboard"
+                    filters {}
+                    widgets = [
+                        [
+                            widgetId: "inventoryByLotAndBin",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "receivingBin",
+                            order   : 2
+                        ],
+                        [
+                            widgetId: "inProgressShipments",
+                            order   : 3
+                        ],
+                        [
+                            widgetId: "inProgressPutaways",
+                            order   : 4
+                        ],
 
-                    [
-                        widgetId: "inventorySummary",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "expirationSummary",
-                        order: 2
-                    ],
-                    [
-                        widgetId: "incomingStock",
-                        order: 3
-                    ],
-                    [
-                        widgetId: "outgoingStock",
-                        order: 4
-                    ],
-                    [
-                        widgetId: "delayedShipments",
-                        order: 5
-                    ],
-                    [
-                        widgetId: "discrepancy",
-                        order: 6
+                        [
+                            widgetId: "inventorySummary",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "expirationSummary",
+                            order   : 2
+                        ],
+                        [
+                            widgetId: "incomingStock",
+                            order   : 3
+                        ],
+                        [
+                            widgetId: "outgoingStock",
+                            order   : 4
+                        ],
+                        [
+                            widgetId: "delayedShipments",
+                            order   : 5
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order   : 6
+                        ]
                     ]
-                ]
-            }
-            warehouse {
-                name = "Warehouse Management"
-                filters {}
-                widgets = [
-                    [
-                        widgetId: "inventoryByLotAndBin",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "receivingBin",
-                        order: 2
-                    ],
-                    [
-                        widgetId: "inProgressShipments",
-                        order: 3
-                    ],
-                    [
-                        widgetId: "inProgressPutaways",
-                        order: 4
-                    ],
-                    [
-                        widgetId: "itemsInventoried",
-                        order: 5
-                    ],
-
-                    [
-                        widgetId: "inventorySummary",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "expirationSummary",
-                        order: 2
-                    ],
-                    [
-                        widgetId: "incomingStock",
-                        order: 3
-                    ],
-                    [
-                        widgetId: "outgoingStock",
-                        order: 4
-                    ],
-                    [
-                        widgetId: "delayedShipments",
-                        order: 5
-                    ],
-                    [
-                        widgetId: "discrepancy",
-                        order: 6
-                    ]
-                ]
-            }
-            inventory {
-                name = "Inventory Management"
-                filters {}
-                widgets = [
-                    [
-                        widgetId: "receivingBin",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "defaultBin",
-                        order: 2
-                    ],
-                    [
-                        widgetId: "negativeInventory",
-                        order: 3
-                    ],
-                    [
-                        widgetId: "expiredStock",
-                        order: 4
-                    ],
-                    [
-                        widgetId: "openStockRequests",
-                        order: 5
-                    ],
-
-                    [
-                        widgetId: "delayedShipments",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "productsInventoried",
-                        order: 2
-                    ]
-                ]
-            }
-            transaction {
-                name = "Transaction Management"
-                filters {}
-                widgets = [
-                    [
-                        widgetId: "fillRateSnapshot",
-                        order: 1
-                    ],
-
-                    [
-                        widgetId: "receivedStockMovements",
-                        order: 1
-                    ],
-                    [
-                        widgetId: "sentStockMovements",
-                        order: 2
-                    ],
-                    [
-                        widgetId: "lossCausedByExpiry",
-                        order: 3
-                    ],
-                    [
-                        widgetId: "percentageAdHoc",
-                        order: 4
-                    ],
-                    [
-                        widgetId: "fillRate",
-                        order: 5
-                    ],
-                    [
-                        widgetId: "stockOutLastMonth",
-                        order: 6
-                    ]
-                ]
-            }
-            fillRate {
-                name = "Fill Rate"
-                filters {
-                    category {
-                        endpoint = "/categoryApi/list"
-                    }
                 }
-                widgets = [
-                    [
-                        widgetId: "fillRateSnapshot",
-                        order: 1
-                    ],
+                warehouse {
+                    name = "Warehouse Management"
+                    filters {}
+                    widgets = [
+                        [
+                            widgetId: "inventoryByLotAndBin",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "receivingBin",
+                            order   : 2
+                        ],
+                        [
+                            widgetId: "inProgressShipments",
+                            order   : 3
+                        ],
+                        [
+                            widgetId: "inProgressPutaways",
+                            order   : 4
+                        ],
 
-                    [
-                        widgetId: "fillRate",
-                        order: 1
+                        [
+                            widgetId: "inventorySummary",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "expirationSummary",
+                            order   : 2
+                        ],
+                        [
+                            widgetId: "incomingStock",
+                            order   : 3
+                        ],
+                        [
+                            widgetId: "outgoingStock",
+                            order   : 4
+                        ],
+                        [
+                            widgetId: "delayedShipments",
+                            order   : 5
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order   : 6
+                        ]
                     ]
-                ]
+                }
+                inventory {
+                    name = "Inventory Management"
+                    filters {}
+                    widgets = [
+                        [
+                            widgetId: "receivingBin",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "defaultBin",
+                            order   : 2
+                        ],
+                        [
+                            widgetId: "negativeInventory",
+                            order   : 3
+                        ],
+                        [
+                            widgetId: "expiredStock",
+                            order   : 4
+                        ],
+                        [
+                            widgetId: "openStockRequests",
+                            order   : 5
+                        ],
+
+                        [
+                            widgetId: "delayedShipments",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "productsInventoried",
+                            order   : 2
+                        ]
+                    ]
+                }
+                transaction {
+                    name = "Transaction Management"
+                    filters {}
+                    widgets = [
+                        [
+                            widgetId: "fillRateSnapshot",
+                            order   : 1
+                        ],
+
+                        [
+                            widgetId: "receivedStockMovements",
+                            order   : 1
+                        ],
+                        [
+                            widgetId: "sentStockMovements",
+                            order   : 2
+                        ],
+                        [
+                            widgetId: "lossCausedByExpiry",
+                            order   : 3
+                        ],
+                        [
+                            widgetId: "percentageAdHoc",
+                            order   : 4
+                        ],
+                        [
+                            widgetId: "fillRate",
+                            order   : 5
+                        ],
+                        [
+                            widgetId: "stockOutLastMonth",
+                            order   : 6
+                        ]
+                    ]
+                }
+                fillRate {
+                    name = "Fill Rate"
+                    filters {
+                        category {
+                            endpoint = "/categoryApi/list"
+                        }
+                    }
+                    widgets = [
+                        [
+                            widgetId: "fillRateSnapshot",
+                            order   : 1
+                        ],
+
+                        [
+                            widgetId: "fillRate",
+                            order   : 1
+                        ]
+                    ]
+                }
+
             }
             supplier {
-                name = "Supplier Dashboard"
-                filters {
-                    supplier {
-                        endpoint = "/api/locations?direction=INBOUND"
+                supplier {
+                    name = "Supplier Dashboard"
+                    filters {
+                        supplier {
+                            endpoint = "/api/locations?direction=INBOUND"
+                        }
                     }
-                }
-                widgets = [
-                    [
-                        widgetId: "numberOfOpenPurchaseOrders",
-                        order: 1
+                    widgets = [
+                        [
+                            widgetId: "numberOfOpenPurchaseOrders",
+                            order   : 1
+                        ]
                     ]
-                ]
+                }
             }
         }
         // TODO: OBPIH-4384 Refactor indicator filters to be more generic (currently filters are hardcoded on the frontend, these should be defined here and rendered there basing on config)
@@ -938,109 +1047,6 @@ openboxes {
     }
 }
 
-//Breadcrumbs configuration
-breadcrumbsConfig {
-    inbound {
-        actionLabel = "react.stockMovement.inbound.create.label"
-        defaultActionLabel = "Create Inbound"
-        listLabel = "react.stockMovement.label"
-        defaultListLabel = "Stock Movement"
-        actionUrl = "/stockMovement/createInbound/"
-        listUrl   = "/stockMovement/list?direction=INBOUND"
-    }
-    outbound {
-        actionLabel = "react.stockMovement.outbound.create.label"
-        defaultActionLabel = "Create Outbound"
-        listLabel = "react.stockMovement.label"
-        defaultListLabel = "Stock Movement"
-        actionUrl = "/stockMovement/createOutbound/"
-        listUrl = "/stockMovement/list?direction=OUTBOUND"
-    }
-    request {
-        actionLabel = "react.stockMovement.request.create.label"
-        defaultActionLabel = "Create Request"
-        listLabel = "react.stockMovement.label"
-        defaultListLabel = "Stock Movement"
-        actionUrl = "/stockMovement/createRequest/"
-        listUrl = "/stockMovement/list?direction=INBOUND"
-    }
-    verifyRequest {
-        actionLabel = "react.stockMovement.request.verify.label"
-        defaultActionLabel = "Verify Request"
-        listLabel = "react.stockMovement.label"
-        defaultListLabel = "Stock Movement"
-        actionUrl = "/stockMovement/list"
-        listUrl = "/stockMovement/list"
-    }
-    putAway {
-        actionLabel = "react.putAway.createPutAway.label"
-        defaultActionLabel = "Create Putaway"
-        listLabel = "react.breadcrumbs.order.label"
-        defaultListLabel = "Order"
-        actionUrl = "/putAway/create/"
-        listUrl = "/order/list?orderType=PUTAWAY_ORDER&status=PENDING"
-    }
-    combinedShipments {
-        actionLabel = "shipmentFromPO.label"
-        defaultActionLabel = "Ship from PO"
-        listLabel = "react.stockMovement.label"
-        defaultListLabel = "Stock Movement"
-        actionUrl = "/stockMovement/createCombinedShipments/"
-        listUrl   = "/stockMovement/list?direction=INBOUND"
-    }
-    invoice {
-        actionLabel = "react.invoice.create.label"
-        defaultActionLabel = "Create"
-        listLabel = "react.invoice.label"
-        defaultListLabel = "Invoice"
-        actionUrl = "/invoice/create/"
-        listUrl   = "/invoice/list/"
-    }
-    stockTransfer {
-        actionLabel = "react.stockTransfer.createStockTransfer.label"
-        defaultActionLabel = "Create Stock Transfer"
-        listLabel = "react.stockTransfer.label"
-        defaultListLabel = "Stock Transfer"
-        actionUrl = "/stockTransfer/create/"
-        listUrl = "/"
-    }
-    replenishment {
-        actionLabel = "react.replenishment.createReplenishment.label"
-        defaultActionLabel = "Create Replenishment"
-        listLabel = "react.replenishment.label"
-        defaultListLabel = "Replenishment"
-        actionUrl = "/replenishment/create/"
-        listUrl = "/"
-    }
-    outboundReturns {
-        actionLabel = "react.outboundReturns.createReturn.label"
-        defaultActionLabel = "Create Outbound Return"
-        listLabel = "react.outboundReturns.label"
-        defaultListLabel = "Outbound Returns"
-        actionUrl = "/stockTransfer/createOutboundReturn/"
-        listUrl = "/"
-    }
-    inboundReturns {
-        actionLabel = "react.inboundReturns.createReturn.label"
-        defaultActionLabel = "Create Inbound Return"
-        listLabel = "react.inboundReturns.label"
-        defaultListLabel = "Inbound Returns"
-        actionUrl = "/stockTransfer/createInboundReturn/"
-        listUrl = "/"
-    }
-    productsConfiguration {
-        actionLabel = "productsConfiguration.label"
-        defaultActionLabel = "Categories and Products Configuration"
-        actionUrl = "/productsConfiguration/index"
-    }
-    locationsConfiguration {
-        actionLabel = "locationsConfiguration.label"
-        defaultActionLabel = "Locations Configuration"
-        actionUrl = "/locationsConfiguration/create"
-    }
-}
-
-
 openboxes.supportLinks = [
     configureOrganizationsAndLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations',
     manageBinLocations: 'https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1311572061/Manage+Bin+Locations',
@@ -1234,3 +1240,6 @@ openboxes {
         }
     }
 }
+
+// Order number prefix for bin replenishment case
+openboxes.stockTransfer.binReplenishment.prefix = Constants.REPLENISHMENT_PREFIX

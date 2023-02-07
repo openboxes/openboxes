@@ -22,12 +22,12 @@ import grails.converters.JSON
 import grails.test.*
 import grails.validation.ValidationException
 
+import testutils.DbHelper
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
-import testutils.DbHelper
 
 @Ignore
 class ShipmentServiceTests extends GroovyTestCase {

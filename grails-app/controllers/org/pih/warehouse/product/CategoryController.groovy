@@ -10,7 +10,8 @@
 package org.pih.warehouse.product
 
 import grails.gorm.transactions.Transactional
-import grails.plugin.springcache.annotations.CacheFlush
+// TODO: Fix CacheFlush
+// import grails.plugin.springcache.annotations.CacheFlush
 
 @Transactional
 class CategoryController {
@@ -43,7 +44,7 @@ class CategoryController {
         redirect(action: "tree")
     }
 
-    @CacheFlush("selectCategoryCache")
+    //  @CacheFlush("selectCategoryCache")
     def saveCategory() {
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
@@ -89,7 +90,7 @@ class CategoryController {
         return [categoryInstance: categoryInstance, rootCategory: productService.getRootCategory()]
     }
 
-    @CacheFlush("selectCategoryCache")
+    //  @CacheFlush("selectCategoryCache")
     def save() {
         def categoryInstance = new Category(params)
 
@@ -122,7 +123,7 @@ class CategoryController {
         }
     }
 
-    @CacheFlush("selectCategoryCache")
+    //  @CacheFlush("selectCategoryCache")
     def update() {
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {
@@ -148,7 +149,7 @@ class CategoryController {
         }
     }
 
-    @CacheFlush("selectCategoryCache")
+    //  @CacheFlush("selectCategoryCache")
     def delete() {
         def categoryInstance = Category.get(params.id)
         if (categoryInstance) {

@@ -20,7 +20,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AlertMessage from 'utils/AlertMessage';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient, { handleError, stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';

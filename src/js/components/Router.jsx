@@ -150,6 +150,7 @@ const AsyncStockMovementInboundList = Loadable({
   loader: () => import('components/stock-movement/inbound/StockMovementInboundList'),
   loading: Loading,
 });
+
 const AsyncStockMovementOutboundList = Loadable({
   loader: () => import('components/stock-movement/outbound/StockMovementOutboundList'),
   loading: Loading,
@@ -167,7 +168,7 @@ const StockMovementList = (props) => {
       return <AsyncStockMovementOutboundList {...props} isRequestsList={isRequestsList} />;
     }
     default:
-      return <Redirect to="/openboxes/" />;
+      return <Redirect to="/" />;
   }
 };
 
