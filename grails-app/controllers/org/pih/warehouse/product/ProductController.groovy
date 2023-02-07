@@ -1160,7 +1160,7 @@ class ProductController {
             excelImporter.validateData(command)
 
             if (command.errors.allErrors) {
-                flash.error = "Failed to import template due to validation errors"
+                flash.errors = command.errors
             } else {
                 flash.message = "Succesfully imported product synonyms"
                 excelImporter.importData(command)
