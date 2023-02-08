@@ -154,7 +154,7 @@
 											${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode}
 										</td>
 										<td>
-											<format:product product="${checklistEntry?.shipmentItem?.inventoryItem?.product}"/>
+											<g:translatedProductName product="${checklistEntry?.shipmentItem?.inventoryItem?.product}" />
 										</td>
 										<td>
 											${checklistEntry?.shipmentItem?.inventoryItem?.lotNumber }
