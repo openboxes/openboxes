@@ -158,9 +158,10 @@ class ReportController {
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
         binLocations = binLocations.collect {
+            Product product = Product.findByProductCode(it.product.productCode)
             [
                     productCode   : it.product.productCode,
-                    productName   : it.product.name,
+                    productName   : product.translatedNameWithLocaleCode,
                     lotNumber     : it.inventoryItem.lotNumber,
                     expirationDate: it.inventoryItem.expirationDate,
                     binLocation   : it?.binLocation?.name ?: "Default Bin",
@@ -692,7 +693,7 @@ class ReportController {
 
                 def printRow = [
                         'Product code'                    : product.productCode ?: '',
-                        'Name'                            : product.name,
+                        'Name'                            : product.translatedNameWithLocaleCode,
                         'Order Period (Days)'             : replenishmentPeriodDays,
                         'Lead Time (Days)'                : leadTimeDays,
                         'Qty On Order'                    : quantityOnOrder,
