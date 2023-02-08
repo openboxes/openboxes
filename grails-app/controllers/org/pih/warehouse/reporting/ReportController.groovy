@@ -187,10 +187,6 @@ class ReportController {
         long startTime = System.currentTimeMillis()
         Location location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandDetails(location, null)
-        data.each {
-            Product product = Product.findByProductCode(it.product_code)
-            it.product_name = product?.translatedNameWithLocaleCode ?: it.product_name
-        }
         if (params.downloadFormat == "csv") {
             String csv = ReportUtil.getCsvForListOfMapEntries(data)
             def filename = "Product Demand - ${location.name}.csv"
