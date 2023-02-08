@@ -20,6 +20,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
@@ -778,19 +779,25 @@ class ProductAvailabilityService {
         def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
             eq("active", true)
             projections {
-                distinct 'id'
+                property 'id'
             }
             and {
                 searchTerms.each { searchTerm ->
                     or {
                         ilike("name", "%" + searchTerm + "%")
+                        synonyms {
+                            and {
+                                ilike("name", "%" + searchTerm + "%")
+                                eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                            }
+                        }
                         inventoryItems {
                             ilike("lotNumber", "%" + searchTerm + "%")
                         }
                     }
                 }
             }
-        }
+        }.unique()
 
         def paginationParams = searchTerms ? [:] : [max: command.maxResults, offset: command.offset]
 

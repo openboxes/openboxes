@@ -107,7 +107,6 @@ class ForecastingService {
             Sql sql = new Sql(dataSource)
             try {
                 data = sql.rows(query, params)
-
             } catch (Exception e) {
                 log.error("Unable to execute query: " + e.message, e)
             }
@@ -298,9 +297,10 @@ class ForecastingService {
         }
 
         data = data.collect {
+            Product product = Product.findByProductCode(it?.product_code)
             [
                     productCode             : it?.product_code,
-                    productName             : it?.product_name,
+                    productName             : product?.translatedNameWithLocaleCode ?: it?.product_name,
                     unitPrice               : it?.price_per_unit,
                     origin                  : it?.origin_name,
                     requestNumber           : it?.request_number,
