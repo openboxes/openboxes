@@ -11,7 +11,6 @@ package org.pih.warehouse.inventory
 
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.ApplicationExceptionEvent
@@ -32,6 +31,7 @@ class InventorySnapshotService {
     boolean transactional = true
 
     def dataSource
+    def gparsService
     def locationService
     def productAvailabilityService
     def persistenceInterceptor
@@ -46,7 +46,7 @@ class InventorySnapshotService {
 
         // Compute bin locations from transaction entries for given location and date
         // Uses GPars to improve performance
-        GParsPool.withPool {
+        gparsService.withPool('PopulateInventorySnapshots') {
             def depotLocations = locationService.getDepots()
             results = depotLocations.collectParallel { Location loc ->
                 def binLocations
