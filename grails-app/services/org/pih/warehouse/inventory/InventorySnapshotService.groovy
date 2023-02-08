@@ -598,15 +598,16 @@ class InventorySnapshotService {
             // Transform data into inventory balance rows
             if (balanceOpening || quantityInbound || quantityOutbound || balanceClosing) {
                 data << [
-                            "Code"       : product.productCode,
-                            "Name"       : product.translatedNameWithLocaleCode,
-                            "Category"   : product.category.name,
-                            "Unit Cost"  : product.pricePerUnit ?: '',
-                            "Opening"    : balanceOpening,
-                            "Credits"    : quantityInbound,
-                            "Debits"     : quantityOutbound,
-                            "Adjustments": quantityAdjustments,
-                            "Closing"    : balanceClosing,
+                            "Code"           : product.productCode,
+                            "Name"           : product.translatedNameWithLocaleCode,
+                            "TranslatedName" : product.translatedName,
+                            "Category"       : product.category.name,
+                            "Unit Cost"      : product.pricePerUnit ?: '',
+                            "Opening"        : balanceOpening,
+                            "Credits"        : quantityInbound,
+                            "Debits"         : quantityOutbound,
+                            "Adjustments"    : quantityAdjustments,
+                            "Closing"        : balanceClosing,
                         ]
             }
         }

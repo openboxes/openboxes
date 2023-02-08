@@ -681,6 +681,7 @@ class ReportService implements ApplicationContextAware {
             [
                     productCode          : it.productCode,
                     productName          : product?.translatedNameWithLocaleCode ?: it.productName,
+                    translatedProductName : product?.translatedName,
                     qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
                     qtyShippedNotReceived: qtyShippedNotReceived ?: '',
                     totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
