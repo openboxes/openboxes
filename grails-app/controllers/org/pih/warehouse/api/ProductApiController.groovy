@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.core.Localization
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
@@ -26,6 +27,7 @@ class ProductApiController extends BaseDomainApiController {
     def forecastingService
     def grailsApplication
     def productAvailabilityService
+    def localizationService
 
     def list = {
         boolean includeInactive = params.boolean('includeInactive') ?: false
@@ -130,9 +132,9 @@ class ProductApiController extends BaseDomainApiController {
 
             products = products.unique()
         } else {
-            products = productService.searchProductDtos(terms)
+            Locale currentLocale = localizationService.getCurrentLocale()
+            products = productService.searchProductDtos(terms, currentLocale)
         }
-
         render([data: products] as JSON)
     }
 

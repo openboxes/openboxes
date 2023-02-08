@@ -275,13 +275,13 @@ class AddItemsPage extends Component {
       this.props.debounceTime,
       this.props.minSearchLength,
       this.props.initialValues.origin.id,
+
     );
   }
 
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchAllData();
     }
   }

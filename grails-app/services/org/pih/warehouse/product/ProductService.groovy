@@ -1242,7 +1242,7 @@ class ProductService {
         return results
     }
 
-    def searchProductDtos(String[] terms) {
+    def searchProductDtos(String[] terms, locale = null) {
         def query = """
             select distinct
             product.id, 
@@ -1253,6 +1253,7 @@ class ProductService {
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
             product.lot_and_expiry_control as lotAndExpiryControl,
+            ${locale ? "synonym.name as translatedName," : ""}
             # Return whether search term returns an exact match
             ifnull(
                 product.product_code = '${terms.join(" ")}' or 
@@ -1268,7 +1269,16 @@ class ProductService {
                 where pci.product_id = product.id 
                 group by pci.product_id
             ) as productColor
-            from product """
+            from product
+            """
+
+        if (locale) {
+            query += """
+            left outer join synonym
+                on (product.id = synonym.product_id and
+                synonym.locale = '${locale}' and
+                synonym.synonym_type_code = 'DISPLAY_NAME')"""
+        }
 
         if (terms && terms.size() > 0) {
             query += """
