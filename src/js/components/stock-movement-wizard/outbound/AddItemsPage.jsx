@@ -672,7 +672,6 @@ class AddItemsPage extends Component {
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
-
           const lineItemsBackendData = _.map(
             lineItems,
             val => ({
