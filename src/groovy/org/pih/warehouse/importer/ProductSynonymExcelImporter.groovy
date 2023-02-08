@@ -21,7 +21,7 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter {
                     'A': 'product.productCode',
                     'B': 'synonymTypeCode',
                     'C': 'locale',
-                    'D': 'synonym.name',
+                    'D': 'name',
             ]
     ]
 
@@ -29,7 +29,7 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter {
             "product.productCode"       : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "synonymTypeCode"           : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
             "locale"                    : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
-            "synonym.name"              : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
+            "name"                      : ([expectedType: ExcelImportUtils.PROPERTY_TYPE_STRING, defaultValue: null]),
     ]
 
 
