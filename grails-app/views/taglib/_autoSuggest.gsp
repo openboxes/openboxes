@@ -53,7 +53,6 @@
                 return false;
             },
             select: function(event, ui) {
-              console.log(ui);
                 if (ui.item) {
                     var textField = $(this);
                     var hiddenField = $("#${attrs.id}-id");
