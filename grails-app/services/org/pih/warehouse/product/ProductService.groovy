@@ -1425,7 +1425,7 @@ class ProductService {
 
         // Validation not to allow having more than one synonym of DISPLAY_NAME type for one locale
         if (!validateMultipleSynonymsOfType(product.synonyms, synonymTypeCode, SynonymTypeCode.DISPLAY_NAME, locale)) {
-            throw new IllegalArgumentException("${g.message(code: 'synonym.validation.multipleSynonym.error.label')} ${SynonymTypeCode.DISPLAY_NAME}")
+            throw new IllegalArgumentException("${g.message(code: 'synonym.validation.multipleSynonym.error.label')}")
         }
         Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
         product.addToSynonyms(synonym)

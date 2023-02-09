@@ -68,7 +68,7 @@ class ProductSynonymDataService {
                         SynonymTypeCode.DISPLAY_NAME,
                         new Locale(params['locale']))
                 ) {
-                    command.errors.reject("Row ${index + 1}: ${g.message(code: 'synonym.validation.multipleSynonym.error.label')} ${SynonymTypeCode.DISPLAY_NAME}")
+                    command.errors.reject("Row ${index + 1}: ${g.message(code: 'synonym.validation.multipleSynonym.error.label')}")
                 }
             }
         }
