@@ -796,7 +796,7 @@ class AddItemsPage extends Component {
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
             product: {
               ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
+              label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
             },
           };
         },
@@ -815,7 +815,7 @@ class AddItemsPage extends Component {
             quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
             product: {
               ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
+              label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
             },
           };
         },
@@ -829,7 +829,7 @@ class AddItemsPage extends Component {
           quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
           product: {
             ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
+            label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
           },
         }),
       );
