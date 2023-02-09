@@ -1,31 +1,23 @@
 <input
-    id="${attrs.id}-field"
+    id="${attrs.id}"
+    name="${attrs.name}"
     placeholder="${attrs.placeholder}"
     required="${attrs.required}"
     style="${attrs.style}"
+    size="${attrs.size}"
+    value="${attrs.value}"
     type="text"
     class="text"
 />
-<input id="${attrs.id}" type="hidden" name="${attrs.name}"  />
-
-<script language="javascript">
-    $(document).ready(function() {
-
-      $("#${attrs.id}-field")
-        .on('input', function () {
-        // prevent user from inputting any characters that are not digits, dot or a comma
-        this.value = this.value.replace(/(?![\d,.])./g,'');
-
-        // there is currently no easy way in javascript to reverse a localized number string
-        // so we are reverse engineering this by localizing a test number eg. 1234.5
-        // and extracting the thousand and decimal separators
-        const [thousandSeparator, decimalSeparator] = (1234.5).toLocaleString("${attrs.locale ?: 'en'}").match(/(\D+)/g);
-        const delocalizedNumberString = this.value
-          .replaceAll(thousandSeparator, "")
-          .replaceAll(decimalSeparator, ".")
-
-        $("#${attrs.id}").val(parseFloat(delocalizedNumberString))
-      })
-
+<script>
+  $(document)
+    .ready(function () {
+      $("#${attrs.id}")
+        .on("input", function () {
+          const sign = this.value.substring(0, 1) === "-" ? "-" : ""
+          // prevent user from inputting any other characters than: digits or decimal separator of the current locale
+          const parsedNumber = this.value.replace(/(?![\d"${decimalSeparator}"])./g, "");
+          this.value = sign + parsedNumber
+        })
     });
 </script>

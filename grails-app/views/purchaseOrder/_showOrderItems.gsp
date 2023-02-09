@@ -445,7 +445,7 @@
 
           if (!product) $("#product-suggest").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!quantity) $("#quantity").notify("${g.message(code: 'default.required.label', default: 'Required')}")
-          if (!unitPrice) $("#unitPrice-field").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!unitPrice) $("#unitPrice").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!quantityUom) $("#quantityUom_chosen").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!quantityPerUom) $("#quantityPerUom").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!budgetCode && isAccountingRequired) {

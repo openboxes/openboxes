@@ -739,7 +739,6 @@ class OrderController {
             }
         }
         if (!orderItem) {
-            params.unitPrice = new BigDecimal(params.unitPrice)
             orderItem = new OrderItem(params)
             order.addToOrderItems(orderItem)
         }
