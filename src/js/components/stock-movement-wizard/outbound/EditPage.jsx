@@ -84,19 +84,19 @@ const FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: value => (
-            <span className="d-flex">
-              <Tooltip
-                html={<div className="text-truncate">{value.name}</div>}
-                theme="dark"
-                disabled={!value.translatedName}
-                position="top-start"
-              >
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.translatedName}
+              position="top-start"
+            >
+              <span className="d-flex">
                 <span className="text-truncate">
                   {(value.translatedName ?? value.name) || ''}
                 </span>
                 {renderHandlingIcons(value ? value.handlingIcons : null)}
-              </Tooltip>
-            </span>
+              </span>
+            </Tooltip>
           ),
         },
         getDynamicAttr: ({ subfield }) => ({

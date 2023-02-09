@@ -9,31 +9,31 @@ import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 
 const Option = option => (
-  <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-    <Tooltip
-      html={<div className="text-truncate">{option.originalLabel}</div>}
-      theme="dark"
-      disabled={option.originalLabel === option.label}
-      position="top-start"
-    >
+  <Tooltip
+    html={<div className="text-truncate">{option.originalLabel}</div>}
+    theme="transparent"
+    disabled={option.originalLabel === option.label}
+    position="top-start"
+  >
+    <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
       {option.label}
-      &nbsp;
+        &nbsp;
       {renderHandlingIcons(option.handlingIcons)}
-    </Tooltip>
-  </strong>);
+    </strong>
+  </Tooltip>);
 
 const SelectedValue = option => (
-  <span className="d-flex align-items-center">
-    <Tooltip
-      html={<div className="text-truncate">{option.originalLabel}</div>}
-      theme="dark"
-      disabled={option.originalLabel === option.label}
-      position="top-start"
-    >
+  <Tooltip
+    html={<div className="text-truncate">{option.originalLabel}</div>}
+    theme="dark"
+    disabled={option.originalLabel === option.label}
+    position="top-start"
+  >
+    <span className="d-flex align-items-center">
       <span className="text-truncate">{option.label}</span>
       &nbsp;{renderHandlingIcons(option?.handlingIcons)}
-    </Tooltip>
-  </span>
+    </span>
+  </Tooltip>
 );
 
 const ProductSelect = ({
