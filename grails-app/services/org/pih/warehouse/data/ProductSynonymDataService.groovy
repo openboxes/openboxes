@@ -20,6 +20,7 @@ class ProductSynonymDataService {
     def grailsApplication
 
     Boolean validateData(ImportDataCommand command) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         log.info "Validate data " + command.filename
 
         command.data.eachWithIndex { params, index ->
@@ -30,8 +31,11 @@ class ProductSynonymDataService {
                 }
             }
 
+            Product product = null
+            SynonymTypeCode synonymTypeCode = null
+
             if (params['product.productCode']) {
-                Product product = Product.findByProductCode(params['product.productCode'])
+                product = Product.findByProductCode(params['product.productCode'])
                 if (!product) {
                     command.errors.reject("Row ${index + 1}: Product with code '${params['product.productCode']}' does not exist")
                 }
@@ -40,7 +44,7 @@ class ProductSynonymDataService {
             if (params['synonymTypeCode']) {
                 params['synonymTypeCode'] = params['synonymTypeCode']?.toUpperCase()
                 try {
-                    SynonymTypeCode.valueOf(params['synonymTypeCode']);
+                    synonymTypeCode = SynonymTypeCode.valueOf(params['synonymTypeCode'])
                 } catch (IllegalArgumentException ex) {
                     command.errors.reject("Row ${index + 1}: Synonym type code '${params['synonymTypeCode']} does not exist")
                 }
@@ -55,6 +59,16 @@ class ProductSynonymDataService {
                     params['locale'] = foundLocale
                 } else {
                     command.errors.reject("Row ${index + 1}: Locale '${params['locale']}' is not a supported locale")
+                }
+
+                // Validation not to allow having more than one synonym of DISPLAY_NAME type for one locale
+                if (!productService.validateMultipleSynonymsOfType(
+                        product?.synonyms,
+                        synonymTypeCode,
+                        SynonymTypeCode.DISPLAY_NAME,
+                        new Locale(params['locale']))
+                ) {
+                    command.errors.reject("Row ${index + 1}: ${g.message(code: 'synonym.validation.multipleSynonym.error.label')} ${SynonymTypeCode.DISPLAY_NAME}")
                 }
             }
         }

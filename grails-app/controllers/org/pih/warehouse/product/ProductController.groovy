@@ -1014,14 +1014,18 @@ class ProductController {
     def addSynonymToProduct = {
         println "addSynonymToProduct() " + params
         Product product = null
+        def inputValues = null
         try {
             product = productService.addSynonymToProduct(params.id, params.synonymTypeCode, params.synonym, params.locale)
         } catch (IllegalArgumentException e) {
             // If adding a synonym fails, we still want to return the product to the view
             product = Product.read(params.id)
+            // If a validation error occurs, we want to return those values to the view,
+            // and set them as initialValues of the form, so a user can correct him/herself
+            inputValues = params
             flash.error = e.message
         }
-        render(template: 'productSynonyms', model: [productInstance: product])
+        render(template: 'productSynonyms', model: [productInstance: product, inputValues: inputValues])
     }
 
     /**
