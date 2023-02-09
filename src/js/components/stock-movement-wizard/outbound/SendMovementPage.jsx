@@ -211,12 +211,19 @@ const FIELDS = {
         attributes: {
           className: 'text-left',
           formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                &nbsp;{value.name}
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.translatedName}
+              position="top-start"
+            >
+              <span className="d-flex">
+                <span className="text-truncate">
+                  {value.translatedName ?? value.name}
+                </span>
+                {renderHandlingIcons(value.handlingIcons)}
               </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
+            </Tooltip>
           ),
         },
       },

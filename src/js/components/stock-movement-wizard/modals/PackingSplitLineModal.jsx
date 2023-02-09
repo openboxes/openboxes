@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -40,12 +41,19 @@ const FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name}
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.translatedName}
+              position="top-start"
+            >
+              <span className="d-flex">
+                <span className="text-truncate">
+                  {value.translatedName ?? value.name}
+                </span>
+                {renderHandlingIcons(value.handlingIcons)}
               </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
+            </Tooltip>
           ),
         },
       },

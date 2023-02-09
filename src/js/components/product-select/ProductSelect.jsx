@@ -11,8 +11,8 @@ import Select from 'utils/Select';
 const Option = option => (
   <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
     <Tooltip
-      html={<div className="custom-tooltip">{option.originalLabel}</div>}
-      theme="transparent"
+      html={<div className="text-truncate">{option.originalLabel}</div>}
+      theme="dark"
       disabled={option.originalLabel === option.label}
       position="top-start"
     >
@@ -25,8 +25,8 @@ const Option = option => (
 const SelectedValue = option => (
   <span className="d-flex align-items-center">
     <Tooltip
-      html={<div className="custom-tooltip">{option.originalLabel}</div>}
-      theme="transparent"
+      html={<div className="text-truncate">{option.originalLabel}</div>}
+      theme="dark"
       disabled={option.originalLabel === option.label}
       position="top-start"
     >

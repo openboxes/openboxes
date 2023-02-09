@@ -86,8 +86,8 @@ const FIELDS = {
           formatValue: value => (
             <span className="d-flex">
               <Tooltip
-                html={<div className="custom-tooltip">{value.name}</div>}
-                theme="transparent"
+                html={<div className="text-truncate">{value.name}</div>}
+                theme="dark"
                 disabled={!value.translatedName}
                 position="top-start"
               >
@@ -190,6 +190,7 @@ const FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          productTranslatedName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,

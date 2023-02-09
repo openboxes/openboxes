@@ -89,8 +89,8 @@ const FIELDS = {
               className="d-flex align-items-center"
             >
               <Tooltip
-                html={<div className="custom-tooltip">{option.originalLabel}</div>}
-                theme="transparent"
+                html={<div className="text-truncate">{option.originalLabel}</div>}
+                theme="dark"
                 disabled={option.label === option.originalLabel}
                 position="top-start"
               >
@@ -119,7 +119,7 @@ const FIELDS = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {(value.translatedName ?? value.name) || ''}
+                {value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
@@ -285,7 +285,7 @@ class SubstitutionsModal extends Component {
               id: `${val.productId}`,
               productCode: `${val.productCode}`,
               name: `${val.productName}`,
-              translatedName: `${val.product.translatedName}`,
+              translatedName: val.product.translatedName,
               minExpirationDate: `${val.minExpirationDate}`,
               quantityAvailable: `${val.quantityAvailable}`,
               handlingIcons: val.product.handlingIcons,
@@ -303,7 +303,7 @@ class SubstitutionsModal extends Component {
               id: `${this.state.attr.lineItem.product.id}`,
               productCode: `${this.state.attr.lineItem.productCode}`,
               name: `${this.state.attr.lineItem.productName}`,
-              translatedName: `${this.state.attr.lineItem.product.translatedName}`,
+              translatedName: this.state.attr.lineItem.product.translatedName,
               minExpirationDate: this.state.attr.lineItem.minExpirationDate,
               quantityAvailable: this.state.attr.lineItem.quantityAvailable,
             },
@@ -402,10 +402,20 @@ class SubstitutionsModal extends Component {
             />: {this.state.attr.lineItem.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate
-              id="react.stockMovement.productName.label"
-              defaultMessage="Product name"
-            />: {this.state.attr.lineItem.productName}
+            <Tooltip
+              html={<div className="text-truncate">{this.state.attr.lineItem.product.name}</div>}
+              theme="dark"
+              disabled={!this.state.attr.lineItem.product.translatedName}
+              position="top-start"
+            >
+              <Translate
+                id="react.stockMovement.productName.label"
+                defaultMessage="Product name"
+              />: {
+              this.state.attr.lineItem.product.translatedName ??
+              this.state.attr.lineItem.product.name
+              }
+            </Tooltip>
           </div>
           <div className="font-weight-bold">
             <Translate

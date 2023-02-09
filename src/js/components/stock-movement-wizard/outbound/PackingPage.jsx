@@ -10,6 +10,7 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -59,12 +60,19 @@ const FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name}
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.translatedName}
+              position="top-start"
+            >
+              <span className="d-flex">
+                <span className="text-truncate">
+                  {value.translatedName ?? value.name}
+                </span>
+                {renderHandlingIcons(value.handlingIcons)}
               </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
+            </Tooltip>
           ),
         },
       },
