@@ -78,7 +78,7 @@ const FIELDS = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                &nbsp;{value.name}
+                &nbsp;{value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value.handlingIcons)}
             </span>

@@ -109,7 +109,8 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
             quantityAvailable: obj.quantityAvailable,
             minExpirationDate: obj.minExpirationDate,
             handlingIcons: obj.product.handlingIcons,
-            label: `${obj.productCode} - ${obj.name}`,
+            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
+            originalLabel: `${obj.productCode} - ${obj.name}`,
             color: obj.color,
           }
         ))))

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -87,24 +88,38 @@ const FIELDS = {
               style={{ color: option.color ? option.color : 'black' }}
               className="d-flex align-items-center"
             >
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+              <Tooltip
+                html={<div className="custom-tooltip">{option.originalLabel}</div>}
+                theme="transparent"
+                disabled={option.label === option.originalLabel}
+                position="top-start"
+              >
+                <span className="text-truncate">
+                  {option.label}
+                  &nbsp;
+                  {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
+                </span>
+              </Tooltip>
             </strong>
           ),
           valueRenderer: option => (
-            <span className="d-flex align-items-center">
+            <Tooltip
+              html={<div className="custom-tooltip">{option.originalLabel}</div>}
+              theme="transparent"
+              disabled={option.label === option.originalLabel}
+              position="top-start"
+            >
               <span className="text-truncate">
                 {option.label}
+                  &nbsp;
+                {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
               </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
+            </Tooltip>
           ),
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name || ''}
+                {(value.translatedName ?? value.name) || ''}
               </span>
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
@@ -270,6 +285,7 @@ class SubstitutionsModal extends Component {
               id: `${val.productId}`,
               productCode: `${val.productCode}`,
               name: `${val.productName}`,
+              translatedName: `${val.product.translatedName}`,
               minExpirationDate: `${val.minExpirationDate}`,
               quantityAvailable: `${val.quantityAvailable}`,
               handlingIcons: val.product.handlingIcons,
@@ -287,6 +303,7 @@ class SubstitutionsModal extends Component {
               id: `${this.state.attr.lineItem.product.id}`,
               productCode: `${this.state.attr.lineItem.productCode}`,
               name: `${this.state.attr.lineItem.productName}`,
+              translatedName: `${this.state.attr.lineItem.product.translatedName}`,
               minExpirationDate: this.state.attr.lineItem.minExpirationDate,
               quantityAvailable: this.state.attr.lineItem.quantityAvailable,
             },

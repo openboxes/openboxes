@@ -678,7 +678,7 @@ class AddItemsPage extends Component {
               ...val,
               product: {
                 ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
+                label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
               },
             }),
           );

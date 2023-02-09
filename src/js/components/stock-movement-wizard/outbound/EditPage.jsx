@@ -9,6 +9,7 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -84,10 +85,17 @@ const FIELDS = {
         attributes: {
           formatValue: value => (
             <span className="d-flex">
-              <span className="text-truncate">
-                {value.name || ''}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
+              <Tooltip
+                html={<div className="custom-tooltip">{value.name}</div>}
+                theme="transparent"
+                disabled={!value.translatedName}
+                position="top-start"
+              >
+                <span className="text-truncate">
+                  {(value.translatedName ?? value.name) || ''}
+                </span>
+                {renderHandlingIcons(value ? value.handlingIcons : null)}
+              </Tooltip>
             </span>
           ),
         },
@@ -341,7 +349,6 @@ class EditItemsPage extends Component {
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchAllData(false);
     }
   }
@@ -355,6 +362,7 @@ class EditItemsPage extends Component {
 
     // If we change the language, refetch the reason codes
     if (nextProps.currentLocale !== this.props.currentLocale) {
+      this.fetchItems();
       this.props.fetchReasonCodes();
     }
   }
