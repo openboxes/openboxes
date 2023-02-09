@@ -97,12 +97,19 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: value => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {value.name || ''}
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.translatedName}
+              position="top-start"
+            >
+              <span className="d-flex align-items-center">
+                <span className="text-truncate">
+                  {value.translatedName ?? value.name}
+                </span>
+                {renderHandlingIcons(value ? value.handlingIcons : null)}
               </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
+            </Tooltip>
           ),
         },
         getDynamicAttr: ({ subfield }) => ({
@@ -231,6 +238,7 @@ const AD_HOCK_FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          translatedProductName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,

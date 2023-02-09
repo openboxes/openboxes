@@ -190,7 +190,7 @@ const FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
-          productTranslatedName: fieldValue?.product?.translatedName,
+          translatedProductName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
