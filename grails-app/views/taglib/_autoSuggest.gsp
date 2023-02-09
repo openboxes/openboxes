@@ -88,6 +88,16 @@
                 // Set focus on the next field
                 $(this).focusNextInputField();
 
+                const setTooltip = (tooltip) => {
+                  if (tooltip) {
+                    $("#${attrs.id}-suggest").attr('title', tooltip);
+                    return;
+                  }
+                  $("#${attrs.id}-suggest").attr('title', null);
+                }
+
+                // If the tooltip property is passed from the API, assign it to the input
+                setTooltip(ui?.item?.tooltip)
                 // Trigger the select
                 $("#${attrs.id}-suggest").trigger("selected");
                 return false;

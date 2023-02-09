@@ -853,7 +853,7 @@ class JsonController {
                     inventoryItemList = inventoryItemList.sort { it?.expirationDate }
                 }
 
-                def localizedName = localizationService.getLocalizedString(product.name)
+                def localizedName = product?.translatedName ?: product?.name
 
 
                 // Convert product attributes to JSON object attributes
@@ -870,7 +870,8 @@ class JsonController {
                         desc          : product.description,
                         inventoryItems: inventoryItemList,
                         handlingIcons : product?.getHandlingIcons(),
-                        color         : product?.color
+                        color         : product?.color,
+                        tooltip       : product?.translatedName ? product?.name : null
                 ]
             }
         }
