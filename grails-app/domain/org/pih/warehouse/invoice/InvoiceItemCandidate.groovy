@@ -93,10 +93,7 @@ class InvoiceItemCandidate {
     }
 
     Boolean isAdjustment() {
-        if (adjustmentAmount || adjustmentPercentage) {
-            return true
-        }
-        return false
+        return adjustmentAmount || adjustmentPercentage
     }
 
     Map toJson() {
