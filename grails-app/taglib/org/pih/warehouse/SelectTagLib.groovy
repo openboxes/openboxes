@@ -40,6 +40,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.requisition.CommodityClass
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -127,6 +128,19 @@ class SelectTagLib {
         attrs.value = attrs.value
         attrs.optionKey = "id"
         attrs.optionValue = { it.name + " (" + it.productCount + ")" }
+        out << g.select(attrs)
+    }
+
+    @Cacheable("selectProductTypeCache")
+    def selectProductType = { attrs, body ->
+        def productTypes = ProductType.list(sort: "name").collect {
+            [id: it.id, name: it.name]
+        }
+        attrs.from = productTypes
+        attrs.multiple = true
+        attrs.value = attrs.value
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 
