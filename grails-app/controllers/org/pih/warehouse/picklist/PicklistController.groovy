@@ -19,7 +19,6 @@ class PicklistController {
     def scaffold = true
 
     def picklistService
-    def pdfRenderingService
 
     def save = {
         def jsonRequest = request.JSON

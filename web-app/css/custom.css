@@ -1212,7 +1212,7 @@ span.tag { border: 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-rad
 span.tag a { font-weight: none; color: #82ad2b; text-decoration:none; font-size: 11px;  } 
 
 /*span.lotNumber { 1px solid #a5d24a; -moz-border-radius:2px; -webkit-border-radius:2px; display: block; color: black; font-weight: bold; margin-right: 5px; margin-bottom:5px;font-family: helvetica;  font-size:13px; }*/
-.lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
+.lotNumber { font-family: ui-monospace, monospace, sans-serif; vertical-align: middle; text-transform: uppercase; }
 .genericName { text-transform: uppercase; }
 #more { background-color: #ddd; padding: 10px; }
 
