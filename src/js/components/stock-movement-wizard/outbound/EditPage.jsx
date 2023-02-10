@@ -363,7 +363,6 @@ class EditItemsPage extends Component {
 
     // If we change the language, refetch the reason codes
     if (nextProps.currentLocale !== this.props.currentLocale) {
-      this.fetchItems();
       this.props.fetchReasonCodes();
     }
   }
