@@ -784,11 +784,12 @@ class ProductAvailabilityService {
         def innerProductIds = searchTerms ?
                 productService.searchProducts(searchTerms.toArray(), [])?.collect { it.id } : []
 
+        // Retrieve all product types with SEARCHABLE and SEARCHABLE_NO_STOCK activity codes
         String productTypeQuery = "select pt from ProductType pt left join pt.supportedActivities sa where sa=:productActivityCode"
         def searchableProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE])
         def searchableNoStockProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE_NO_STOCK])
 
-        // Detached criteria used as a subquery to get all
+        // Detached criteria used as a subquery to get aggregated quantity on hand value for a product location pair
         DetachedCriteria aggregatedQuantityQuery = DetachedCriteria.forClass(ProductAvailability, 'pa').with {
             setProjection Projections.sum('pa.quantityOnHand')
             add(Restrictions.eqProperty('pa.product.id', 'this.id'))
