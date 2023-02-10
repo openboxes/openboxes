@@ -106,6 +106,7 @@ const ProductSelect = ({
       async
       options={[]}
       loadOptions={loadProductOptions}
+      // showLabelTooltip
       onMenuClose={() => {
         setLoadedOptions([]);
         setSearchTerm('');
