@@ -167,7 +167,7 @@
                                                     ${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}
                                                 </td>
                                                 <td>
-                                                    <format:product product="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}"/>
+                                                    <g:translatedProductName product="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}"/>
                                                 </td>
                                                 <td>
                                                     ${checklistEntry?.shipmentItem?.inventoryItem?.lotNumber?:checklistEntry?.shipmentItem?.lotNumber  }

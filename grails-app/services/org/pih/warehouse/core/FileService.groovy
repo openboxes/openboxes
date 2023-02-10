@@ -140,7 +140,7 @@ class FileService {
             return [
                     parentContainer: parentContainer ? parentContainer?.name : childContainer?.name,
                     childContainer : parentContainer ? childContainer?.name : null,
-                    productName    : shipmentItem.inventoryItem?.product?.name,
+                    productName    : shipmentItem.inventoryItem?.product?.translatedName?: shipmentItem.inventoryItem?.product?.name,
                     lotNumber      : shipmentItem?.inventoryItem?.lotNumber ?: "",
                     expirationDate : shipmentItem?.inventoryItem?.expirationDate?.format("dd-MMM-yyyy") ?: "",
                     quantity       : "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure ?: ''}",
@@ -183,7 +183,7 @@ class FileService {
 
             return [
                     productCode      : shipmentItem.inventoryItem?.product?.productCode,
-                    productName      : shipmentItem.inventoryItem?.product?.name,
+                    productName      : shipmentItem.inventoryItem?.product?.translatedName ?: shipmentItem.inventoryItem?.product?.name,
                     manufacturerName : manufacturerName,
                     origin           : "",
                     unitOfMeasure    : shipmentItem.inventoryItem?.product?.unitOfMeasure,

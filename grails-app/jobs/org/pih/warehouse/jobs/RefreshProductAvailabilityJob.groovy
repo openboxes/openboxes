@@ -9,22 +9,18 @@
  **/
 package org.pih.warehouse.jobs
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
-//@DisallowConcurrentExecution
 class RefreshProductAvailabilityJob {
 
-    //def concurrent = false
+    def concurrent = true  // make `static` in Grails 3
     def productAvailabilityService
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
 
     def execute(JobExecutionContext context) {
-        Boolean enabled = ConfigurationHolder.config.openboxes.jobs.refreshProductAvailabilityJob.enabled
-        if (enabled) {
+        if (JobUtils.shouldExecute(RefreshProductAvailabilityJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing product availability data: " + context.mergedJobDataMap)
             boolean forceRefresh = context.mergedJobDataMap.getBoolean("forceRefresh")?:false

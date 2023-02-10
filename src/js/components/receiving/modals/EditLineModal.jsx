@@ -241,6 +241,7 @@ class EditLineModal extends Component {
         validate={this.validate}
         initialValues={this.state.formValues}
         fields={FIELDS}
+        wrapperClassName={this.props.wrapperClassName}
         formProps={{
           shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
           debouncedProductsFetch: this.debouncedProductsFetch,
@@ -286,4 +287,9 @@ EditLineModal.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
+  wrapperClassName: PropTypes.string,
+};
+
+EditLineModal.defaultProps = {
+  wrapperClassName: null,
 };

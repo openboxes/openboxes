@@ -174,6 +174,7 @@ class DashboardController {
                 menu                    : translatedMenu,
                 configurationSection    : configurationSection,
                 megamenuConfig          : grailsApplication.config.openboxes.megamenu,
+                menuSectionsUrlParts    : grailsApplication.config.openboxes.menuSectionsUrlParts as JSON
         ]
     }
 

@@ -65,7 +65,7 @@
                                 </g:if>
                                 <g:else>
                                     <div class="product-name">
-                                        ${receiptItem?.product?.name}
+                                        <g:translatedProductName product="${receiptItem?.product}" />
                                     </div>
                                 </g:else>
                             </td>

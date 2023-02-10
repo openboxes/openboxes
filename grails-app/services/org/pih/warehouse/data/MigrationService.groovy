@@ -12,7 +12,6 @@ package org.pih.warehouse.data
 
 import grails.validation.ValidationException
 import groovy.sql.Sql
-import groovyx.gpars.GParsPool
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
@@ -21,14 +20,11 @@ import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PartyType
-import org.pih.warehouse.core.PreferenceTypeCode
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
-import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.receiving.Receipt
@@ -39,11 +35,10 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 class MigrationService {
 
     def dataService
+    def gparsService
     def inventoryService
     def persistenceInterceptor
-    def mailService
     def dataSource
-    def sessionFactory
 
     boolean transactional = true
 
@@ -109,7 +104,7 @@ class MigrationService {
 
         def currentInventory
 
-        GParsPool.withPool {
+        gparsService.withPool('CurrentInventory') {
 
             log.info("locations: ${locations.size()}")
             currentInventory = locations.collectParallel { Location location ->
@@ -228,7 +223,7 @@ class MigrationService {
     def migrateInventoryTransactions() {
         def locationCounts = getLocationsWithTransactions([TransactionCode.INVENTORY])
 
-        GParsPool.withPool {
+        gparsService.withPool('MigrateInventoryTransactions') {
             locationCounts.eachParallel {
                 persistenceInterceptor.init()
                 def location = Location.get(it.locationId)
@@ -407,7 +402,7 @@ class MigrationService {
         List suppliers = getSuppliersForMigration()
         PartyType partyType = PartyType.findByCode("ORG")
 
-        GParsPool.withPool {
+        gparsService.withPool('MigrateOrganizations') {
             migratedList = suppliers.collectParallel { supplier ->
                 persistenceInterceptor.init()
                 supplier = Location.load(supplier.id)
@@ -455,7 +450,7 @@ class MigrationService {
     def migrateProductSuppliersInParallel() {
         def migratedList = []
         def ids = getProductsForMigration()
-        GParsPool.withPool {
+        gparsService.withPool('MigrateProductSuppliers') {
             migratedList = ids.collectParallel { id ->
                 persistenceInterceptor.init()
                 try {

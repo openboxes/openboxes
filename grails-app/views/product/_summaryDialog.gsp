@@ -24,7 +24,7 @@
 			            <div id="product-title" class="title">
 			            	<small class="font-weight-bold">${productInstance?.productCode }</small>
 			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
-			                	${productInstance?.name }
+								<g:translatedProductName product="${productInstance}" />
 			                </g:link>
 			            </div>
         			</div>

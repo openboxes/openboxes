@@ -432,7 +432,7 @@ class ConfirmInvoicePage extends Component {
                   type="submit"
                   onClick={() => { this.submitInvoice(); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={this.state.values.dateSubmitted}
+                  disabled={this.state.values.dateSubmitted || this.state.values.datePosted}
                 >
                   <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
                 </button>

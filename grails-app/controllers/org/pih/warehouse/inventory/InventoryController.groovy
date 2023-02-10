@@ -614,7 +614,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocaleCode) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
@@ -771,13 +771,15 @@ class InventoryController {
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = inventoryLevel?.statusMessage(quantity ?: 0)
+
             if (!statusMessage) {
                 def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
                 statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
             }
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocaleCode ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
@@ -828,7 +830,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(product.translatedNameWithLocaleCode) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
@@ -1260,11 +1262,7 @@ class InventoryController {
                 if (!transaction?.hasErrors() && transaction?.validate()) {
                     transaction.save(failOnError: true)
                     flash.message = "Successfully saved transaction"
-                    if (productIds.size() > 1) {
-                        redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
-                    } else {
-                        redirect(controller: "inventoryItem", action: "showStockCard", id: productIds)
-                    }
+                    redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
                 }
             } catch (ValidationException e) {
                 log.debug("caught validation exception " + e)

@@ -12,6 +12,7 @@ export default {
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ statuses }) => ({
       options: statuses,

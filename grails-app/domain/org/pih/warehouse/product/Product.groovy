@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
@@ -28,6 +29,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.util.LocalizationUtil
 
 /**
  * An product is an instance of a generic.  For instance,
@@ -241,7 +243,9 @@ class Product implements Comparable, Serializable {
                          "substitutions",
                          "applicationTagLib",
                          "handlingIcons",
-                         "uoms"
+                         "uoms",
+                         "translatedName",
+                         "translatedNameWithLocaleCode"
     ]
 
     static hasMany = [
@@ -675,6 +679,19 @@ class Product implements Comparable, Serializable {
 
     List getUoms() {
        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+    }
+
+    String getTranslatedNameWithLocaleCode() {
+        String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
+        return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
+    }
+
+    String getTranslatedName() {
+        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
+        Synonym synonym = synonyms.find { Synonym synonym ->
+            synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME && synonym.locale == currentLocale
+        }
+        return synonym?.name
     }
 
     Map toJson() {

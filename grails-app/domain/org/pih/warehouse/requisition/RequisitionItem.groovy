@@ -753,6 +753,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                         id           : product.id,
                         productCode  : product.productCode,
                         name         : product.name,
+                        translatedName : product.translatedName,
                         category     : product.category?.name,
                         unitOfMeasure: product.unitOfMeasure,
                         pricePerUnit : product.pricePerUnit ?: 0,

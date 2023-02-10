@@ -677,9 +677,11 @@ class ReportService implements ApplicationContextAware {
             def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
             def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
             def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+            Product product = Product.findByProductCode(it.productCode)
             [
                     productCode          : it.productCode,
-                    productName          : it.productName,
+                    productName          : product?.translatedNameWithLocaleCode ?: it.productName,
+                    translatedProductName : product?.translatedName,
                     qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
                     qtyShippedNotReceived: qtyShippedNotReceived ?: '',
                     totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
@@ -963,16 +965,16 @@ class ReportService implements ApplicationContextAware {
                 "Code"                                              : orderItem?.product?.productCode,
                 "Description"                                       : orderItem?.product?.description,
                 "UOM"                                               : orderItem?.unitOfMeasure,
-                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice),
+                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice ?: 0),
                 "Qty Ordered not shipped (UOM)"                     : integerFormat.format(orderedNotShipped),
                 "Qty Ordered not shipped (Each)"                    : integerFormat.format(orderedNotShipped * orderItem?.quantityPerUom),
-                "Value ordered not shipped"                         : currencyNumberFormat.format((orderedNotShipped * orderItem?.unitPrice) ?: 0),
+                "Value ordered not shipped"                         : currencyNumberFormat.format(orderedNotShipped * (orderItem?.unitPrice ?: 0)),
                 "Qty Shipped not Invoiced (UOM)"                    : integerFormat.format(shippedNotInvoiced),
                 "Qty Shipped not Invoiced (Each)"                   : integerFormat.format(shippedNotInvoiced * orderItem?.quantityPerUom),
-                "Value Shipped not invoiced"                        : currencyNumberFormat.format((shippedNotInvoiced * orderItem?.unitPrice) ?: 0),
+                "Value Shipped not invoiced"                        : currencyNumberFormat.format(shippedNotInvoiced * (orderItem?.unitPrice ?: 0)),
                 "Total Qty not Invoiced (UOM)"                      : integerFormat.format(quantityNotInvoiced),
                 "Total Qty not Invoiced (Each)"                     : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
-                "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.unitPrice) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format(quantityNotInvoiced * (orderItem?.unitPrice ?: 0)),
                 "Budget Code"                                       : orderItem?.budgetCode?.code,
                 "Recipient"                                         : orderItem?.recipient?.name,
                 "Estimated Ready Date"                              : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),

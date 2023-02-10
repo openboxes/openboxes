@@ -383,7 +383,10 @@
                                         <g:elseif test="${shipment?.isFromReturnOrder}">
                                             <g:link controller="stockMovement" action="show" id="${shipment?.id}">
                                                 <div class="ellipsis" title="${shipment?.shipmentNumber} &rsaquo; ${shipment?.name}">
-                                                    ${shipment?.returnOrder?.orderType?.name}
+                                                    <g:message
+                                                        code="order.orderType.code.${shipment?.returnOrder?.orderType?.code}"
+                                                        default="${shipment?.returnOrder?.orderType?.name}"
+                                                    />
                                                     &rsaquo;
                                                     ${shipment?.shipmentNumber}
                                                 </div>
@@ -413,7 +416,10 @@
                                         <g:elseif test="${stockHistoryEntry?.transaction?.order }">
                                             <g:link controller="order" action="show" id="${stockHistoryEntry?.transaction?.order?.id }">
                                                 <div title="${stockHistoryEntry?.transaction?.order?.name }">
-                                                    ${stockHistoryEntry?.transaction?.order?.orderType?.name}
+                                                    <g:message
+                                                        code="order.orderType.code.${stockHistoryEntry?.transaction?.order?.orderType?.code}"
+                                                        default="${stockHistoryEntry?.transaction?.order?.orderType?.name}"
+                                                    />
                                                     &rsaquo;
                                                     ${stockHistoryEntry?.transaction?.order?.orderNumber }
                                                 </div>
@@ -438,7 +444,7 @@
 
                             <td class="border-right middle">
                                 <div class="line">
-                                    <span>
+                                    <span class="d-flex">
                                         <g:if test="${stockHistoryEntry?.binLocation}">
                                             <g:if test="${stockHistoryEntry?.binLocation?.zone}">
                                                 <span class="line-base" title="${stockHistoryEntry?.binLocation?.zone?.name}">
@@ -456,10 +462,12 @@
                                     <g:if test="${stockHistoryEntry?.isInternal}">
                                         <span>&nbsp;&rsaquo;&nbsp;</span>
                                         <g:if test="${stockHistoryEntry?.destinationBinLocation}">
-                                            <span>
+                                            <span class="line-base" title="${stockHistoryEntry?.destinationBinLocation?.zone?.name}">
                                                 <g:if test="${stockHistoryEntry?.destinationBinLocation?.zone}">
                                                     ${stockHistoryEntry?.destinationBinLocation?.zone?.name}
                                                 </g:if>
+                                            </span>
+                                            <span class="line-extension" title="${stockHistoryEntry?.destinationBinLocation?.name}">
                                                 ${stockHistoryEntry?.destinationBinLocation?.name}
                                             </span>
                                         </g:if>

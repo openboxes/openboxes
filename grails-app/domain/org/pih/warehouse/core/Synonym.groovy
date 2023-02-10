@@ -12,7 +12,6 @@ package org.pih.warehouse.core
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.product.Product
 
-
 class Synonym implements Serializable {
 
     def beforeInsert = {
@@ -36,6 +35,7 @@ class Synonym implements Serializable {
     String id
     String name
     Locale locale
+    SynonymTypeCode synonymTypeCode
     Date dateCreated
     Date lastUpdated
     User createdBy
@@ -50,8 +50,16 @@ class Synonym implements Serializable {
     static constraints = {
         name(nullable: false, maxSize: 255)
         locale(nullable: true)
+        synonymTypeCode(nullable: false)
         updatedBy(nullable: true)
         createdBy(nullable: true)
     }
+
+    static PROPERTIES = [
+            "Product Code"           : "product.productCode",
+            "Class of synonym"       : "synonymTypeCode",
+            "Locale"                 : "locale",
+            "Synonym name"           : "name",
+    ]
 
 }

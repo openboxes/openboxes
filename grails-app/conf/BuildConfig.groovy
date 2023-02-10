@@ -26,6 +26,12 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
         excludes(
+                /*
+                 * N.B. dependencies excluded here can still be silently pulled
+                 * in by a plugin; see, for example, the rendering plugin below.
+                 * If editing this block, be sure to run `grails dependency-report`
+                 * to verify the dependency is actually excluded!
+                 */
                 "commons-logging",  // use jcl-over-slf4j instead
                 "core-renderer", // use flying-saucer-core instead
                 "itext",  // use flying-saucer-pdf-openpdf instead
@@ -177,7 +183,7 @@ grails.project.dependency.resolution = {
         // Required by functionality (need to be upgraded or replaced)
         runtime(":jquery:1.7.2")
         runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
-        compile ":rendering:0.4.4"
+        compile(':rendering:0.4.4') { excludes 'core-renderer', 'itext' }
         compile ":raven:0.5.8"
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }

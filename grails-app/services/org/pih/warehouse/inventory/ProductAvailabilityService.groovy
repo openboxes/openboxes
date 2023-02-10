@@ -12,7 +12,6 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
@@ -24,6 +23,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
@@ -40,6 +40,7 @@ class ProductAvailabilityService {
     boolean transactional = true
 
     def dataSource
+    def gparsService
     def grailsApplication
     def persistenceInterceptor
     def productService
@@ -88,7 +89,7 @@ class ProductAvailabilityService {
         // Compute bin locations from transaction entries for all products over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
-        GParsPool.withPool {
+        gparsService.withPool('RefreshAllProducts') {
             locationService.depots.eachParallel { Location loc ->
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
@@ -104,7 +105,7 @@ class ProductAvailabilityService {
         // Compute bin locations from transaction entries for specific product over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
-        GParsPool.withPool {
+        gparsService.withPool('RefreshSingleProduct') {
             locationService.depots.eachParallel { Location loc ->
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)

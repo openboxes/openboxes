@@ -89,11 +89,11 @@
                             <td class="center" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
-                                        ${StringEscapeUtils.escapeXml(requisitionItem?.parentRequisitionItem?.product?.name)}
+                                        <g:translatedProductName product="${requisitionItem?.parentRequisitionItem?.product}" />
                                     </div>
                                 </g:if>
                                 <div class="${requisitionItem?.status}">
-                                    ${StringEscapeUtils.escapeXml(requisitionItem?.product?.name)}
+                                    <g:translatedProductName product="${requisitionItem?.product}" />
                                 </div>
                             </td>
                             <td class="center" rowspan="${numInventoryItem}">

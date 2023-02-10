@@ -15,7 +15,12 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInvoiceFilters = ({ setFilterParams }) => {
   const {
-    statuses, suppliers, typeCodes, currentLocation, currentUser,
+    statuses,
+    suppliers,
+    typeCodes,
+    currentLocation,
+    currentUser,
+    currentLocale,
   } = useSelector(state => ({
     statuses: state.invoices.statuses,
     suppliers: state.organizations.suppliers,
@@ -24,6 +29,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
     currentUser: state.session.user,
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
+    currentLocale: state.session.activeLanguage,
   }));
   const [defaultValues, setDefaultValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -82,14 +88,13 @@ const useInvoiceFilters = ({ setFilterParams }) => {
   useCommonFiltersCleaner({ initializeDefaultFilterValues, clearFilterValues, filtersInitialized });
 
   useEffect(() => {
-    // If statuses or invoice type codes not yet in store, fetch them
-    if (!statuses || !statuses.length) {
-      dispatch(fetchInvoiceStatuses());
-    }
-    if (!typeCodes || !typeCodes.length) {
-      dispatch(fetchInvoiceTypeCodes());
-    }
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchInvoiceStatuses());
+    dispatch(fetchInvoiceTypeCodes());
+  }, [currentLocale]);
 
+  useEffect(() => {
     // TODO: If editing organizations is in React,
     //  fetch only if length === 0, as edit would should force refetch anyway
     dispatch(fetchSuppliers());

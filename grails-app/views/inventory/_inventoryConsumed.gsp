@@ -113,7 +113,7 @@
                                             ${entry?.product?.productCode}
                                         </td>
 										<td>
-											<format:product product="${entry?.product }"/>
+                                            <g:translatedProductName product="${entry?.product}" />
 										</td>
 										<td>
 											${entry?.binLocation?.name}

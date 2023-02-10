@@ -214,6 +214,7 @@ class AddItemsPage extends Component {
     this.confirmTransition = this.confirmTransition.bind(this);
     this.newItemAdded = this.newItemAdded.bind(this);
     this.validate = this.validate.bind(this);
+    this.isValidForSave = this.isValidForSave.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
@@ -364,7 +365,7 @@ class AddItemsPage extends Component {
   dataFetched = false;
 
 
-  validate(values) {
+  validate(values, ignoreLotAndExpiry) {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
@@ -381,23 +382,30 @@ class AddItemsPage extends Component {
       if (date.diff(dateRequested) > 0) {
         errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.invalidDate.label' };
       }
-      if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
-        errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
-      }
-      if (!_.isNil(item.product) && item.product.lotAndExpiryControl) {
-        if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
-          errors.lineItems[key] = {
-            expirationDate: 'react.stockMovement.error.lotAndExpiryControl.label',
-            lotNumber: 'react.stockMovement.error.lotAndExpiryControl.label',
-          };
-        } else if (!item.expirationDate) {
-          errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.lotAndExpiryControl.label' };
-        } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
-          errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.lotAndExpiryControl.label' };
+      if (!ignoreLotAndExpiry) {
+        if (item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+          errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.expiryWithoutLot.label' };
+        }
+        if (!_.isNil(item.product) && item.product.lotAndExpiryControl) {
+          if (!item.expirationDate && (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber))) {
+            errors.lineItems[key] = {
+              expirationDate: 'react.stockMovement.error.lotAndExpiryControl.label',
+              lotNumber: 'react.stockMovement.error.lotAndExpiryControl.label',
+            };
+          } else if (!item.expirationDate) {
+            errors.lineItems[key] = { expirationDate: 'react.stockMovement.error.lotAndExpiryControl.label' };
+          } else if (_.isNil(item.lotNumber) || _.isEmpty(item.lotNumber)) {
+            errors.lineItems[key] = { lotNumber: 'react.stockMovement.error.lotAndExpiryControl.label' };
+          }
         }
       }
     });
     return errors;
+  }
+
+  isValidForSave(values) {
+    const errors = this.validate(values, true);
+    return !errors.lineItems || errors.lineItems.every(_.isEmpty);
   }
 
   newItemAdded() {
@@ -991,7 +999,7 @@ class AddItemsPage extends Component {
               </button>
               <button
                 type="button"
-                disabled={invalid}
+                disabled={!this.isValidForSave(values)}
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
@@ -999,7 +1007,7 @@ class AddItemsPage extends Component {
               </button>
               <button
                 type="button"
-                disabled={invalid}
+                disabled={!this.isValidForSave(values)}
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
@@ -1053,7 +1061,10 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
+                  disabled={
+                    !_.some(values.lineItems, item =>
+                      item.product && _.parseInt(item.quantityRequested))
+                  }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

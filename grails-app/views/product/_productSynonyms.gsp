@@ -1,22 +1,37 @@
+<%@ page import="org.pih.warehouse.core.SynonymTypeCode" %>
 <div id="synonyms">
     <div class="box">
+        <g:if test="${flash.message}">
+            <div class="message">${flash.message}</div>
+        </g:if>
+        <g:if test="${flash.error}">
+            <div class="errors p-1">${flash.error}</div>
+        </g:if>
+        <%
+            // Prevent flash messages displaying twice if there is no redirect
+            flash.error = null
+        %>
         <h2><warehouse:message code="product.synonyms.label" default="Synonyms"/></h2>
         <table id="synonymTable" class="zebra">
             <thead>
                 <tr>
                     <th><warehouse:message code="synonym.name.label" default="Synonym"/></th>
                     <th><warehouse:message code="synonym.locale.label" default="Locale"/></th>
+                    <th><g:message code="synonym.classification.label" default="Classification"/></th>
                     <th><warehouse:message code="default.actions.label" default="Actions"/></th>
                 </tr>
             </thead>
             <tbody>
-                <g:each var="synonym" in="${productInstance.synonyms}">
+                <g:each var="synonym" in="${productInstance?.synonyms}">
                     <tr>
                         <td class="middle">
                             ${synonym.name}
                         </td>
                         <td class="middle">
                             ${synonym.locale}
+                        </td>
+                        <td class="middle">
+                            ${g.message(code: 'enum.SynonymTypeCode.' + synonym.synonymTypeCode)}
                         </td>
                         <td class="middle">
                             <g:remoteLink controller="product" action="deleteSynonym" update="synonyms" class="button"
@@ -45,13 +60,63 @@
 
                                       url="[controller: 'product', action:'addSynonymToProduct']">
                             <input name="id" type="hidden" value="${productInstance?.id}" />
-                            <input id="synonym" type="text" name="synonym" value="" size="80" class="medium text"/>
-                            <button  class="button">
-                                <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
-                                ${warehouse.message(code:'default.button.add.label')}
-                            </button>
+                            <div class="d-flex w-75 gap-8">
+                                <g:selectLocale
+                                    name="locale"
+                                    noSelection="['':'']"
+                                    class="chzn-select-deselect"
+                                    data-placeholder="${g.message(code: 'synonym.selectLocale.placeholder.label', default: 'Select a locale')}"
+                                />
+                                <g:select
+                                    name="synonymTypeCode"
+                                    from="${SynonymTypeCode.list()}"
+                                    optionValue="${{ g.message(code: "enum.SynonymTypeCode." + it ) }}"
+                                    noSelection="['':'']"
+                                    data-placeholder="${g.message(code: 'synonym.synonymTypeCode.placeholder.label', default: 'Select a classification')}"
+                                    class="chzn-select-deselect"
+                                />
+                                <input
+                                    id="synonym"
+                                    type="text"
+                                    name="synonym"
+                                    value=""
+                                    size="80"
+                                    class="medium text"
+                                    placeholder="${g.message(code: 'synonym.typeSynonym.placeholder.label', default: 'Type the synonym here')}"
+                                />
+                                <button  class="button">
+                                    <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                    ${warehouse.message(code:'default.button.add.label')}
+                                </button>
+                            </div>
                         </g:formRemote>
-
+                    </td>
+                    <td>
+                       <div class="d-flex flex-wrap">
+                           <g:link
+                               class="button mr-2"
+                               controller="product"
+                               action="exportSynonymTemplate"
+                               params="[productCode: productInstance.productCode]"
+                           >
+                               <img src="${createLinkTo(dir:'images/icons/silk',file: 'page_excel.png')}" />&nbsp;
+                                <g:message
+                                    code="default.download.label"
+                                    args="[ g.message(code: 'default.template.label', 'Template') ]"
+                                />
+                           </g:link>
+                           <g:uploadForm controller="product" action="importProductSynonyms">
+                               <button class="button" type="submit">
+                                   <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
+                                   <g:message
+                                       code="default.import.label"
+                                       args="[ g.message(code: 'default.template.label', 'Template') ]"
+                                   />
+                               </button>
+                               <input name="file" type="file" required />
+                               <g:hiddenField name="product.id" value="${productInstance.id}"/>
+                           </g:uploadForm>
+                       </div>
                     </td>
 
                 </tr>
