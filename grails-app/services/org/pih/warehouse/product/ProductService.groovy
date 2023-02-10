@@ -22,6 +22,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.util.LocalizationUtil
 import util.ReportUtil
 import java.text.SimpleDateFormat
 /**
@@ -1242,7 +1243,9 @@ class ProductService {
         return results
     }
 
-    def searchProductDtos(String[] terms, locale = null) {
+    def searchProductDtos(String[] terms) {
+        String currentLocaleTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+
         def query = """
             select distinct
             product.id, 
@@ -1253,7 +1256,7 @@ class ProductService {
             product.hazardous_material as hazardousMaterial, 
             product.reconditioned,
             product.lot_and_expiry_control as lotAndExpiryControl,
-            ${locale ? "synonym.name as translatedName," : ""}
+            synonym.name as translatedName,
             # Return whether search term returns an exact match
             ifnull(
                 product.product_code = '${terms.join(" ")}' or 
@@ -1270,15 +1273,11 @@ class ProductService {
                 group by pci.product_id
             ) as productColor
             from product
-            """
-
-        if (locale) {
-            query += """
-            left outer join synonym
+                left outer join synonym
                 on (product.id = synonym.product_id and
-                synonym.locale = '${locale}' and
-                synonym.synonym_type_code = 'DISPLAY_NAME')"""
-        }
+                synonym.locale = '${currentLocaleTag}' and
+                synonym.synonym_type_code = 'DISPLAY_NAME')
+            """
 
         if (terms && terms.size() > 0) {
             query += """
