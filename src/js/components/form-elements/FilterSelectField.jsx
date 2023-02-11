@@ -8,6 +8,7 @@ import { components } from 'react-select';
 import BaseField from 'components/form-elements/BaseField';
 import Select from 'utils/Select';
 
+import 'components/Filter/FilterStyles.scss';
 import 'components/form-elements/FilterSelectField.scss';
 
 const Dropdown = ({
