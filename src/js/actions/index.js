@@ -530,7 +530,6 @@ export function fetchShipmentStatusCodes() {
   };
 }
 
-
 export function fetchRequisitionStatusCodes() {
   return (dispatch) => {
     apiClient.get('/api/stockMovements/requisitionsStatusCodes')
