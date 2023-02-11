@@ -21,6 +21,8 @@
     "airbnb"
   ],
   "rules": {
+    "arrow-parens": "warn",
+    "implicit-arrow-linebreak": "warn",
     "import/named": 2,
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
@@ -32,6 +34,7 @@
       "required": "id",
       "allowChildren": false
     }],
+    "operator-linebreak": "warn",
     "simple-import-sort/imports": [
       "error",
       {
