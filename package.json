@@ -137,7 +137,7 @@
     "jest-environment-jsdom": "29.2.2",
     "jquery": "3.6.2",
     "jss": "9.8.7",
-    "mini-css-extract-plugin": "0.10.0",
+    "mini-css-extract-plugin": "1.6.2",
     "mock-local-storage": "1.1.23",
     "optimize-css-assets-webpack-plugin": "6.0.1",
     "postcss": "8.2.15",
