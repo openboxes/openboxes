@@ -370,6 +370,7 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
   };
 }
 
+// eslint-disable-next-line default-param-last
 export function fetchConfigAndData(locationId, config = 'personal', userId, id, filterSelected) {
   return (dispatch) => {
     apiClient.get(`/api/dashboard/${id}/config`).then((res) => {
