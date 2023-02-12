@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 import {
   RiDeleteBinLine,
   RiDownload2Line,
-  RiInformationLine, RiPencilLine,
+  RiInformationLine,
+  RiPencilLine,
 } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
