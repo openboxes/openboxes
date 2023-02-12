@@ -119,14 +119,14 @@ assetCompile {
  * http://www.asset-pipeline.com/manual/index.html#configuration-2
  */
 assets {
-    enableDigests = false
-    enableGzip = false
+    developmentRuntime = false
+    enableDigests = false // defer to webpack
+    enableGzip = true
+    enableSourceMaps = false
     maxThreads = 1
     minifyJs = false  // defer to webpack
     minifyCss = false  // defer to webpack
-    minifyOptions = [
-        languageMode: 'ES6'
-    ]
+    skipNonDigests = false
 }
 
 bootRun {
