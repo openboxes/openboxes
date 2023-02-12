@@ -22,6 +22,16 @@ module.exports = {
     entry: {
       app: `${SRC}/index.jsx`,
     },
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            name: 'vendors',
+            test: /[\\/]node_modules[\\/]/,
+          },
+        },
+      },
+    },
     output: {
       path: DEST,
       filename: 'javascripts/bundle.[hash].js',
