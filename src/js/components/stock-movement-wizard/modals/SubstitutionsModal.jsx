@@ -89,9 +89,9 @@ const FIELDS = {
               className="d-flex align-items-center"
             >
               <Tooltip
-                html={<div className="text-truncate">{option.originalLabel}</div>}
+                html={<div className="text-truncate">{option.name}</div>}
                 theme="dark"
-                disabled={option.label === option.originalLabel}
+                disabled={!option.hasTranslatedName}
                 position="top-start"
               >
                 <span className="text-truncate">
@@ -104,9 +104,9 @@ const FIELDS = {
           ),
           valueRenderer: option => (
             <Tooltip
-              html={<div className="custom-tooltip">{option.originalLabel}</div>}
+              html={<div className="custom-tooltip">{option.name}</div>}
               theme="transparent"
-              disabled={option.label === option.originalLabel}
+              disabled={!option.hasTranslatedName}
               position="top-start"
             >
               <span className="text-truncate">

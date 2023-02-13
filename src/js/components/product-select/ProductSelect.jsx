@@ -10,9 +10,9 @@ import Select from 'utils/Select';
 
 const Option = option => (
   <Tooltip
-    html={<div className="text-truncate">{option.originalLabel}</div>}
+    html={<div className="text-truncate">{option.name}</div>}
     theme="transparent"
-    disabled={option.originalLabel === option.label}
+    disabled={!option.hasTranslatedName}
     position="top-start"
   >
     <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
@@ -24,9 +24,9 @@ const Option = option => (
 
 const SelectedValue = option => (
   <Tooltip
-    html={<div className="text-truncate">{option.originalLabel}</div>}
+    html={<div className="text-truncate">{option.name}</div>}
     theme="dark"
-    disabled={option.originalLabel === option.label}
+    disabled={!option.hasTranslatedName}
     position="top-start"
   >
     <span className="d-flex align-items-center">
@@ -106,7 +106,6 @@ const ProductSelect = ({
       async
       options={[]}
       loadOptions={loadProductOptions}
-      // showLabelTooltip
       onMenuClose={() => {
         setLoadedOptions([]);
         setSearchTerm('');

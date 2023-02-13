@@ -752,7 +752,6 @@ class StockMovementService {
             }
         }
 
-
         switch(stepNumber) {
             case "2":
                 return getAddPageItems(requisition, stockMovementItems)

@@ -107,16 +107,16 @@ class Select extends Component {
       multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
     } = this.props;
 
-    if (value.translatedName) {
+    if (value?.translatedName) {
       return (
         <div className="p-1">
-          {value.name}
+          {value?.name}
         </div>);
     }
 
     if (showLabelTooltip) {
       const valueMapped = multi && value ? this.props.value.map(v => v && v.label) : [];
-      const valueLabel = multi ? valueMapped.join(', ') : value.label || value.name;
+      const valueLabel = multi ? valueMapped.join(', ') : (value.label || value.name);
       return (
         <div className="p-1">
           {`${this.props.translate(placeholder, defaultPlaceholder ?? placeholder)}${valueLabel ? `: ${valueLabel}` : ''}`}
@@ -261,18 +261,19 @@ class Select extends Component {
       return null;
     };
 
-    const isTooltipEnabled = () => {
-      if (this.props.value.translatedName) {
-        return true;
+    const isTooltipDisabled = () => {
+      if (this.props.value?.translatedName) {
+        return false;
       }
-      return !(!showLabelTooltip || (showValueTooltip && this.props.value));
+
+      return !showLabelTooltip || (showValueTooltip && this.props.value);
     };
 
     return (
       <div id={`${this.state.id}-container`}>
         <Tooltip
           html={this.getTooltipHtml()}
-          disabled={!isTooltipEnabled()}
+          disabled={isTooltipDisabled()}
           theme="transparent"
           arrow="true"
           delay="150"

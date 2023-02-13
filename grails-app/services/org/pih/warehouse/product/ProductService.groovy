@@ -1274,10 +1274,15 @@ class ProductService {
             ) as productColor
             from product
                 left outer join synonym
-                on (product.id = synonym.product_id and
+                on synonym.product_id = (
+                select synonym.product_id
+                from synonym
+                where product.id = synonym.product_id and
                 synonym.locale = '${currentLocaleTag}' and
-                synonym.synonym_type_code = 'DISPLAY_NAME')
-            """
+                synonym.synonym_type_code = 'DISPLAY_NAME'
+                limit 1
+                )
+                """
 
         if (terms && terms.size() > 0) {
             query += """
