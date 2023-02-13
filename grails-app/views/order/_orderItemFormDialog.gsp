@@ -119,7 +119,7 @@
                     <label for="dlgUnitPrice"><warehouse:message code="orderItem.unitPrice.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <input type="text" id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" class="text" />
+                    <g:decimalNumberField id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" />
                     <span class="fade"><warehouse:message code="order.unitPrice.hint"/></span>
                 </td>
             </tr>
