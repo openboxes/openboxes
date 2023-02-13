@@ -104,7 +104,6 @@ const LocationChooser = (props) => {
 
 const mapStateToProps = state => ({
   currentLocation: state.session.currentLocation,
-  defaultTranslationsFetched: state.session.fetchedTranslations.default,
   logoLabel: state.session.logoLabel,
 });
 
