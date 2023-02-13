@@ -42,7 +42,6 @@ class StockTransferApiController {
             render([errorMessage: message] as JSON)
             return
         }
-
         def stockTransfers = stockTransferService.getStockTransfers(params)
         render([
             data: stockTransfers?.collect { it.toJson(it.orderType.orderTypeCode) },
@@ -57,10 +56,12 @@ class StockTransferApiController {
         }
 
         StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
+        println stockTransfer.stockTransferItems.product
         stockTransferService.setQuantityOnHand(stockTransfer)
         if (order?.picklist) {
             stockTransferService.getDocuments(stockTransfer)
         }
+        println stockTransfer?.toJson()
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
