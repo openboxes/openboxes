@@ -277,31 +277,31 @@
                 <g:set var="pageTitle">
                     ${warehouse.message(code:'product.coldChain.label', default:'Cold chain')}
                 </g:set>
-                <g:render template="/picklist/page" model="[pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+                <g:render template="/picklist/page" model="[locale: locale, pageTitle: pageTitle, requisitionItems:requisitionItemsColdChain, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
             </g:if>
             <g:if test="${requisitionItemsControlled}">
                 <g:set var="pageTitle">
                     ${warehouse.message(code:'product.controlledSubstance.label', default:'Controlled substance')}
                 </g:set>
-                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsControlled, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+                <g:render template="/picklist/page" model="[locale: locale, pageTitle: pageTitle,requisitionItems:requisitionItemsControlled, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
             </g:if>
             <g:if test="${requisitionItemsHazmat}">
                 <g:set var="pageTitle">
                     ${warehouse.message(code:'product.hazardousMaterial.label', default:'Hazardous material')}
                 </g:set>
-                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsHazmat, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+                <g:render template="/picklist/page" model="[locale: locale, pageTitle: pageTitle,requisitionItems:requisitionItemsHazmat, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
             </g:if>
             <g:if test="${requisitionItemsOther}">
                 <g:set var="pageTitle">
                     ${warehouse.message(code:'product.generalGoods.label', default:'General Goods')}
                 </g:set>
-                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsOther, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+                <g:render template="/picklist/page" model="[locale: locale, pageTitle: pageTitle,requisitionItems:requisitionItemsOther, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
             </g:if>
             <g:if test="${requisitionItemsCanceled}">
                 <g:set var="pageTitle">
                     ${warehouse.message(code:'default.canceled.label', default:'Canceled items')}
                 </g:set>
-                <g:render template="/picklist/page" model="[pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
+                <g:render template="/picklist/page" model="[locale: locale, pageTitle: pageTitle,requisitionItems:requisitionItemsCanceled, pickListItemsByRequisition: pickListItemsByRequisition, location: location, picklist:picklist, pageBreakAfter: 'avoid', sorted:sorted]"/>
             </g:if>
         </div>
     </g:each>

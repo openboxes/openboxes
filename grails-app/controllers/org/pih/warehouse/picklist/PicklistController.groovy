@@ -20,6 +20,7 @@ class PicklistController {
 
     def picklistService
     def pdfRenderingService
+    def localizationService
 
     def save = {
         def jsonRequest = request.JSON
@@ -52,11 +53,12 @@ class PicklistController {
         def requisition = Requisition.get(params.id)
         def picklist = Picklist.findByRequisition(requisition)
         def location = Location.get(session.warehouse.id)
+        Locale locale = localizationService.currentLocale
 
         renderPdf(
                 template: "/picklist/print",
                 //locale:locale,
-                model: [requisition: requisition, picklist: picklist, location: location, sorted: params.sorted],
+                model: [locale: locale, requisition: requisition, picklist: picklist, location: location, sorted: params.sorted],
                 filename: "Picklist - ${requisition.requestNumber}"
         )
     }

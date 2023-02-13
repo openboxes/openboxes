@@ -686,12 +686,16 @@ class Product implements Comparable, Serializable {
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
-    String getTranslatedName() {
-        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
+    String getNameByLocale(Locale locale) {
         Synonym synonym = synonyms.find { Synonym synonym ->
-            synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME && synonym.locale == currentLocale
+            synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME && synonym.locale == locale
         }
         return synonym?.name
+    }
+
+    String getTranslatedName() {
+        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
+        return getNameByLocale(currentLocale)
     }
 
     Map toJson() {
