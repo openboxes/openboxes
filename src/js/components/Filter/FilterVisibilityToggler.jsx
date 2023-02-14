@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/all';
+import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 
 import BadgeCount from 'components/Filter/BadgeCount';
 import Translate from 'utils/Translate';

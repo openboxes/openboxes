@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiShieldUserLine } from 'react-icons/all';
+import { RiShieldUserLine } from 'react-icons/ri';
 import { connect } from 'react-redux';
 
 import Button from 'components/form-elements/Button';

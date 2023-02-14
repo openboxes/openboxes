@@ -12,6 +12,7 @@ const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
+const ESLintPlugin = require('eslint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -20,6 +21,16 @@ const FileManagerPlugin = require('filemanager-webpack-plugin');
 module.exports = {
     entry: {
       app: `${SRC}/index.jsx`,
+    },
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            name: 'vendors',
+            test: /[\\/]node_modules[\\/]/,
+          },
+        },
+      },
     },
     output: {
       path: DEST,
@@ -30,6 +41,7 @@ module.exports = {
       colors: false,
     },
     plugins: [
+      new ESLintPlugin({}),
       new FileManagerPlugin({
         events: {
           onStart: {
@@ -107,12 +119,6 @@ module.exports = {
   ],
   module: {
     rules: [
-      {
-        enforce: 'pre',
-        test: /\.jsx$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader',
-      },
       {
         test: /\.jsx?$/,
         use: ['cache-loader', 'babel-loader?presets[]=@babel/react&presets[]=@babel/env'],
