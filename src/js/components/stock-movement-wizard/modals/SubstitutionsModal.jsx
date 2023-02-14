@@ -74,24 +74,6 @@ const FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '6',
-        attributes: {
-          className: 'text-left',
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.translatedName ?? value.name}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
-          ),
-        },
-        getDynamicAttr: ({
-          fieldValue,
-          debouncedProductsFetch,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
-        }),
       },
       'product.minExpirationDate': {
         type: LabelField,
