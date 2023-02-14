@@ -271,7 +271,7 @@
                 </g:if>
                 <g:else>
                     <td valign="top" class="value">
-                        <input type="text" id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" class="text" />
+                        <g:decimalNumberField id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" />
                         <span class="fade"><warehouse:message code="order.unitPrice.hint"/></span>
                     </td>
                 </g:else>
