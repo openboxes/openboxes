@@ -10,6 +10,7 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -69,23 +70,33 @@ const FIELDS = {
         defaultMessage: 'Code',
         flexWidth: '1',
       },
-      'product.name': {
-        type: (params) => {
-          const { rowIndex, values } = params;
-          const handlingIcons = _.get(values, `returnItems[${rowIndex}].product.handlingIcons`, []);
-          const productNameWithIcons = (
-            <div className="d-flex">
-              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-              {renderHandlingIcons(handlingIcons)}
-            </div>);
-          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
-        },
+      product: {
+        type: LabelField,
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
         flexWidth: '4.5',
         attributes: {
+          formatValue: (value) => {
+            if (value.translatedName) {
+              return (
+                <Tooltip
+                  html={<div className="text-truncate">{value.name}</div>}
+                  theme="dark"
+                  position="top-start"
+                >
+                  <div className="d-flex">
+                    {value.translatedName ?? value.name}
+                    {renderHandlingIcons(value.handlingIcons)}
+                  </div>
+                </Tooltip>);
+            }
+            return (
+              <div className="d-flex">
+                {value.translatedName ?? value.name}
+                {renderHandlingIcons(value.handlingIcons)}
+              </div>);
+          },
           className: 'text-left ml-1',
-          showValueTooltip: true,
         },
       },
       lotNumber: {

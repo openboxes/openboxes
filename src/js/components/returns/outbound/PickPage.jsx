@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -43,22 +44,36 @@ const FIELDS = {
         defaultMessage: 'Code',
         flexWidth: '0.5',
       },
-      'product.name': {
-        type: (params) => {
-          const { rowIndex, values } = params;
-          const handlingIcons = values.picklistItems[rowIndex]['product.handlingIcons'];
-          const productNameWithIcons = (
-            <div className="d-flex">
-              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-              {renderHandlingIcons(handlingIcons)}
-            </div>);
-          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
-        },
+      product: {
+        type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         flexWidth: '2',
         headerAlign: 'left',
         attributes: {
+          formatValue: (value) => {
+            // this console.log shows product, after few second shows null
+            console.log(value);
+          },
+          //   if (value?.translatedName) {
+          //     return (
+          //       <Tooltip
+          //         html={<div className="text-truncate">{value?.name}</div>}
+          //         theme="dark"
+          //         position="top-start"
+          //       >
+          //         <div className="d-flex">
+          //           {value?.translatedName ?? value?.name}
+          //           {renderHandlingIcons(value?.handlingIcons)}
+          //         </div>
+          //       </Tooltip>);
+          //   }
+          //   return (
+          //     <div className="d-flex">
+          //       {value?.translatedName ?? value?.name}
+          //       {renderHandlingIcons(value?.handlingIcons)}
+          //     </div>);
+          // },
           showValueTooltip: true,
           className: 'text-left ml-1',
         },

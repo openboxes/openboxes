@@ -136,17 +136,6 @@ const FIELDS = {
       },
       product: {
         type: LabelField,
-        // {
-        //   const { rowIndex, values } = params;
-        //   const handlingIcons = _.get(values, `stockTransferItems[${rowIndex}].product.handlingIcons`, []);
-        //   const productNameWithIcons = (
-        //     <div className="d-flex">
-        //       {console.log(params)}
-        //       <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-        //       {renderHandlingIcons(handlingIcons)}
-        //     </div>);
-        //   return (<LabelField {...params} fieldValue={productNameWithIcons} />);
-        // },
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         flexWidth: '2',

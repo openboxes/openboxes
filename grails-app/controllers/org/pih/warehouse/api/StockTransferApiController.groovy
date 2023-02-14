@@ -61,7 +61,6 @@ class StockTransferApiController {
         if (order?.picklist) {
             stockTransferService.getDocuments(stockTransfer)
         }
-        println stockTransfer?.toJson()
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
