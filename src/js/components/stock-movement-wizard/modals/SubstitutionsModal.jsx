@@ -9,6 +9,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
@@ -68,54 +69,13 @@ const FIELDS = {
     fields: {
       product: {
         fieldKey: 'disabled',
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '6',
         attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
           className: 'text-left',
-          showLabel: true,
-          optionRenderer: option => (
-            <strong
-              style={{ color: option.color ? option.color : 'black' }}
-              className="d-flex align-items-center"
-            >
-              <Tooltip
-                html={<div className="text-truncate">{option.name}</div>}
-                theme="dark"
-                disabled={!option.hasTranslatedName}
-                position="top-start"
-              >
-                <span className="text-truncate">
-                  {option.label}
-                  &nbsp;
-                  {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-                </span>
-              </Tooltip>
-            </strong>
-          ),
-          valueRenderer: option => (
-            <Tooltip
-              html={<div className="custom-tooltip">{option.name}</div>}
-              theme="transparent"
-              disabled={!option.hasTranslatedName}
-              position="top-start"
-            >
-              <span className="text-truncate">
-                {option.label}
-                  &nbsp;
-                {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-              </span>
-            </Tooltip>
-          ),
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
