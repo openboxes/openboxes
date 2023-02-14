@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -50,19 +49,17 @@ const FIELDS = {
         defaultMessage: 'Product',
         flexWidth: '2',
         headerAlign: 'left',
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
           formatValue: value => (
-            <Tooltip
-              html={<div className="text-truncate">{value?.name}</div>}
-              theme="dark"
-              position="top-start"
-            >
-              <div className="d-flex">
-                {value?.translatedName ?? value?.name}
-                {renderHandlingIcons(value?.handlingIcons)}
-              </div>
-            </Tooltip>),
+            <div className="d-flex">
+              {value?.translatedName ?? value?.name}
+              {renderHandlingIcons(value?.handlingIcons)}
+            </div>),
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       originZone: {
@@ -142,7 +139,7 @@ class PickPage extends Component {
 
     return apiClient.get(url)
       .then((resp) => {
-        const outboundReturn = parseResponse(resp.data.data);
+        const outboundReturn = resp.data.data;
         const printPicks = _.find(
           outboundReturn.documents,
           doc => doc.documentType === 'PICKLIST',
@@ -177,7 +174,8 @@ class PickPage extends Component {
   }
 
   render() {
-    const { outboundReturn } = this.state.values;
+    // There is a parseResponse to avoid affecting outboundReturn in state
+    const { outboundReturn } = parseResponse(this.state.values);
     const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));
 
     return (

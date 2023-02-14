@@ -9,7 +9,6 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -140,28 +139,17 @@ const FIELDS = {
         defaultMessage: 'Product',
         flexWidth: '2',
         headerAlign: 'left',
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
-          formatValue: (value) => {
-            if (value.translatedName) {
-              return (
-                <Tooltip
-                  html={<div className="text-truncate">{value.name}</div>}
-                  theme="dark"
-                  position="top-start"
-                >
-                  <div className="d-flex">
-                    {value.translatedName ?? value.name}
-                    {renderHandlingIcons(value.handlingIcons)}
-                  </div>
-                </Tooltip>);
-            }
-            return (
-              <div className="d-flex">
-                {value.translatedName ?? value.name}
-                {renderHandlingIcons(value.handlingIcons)}
-              </div>);
-          },
+          formatValue: value => (
+            <div className="d-flex">
+              {value.translatedName ?? value.name}
+              {renderHandlingIcons(value.handlingIcons)}
+            </div>),
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       lotNumber: {
