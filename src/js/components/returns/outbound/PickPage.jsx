@@ -11,7 +11,7 @@ import { Tooltip } from 'react-tippy';
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
-import apiClient from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -51,30 +51,17 @@ const FIELDS = {
         flexWidth: '2',
         headerAlign: 'left',
         attributes: {
-          formatValue: (value) => {
-            // this console.log shows product, after few second shows null
-            console.log(value);
-          },
-          //   if (value?.translatedName) {
-          //     return (
-          //       <Tooltip
-          //         html={<div className="text-truncate">{value?.name}</div>}
-          //         theme="dark"
-          //         position="top-start"
-          //       >
-          //         <div className="d-flex">
-          //           {value?.translatedName ?? value?.name}
-          //           {renderHandlingIcons(value?.handlingIcons)}
-          //         </div>
-          //       </Tooltip>);
-          //   }
-          //   return (
-          //     <div className="d-flex">
-          //       {value?.translatedName ?? value?.name}
-          //       {renderHandlingIcons(value?.handlingIcons)}
-          //     </div>);
-          // },
-          showValueTooltip: true,
+          formatValue: value => (
+            <Tooltip
+              html={<div className="text-truncate">{value?.name}</div>}
+              theme="dark"
+              position="top-start"
+            >
+              <div className="d-flex">
+                {value?.translatedName ?? value?.name}
+                {renderHandlingIcons(value?.handlingIcons)}
+              </div>
+            </Tooltip>),
           className: 'text-left ml-1',
         },
       },
@@ -155,7 +142,7 @@ class PickPage extends Component {
 
     return apiClient.get(url)
       .then((resp) => {
-        const outboundReturn = resp.data.data;
+        const outboundReturn = parseResponse(resp.data.data);
         const printPicks = _.find(
           outboundReturn.documents,
           doc => doc.documentType === 'PICKLIST',
