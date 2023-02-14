@@ -11,6 +11,7 @@ package org.pih.warehouse
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.util.Holders
 import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
