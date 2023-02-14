@@ -73,12 +73,16 @@ const FIELDS = {
         defaultMessage: 'Product name',
         flexWidth: '3.8',
         headerAlign: 'left',
+        getDynamicAttr: ({ fieldValue }) => ({
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
           className: 'text-left ml-1',
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                &nbsp;{value.name}
+                {value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value.handlingIcons)}
             </span>

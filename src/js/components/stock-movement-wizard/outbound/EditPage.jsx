@@ -85,14 +85,16 @@ const FIELDS = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name || ''}
+                {(value.translatedName ?? value.name) || ''}
               </span>
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
           ),
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
         }),
       },
       quantityRequested: {
@@ -182,6 +184,7 @@ const FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          translatedProductName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -341,7 +344,6 @@ class EditItemsPage extends Component {
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchAllData(false);
     }
   }

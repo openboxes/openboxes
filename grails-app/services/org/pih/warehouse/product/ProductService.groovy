@@ -22,6 +22,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.util.LocalizationUtil
 import util.ReportUtil
 import java.text.SimpleDateFormat
 /**
@@ -1243,6 +1244,8 @@ class ProductService {
     }
 
     def searchProductDtos(String[] terms) {
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+
         def query = """
             select distinct
             product.id, 
@@ -1267,7 +1270,14 @@ class ProductService {
                 left outer join product_catalog pc on pci.product_catalog_id = pc.id 
                 where pci.product_id = product.id 
                 group by pci.product_id
-            ) as productColor
+            ) as productColor,
+            (
+                select s.name from synonym s
+                where s.product_id = product.id
+                and s.synonym_type_code = 'DISPLAY_NAME'
+                and s.locale = '${locale}'
+                limit 1
+            ) as translatedName 
             from product """
 
         if (terms && terms.size() > 0) {

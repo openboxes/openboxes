@@ -2,23 +2,38 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 
 const Option = option => (
-  <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-    {option.label}
-  &nbsp;
-    {renderHandlingIcons(option.handlingIcons)}
-  </strong>);
+  <Tooltip
+    html={<div className="text-truncate">{option.name}</div>}
+    theme="transparent"
+    disabled={!option.hasTranslatedName}
+    position="top-start"
+  >
+    <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
+      {option.label}
+        &nbsp;
+      {renderHandlingIcons(option.handlingIcons)}
+    </strong>
+  </Tooltip>);
 
 const SelectedValue = option => (
-  <span className="d-flex align-items-center">
-    <span className="text-truncate">{option.label}</span>
-    &nbsp;{renderHandlingIcons(option?.handlingIcons)}
-  </span>
+  <Tooltip
+    html={<div className="text-truncate">{option.name}</div>}
+    theme="dark"
+    disabled={!option.hasTranslatedName}
+    position="top-start"
+  >
+    <span className="d-flex align-items-center">
+      <span className="text-truncate">{option.label}</span>
+      &nbsp;{renderHandlingIcons(option?.handlingIcons)}
+    </span>
+  </Tooltip>
 );
 
 const ProductSelect = ({

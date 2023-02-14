@@ -205,15 +205,17 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        getDynamicAttr: ({ isBoxNameEmpty, isPalletNameEmpty }) => ({
+        getDynamicAttr: ({ isBoxNameEmpty, fieldValue, isPalletNameEmpty }) => ({
           flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
         }),
         attributes: {
           className: 'text-left',
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                &nbsp;{value.name}
+                {value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value.handlingIcons)}
             </span>
@@ -836,7 +838,7 @@ class SendMovementPage extends Component {
                     >
                       <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.download.label" defaultMessage="Download" /></span>
                     </button>
-                    <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1 
+                    <div className={`dropdown-content print-buttons-container col-md-3 flex-grow-1
                       ${this.state.isDropdownVisible ? 'visible' : ''}`}
                     >
                       {this.state.documents.length && _.map(

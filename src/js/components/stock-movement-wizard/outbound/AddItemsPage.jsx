@@ -375,7 +375,7 @@ class AddItemsPage extends Component {
           disabled: true,
           product: {
             ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
+            label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
           },
         }),
       );
@@ -672,14 +672,13 @@ class AddItemsPage extends Component {
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
-
           const lineItemsBackendData = _.map(
             lineItems,
             val => ({
               ...val,
               product: {
                 ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
+                label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
               },
             }),
           );
