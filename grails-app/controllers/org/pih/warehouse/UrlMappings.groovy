@@ -273,7 +273,7 @@ class UrlMappings {
 
         "/api/stockMovements"(parseRequest: true) {
             controller = "stockMovementApi"
-            action = [GET: "list"]
+            action = [GET: "list", POST: "create"]
         }
 
         "/api/stockMovements/shippedItems"(parseRequest: true) {
