@@ -1244,81 +1244,77 @@ class ProductService {
     }
 
     def searchProductDtos(String[] terms) {
-        String currentLocaleTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
 
         def query = """
-            select distinct
-            product.id, 
-            product.name, 
-            product.product_code as productCode, 
-            product.cold_chain as coldChain, 
-            product.controlled_substance as controlledSubstance, 
-            product.hazardous_material as hazardousMaterial, 
-            product.reconditioned,
-            product.lot_and_expiry_control as lotAndExpiryControl,
-            synonym.name as translatedName,
-            # Return whether search term returns an exact match
-            ifnull(
-                product.product_code = '${terms.join(" ")}' or 
-                product.upc = '${terms.join(" ")}' or 
-                product.ndc = '${terms.join(" ")}' or 
-                product_supplier.supplier_code = '${terms.join(" ")}' or
-                product_supplier.manufacturer_code = '${terms.join(" ")}', false
-            ) as exactMatch,
-            (
-                select max(pc.color) 
-                from product_catalog_item pci 
-                left outer join product_catalog pc on pci.product_catalog_id = pc.id 
-                where pci.product_id = product.id 
-                group by pci.product_id
-            ) as productColor
-            from product
-                left outer join synonym
-                on synonym.product_id = (
-                select synonym.product_id
-                from synonym
-                where product.id = synonym.product_id and
-                synonym.locale = '${currentLocaleTag}' and
-                synonym.synonym_type_code = 'DISPLAY_NAME'
-                limit 1
-                )
-                """
+        select distinct
+        product.id, 
+        product.name, 
+        product.product_code as productCode, 
+        product.cold_chain as coldChain, 
+        product.controlled_substance as controlledSubstance, 
+        product.hazardous_material as hazardousMaterial, 
+        product.reconditioned,
+        product.lot_and_expiry_control as lotAndExpiryControl,
+        # Return whether search term returns an exact match
+        ifnull(
+            product.product_code = '${terms.join(" ")}' or 
+            product.upc = '${terms.join(" ")}' or 
+            product.ndc = '${terms.join(" ")}' or 
+            product_supplier.supplier_code = '${terms.join(" ")}' or
+            product_supplier.manufacturer_code = '${terms.join(" ")}', false
+        ) as exactMatch,
+        (
+            select max(pc.color) 
+            from product_catalog_item pci 
+            left outer join product_catalog pc on pci.product_catalog_id = pc.id 
+            where pci.product_id = product.id 
+            group by pci.product_id
+        ) as productColor,
+        (
+            select s.name from synonym s
+            where s.product_id = product.id
+            and s.synonym_type_code = 'DISPLAY_NAME'
+            and s.locale = '${locale}'
+            limit 1
+        ) as translatedName 
+        from product """
 
         if (terms && terms.size() > 0) {
             query += """
-            left outer join product_supplier 
-                on product.id = product_supplier.product_id
-            left outer join synonym 
-                on product.id = synonym.product_id
-            left outer join party manufacturer 
-                on product_supplier.manufacturer_id = manufacturer.id 
-                and (${terms.collect { "lower(manufacturer.name) like '${it}%'" }.join(" or ")}) # adding the conditions to join will allow MySQL to optimize the query
-            left outer join party supplier 
-                on product_supplier.supplier_id = supplier.id 
-                and (${terms.collect { "lower(supplier.name) like '${it}%'" }.join(" or ")})
-            left outer join inventory_item 
-                on product.id = inventory_item.product_id 
-                and (${terms.collect { "lower(inventory_item.lot_number) like '${it}%'" }.join(" or ")})
-            where product.active = 1 and (${terms.collect {"""
-                lower(product.name) like '%${it}%' 
-                or lower(product.product_code) like '${it}%' 
-                or (synonym.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' and synonym.name like '%${it}%')
-                or lower(product.description) like '%${it}%'
-                or lower(product.upc) like '${it}%' 
-                or lower(product.ndc) like '${it}%'
-                or lower(product.unit_of_measure) like '${it}%' 
-                or lower(product_supplier.name) like '%${it}%' 
-                or lower(product_supplier.code) like '${it}%'
-                or lower(product_supplier.product_code) like '${it}%' 
-                or lower(product_supplier.manufacturer_code) like '${it}%'
-                or lower(product_supplier.manufacturer_name) like '${it}%' 
-                or lower(product_supplier.supplier_code) like '${it}%'
-                or lower(product_supplier.supplier_name) like '${it}%'""" }.join(" or ")}
-                # when the condition is added to the join, we still need to check if there were any results
-                or manufacturer.id is not null  
-                or supplier.id is not null
-                or inventory_item.id is not null)
-            order by productCode"""
+        left outer join product_supplier 
+            on product.id = product_supplier.product_id
+        left outer join synonym 
+            on product.id = synonym.product_id
+        left outer join party manufacturer 
+            on product_supplier.manufacturer_id = manufacturer.id 
+            and (${terms.collect { "lower(manufacturer.name) like '${it}%'" }.join(" or ")}) # adding the conditions to join will allow MySQL to optimize the query
+        left outer join party supplier 
+            on product_supplier.supplier_id = supplier.id 
+            and (${terms.collect { "lower(supplier.name) like '${it}%'" }.join(" or ")})
+        left outer join inventory_item 
+            on product.id = inventory_item.product_id 
+            and (${terms.collect { "lower(inventory_item.lot_number) like '${it}%'" }.join(" or ")})
+        where product.active = 1 and (${terms.collect {"""
+            lower(product.name) like '%${it}%' 
+            or lower(product.product_code) like '${it}%' 
+            or (synonym.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' and synonym.name like '%${it}%')
+            or lower(product.description) like '%${it}%'
+            or lower(product.upc) like '${it}%' 
+            or lower(product.ndc) like '${it}%'
+            or lower(product.unit_of_measure) like '${it}%' 
+            or lower(product_supplier.name) like '%${it}%' 
+            or lower(product_supplier.code) like '${it}%'
+            or lower(product_supplier.product_code) like '${it}%' 
+            or lower(product_supplier.manufacturer_code) like '${it}%'
+            or lower(product_supplier.manufacturer_name) like '${it}%' 
+            or lower(product_supplier.supplier_code) like '${it}%'
+            or lower(product_supplier.supplier_name) like '${it}%'""" }.join(" or ")}
+            # when the condition is added to the join, we still need to check if there were any results
+            or manufacturer.id is not null  
+            or supplier.id is not null
+            or inventory_item.id is not null)
+        order by productCode"""
         } else {
             query += " where product.active = 1 "
         }
