@@ -161,17 +161,24 @@ const TABLE_FIELDS = {
         type: (params) => {
           if (params.subfield) {
             const { parentIndex, rowIndex } = params;
-            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
-            const handlingIcons = _.get(params.values, fieldPath);
+            const shipmentItemProduct = _.get(params.values, `containers[${parentIndex}].shipmentItems[${rowIndex}].product`);
+
+            const labelFieldProps = { ...params };
+            labelFieldProps.fieldConfig.attributes.tooltipValue = shipmentItemProduct?.name;
 
             const productNameWithIcons = (
               <div className="d-flex">
                 <span className="text-truncate">
-                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
+                  {shipmentItemProduct?.translatedName || shipmentItemProduct?.name}
                 </span>
-                {renderHandlingIcons(handlingIcons)}
+                {renderHandlingIcons(shipmentItemProduct?.handlingIcons)}
               </div>);
-            return <LabelField {...params} fieldValue={productNameWithIcons} />;
+            return (
+              <LabelField
+                {...labelFieldProps}
+                fieldValue={productNameWithIcons}
+              />
+            );
           }
           return null;
         },
