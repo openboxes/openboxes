@@ -178,7 +178,9 @@ const SUPPLIER_FIELDS = {
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '7',
-        getDynamicAttr: ({ isBoxNameEmpty, isPalletNameEmpty }) => ({
+        getDynamicAttr: ({ fieldValue, isBoxNameEmpty, isPalletNameEmpty }) => ({
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
           flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
         }),
         attributes: {
@@ -186,7 +188,7 @@ const SUPPLIER_FIELDS = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name}
+                {value.translatedName || value.name}
               </span>
               {renderHandlingIcons(value.handlingIcons)}
             </span>
