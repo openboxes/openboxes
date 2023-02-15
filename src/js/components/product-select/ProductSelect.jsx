@@ -105,7 +105,7 @@ const ProductSelect = ({
       }}
       async
       options={[]}
-      loadOptions={loadProductOptions}
+      loadOptions={props.loadOptions || loadProductOptions}
       onMenuClose={() => {
         setLoadedOptions([]);
         setSearchTerm('');
@@ -125,6 +125,7 @@ ProductSelect.defaultProps = {
   showValueTooltip: true,
   onExactProductSelected: undefined,
   fieldRef: undefined,
+  loadOptions: undefined,
 };
 
 ProductSelect.propTypes = {
@@ -136,6 +137,7 @@ ProductSelect.propTypes = {
   locationId: PropTypes.string.isRequired,
   onExactProductSelected: PropTypes.func,
   fieldRef: PropTypes.func,
+  loadOptions: PropTypes.func,
 };
 
 export default ProductSelect;
