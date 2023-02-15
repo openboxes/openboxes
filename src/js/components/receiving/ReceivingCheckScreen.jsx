@@ -97,26 +97,8 @@ const TABLE_FIELDS = {
           className: 'text-left ml-1',
         },
       },
-      'product.name': {
-        type: (params) => {
-          if (params.subfield) {
-            const { parentIndex, rowIndex } = params;
-            const shipmentItemProduct = _.get(params.values, `containers[${parentIndex}].shipmentItems[${rowIndex}].product`);
-
-            const labelFieldProps = { ...params };
-            labelFieldProps.fieldConfig.attributes.tooltipValue = shipmentItemProduct?.name;
-
-            const productNameWithIcons = (
-              <div className="d-flex">
-                <span className="text-truncate">
-                  {shipmentItemProduct?.translatedName || shipmentItemProduct?.name}
-                </span>
-                {renderHandlingIcons(shipmentItemProduct?.handlingIcons)}
-              </div>);
-            return <LabelField {...labelFieldProps} fieldValue={productNameWithIcons} />;
-          }
-          return null;
-        },
+      product: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -124,7 +106,15 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
+          formatValue: value => (
+            <div className="d-flex">
+              {value?.translatedName ?? value?.name}
+              {renderHandlingIcons(value?.handlingIcons)}
+            </div>),
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
