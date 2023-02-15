@@ -42,6 +42,7 @@ class StockTransferApiController {
             render([errorMessage: message] as JSON)
             return
         }
+        
         def stockTransfers = stockTransferService.getStockTransfers(params)
         render([
             data: stockTransfers?.collect { it.toJson(it.orderType.orderTypeCode) },
