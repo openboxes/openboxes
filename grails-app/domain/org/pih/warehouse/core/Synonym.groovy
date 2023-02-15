@@ -55,7 +55,7 @@ class Synonym implements Serializable {
                 Set<Synonym> duplicates = obj?.product?.synonyms?.findAll { Synonym synonym ->
                     synonym.locale == val && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
                 }
-                return duplicates.size() > 1 ? ["validator.multipleError"] : true
+                return duplicates?.size() > 1 ? ["validator.multipleError"] : true
             }
         })
         synonymTypeCode(nullable: false)
