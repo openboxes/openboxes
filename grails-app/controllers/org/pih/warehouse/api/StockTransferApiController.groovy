@@ -56,7 +56,6 @@ class StockTransferApiController {
         }
 
         StockTransfer stockTransfer = StockTransfer.createFromOrder(order)
-        println stockTransfer.stockTransferItems.product
         stockTransferService.setQuantityOnHand(stockTransfer)
         if (order?.picklist) {
             stockTransferService.getDocuments(stockTransfer)
