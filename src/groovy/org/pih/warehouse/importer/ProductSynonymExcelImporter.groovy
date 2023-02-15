@@ -45,12 +45,13 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter {
         return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
     }
 
-    void validateData(ImportDataCommand command) {
-        dataService.validateData(command)
-    }
-
     void importData(ImportDataCommand command) {
         dataService.importData(command)
+    }
+
+    void validateData(ImportDataCommand command) {
+        // Do nothing for now
+        // needs to be implemented, because AbstractExcelImporter has it as abstract method
     }
 
 }

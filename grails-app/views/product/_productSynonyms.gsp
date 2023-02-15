@@ -1,6 +1,11 @@
 <%@ page import="org.pih.warehouse.core.SynonymTypeCode" %>
 <div id="synonyms">
     <div class="box">
+        <g:hasErrors bean="${productInstance}">
+            <div class="errors">
+                <g:renderErrors bean="${productInstance}" as="list"/>
+            </div>
+        </g:hasErrors>
         <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
         </g:if>

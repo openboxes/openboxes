@@ -16,10 +16,9 @@ import org.pih.warehouse.product.Product
 
 class ProductSynonymDataService {
 
-    def productService
     def grailsApplication
 
-    Boolean validateData(ImportDataCommand command) {
+    def importData(ImportDataCommand command) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         log.info "Validate data " + command.filename
 
@@ -61,25 +60,17 @@ class ProductSynonymDataService {
                     command.errors.reject("Row ${index + 1}: Locale '${params['locale']}' is not a supported locale")
                 }
 
-                // Validation not to allow having more than one synonym of DISPLAY_NAME type for one locale
-                if (!productService.validateMultipleSynonymsOfType(
-                        product?.synonyms,
-                        synonymTypeCode,
-                        SynonymTypeCode.DISPLAY_NAME,
-                        new Locale(params['locale']))
-                ) {
-                    command.errors.reject("Row ${index + 1}: ${g.message(code: 'synonym.validation.multipleSynonym.error.label')}")
+            }
+
+            // If none validation error occured yet, try to add a synonym
+            if (!command.errors.allErrors) {
+                Synonym synonym = new Synonym(name: params['name'], locale: new Locale(params['locale']), synonymTypeCode: params['synonymTypeCode'])
+                product.addToSynonyms(synonym)
+                if (!synonym.validate() || !product.save(flush: true, failOnError: true)) {
+                    command.errors.reject("Row ${index + 1}: Validation error occured. Most probably you are trying to add multiple DISPLAY_NAME synonym for one locale")
                 }
             }
-        }
-    }
 
-    void importData(ImportDataCommand command) {
-        log.info "Import data " + command.filename
-
-        command.data.each{ params ->
-            Product product = Product.findByProductCode(params['product.productCode'])
-            productService.addSynonymToProduct(product.id, params['synonymTypeCode'], params['name'], params['locale'])
         }
     }
 

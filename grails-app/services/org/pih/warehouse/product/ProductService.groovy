@@ -1390,29 +1390,7 @@ class ProductService {
         }
     }
 
-    Set<Synonym> getSynonymsOfTypeAndLocale(Set<Synonym> synonyms, SynonymTypeCode synonymTypeCode, Locale locale) {
-        return synonyms.findAll{ it.synonymTypeCode == synonymTypeCode && it.locale == locale }
-    }
-
-    /**
-     * Validation for having multiple synonyms of a given type code and a locale.
-     * @param synonyms
-     * @param synonymTypeCode
-     * @param typeCodeToValidate
-     * @param locale
-     * @return If a product already has a synonym of given type code to validate and we are trying to add a synonym with that type code,
-     * we want to return false. If the synonym passes the validation, we return true.
-     */
-    Boolean validateMultipleSynonymsOfType(Set<Synonym> synonyms, SynonymTypeCode synonymTypeCode, SynonymTypeCode typeCodeToValidate, Locale locale) {
-        Set<Synonym> synonymsOfTypeAndLocale = getSynonymsOfTypeAndLocale(synonyms, synonymTypeCode, locale)
-        if (synonymTypeCode == typeCodeToValidate && synonymsOfTypeAndLocale) {
-            return false
-        }
-        return true
-    }
-
     Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         Product product = Product.get(productId)
         if (!localeName) {
             throw new IllegalArgumentException("You must provide a locale")
@@ -1423,13 +1401,11 @@ class ProductService {
             throw new IllegalArgumentException("Synonym can't be an empty string")
         }
 
-        // Validation not to allow having more than one synonym of DISPLAY_NAME type for one locale
-        if (!validateMultipleSynonymsOfType(product.synonyms, synonymTypeCode, SynonymTypeCode.DISPLAY_NAME, locale)) {
-            throw new IllegalArgumentException("${g.message(code: 'synonym.validation.multipleSynonym.error.label')}")
-        }
         Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
         product.addToSynonyms(synonym)
-        product.save(flush: true, failOnError: true)
+        if (!synonym.validate() || !product.save(flush: true, failOnError: true)) {
+            throw new ValidationException("Invalid synonym", synonym.errors)
+        }
         return product
     }
 }

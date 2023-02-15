@@ -1017,13 +1017,19 @@ class ProductController {
         def inputValues = null
         try {
             product = productService.addSynonymToProduct(params.id, params.synonymTypeCode, params.synonym, params.locale)
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             // If adding a synonym fails, we still want to return the product to the view
             product = Product.read(params.id)
             // If a validation error occurs, we want to return those values to the view,
             // and set them as initialValues of the form, so a user can correct him/herself
             inputValues = params
             flash.error = e.message
+            if (e instanceof ValidationException) {
+                // If the ValidationError occurs, we don't want to display it as a flash error,
+                // but render it as productInstance's errors using <g:renderErrors>
+                flash.error = null
+                product.errors = e.errors
+            }
         }
         render(template: 'productSynonyms', model: [productInstance: product, inputValues: inputValues])
     }
@@ -1161,13 +1167,12 @@ class ProductController {
             command.data = excelImporter.data
 
             command.errors = null
-            excelImporter.validateData(command)
+            excelImporter.importData(command)
 
             if (command.errors.allErrors) {
                 flash.errors = command.errors
             } else {
                 flash.message = "Succesfully imported product synonyms"
-                excelImporter.importData(command)
             }
         }
 
