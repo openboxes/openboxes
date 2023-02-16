@@ -321,10 +321,6 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          product: {
-            ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
-          },
         }),
       );
     }
@@ -683,10 +679,6 @@ class AddItemsPage extends Component {
             lineItems,
             val => ({
               ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
             }),
           );
 

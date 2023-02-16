@@ -12,6 +12,7 @@ package org.pih.warehouse.order
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.SynonymTypeCode
 
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
@@ -1011,6 +1012,12 @@ class OrderService {
                         term = term + "%"
                         or {
                             ilike("name", "%" + term)
+                            synonyms {
+                                and {
+                                    ilike("name", "%" + term)
+                                    eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                                }
+                            }
                             ilike("productCode", term)
                             ilike("description", "%" + term)
                         }

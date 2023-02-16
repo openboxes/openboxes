@@ -81,6 +81,7 @@ class PartialReceiptItem {
                 "product.id"                    : inventoryItem?.product?.id,
                 "product.productCode"           : inventoryItem?.product?.productCode,
                 "product.name"                  : inventoryItem?.product?.name,
+                "product.translatedName"        : inventoryItem?.product?.translatedName,
                 "product.lotAndExpiryControl"   : inventoryItem?.product?.lotAndExpiryControl,
                 "product.handlingIcons"         : inventoryItem?.product?.handlingIcons,
                 "lotNumber"                     : lotNumber,

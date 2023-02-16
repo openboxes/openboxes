@@ -17,6 +17,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
@@ -97,27 +98,15 @@ const FIELDS = {
         },
       },
       product: {
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '4',
         required: true,
         attributes: {
-          className: 'text-left',
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
           disabled: true,
-          showValueTooltip: true,
-          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
         },
-        getDynamicAttr: ({ debouncedProductsFetch }) => ({
-          loadOptions: debouncedProductsFetch,
-        }),
       },
       lotNumber: {
         type: TextField,
@@ -209,7 +198,7 @@ const FIELDS = {
             addRow({
               product: {
                 ...fieldValue.product,
-                label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
+                label: `${fieldValue.product.productCode} ${fieldValue.product.translatedName || fieldValue.product.name}`,
               },
               recipient: fieldValue.recipient,
               sortOrder: fieldValue.sortOrder + 1,
@@ -326,7 +315,7 @@ class AddItemsPage extends Component {
         disabled: true,
         product: {
           ...val.product,
-          label: `${val.productCode} ${val.product.name}`,
+          label: `${val.productCode} ${val.product.translatedName || val.product.name}`,
         },
         referenceId: val.orderItemId,
       }),
@@ -688,7 +677,7 @@ class AddItemsPage extends Component {
               ...val,
               product: {
                 ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
+                label: `${val.productCode} ${val.product.translatedName || val.product.name}`,
               },
               referenceId: val.orderItemId,
             }),

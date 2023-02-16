@@ -84,6 +84,7 @@ class CombinedShipmentItemApiController {
                 orderNumber: it.order?.orderNumber,
                 productCode: it.product?.productCode,
                 productName: it.product?.name,
+                productTranslatedName: it.product?.translatedName,
                 budgetCode: it.budgetCode?.code,
                 recipient: it.recipient?.name,
                 quantityAvailable: it.getQuantityRemainingToShip(),
