@@ -12,9 +12,7 @@ package org.pih.warehouse.core
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 
 class BudgetCodeService {
-
-    boolean transactional = true
-
+    
     def getBudgetCodes(GrailsParameterMap params) {
         return BudgetCode.createCriteria().list(max: params.max, offset: params.offset) {
             if (params.q) {
