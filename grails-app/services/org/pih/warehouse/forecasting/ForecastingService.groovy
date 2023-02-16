@@ -15,11 +15,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.util.LocalizationUtil
 
 import java.math.RoundingMode
 import java.sql.Timestamp
 import java.text.DateFormatSymbols
 import java.text.NumberFormat
+import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
@@ -62,6 +64,7 @@ class ForecastingService {
     }
 
     def getDemandDetails(Location origin, Location destination, Product product, Date startDate, Date endDate) {
+        String currentLocale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
         List data = []
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
@@ -81,6 +84,13 @@ class ForecastingService {
                     destination_name,
                     product_code,
                     product_name,
+                    (
+                        select s.name from synonym s
+                        where s.product_id = pdd.product_id
+                        and s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}'
+                        and s.locale = '${currentLocale}'
+                        limit 1
+                    ) as translatedName,
                     quantity_requested,
                     quantity_canceled,
                     quantity_approved,
@@ -88,7 +98,7 @@ class ForecastingService {
                     quantity_picked,
                     quantity_demand,
                     reason_code_classification
-                FROM product_demand_details
+                FROM product_demand_details pdd
                 WHERE date_issued BETWEEN :startDate AND :endDate
                 """
             if (product) {
