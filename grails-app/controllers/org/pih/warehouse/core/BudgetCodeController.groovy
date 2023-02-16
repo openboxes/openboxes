@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 class BudgetCodeController {
+    def budgetCodeService
 
     def index = {
         redirect(action: "list", params: params)
@@ -17,7 +18,9 @@ class BudgetCodeController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [budgetCodes: BudgetCode.list(params), budgetCodesTotal: BudgetCode.count()]
+        params.offset = params.offset ?: 0
+        def budgetCodeList = budgetCodeService.getBudgetCodes(params)
+        return [budgetCodes: budgetCodeList, budgetCodesTotal: budgetCodeList.totalCount]
     }
 
     def create = {
