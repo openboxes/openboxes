@@ -1296,6 +1296,9 @@ openboxes.inventorySnapshot.batchSize = 100
 openboxes.expirationDate.minValue = new Date("01/01/2000")
 openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 
+// Date configuration
+openboxes.table.date.format = Constants.TABLE_MONTH_YEAR_DATE_FORMAT
+
 // Global megamenu configuration
 
 openboxes.menuSectionsUrlParts = [

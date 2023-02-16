@@ -90,6 +90,7 @@ class ApiController {
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
         def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
+        def tableDateFormat = grailsApplication.config.openboxes.table.date.format
 
         if (session.useDebugLocale) {
 
@@ -201,7 +202,8 @@ class ApiController {
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
                 localizationModeEnabled : localizationModeEnabled,
-                localizationModeLocale : localizationModeLocale
+                localizationModeLocale : localizationModeLocale,
+                tableDateFormat        : tableDateFormat
             ],
         ] as JSON)
     }

@@ -74,6 +74,7 @@ const initialState = {
   loading: false,
   localizationModeEnabled: false,
   localizationModeLocale: 'ach',
+  tableDateFormat: 'MMM DD, yyyy',
 };
 
 export default function (state = initialState, action) {
@@ -113,6 +114,7 @@ export default function (state = initialState, action) {
         loading: false,
         localizationModeEnabled: _.get(action, 'payload.data.data.localizationModeEnabled', false),
         localizationModeLocale: _.get(action, 'payload.data.data.localizationModeLocale', 'ach'),
+        tableDateFormat: _.get(action, 'payload.data.data.tableDateFormat', 'MMM DD, yyyy'),
       };
     case FETCH_MENU_CONFIG:
       return {
