@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.util.LocalizationUtil
 
 import java.math.RoundingMode
 import java.sql.Timestamp
@@ -29,7 +30,6 @@ class ForecastingService {
     def dataSource
     def grailsApplication
     def productAvailabilityService
-    def localizationService
 
     def getDemand(Location origin, Location destination, Product product) {
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
@@ -64,7 +64,7 @@ class ForecastingService {
     }
 
     def getDemandDetails(Location origin, Location destination, Product product, Date startDate, Date endDate) {
-        String currentLocale = localizationService.getCurrentLocale().toLanguageTag()
+        String currentLocale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
         List data = []
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
