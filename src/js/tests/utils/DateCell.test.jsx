@@ -8,12 +8,10 @@ import DateCell from 'components/DataTable/DateCell';
 
 import '@testing-library/jest-dom';
 
-let dateCell;
-
 
 describe('date cell', () => {
   it('should contain proper text when date provided', () => {
-    dateCell = (
+    const dateCell = (
       <Router>
         <DateCell
           tableDateFormat="MM DD, yyyy"
@@ -28,7 +26,7 @@ describe('date cell', () => {
   });
 
   it('should contain default value when date not provided', () => {
-    dateCell = (
+    const dateCell = (
       <Router>
         <DateCell
           tableDateFormat="MM DD, yyyy"
@@ -43,7 +41,7 @@ describe('date cell', () => {
   });
 
   it('should contain proper text when date provided with hour', () => {
-    dateCell = (
+    const dateCell = (
       <Router>
         <DateCell
           tableDateFormat="MM DD, yyyy"
