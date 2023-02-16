@@ -20,6 +20,7 @@ import java.math.RoundingMode
 import java.sql.Timestamp
 import java.text.DateFormatSymbols
 import java.text.NumberFormat
+import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
@@ -86,7 +87,7 @@ class ForecastingService {
                     (
                         select s.name from synonym s
                         where s.product_id = pdd.product_id
-                        and s.synonym_type_code = 'DISPLAY_NAME'
+                        and s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}'
                         and s.locale = '${currentLocale}'
                         limit 1
                     ) as translatedName,
