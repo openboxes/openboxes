@@ -71,8 +71,8 @@ const FIELDS = {
         type: ProductSelectField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        getDynamicAttr: ({ debouncedProductsFetch }) => ({
-          loadOptions: debouncedProductsFetch,
+        getDynamicAttr: ({ debouncedAvailableItemsFetch }) => ({
+          loadOptions: debouncedAvailableItemsFetch,
         }),
       },
       'product.minExpirationDate': {
@@ -336,7 +336,7 @@ class SubstitutionsModal extends Component {
           defaultEmptyDataMessage: 'There are no substitutions available',
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,
-          debouncedProductsFetch: this.debouncedAvailableItemsFetch,
+          debouncedAvailableItemsFetch: this.debouncedAvailableItemsFetch,
         }}
         renderBodyWithValues={this.calculateSelected}
       >
