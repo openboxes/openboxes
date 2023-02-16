@@ -1,6 +1,11 @@
 <%@ page import="org.pih.warehouse.core.SynonymTypeCode" %>
 <div id="synonyms">
     <div class="box">
+        <g:hasErrors bean="${productInstance}">
+            <div class="errors">
+                <g:renderErrors bean="${productInstance}" as="list"/>
+            </div>
+        </g:hasErrors>
         <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
         </g:if>
@@ -66,6 +71,7 @@
                                     noSelection="['':'']"
                                     class="chzn-select-deselect"
                                     data-placeholder="${g.message(code: 'synonym.selectLocale.placeholder.label', default: 'Select a locale')}"
+                                    value="${inputValues?.locale}"
                                 />
                                 <g:select
                                     name="synonymTypeCode"
@@ -74,12 +80,13 @@
                                     noSelection="['':'']"
                                     data-placeholder="${g.message(code: 'synonym.synonymTypeCode.placeholder.label', default: 'Select a classification')}"
                                     class="chzn-select-deselect"
+                                    value="${inputValues?.synonymTypeCode}"
                                 />
                                 <input
                                     id="synonym"
                                     type="text"
                                     name="synonym"
-                                    value=""
+                                    value="${inputValues?.synonym}"
                                     size="80"
                                     class="medium text"
                                     placeholder="${g.message(code: 'synonym.typeSynonym.placeholder.label', default: 'Type the synonym here')}"

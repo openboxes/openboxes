@@ -30,8 +30,11 @@ class ProductSynonymDataService {
                 }
             }
 
+            Product product = null
+            SynonymTypeCode synonymTypeCode = null
+
             if (params['product.productCode']) {
-                Product product = Product.findByProductCode(params['product.productCode'])
+                product = Product.findByProductCode(params['product.productCode'])
                 if (!product) {
                     command.errors.reject("Row ${index + 1}: Product with code '${params['product.productCode']}' does not exist")
                 }
@@ -40,7 +43,7 @@ class ProductSynonymDataService {
             if (params['synonymTypeCode']) {
                 params['synonymTypeCode'] = params['synonymTypeCode']?.toUpperCase()
                 try {
-                    SynonymTypeCode.valueOf(params['synonymTypeCode']);
+                    synonymTypeCode = SynonymTypeCode.valueOf(params['synonymTypeCode'])
                 } catch (IllegalArgumentException ex) {
                     command.errors.reject("Row ${index + 1}: Synonym type code '${params['synonymTypeCode']} does not exist")
                 }
@@ -56,7 +59,20 @@ class ProductSynonymDataService {
                 } else {
                     command.errors.reject("Row ${index + 1}: Locale '${params['locale']}' is not a supported locale")
                 }
+
             }
+
+            // Check if none error occures to be sure, that we have correct product, locale and synonymTypeCode
+            // before we check the duplicates
+            if (!command.errors.allErrors && synonymTypeCode == SynonymTypeCode.DISPLAY_NAME) {
+               Set<Synonym> duplicates = product?.synonyms?.findAll { Synonym synonym ->
+                   synonym.locale == new Locale(params['locale']) && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
+               }
+               if (duplicates) {
+                   command.errors.reject("Row ${index + 1}: You cannot add multiple display names in the same language. Edit the existing synonym instead.")
+               }
+            }
+
         }
     }
 
