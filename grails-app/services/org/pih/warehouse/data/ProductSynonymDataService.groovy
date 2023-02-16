@@ -16,10 +16,10 @@ import org.pih.warehouse.product.Product
 
 class ProductSynonymDataService {
 
+    def productService
     def grailsApplication
 
-    def importData(ImportDataCommand command) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+    Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
 
         command.data.eachWithIndex { params, index ->
@@ -62,15 +62,28 @@ class ProductSynonymDataService {
 
             }
 
-            // If none validation error occured yet, try to add a synonym
+            // Check if none error occures to be sure, that we have correct product, locale and synonymTypeCode
+            // before we check the duplicates
             if (!command.errors.allErrors) {
-                Synonym synonym = new Synonym(name: params['name'], locale: new Locale(params['locale']), synonymTypeCode: params['synonymTypeCode'])
-                product.addToSynonyms(synonym)
-                if (!synonym.validate() || !product.save(flush: true, failOnError: true)) {
-                    command.errors.reject("Row ${index + 1}: Validation error occured. Most probably you are trying to add multiple DISPLAY_NAME synonym for one locale")
-                }
+               if (synonymTypeCode == SynonymTypeCode.DISPLAY_NAME) {
+                   Set<Synonym> duplicates = product?.synonyms?.findAll { Synonym synonym ->
+                       synonym.locale == new Locale(params['locale']) && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
+                   }
+                   if (duplicates) {
+                       command.errors.reject("Row ${index + 1}: You cannot add multiple display names in the same language. Edit the existing synonym instead.")
+                   }
+               }
             }
 
+        }
+    }
+
+    void importData(ImportDataCommand command) {
+        log.info "Import data " + command.filename
+
+        command.data.each{ params ->
+            Product product = Product.findByProductCode(params['product.productCode'])
+            productService.addSynonymToProduct(product.id, params['synonymTypeCode'], params['name'], params['locale'])
         }
     }
 

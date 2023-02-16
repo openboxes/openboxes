@@ -48,8 +48,8 @@ class Synonym implements Serializable {
     }
 
     static constraints = {
-        name(nullable: false, maxSize: 255)
-        locale(nullable: true, validator: { val, obj ->
+        name(nullable: false, maxSize: 255, blank: false)
+        locale(nullable: false, validator: { val, obj ->
             // Validate not to allow multiple DISPLAY_NAME for one locale
             if (obj?.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME) {
                 Set<Synonym> duplicates = obj?.product?.synonyms?.findAll { Synonym synonym ->

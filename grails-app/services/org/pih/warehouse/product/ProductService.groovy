@@ -1392,15 +1392,8 @@ class ProductService {
 
     Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Product product = Product.get(productId)
-        if (!localeName) {
-            throw new IllegalArgumentException("You must provide a locale")
-        }
-        Locale locale = new Locale(localeName)
+        Locale locale = localeName ? new Locale(localeName) : null
         SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
-        if (!synonymValue) {
-            throw new IllegalArgumentException("Synonym can't be an empty string")
-        }
-
         Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
         product.addToSynonyms(synonym)
         if (!synonym.validate() || !product.save(flush: true, failOnError: true)) {

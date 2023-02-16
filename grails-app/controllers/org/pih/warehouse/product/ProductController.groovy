@@ -1141,7 +1141,7 @@ class ProductController {
     def importProductSynonyms = { ImportDataCommand command ->
 
         log.info params
-        log.info command.location
+        log.info command?.location
 
         if (request.method == "POST") {
             File localFile = null
@@ -1167,12 +1167,13 @@ class ProductController {
             command.data = excelImporter.data
 
             command.errors = null
-            excelImporter.importData(command)
+            excelImporter.validateData(command)
 
             if (command.errors.allErrors) {
                 flash.errors = command.errors
             } else {
                 flash.message = "Succesfully imported product synonyms"
+                excelImporter.importData(command)
             }
         }
 
