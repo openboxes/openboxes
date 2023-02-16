@@ -35,6 +35,7 @@ class Constants {
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
     static final String TABLE_MONTH_YEAR_DATE_FORMAT = "MMM DD, yyyy"
+    static final String TABLE_DATE_DEFAULT_VALUE = "-"
 
 
     static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT)

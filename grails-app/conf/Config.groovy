@@ -1298,6 +1298,7 @@ openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 
 // Date configuration
 openboxes.table.date.format = Constants.TABLE_MONTH_YEAR_DATE_FORMAT
+openboxes.table.date.defaultValue = Constants.TABLE_DATE_DEFAULT_VALUE
 
 // Global megamenu configuration
 
