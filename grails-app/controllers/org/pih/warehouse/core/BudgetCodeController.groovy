@@ -18,13 +18,9 @@ class BudgetCodeController {
 
     def list = {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-        if (params.q) {
-            def budgetCodeList = budgetCodeService.findBudgetCodes(params.q)
-            return [budgetCodes: budgetCodeList, budgetCodesTotal: budgetCodeList.size()]
-        }
-
-        return [budgetCodes: BudgetCode.list(params), budgetCodesTotal: BudgetCode.count()]
+        params.offset = params.offset ?: 0
+        def budgetCodeList = budgetCodeService.getBudgetCodes(params)
+        return [budgetCodes: budgetCodeList, budgetCodesTotal: budgetCodeList.totalCount]
     }
 
     def create = {

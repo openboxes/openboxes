@@ -9,13 +9,17 @@
 **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+
 class BudgetCodeService {
 
     boolean transactional = true
 
-    def findBudgetCodes(String term) {
-        return BudgetCode.createCriteria().list {
-                ilike("code", "%" + term + "%")
+    def getBudgetCodes(GrailsParameterMap params) {
+        return BudgetCode.createCriteria().list(max: params.max, offset: params.offset) {
+            if (params.q) {
+                ilike("code", "%" + params.q + "%")
+            }
         }
     }
 }

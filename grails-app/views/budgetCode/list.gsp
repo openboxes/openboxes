@@ -97,7 +97,7 @@
                     </tbody>
                 </table>
                 <div class="paginateButtons">
-                    <g:paginate total="${budgetCodesTotal}" />
+                    <g:paginate total="${budgetCodesTotal}" params="${params}"/>
                 </div>
             </div>
         </div>
