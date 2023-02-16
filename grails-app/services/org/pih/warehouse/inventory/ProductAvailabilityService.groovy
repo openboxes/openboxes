@@ -996,15 +996,10 @@ class ProductAvailabilityService {
                 existingPA.quantityAllocated += remainingPA.quantityAllocated
                 existingPA.quantityNotPicked += remainingPA.quantityNotPicked
                 existingPA.quantityOnHold += remainingPA.quantityOnHold
-                existingPA. quantityAvailableToPromise += remainingPA.quantityAvailableToPromise
+                existingPA.quantityAvailableToPromise += remainingPA.quantityAvailableToPromise
                 existingPA.save(flush: true)
 
-                remainingPA.quantityOnHand = 0
-                remainingPA.quantityAllocated = 0
-                remainingPA.quantityNotPicked = 0
-                remainingPA.quantityOnHold = 0
-                remainingPA. quantityAvailableToPromise = 0
-                remainingPA.save(flush: true)
+                remainingPA.delete(flush: true)
 
                 return
             }

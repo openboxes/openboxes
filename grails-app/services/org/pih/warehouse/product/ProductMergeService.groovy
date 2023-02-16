@@ -196,8 +196,7 @@ class ProductMergeService {
         log.info "Moving ${obsoleteInventoryItems?.size() ?: 0} Inventory items"
         obsoleteInventoryItems?.each { InventoryItem obsoleteInventoryItem ->
             // Check if this lot already exists for the primary product
-            def obsoleteLotNumber = obsoleteInventoryItem?.lotNumber
-            InventoryItem primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            InventoryItem primaryInventoryItem = getPrimaryInventoryItem(primaryInventoryItems, obsoleteInventoryItem)
 
             int productAvailabilitiesCount = ProductAvailability.countByInventoryItem(obsoleteInventoryItem)
             if (primaryInventoryItem) {
@@ -248,8 +247,7 @@ class ProductMergeService {
             obsoleteTransactionEntry.product = primary
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
-            def obsoleteLotNumber = obsoleteTransactionEntry.inventoryItem?.lotNumber
-            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            InventoryItem primaryInventoryItem = getPrimaryInventoryItem(primaryInventoryItems, obsoleteTransactionEntry?.inventoryItem)
             if (primaryInventoryItem) {
                 obsoleteTransactionEntry.inventoryItem = primaryInventoryItem
             }
@@ -270,8 +268,7 @@ class ProductMergeService {
             obsoleteRequisitionItem.product = primary
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
-            def obsoleteLotNumber = obsoleteRequisitionItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            InventoryItem primaryInventoryItem = getPrimaryInventoryItem(primaryInventoryItems, obsoleteRequisitionItem?.inventoryItem)
             if (primaryInventoryItem) {
                 obsoleteRequisitionItem.inventoryItem = primaryInventoryItem
             }
@@ -290,8 +287,7 @@ class ProductMergeService {
             obsoleteShipmentItem.product = primary
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
-            def obsoleteLotNumber = obsoleteShipmentItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            InventoryItem primaryInventoryItem = getPrimaryInventoryItem(primaryInventoryItems, obsoleteShipmentItem?.inventoryItem)
             if (primaryInventoryItem) {
                 obsoleteShipmentItem.inventoryItem = primaryInventoryItem
                 obsoleteShipmentItem.lotNumber = primaryInventoryItem?.lotNumber
@@ -312,8 +308,7 @@ class ProductMergeService {
             obsoleteOrderItem.product = primary
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
-            def obsoleteLotNumber = obsoleteOrderItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            InventoryItem primaryInventoryItem = getPrimaryInventoryItem(primaryInventoryItems, obsoleteOrderItem?.inventoryItem)
             if (primaryInventoryItem) {
                 obsoleteOrderItem.inventoryItem = primaryInventoryItem
             }
@@ -332,8 +327,7 @@ class ProductMergeService {
             obsoleteReceiptItem.product = primary
 
             // Swap inventory item (in case the primary product had the same lot as obsolete)
-            def obsoleteLotNumber = obsoleteReceiptItem.inventoryItem?.lotNumber
-            def primaryInventoryItem = primaryInventoryItems.find { it.lotNumber == obsoleteLotNumber}
+            InventoryItem primaryInventoryItem = getPrimaryInventoryItem(primaryInventoryItems, obsoleteReceiptItem?.inventoryItem)
             if (primaryInventoryItem) {
                 obsoleteReceiptItem.inventoryItem = primaryInventoryItem
                 obsoleteReceiptItem.lotNumber = primaryInventoryItem?.lotNumber
@@ -363,6 +357,19 @@ class ProductMergeService {
         // RefreshStockoutDataJob.triggerNow()
         // RefreshDemandDataJob.triggerNow() // <- FIXME: probably can be skipped if takes too long time to process
         // RefreshOrderSummaryJob.triggerNow() // <- FIXME: maybe do a refresh by list of affected orders instead of full table
+    }
+
+    /**
+     * Finds inventory item from primary product, that has the same lot and expiry date as obsoleteInventoryItem
+     * (null lotNumber and empty string lotNumber are treated equally)
+     * */
+    def getPrimaryInventoryItem(Set<InventoryItem> primaryInventoryItems, InventoryItem obsoleteInventoryItem) {
+        def obsoleteLotNumber = obsoleteInventoryItem?.lotNumber
+        def obsoleteExpirationDate = obsoleteInventoryItem?.expirationDate
+        return primaryInventoryItems?.find {
+            def exactLotNumber = obsoleteLotNumber ? (it.lotNumber == obsoleteLotNumber) : (it.lotNumber == null || it.lotNumber == "")
+            return exactLotNumber && it.expirationDate == obsoleteExpirationDate
+        } ?: null
     }
 
     /**
