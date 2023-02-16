@@ -43,7 +43,7 @@ class SynonymTests extends GrailsUnitTestCase {
 
     @Test
     void validate_shouldPassValidation() {
-        def synonym = new Synonym(name: "a synonym", product: new Product(), synonymTypeCode: SynonymTypeCode.DISPLAY_NAME)
+        def synonym = new Synonym(name: "a synonym", product: new Product(), synonymTypeCode: SynonymTypeCode.DISPLAY_NAME, locale: new Locale("en"))
         assertTrue synonym.validate()
         println synonym.errors
         assertTrue !synonym.hasErrors()
@@ -55,7 +55,7 @@ class SynonymTests extends GrailsUnitTestCase {
         assertTrue !synonym.validate()
         println synonym.errors
         assertTrue synonym.hasErrors()
-        assertEquals 3, synonym.errors.errorCount
+        assertEquals 4, synonym.errors.errorCount
     }
 
     @Test
