@@ -20,8 +20,7 @@ class BudgetCodeController {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         if (params.q) {
-            String[] terms = ["%" + params.q + "%"]
-            def budgetCodeList = budgetCodeService.findBudgetCodes(terms)
+            def budgetCodeList = budgetCodeService.findBudgetCodes(params.q)
             return [budgetCodes: budgetCodeList, budgetCodesTotal: budgetCodeList.size()]
         }
 

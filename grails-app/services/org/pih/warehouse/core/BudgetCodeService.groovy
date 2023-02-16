@@ -13,15 +13,9 @@ class BudgetCodeService {
 
     boolean transactional = true
 
-    def findBudgetCodes(String[] terms) {
+    def findBudgetCodes(String term) {
         return BudgetCode.createCriteria().list {
-            if (terms) {
-                terms.each { term ->
-                    or {
-                        ilike("code", "%" + term + "%")
-                    }
-                }
-            }
+                ilike("code", "%" + term + "%")
         }
     }
 }
