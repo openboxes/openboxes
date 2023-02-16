@@ -71,7 +71,7 @@ const FIELDS = {
         type: ProductSelectField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        getDynamicAttr: ({ debouncedProductsFetch, fieldValue }) => ({
+        getDynamicAttr: ({ debouncedProductsFetch }) => ({
           loadOptions: debouncedProductsFetch,
         }),
       },
