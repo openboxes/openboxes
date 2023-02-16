@@ -265,7 +265,7 @@ class AddItemsPage extends Component {
               ...item,
               product: {
                 ...item.product,
-                label: `${item.product.productCode} ${item.product.name}`,
+                label: `${item.product.productCode} ${item.product.translatedName ?? item.product.name}`,
               },
             })) : new Array(1).fill({ sortOrder: 100 });
 
