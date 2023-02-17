@@ -227,14 +227,9 @@ class SendMovementPage extends Component {
 
     return apiClient.get(url)
       .then((response) => {
-        const shipmentTypes = _.map(response.data.data, (type) => {
-          const [en, fr] = _.split(type.name, '|fr:');
-          return {
-            ...type,
-            label: this.props.locale === 'fr' && fr ? fr : en,
-          };
-        });
-
+        const shipmentTypes = _.map(response.data.data, type => ({
+          ...type, label: splitTranslation(type.name, this.props.locale),
+        }));
         this.setState({ shipmentTypes }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
@@ -363,7 +358,14 @@ class SendMovementPage extends Component {
   save(values) {
     this.saveValues(values)
       .then((resp) => {
-        const outboundReturn = parseResponse(resp.data.data);
+        const { data } = resp.data;
+        const outboundReturn = {
+          ...parseResponse(data),
+          shipmentType: {
+            ...data.shipmentType,
+            label: splitTranslation(data.shipmentType.name, this.props.locale),
+          },
+        };
         const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));
         this.setState({
           values: {
