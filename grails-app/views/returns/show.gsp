@@ -18,7 +18,7 @@
         <div class="error">${flash.error}</div>
     </g:if>
 
-    <g:render template="../stockMovement/summary" model="[shipmentInstance:stockMovement?.shipment]"/>
+    <g:render template="/stockMovement/summary" model="[shipmentInstance:stockMovement?.shipment]"/>
 
     <div class="button-bar ">
         <g:if test="${stockMovement?.documents}">
