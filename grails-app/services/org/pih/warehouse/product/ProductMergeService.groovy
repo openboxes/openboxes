@@ -25,7 +25,6 @@ import org.pih.warehouse.shipping.ShipmentItem
 class ProductMergeService {
 
     def inventoryService
-    def picklistService
     def productAvailabilityService
 
     /**
@@ -210,7 +209,7 @@ class ProductMergeService {
                 // if product inventory item already exists, then check if obsolete InventoryItem has PicklistItems
                 int picklistItemsCount = PicklistItem.countByInventoryItem(obsoleteInventoryItem)
                 if (picklistItemsCount > 0) {
-                    picklistService.updatePicklistItemsOnProductMerge(primaryInventoryItem, obsoleteInventoryItem)
+                    updatePicklistItemsOnProductMerge(primaryInventoryItem, obsoleteInventoryItem)
                 }
 
                 // return, to not duplicate the lot number if it already exists for primary
@@ -364,12 +363,34 @@ class ProductMergeService {
      * (null lotNumber and empty string lotNumber are treated equally)
      * */
     def getPrimaryInventoryItem(Set<InventoryItem> primaryInventoryItems, InventoryItem obsoleteInventoryItem) {
-        def obsoleteLotNumber = obsoleteInventoryItem?.lotNumber
+        def obsoleteLotNumber = obsoleteInventoryItem?.lotNumber?.trim()
         def obsoleteExpirationDate = obsoleteInventoryItem?.expirationDate
         return primaryInventoryItems?.find {
-            def exactLotNumber = obsoleteLotNumber ? (it.lotNumber == obsoleteLotNumber) : (it.lotNumber == null || it.lotNumber == "")
+            def exactLotNumber = obsoleteLotNumber ? (it.lotNumber == obsoleteLotNumber) : (it.lotNumber == null || it.lotNumber?.trim() == "")
             return exactLotNumber && it.expirationDate == obsoleteExpirationDate
         } ?: null
+    }
+
+    /**
+     * Change inventory item to primary for rows with given obsolete inventory item
+     * (when primary product's inventory item *had* the same lot as obsolete)
+     * */
+    void updatePicklistItemsOnProductMerge(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem) {
+        if (!primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        def results = PicklistItem.executeUpdate(
+            "update PicklistItem pi " +
+                "set pi.inventoryItem = :primaryInventoryItem " +
+                "where pi.inventoryItem.id = :obsoleteInventoryItemId",
+            [
+                primaryInventoryItem    : primaryInventoryItem,
+                obsoleteInventoryItemId : obsoleteInventoryItem.id
+            ]
+        )
+        log.info "Updated ${results} picklist items for product: ${primaryInventoryItem?.product?.productCode} and " +
+            "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
     }
 
     /**
