@@ -102,7 +102,7 @@ class StockTransferService {
         return orders
     }
 
-    def getStockTransferCandidates(Location location, Map params) {
+    def getStockTransferCandidates(Location location, params) {
         List<StockTransferItem> stockTransferItems = []
 
         List stockTransferCandidates = productAvailabilityService.getStockTransferCandidates(location, params)
