@@ -216,12 +216,12 @@ class StockTransferApiController {
     }
 
     def returnCandidates() {
-        Location location = Location.get(params.locationId)
+        Location location = Location.get(request?.JSON?.locationId)
         if (!location) {
-            throw new IllegalArgumentException("Can't find location with given id: ${params.locationId}")
+            throw new IllegalArgumentException("Can't find location with given id: ${request?.JSON?.locationId}")
         }
 
-        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, params)
+        List<StockTransferItem> stockTransferCandidates = stockTransferService.getStockTransferCandidates(location, request?.JSON)
         render([data: stockTransferCandidates?.collect { it.toJson() }] as JSON)
     }
 
