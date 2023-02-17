@@ -244,23 +244,25 @@ class Product implements Comparable, Serializable {
                          "applicationTagLib",
                          "handlingIcons",
                          "uoms",
+                         "displayName",
+                         "displayNameOrDefaultName",
                          "translatedName",
                          "translatedNameWithLocaleCode"
     ]
 
     static hasMany = [
-            categories         : Category,
-            attributes         : ProductAttribute,
-            tags               : Tag,
-            documents          : Document,
-            productGroups      : ProductGroup,
-            packages           : ProductPackage,
-            synonyms           : Synonym,
-            inventoryLevels    : InventoryLevel,
-            inventoryItems     : InventoryItem,
-            productComponents  : ProductComponent,
-            productSuppliers   : ProductSupplier,
-            productCatalogItems: ProductCatalogItem,
+            categories           : Category,
+            attributes           : ProductAttribute,
+            tags                 : Tag,
+            documents            : Document,
+            productGroups        : ProductGroup,
+            packages             : ProductPackage,
+            synonyms             : Synonym,
+            inventoryLevels      : InventoryLevel,
+            inventoryItems       : InventoryItem,
+            productComponents    : ProductComponent,
+            productSuppliers     : ProductSupplier,
+            productCatalogItems  : ProductCatalogItem,
             productAvailabilities: ProductAvailability
     ]
 
@@ -678,7 +680,7 @@ class Product implements Comparable, Serializable {
     }
 
     List getUoms() {
-       return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
     String getTranslatedNameWithLocaleCode() {
@@ -686,32 +688,50 @@ class Product implements Comparable, Serializable {
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
-    String getNameByLocale(Locale locale) {
+    String getSynonymNameByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
         Synonym synonym = synonyms.find { Synonym synonym ->
-            synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME && synonym.locale == locale
+            synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
         }
         return synonym?.name
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     String getTranslatedName() {
-        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
-        return getNameByLocale(currentLocale)
+        return displayName
     }
+
+    /**
+     * @return the display name if it exists or null
+     */
+    String getDisplayName() {
+        return getSynonymNameByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)
+    }
+
+    /**
+     * @return the display name if it exists or the default name
+     */
+    String getDisplayNameOrDefaultName() {
+        return displayName ?: name
+    }
+
 
     Map toJson() {
         [
-                id                  : id,
-                productCode         : productCode,
-                name                : name,
-                description         : description,
-                category            : category,
-                unitOfMeasure       : unitOfMeasure,
-                pricePerUnit        : pricePerUnit,
-                dateCreated         : dateCreated,
-                lastUpdated         : lastUpdated,
-                color               : color,
-                handlingIcons       : handlingIcons,
-                lotAndExpiryControl : lotAndExpiryControl,
+                id                 : id,
+                productCode        : productCode,
+                name               : name,
+                description        : description,
+                category           : category,
+                unitOfMeasure      : unitOfMeasure,
+                pricePerUnit       : pricePerUnit,
+                dateCreated        : dateCreated,
+                lastUpdated        : lastUpdated,
+                color              : color,
+                handlingIcons      : handlingIcons,
+                lotAndExpiryControl: lotAndExpiryControl,
         ]
     }
 }

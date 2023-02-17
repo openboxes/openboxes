@@ -89,11 +89,11 @@
                         <g:if test="${j==0}">
                             <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                 <wordwrap:div class="canceled">
-                                    ${StringEscapeUtils.escapeXml(requisitionItem?.parentRequisitionItem?.product?.getNameByLocale(locale) ?: requisitionItem?.parentRequisitionItem?.product?.name)}
+                                    ${StringEscapeUtils.escapeXml(requisitionItem?.parentRequisitionItem?.product?.displayNameOrDefaultName)}
                                 </wordwrap:div>
                             </g:if>
                             <wordwrap:div class="${requisitionItem?.status}">
-                                ${StringEscapeUtils.escapeXml(requisitionItem?.product?.getNameByLocale(locale) ?: requisitionItem?.product?.name)}
+                                ${StringEscapeUtils.escapeXml(requisitionItem?.product?.displayNameOrDefaultName)}
                             </wordwrap:div>
                         </g:if>
                     </td>

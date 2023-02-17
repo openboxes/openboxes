@@ -22,6 +22,10 @@ class LocalizationUtil {
         return ApplicationHolder?.application?.mainContext?.getBean("localizationService")
     }
 
+    static Locale getCurrentLocale() {
+        return localizationService.currentLocale
+    }
+
     static String getLocalizedString(Transaction transaction) {
         String label = ""
         def localizationService = getLocalizationService()
@@ -42,7 +46,7 @@ class LocalizationUtil {
      * If locale is null, returns the default value
      */
     static String getLocalizedString(String str) {
-        return getLocalizedString(str, localizationService.getCurrentLocale())
+        return getLocalizedString(str, localizationService.currentLocale)
     }
 
     /**
