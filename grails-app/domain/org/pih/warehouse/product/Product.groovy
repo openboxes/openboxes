@@ -251,18 +251,18 @@ class Product implements Comparable, Serializable {
     ]
 
     static hasMany = [
-            categories           : Category,
-            attributes           : ProductAttribute,
-            tags                 : Tag,
-            documents            : Document,
-            productGroups        : ProductGroup,
-            packages             : ProductPackage,
-            synonyms             : Synonym,
-            inventoryLevels      : InventoryLevel,
-            inventoryItems       : InventoryItem,
-            productComponents    : ProductComponent,
-            productSuppliers     : ProductSupplier,
-            productCatalogItems  : ProductCatalogItem,
+            categories         : Category,
+            attributes         : ProductAttribute,
+            tags               : Tag,
+            documents          : Document,
+            productGroups      : ProductGroup,
+            packages           : ProductPackage,
+            synonyms           : Synonym,
+            inventoryLevels    : InventoryLevel,
+            inventoryItems     : InventoryItem,
+            productComponents  : ProductComponent,
+            productSuppliers   : ProductSupplier,
+            productCatalogItems: ProductCatalogItem,
             productAvailabilities: ProductAvailability
     ]
 
@@ -688,11 +688,11 @@ class Product implements Comparable, Serializable {
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
-    String getSynonymNameByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
+    Synonym getSynonymByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
         Synonym synonym = synonyms.find { Synonym synonym ->
             synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
         }
-        return synonym?.name
+        return synonym
     }
 
     /**
@@ -707,7 +707,7 @@ class Product implements Comparable, Serializable {
      * @return the display name if it exists or null
      */
     String getDisplayName() {
-        return getSynonymNameByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)
+        return getSynonymByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)?.name
     }
 
     /**
@@ -720,18 +720,18 @@ class Product implements Comparable, Serializable {
 
     Map toJson() {
         [
-                id                 : id,
-                productCode        : productCode,
-                name               : name,
-                description        : description,
-                category           : category,
-                unitOfMeasure      : unitOfMeasure,
-                pricePerUnit       : pricePerUnit,
-                dateCreated        : dateCreated,
-                lastUpdated        : lastUpdated,
-                color              : color,
-                handlingIcons      : handlingIcons,
-                lotAndExpiryControl: lotAndExpiryControl,
+                id                  : id,
+                productCode         : productCode,
+                name                : name,
+                description         : description,
+                category            : category,
+                unitOfMeasure       : unitOfMeasure,
+                pricePerUnit        : pricePerUnit,
+                dateCreated         : dateCreated,
+                lastUpdated         : lastUpdated,
+                color               : color,
+                handlingIcons       : handlingIcons,
+                lotAndExpiryControl : lotAndExpiryControl,
         ]
     }
 }
