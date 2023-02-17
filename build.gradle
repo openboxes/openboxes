@@ -347,7 +347,7 @@ manifest {
 node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
-    npmVersion = '6.14.17'
+    npmVersion = '6.14.18'
     version = '14.21.2'
 }
 
