@@ -223,20 +223,14 @@ class SendMovementPage extends Component {
     }
   }
 
-  getShipmentType(shipmentType) {
-    const [en, fr] = _.split(shipmentType.name, '|fr:');
-    return {
-      ...shipmentType,
-      label: this.props.locale === 'fr' && fr ? fr : en,
-    };
-  }
-
   fetchShipmentTypes() {
     const url = '/openboxes/api/generic/shipmentType';
 
     return apiClient.get(url)
       .then((response) => {
-        const shipmentTypes = _.map(response.data.data, type => this.getShipmentType(type));
+        const shipmentTypes = _.map(response.data.data, type => ({
+          ...type, name: splitTranslation(type.name, this.props.locale),
+        }));
         this.setState({ shipmentTypes }, () => this.props.hideSpinner());
       })
       .catch(() => this.props.hideSpinner());
@@ -368,7 +362,10 @@ class SendMovementPage extends Component {
         const { data } = resp.data;
         const outboundReturn = {
           ...parseResponse(data),
-          shipmentType: this.getShipmentType(data.shipmentType),
+          shipmentType: {
+            ...data.shipmentType,
+            name: splitTranslation(data.shipmentType.name, this.props.locale),
+          },
         };
         const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));
         this.setState({
