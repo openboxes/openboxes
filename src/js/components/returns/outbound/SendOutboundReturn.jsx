@@ -364,7 +364,7 @@ class SendMovementPage extends Component {
           ...parseResponse(data),
           shipmentType: {
             ...data.shipmentType,
-            name: splitTranslation(data.shipmentType.name, this.props.locale),
+            label: splitTranslation(data.shipmentType.name, this.props.locale),
           },
         };
         const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));

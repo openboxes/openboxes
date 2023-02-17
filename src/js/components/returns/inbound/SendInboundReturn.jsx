@@ -346,7 +346,14 @@ class SendMovementPage extends Component {
   save(values) {
     this.saveValues(values)
       .then((resp) => {
-        const inboundReturn = parseResponse(resp.data.data);
+        const { data } = resp.data;
+        const inboundReturn = {
+          ...parseResponse(data),
+          shipmentType: {
+            ...data.shipmentType,
+            label: splitTranslation(data.shipmentType.name, this.props.locale),
+          },
+        };
         this.setState({
           values: {
             inboundReturn,
