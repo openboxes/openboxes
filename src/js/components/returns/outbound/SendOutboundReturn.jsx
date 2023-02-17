@@ -229,7 +229,7 @@ class SendMovementPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         const shipmentTypes = _.map(response.data.data, type => ({
-          ...type, name: splitTranslation(type.name, this.props.locale),
+          ...type, label: splitTranslation(type.name, this.props.locale),
         }));
         this.setState({ shipmentTypes }, () => this.props.hideSpinner());
       })
