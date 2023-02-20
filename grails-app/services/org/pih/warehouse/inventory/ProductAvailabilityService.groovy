@@ -980,43 +980,43 @@ class ProductAvailabilityService {
      * */
     void processIgnoredProductAvailabilitiesOnProductMerge(Product primaryProduct, InventoryItem obsoleteInventoryItem, InventoryItem primaryInventoryItem) {
         // Get all remaining obsolete product availabilities with obsolete inventory item
-        List<ProductAvailability> remainingPAs = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
-        remainingPAs?.each { ProductAvailability remainingPA ->
+        List<ProductAvailability> remainingProductAvailabilities = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
+        remainingProductAvailabilities?.each { ProductAvailability remainingProductAvailability ->
             // Check if product availabilities are already existing for a product_availability_uniq_idx
-            ProductAvailability existingPA = ProductAvailability.createCriteria().get {
-                eq("location", remainingPA.location)
+            ProductAvailability existingProductAvailability = ProductAvailability.createCriteria().get {
+                eq("location", remainingProductAvailability.location)
                 eq("productCode", primaryProduct.productCode)
-                eq("lotNumber", remainingPA.lotNumber)
-                eq("binLocationName", remainingPA.binLocationName)
+                eq("lotNumber", remainingProductAvailability.lotNumber?.trim() ?: 'DEFAULT')
+                eq("binLocationName", remainingProductAvailability.binLocationName)
             }
 
             // If exists, then add quantities from obsolete PA to the new main one
-            if (existingPA) {
-                existingPA.quantityOnHand += remainingPA.quantityOnHand
-                existingPA.quantityAllocated += remainingPA.quantityAllocated
-                existingPA.quantityNotPicked += remainingPA.quantityNotPicked
-                existingPA.quantityOnHold += remainingPA.quantityOnHold
-                existingPA. quantityAvailableToPromise += remainingPA.quantityAvailableToPromise
-                existingPA.save(flush: true)
+            if (existingProductAvailability) {
+                existingProductAvailability.quantityOnHand += remainingProductAvailability.quantityOnHand
+                existingProductAvailability.quantityAllocated += remainingProductAvailability.quantityAllocated
+                existingProductAvailability.quantityNotPicked += remainingProductAvailability.quantityNotPicked
+                existingProductAvailability.quantityOnHold += remainingProductAvailability.quantityOnHold
+                existingProductAvailability.quantityAvailableToPromise += remainingProductAvailability.quantityAvailableToPromise
+                existingProductAvailability.save(flush: true)
 
-                remainingPA.quantityOnHand = 0
-                remainingPA.quantityAllocated = 0
-                remainingPA.quantityNotPicked = 0
-                remainingPA.quantityOnHold = 0
-                remainingPA. quantityAvailableToPromise = 0
-                remainingPA.save(flush: true)
+                remainingProductAvailability.quantityOnHand = 0
+                remainingProductAvailability.quantityAllocated = 0
+                remainingProductAvailability.quantityNotPicked = 0
+                remainingProductAvailability.quantityOnHold = 0
+                remainingProductAvailability.quantityAvailableToPromise = 0
+                remainingProductAvailability.save(flush: true)
 
                 return
             }
 
             // Otherwise swap product (and inventory item) on the remaining obsolete PA with primary ones
-            remainingPA.product = primaryProduct
-            remainingPA.productCode = primaryProduct.productCode
+            remainingProductAvailability.product = primaryProduct
+            remainingProductAvailability.productCode = primaryProduct.productCode
             if (primaryInventoryItem) {
-                remainingPA.inventoryItem = primaryInventoryItem
-                remainingPA.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
+                remainingProductAvailability.inventoryItem = primaryInventoryItem
+                remainingProductAvailability.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
             }
-            remainingPA.save(flush: true)
+            remainingProductAvailability.save(flush: true)
         }
     }
 }
