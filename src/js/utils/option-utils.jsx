@@ -131,7 +131,8 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
             name: obj.name,
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
-            label: `${obj.productCode} - ${obj.name}`,
+            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
+            hasTranslatedName: !!obj.translatedName,
             color: obj.color,
           }
         ))))
