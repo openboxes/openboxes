@@ -97,7 +97,6 @@ class ProductApiController extends BaseDomainApiController {
     }
 
     def search = {
-
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
 
         if (params.name && params.name.size() < minLength) {
@@ -106,11 +105,13 @@ class ProductApiController extends BaseDomainApiController {
         }
 
         String[] terms = params?.name?.split(",| ")?.findAll { it }
-        def products
+        def products, availableItems = []
         if(params.availableItems) {
-            products = productService.searchProducts(terms, [])
             def location = Location.get(session.warehouse.id)
-            def availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            products = productService.searchProducts(terms, [])
+            if (products) {
+                availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            }
             products = []
             availableItems.each { k, v ->
                 products += [
@@ -122,7 +123,8 @@ class ProductApiController extends BaseDomainApiController {
                     minExpirationDate: v.findAll { it.inventoryItem.expirationDate != null }.collect {
                         it.inventoryItem?.expirationDate
                     }.min()?.format("MM/dd/yyyy"),
-                    color: v[0].inventoryItem.product.color
+                    color: v[0].inventoryItem.product.color,
+                    translatedName: v[0].inventoryItem.product.translatedName,
                 ]
             }
 
@@ -130,7 +132,6 @@ class ProductApiController extends BaseDomainApiController {
         } else {
             products = productService.searchProductDtos(terms)
         }
-
         render([data: products] as JSON)
     }
 

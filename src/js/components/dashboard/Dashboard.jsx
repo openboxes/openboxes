@@ -421,7 +421,6 @@ class Dashboard extends Component {
           onClick={this.toggleNav}
           onKeyPress={this.toggleNav}
         />
-
         <div className="filter-and-cards-container">
           <Filter
             configs={this.props.dashboardConfig.dashboard || {}}

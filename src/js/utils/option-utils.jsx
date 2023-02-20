@@ -62,6 +62,8 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
             url: obj.url,
             label: obj.label,
             color: obj.color,
+            hasTranslatedName: obj.hasTranslatedName,
+            originalName: obj.value,
           }
         ))))
         .catch(() => callback([]));
@@ -82,7 +84,8 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
             lotAndExpiryControl: obj.lotAndExpiryControl,
-            label: `${obj.productCode} - ${obj.name}`,
+            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
+            hasTranslatedName: !!obj.translatedName,
             color: obj.color,
             exactMatch: obj.exactMatch,
           }
@@ -106,7 +109,8 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
             quantityAvailable: obj.quantityAvailable,
             minExpirationDate: obj.minExpirationDate,
             handlingIcons: obj.product.handlingIcons,
-            label: `${obj.productCode} - ${obj.name}`,
+            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
+            hasTranslatedName: !!obj.translatedName,
             color: obj.color,
           }
         ))))
@@ -127,7 +131,8 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
             name: obj.name,
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
-            label: `${obj.productCode} - ${obj.name}`,
+            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
+            hasTranslatedName: !!obj.translatedName,
             color: obj.color,
           }
         ))))

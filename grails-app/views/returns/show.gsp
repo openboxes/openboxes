@@ -385,9 +385,12 @@
         </div>
     </div>
 </div>
-
 <script type="text/javascript">
     $(document).ready(function() {
+
+      const stockMovementDirection = ${stockMovement?.destination?.id == currentLocation?.id} ? 'inbound' : 'outbound';
+      applyActiveSection(stockMovementDirection);
+
         $(".tabs").tabs({
             cookie : {
                 expires : 1

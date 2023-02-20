@@ -271,7 +271,11 @@
                 <g:each var="month" in="${year.value}">
                     <tr class="monthRow border-top ${isCurrentYear ? 'currentYear' : ''}">
                         <td colspan="14" class="icon  ${isCurrentYear ? 'active' : ''}">
-                            ${new java.text.DateFormatSymbols().months[(month.key).toInteger()]} ${year.key}
+                            <g:message
+                                code="month.${(month.key).toInteger() + 1}.label"
+                                default="${new java.text.DateFormatSymbols().months[(month.key).toInteger()]}"
+                            />
+                            ${year.key}
                         </td>
                     </tr>
                     <g:each var="stockHistoryEntry" in="${month.value}">
@@ -440,7 +444,7 @@
 
                             <td class="border-right middle">
                                 <div class="line">
-                                    <span>
+                                    <span class="d-flex">
                                         <g:if test="${stockHistoryEntry?.binLocation}">
                                             <g:if test="${stockHistoryEntry?.binLocation?.zone}">
                                                 <span class="line-base" title="${stockHistoryEntry?.binLocation?.zone?.name}">
@@ -458,10 +462,12 @@
                                     <g:if test="${stockHistoryEntry?.isInternal}">
                                         <span>&nbsp;&rsaquo;&nbsp;</span>
                                         <g:if test="${stockHistoryEntry?.destinationBinLocation}">
-                                            <span>
+                                            <span class="line-base" title="${stockHistoryEntry?.destinationBinLocation?.zone?.name}">
                                                 <g:if test="${stockHistoryEntry?.destinationBinLocation?.zone}">
                                                     ${stockHistoryEntry?.destinationBinLocation?.zone?.name}
                                                 </g:if>
+                                            </span>
+                                            <span class="line-extension" title="${stockHistoryEntry?.destinationBinLocation?.name}">
                                                 ${stockHistoryEntry?.destinationBinLocation?.name}
                                             </span>
                                         </g:if>

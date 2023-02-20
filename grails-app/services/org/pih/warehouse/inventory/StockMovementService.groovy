@@ -787,6 +787,7 @@ class StockMovementService {
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
+                        quantityRequested               : stockMovementItem.quantityRequested,
                         comments                        : stockMovementItem.comments,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
@@ -794,7 +795,14 @@ class StockMovementService {
                         demandPerReplenishmentPeriod    : Math.ceil((demand?.dailyDemand ?: 0) * (template?.replenishmentPeriod ?: 30)),
                 ]
             } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
-                def demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
+                def demand
+                // if request FROM Ward then pull demand from origin to ward
+                if (requisition?.destination?.isWard()) {
+                    demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
+                } else {
+                    // if request is NOT FROM Ward, then pull demand outgoing FROM destination to all other locations
+                    demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
+                }
                 return [
                         id                              : stockMovementItem.id,
                         product                         : stockMovementItem.product,
@@ -1213,7 +1221,11 @@ class StockMovementService {
                 requisitionItem.errors.rejectValue("picklistItems", errorMessage, [
                         requisitionItem?.product?.productCode,
                 ].toArray(), errorMessage)
-                throw new ValidationException(errorMessage, requisitionItem.errors)
+
+                // FIXME: Refactor this part to get rid of need to throw wrapped exception plus consider not allowing zeroing out picked stock
+                // Throw checked exception with ValidationException cause to not rollback deleted picklist while throwing unchecked exception
+                // See: https://pihemr.atlassian.net/browse/OBPIH-5318
+                throw new Exception(errorMessage, new ValidationException(errorMessage, requisitionItem.errors))
             }
         }
     }
@@ -2716,6 +2728,7 @@ class StockMovementService {
     }
 
     List buildStockMovementItemList(StockMovement stockMovement) {
+
         // We need to create at least one row to ensure an empty template
         if (stockMovement?.lineItems?.empty) {
             stockMovement?.lineItems.add(new StockMovementItem())
@@ -2725,7 +2738,7 @@ class StockMovementService {
             [
                 "Requisition item id"            : it?.id ?: "",
                 "Product code (required)"     : it?.product?.productCode ?: "",
-                "Product name"                  : it?.product?.name ?: "",
+                "Product name"                  : it?.product?.translatedNameWithLocaleCode ?: "",
                 "Pack level 1"                   : it?.palletName ?: "",
                 "Pack level 2"                      : it?.boxName ?: "",
                 "Lot number"                    : it?.lotNumber ?: "",

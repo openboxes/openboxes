@@ -853,7 +853,7 @@ class JsonController {
                     inventoryItemList = inventoryItemList.sort { it?.expirationDate }
                 }
 
-                def localizedName = localizationService.getLocalizedString(product.name)
+                def localizedName = product?.translatedName ?: product?.name
 
 
                 // Convert product attributes to JSON object attributes
@@ -870,7 +870,8 @@ class JsonController {
                         desc          : product.description,
                         inventoryItems: inventoryItemList,
                         handlingIcons : product?.getHandlingIcons(),
-                        color         : product?.color
+                        color         : product?.color,
+                        tooltip       : product?.translatedName ? product?.name : null
                 ]
             }
         }
@@ -1079,8 +1080,10 @@ class JsonController {
                     type : product.class,
                     url  : request.contextPath + "/" + type + "/redirect/" + product.id,
                     value: product.name,
-                    label: product.productCode + " " + product.name + " " + quantity,
-                    color: product.color
+                    label: product.productCode + " " + (product.translatedName ?: product.name) + " " + quantity,
+                    color: product.color,
+                    // Do not remove double negation even if IDE recommends this - we want to convert string/null to boolean
+                    hasTranslatedName: !!product.translatedName
             ]
         }
         render json.findAll { it != null } as JSON
@@ -1362,6 +1365,7 @@ class JsonController {
                     status                      : g.message(code: "binLocationSummary.${it.status}.label"),
                     productCode                 : it.product?.productCode,
                     productName                 : it?.product?.name,
+                    translatedProductName       : it?.product?.translatedName,
                     productGroup                : it?.product?.genericProduct?.name,
                     category                    : it?.product?.category?.name,
                     lotNumber                   : it?.inventoryItem?.lotNumber,
@@ -1391,6 +1395,7 @@ class JsonController {
             [
                     productCode  : it.product?.productCode,
                     productName  : it.product?.name,
+                    translatedProductName : it.product?.translatedName,
                     qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                     qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                     orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),

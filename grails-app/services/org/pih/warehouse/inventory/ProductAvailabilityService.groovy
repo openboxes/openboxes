@@ -12,20 +12,25 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
@@ -35,8 +40,10 @@ class ProductAvailabilityService {
     boolean transactional = true
 
     def dataSource
+    def gparsService
     def grailsApplication
     def persistenceInterceptor
+    def productService
     def locationService
     def inventoryService
     def dataService
@@ -82,7 +89,7 @@ class ProductAvailabilityService {
         // Compute bin locations from transaction entries for all products over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
-        GParsPool.withPool {
+        gparsService.withPool('RefreshAllProducts') {
             locationService.depots.eachParallel { Location loc ->
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
@@ -98,7 +105,7 @@ class ProductAvailabilityService {
         // Compute bin locations from transaction entries for specific product over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
-        GParsPool.withPool {
+        gparsService.withPool('RefreshSingleProduct') {
             locationService.depots.eachParallel { Location loc ->
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
@@ -775,74 +782,84 @@ class ProductAvailabilityService {
         List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms?.split(" ")) : null)
 
         // Only search if there are search terms otherwise the list of product IDs includes all products
-        def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
-            eq("active", true)
-            projections {
-                distinct 'id'
-            }
-            and {
-                searchTerms.each { searchTerm ->
-                    or {
-                        ilike("name", "%" + searchTerm + "%")
-                        inventoryItems {
-                            ilike("lotNumber", "%" + searchTerm + "%")
-                        }
-                    }
-                }
-            }
+        def innerProductIds = searchTerms ?
+                productService.searchProducts(searchTerms.toArray(), [])?.collect { it.id } : []
+
+        // Retrieve all product types with SEARCHABLE and SEARCHABLE_NO_STOCK activity codes
+        String productTypeQuery = "select pt from ProductType pt left join pt.supportedActivities sa where sa=:productActivityCode"
+        def searchableProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE])
+        def searchableNoStockProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE_NO_STOCK])
+
+        // Detached criteria used as a subquery to get aggregated quantity on hand value for a product location pair
+        DetachedCriteria aggregatedQuantityQuery = DetachedCriteria.forClass(ProductAvailability, 'pa').with {
+            setProjection Projections.sum('pa.quantityOnHand')
+            add(Restrictions.eqProperty('pa.product.id', 'this.id'))
+            add(Restrictions.eq('pa.location.id', command.location.id))
         }
 
-        def paginationParams = searchTerms ? [:] : [max: command.maxResults, offset: command.offset]
-
-        def products = Product.createCriteria().list(paginationParams) {
+        def products = Product.createCriteria().list([max: command.maxResults, offset: command.offset]) {
             eq("active", true)
-            and {
-                if (categories) {
-                    'in'("category", categories)
-                }
-                if (command.tags) {
-                    tags {
-                        'in'("id", command.tags*.id)
-                    }
-                }
-                if (command.catalogs) {
-                    productCatalogItems {
-                        productCatalog {
-                            'in'("id", command.catalogs*.id)
-                        }
-                    }
-                }
-                // This is pretty inefficient if the previous query does not narrow the results
-                // if the inner products list is empty, but there are search terms then return empty results
-                if (innerProductIds || searchTerms) {
-                    'in'("id", innerProductIds ?: [null])
+
+            // Restrict products by selected product types
+            if (command.productTypes) {
+                'in'("productType", command.productTypes)
+                if (!command.showOutOfStockProducts) {
+                    // Read: 0 is less than result from subquery
+                    add Subqueries.lt(0, aggregatedQuantityQuery)
                 }
             }
+            // Or apply default product type restrictions:
+            // return products with product type with activity searchable no stock OR (searchable AND qoh > 0)
+            else {
+                if (!command.showOutOfStockProducts) {
+                    add(Restrictions.disjunction().
+                            add(Restrictions.in("productType", searchableNoStockProductTypes)).
+                            add(Restrictions.conjunction().
+                                    add(Subqueries.lt(0, aggregatedQuantityQuery)).
+                                    add(Restrictions.in("productType", searchableProductTypes))
+                            ))
+                }
+            }
+
+            // Restrict products by selected categories
+            if (categories) {
+                'in'("category", categories)
+            }
+
+            // Restrict products by selected tags
+            if (command.tags) {
+                tags {
+                    'in'("id", command.tags*.id)
+                }
+            }
+
+            // Restrict products by selected catalogs
+            if (command.catalogs) {
+                productCatalogItems {
+                    productCatalog {
+                        'in'("id", command.catalogs*.id)
+                    }
+                }
+            }
+
+            // This is pretty inefficient if the previous query does not narrow the results
+            // if the inner products list is empty, but there are search terms then return empty results
+            if (innerProductIds || searchTerms) {
+                'in'("id", innerProductIds ?: [null])
+            }
+            order("productCode")
         }
 
-        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : []
-
-        def items = []
-
-        products.each { Product product ->
-            def quantity = quantityMap[product] ?: 0
-
-            if (product.productType && !product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE_NO_STOCK)) {
-                if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
-                    return
-                } else if (quantity == 0) {
-                    return
-                }
-            }
-
-            items << [
+        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : [:]
+        def items = products.collect { Product product ->
+            [
                 id   : product.id,
                 product: product,
-                quantityOnHand: quantity
+                quantityOnHand: quantityMap[product] ?: 0
             ]
         }
 
-        return searchTerms ? items : new PagedResultList(items, products.totalCount)
+        return new PagedResultList(items, products.totalCount)
     }
 
     List<ProductAvailability> getStockTransferCandidates(Location location) {

@@ -2,23 +2,40 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 
 const Option = option => (
-  <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-    {option.label}
-  &nbsp;
-    {renderHandlingIcons(option.handlingIcons)}
-  </strong>);
+  <Tooltip
+    html={<div className="text-truncate">{option.name}</div>}
+    theme="transparent"
+    disabled={!option.hasTranslatedName}
+    position="top-start"
+  >
+    <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
+      {option.label}
+        &nbsp;
+      {renderHandlingIcons(option.handlingIcons)}
+    </strong>
+  </Tooltip>);
 
 const SelectedValue = option => (
-  <span className="d-flex align-items-center">
-    <span className="text-truncate">{option.label}</span>
-    &nbsp;{renderHandlingIcons(option?.handlingIcons)}
-  </span>
+  <Tooltip
+    html={<div className="text-truncate">{option.name}</div>}
+    theme="dark"
+    disabled={!option.hasTranslatedName}
+    position="top-start"
+  >
+    <span className="d-flex align-items-center">
+      <span className="text-truncate">
+        {option.label || `${option.productCode} - ${option.translatedName || option.name}`}
+      </span>
+      &nbsp;{renderHandlingIcons(option?.handlingIcons)}
+    </span>
+  </Tooltip>
 );
 
 const ProductSelect = ({
@@ -90,7 +107,7 @@ const ProductSelect = ({
       }}
       async
       options={[]}
-      loadOptions={loadProductOptions}
+      loadOptions={props.loadOptions || loadProductOptions}
       onMenuClose={() => {
         setLoadedOptions([]);
         setSearchTerm('');
@@ -110,6 +127,7 @@ ProductSelect.defaultProps = {
   showValueTooltip: true,
   onExactProductSelected: undefined,
   fieldRef: undefined,
+  loadOptions: undefined,
 };
 
 ProductSelect.propTypes = {
@@ -121,6 +139,7 @@ ProductSelect.propTypes = {
   locationId: PropTypes.string.isRequired,
   onExactProductSelected: PropTypes.func,
   fieldRef: PropTypes.func,
+  loadOptions: PropTypes.func,
 };
 
 export default ProductSelect;

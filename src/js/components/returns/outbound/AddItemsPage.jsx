@@ -15,6 +15,7 @@ import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
+import ProductSelect from 'components/product-select/ProductSelect';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
@@ -69,23 +70,22 @@ const FIELDS = {
         defaultMessage: 'Code',
         flexWidth: '1',
       },
-      'product.name': {
-        type: (params) => {
-          const { rowIndex, values } = params;
-          const handlingIcons = _.get(values, `returnItems[${rowIndex}].product.handlingIcons`, []);
-          const productNameWithIcons = (
-            <div className="d-flex">
-              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-              {renderHandlingIcons(handlingIcons)}
-            </div>);
-          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
-        },
+      product: {
+        type: LabelField,
         label: 'react.outboundReturns.productName.label',
         defaultMessage: 'Product',
         flexWidth: '4.5',
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
-          className: 'text-left ml-1',
+          formatValue: value => (
+            <div className="d-flex">
+              {value.translatedName ?? value.name}
+              {renderHandlingIcons(value.handlingIcons)}
+            </div>),
           showValueTooltip: true,
+          className: 'text-left ml-1',
         },
       },
       lotNumber: {
@@ -462,34 +462,10 @@ class AddItemsPage extends Component {
         render={({ handleSubmit, values }) => (
           <div className="d-flex flex-column">
             <div className="d-flex mb-3 justify-content-start align-items-center w-100 combined-shipment-filter">
-              <Select
-                async
+              <ProductSelect
                 placeholder={this.props.translate('react.outboundReturns.selectProduct.label', 'Select product...')}
-                options={[]}
-                classes=""
-                showValueltip
                 loadOptions={this.debounceAvailableItemsFetch}
                 onChange={value => this.setSelectedProduct(value)}
-                openOnClick={false}
-                autoload={false}
-                filterOption={options => options}
-                cache={false}
-                optionRenderer={option => (
-                  <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-                    {option.label}
-                    &nbsp;
-                    {renderHandlingIcons(option.handlingIcons)}
-                  </strong>
-                )}
-                valueRenderer={option => (
-                  <span className="d-flex align-items-center">
-                    <span className="text-truncate">
-                      {option.label}
-                    </span>
-                    &nbsp;
-                    {renderHandlingIcons(option ? option.handlingIcons : [])}
-                  </span>
-                )}
               />
               &nbsp;
               <input
@@ -548,6 +524,9 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
+                  disabled={
+                    !_.some(values.returnItems, item => _.parseInt(item.quantity) && item.checked)
+                  }
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 ><Translate id="react.replenishment.next.label" defaultMessage="Next" />
                 </button>

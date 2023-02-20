@@ -17,11 +17,13 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.util.LocalizationUtil
 import util.ReportUtil
-
 import java.text.SimpleDateFormat
 /**
  * @author jmiranda*
@@ -325,7 +327,15 @@ class ProductService {
                 }
             }
             or {
-                if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                if (params.name) {
+                    ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                    synonyms {
+                        and {
+                            ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                            eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                        }
+                    }
+                }
                 if (params.description) ilike("description", params.description + "%")
                 if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
                 if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
@@ -1196,6 +1206,12 @@ class ProductService {
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
+                        synonyms {
+                           and {
+                               ilike("name", "%" + term)
+                               eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                           }
+                        }
                         ilike("description", "%" + term)
                         ilike("upc", term)
                         ilike("ndc", term)
@@ -1228,6 +1244,8 @@ class ProductService {
     }
 
     def searchProductDtos(String[] terms) {
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+
         def query = """
             select distinct
             product.id, 
@@ -1252,13 +1270,22 @@ class ProductService {
                 left outer join product_catalog pc on pci.product_catalog_id = pc.id 
                 where pci.product_id = product.id 
                 group by pci.product_id
-            ) as productColor
+            ) as productColor,
+            (
+                select s.name from synonym s
+                where s.product_id = product.id
+                and s.synonym_type_code = 'DISPLAY_NAME'
+                and s.locale = '${locale}'
+                limit 1
+            ) as translatedName 
             from product """
 
         if (terms && terms.size() > 0) {
             query += """
             left outer join product_supplier 
                 on product.id = product_supplier.product_id
+            left outer join synonym 
+                on product.id = synonym.product_id
             left outer join party manufacturer 
                 on product_supplier.manufacturer_id = manufacturer.id 
                 and (${terms.collect { "lower(manufacturer.name) like '${it}%'" }.join(" or ")}) # adding the conditions to join will allow MySQL to optimize the query
@@ -1271,6 +1298,7 @@ class ProductService {
             where product.active = 1 and (${terms.collect {"""
                 lower(product.name) like '%${it}%' 
                 or lower(product.product_code) like '${it}%' 
+                or (synonym.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' and synonym.name like '%${it}%')
                 or lower(product.description) like '%${it}%'
                 or lower(product.upc) like '${it}%' 
                 or lower(product.ndc) like '${it}%'
@@ -1370,5 +1398,17 @@ class ProductService {
 
             importProducts(products)
         }
+    }
+
+    Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
+        Product product = Product.get(productId)
+        Locale locale = localeName ? new Locale(localeName) : null
+        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
+        Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
+        product.addToSynonyms(synonym)
+        if (!synonym.validate() || !product.save(flush: true, failOnError: true)) {
+            throw new ValidationException("Invalid synonym", synonym.errors)
+        }
+        return product
     }
 }

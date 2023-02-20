@@ -265,7 +265,7 @@ class StockMovement {
             }
         }
 
-        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder))
+        return ((canOriginManageInventory && isOrigin) || (!canOriginManageInventory && isDestination) || (isCentralPurchasingEnabled && isFromOrder) || (electronicType && isDestination))
     }
 
     Boolean isEditAuthorized(Location currentLocation) {

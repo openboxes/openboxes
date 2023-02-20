@@ -56,12 +56,16 @@ const FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
         flexWidth: '3.5',
+        getDynamicAttr: ({ fieldValue }) => ({
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
           className: 'text-left ml-1',
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name}
+                {value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value.handlingIcons)}
             </span>

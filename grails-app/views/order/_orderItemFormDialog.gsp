@@ -119,7 +119,7 @@
                     <label for="dlgUnitPrice"><warehouse:message code="orderItem.unitPrice.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <input type="text" id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" class="text" />
+                    <g:decimalNumberField id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" />
                     <span class="fade"><warehouse:message code="order.unitPrice.hint"/></span>
                 </td>
             </tr>
@@ -271,7 +271,7 @@
                 </g:if>
                 <g:else>
                     <td valign="top" class="value">
-                        <input type="text" id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" class="text" />
+                        <g:decimalNumberField id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" />
                         <span class="fade"><warehouse:message code="order.unitPrice.hint"/></span>
                     </td>
                 </g:else>
@@ -457,7 +457,11 @@
               if (jqXHR.responseText) {
                 try {
                   let data = JSON.parse(jqXHR.responseText);
-                  $.notify(data.errorMessage, "error");
+                  if (data.errorMessages.length > 0) {
+                    $.notify(data.errorMessages.join("\n"), "error");
+                  } else {
+                    $.notify(data.errorMessage, "error");
+                  }
                 } catch (e) {
                   $.notify(jqXHR.responseText, "error");
                 }

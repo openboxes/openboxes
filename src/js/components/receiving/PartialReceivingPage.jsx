@@ -157,24 +157,8 @@ const TABLE_FIELDS = {
           className: 'text-left ml-1',
         },
       },
-      'product.name': {
-        type: (params) => {
-          if (params.subfield) {
-            const { parentIndex, rowIndex } = params;
-            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
-            const handlingIcons = _.get(params.values, fieldPath);
-
-            const productNameWithIcons = (
-              <div className="d-flex">
-                <span className="text-truncate">
-                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-                </span>
-                {renderHandlingIcons(handlingIcons)}
-              </div>);
-            return <LabelField {...params} fieldValue={productNameWithIcons} />;
-          }
-          return null;
-        },
+      product: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -182,7 +166,15 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
+          formatValue: value => (
+            <div className="d-flex">
+              {value?.translatedName ?? value?.name}
+              {renderHandlingIcons(value?.handlingIcons)}
+            </div>),
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -298,9 +290,9 @@ const TABLE_FIELDS = {
         }),
       },
       edit: {
-        type: params => (params.subfield ? <EditLineModal {...params} /> : null),
+        type: params => (params.subfield ? <EditLineModal {...params} wrapperClassName="edit-button-cell" /> : null),
         fieldKey: '',
-        flexWidth: '0.5',
+        flexWidth: '0.9',
         label: '',
         attributes: {
           btnOpenText: 'react.default.button.edit.label',

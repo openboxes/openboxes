@@ -40,6 +40,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.requisition.CommodityClass
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -127,6 +128,19 @@ class SelectTagLib {
         attrs.value = attrs.value
         attrs.optionKey = "id"
         attrs.optionValue = { it.name + " (" + it.productCount + ")" }
+        out << g.select(attrs)
+    }
+
+    @Cacheable("selectProductTypeCache")
+    def selectProductType = { attrs, body ->
+        def productTypes = ProductType.list(sort: "name").collect {
+            [id: it.id, name: it.name]
+        }
+        attrs.from = productTypes
+        attrs.multiple = true
+        attrs.value = attrs.value
+        attrs.optionKey = "id"
+        attrs.optionValue = { it.name }
         out << g.select(attrs)
     }
 
@@ -276,7 +290,7 @@ class SelectTagLib {
     }
 
     def selectGlAccount = { attrs, body ->
-        attrs.from = GlAccount.list()
+        attrs.from = GlAccount.findAllByActive(true)
         attrs.optionKey = 'id'
         attrs.optionValue = { it.code + " " + it.description }
         out << g.select(attrs)
@@ -335,6 +349,7 @@ class SelectTagLib {
     def selectContainer = { attrs, body ->
         def currentLocation = Location.get(session?.warehouse?.id)
         attrs.from = shipmentService.getPendingShipments(currentLocation)
+        attrs['data-placeholder'] = attrs['data-placeholder'] ?: g.message(code: 'default.selectAnOption.label', default: 'Select an Option')
         out << render(template: '/taglib/selectContainer', model: [attrs: attrs])
 
     }
@@ -683,7 +698,7 @@ class SelectTagLib {
                 writer.println()
 
                 from.eachWithIndex { el, i ->
-                    if (el.properties[groupBy].equals(optGroup)) {
+                    if (el.properties[groupBy]?.id == optGroup?.id) {
 
                         def keyValue = null
                         writer << '<option '

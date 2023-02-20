@@ -5,6 +5,7 @@ import { RiCloseLine, RiSearchLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import { Async, components } from 'react-select';
+import { Tooltip } from 'react-tippy';
 
 import { debounceGlobalSearch } from 'utils/option-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -69,11 +70,18 @@ const GlobalSearch = ({
     const { before, matched, after } = splitMatchingStr(data.label, inputValue);
     return (
       <components.Option {...props}>
-        <div style={{ color: data.color }}>
-          {before && <span>{before}</span>}
-          {matched && <strong className="font-weight-bold">{matched}</strong>}
-          {after && <span>{after}</span>}
-        </div>
+        <Tooltip
+          html={<div className="custom-tooltip">{data.originalName}</div>}
+          theme="transparent"
+          disabled={!data?.hasTranslatedName}
+          position="top-start"
+        >
+          <div style={{ color: data.color }}>
+            {before && <span>{before}</span>}
+            {matched && <strong className="font-weight-bold">{matched}</strong>}
+            {after && <span>{after}</span>}
+          </div>
+        </Tooltip>
       </components.Option>
     );
   };
@@ -139,7 +147,7 @@ export default connect(mapStateToProps)(GlobalSearch);
 
 GlobalSearch.propTypes = {
   visible: PropTypes.bool,
-  renderButton: PropTypes.func.isRequired,
+  renderButton: PropTypes.func,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
   className: PropTypes.string,
@@ -147,6 +155,7 @@ GlobalSearch.propTypes = {
 };
 
 GlobalSearch.defaultProps = {
+  renderButton: undefined,
   visible: false,
   className: '',
 };

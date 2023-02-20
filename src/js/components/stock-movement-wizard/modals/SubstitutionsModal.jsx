@@ -3,16 +3,17 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate from 'utils/Translate';
 
 
@@ -67,55 +68,11 @@ const FIELDS = {
     fields: {
       product: {
         fieldKey: 'disabled',
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
-        headerAlign: 'left',
-        flexWidth: '6',
-        attributes: {
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-          className: 'text-left',
-          showLabel: true,
-          optionRenderer: option => (
-            <strong
-              style={{ color: option.color ? option.color : 'black' }}
-              className="d-flex align-items-center"
-            >
-              {option.label}
-              &nbsp;
-              {renderHandlingIcons(option.value ? option.value.handlingIcons : [])}
-            </strong>
-          ),
-          valueRenderer: option => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {option.label}
-              </span>
-              &nbsp;
-              {renderHandlingIcons(option ? option.handlingIcons : [])}
-            </span>
-          ),
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name || ''}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
-          ),
-        },
-        getDynamicAttr: ({
-          fieldValue,
-          debouncedProductsFetch,
-        }) => ({
-          disabled: !!fieldValue,
-          loadOptions: debouncedProductsFetch,
+        getDynamicAttr: ({ debouncedAvailableItemsFetch }) => ({
+          loadOptions: debouncedAvailableItemsFetch,
         }),
       },
       'product.minExpirationDate': {
@@ -193,7 +150,7 @@ class SubstitutionsModal extends Component {
     this.onSave = this.onSave.bind(this);
     this.validate = this.validate.bind(this);
 
-    this.debouncedProductsFetch = debounceAvailableItemsFetch(
+    this.debouncedAvailableItemsFetch = debounceAvailableItemsFetch(
       this.props.debounceTime,
       this.props.minSearchLength,
     );
@@ -266,10 +223,11 @@ class SubstitutionsModal extends Component {
             ...val,
             disabled: true,
             product: {
-              label: `${val.productCode} - ${val.productName}`,
+              label: `${val.productCode} - ${val.product.translatedName ?? val.productName}`,
               id: `${val.productId}`,
               productCode: `${val.productCode}`,
               name: `${val.productName}`,
+              translatedName: val.product.translatedName,
               minExpirationDate: `${val.minExpirationDate}`,
               quantityAvailable: `${val.quantityAvailable}`,
               handlingIcons: val.product.handlingIcons,
@@ -279,16 +237,21 @@ class SubstitutionsModal extends Component {
         let originalItem = null;
 
         if (_.toInteger(this.state.attr.lineItem.quantityAvailable) > 0) {
+          const {
+            productCode, product, productName, minExpirationDate, quantityAvailable,
+          } = this.state.attr.lineItem;
+
           originalItem = {
             ...this.state.attr.lineItem,
             originalItem: true,
             product: {
-              label: `${this.state.attr.lineItem.productCode} - ${this.state.attr.lineItem.productName}`,
-              id: `${this.state.attr.lineItem.product.id}`,
-              productCode: `${this.state.attr.lineItem.productCode}`,
-              name: `${this.state.attr.lineItem.productName}`,
-              minExpirationDate: this.state.attr.lineItem.minExpirationDate,
-              quantityAvailable: this.state.attr.lineItem.quantityAvailable,
+              label: `${productCode} - ${product.translatedName ?? productName}`,
+              id: `${product.id}`,
+              productCode: `${productCode}`,
+              name: `${productName}`,
+              translatedName: product.translatedName,
+              minExpirationDate,
+              quantityAvailable,
             },
           };
           substitutions = [
@@ -373,7 +336,7 @@ class SubstitutionsModal extends Component {
           defaultEmptyDataMessage: 'There are no substitutions available',
           reasonCodes: this.state.attr.reasonCodes,
           originalItem: this.state.originalItem,
-          debouncedProductsFetch: this.debouncedProductsFetch,
+          debouncedAvailableItemsFetch: this.debouncedAvailableItemsFetch,
         }}
         renderBodyWithValues={this.calculateSelected}
       >
@@ -385,10 +348,20 @@ class SubstitutionsModal extends Component {
             />: {this.state.attr.lineItem.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate
-              id="react.stockMovement.productName.label"
-              defaultMessage="Product name"
-            />: {this.state.attr.lineItem.productName}
+            <Tooltip
+              html={<div className="text-truncate">{this.state.attr.lineItem.product.name}</div>}
+              theme="dark"
+              disabled={!this.state.attr.lineItem.product.translatedName}
+              position="top-start"
+            >
+              <Translate
+                id="react.stockMovement.productName.label"
+                defaultMessage="Product name"
+              />: {
+              this.state.attr.lineItem.product.translatedName ??
+              this.state.attr.lineItem.product.name
+              }
+            </Tooltip>
           </div>
           <div className="font-weight-bold">
             <Translate

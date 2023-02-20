@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { fetchStockTransferStatuses } from 'actions';
 import filterFields from 'components/stock-transfer/list/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -16,13 +17,17 @@ const useStockTransferFilters = () => {
 
   const history = useHistory();
   const {
-    statuses, currentUser,
+    statuses,
+    currentUser,
+    currentLocale,
   } = useSelector(state => ({
     statuses: state.stockTransfer.statuses,
     currentUser: state.session.user,
     currentLocation: state.session.currentLocation,
     shouldRebuildParams: state.filterForm.shouldRebuildParams,
+    currentLocale: state.session.activeLanguage,
   }));
+  const dispatch = useDispatch();
 
 
   const clearFilterValues = () => {
@@ -56,6 +61,12 @@ const useStockTransferFilters = () => {
     setDefaultFilterValues({ ...defaultValues });
     setFiltersInitialized(true);
   };
+
+  useEffect(() => {
+    // TODO: When having full React, if once fetched, fetch only if a current language differs
+    // TODO: from the language, that we were fetching this for
+    dispatch(fetchStockTransferStatuses());
+  }, [currentLocale]);
 
   // Custom hook for changing location/filters rebuilding logic
   useCommonFiltersCleaner({ clearFilterValues, initializeDefaultFilterValues, filtersInitialized });

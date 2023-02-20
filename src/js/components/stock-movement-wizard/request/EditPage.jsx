@@ -97,12 +97,19 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: value => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {value.name || ''}
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.translatedName}
+              position="top-start"
+            >
+              <span className="d-flex align-items-center">
+                <span className="text-truncate">
+                  {value.translatedName ?? value.name}
+                </span>
+                {renderHandlingIcons(value ? value.handlingIcons : null)}
               </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
+            </Tooltip>
           ),
         },
         getDynamicAttr: ({ subfield }) => ({
@@ -231,6 +238,7 @@ const AD_HOCK_FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          translatedProductName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -401,14 +409,16 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name || ''}
+                {value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
           ),
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
         }),
       },
       quantityOnStocklist: {
@@ -533,6 +543,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          translatedProductName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -703,14 +714,16 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name || ''}
+                {value.translatedName ?? value.name}
               </span>
               {renderHandlingIcons(value ? value.handlingIcons : null)}
             </span>
           ),
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
         }),
       },
       demandPerReplenishmentPeriod: {
@@ -835,6 +848,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          translatedProductName: fieldValue?.product?.translatedName,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -1014,6 +1028,11 @@ class EditItemsPage extends Component {
 
       this.fetchAllData(false);
     }
+
+    // If we change the language, refetch the reason codes
+    if (nextProps.currentLocale !== this.props.currentLocale) {
+      this.props.fetchReasonCodes();
+    }
   }
 
   setEditPageItems(response, startIndex) {
@@ -1118,10 +1137,8 @@ class EditItemsPage extends Component {
    */
   fetchAllData(forceFetch) {
     this.props.showSpinner();
-
-    if (!this.props.reasonCodesFetched || forceFetch) {
-      this.props.fetchReasonCodes();
-    }
+    // TODO: When having full React, fetch only if not fetched yet or language changed
+    this.props.fetchReasonCodes();
 
     this.fetchEditPageData().then((resp) => {
       const { statusCode } = resp.data.data;
@@ -1628,13 +1645,13 @@ class EditItemsPage extends Component {
 }
 
 const mapStateToProps = state => ({
-  reasonCodesFetched: state.reasonCodes.fetched,
   reasonCodes: state.reasonCodes.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   supportedActivities: state.session.supportedActivities,
+  currentLocale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps, {
@@ -1655,8 +1672,6 @@ EditItemsPage.propTypes = {
   hideSpinner: PropTypes.func.isRequired,
   /** Function fetching reason codes */
   fetchReasonCodes: PropTypes.func.isRequired,
-  /** Indicator if reason codes' data is fetched */
-  reasonCodesFetched: PropTypes.bool.isRequired,
   /** Array of available reason codes */
   reasonCodes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   translate: PropTypes.func.isRequired,
@@ -1667,4 +1682,5 @@ EditItemsPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  currentLocale: PropTypes.string.isRequired,
 };

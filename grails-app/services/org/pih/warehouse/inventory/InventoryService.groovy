@@ -11,7 +11,6 @@ package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
@@ -47,7 +46,7 @@ class InventoryService implements ApplicationContextAware {
     def grailsApplication
 
     def dataService
-    def productService
+    def gparsService
     def identifierService
     def messageService
     def locationService
@@ -766,7 +765,7 @@ class InventoryService implements ApplicationContextAware {
         def startTime = System.currentTimeMillis()
         List binLocations
         def products = getProductsWithTransactions(location)
-        GParsPool.withPool(8) {
+        gparsService.withPool('QuantityByBinLocation', 8) {
             log.info "Processing ${products.size()} products"
             binLocations = products.collectParallel { product ->
                 persistenceInterceptor.init()
@@ -2625,10 +2624,11 @@ class InventoryService implements ApplicationContextAware {
     String exportBaselineQoH(products, quantityMapByDate) {
         def csvrows = []
         NumberFormat numberFormat = NumberFormat.getNumberInstance()
+
         products.each { product ->
             def csvrow = [
                     'Product code'     : product.productCode ?: '',
-                    'Product'          : product.name,
+                    'Product'          : product?.translatedNameWithLocaleCode,
                     'UOM'              : product.unitOfMeasure,
                     'Generic product'  : product?.genericProduct?.name ?: "",
                     'Category'         : product?.category?.name,

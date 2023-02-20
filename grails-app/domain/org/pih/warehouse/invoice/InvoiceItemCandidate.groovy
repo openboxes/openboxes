@@ -15,6 +15,7 @@ import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.shipping.Shipment
 
 class InvoiceItemCandidate {
@@ -58,7 +59,7 @@ class InvoiceItemCandidate {
     static constraints = {
     }
 
-    static transients = ['unitOfMeasure', 'candidateUnitPrice']
+    static transients = ['unitOfMeasure', 'candidateUnitPrice', 'associatedProduct', 'adjustment']
 
     String getUnitOfMeasure() {
         if (quantityUom) {
@@ -84,6 +85,17 @@ class InvoiceItemCandidate {
         return unitPrice
     }
 
+    Product getAssociatedProduct() {
+        if (productCode) {
+            return Product.findByProductCode(productCode)
+        }
+        return null
+    }
+
+    Boolean isAdjustment() {
+        return adjustmentAmount || adjustmentPercentage
+    }
+
     Map toJson() {
         return [
             id: id,
@@ -99,7 +111,10 @@ class InvoiceItemCandidate {
             quantity: quantity,
             quantityToInvoice: quantityToInvoice,
             uom: unitOfMeasure,
-            unitPrice: candidateUnitPrice
+            unitPrice: candidateUnitPrice,
+            isAdjustment: adjustment,
+            productName: associatedProduct?.name,
+            translatedProductName: associatedProduct?.translatedName
         ]
     }
 }

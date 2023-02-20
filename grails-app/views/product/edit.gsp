@@ -27,6 +27,11 @@
             <g:if test="${flash.error}">
                 <div class="errors">${flash.error}</div>
             </g:if>
+            <g:if test="${flash.errors}">
+                <div class="errors">
+                    <g:renderErrors bean="${flash.errors}" as="list" />
+                </div>
+            </g:if>
             <g:hasErrors bean="${productInstance}">
 	            <div class="errors">
 	                <g:renderErrors bean="${productInstance}" as="list" />
@@ -239,5 +244,6 @@
               });
             });
 		</script>
+
     </body>
 </html>

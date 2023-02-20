@@ -386,7 +386,6 @@ openboxes.dashboard.newsSummary.newsItems = []
 openboxes.dashboard.newsSummary.rssUrl = "https://openboxes.com/blog/index.xml"
 openboxes.dashboard.newsSummary.limit = 25
 
-
 openboxes {
     dashboard {
         yearTypes {
@@ -1027,7 +1026,7 @@ openboxes.security.rbac.rules = [
         [controller: 'stockTransfer', actions: ['eraseStockTransfer'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER ]],
         [controller: 'stockMovementItemApi', actions: ['eraseItem'],  accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
         [controller: 'stockMovement', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT ]],
-        [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ADMIN]],
+        [controller: 'stockRequest', actions: ['remove'], accessRules: [minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
         [controller: 'glAccount', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
@@ -1298,6 +1297,20 @@ openboxes.expirationDate.minValue = new Date("01/01/2000")
 openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 
 // Global megamenu configuration
+
+openboxes.menuSectionsUrlParts = [
+    inventory: ["inventory", "inventoryItem", "stockTransfer"],
+    products: ["product"],
+    purchasing: ["purchaseOrder"],
+    invoicing: ["invoice"],
+    outbound: ["verifyRequest"],
+    requisitionTemplate: ["requisitionTemplate"],
+    configuration: ["locationsConfiguration"],
+    // for inbound / outbound and purchasing / putaway the same url is used,
+    // so it is underlined directly from stockMovement/show.gsp
+    injectedDirectly: ["stockMovement", "order"]
+]
+
 // TODO: Clean up and add all missing message.properties
 openboxes {
     megamenu {
@@ -1341,7 +1354,7 @@ openboxes {
                         [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/${appName}/batch/importData?type=inventory&execution=e1s1"],
                         [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/stockTransfer/list"],
-                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/index"]
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/${appName}/replenishment/create"]
                     ]
                 ]
             ]
@@ -1355,7 +1368,7 @@ openboxes {
                     label: "",
                     defaultLabel: "Purchasing",
                     menuItems: [
-                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/index", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
+                            [label: "order.createPurchase.label", defaultLabel: "Create Purchase Order", href: "/${appName}/purchaseOrder/create", requiredActivitiesAny: [ActivityCode.PLACE_ORDER]],
                             [label: "order.listPurchase.label", defaultLabel: "List Purchase Orders", href: "/${appName}/purchaseOrder/list"],
                             [label: "location.listSuppliers.label", defaultLabel: "List Suppliers", href: "/${appName}/supplier/list"],
                             [label: "shipment.shipfromPO.label", defaultLabel: "Ship from Purchase Order", href: "/${appName}/stockMovement/createCombinedShipments?direction=INBOUND"],

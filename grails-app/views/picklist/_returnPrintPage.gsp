@@ -81,7 +81,7 @@
                                 ${orderItem?.product?.productCode}
                             </td>
                             <td class="center" rowspan="${numInventoryItem}">
-                                ${StringEscapeUtils.escapeXml(orderItem?.product?.name)}
+                                <g:translatedProductName product="${orderItem?.product}" />
                             </td>
                         </g:if>
                         <td class="middle center">

@@ -174,15 +174,17 @@ const SUPPLIER_FIELDS = {
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
-        getDynamicAttr: ({ isBoxNameEmpty, isPalletNameEmpty }) => ({
+        getDynamicAttr: ({ fieldValue, isBoxNameEmpty, isPalletNameEmpty }) => ({
           flexWidth: 12 + (isBoxNameEmpty ? 12 : 0) + (isPalletNameEmpty ? 12 : 0),
+          showValueTooltip: !!fieldValue?.translatedName,
+          tooltipValue: fieldValue?.name,
         }),
         attributes: {
           className: 'text-left',
           formatValue: value => (
             <span className="d-flex">
               <span className="text-truncate">
-                {value.name}
+                {value.translatedName || value.name}
               </span>
               {renderHandlingIcons(value.handlingIcons)}
             </span>

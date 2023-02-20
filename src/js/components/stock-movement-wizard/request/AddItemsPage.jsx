@@ -21,6 +21,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import isRequestFromWard from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -43,6 +44,19 @@ function addButton({
   );
 }
 
+// Used for util function to calculate quantityRequested for requests from wards
+// where quantityRequested is calculated by subtracting one of below from QOH
+const RequestFromWardTypes = {
+  MANUAL: {
+    calculateQtyRequestedFrom: 'monthlyDemand',
+  },
+  STOCKLIST_PUSH_TYPE: {
+    calculateQtyRequestedFrom: 'quantityAllowed',
+  },
+  STOCKLIST_PULL_TYPE: {
+    calculateQtyRequestedFrom: 'demandPerReplenishmentPeriod',
+  },
+};
 
 const FIELDS = {
   product: {
@@ -154,7 +168,7 @@ const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
-  flexWidth: '0.5',
+  flexWidth: '1',
   fieldKey: '',
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
@@ -327,18 +341,20 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
         headerTooltip: 'react.stockMovement.tooltip.quantityOnHand.label',
         headerAlign: 'right',
         attributes: {
-          ...FIELDS.quantityAllowed.attributes,
-          required: true,
+          ...FIELDS.quantityOnHand.attributes,
           cellClassName: 'text-right',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].quantityAllowed - fieldValue >= 0 ?
-                values.lineItems[rowIndex].quantityAllowed - fieldValue : 0;
+            const valuesWithUpdatedQtyRequested =
+              calculateQtyRequested(
+                values,
+                rowIndex,
+                fieldValue,
+                RequestFromWardTypes.STOCKLIST_PUSH_TYPE,
+              );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -346,6 +362,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PUSH_TYPE = {
       quantityRequested: {
         ...FIELDS.quantityRequested,
         headerAlign: 'right',
+        required: true,
         headerTooltip: 'react.stockMovement.tooltip.quantityRequested.label',
         attributes: {
           ...FIELDS.quantityRequested.attributes,
@@ -410,7 +427,6 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QOH',
         flexWidth: '0.6',
-        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
         headerDefaultTooltip: 'Enter your current quantity on hand for this product',
@@ -418,13 +434,16 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
           type: 'number',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue >= 0 ?
-                values.lineItems[rowIndex].demandPerReplenishmentPeriod - fieldValue : 0;
+            const valuesWithUpdatedQtyRequested =
+              calculateQtyRequested(
+                values,
+                rowIndex,
+                fieldValue,
+                RequestFromWardTypes.STOCKLIST_PULL_TYPE,
+              );
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -434,6 +453,7 @@ const REQUEST_FROM_WARD_STOCKLIST_FIELDS_PULL_TYPE = {
         label: 'react.stockMovement.neededQuantity.label',
         defaultMessage: 'Needed Qty',
         flexWidth: '0.6',
+        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
         headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
@@ -517,7 +537,6 @@ const REQUEST_FROM_WARD_FIELDS = {
         label: 'react.stockMovement.quantityOnHand.label',
         defaultMessage: 'QOH',
         flexWidth: '0.6',
-        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityOnHand.headerTooltip.label',
         headerDefaultTooltip: 'Enter your current quantity on hand for this product',
@@ -525,13 +544,11 @@ const REQUEST_FROM_WARD_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          fieldValue, rowIndex, values, updateRow,
+          fieldValue, rowIndex, values, updateRow, calculateQtyRequested,
         }) => ({
           onBlur: () => {
-            const valuesWithUpdatedQtyRequested = values;
-            valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
-              values.lineItems[rowIndex].monthlyDemand - fieldValue >= 0 ?
-                values.lineItems[rowIndex].monthlyDemand - fieldValue : 0;
+            const valuesWithUpdatedQtyRequested =
+              calculateQtyRequested(values, rowIndex, fieldValue, RequestFromWardTypes.MANUAL);
             updateRow(valuesWithUpdatedQtyRequested, rowIndex);
           },
         }),
@@ -541,6 +558,7 @@ const REQUEST_FROM_WARD_FIELDS = {
         label: 'react.stockMovement.neededQuantity.label',
         defaultMessage: 'Needed Qty',
         flexWidth: '0.6',
+        required: true,
         headerAlign: 'right',
         headerTooltip: 'react.stockMovement.quantityRequested.headerTooltip.label',
         headerDefaultTooltip: 'Your demand for the request period minus your QOH. Edit as needed.',
@@ -586,7 +604,21 @@ const REQUEST_FROM_WARD_FIELDS = {
 };
 
 const REPLENISHMENT_TYPE_PULL = 'PULL';
-const REPLENISHMENT_TYPE_PUSH = 'PUSH';
+
+function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
+  const valuesWithUpdatedQtyRequested = values;
+  const lineItem = valuesWithUpdatedQtyRequested.lineItems[rowIndex];
+  // Options: quantityAllowed, demandPerReplenishmentPeriod, monthlyDemand
+  // depending on request from ward type: stocklist push, stocklist pull, manual respectively
+  const baseValue = lineItem[requestType.calculateQtyRequestedFrom];
+  if (baseValue && fieldValue) {
+    valuesWithUpdatedQtyRequested.lineItems[rowIndex].quantityRequested =
+      baseValue - fieldValue >= 0 ?
+        baseValue - fieldValue : 0;
+  }
+  return valuesWithUpdatedQtyRequested;
+}
+
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -620,6 +652,9 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.updateProductData = this.updateProductData.bind(this);
     this.submitRequest = this.submitRequest.bind(this);
+    this.calculateQuantityRequested =
+      calculateQuantityRequested.bind(this);
+    this.cancelRequest = this.cancelRequest.bind(this);
   }
 
   componentDidMount() {
@@ -761,7 +796,7 @@ class AddItemsPage extends Component {
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
             product: {
               ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
+              label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
             },
           };
         },
@@ -777,9 +812,10 @@ class AddItemsPage extends Component {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
+            quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
             product: {
               ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
+              label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
             },
           };
         },
@@ -790,9 +826,10 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
+          quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
           product: {
             ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
+            label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
           },
         }),
       );
@@ -838,17 +875,12 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
-    const isPush = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PUSH;
-    const isPull = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
 
     _.forEach(values.lineItems, (item, key) => {
       const rowErrors = {};
       if (!_.isNil(item.product)) {
         if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
           rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
-        }
-        if (_.isNil(item.quantityOnHand) && !isPush && !isPull) {
-          rowErrors.quantityOnHand = 'react.stockMovement.error.enterQuantity.label';
         }
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -860,8 +892,8 @@ class AddItemsPage extends Component {
       }
 
       if (this.state.isRequestFromWard) {
-        if (!item.quantityOnHand || item.quantityOnHand < 0) {
-          rowErrors.quantityOnHand = 'react.stockMovement.error.quantityOnHand.label';
+        if ((_.isNil(item.quantityRequested) || item.quantityRequested < 0)) {
+          rowErrors.quantityRequested = 'react.stockMovement.error.enterQuantity.label';
         }
       }
       if (!_.isEmpty(rowErrors)) {
@@ -1071,7 +1103,11 @@ class AddItemsPage extends Component {
             statusCode,
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
-          isRequestFromWard: this.props.currentLocationId === this.state.values.destination.id && this.state.values.destination.type === 'WARD',
+          isRequestFromWard: isRequestFromWard(
+            this.props.currentLocationId,
+            this.state.values.destination.id,
+            this.props.supportedActivities,
+          ),
         });
         this.props.hideSpinner();
       })
@@ -1235,6 +1271,46 @@ class AddItemsPage extends Component {
     } else {
       this.saveItems(lineItems);
     }
+  }
+
+  cancelRequest() {
+    confirmAlert({
+      title: this.props.translate(
+        'react.stockMovement.request.confirmCancellation.label',
+        'Confirm request cancellation',
+      ),
+      message: this.props.translate(
+        'react.stockMovement.request.confirmCancellation.message.label',
+        'Are you sure you want to delete current request ?',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: () => {
+            this.props.showSpinner();
+            apiClient.delete(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}`)
+              .then((response) => {
+                if (response.status === 204) {
+                  this.props.hideSpinner();
+                  Alert.success(this.props.translate(
+                    'react.stockMovement.request.successfullyDeleted.label',
+                    'Request was successfully deleted',
+                  ), { timeout: 3000 });
+                  if (this.state.isRequestFromWard) {
+                    this.props.history.push('/openboxes/');
+                  } else {
+                    window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+                  }
+                }
+              })
+              .catch(() => this.props.hideSpinner());
+          },
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
   }
 
   /**
@@ -1525,7 +1601,8 @@ class AddItemsPage extends Component {
             <span className="buttons-container">
               <label
                 htmlFor="csvInput"
-                className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                className={`float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs ${this.state.isRequestFromWard ? 'disabled' : ''}`}
+                title={this.state.isRequestFromWard ? 'Temporarily disabled' : ''}
               >
                 <span><i className="fa fa-download pr-2" /><Translate id="react.default.button.importTemplate.label" defaultMessage="Import template" /></span>
                 <input
@@ -1533,6 +1610,7 @@ class AddItemsPage extends Component {
                   type="file"
                   style={{ display: 'none' }}
                   onChange={this.importTemplate}
+                  disabled={this.state.isRequestFromWard}
                   onClick={(event) => {
                     // eslint-disable-next-line no-param-reassign
                     event.target.value = null;
@@ -1545,14 +1623,20 @@ class AddItemsPage extends Component {
                 onClick={() => this.exportTemplate(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
+                <span>
+                  <i className="fa fa-upload pr-2" />
+                  <Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" />
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => this.refresh()}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-refresh pr-2" /><Translate id="react.default.button.refresh.label" defaultMessage="Reload" /></span>
+                <span>
+                  <i className="fa fa-refresh pr-2" />
+                  <Translate id="react.default.button.refresh.label" defaultMessage="Reload" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1560,7 +1644,10 @@ class AddItemsPage extends Component {
                 onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                <span>
+                  <i className="fa fa-save pr-2" />
+                  <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                </span>
               </button>
               <button
                 type="button"
@@ -1568,15 +1655,31 @@ class AddItemsPage extends Component {
                 onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
+                <span>
+                  <i className="fa fa-sign-out pr-2" />
+                  <Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" />
+                </span>
               </button>
               <button
                 type="button"
                 disabled={invalid}
                 onClick={() => this.removeAll()}
-                className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
+                className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
               >
-                <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" />
+                </span>
+              </button>
+              <button
+                type="button"
+                className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
+                onClick={() => this.cancelRequest()}
+              >
+                <span>
+                  <i className="fa fa-remove pr-2" />
+                  <Translate id="react.stockMovement.request.cancel.label" defaultMessage="Cancel Request" />
+                </span>
               </button>
             </span>
             <form onSubmit={handleSubmit}>
@@ -1599,6 +1702,7 @@ class AddItemsPage extends Component {
                     values,
                     isFirstPageLoaded: this.state.isFirstPageLoaded,
                     updateProductData: this.updateProductData,
+                    calculateQtyRequested: this.calculateQuantityRequested,
                   }))}
               </div>
               <div className="submit-buttons">
@@ -1614,7 +1718,10 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => this.submitRequest(values.lineItems)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={invalid}
+                  disabled={
+                    invalid || !_.some(values.lineItems, item =>
+                        item.product && _.parseInt(item.quantityRequested))
+                  }
                 ><Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
                 </button>
               </div>
