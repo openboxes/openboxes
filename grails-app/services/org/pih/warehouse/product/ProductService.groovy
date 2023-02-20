@@ -11,6 +11,7 @@ package org.pih.warehouse.product
 
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
@@ -335,6 +336,7 @@ class ProductService {
                             eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
                         }
                     }
+                    setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 }
                 if (params.description) ilike("description", params.description + "%")
                 if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
