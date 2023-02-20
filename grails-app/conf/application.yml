@@ -88,15 +88,18 @@ grails:
     #
     # Every field except `bundle` should also be set in build.gradle.
     #
+    # Because we use webpack to bundle .css and .js files, most of
+    # asset-pipeline's advanced features are unnecessary.
+    #
     assets:
-        bundle: false  # defer to webpack
+        bundle: false
         developmentRuntime: false
-        enableDigests: false  # defer to webpack
-        enableGzip: true
+        enableDigests: false
+        enableGzip: false
         enableSourceMaps: false
         maxThreads: 1
-        minifyCss: false  # defer to webpack
-        minifyJs: false  # defer to webpack
+        minifyCss: false
+        minifyJs: false
         skipNonDigests: false
     cache:
         clearAtStartup: true
@@ -578,7 +581,7 @@ openboxes:
 
     # Allow users to customize logo image url as well as label
     logo:
-        url: "/openboxes/images/logo/openboxes_logo_40x40.jpg"
+        url: "/assets/openboxes_logo_40x40.jpg"
         label: ""
     report:
         logo:

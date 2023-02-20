@@ -2,12 +2,10 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, 'src');
 const SRC = path.resolve(ROOT, 'js');
-const DEST = path.resolve(__dirname, 'grails-app/assets');
-const BUILD_ASSETS = path.resolve(__dirname, 'build/assets');
-const ASSETS = path.resolve(ROOT, 'assets');
-const JS_DEST = path.resolve(__dirname, 'grails-app/assets/javascripts');
-const CSS_DEST = path.resolve(__dirname, 'grails-app/assets/stylesheets');
-const IMAGES_DEST = path.resolve(__dirname, 'grails-app/assets/images');
+
+// this value is tightly coupled with src/js/index.jsx::__webpack_public_path__
+const WEBPACK_OUTPUT = path.resolve(ROOT, 'main/webapp/webpack');
+const TEMPLATES = path.resolve(ROOT, 'assets');
 const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
@@ -22,19 +20,14 @@ module.exports = {
     entry: {
       app: `${SRC}/index.jsx`,
     },
-    optimization: {
-      splitChunks: {
-        cacheGroups: {
-          vendor: {
-            name: 'vendors',
-            test: /[\\/]node_modules[\\/]/,
-          },
-        },
-      },
-    },
     output: {
-      path: DEST,
-      filename: 'javascripts/bundle.[hash].js',
+      path: WEBPACK_OUTPUT,
+      /*
+       * Don't set publicPath here, because it's hard to know the
+       * application context at bundle time. Instead, we rely on
+       * __webpack_public_path__, specified in src/js/index.jsx, q.v.
+       */
+      filename: 'bundle.[hash].js',
       chunkFilename: 'bundle.[hash].[name].js',
     },
     stats: {
@@ -46,69 +39,48 @@ module.exports = {
         events: {
           onStart: {
             delete: [
-              // remove previous webpack output
-              `${JS_DEST}/bundle.*`,
-              `${CSS_DEST}/bundle.*`,
-              // remove previous asset-pipeline output
-              BUILD_ASSETS,
+              WEBPACK_OUTPUT,
             ],
           },
-          onEnd: [
-            /*
-             * By providing a list of maps here (instead of a single map,
-             * like we do for `onStart`, above, we guarantee that the
-             * copy commands will complete before the delete commands
-             * begin. However, FileManagerPlugin is multithreaded and
-             * operations within each map will run in arbitrary order.
-             */
-            {
-              copy: [
-                { source: `${DEST}/bundle*.js`, destination: JS_DEST },
-                { source: `${DEST}/bundle*.css`, destination: CSS_DEST },
-                { source: `${DEST}/*.eot`, destination: IMAGES_DEST },
-                { source: `${DEST}/*.svg`, destination: IMAGES_DEST },
-                { source: `${DEST}/*.woff2`, destination: IMAGES_DEST },
-                { source: `${DEST}/*.ttf`, destination: IMAGES_DEST },
-                { source: `${DEST}/*.woff`, destination: IMAGES_DEST },
-              ],
-            },
-            {
-              delete: [
-                `${DEST}/bundle.*`,
-                `${DEST}/*.eot`,
-                `${DEST}/*.svg`,
-                `${DEST}/*.woff2`,
-                `${DEST}/*.ttf`,
-                `${DEST}/*.woff`
-              ],
-            },
-          ],
         },
       }),
       new MiniCssExtractPlugin({
-        filename: 'stylesheets/bundle.[hash].css',
+        filename: 'bundle.[hash].css',
         chunkFilename: 'bundle.[hash].[name].css',
       }),
       new OptimizeCSSAssetsPlugin({}),
+      /*
+       * We use the HtmlWebpackPlugin to render templates to .gsp pages. In
+       * the templateParameters field, ${x} is a JavaScript variable expansion,
+       * while \${y} is exported literally as ${y} for Grails to later parse
+       * as a GString. Of particular note, the calls to resource() below depend
+       * on Grails' Resources plugin and can bypass the asset-pipeline entirely
+       * (OGBM-404); see the following document's advice beginning with
+       * "if you do not want to use the asset-pipeline plugin ..."
+       *
+       * https://gsp.grails.org/latest/guide/resources.html
+       */
       new HtmlWebpackPlugin({
         filename: `${COMMON_VIEW}/_react.gsp`,
-        template: `${ASSETS}/grails-template.html`,
+        template: `${TEMPLATES}/grails-template.html`,
         inject: false,
-        templateParameters: compilation => ({
+        templateParameters: (compilation) => ({
+          // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
           contextPath: '\${util.ConfigHelper.contextPath}',
-          jsSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.js')}`,
-          cssSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.css')}`,
+          jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
+          cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement: '',
         }),
       }),
       new HtmlWebpackPlugin({
         filename: `${RECEIVING_VIEW}/_create.gsp`,
-        template: `${ASSETS}/grails-template.html`,
+        template: `${TEMPLATES}/grails-template.html`,
         inject: false,
-        templateParameters: compilation => ({
+        templateParameters: (compilation) => ({
+          // eslint-disable-next-line no-template-curly-in-string,no-useless-escape
           contextPath: '\${util.ConfigHelper.contextPath}',
-          jsSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.js')}`,
-          cssSource: `\${resource(dir:'assets', file:'bundle.${compilation.hash}.css')}`,
+          jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
+          cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
           receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +
