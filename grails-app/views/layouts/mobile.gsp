@@ -27,7 +27,7 @@
             integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js"></script>
-    <script src="/openboxes/js/onScan/onScan.min.js" type="text/javascript"></script>
+    <asset:javascript src="onScan.min.js" />
     <script>
     $(document).ready(function() {
         // Enable scan events for the entire document

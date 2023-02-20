@@ -22,8 +22,8 @@ import 'css/main.scss';
 import 'react-tippy/dist/tippy.css';
 
 library.add(fab, fas);
-// eslint-disable-next-line
-__webpack_public_path__ = window.CONTEXT_PATH + '/assets/';
+// eslint-disable-next-line camelcase,no-undef
+__webpack_public_path__ = `${window.CONTEXT_PATH}/static/webpack/`;
 
 ReactDOM.render(
   <Provider store={store}>
@@ -36,4 +36,3 @@ ReactDOM.render(
   </Provider>
   , document.getElementById('root'),
 );
-
