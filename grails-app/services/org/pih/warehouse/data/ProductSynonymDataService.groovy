@@ -68,12 +68,12 @@ class ProductSynonymDataService {
             // Check if none error occures to be sure, that we have correct product, locale and synonymTypeCode
             // before we check the duplicates
             if (!command.errors.allErrors && synonymTypeCode == SynonymTypeCode.DISPLAY_NAME) {
-                Set<Synonym> duplicates = product?.synonyms?.findAll { Synonym synonym ->
+                Synonym duplicate = product?.synonyms?.find { Synonym synonym ->
                     synonym.locale == new Locale(params['locale']) && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
                 }
                 // If the product already has a synonym of type DISPLAY_NAME and a locale
                 // or we are trying to add it in any of the line above for this single import, throw a validation error
-                if (duplicates || productsWithDisplayName.find{ it?.code == product?.productCode && it?.locale == params['locale'] }) {
+                if (duplicate || productsWithDisplayName.find{ it?.code == product?.productCode && it?.locale == params['locale'] }) {
                     command.errors.reject("Row ${index + 1}: You cannot add multiple display names in the same language. Edit the existing synonym instead.")
                     return
                 }
