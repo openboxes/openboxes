@@ -45,6 +45,7 @@ class ProductController {
     def inventoryService
     def barcodeService
     UploadService uploadService
+    def localizationService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -1033,12 +1034,26 @@ class ProductController {
      */
     def editProductSynonym = {
         println "editProductSynonym() " + params
-        productService.editProductSynonym(params['synonym.id'], params.synonymTypeCode, params.synonym, params.locale)
-        render (status: 200, text: "successfully edited synonym")
+        try {
+            productService.editProductSynonym(params['synonym.id'], params.synonymTypeCode, params.synonym, params.locale)
+            render (status: 200, text: "successfully edited synonym")
+        } catch (ValidationException e) {
+            def errorMessages = e.errors.allErrors.collect {
+                g.message(error: it, locale: localizationService.currentLocale)
+            }
+            response.status = 400
+            render([ errorMessages: errorMessages ] as JSON)
+        }
     }
 
     def editProductSynonymDialog = {
         Synonym synonym = Synonym.read(params.id)
+        if (!synonym) {
+            throw new RuntimeException("Synonym does not exist")
+        }
+        if (!synonym.product) {
+            throw new RuntimeException("Product does not exist")
+        }
         render(template: 'productSynonymsEdit', model: [product: synonym.product, synonym: synonym])
     }
 

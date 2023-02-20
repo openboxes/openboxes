@@ -13,7 +13,7 @@
                     id="locale-dlg"
                     name="locale"
                     noSelection="['':'']"
-                    value="${synonym.locale.language}"
+                    value="${synonym?.locale?.language}"
                     class="chzn-select-deselect"
                     data-placeholder="${g.message(code: 'synonym.selectLocale.placeholder.label', default: 'Select a locale')}"
                 />
@@ -30,7 +30,7 @@
                     from="${SynonymTypeCode.list()}"
                     optionValue="${{ g.message(code: "enum.SynonymTypeCode." + it ) }}"
                     noSelection="['':'']"
-                    value="${synonym.synonymTypeCode}"
+                    value="${synonym?.synonymTypeCode}"
                     data-placeholder="${g.message(code: 'synonym.synonymTypeCode.placeholder.label', default: 'Select a classification')}"
                     class="chzn-select-deselect"
                 />
@@ -45,7 +45,7 @@
                     id="synonym-dlg"
                     type="text"
                     name="synonym"
-                    value="${synonym.name}"
+                    value="${synonym?.name}"
                     size="80"
                     class="medium text"
                     placeholder="${g.message(code: 'synonym.typeSynonym.placeholder.label', default: 'Type the synonym here')}"
@@ -93,20 +93,16 @@
       success: function() {
         window.location.href = "${request.contextPath}/product/edit/${product.id}";
       },
-      error: function(jqXHR, textStatus, errorThrown) {
-        if (jqXHR.responseText) {
-          try {
-            let data = JSON.parse(jqXHR.responseText);
-            if (data.errorMessages.length > 0) {
-              $.notify(data.errorMessages.join("\n"), "error");
-            } else {
-              $.notify(data.errorMessage, "error");
-            }
-          } catch (e) {
-            $.notify(jqXHR.responseText, "error");
-          }
-        } else {
-          $.notify("Error saving your item");
+      error: function(jqXHR) {
+        if (!jqXHR.responseText) {
+          $.notify("Error saving synonym");
+          return
+        }
+        try {
+          let data = JSON.parse(jqXHR.responseText);
+          data?.errorMessages?.forEach(error => $.notify(error, "error"))
+        } catch (e) {
+          $.notify(jqXHR.responseText, "error");
         }
       }
     });
