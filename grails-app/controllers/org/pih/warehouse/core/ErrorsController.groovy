@@ -98,7 +98,7 @@ class ErrorsController {
             response.status = 400
             BeanPropertyBindingResult errors = request?.exception?.cause?.errors
             def errorMessages = errors.allErrors.collect {
-                return messageService.getMessage(it.codes[0], it.arguments, (it.defaultMessage ?: it.codes[0]), localizationService.getCurrentLocale())
+                return g.message(error: it, args: it.arguments, default: it.defaultMessage, locale: localizationService.getCurrentLocale())
             }
             render([errorCode: 400,
                     errorMessage: "Validation error. " + request?.exception?.cause?.fullMessage,

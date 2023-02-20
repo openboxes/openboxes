@@ -1411,4 +1411,15 @@ class ProductService {
         }
         return product
     }
+
+    Synonym editProductSynonym(String synonymId, String synonymTypeCodeName, String synonymValue, String localeName) {
+        Synonym synonym = Synonym.get(synonymId)
+        Locale locale = localeName ? new Locale(localeName) : null
+        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
+        synonym.properties = [ locale: locale, synonymTypeCode: synonymTypeCode, name: synonymValue ]
+        if (!synonym.validate() || !synonym.save(flush: true, failOnError: true)) {
+            throw new ValidationException("Invalid synonym", synonym.errors)
+        }
+        return synonym
+    }
 }

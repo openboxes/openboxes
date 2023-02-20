@@ -1029,6 +1029,20 @@ class ProductController {
     }
 
     /**
+     * Edit existing product synonym
+     */
+    def editProductSynonym = {
+        println "editProductSynonym() " + params
+        productService.editProductSynonym(params['synonym.id'], params.synonymTypeCode, params.synonym, params.locale)
+        render (status: 200, text: "successfully edited synonym")
+    }
+
+    def editProductSynonymDialog = {
+        Synonym synonym = Synonym.read(params.id)
+        render(template: 'productSynonymsEdit', model: [product: synonym.product, synonym: synonym])
+    }
+
+    /**
      * Delete synonym from database
      */
     def deleteSynonym = {
