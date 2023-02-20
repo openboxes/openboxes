@@ -15,6 +15,10 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
@@ -26,6 +30,7 @@ import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
@@ -38,6 +43,7 @@ class ProductAvailabilityService {
     def gparsService
     def grailsApplication
     def persistenceInterceptor
+    def productService
     def locationService
     def inventoryService
     def dataService
@@ -776,80 +782,84 @@ class ProductAvailabilityService {
         List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms?.split(" ")) : null)
 
         // Only search if there are search terms otherwise the list of product IDs includes all products
-        def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
-            eq("active", true)
-            projections {
-                property 'id'
-            }
-            and {
-                searchTerms.each { searchTerm ->
-                    or {
-                        ilike("name", "%" + searchTerm + "%")
-                        synonyms {
-                            and {
-                                ilike("name", "%" + searchTerm + "%")
-                                eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
-                            }
-                        }
-                        inventoryItems {
-                            ilike("lotNumber", "%" + searchTerm + "%")
-                        }
-                    }
-                }
-            }
-        }.unique()
+        def innerProductIds = searchTerms ?
+                productService.searchProducts(searchTerms.toArray(), [])?.collect { it.id } : []
 
-        def paginationParams = searchTerms ? [:] : [max: command.maxResults, offset: command.offset]
+        // Retrieve all product types with SEARCHABLE and SEARCHABLE_NO_STOCK activity codes
+        String productTypeQuery = "select pt from ProductType pt left join pt.supportedActivities sa where sa=:productActivityCode"
+        def searchableProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE])
+        def searchableNoStockProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE_NO_STOCK])
 
-        def products = Product.createCriteria().list(paginationParams) {
-            eq("active", true)
-            and {
-                if (categories) {
-                    'in'("category", categories)
-                }
-                if (command.tags) {
-                    tags {
-                        'in'("id", command.tags*.id)
-                    }
-                }
-                if (command.catalogs) {
-                    productCatalogItems {
-                        productCatalog {
-                            'in'("id", command.catalogs*.id)
-                        }
-                    }
-                }
-                // This is pretty inefficient if the previous query does not narrow the results
-                // if the inner products list is empty, but there are search terms then return empty results
-                if (innerProductIds || searchTerms) {
-                    'in'("id", innerProductIds ?: [null])
-                }
-            }
+        // Detached criteria used as a subquery to get aggregated quantity on hand value for a product location pair
+        DetachedCriteria aggregatedQuantityQuery = DetachedCriteria.forClass(ProductAvailability, 'pa').with {
+            setProjection Projections.sum('pa.quantityOnHand')
+            add(Restrictions.eqProperty('pa.product.id', 'this.id'))
+            add(Restrictions.eq('pa.location.id', command.location.id))
         }
 
-        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : []
+        def products = Product.createCriteria().list([max: command.maxResults, offset: command.offset]) {
+            eq("active", true)
 
-        def items = []
-
-        products.each { Product product ->
-            def quantity = quantityMap[product] ?: 0
-
-            if (product.productType && !product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE_NO_STOCK)) {
-                if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
-                    return
-                } else if (quantity == 0) {
-                    return
+            // Restrict products by selected product types
+            if (command.productTypes) {
+                'in'("productType", command.productTypes)
+                if (!command.showOutOfStockProducts) {
+                    // Read: 0 is less than result from subquery
+                    add Subqueries.lt(0, aggregatedQuantityQuery)
+                }
+            }
+            // Or apply default product type restrictions:
+            // return products with product type with activity searchable no stock OR (searchable AND qoh > 0)
+            else {
+                if (!command.showOutOfStockProducts) {
+                    add(Restrictions.disjunction().
+                            add(Restrictions.in("productType", searchableNoStockProductTypes)).
+                            add(Restrictions.conjunction().
+                                    add(Subqueries.lt(0, aggregatedQuantityQuery)).
+                                    add(Restrictions.in("productType", searchableProductTypes))
+                            ))
                 }
             }
 
-            items << [
+            // Restrict products by selected categories
+            if (categories) {
+                'in'("category", categories)
+            }
+
+            // Restrict products by selected tags
+            if (command.tags) {
+                tags {
+                    'in'("id", command.tags*.id)
+                }
+            }
+
+            // Restrict products by selected catalogs
+            if (command.catalogs) {
+                productCatalogItems {
+                    productCatalog {
+                        'in'("id", command.catalogs*.id)
+                    }
+                }
+            }
+
+            // This is pretty inefficient if the previous query does not narrow the results
+            // if the inner products list is empty, but there are search terms then return empty results
+            if (innerProductIds || searchTerms) {
+                'in'("id", innerProductIds ?: [null])
+            }
+            order("productCode")
+        }
+
+        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : [:]
+        def items = products.collect { Product product ->
+            [
                 id   : product.id,
                 product: product,
-                quantityOnHand: quantity
+                quantityOnHand: quantityMap[product] ?: 0
             ]
         }
 
-        return searchTerms ? items : new PagedResultList(items, products.totalCount)
+        return new PagedResultList(items, products.totalCount)
     }
 
     List<ProductAvailability> getStockTransferCandidates(Location location) {

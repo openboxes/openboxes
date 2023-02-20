@@ -33,31 +33,24 @@
 					<div class="yui-u">
 
                         <div class="box">
-							<g:if test="${commandInstance?.searchResults instanceof grails.orm.PagedResultList}">
-								<h2>
-									<g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
-									<g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
-									<g:set var="totalResults" value="${commandInstance?.searchResults?.totalCount }"/>
+							<h2>
+								<g:set var="rangeBegin" value="${Integer.valueOf(params.offset)+1 }"/>
+								<g:set var="rangeEnd" value="${(Integer.valueOf(params.max) + Integer.valueOf(params.offset))}"/>
+								<g:set var="totalResults" value="${commandInstance?.searchResults?.totalCount }"/>
 
-									<g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
-										<g:set var="rangeEnd" value="${totalResults }"/>
-									</g:if>
-									<g:if test="${totalResults > 0 }">
-										<warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
-									</g:if>
-									<g:else>
-										<warehouse:message code="inventory.showingNoResults.label" default="Showing 0 results"/>
-									</g:else>
-									<g:if test="${commandInstance?.searchTerms}">
-										"${commandInstance.searchTerms }"
-									</g:if>
-
-									<g:link controller="inventory" action="browse" class="button icon reload">
-										<warehouse:message code="default.showAll.label" default="Show all"/>
-									</g:link>
-								</h2>
-							</g:if>
-
+								<g:if test="${totalResults < rangeEnd || rangeEnd < 0}">
+									<g:set var="rangeEnd" value="${totalResults }"/>
+								</g:if>
+								<g:if test="${totalResults > 0 }">
+									<warehouse:message code="inventory.browseTab.label" args="[rangeBegin, rangeEnd, totalResults]"/>
+								</g:if>
+								<g:else>
+									<warehouse:message code="inventory.showingNoResults.label" default="Showing 0 results"/>
+								</g:else>
+								<g:if test="${commandInstance?.searchTerms}">
+									"${commandInstance.searchTerms }"
+								</g:if>
+							</h2>
                             <div id="tabs-1" style="padding: 0px;">
 					            <form id="inventoryBrowserForm" method="POST">
 					                <table id="inventoryBrowserTable" border="0">
@@ -74,6 +67,9 @@
 %{--												</th>--}%
 												<th class="middle">
 													<g:message code="product.label"/>
+												</th>
+												<th class="middle">
+													<g:message code="productType.label"/>
 												</th>
                                                 <th class="middle">
                                                     <g:message code="category.label"/>
@@ -111,6 +107,9 @@
 																<g:translatedProductName product="${searchResult?.product}" showProductCode="${true}" />
 																<g:renderHandlingIcons product="${searchResult?.product}" />
 														   	</g:link>
+														</td>
+														<td>
+															${searchResult?.product?.productType?.name}
 														</td>
 														<td>
 															<g:link controller="inventory" action="browse" params="${params + ['categoryId':searchResult?.product?.category.id]}">

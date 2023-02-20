@@ -13,12 +13,15 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.shipping.Shipment
 
 class InventoryCommand {
 
     List<Tag> tags
     List<ProductCatalog> catalogs
+    List<ProductType> productTypes
+
     Shipment shipment
     Category category
     Location location
@@ -32,7 +35,7 @@ class InventoryCommand {
     // indicates whether non-inventory products for the warehouse should be included
     def showNonInventoryProducts = Boolean.FALSE
     // indicates whether out of stock products for the warehouse should be included
-    def showOutOfStockProducts = Boolean.TRUE
+    def showOutOfStockProducts = Boolean.FALSE
 
     // all of the resulting ProductCommands above, organized by Category
     Boolean searchPerformed = Boolean.FALSE
