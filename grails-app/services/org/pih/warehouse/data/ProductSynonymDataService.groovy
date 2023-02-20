@@ -22,8 +22,8 @@ class ProductSynonymDataService {
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
 
-        // List to store product codes that we've already added a DISPLAY_NAME synonym during this one import
-        List<String> productsWithDisplayName = []
+        // List to store product codes and a locale that we've already added a DISPLAY_NAME synonym for during this one import
+        List<Map<String, Object>> productsWithDisplayName = []
 
         command.data.eachWithIndex { params, index ->
             // check for required fields
@@ -71,13 +71,13 @@ class ProductSynonymDataService {
                 Set<Synonym> duplicates = product?.synonyms?.findAll { Synonym synonym ->
                     synonym.locale == new Locale(params['locale']) && synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME
                 }
-                // If the product already has a synonym of type DISPLAY_NAME
+                // If the product already has a synonym of type DISPLAY_NAME and a locale
                 // or we are trying to add it in any of the line above for this single import, throw a validation error
-                if (duplicates || productsWithDisplayName.find{ it == product?.productCode }) {
+                if (duplicates || productsWithDisplayName.find{ it?.code == product?.productCode && it?.locale == params['locale'] }) {
                     command.errors.reject("Row ${index + 1}: You cannot add multiple display names in the same language. Edit the existing synonym instead.")
                     return
                 }
-                productsWithDisplayName.add(product?.productCode)
+                productsWithDisplayName.add([code: product?.productCode, locale: params['locale']])
             }
 
         }
