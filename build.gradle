@@ -99,17 +99,6 @@ mainClassName = 'org.pih.warehouse.Application'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-assetCompile {
-    dependsOn 'npm_run_bundle'
-    /*
-     * Webpack's FileManagerPlugin modifies asset-pipeline's working
-     * directory every time we build, but Gradle's "up-to-date" checks do
-     * not reliably detect those changes. This directive instructs gradle
-     * to always (re)run this task, which only takes a few seconds anyway.
-     */
-    outputs.upToDateWhen { false }
-}
-
 /*
  * From the asset-pipeline manual: "If you want settings to apply to
  * both development runtime and build time the properties have to be
@@ -117,15 +106,18 @@ assetCompile {
  *
  * http://www.asset-pipeline.com/manual/index.html#configuration
  * http://www.asset-pipeline.com/manual/index.html#configuration-2
+ *
+ * Because we use webpack to bundle .css and .js files, most of
+ * asset-pipeline's advanced features are unnecessary.
  */
 assets {
     developmentRuntime = false
-    enableDigests = false // defer to webpack
-    enableGzip = true
+    enableDigests = false
+    enableGzip = false
     enableSourceMaps = false
     maxThreads = 1
-    minifyJs = false  // defer to webpack
-    minifyCss = false  // defer to webpack
+    minifyJs = false
+    minifyCss = false
     skipNonDigests = false
 }
 
@@ -355,8 +347,12 @@ manifest {
 node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
-    npmVersion = '6.14.17'
-    version = '14.20.1'
+    npmVersion = '6.14.18'
+    version = '14.21.2'
+}
+
+processResources {
+    dependsOn 'npm_run_bundle'
 }
 
 repositories {
