@@ -64,11 +64,18 @@ class ForecastingService {
     }
 
     def getDemandDetails(Location origin, Location destination, Product product, Date startDate, Date endDate) {
-        String currentLocale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
         List data = []
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             Map params = [startDate: startDate, endDate: endDate]
+            String translatedNameSubquery = """
+                (SELECT s.name FROM synonym s 
+                WHERE s.product_id = pdd.product_id 
+                AND s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' 
+                AND s.locale = '${currentLocale}'
+                LIMIT 1)
+            """
             String query = """
                 select 
                     request_id,
@@ -83,14 +90,12 @@ class ForecastingService {
                     origin_name,
                     destination_name,
                     product_code,
-                    product_name,
-                    (
-                        select s.name from synonym s
-                        where s.product_id = pdd.product_id
-                        and s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}'
-                        and s.locale = '${currentLocale}'
-                        limit 1
-                    ) as translatedName,
+                    CONCAT(product_name, 
+                        IFNULL(
+                            CONCAT(' (', '${currentLocale?.toLanguageTag()?.toUpperCase()}', ': ', ${translatedNameSubquery}, ')'), 
+                            ''
+                        ), 
+                    '') AS product_name,
                     quantity_requested,
                     quantity_canceled,
                     quantity_approved,

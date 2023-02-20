@@ -23,7 +23,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.report.MultiLocationInventoryReportCommand
-import org.pih.warehouse.util.LocalizationUtil
+
 import org.quartz.JobKey
 import org.quartz.impl.StdScheduler
 import util.ReportUtil
@@ -188,31 +188,6 @@ class ReportController {
         Location location = Location.get(session.warehouse.id)
         def data = forecastingService.getDemandDetails(location, null)
         if (params.downloadFormat == "csv") {
-            String currentLocaleTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
-            data = data.collect {
-                [
-                        request_id: it?.request_id,
-                        request_item_id: it?.request_item_id,
-                        request_status: it?.request_status,
-                        request_number: it?.request_number,
-                        month_year: it?.month_year,
-                        date_requested: it?.date_requested,
-                        date_requested_formatted: it?.date_requested_formatted,
-                        date_issued: it?.date_issued,
-                        date_issued_formatted: it?.date_issued_formatted,
-                        origin_name: it?.origin_name,
-                        destination_name: it?.destination_name,
-                        product_code: it?.product_code,
-                        product_name: "${it?.product_name}${it?.translatedName ? " (${currentLocaleTag}: ${it?.translatedName})" : ''}",
-                        quantity_requested: it?.quantity_requested,
-                        quantity_canceled: it?.quantity_canceled,
-                        quantity_approved: it?.quantity_approved,
-                        quantity_modified: it?.quantity_modified,
-                        quantity_picked: it?.quantity_picked,
-                        quantity_demand: it?.quantity_demand,
-                        reason_code_classification: it?.reason_code_classification
-                ]
-            }
             String csv = ReportUtil.getCsvForListOfMapEntries(data)
             def filename = "Product Demand - ${location.name}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
