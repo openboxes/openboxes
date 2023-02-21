@@ -453,7 +453,7 @@ class ProductService {
         /**
          * Using setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY) returns distinct products, but
          * it returns wrong number of totalCount (it includes duplicates).
-         * To make the pagination working propely, we override the totalCount returned by the products criteria
+         * To make the pagination working properly, we override the totalCount returned by the products criteria
          * with previously counted number of distinct products
          */
         products.setTotalCount(countProducts)
