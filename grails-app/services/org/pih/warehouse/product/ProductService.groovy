@@ -1415,9 +1415,17 @@ class ProductService {
     Synonym editProductSynonym(String synonymId, String synonymTypeCodeName, String synonymValue, String localeName) {
         Synonym synonym = Synonym.get(synonymId)
         Locale locale = localeName ? new Locale(localeName) : null
-        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
+        SynonymTypeCode synonymTypeCode = null
+        try {
+            if (synonymTypeCodeName) {
+                synonymTypeCode = SynonymTypeCode.valueOf(synonymTypeCodeName)
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("classification of type '${synonymTypeCodeName}' does not exist")
+        }
+
         synonym.properties = [ locale: locale, synonymTypeCode: synonymTypeCode, name: synonymValue ]
-        if (!synonym.validate() || !synonym.save(flush: true, failOnError: true)) {
+        if (!synonym.validate() || !synonym.save(flush: true)) {
             throw new ValidationException("Invalid synonym", synonym.errors)
         }
         return synonym

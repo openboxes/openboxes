@@ -101,6 +101,9 @@
         try {
           let data = JSON.parse(jqXHR.responseText);
           data?.errorMessages?.forEach(error => $.notify(error, "error"))
+          if (data?.errorMessage) {
+            $.notify(data?.errorMessage, "error")
+          }
         } catch (e) {
           $.notify(jqXHR.responseText, "error");
         }
