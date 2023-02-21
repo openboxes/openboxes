@@ -688,11 +688,10 @@ class Product implements Comparable, Serializable {
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
-    Synonym getSynonymByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
-        Synonym synonym = synonyms.find { Synonym synonym ->
+    List<Synonym> getSynonymsByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
+        return synonyms.findAll { Synonym synonym ->
             synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
         }
-        return synonym
     }
 
     /**
@@ -707,7 +706,8 @@ class Product implements Comparable, Serializable {
      * @return the display name if it exists or null
      */
     String getDisplayName() {
-        return getSynonymByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)?.name
+        List<Synonym> synonyms = getSynonymsByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)
+        return !synonyms.empty ? synonyms.first().name : null
     }
 
     /**
