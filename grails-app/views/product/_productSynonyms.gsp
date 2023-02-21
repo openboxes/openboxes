@@ -39,8 +39,15 @@
                             ${g.message(code: 'enum.SynonymTypeCode.' + synonym.synonymTypeCode)}
                         </td>
                         <td class="middle">
+                            <a href="javascript:void(0);" class="button btn-show-dialog"  data-width="900"
+                               data-title="${g.message(code:'default.edit.label', args: [ g.message(code: 'product.synonym.label')])}"
+                               data-url="${request.contextPath}/product/editProductSynonymDialog/${synonym?.id}"
+                            >
+                                <img src="${createLinkTo(dir:'images/icons/silk', file: 'pencil.png')}"/>&nbsp;
+                                <g:message code="default.button.edit.label" />
+                            </a>
                             <g:remoteLink controller="product" action="deleteSynonym" update="synonyms" class="button"
-                                        onError="alert('An error occurred while trying to delete this synonym.  Please refresh the page and try again.');"
+                                          onError="alert('An error occurred while trying to delete this synonym.  Please refresh the page and try again.');"
                                           id="${synonym.id}" params="[productId:productInstance.id]">
                                 <img src="${createLinkTo(dir:'images/icons/silk', file:'delete.png')}" />&nbsp;
                                 ${warehouse.message(code:'default.button.delete.label')}
@@ -91,7 +98,7 @@
                                     class="medium text"
                                     placeholder="${g.message(code: 'synonym.typeSynonym.placeholder.label', default: 'Type the synonym here')}"
                                 />
-                                <button  class="button">
+                                <button class="button">
                                     <img src="${createLinkTo(dir:'images/icons/silk', file:'add.png')}" />&nbsp;
                                     ${warehouse.message(code:'default.button.add.label')}
                                 </button>
