@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.hibernate.Criteria
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.Criteria
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
@@ -292,16 +293,11 @@ class ProductService {
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
 
-        def results = Product.createCriteria().list(max: max, offset: offset) {
+        // Count the distinct products
+        int countProducts = Product.createCriteria().get {
 
-            def fields = params.fields ? params.fields.split(",") : null
-            log.info "Fields: " + fields
-            if (fields) {
-                projections {
-                    fields.each { field ->
-                        property(field)
-                    }
-                }
+            projections {
+                countDistinct "id"
             }
             if (!includeInactive) {
                 eq("active", true)
@@ -336,7 +332,6 @@ class ProductService {
                             eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
                         }
                     }
-                    setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 }
                 if (params.description) ilike("description", params.description + "%")
                 if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
@@ -374,7 +369,95 @@ class ProductService {
             }
         }
 
-        return results
+        // Find distinct products
+        List<Product> products = Product.createCriteria().list(max: max, offset: offset) {
+            def fields = params.fields ? params.fields.split(",") : null
+            log.info "Fields: " + fields
+            if (fields) {
+                projections {
+                    fields.each { field ->
+                        property(field)
+                    }
+                }
+            }
+            setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+            if (!includeInactive) {
+                eq("active", true)
+            }
+
+            if (categories) {
+                if (params.includeCategoryChildren) {
+                    'in'("category", categories + categories*.children?.flatten())
+                } else {
+                    'in'("category", categories)
+                }
+            }
+
+
+            if (tagsInput) {
+                tags {
+                    'in'("id", tagsInput.collect { it.id })
+                }
+            }
+
+            if (catalogsInput) {
+                productCatalogItems {
+                    "in"("productCatalog", catalogsInput)
+                }
+            }
+            or {
+                if (params.name) {
+                    ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                    synonyms {
+                        and {
+                            ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                            eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                        }
+                    }
+                }
+                if (params.description) ilike("description", params.description + "%")
+                if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
+                if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
+                if (params.manufacturerCode) ilike("manufacturerCode", "%" + params?.manufacturerCode?.trim() + "%")
+                if (params.vendor) ilike("vendor", "%" + params?.vendor?.trim() + "%")
+                if (params.vendorCode) ilike("vendorCode", "%" + params?.vendorCode?.trim() + "%")
+                if (params.productCode) ilike("productCode", "%" + params.productCode + "%")
+                if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
+                if (params.createdById) eq("createdBy.id", params.createdById)
+                if (params.updatedById) eq("updatedBy.id", params.updatedById)
+
+                if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
+                if (params.productCodeIsNull) isNull("productCode")
+                if (params.brandNameIsNull) isNull("brandName")
+                if (params.manufacturerIsNull) isNull("manufacturer")
+                if (params.manufacturerCodeIsNull) isNull("manufacturerCode")
+                if (params.vendorIsNull) isNull("vendor")
+                if (params.vendorCodeIsNull) isNull("vendorCode")
+            }
+
+            if (sortColumn) {
+                if (sortColumn == "category") {
+                    category {
+                        order("name", sortOrder)
+                    }
+                } else if (sortColumn == "updatedBy") {
+                    updatedBy {
+                        order("firstName", sortOrder)
+                        order("lastName", sortOrder)
+                    }
+                } else {
+                    order(sortColumn, sortOrder)
+                }
+            }
+        }
+        /**
+         * Using setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY) returns distinct products, but
+         * it returns wrong number of totalCount (it includes duplicates).
+         * To make the pagination working propely, we override the totalCount returned by the products criteria
+         * with previously counted number of distinct products
+         */
+        products.setTotalCount(countProducts)
+        return products
     }
 
     /**
