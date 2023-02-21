@@ -6,23 +6,23 @@ import { connect } from 'react-redux';
 
 import TableCell from 'components/DataTable/TableCell';
 
-const DateCell = ({ tableDateFormat, tableDateDefaultValue, ...row }) => (
+const DateCell = ({ displayDateFormat, displayDateDefaultValue, ...row }) => (
   <TableCell
     {...row}
-    value={row.value && moment(row.value).format(tableDateFormat)}
-    defaultValue={tableDateDefaultValue}
+    value={row.value && moment(row.value).format(displayDateFormat)}
+    defaultValue={displayDateDefaultValue}
   />
 );
 
 const mapStateToProps = state => ({
-  tableDateFormat: state.session.tableDateFormat,
-  tableDateDefaultValue: state.session.tableDateDefaultValue,
+  displayDateFormat: state.session.displayDateFormat,
+  displayDateDefaultValue: state.session.displayDateDefaultValue,
 });
 
 export default connect(mapStateToProps)(DateCell);
 
 
 DateCell.propTypes = {
-  tableDateFormat: PropTypes.string.isRequired,
-  tableDateDefaultValue: PropTypes.string.isRequired,
+  displayDateFormat: PropTypes.string.isRequired,
+  displayDateDefaultValue: PropTypes.string.isRequired,
 };

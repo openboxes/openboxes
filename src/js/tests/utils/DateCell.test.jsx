@@ -14,7 +14,8 @@ describe('date cell', () => {
     const dateCell = (
       <Router>
         <DateCell
-          tableDateFormat="MM DD, yyyy"
+          displayDateFormat="MMM DD, yyyy"
+          displayDateDefaultValue="-"
           value="2023-02-09"
           store={store}
         />
@@ -29,7 +30,8 @@ describe('date cell', () => {
     const dateCell = (
       <Router>
         <DateCell
-          tableDateFormat="MM DD, yyyy"
+          displayDateFormat="MMM DD, yyyy"
+          displayDateDefaultValue="-"
           value={undefined}
           store={store}
         />
@@ -44,7 +46,8 @@ describe('date cell', () => {
     const dateCell = (
       <Router>
         <DateCell
-          tableDateFormat="MM DD, yyyy"
+          displayDateFormat="MMM DD, yyyy"
+          displayDateDefaultValue="-"
           value="2023-02-17T12:00:00Z"
           store={store}
         />
