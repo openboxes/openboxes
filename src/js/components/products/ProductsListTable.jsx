@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { RiDownload2Line } from 'react-icons/all';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import useProductsListTableData from 'hooks/list-pages/product/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
@@ -71,6 +72,7 @@ const ProductsListTable = ({
       Header: <Translate id="react.productsList.column.lastUpdated.label" defaultMessage="Last updated" />,
       accessor: 'lastUpdated',
       maxWidth: 200,
+      Cell: row => <DateCell {...row} />,
     },
   ], []);
 

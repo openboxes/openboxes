@@ -74,6 +74,8 @@ const initialState = {
   loading: false,
   localizationModeEnabled: false,
   localizationModeLocale: 'ach',
+  displayDateFormat: 'MMM DD, yyyy',
+  displayDateDefaultValue: '-',
 };
 
 export default function (state = initialState, action) {
@@ -113,6 +115,8 @@ export default function (state = initialState, action) {
         loading: false,
         localizationModeEnabled: _.get(action, 'payload.data.data.localizationModeEnabled', false),
         localizationModeLocale: _.get(action, 'payload.data.data.localizationModeLocale', 'ach'),
+        displayDateFormat: _.get(action, 'payload.data.data.displayDateFormat', 'MMM DD, yyyy'),
+        displayDateDefaultValue: _.get(action, 'payload.data.data.displayDateDefaultValue', '-'),
       };
     case FETCH_MENU_CONFIG:
       return {

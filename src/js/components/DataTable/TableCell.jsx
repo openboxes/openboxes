@@ -24,7 +24,7 @@ const TableCell = ({
   }
   const elementClasses = `${className} text-overflow-ellipsis`;
 
-  let cellElement = <div className={elementClasses}>{cellValue}</div>;
+  let cellElement = <div className={elementClasses} data-testid="table-cell">{cellValue}</div>;
 
   if (link && typeof link === 'string') {
     if (reactLink) {

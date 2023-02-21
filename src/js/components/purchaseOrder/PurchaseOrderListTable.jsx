@@ -18,6 +18,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
@@ -209,6 +210,7 @@ const PurchaseOrderListTable = ({
       />,
       accessor: 'dateOrdered',
       minWidth: 120,
+      Cell: row => <DateCell {...row} />,
     },
     {
       Header: <Translate
