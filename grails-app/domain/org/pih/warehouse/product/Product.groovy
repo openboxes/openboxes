@@ -691,11 +691,11 @@ class Product implements Comparable, Serializable {
     List<Synonym> getSynonymsByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
         return synonyms.findAll { Synonym synonym ->
             synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
-        }
+        } as List
     }
 
     /**
-     * @deprecated
+     * @deprecated remove once all references have been replaced by displayName
      * @return
      */
     String getTranslatedName() {
