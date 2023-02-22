@@ -268,7 +268,7 @@ class Select extends Component {
         return false;
       }
 
-      return !showLabelTooltip || (showValueTooltip && !fieldValue);
+      return !showLabelTooltip || (showValueTooltip && fieldValue);
     };
 
     return (
