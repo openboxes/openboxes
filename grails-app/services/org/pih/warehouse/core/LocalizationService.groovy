@@ -13,8 +13,8 @@ import grails.util.Metadata
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.pih.warehouse.util.LocalizationUtil
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
-import org.springframework.web.context.request.RequestContextHolder
 
 class LocalizationService {
 
@@ -64,15 +64,7 @@ class LocalizationService {
      * Gets the current locale or return default locale.
      */
     Locale getCurrentLocale() {
-        // First search for session locale, if none set, then search for user's default locale, otherwise get the default locale
-        def session = RequestContextHolder.currentRequestAttributes().getSession()
-        if (session?.locale) {
-            return session.locale
-        }
-        if (session?.user?.locale) {
-            return session.user.locale
-        }
-        return new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
+        return LocaleContextHolder.locale ?: new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
     }
 
     /**

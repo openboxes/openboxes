@@ -244,6 +244,8 @@ class Product implements Comparable, Serializable {
                          "applicationTagLib",
                          "handlingIcons",
                          "uoms",
+                         "displayName",
+                         "displayNameOrDefaultName",
                          "translatedName",
                          "translatedNameWithLocaleCode"
     ]
@@ -678,7 +680,7 @@ class Product implements Comparable, Serializable {
     }
 
     List getUoms() {
-       return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
     String getTranslatedNameWithLocaleCode() {
@@ -686,13 +688,35 @@ class Product implements Comparable, Serializable {
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
-    String getTranslatedName() {
-        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
-        Synonym synonym = synonyms.find { Synonym synonym ->
-            synonym.synonymTypeCode == SynonymTypeCode.DISPLAY_NAME && synonym.locale == currentLocale
-        }
-        return synonym?.name
+    List<Synonym> getSynonymsByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
+        return synonyms.findAll { Synonym synonym ->
+            synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
+        } as List
     }
+
+    /**
+     * @deprecated remove once all references have been replaced by displayName
+     * @return
+     */
+    String getTranslatedName() {
+        return displayName
+    }
+
+    /**
+     * @return the display name if it exists or null
+     */
+    String getDisplayName() {
+        List<Synonym> synonyms = getSynonymsByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)
+        return !synonyms.empty ? synonyms.first().name : null
+    }
+
+    /**
+     * @return the display name if it exists or the default name
+     */
+    String getDisplayNameOrDefaultName() {
+        return displayName ?: name
+    }
+
 
     Map toJson() {
         [
