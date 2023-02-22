@@ -291,17 +291,26 @@ class ProductService {
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
 
-        def results = Product.createCriteria().list(max: max, offset: offset) {
+        def query = { isCountQuery ->
 
-            def fields = params.fields ? params.fields.split(",") : null
-            log.info "Fields: " + fields
-            if (fields) {
+            if (isCountQuery) {
                 projections {
-                    fields.each { field ->
-                        property(field)
+                    countDistinct "id"
+                }
+            }
+            else {
+                setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+                def fields = params.fields ? params.fields.split(",") : null
+                log.info "Fields: " + fields
+                if (fields) {
+                    projections {
+                        fields.each { field ->
+                            property(field)
+                        }
                     }
                 }
             }
+
             if (!includeInactive) {
                 eq("active", true)
             }
@@ -356,6 +365,7 @@ class ProductService {
                 if (params.vendorCodeIsNull) isNull("vendorCode")
             }
 
+            // Sort order
             if (sortColumn) {
                 if (sortColumn == "category") {
                     category {
@@ -372,7 +382,20 @@ class ProductService {
             }
         }
 
-        return results
+        // Get products
+        def products = Product.createCriteria().list(params) {
+            query.delegate = delegate
+            query(false)
+        }
+
+        // Get result count
+        def productCount = Product.createCriteria().get() {
+            query.delegate = delegate
+            query(true)
+        }
+        products.totalCount = productCount
+
+        return products
     }
 
     /**
