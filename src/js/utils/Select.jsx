@@ -262,11 +262,13 @@ class Select extends Component {
     };
 
     const isTooltipDisabled = () => {
-      if (this.props.value?.translatedName) {
+      const { forceTooltip, value: fieldValue } = this.props;
+
+      if (fieldValue?.translatedName || forceTooltip) {
         return false;
       }
 
-      return !showLabelTooltip || (showValueTooltip && this.props.value);
+      return !showLabelTooltip || (showValueTooltip && !fieldValue);
     };
 
     return (
@@ -398,9 +400,11 @@ Select.propTypes = {
   classNamePrefix: PropTypes.string,
   translate: PropTypes.func.isRequired,
   defaultPlaceholder: PropTypes.string,
+  forceTooltip: PropTypes.bool,
 };
 
 Select.defaultProps = {
+  forceTooltip: undefined,
   value: undefined,
   onChange: null,
   onMenuClose: null,
