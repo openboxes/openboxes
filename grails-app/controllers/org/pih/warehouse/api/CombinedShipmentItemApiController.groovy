@@ -71,10 +71,10 @@ class CombinedShipmentItemApiController {
 
         def orderItems
 
-        if (product) {
-            orderItems = OrderItem.findAllByOrderInListAndProduct(orders, product)
-        } else  {
-            orderItems = OrderItem.findAllByOrderInList(orders)
+        if (orders) {
+            orderItems = product
+                    ? OrderItem.findAllByOrderInListAndProduct(orders, product)
+                    : OrderItem.findAllByOrderInList(orders)
         }
 
         render([orderItems: orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.collect {
