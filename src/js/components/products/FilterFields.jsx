@@ -58,7 +58,7 @@ export default {
       options: tags,
     }),
   },
-  glAccount: {
+  glAccountsId: {
     type: FilterSelectField,
     attributes: {
       valueKey: 'id',

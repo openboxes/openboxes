@@ -24,7 +24,9 @@ const ProductsList = () => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
-        formProps={{ categories, catalogs, tags, glAccounts }}
+        formProps={{
+         categories, catalogs, tags, glAccounts,
+        }}
       />
       <ProductsListTable filterParams={filterParams} />
     </div>

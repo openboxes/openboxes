@@ -41,9 +41,14 @@ const useProductFilters = () => {
     if (queryProps.includeCategoryChildren) {
       defaultValues.includeCategoryChildren = queryProps.includeCategoryChildren;
     }
-    // If there are no values for catalogs, tags or categories
+    // If there are no values for catalogs, tags, glAccounts or categories
     // then set default filters without waiting for those options to load
-    if (!queryProps.catalogId && !queryProps.tagId && !queryProps.categoryId) {
+    if (
+      !queryProps.catalogId &&
+      !queryProps.tagId &&
+      !queryProps.categoryId &&
+      !queryProps.glAccountsId
+    ) {
       setDefaultFilterValues(defaultValues);
     }
     const [categoryList, catalogList, tagList] = await Promise.all([
@@ -51,10 +56,11 @@ const useProductFilters = () => {
       fetchProductsCatalogs(),
       fetchProductsTags(),
     ]);
+    const glAccountsList = [{ id: '1', label: 'test' }];
     setCatalogs(catalogList);
     setCategories(categoryList);
     setTags(tagList);
-    setGlAccounts([{ id: '1', label: 'test' }]);
+    setGlAccounts(glAccountsList);
 
     if (queryProps.catalogId) {
       const catalogIdList = getParamList(queryProps.catalogId);
@@ -81,10 +87,10 @@ const useProductFilters = () => {
         }));
     }
 
-    if (queryProps.glAccounts) {
-      const glAccountsList = getParamList(queryProps.glAccounts);
+    if (queryProps.glAccountsId) {
+      const glAccountsIdList = getParamList(queryProps.glAccountsId);
       defaultValues.glAccountsId = glAccountsList
-        .filter(({ id }) => glAccountsList.includes(id))
+        .filter(({ id }) => glAccountsIdList.includes(id))
         .map(({ id, label }) => ({
           id, label, name: label, value: id,
         }));
@@ -110,7 +116,7 @@ const useProductFilters = () => {
       catalogId: { name: 'catalogId', accessor: 'id' },
       tagId: { name: 'tagId', accessor: 'id' },
       categoryId: { name: 'categoryId', accessor: 'id' },
-      glAccounts: { name: 'glAccounts', accessor: 'id' },
+      glAccountsId: { name: 'glAccountsId', accessor: 'id' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
