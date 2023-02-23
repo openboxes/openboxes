@@ -263,7 +263,7 @@ class Select extends Component {
 
 
     /* We would like to see the tooltip when an item
-      have translatedName or when the showLabelTooltip
+      has translatedName or when the showLabelTooltip
       or showValueTooltip are truthy. We return false
       when at least one property is true, because we need
       an information when the tooltip should be disabled.
