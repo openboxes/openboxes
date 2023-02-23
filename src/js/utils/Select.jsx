@@ -107,7 +107,7 @@ class Select extends Component {
       multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
     } = this.props;
 
-    if (value?.translatedName) {
+    if (value?.translatedName || value?.hasTranslatedName) {
       return (
         <div className="p-1">
           {value?.name}
@@ -262,13 +262,11 @@ class Select extends Component {
     };
 
     const isTooltipDisabled = () => {
-      const { forceTooltip, value: fieldValue } = this.props;
+      const { value: fieldValue } = this.props;
 
-      if (fieldValue?.translatedName || forceTooltip) {
-        return false;
-      }
-
-      return !showLabelTooltip || (showValueTooltip && fieldValue);
+      return !(
+        fieldValue?.translatedName || showLabelTooltip || (showValueTooltip && this.props.value)
+      );
     };
 
     return (

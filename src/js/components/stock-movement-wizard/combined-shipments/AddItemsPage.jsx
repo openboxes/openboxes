@@ -105,7 +105,7 @@ const FIELDS = {
         flexWidth: '4',
         required: true,
         attributes: {
-          forceTooltip: true,
+          showValueTooltip: true,
           disabled: true,
         },
       },
