@@ -58,6 +58,21 @@ export default {
       options: tags,
     }),
   },
+  glAccount: {
+    type: FilterSelectField,
+    attributes: {
+      valueKey: 'id',
+      placeholder: 'react.productsList.filters.glAccount.label',
+      defaultPlaceholder: 'Gl Account',
+      multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+      filterElement: true,
+    },
+    getDynamicAttr: ({ glAccounts }) => ({
+      options: glAccounts,
+    }),
+  },
   includeInactive: {
     type: CheckboxField,
     label: 'react.productsList.includeInactive.label',

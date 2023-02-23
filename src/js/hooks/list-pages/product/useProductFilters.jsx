@@ -18,6 +18,7 @@ const useProductFilters = () => {
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
+  const [glAccounts, setGlAccounts] = useState([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const history = useHistory();
@@ -53,6 +54,7 @@ const useProductFilters = () => {
     setCatalogs(catalogList);
     setCategories(categoryList);
     setTags(tagList);
+    setGlAccounts([{ id: '1', label: 'test' }]);
 
     if (queryProps.catalogId) {
       const catalogIdList = getParamList(queryProps.catalogId);
@@ -79,7 +81,20 @@ const useProductFilters = () => {
         }));
     }
 
-    if (queryProps.catalogId || queryProps.tagId || queryProps.categoryId) {
+    if (queryProps.glAccounts) {
+      const glAccountsList = getParamList(queryProps.glAccounts);
+      defaultValues.glAccountsId = glAccountsList
+        .filter(({ id }) => glAccountsList.includes(id))
+        .map(({ id, label }) => ({
+          id, label, name: label, value: id,
+        }));
+    }
+
+    const {
+      catalogId, tagId, categoryId, glAccountsId,
+    } = queryProps;
+
+    if (catalogId || tagId || categoryId || glAccountsId) {
       setDefaultFilterValues(defaultValues);
     }
     setFiltersInitialized(true);
@@ -95,6 +110,7 @@ const useProductFilters = () => {
       catalogId: { name: 'catalogId', accessor: 'id' },
       tagId: { name: 'tagId', accessor: 'id' },
       categoryId: { name: 'categoryId', accessor: 'id' },
+      glAccounts: { name: 'glAccounts', accessor: 'id' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
@@ -106,7 +122,7 @@ const useProductFilters = () => {
   };
 
   return {
-    defaultFilterValues, setFilterValues, categories, catalogs, tags, filterParams,
+    defaultFilterValues, setFilterValues, categories, catalogs, tags, glAccounts, filterParams,
   };
 };
 

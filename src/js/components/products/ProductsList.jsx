@@ -12,7 +12,7 @@ import useTranslation from 'hooks/useTranslation';
 
 const ProductsList = () => {
   const {
-    defaultFilterValues, setFilterValues, categories, catalogs, tags, filterParams,
+    defaultFilterValues, setFilterValues, categories, catalogs, tags, glAccounts, filterParams,
   } = useProductFilters();
 
   useTranslation('productsList', 'reactTable');
@@ -24,7 +24,7 @@ const ProductsList = () => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
-        formProps={{ categories, catalogs, tags }}
+        formProps={{ categories, catalogs, tags, glAccounts }}
       />
       <ProductsListTable filterParams={filterParams} />
     </div>
