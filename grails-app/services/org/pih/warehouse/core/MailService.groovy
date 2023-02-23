@@ -54,7 +54,12 @@ class MailService {
     }
 
     Boolean getIsMailEnabled() {
-        return grailsApplication.config.grails.mail.enabled.toBoolean()
+        /*
+         * If no grails.mail stanza exists, isEnabled will be an empty
+         * ConfigObject, which is falsey but has no toBoolean() method.
+         */
+        def isEnabled = grailsApplication.config.grails.mail.enabled
+        return isEnabled ? isEnabled.toBoolean() : false
     }
 
     Boolean sendMail(String subject, String msg, String to) {
