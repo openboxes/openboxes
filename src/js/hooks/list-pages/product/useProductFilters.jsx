@@ -8,7 +8,7 @@ import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchProductsCatalogs,
-  fetchProductsCategories,
+  fetchProductsCategories, fetchProductsGlAccounts,
   fetchProductsTags,
 } from 'utils/option-utils';
 
@@ -51,12 +51,12 @@ const useProductFilters = () => {
     ) {
       setDefaultFilterValues(defaultValues);
     }
-    const [categoryList, catalogList, tagList] = await Promise.all([
+    const [categoryList, catalogList, tagList, glAccountsList] = await Promise.all([
       fetchProductsCategories(),
       fetchProductsCatalogs(),
       fetchProductsTags(),
+      fetchProductsGlAccounts(),
     ]);
-    const glAccountsList = [{ id: '1', label: 'test' }];
     setCatalogs(catalogList);
     setCategories(categoryList);
     setTags(tagList);

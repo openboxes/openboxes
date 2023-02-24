@@ -218,3 +218,8 @@ export const fetchProductsTags = async () => {
   const response = await apiClient.get('/openboxes/api/tagOptions');
   return response.data.data;
 };
+
+export const fetchProductsGlAccounts = async () => {
+  const response = await apiClient.get('/openboxes/api/glAccountOptions');
+  return response.data.data;
+};

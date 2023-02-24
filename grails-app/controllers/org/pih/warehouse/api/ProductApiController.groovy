@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
@@ -286,5 +287,13 @@ class ProductApiController extends BaseDomainApiController {
         }
 
         render([data: tags] as JSON)
+    }
+
+    def glAccountOptions = {
+        def glAccounts = GlAccount.list().collect {
+            [id: it.id, label: "${it.code} - ${it.name}"]
+        }
+
+        render([data: glAccounts] as JSON)
     }
 }
