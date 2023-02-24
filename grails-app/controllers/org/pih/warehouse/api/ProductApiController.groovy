@@ -289,12 +289,4 @@ class ProductApiController extends BaseDomainApiController {
 
         render([data: tags] as JSON)
     }
-
-    def glAccountOptions = {
-        def glAccounts = GlAccount.list().collect {
-            [id: it.id, label: "${it.code} - ${it.name}"]
-        }
-
-        render([data: glAccounts] as JSON)
-    }
 }

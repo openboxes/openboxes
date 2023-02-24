@@ -8,9 +8,13 @@
 * You must not remove this notice, or any other, from this software.
 **/
 package org.pih.warehouse.core
+
+import grails.converters.JSON
 import org.pih.warehouse.product.Product
 
 class GlAccountController {
+
+    def GlAccountService glAccountService
 
     def index = {
         redirect(action: "list", params: params)
@@ -83,5 +87,10 @@ class GlAccountController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), params.id])}"
             redirect(action: "list")
         }
+    }
+
+    def glAccountOptions = {
+        def glAccounts = glAccountService.getGlAccountsOptions()
+        render([data: glAccounts] as JSON)
     }
 }

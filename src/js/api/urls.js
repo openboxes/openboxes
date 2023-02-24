@@ -27,3 +27,6 @@ export const STOCKLIST_CLEAR = id => `${STOCKLIST_API}/${id}/clear`;
 export const STOCKLIST_CLONE = id => `${STOCKLIST_API}/${id}/clone`;
 export const STOCKLIST_PUBLISH = id => `${STOCKLIST_API}/${id}/publish`;
 export const STOCKLIST_UNPUBLISH = id => `${STOCKLIST_API}/${id}/unpublish`;
+
+// GL ACCOUNTS
+export const GL_ACCOUNTS_OPTION = '/openboxes/api/glAccountOptions';
