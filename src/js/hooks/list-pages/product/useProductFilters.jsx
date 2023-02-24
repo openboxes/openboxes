@@ -28,12 +28,29 @@ const useProductFilters = () => {
     history.push({ pathname });
   };
 
+  const setDefaultValue = (queryPropsParam, elementsList, defaultValuesProperty, defaultValues) => {
+    if (queryPropsParam) {
+      const idList = getParamList(queryPropsParam);
+      // eslint-disable-next-line no-param-reassign
+      defaultValues[defaultValuesProperty] = elementsList
+        .filter(({ id }) => idList.includes(id))
+        .map(({ id, label }) => ({
+          id, label, name: label, value: id,
+        }));
+    }
+  };
+
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
     const queryProps = queryString.parse(history.location.search);
+
+    const {
+      catalogId, tagId, categoryId, glAccountsId,
+    } = queryProps;
+
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.includeInactive) {
       defaultValues.includeInactive = queryProps.includeInactive;
@@ -43,12 +60,7 @@ const useProductFilters = () => {
     }
     // If there are no values for catalogs, tags, glAccounts or categories
     // then set default filters without waiting for those options to load
-    if (
-      !queryProps.catalogId &&
-      !queryProps.tagId &&
-      !queryProps.categoryId &&
-      !queryProps.glAccountsId
-    ) {
+    if (!catalogId && !tagId && !categoryId && !glAccountsId) {
       setDefaultFilterValues(defaultValues);
     }
     const [categoryList, catalogList, tagList, glAccountsList] = await Promise.all([
@@ -62,43 +74,10 @@ const useProductFilters = () => {
     setTags(tagList);
     setGlAccounts(glAccountsList);
 
-    if (queryProps.catalogId) {
-      const catalogIdList = getParamList(queryProps.catalogId);
-      defaultValues.catalogId = catalogList
-        .filter(({ id }) => catalogIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-    if (queryProps.tagId) {
-      const tagIdList = getParamList(queryProps.tagId);
-      defaultValues.tagId = tagList
-        .filter(({ id }) => tagIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-    if (queryProps.categoryId) {
-      const categoryIdList = getParamList(queryProps.categoryId);
-      defaultValues.categoryId = categoryList
-        .filter(({ id }) => categoryIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-
-    if (queryProps.glAccountsId) {
-      const glAccountsIdList = getParamList(queryProps.glAccountsId);
-      defaultValues.glAccountsId = glAccountsList
-        .filter(({ id }) => glAccountsIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-
-    const {
-      catalogId, tagId, categoryId, glAccountsId,
-    } = queryProps;
+    setDefaultValue(catalogId, catalogList, 'catalogId', defaultValues);
+    setDefaultValue(tagId, tagList, 'tagId', defaultValues);
+    setDefaultValue(categoryId, categoryList, 'categoryId', defaultValues);
+    setDefaultValue(glAccountsId, glAccountsList, 'glAccountsId', defaultValues);
 
     if (catalogId || tagId || categoryId || glAccountsId) {
       setDefaultFilterValues(defaultValues);

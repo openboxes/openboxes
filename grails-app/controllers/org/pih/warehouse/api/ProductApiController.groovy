@@ -51,7 +51,7 @@ class ProductApiController extends BaseDomainApiController {
             params.max = -1
         }
 
-        def products = productService.getProducts(categories, catalogs, tags, includeInactive, params, glAccounts)
+        def products = productService.getProducts(categories, catalogs, tags, glAccounts, includeInactive, params)
 
         if (params.format == 'csv') {
             boolean includeAttributes = params.boolean("includeAttributes") ?: false
