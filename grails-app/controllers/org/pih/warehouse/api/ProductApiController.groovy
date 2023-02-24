@@ -33,6 +33,7 @@ class ProductApiController extends BaseDomainApiController {
         def categories = params.categoryId ? Category.findAllByIdInList(params.list("categoryId")) : null
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
         def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
+        def glAccounts = params.glAccountsId ? GlAccount.getAll(params.list('glAccountsId')) : []
 
         // Following this approach of assigning q into other params for productService.getProducts
         params.name = params.q
@@ -50,7 +51,7 @@ class ProductApiController extends BaseDomainApiController {
             params.max = -1
         }
 
-        def products = productService.getProducts(categories, catalogs, tags, includeInactive, params)
+        def products = productService.getProducts(categories, catalogs, tags, includeInactive, params, glAccounts)
 
         if (params.format == 'csv') {
             boolean includeAttributes = params.boolean("includeAttributes") ?: false
