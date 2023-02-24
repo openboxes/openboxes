@@ -8,7 +8,8 @@ import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchProductsCatalogs,
-  fetchProductsCategories, fetchProductsGlAccounts,
+  fetchProductsCategories,
+  fetchProductsGlAccounts,
   fetchProductsTags,
 } from 'utils/option-utils';
 
