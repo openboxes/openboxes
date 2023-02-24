@@ -28,16 +28,16 @@ const useProductFilters = () => {
     history.push({ pathname });
   };
 
-  const setDefaultValue = (queryPropsParam, elementsList, defaultValuesProperty, defaultValues) => {
+  const setDefaultValue = (queryPropsParam, elementsList) => {
     if (queryPropsParam) {
       const idList = getParamList(queryPropsParam);
-      // eslint-disable-next-line no-param-reassign
-      defaultValues[defaultValuesProperty] = elementsList
+      return elementsList
         .filter(({ id }) => idList.includes(id))
         .map(({ id, label }) => ({
           id, label, name: label, value: id,
         }));
     }
+    return null;
   };
 
   const initializeDefaultFilterValues = async () => {
@@ -74,10 +74,10 @@ const useProductFilters = () => {
     setTags(tagList);
     setGlAccounts(glAccountsList);
 
-    setDefaultValue(catalogId, catalogList, 'catalogId', defaultValues);
-    setDefaultValue(tagId, tagList, 'tagId', defaultValues);
-    setDefaultValue(categoryId, categoryList, 'categoryId', defaultValues);
-    setDefaultValue(glAccountsId, glAccountsList, 'glAccountsId', defaultValues);
+    defaultValues.catalogId = setDefaultValue(catalogId, catalogList);
+    defaultValues.tagId = setDefaultValue(tagId, tagList);
+    defaultValues.categoryId = setDefaultValue(categoryId, categoryList);
+    defaultValues.glAccountsId = setDefaultValue(glAccountsId, glAccountsList);
 
     if (catalogId || tagId || categoryId || glAccountsId) {
       setDefaultFilterValues(defaultValues);
