@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2012 Partners In Health.  All rights reserved.
+ * Copyright (c) 2023 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
  * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
  * which can be found in the file epl-v10.html at the root of this distribution.
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/
+ */
 package org.pih.warehouse.util
 
 import com.lowagie.text.pdf.BaseFont
@@ -14,9 +14,9 @@ import com.lowagie.text.pdf.PdfName
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PDFUtil {
+class PdfUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(PDFUtil)
+    private static final Logger log = LoggerFactory.getLogger(PdfUtil)
 
     static final Map PDF_BASE14_FONTS = [
         (BaseFont.COURIER)              : PdfName.COURIER,

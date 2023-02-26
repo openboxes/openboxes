@@ -27,7 +27,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.util.PDFUtil
+import org.pih.warehouse.util.PdfUtil
 
 class DocumentTemplateService {
 
@@ -86,7 +86,7 @@ class DocumentTemplateService {
             }
             log.info "Report dump: " + report.dump()
         } finally {
-            PDFUtil.restoreBaseFonts()
+            PdfUtil.restoreBaseFonts()
         }
     }
 
