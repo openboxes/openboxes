@@ -85,8 +85,9 @@ const NO_STOCKLIST_FIELDS = {
         headerAlign: 'left',
         flexWidth: '9.5',
         getDynamicAttr: ({
-          fieldValue, rowIndex, rowCount, originId, focusField,
+          fieldValue, rowIndex, rowCount, originId, focusField, values, saveProgress,
         }) => ({
+          onBlur: () => saveProgress(values),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -107,10 +108,13 @@ const NO_STOCKLIST_FIELDS = {
         },
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue, updateRow, values, rowIndex,
+          fieldValue, updateRow, values, rowIndex, saveProgress,
         }) => ({
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            saveProgress(values);
+          },
         }),
       },
       recipient: {
@@ -121,7 +125,7 @@ const NO_STOCKLIST_FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
+          updateTotalCount, updateRow, values, saveProgress,
         }) => ({
           options: recipients,
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
@@ -137,7 +141,10 @@ const NO_STOCKLIST_FIELDS = {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            saveProgress(values);
+          },
         }),
         attributes: {
           labelKey: 'name',
@@ -183,8 +190,9 @@ const STOCKLIST_FIELDS = {
         headerAlign: 'left',
         flexWidth: '9',
         getDynamicAttr: ({
-          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
         }) => ({
+          onBlur: () => saveProgress(values),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
@@ -203,6 +211,9 @@ const STOCKLIST_FIELDS = {
         attributes: {
           type: 'number',
         },
+        getDynamicAttr: ({ saveProgress, values }) => ({
+          onBlur: () => saveProgress(values),
+        }),
       },
       quantityRequested: {
         type: TextField,
@@ -213,7 +224,8 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount, updateRow, values,
+          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
+          updateRow, values, saveProgress,
         }) => ({
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
@@ -227,7 +239,10 @@ const STOCKLIST_FIELDS = {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            saveProgress(values);
+          },
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -695,6 +710,26 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
+  saveProgress = (values, isDebouncedSave) => {
+    const errors = this.validate(values).lineItems;
+    const savingFunction = () => this.saveRequisitionItemsInCurrentStep(values.lineItems);
+
+    // If there are errors we not want to trigger autosave
+    if (errors.length) {
+      return;
+    }
+
+    // It should be enabled when we use arrows to change the value
+    // of fields with i.e type="number", because clicking on arrow
+    // doesn't trigger focus on field
+    if (isDebouncedSave) {
+      _.debounce(savingFunction, 500);
+    }
+
+    // if the save isn't debounced we just trigger normal saving function
+    savingFunction();
+  };
+
   /**
    * Saves list of requisition items in current step (without step change).
    * @param {object} formValues
@@ -1037,6 +1072,7 @@ class AddItemsPage extends Component {
                   updateRow: this.updateRow,
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  saveProgress: this.saveProgress,
                 }))}
               </div>
               <div className="submit-buttons">
