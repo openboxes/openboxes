@@ -6,7 +6,9 @@ import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 import Alert from 'react-s-alert';
 
+import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
+import NotificationType from 'consts/notificationTypes';
 
 const justRejectRequestError = error => Promise.reject(error);
 
@@ -55,9 +57,12 @@ export const handleSuccess = response => response;
 export const handleError = (error) => {
   switch (error.response.status) {
     case 400: {
-      const errorMessages = _.map(_.get(error, 'response.data.errorMessages', ''), errorMessage => `<div>${errorMessage}</div>`);
+      const errorMessages = _.map(_.get(error, 'response.data.errorMessages', ''), errorMessage => `${errorMessage}, `);
       const errorMessage = _.get(error, 'response.data.errorMessage', '');
-      Alert.error(`Bad Request.</br> ${errorMessage || errorMessages}`);
+      notification(NotificationType.ERROR_OUTLINED)({
+        message: 'Bad request',
+        details: errorMessage ?? errorMessages,
+      });
       break;
     }
 
@@ -67,17 +72,28 @@ export const handleError = (error) => {
       });
       break;
     case 403:
-      Alert.error(`Access denied.</br>${_.get(error, 'response.data.errorMessage', '')}`);
+      notification(NotificationType.WARNING)({
+        message: 'Access denied',
+        details: _.get(error, 'response.data.errorMessage', ''),
+      });
       break;
     case 404:
-      Alert.error(`Not found.</br>${_.get(error, 'response.data.errorMessage', '')}`);
+      notification(NotificationType.ERROR_OUTLINED)({
+        message: 'Not found',
+        details: _.get(error, 'response.data.errorMessage', ''),
+      });
       break;
     case 500:
-      Alert.error(`Internal server error.</br>${_.get(error, 'response.data.errorMessage', '')}`);
+      notification(NotificationType.ERROR_FILLED)({
+        message: 'Internal server error',
+        details: _.get(error, 'response.data.errorMessage', ''),
+      });
       break;
-    default: {
-      Alert.error(`${error}</br>${_.get(error, 'response.data.errorMessage', '')}`);
-    }
+    default:
+      notification(NotificationType.ERROR_FILLED)({
+        message: error,
+        details: _.get(error, 'response.data.errorMessage', ''),
+      });
   }
   return Promise.reject(error);
 };
