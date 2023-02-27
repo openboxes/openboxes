@@ -18,13 +18,20 @@ export default {
       options: categories,
     }),
   },
-  includeCategoryChildren: {
-    type: CheckboxField,
-    label: 'react.productsList.includeSubcategories.label',
-    defaultMessage: 'Include all products in all subcategories',
+  glAccountsId: {
+    type: FilterSelectField,
     attributes: {
+      valueKey: 'id',
+      placeholder: 'react.productsList.filters.glAccount.label',
+      defaultPlaceholder: 'Gl Account',
+      multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
       filterElement: true,
     },
+    getDynamicAttr: ({ glAccounts }) => ({
+      options: glAccounts,
+    }),
   },
   catalogId: {
     type: FilterSelectField,
@@ -58,25 +65,18 @@ export default {
       options: tags,
     }),
   },
-  glAccountsId: {
-    type: FilterSelectField,
-    attributes: {
-      valueKey: 'id',
-      placeholder: 'react.productsList.filters.glAccount.label',
-      defaultPlaceholder: 'Gl Account',
-      multi: true,
-      closeMenuOnSelect: false,
-      blurInputOnSelect: false,
-      filterElement: true,
-    },
-    getDynamicAttr: ({ glAccounts }) => ({
-      options: glAccounts,
-    }),
-  },
   includeInactive: {
     type: CheckboxField,
     label: 'react.productsList.includeInactive.label',
     defaultMessage: 'Include inactive',
+    attributes: {
+      filterElement: true,
+    },
+  },
+  includeCategoryChildren: {
+    type: CheckboxField,
+    label: 'react.productsList.includeSubcategories.label',
+    defaultMessage: 'Include all products in all subcategories',
     attributes: {
       filterElement: true,
     },
