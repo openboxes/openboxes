@@ -228,7 +228,7 @@ const Router = (props) => {
       </div>
       <Alert
         timeout={props.notificationDisappearTime}
-        stack={{ limit: 5 }}
+        stack={{ limit: 3 }}
         contentTemplate={CustomAlert}
         position="top-right"
         effect="bouncyflip"
