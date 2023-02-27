@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { RiInformationLine } from 'react-icons/all';
-import { RiAlertLine, RiCheckboxCircleLine, RiErrorWarningFill, RiErrorWarningLine } from 'react-icons/ri';
+import { RiAlertLine, RiCheckboxCircleLine, RiErrorWarningFill, RiErrorWarningLine, RiInformationLine } from 'react-icons/ri';
 import Alert from 'react-s-alert';
 
 import NotificationType from 'consts/notificationTypes';
