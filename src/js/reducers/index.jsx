@@ -5,6 +5,7 @@ import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
+import onlineReducer from 'reducers/onlineReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
@@ -19,6 +20,7 @@ import usersReducer from 'reducers/usersReducer';
 const rootReducer = combineReducers({
   localize: localizeReducer,
   spinner: spinnerReducer,
+  online: onlineReducer,
   reasonCodes: reasonCodesReducer,
   users: usersReducer,
   session: sessionReducer,
