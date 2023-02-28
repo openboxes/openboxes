@@ -25,6 +25,7 @@ class ProductGroup implements Comparable, Serializable {
     Date lastUpdated
 
     static belongsTo = Product
+    static mappedBy = [products: 'productFamily']
     static hasMany = [products: Product]
     static mapping = {
         id generator: 'uuid'
