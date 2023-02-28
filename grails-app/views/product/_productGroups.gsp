@@ -14,7 +14,7 @@
                 <g:each var="productGroup" in="${productInstance.productGroups}">
                     <tr>
                         <td class="top">
-                            <g:link controller="productGroup" action="show" id="${productGroup.id}">
+                            <g:link controller="productGroup" action="edit" id="${productGroup.id}">
                                 ${productGroup.name}
                             </g:link>
                         </td>

@@ -1,4 +1,4 @@
-<div id="products">
+<div id="products-table-wrapper">
     <table id="productTable" class="zebra">
         <thead>
         <tr class="">
@@ -59,7 +59,7 @@
             <tr>
                 <td colspan="8">
                     <g:formRemote id="addProductToProductGroup" name="addProductToProductGroup"
-                                  update="products" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()"
+                                  update="products-table-wrapper" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()"
                                   url="[controller: 'productGroup', action:'addProductToProductGroup']">
                         <input name="id" type="hidden" value="${productGroup?.id}" />
                         <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" width="500" styleClass="text"
