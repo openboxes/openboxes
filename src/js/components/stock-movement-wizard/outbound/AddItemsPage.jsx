@@ -265,6 +265,7 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      isSaveCompleted: true,
     };
 
     this.props.showSpinner();
@@ -691,6 +692,7 @@ class AddItemsPage extends Component {
             lineItems,
             val => ({
               ...val,
+              disabled: true,
               product: {
                 ...val.product,
                 label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
@@ -710,24 +712,18 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
-  saveProgress = (values, isDebouncedSave) => {
+  saveProgress = (values) => {
     const errors = this.validate(values).lineItems;
-    const savingFunction = () => this.saveRequisitionItemsInCurrentStep(values.lineItems);
+    this.setState({ isSaveCompleted: false });
 
     // If there are errors we not want to trigger autosave
     if (errors.length) {
       return;
     }
 
-    // It should be enabled when we use arrows to change the value
-    // of fields with i.e type="number", because clicking on arrow
-    // doesn't trigger focus on field
-    if (isDebouncedSave) {
-      _.debounce(savingFunction, 500);
-    }
-
-    // if the save isn't debounced we just trigger normal saving function
-    savingFunction();
+    this.saveRequisitionItemsInCurrentStep(values.lineItems).then(() => {
+      this.setState({ isSaveCompleted: true });
+    });
   };
 
   /**
@@ -1093,8 +1089,8 @@ class AddItemsPage extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
-                    invalid || showOnly
+                    (values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
+                    invalid || showOnly) && !this.state.isSaveCompleted
                   }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
