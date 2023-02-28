@@ -676,7 +676,7 @@ class AddItemsPage extends Component {
   /**
    * Saves list of requisition items in current step (without step change). Used to export template.
    * @param {object} itemCandidatesToSave
-   * @param {boolean} modifyState
+   * @param {boolean} withStateChange
    * @public
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
