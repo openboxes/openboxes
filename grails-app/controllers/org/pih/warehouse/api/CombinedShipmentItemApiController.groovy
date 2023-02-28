@@ -123,28 +123,7 @@ class CombinedShipmentItemApiController {
     }
 
     def importTemplate = { ImportDataCommand command ->
-        Shipment shipment = Shipment.get(params.id)
-        def importFile = command.importFile
-        if (importFile.isEmpty()) {
-            throw new IllegalArgumentException("File cannot be empty")
-        }
-
-        if (importFile.fileItem.contentType != "text/csv") {
-            throw new IllegalArgumentException("File must be in CSV format")
-        }
-        String csv = new String(importFile.bytes)
-        List importedLines = combinedShipmentService.parseOrderItemsFromTemplateImport(csv)
-        if (combinedShipmentService.validateItemsFromTemplateImport(shipment, importedLines)) {
-            combinedShipmentService.addItemsToShipment(shipment, importedLines)
-        } else {
-            String message = "Failed to import template due to validation errors:"
-            importedLines.eachWithIndex { line, idx ->
-                if (line.errors) {
-                    message += "<br>Row ${idx + 1}: ${line.errors.join("; ")}"
-                }
-            }
-            throw new ValidationException(message)
-        }
+        combinedShipmentService.importTemplate(command, params.id)
         render (status: 200, text: "Successfully imported template")
     }
 
