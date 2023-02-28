@@ -318,7 +318,9 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+      !item.statusCode &&
+      parseInt(item.quantityRequested, 10) > 0 &&
+      item.product && !item.disabled);
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -674,9 +676,10 @@ class AddItemsPage extends Component {
   /**
    * Saves list of requisition items in current step (without step change). Used to export template.
    * @param {object} itemCandidatesToSave
+   * @param {boolean} modifyState
    * @public
    */
-  saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
+  saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
@@ -699,6 +702,26 @@ class AddItemsPage extends Component {
               },
             }),
           );
+          // In autosave, we don't modify the state, because
+          // lines which not passed the validation will be
+          // deleted during users work
+          if (!withStateChange) {
+            // We want to disable saved line, so I am looking for product with the same
+            // code and quantity higher than 0 in response
+            // (to avoid disabling new line with the same productCode)
+            const savedItemsProductCodes = lineItemsBackendData.map(item => item.productCode);
+            const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
+              if (
+                _.includes(savedItemsProductCodes, item.product.productCode)
+                && parseInt(item.quantityRequested, 10)
+              ) {
+                return { ...item, disabled: true };
+              }
+              return item;
+            });
+            this.setState({ values: { ...this.state.values, lineItems: lineItemsAfterSave } });
+            return;
+          }
 
           this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
 
@@ -713,15 +736,9 @@ class AddItemsPage extends Component {
   }
 
   saveProgress = (values) => {
-    const errors = this.validate(values).lineItems;
     this.setState({ isSaveCompleted: false });
 
-    // If there are errors we not want to trigger autosave
-    if (errors.length) {
-      return;
-    }
-
-    this.saveRequisitionItemsInCurrentStep(values.lineItems).then(() => {
+    this.saveRequisitionItemsInCurrentStep(values.lineItems, false).then(() => {
       this.setState({ isSaveCompleted: true });
     });
   };
@@ -1089,8 +1106,8 @@ class AddItemsPage extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    (values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
-                    invalid || showOnly) && !this.state.isSaveCompleted
+                    values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
+                    invalid || showOnly || !this.state.isSaveCompleted
                   }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
