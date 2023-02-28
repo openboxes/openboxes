@@ -31,13 +31,7 @@ import org.pih.warehouse.requisition.Requisition
 class Shipment implements Comparable, Serializable {
 
     def publishRefreshEvent = {
-        if (!disableRefresh) {
-            orders?.each { Order o ->
-                if (o?.isPurchaseOrder) {
-                    publishEvent(new RefreshOrderSummaryEvent(o))
-                }
-            }
-        }
+        publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
     def beforeInsert = {
@@ -50,6 +44,7 @@ class Shipment implements Comparable, Serializable {
         currentStatus = status.code
 
     }
+
     def beforeUpdate = {
         def currentUser = AuthService.currentUser.get()
         if (currentUser) {

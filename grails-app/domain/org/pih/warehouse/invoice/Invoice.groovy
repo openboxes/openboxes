@@ -26,11 +26,7 @@ import org.pih.warehouse.shipping.Shipment
 class Invoice implements Serializable {
 
     def publishRefreshEvent = {
-        orders?.each { Order o ->
-            if (o?.isPurchaseOrder) {
-                publishEvent(new RefreshOrderSummaryEvent(o))
-            }
-        }
+        publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
     def afterInsert = publishRefreshEvent

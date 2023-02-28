@@ -1238,16 +1238,20 @@ class OrderService {
     }
 
     /**
-     * Refreshing the Order Summary materialized view for a specific Order (PASS ONLY A PO ID)
+     * Refreshing the Order Summary materialized view for a specific list of Order Ids (PASS ONLY A PO IDs)
      * */
-    def refreshOrderSummary(String orderId, Boolean isDelete) {
+    def refreshOrderSummary(List<String> orderIds, Boolean isDelete) {
         List statements = []
-        if (isDelete) {
-            statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
-        } else {
-            statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
+        orderIds?.each { String orderId ->
+            if (isDelete) {
+                statements << "DELETE FROM order_summary_mv WHERE id = '${orderId}';"
+            } else {
+                statements << "REPLACE INTO order_summary_mv (SELECT * FROM order_summary WHERE id = '${orderId}');"
+            }
         }
 
-        dataService.executeStatements(statements)
+        if (statements) {
+            dataService.executeStatements(statements)
+        }
     }
 }
