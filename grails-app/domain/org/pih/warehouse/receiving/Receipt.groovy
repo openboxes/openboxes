@@ -18,13 +18,7 @@ import org.pih.warehouse.shipping.Shipment
 class Receipt implements Serializable, Comparable<Receipt> {
 
     def publishRefreshEvent = {
-        if (!disableRefresh) {
-            shipment?.orders?.each { Order o ->
-                if (o?.isPurchaseOrder) {
-                    publishEvent(new RefreshOrderSummaryEvent(o))
-                }
-            }
-        }
+        publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
     def afterInsert = publishRefreshEvent

@@ -21,9 +21,9 @@ class RefreshOrderSummaryEventService implements ApplicationListener<RefreshOrde
     void onApplicationEvent(RefreshOrderSummaryEvent event) {
         log.info "Application event ${event} has been published! " + event.properties
 
-        if (event?.orderId) {
-            log.info "Refreshing order summary ${event.isDelete ? 'before delete action' : ''} for order with id : ${event.orderId}"
-            orderService.refreshOrderSummary(event.orderId, event.isDelete)
+        if (event?.orderIds && !event.disableRefresh) {
+            log.info "Refreshing order summary ${event.isDelete ? 'before delete action' : ''} for orders with ids : ${event.orderIds}"
+            orderService.refreshOrderSummary(event.orderIds, event.isDelete)
         }
     }
 }
