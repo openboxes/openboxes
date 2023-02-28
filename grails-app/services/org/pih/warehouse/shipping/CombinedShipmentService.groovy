@@ -12,6 +12,7 @@ package org.pih.warehouse.shipping
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
@@ -193,7 +194,6 @@ class CombinedShipmentService {
     }
 
     def addItemsToShipment(Shipment shipment, List importedLines) {
-
         importedLines.each { line ->
             if ((line.quantityToShip as int) > 0) {
                 Order order = Order.findByOrderNumber(line.orderNumber)
@@ -245,14 +245,37 @@ class CombinedShipmentService {
                 shipment.addToShipmentItems(shipmentItem)
                 orderItem.addToShipmentItems(shipmentItem)
 
-                shipmentItem.save(flush: true)
+                shipmentItem.save()
             }
         }
 
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
+    }
 
-        return shipment
+    void importTemplate(ImportDataCommand command, String shipmentId) {
+        Shipment shipment = Shipment.get(shipmentId)
+        def importFile = command.importFile
+        if (importFile.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be empty")
+        }
+
+        if (importFile.fileItem.contentType != "text/csv") {
+            throw new IllegalArgumentException("File must be in CSV format")
+        }
+        String csv = new String(importFile.bytes)
+        List importedLines = parseOrderItemsFromTemplateImport(csv)
+        if (validateItemsFromTemplateImport(shipment, importedLines)) {
+            addItemsToShipment(shipment, importedLines)
+        } else {
+            String message = "Failed to import template due to validation errors:"
+            importedLines.eachWithIndex { line, idx ->
+                if (line.errors) {
+                    message += "<br>Row ${idx + 1}: ${line.errors.join("; ")}"
+                }
+            }
+            throw new ValidationException(message)
+        }
     }
 }
