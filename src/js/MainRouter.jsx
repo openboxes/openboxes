@@ -7,11 +7,12 @@ import connect from 'react-redux/es/connect/connect';
 
 import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
 import Router from 'components/Router';
+import withConnectionListener from 'hoc/withConnectionListener';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
 const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'productsConfiguration',
-  'locationsConfiguration', 'loadData'];
+  'locationsConfiguration', 'loadData', 'notification'];
 
 // TODO: Refactor fetching app context (fetchSessionInfo)
 // TODO: Refactor fetching menu config
@@ -59,7 +60,8 @@ const mapStateToProps = state => ({
 
 export default withLocalize(connect(mapStateToProps, {
   fetchTranslations, fetchSessionInfo, fetchMenuConfig,
-})(MainRouter));
+})(withConnectionListener(MainRouter)));
+
 
 MainRouter.propTypes = {
   initialize: PropTypes.func.isRequired,
