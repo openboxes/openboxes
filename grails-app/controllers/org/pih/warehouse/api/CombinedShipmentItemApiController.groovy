@@ -69,7 +69,7 @@ class CombinedShipmentItemApiController {
         }
         Product product = Product.get(request.JSON.productId)
 
-        def orderItems
+        List<OrderItem> orderItems = []
 
         if (orders) {
             orderItems = product
