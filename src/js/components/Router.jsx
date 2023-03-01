@@ -8,6 +8,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { ClimbingBoxLoader } from 'react-spinners';
 
+import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
 import Loading from 'components/Loading';
 
@@ -226,12 +227,12 @@ const Router = (props) => {
         />
       </div>
       <Alert
-        timeout="none"
+        timeout={props.notificationAutohideDelay}
         stack={{ limit: 3 }}
-        offset={20}
-        html
+        contentTemplate={CustomAlert}
         position="top-right"
         effect="bouncyflip"
+        offset={20}
       />
     </div>
   );
@@ -240,6 +241,7 @@ const Router = (props) => {
 const mapStateToProps = state => ({
   spinner: state.spinner.show,
   supportedActivities: state.session.supportedActivities,
+  notificationAutohideDelay: state.session.notificationAutohideDelay,
 });
 
 export default connect(mapStateToProps, {})(Router);
@@ -247,4 +249,5 @@ export default connect(mapStateToProps, {})(Router);
 Router.propTypes = {
   spinner: PropTypes.bool.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  notificationAutohideDelay: PropTypes.number.isRequired,
 };

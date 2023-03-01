@@ -1300,6 +1300,11 @@ openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
+// Notifications configuration
+
+// delay is in ms
+openboxes.client.notification.autohide.delay = 8000
+
 // Global megamenu configuration
 
 openboxes.menuSectionsUrlParts = [
