@@ -60,6 +60,7 @@ const NO_STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
+    showSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),

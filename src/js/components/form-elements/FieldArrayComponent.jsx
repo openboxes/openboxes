@@ -56,7 +56,9 @@ class FieldArrayComponent extends Component {
       fieldsConfig, properties, fields, isPaginated,
     } = this.props;
     const AddButton = fieldsConfig.addButton;
-    const { maxTableHeight, virtualized, overflowStyle = 'scroll' } = fieldsConfig;
+    const {
+      maxTableHeight, virtualized, overflowStyle = 'scroll', showSaveIndicator,
+    } = fieldsConfig;
     const addRow = (row = {}, index = null, shouldScroll = true) => {
       if (index === null) {
         const table = document.querySelectorAll('[role="rowgroup"]')[0];
@@ -157,7 +159,10 @@ class FieldArrayComponent extends Component {
           <TableBodyComponent
             fields={fields}
             properties={{
-              ...properties, focusField: this.focusField, copyDown: this.copyDown,
+              ...properties,
+              focusField: this.focusField,
+              copyDown: this.copyDown,
+              showSaveIndicator,
             }}
             addRow={addRow}
             fieldsConfig={fieldsConfig}
