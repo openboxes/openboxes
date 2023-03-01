@@ -703,7 +703,7 @@ class AddItemsPage extends Component {
             }),
           );
           // In autosave, we don't modify the state, because
-          // lines which not passed the validation will be
+          // lines which have not passed the validation will be
           // deleted during users work
           if (!withStateChange) {
             // We want to disable saved line, so I am looking for product with the same
@@ -713,7 +713,7 @@ class AddItemsPage extends Component {
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               if (
                 _.includes(savedItemsProductCodes, item.product.productCode)
-                && parseInt(item.quantityRequested, 10)
+                && parseInt(item.quantityRequested, 10) > 0
               ) {
                 return { ...item, disabled: true };
               }
