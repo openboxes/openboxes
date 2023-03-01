@@ -105,7 +105,7 @@ class Shipment implements Comparable, Serializable {
 
     SortedSet receipts
 
-    Boolean disableRefresh = Boolean.FALSE
+    Boolean disableRefresh = Boolean.TRUE
 
     static transients = [
             "allShipmentItems",

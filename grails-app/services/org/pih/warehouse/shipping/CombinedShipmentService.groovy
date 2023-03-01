@@ -249,6 +249,7 @@ class CombinedShipmentService {
             }
         }
 
+        shipment.disableRefresh = false
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
