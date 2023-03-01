@@ -18,10 +18,6 @@ import org.hibernate.ObjectNotFoundException
 import org.hibernate.SessionFactory
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.Restrictions
-import org.pih.warehouse.core.GlAccount
-import org.pih.warehouse.core.Tag
-import org.pih.warehouse.product.Category
-import org.pih.warehouse.product.ProductCatalog
 
 class GenericApiService {
 
