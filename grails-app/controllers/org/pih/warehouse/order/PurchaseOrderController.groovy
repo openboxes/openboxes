@@ -86,7 +86,7 @@ class PurchaseOrderController {
             return
         }
 
-        redirect(action: addItems, id: order.id)
+        redirect(action: "addItems", id: order.id)
     }
 
 
