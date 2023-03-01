@@ -23,19 +23,12 @@ const Option = option => (
   </Tooltip>);
 
 const SelectedValue = option => (
-  <Tooltip
-    html={<div className="text-truncate">{option.name}</div>}
-    theme="dark"
-    disabled={!option.hasTranslatedName}
-    position="top-start"
-  >
-    <span className="d-flex align-items-center">
-      <span className="text-truncate">
-        {option.label || `${option.productCode} - ${option.translatedName || option.name}`}
-      </span>
-      &nbsp;{renderHandlingIcons(option?.handlingIcons)}
+  <span className="d-flex align-items-center">
+    <span className="text-truncate">
+      {option.label || `${option.productCode} - ${option.translatedName || option.name}`}
     </span>
-  </Tooltip>
+    {renderHandlingIcons(option?.handlingIcons)}
+  </span>
 );
 
 const ProductSelect = ({

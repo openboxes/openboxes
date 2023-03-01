@@ -107,7 +107,11 @@ class Select extends Component {
       multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
     } = this.props;
 
-    if (value?.translatedName) {
+    // TODO: We should change this in the future
+    // to check only hasTranslatedName, but for now
+    // we don't have hasTranslatedName in all mappings
+    // discussion connected to OBPIH-5148
+    if (value?.translatedName || value?.hasTranslatedName) {
       return (
         <div className="p-1">
           {value?.name}
@@ -124,7 +128,7 @@ class Select extends Component {
       );
     }
 
-    return (value && <div className="p-1">{value.label}</div>);
+    return (value && <div className="p-1">{value.label ?? value?.name}</div>);
   }
 
   handleChange(value) {
@@ -261,12 +265,21 @@ class Select extends Component {
       return null;
     };
 
+
+    /* We would like to see the tooltip when an item
+      has translatedName or when the showLabelTooltip
+      or showValueTooltip are truthy. We return false
+      when at least one property is true, because we need
+      an information when the tooltip should be disabled.
+     */
     const isTooltipDisabled = () => {
-      if (this.props.value?.translatedName) {
+      const { value: fieldValue } = this.props;
+
+      if (fieldValue?.translatedName || showLabelTooltip) {
         return false;
       }
 
-      return !showLabelTooltip || (showValueTooltip && this.props.value);
+      return !(showValueTooltip && fieldValue);
     };
 
     return (
