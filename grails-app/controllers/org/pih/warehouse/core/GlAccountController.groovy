@@ -9,7 +9,6 @@
 **/
 package org.pih.warehouse.core
 
-import grails.converters.JSON
 import org.pih.warehouse.product.Product
 
 class GlAccountController {
