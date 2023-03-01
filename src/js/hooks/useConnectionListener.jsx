@@ -9,11 +9,11 @@ import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useConnectionListener = () => {
   const timeoutId = useRef(null);
-  const previousOnlineStatus = useRef(navigator.onLine);
 
   const dispatch = useDispatch();
-  const { translate } = useSelector(state => ({
+  const { translate, online } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
+    online: state.connection.online,
   }));
   const setOnlineStatus = () => {
     dispatch(setOnline());
@@ -31,15 +31,15 @@ const useConnectionListener = () => {
   };
 
   const checkOnlineStatus = () => {
-    if (previousOnlineStatus.current !== navigator.onLine) {
+    timeoutId.current = null;
+
+    if (online !== navigator.onLine) {
       if (navigator.onLine) {
         setOnlineStatus();
       } else {
         setOfflineStatus();
       }
     }
-    timeoutId.current = null;
-    previousOnlineStatus.current = navigator.onLine;
   };
 
   const onChangedOnlineStatus = () => {
@@ -52,14 +52,13 @@ const useConnectionListener = () => {
   useEffect(() => {
     window.addEventListener('offline', onChangedOnlineStatus);
     window.addEventListener('online', onChangedOnlineStatus);
-
-    // cleanup if we unmount
     return () => {
       window.removeEventListener('offline', onChangedOnlineStatus);
       window.removeEventListener('online', onChangedOnlineStatus);
       clearTimeout(timeoutId.current);
+      timeoutId.current = null;
     };
-  }, []);
+  }, [online, translate]);
 };
 
 export default useConnectionListener;
