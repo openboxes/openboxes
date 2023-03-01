@@ -1143,6 +1143,7 @@ class ShipmentService {
             createShipmentEvent(shipmentInstance, shipDate, EventCode.SHIPPED, locationInstance)
 
             // Save updated shipment instance (adding an event and comment)
+            shipmentInstance.disableRefresh = false
             if (!shipmentInstance.hasErrors() && shipmentInstance.save()) {
 
                 // TODO only need to create a transaction if the source is a depot - (we need to think about this)
