@@ -10,29 +10,28 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import org.pih.warehouse.core.SelectOptionsService
 
 class SelectOptionsApiController {
 
-    SelectOptionsService selectOptionsService;
+    GenericApiService genericApiService;
 
     def glAccountOptions = {
-        def glAccounts = selectOptionsService.getGlAccountsOptions()
+        def glAccounts = genericApiService.getGlAccountsOptions()
         render([data: glAccounts] as JSON)
     }
 
     def tagOptions = {
-        def tags = selectOptionsService.getTagsOptions()
+        def tags = genericApiService.getTagsOptions()
         render([data: tags] as JSON)
     }
 
     def catalogOptions = {
-        def catalogs = selectOptionsService.getCatalogsOptions()
+        def catalogs = genericApiService.getCatalogsOptions()
         render([data: catalogs] as JSON)
     }
 
     def categoryOptions = {
-        def categories = selectOptionsService.getCategoryOptions()
+        def categories = genericApiService.getCategoryOptions()
         render([data: categories] as JSON)
     }
 }
