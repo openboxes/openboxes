@@ -273,7 +273,7 @@ class ProductService {
      * @return
      */
     List<Product> getProducts(Category category, List<Tag> tags, boolean includeInactive, Map params) {
-        return getProducts([category], [], tags, includeInactive, params)
+        return getProducts([category], [], tags, [], includeInactive, params)
     }
 
     /**
@@ -282,10 +282,11 @@ class ProductService {
      * @param category
      * @param catalogs
      * @param tags
+     * @param glAccounts
      * @param params
      * @return
      */
-    List<Product> getProducts(List<Category> categories, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
+    List<Product> getProducts(List<Category> categories, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, List<GlAccount> glAccounts, boolean includeInactive, Map params) {
         int max = params.max ? params.int("max") : 10
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
@@ -323,6 +324,11 @@ class ProductService {
                 }
             }
 
+            if (glAccounts) {
+                glAccount {
+                    'in'("id", glAccounts.collect { it.id })
+                }
+            }
 
             if (tagsInput) {
                 tags {

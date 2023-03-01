@@ -8,10 +8,10 @@
 * You must not remove this notice, or any other, from this software.
 **/
 package org.pih.warehouse.core
+
 import org.pih.warehouse.product.Product
 
 class GlAccountController {
-
     def index = {
         redirect(action: "list", params: params)
     }

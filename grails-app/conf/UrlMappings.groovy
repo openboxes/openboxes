@@ -65,6 +65,12 @@ class UrlMappings {
             action = [GET: "tagOptions"]
         }
 
+        // Gl account options for filters on product list page
+        "/api/glAccountOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "glAccountOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list"]

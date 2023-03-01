@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import queryString from 'query-string';
 
+import glAccountApi from 'api/services/GlAccountApi';
 import apiClient from 'utils/apiClient';
 
 
@@ -220,4 +221,9 @@ export const fetchProductsCatalogs = async () => {
 export const fetchProductsTags = async () => {
   const response = await apiClient.get('/openboxes/api/tagOptions');
   return response.data.data;
+};
+
+export const fetchProductsGlAccounts = async () => {
+  const { data } = await glAccountApi.getGlAccountOptions();
+  return data.data;
 };

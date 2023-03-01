@@ -18,7 +18,9 @@ const useProductsListTableData = (filterParams) => {
     state,
     sortingParams,
   }) => {
-    const { catalogId, categoryId, tagId } = filterParams;
+    const {
+      catalogId, categoryId, tagId, glAccountsId,
+    } = filterParams;
     return _.omitBy({
       offset: `${offset}`,
       max: `${state.pageSize}`,
@@ -27,6 +29,7 @@ const useProductsListTableData = (filterParams) => {
       catalogId: catalogId && catalogId.map(({ id }) => id),
       categoryId: categoryId && categoryId.map(({ id }) => id),
       tagId: tagId && tagId.map(({ id }) => id),
+      glAccountsId: glAccountsId && glAccountsId.map(({ id }) => id),
     }, (val) => {
       if (typeof val === 'boolean') {
         return !val;

@@ -9,6 +9,7 @@ import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
   fetchProductsCatalogs,
   fetchProductsCategories,
+  fetchProductsGlAccounts,
   fetchProductsTags,
 } from 'utils/option-utils';
 
@@ -18,6 +19,7 @@ const useProductFilters = () => {
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
+  const [glAccounts, setGlAccounts] = useState([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   const history = useHistory();
@@ -27,12 +29,29 @@ const useProductFilters = () => {
     history.push({ pathname });
   };
 
+  const setDefaultValue = (queryPropsParam, elementsList) => {
+    if (queryPropsParam) {
+      const idList = getParamList(queryPropsParam);
+      return elementsList
+        .filter(({ id }) => idList.includes(id))
+        .map(({ id, label }) => ({
+          id, label, name: label, value: id,
+        }));
+    }
+    return null;
+  };
+
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
     const defaultValues = Object.keys(filterFields)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
     const queryProps = queryString.parse(history.location.search);
+
+    const {
+      catalogId, tagId, categoryId, glAccountsId,
+    } = queryProps;
+
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.includeInactive) {
       defaultValues.includeInactive = queryProps.includeInactive;
@@ -40,46 +59,28 @@ const useProductFilters = () => {
     if (queryProps.includeCategoryChildren) {
       defaultValues.includeCategoryChildren = queryProps.includeCategoryChildren;
     }
-    // If there are no values for catalogs, tags or categories
+    // If there are no values for catalogs, tags, glAccounts or categories
     // then set default filters without waiting for those options to load
-    if (!queryProps.catalogId && !queryProps.tagId && !queryProps.categoryId) {
+    if (!catalogId && !tagId && !categoryId && !glAccountsId) {
       setDefaultFilterValues(defaultValues);
     }
-    const [categoryList, catalogList, tagList] = await Promise.all([
+    const [categoryList, catalogList, tagList, glAccountsList] = await Promise.all([
       fetchProductsCategories(),
       fetchProductsCatalogs(),
       fetchProductsTags(),
+      fetchProductsGlAccounts(),
     ]);
     setCatalogs(catalogList);
     setCategories(categoryList);
     setTags(tagList);
+    setGlAccounts(glAccountsList);
 
-    if (queryProps.catalogId) {
-      const catalogIdList = getParamList(queryProps.catalogId);
-      defaultValues.catalogId = catalogList
-        .filter(({ id }) => catalogIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-    if (queryProps.tagId) {
-      const tagIdList = getParamList(queryProps.tagId);
-      defaultValues.tagId = tagList
-        .filter(({ id }) => tagIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
-    if (queryProps.categoryId) {
-      const categoryIdList = getParamList(queryProps.categoryId);
-      defaultValues.categoryId = categoryList
-        .filter(({ id }) => categoryIdList.includes(id))
-        .map(({ id, label }) => ({
-          id, label, name: label, value: id,
-        }));
-    }
+    defaultValues.catalogId = setDefaultValue(catalogId, catalogList);
+    defaultValues.tagId = setDefaultValue(tagId, tagList);
+    defaultValues.categoryId = setDefaultValue(categoryId, categoryList);
+    defaultValues.glAccountsId = setDefaultValue(glAccountsId, glAccountsList);
 
-    if (queryProps.catalogId || queryProps.tagId || queryProps.categoryId) {
+    if (catalogId || tagId || categoryId || glAccountsId) {
       setDefaultFilterValues(defaultValues);
     }
     setFiltersInitialized(true);
@@ -95,6 +96,7 @@ const useProductFilters = () => {
       catalogId: { name: 'catalogId', accessor: 'id' },
       tagId: { name: 'tagId', accessor: 'id' },
       categoryId: { name: 'categoryId', accessor: 'id' },
+      glAccountsId: { name: 'glAccountsId', accessor: 'id' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
@@ -106,7 +108,7 @@ const useProductFilters = () => {
   };
 
   return {
-    defaultFilterValues, setFilterValues, categories, catalogs, tags, filterParams,
+    defaultFilterValues, setFilterValues, categories, catalogs, tags, glAccounts, filterParams,
   };
 };
 
