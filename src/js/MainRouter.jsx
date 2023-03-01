@@ -7,7 +7,6 @@ import connect from 'react-redux/es/connect/connect';
 
 import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
 import Router from 'components/Router';
-import withConnectionListener from 'hoc/withConnectionListener';
 
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
@@ -60,7 +59,7 @@ const mapStateToProps = state => ({
 
 export default withLocalize(connect(mapStateToProps, {
   fetchTranslations, fetchSessionInfo, fetchMenuConfig,
-})(withConnectionListener(MainRouter)));
+})(MainRouter));
 
 
 MainRouter.propTypes = {

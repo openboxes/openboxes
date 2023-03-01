@@ -1,7 +1,7 @@
 import { SET_OFFLINE, SET_ONLINE } from 'actions/types';
 
 const initialState = {
-  online: false,
+  online: navigator.onLine,
 };
 
 export default function (state = initialState, action) {

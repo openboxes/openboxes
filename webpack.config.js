@@ -113,7 +113,6 @@ module.exports = {
       src: SRC,
       components: path.resolve(SRC, 'components'),
       hooks: path.resolve(SRC, 'hooks'),
-      hoc: path.resolve(SRC, 'hoc'),
       reducers: path.resolve(SRC, 'reducers'),
       actions: path.resolve(SRC, 'actions'),
       consts: path.resolve(SRC, 'consts'),
