@@ -5,11 +5,11 @@ import Alert from 'react-s-alert';
 
 import NotificationType from 'consts/notificationTypes';
 
-const notification = type => ({ message, details, startIcon }) => {
+const notification = type => ({ message, details, icon }) => {
   const alertsProps = {
     customFields: {
       details,
-      startIcon,
+      icon,
     },
   };
   switch (type) {
@@ -18,7 +18,7 @@ const notification = type => ({ message, details, startIcon }) => {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
-          startIcon: alertsProps.customFields.startIcon ?? <RiCheckboxCircleLine />,
+          icon: alertsProps.customFields.icon ?? <RiCheckboxCircleLine />,
         },
       });
     case NotificationType.WARNING:
@@ -26,7 +26,7 @@ const notification = type => ({ message, details, startIcon }) => {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
-          startIcon: alertsProps.customFields.startIcon ?? <RiAlertLine />,
+          icon: alertsProps.customFields.icon ?? <RiAlertLine />,
         },
       });
     case NotificationType.ERROR_OUTLINED:
@@ -34,7 +34,7 @@ const notification = type => ({ message, details, startIcon }) => {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
-          startIcon: alertsProps.customFields.startIcon ?? <RiErrorWarningLine />,
+          icon: alertsProps.customFields.icon ?? <RiErrorWarningLine />,
         },
       });
     case NotificationType.ERROR_FILLED:
@@ -42,7 +42,7 @@ const notification = type => ({ message, details, startIcon }) => {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
-          startIcon: alertsProps.customFields.startIcon ?? <RiErrorWarningFill />,
+          icon: alertsProps.customFields.icon ?? <RiErrorWarningFill />,
         },
       });
     default:
@@ -50,7 +50,7 @@ const notification = type => ({ message, details, startIcon }) => {
         ...alertsProps,
         customFields: {
           ...alertsProps.customFields,
-          startIcon: alertsProps.customFields.startIcon ?? <RiInformationLine />,
+          icon: alertsProps.customFields.icon ?? <RiInformationLine />,
         },
       });
   }

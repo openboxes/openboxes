@@ -227,7 +227,7 @@ const Router = (props) => {
         />
       </div>
       <Alert
-        timeout={props.notificationDisappearTime}
+        timeout={props.notificationAutohideDelay}
         stack={{ limit: 3 }}
         contentTemplate={CustomAlert}
         position="top-right"
@@ -241,7 +241,7 @@ const Router = (props) => {
 const mapStateToProps = state => ({
   spinner: state.spinner.show,
   supportedActivities: state.session.supportedActivities,
-  notificationDisappearTime: state.session.notificationDisappearTime,
+  notificationAutohideDelay: state.session.notificationAutohideDelay,
 });
 
 export default connect(mapStateToProps, {})(Router);
@@ -249,5 +249,5 @@ export default connect(mapStateToProps, {})(Router);
 Router.propTypes = {
   spinner: PropTypes.bool.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
-  notificationDisappearTime: PropTypes.number.isRequired,
+  notificationAutohideDelay: PropTypes.number.isRequired,
 };

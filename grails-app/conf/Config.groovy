@@ -1301,7 +1301,9 @@ openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
 // Notifications configuration
-openboxes.notification.disappear.time.ms = 8000
+
+// delay is in ms
+openboxes.client.notification.autohide.delay = 8000
 
 // Global megamenu configuration
 

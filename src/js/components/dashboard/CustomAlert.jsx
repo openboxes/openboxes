@@ -17,9 +17,9 @@ const CustomAlert = ({
 }) => {
   // Show default start icon for already existing Alerts,
   // which are not called by notification(), but Alert
-  const getStartIcon = () => {
-    if (customFields?.startIcon) {
-      return customFields.startIcon;
+  const getIcon = () => {
+    if (customFields?.icon) {
+      return customFields.icon;
     }
     return defaultStartIcon[condition ?? NotificationType.INFO];
   };
@@ -28,7 +28,7 @@ const CustomAlert = ({
     <div className={`${classNames} ${!customFields?.details ? 'no-details' : ''}`} id={id} style={styles}>
       <div className="s-alert-box-inner">
         <div className="alert-start-icon">
-          {getStartIcon()}
+          {getIcon()}
         </div>
         <span className="alert-title">{message}</span>
         {customFields?.details && <span className="alert-details">{customFields?.details}</span>}
@@ -55,7 +55,7 @@ CustomAlert.propTypes = {
   /** customFields can contain anything in the future - for now we use details and startIcon */
   customFields: PropTypes.shape({
     details: PropTypes.string.isRequired,
-    startIcon: PropTypes.element.isRequired,
+    icon: PropTypes.element.isRequired,
   }).isRequired,
   handleClose: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,

@@ -93,7 +93,7 @@ class ApiController {
         def displayDateFormat = grailsApplication.config.openboxes.display.date.format
         def displayDateDefaultValue = grailsApplication.config.openboxes.display.date.defaultValue
         // Notification disappear time in miliseconds
-        def notificationDisappearTime = grailsApplication.config.openboxes.notification.disappear.time.ms
+        def notificationAutohideDelay = grailsApplication.config.openboxes.client.notification.autohide.delay
 
         if (session.useDebugLocale) {
 
@@ -208,7 +208,7 @@ class ApiController {
                 localizationModeLocale   : localizationModeLocale,
                 displayDateFormat        : displayDateFormat,
                 displayDateDefaultValue  : displayDateDefaultValue,
-                notificationDisappearTime: notificationDisappearTime,
+                notificationAutohideDelay: notificationAutohideDelay,
             ],
         ] as JSON)
     }

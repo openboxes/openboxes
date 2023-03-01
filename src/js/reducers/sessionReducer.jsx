@@ -76,7 +76,7 @@ const initialState = {
   localizationModeLocale: 'ach',
   displayDateFormat: 'MMM DD, yyyy',
   displayDateDefaultValue: '-',
-  notificationDisappearTime: 8000,
+  notificationAutohideDelay: 8000,
 };
 
 export default function (state = initialState, action) {
@@ -118,7 +118,7 @@ export default function (state = initialState, action) {
         localizationModeLocale: _.get(action, 'payload.data.data.localizationModeLocale', 'ach'),
         displayDateFormat: _.get(action, 'payload.data.data.displayDateFormat', 'MMM DD, yyyy'),
         displayDateDefaultValue: _.get(action, 'payload.data.data.displayDateDefaultValue', '-'),
-        notificationDisappearTime: _.get(action, 'payload.data.data.notificationDisappearTime', 8000),
+        notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
       };
     case FETCH_MENU_CONFIG:
       return {

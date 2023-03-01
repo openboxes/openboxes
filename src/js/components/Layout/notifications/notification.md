@@ -4,7 +4,7 @@
 notification is implemented as curried function - as argument it expects `type` of the notification which is from the:
 `NotificationType` enum.
 
-It returns a function that expects `message` (required), `details`, `startIcon` as arguments to then call the proper `Alert` function from `react-s-alert` package.
+It returns a function that expects `message` (required), `details`, `icon` as arguments to then call the proper `Alert` function from `react-s-alert` package.
 
                                                                                                         
 #### Examples:
@@ -12,7 +12,7 @@ It returns a function that expects `message` (required), `details`, `startIcon` 
  notification(NotificationType.INFO)({
     message: 'Lost connection',
     details: 'You are now offline. The changes you made will not be saved',
-    startIcon: <RiWifiOffLine />,
+    icon: <RiWifiOffLine />,
 });
 ````
 The above generates the Alert of info type (gray border) with message (title [bold]) of "Lost connection" and the details of the message with the start icon of Wifi icon.
@@ -24,6 +24,6 @@ The above generates the Alert of info type (gray border) with message (title [bo
 });
 ````
 
-The above generates the Alert of type success. We have not provided the `startIcon` prop, so the default will be: `<RiCheckboxCircleLine />`
+The above generates the Alert of type success. We have not provided the `icon` prop, so the default will be: `<RiCheckboxCircleLine />`
 
 
