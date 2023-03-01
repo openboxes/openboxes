@@ -235,6 +235,8 @@ class Product implements Comparable, Serializable {
 
     ProductGroup productFamily
 
+    static belongsTo = ProductGroup
+
     static transients = ["associations",
                          "rootCategory",
                          "categoriesList",
