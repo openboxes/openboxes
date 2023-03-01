@@ -264,4 +264,29 @@ class ProductApiController extends BaseDomainApiController {
         def demand = forecastingService.getDemand(origin, destination, product)
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
     }
+
+    def catalogOptions = {
+        def catalogs = ProductCatalog.list(sort: "name").collect {
+            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
+        }
+
+        render([data: catalogs] as JSON)
+    }
+
+    def categoryOptions = {
+        def categories = Category.list().sort().collect {
+            [id: it.id, label: it.getHierarchyAsString(" > ")]
+        }
+
+        render([data: categories] as JSON)
+
+    }
+
+    def tagOptions = {
+        def tags = Tag.list(sort: "tag").collect {
+            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
+        }
+
+        render([data: tags] as JSON)
+    }
 }
