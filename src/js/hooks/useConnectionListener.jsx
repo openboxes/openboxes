@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
+import { RiWifiLine, RiWifiOffLine } from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { setOffline, setOnline } from 'actions';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useConnectionListener = () => {
@@ -18,17 +20,31 @@ const useConnectionListener = () => {
   }));
   const setOnlineStatus = () => {
     dispatch(setOnline());
-    Alert.success(translate(
-      'react.notification.connectivity.online.message',
-      'You are back online. You can now continue your work.',
-    ), { timeout: 10000 });
+    notification(NotificationType.SUCCESS)({
+      message: translate(
+        'react.notification.connectivity.online.label',
+        'Connection restored.',
+      ),
+      details: translate(
+        'react.notification.connectivity.online.message',
+        'You are back online. You can now continue your work.',
+      ),
+      icon: <RiWifiLine />,
+    });
   };
   const setOfflineStatus = () => {
     dispatch(setOffline());
-    Alert.warning(translate(
-      'react.notification.connectivity.offline.message',
-      'You are now offline. Your changes will be saved when the connection is restored.',
-    ), { timeout: 10000 });
+    notification(NotificationType.INFO)({
+      message: translate(
+        'react.notification.connectivity.offline.label',
+        'Lost Connection',
+      ),
+      details: translate(
+        'react.notification.connectivity.offline.message',
+        'You are now offline. Your changes will be saved when the connection is restored.',
+      ),
+      icon: <RiWifiOffLine />,
+    });
   };
 
   const checkOnlineStatus = () => {
