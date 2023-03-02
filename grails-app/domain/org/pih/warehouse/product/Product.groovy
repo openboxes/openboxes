@@ -233,6 +233,10 @@ class Product implements Comparable, Serializable {
 
     String color
 
+    ProductGroup productFamily
+
+    static belongsTo = ProductGroup
+
     static transients = ["associations",
                          "rootCategory",
                          "categoriesList",
@@ -321,6 +325,7 @@ class Product implements Comparable, Serializable {
         updatedBy(nullable: true)
         glAccount(nullable: true)
         color(nullable: true)
+        productFamily(nullable: true)
     }
 
     /**

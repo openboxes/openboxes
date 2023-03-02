@@ -14,18 +14,21 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            
+
             <div class="summary">
                 <h1 class="title"><warehouse:message code="productGroups.label"/></h1>
-
             </div>
-
 
             <div class="buttonBar">
-                <g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-                <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+                <g:link class="button" action="list">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"/>&nbsp;
+                    <warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroups.label')]"/>
+                </g:link>
+                <g:link class="button" action="create">
+                    <img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
+                    <warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label')]"/>
+                </g:link>
             </div>
-
 
             <div class="yui-gf">
                 <div class="yui-u first">
@@ -90,8 +93,8 @@
                 </div>
             </div>
 
-        
+
         </div>
-        
+
     </body>
 </html>

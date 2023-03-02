@@ -1,4 +1,13 @@
-<div id="products">
+<g:set var="randomIdentifier" value="${org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8)}"/>
+<g:set var="dynamicContentId" value="products-table-wrapper-${randomIdentifier}"/>
+<div id="${dynamicContentId}">
+    <g:if test="${flash.error}">
+        <div class="errors p-1">${flash.error}</div>
+    </g:if>
+    <%
+        // Prevent flash messages displaying twice if there is no redirect
+        flash.error = null
+    %>
     <table id="productTable" class="zebra">
         <thead>
         <tr class="">
@@ -37,11 +46,11 @@
                     <span class="fade">${product?.vendorCode }</span>
                 </td>
                 <td class="middle">
-                    <g:link controller="product" action="edit" id="${product.id}" class="button icon edit">
-                        <warehouse:message code="default.button.edit.label"/>
-                    </g:link>
-                    <g:remoteLink controller="productGroup" action="deleteProductFromProductGroup" update="products" class="button icon trash"
-                                  id="${productGroup.id}" params="['product.id':product.id]">
+                    <g:remoteLink controller="productGroup" action="deleteProductFromProductGroup"
+                                  update="${dynamicContentId}"
+                                  class="button"
+                                  id="${productGroup.id}" params="['product.id':product.id, isProductFamily: isProductFamily]">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                         <warehouse:message code="default.button.delete.label"/>
                     </g:remoteLink>
                 </td>
@@ -57,14 +66,19 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="8">
+                <td colspan="7">
                     <g:formRemote id="addProductToProductGroup" name="addProductToProductGroup"
-                                  update="products" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()"
+                                  update="${dynamicContentId}" onSuccess="onSuccess(data,textStatus)" onComplete="onComplete()"
                                   url="[controller: 'productGroup', action:'addProductToProductGroup']">
-                        <input name="id" type="hidden" value="${productGroup?.id}" />
-                        <g:autoSuggest id="product" name="product" jsonUrl="${request.contextPath }/json/findProductByName" width="500" styleClass="text"
+                        <g:hiddenField name="id" type="hidden" value="${productGroup?.id}" />
+                        <g:hiddenField name="isProductFamily" value="${isProductFamily?:false}"/>
+                        <g:autoSuggest id="product-${randomIdentifier}" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
+                                       styleClass="text" width="900%"
                                        placeholder="${g.message(code:'productGroup.addProduct.label')}"/>
-                        <button  class="button icon add">${warehouse.message(code:'default.button.add.label')}</button>
+                        <button  class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'add.png')}" />&nbsp;
+                            ${warehouse.message(code:'default.button.add.label')}
+                        </button>
                     </g:formRemote>
                 </td>
             </tr>

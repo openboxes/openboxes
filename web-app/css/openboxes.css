@@ -1158,7 +1158,7 @@ button.action-btn, button.previous, button.next {
 /* Product Details box */
 /*#product-details-box { width: 260px;}*/
 .summary {
-    padding: 5px 5px 5px 5px;
+    padding: 15px 15px 15px 15px;
     background-color: #f5f5f5;
     border-bottom: 1px solid #aaa;
 }

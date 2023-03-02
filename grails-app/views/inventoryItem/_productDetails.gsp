@@ -251,6 +251,23 @@
 
                 </td>
             </tr>
+            <tr class="prop">
+                <td class="label left">
+                    <label><warehouse:message code="product.productFamily.label"/></label>
+                </td>
+                <td class="value">
+                    <g:if test="${productInstance?.productFamily }">
+                        <g:link controller="productGroup" action="edit" id="${productInstance?.productFamily?.id }">
+                            ${productInstance?.productFamily?.name }
+                        </g:link>
+                    </g:if>
+                    <g:else>
+                        <g:link controller="product" action="edit" id="${productInstance.id }" fragment="ui-tabs-1">
+                            <warehouse:message code="default.button.edit.label"/>
+                        </g:link>
+                    </g:else>
+                </td>
+            </tr>
             <g:if test="${productInstance?.glAccount}">
                 <tr class="prop">
                     <td class="label">
@@ -285,26 +302,6 @@
                     </td>
                 </tr>
             </g:if>
-            <tr class="prop">
-                <td class="label left">
-                    <label><warehouse:message code="productGroups.label"/></label>
-                </td>
-                <td class="value">
-                    <g:if test="${productInstance?.productGroups }">
-                        <g:each var="productGroup" in="${productInstance?.productGroups }">
-                            <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
-                                ${productGroup?.name }
-                            </g:link>
-                        </g:each>
-                    </g:if>
-                    <g:else>
-                        <g:link controller="product" action="edit" id="${productInstance.id }" fragment="tabs-productGroups">
-                            <warehouse:message code="default.button.manage.label"/>
-                        </g:link>
-                    </g:else>
-                </td>
-            </tr>
-
             <g:set var="status" value="${0 }"/>
             <g:each var="productAttribute" in="${productInstance?.attributes}">
                 <tr class="prop">
