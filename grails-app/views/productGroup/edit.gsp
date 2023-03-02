@@ -27,7 +27,9 @@
 		</g:hasErrors>
 
         <div class="summary">
-			<h1 class="title"><g:message code="default.edit.label" args="[g.message(code: 'productGroup.label')]"/></h1>
+			<h1 class="title">
+				${productGroupInstance?.name}
+			</h1>
         </div>
 
 		<div class="buttonBar">
@@ -45,6 +47,7 @@
                 <ul>
                     <li><a href="#product-group-tab"><g:message code="productGroup.label"/></a></li>
                     <li><a href="#product-group-products-tab"><g:message code="productGroup.products.label"/></a></li>
+                    <li><a href="#product-group-siblings-tab"><g:message code="productGroup.siblings.label"/></a></li>
                 </ul>
                 <div id="product-group-tab">
 					<g:form method="post" action="update">
@@ -105,7 +108,13 @@
 				<div id="product-group-products-tab">
 					<div class="box">
 						<h2><warehouse:message code="productGroup.products.label" default="Products"/></h2>
-						<g:render template="products" model="[productGroup: productGroupInstance, products:productGroupInstance?.products]"/>
+						<g:render template="products" model="[productGroup: productGroupInstance, products: productGroupInstance?.products, isProductFamily: false]"/>
+					</div>
+				</div>
+				<div id="product-group-siblings-tab">
+					<div class="box">
+						<h2><warehouse:message code="productGroup.products.label" default="Products"/></h2>
+						<g:render template="products" model="[productGroup: productGroupInstance, products: productGroupInstance?.siblings, isProductFamily: true]"/>
 					</div>
 				</div>
 			</div>
@@ -117,7 +126,11 @@
 		    $(this).closest("form").submit();
 		});
 
-		$(".tabs").tabs({});
+		$(".tabs").tabs({
+			cookie : {
+                expires : 1
+			}
+		});
 	});
 </script>
 
