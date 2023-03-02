@@ -66,7 +66,7 @@ export default {
       options: tags,
     }),
   },
-  dateCreatedAfter: {
+  createdAfter: {
     type: DateFilter,
     attributes: {
       label: 'react.productsList.filters.createdAfter.label',
@@ -75,7 +75,7 @@ export default {
       filterElement: true,
     },
   },
-  dateCreatedBefore: {
+  createdBefore: {
     type: DateFilter,
     attributes: {
       label: 'react.productsList.filters.createdBefore.label',
