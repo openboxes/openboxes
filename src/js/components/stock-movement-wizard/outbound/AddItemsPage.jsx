@@ -709,14 +709,27 @@ class AddItemsPage extends Component {
             // We want to disable saved line, so I am looking for product with the same
             // code and quantity higher than 0 in response
             // (to avoid disabling new line with the same productCode)
-            const savedItemsProductCodes = lineItemsBackendData.map(item => item.productCode);
+            // TODO: Add new api endpoints in StockMovementItemApiController
+            // for POST and PUT (create and update) that returns only updated items data
+            // and separate autosave logic from save button logic
+            const savedItems = _.intersectionBy(lineItemsBackendData, itemsToSave, 'product.id');
+            const savedItemsProductCodes = savedItems.map(item => item.productCode);
+            const savedItemsIds = savedItems.map(item => item.id);
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
+              // In this case we check if we're editing item
+              // We don't have to disable edited item, because this
+              // line is disabled by default
+              if (_.includes(savedItemsIds, item.id)) {
+                return item;
+              }
+
               if (
                 _.includes(savedItemsProductCodes, item.product.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
               ) {
                 return { ...item, disabled: true };
               }
+
               return item;
             });
             this.setState({ values: { ...this.state.values, lineItems: lineItemsAfterSave } });
