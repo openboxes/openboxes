@@ -1,6 +1,13 @@
 <g:set var="randomIdentifier" value="${org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(8)}"/>
 <g:set var="dynamicContentId" value="products-table-wrapper-${randomIdentifier}"/>
 <div id="${dynamicContentId}">
+    <g:if test="${flash.error}">
+        <div class="errors p-1">${flash.error}</div>
+    </g:if>
+    <%
+        // Prevent flash messages displaying twice if there is no redirect
+        flash.error = null
+    %>
     <table id="productTable" class="zebra">
         <thead>
         <tr class="">
@@ -65,7 +72,6 @@
                                   url="[controller: 'productGroup', action:'addProductToProductGroup']">
                         <g:hiddenField name="id" type="hidden" value="${productGroup?.id}" />
                         <g:hiddenField name="isProductFamily" value="${isProductFamily?:false}"/>
-                        ${isProductFamily}
                         <g:autoSuggest id="product-${randomIdentifier}" name="product" jsonUrl="${request.contextPath }/json/findProductByName"
                                        styleClass="text" width="900%"
                                        placeholder="${g.message(code:'productGroup.addProduct.label')}"/>

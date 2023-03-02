@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 class ProductGroupController {
 
     def productService
+    ProductGroupService productGroupService
 
     def index = {
         redirect(action: "list", params: params)
@@ -234,19 +235,14 @@ class ProductGroupController {
      */
     def addProductToProductGroup = {
         Boolean isProductFamily = params.boolean("isProductFamily") ?: false
-        def productGroup = ProductGroup.get(params.id)
-        if (productGroup) {
-            def product = Product.get(params.product.id)
-            if (product) {
-                if (isProductFamily) {
-                    productGroup.addToSiblings(product)
-                } else {
-                    productGroup.addToProducts(product)
-                }
-                productGroup.save()
-            }
+        ProductGroup productGroup = null
+        try {
+            productGroup = productGroupService.addProductToProductGroup(params.id, params.product?.id, isProductFamily)
+        } catch (IllegalArgumentException e) {
+            productGroup = ProductGroup.read(params.id)
+            flash.error = e.message
         }
-        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily?productGroup?.siblings:productGroup.products])
+        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily?productGroup?.siblings:productGroup?.products])
     }
 
     /**
