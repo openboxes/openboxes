@@ -85,8 +85,9 @@ const NO_STOCKLIST_FIELDS = {
         headerAlign: 'left',
         flexWidth: '9.5',
         getDynamicAttr: ({
-          fieldValue, rowIndex, rowCount, originId, focusField,
+          fieldValue, rowIndex, rowCount, originId, focusField, values, saveProgress,
         }) => ({
+          onBlur: () => saveProgress(values),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -107,10 +108,13 @@ const NO_STOCKLIST_FIELDS = {
         },
         fieldKey: '',
         getDynamicAttr: ({
-          fieldValue, updateRow, values, rowIndex,
+          fieldValue, updateRow, values, rowIndex, saveProgress,
         }) => ({
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            saveProgress(values);
+          },
         }),
       },
       recipient: {
@@ -121,7 +125,7 @@ const NO_STOCKLIST_FIELDS = {
         fieldKey: '',
         getDynamicAttr: ({
           fieldValue, recipients, addRow, rowCount, rowIndex, getSortOrder,
-          updateTotalCount, updateRow, values,
+          updateTotalCount, updateRow, values, saveProgress,
         }) => ({
           options: recipients,
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
@@ -137,7 +141,10 @@ const NO_STOCKLIST_FIELDS = {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            saveProgress(values);
+          },
         }),
         attributes: {
           labelKey: 'name',
@@ -183,8 +190,9 @@ const STOCKLIST_FIELDS = {
         headerAlign: 'left',
         flexWidth: '9',
         getDynamicAttr: ({
-          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
         }) => ({
+          onBlur: () => saveProgress(values),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
@@ -203,6 +211,9 @@ const STOCKLIST_FIELDS = {
         attributes: {
           type: 'number',
         },
+        getDynamicAttr: ({ saveProgress, values }) => ({
+          onBlur: () => saveProgress(values),
+        }),
       },
       quantityRequested: {
         type: TextField,
@@ -213,7 +224,8 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({
-          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount, updateRow, values,
+          addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
+          updateRow, values, saveProgress,
         }) => ({
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
@@ -227,7 +239,10 @@ const STOCKLIST_FIELDS = {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder() });
           } : null,
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            saveProgress(values);
+          },
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -250,6 +265,7 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      isSaveCompleted: true,
     };
 
     this.props.showSpinner();
@@ -302,7 +318,9 @@ class AddItemsPage extends Component {
    */
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item =>
-      !item.statusCode && item.quantityRequested && item.quantityRequested !== '0' && item.product);
+      !item.statusCode &&
+      parseInt(item.quantityRequested, 10) > 0 &&
+      item.product && !item.disabled);
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -658,9 +676,10 @@ class AddItemsPage extends Component {
   /**
    * Saves list of requisition items in current step (without step change). Used to export template.
    * @param {object} itemCandidatesToSave
+   * @param {boolean} withStateChange
    * @public
    */
-  saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
+  saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
@@ -676,12 +695,46 @@ class AddItemsPage extends Component {
             lineItems,
             val => ({
               ...val,
+              disabled: true,
               product: {
                 ...val.product,
                 label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
               },
             }),
           );
+          // In autosave, we don't modify the state, because
+          // lines which have not passed the validation will be
+          // deleted during users work
+          if (!withStateChange) {
+            // We want to disable saved line, so I am looking for product with the same
+            // code and quantity higher than 0 in response
+            // (to avoid disabling new line with the same productCode)
+            // TODO: Add new api endpoints in StockMovementItemApiController
+            // for POST and PUT (create and update) that returns only updated items data
+            // and separate autosave logic from save button logic
+            const savedItems = _.intersectionBy(lineItemsBackendData, itemsToSave, 'product.id');
+            const savedItemsProductCodes = savedItems.map(item => item.productCode);
+            const savedItemsIds = savedItems.map(item => item.id);
+            const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
+              // In this case we check if we're editing item
+              // We don't have to disable edited item, because this
+              // line is disabled by default
+              if (_.includes(savedItemsIds, item.id)) {
+                return item;
+              }
+
+              if (
+                _.includes(savedItemsProductCodes, item.product.productCode)
+                && parseInt(item.quantityRequested, 10) > 0
+              ) {
+                return { ...item, disabled: true };
+              }
+
+              return item;
+            });
+            this.setState({ values: { ...this.state.values, lineItems: lineItemsAfterSave } });
+            return;
+          }
 
           this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
 
@@ -694,6 +747,14 @@ class AddItemsPage extends Component {
 
     return Promise.resolve();
   }
+
+  saveProgress = (values) => {
+    this.setState({ isSaveCompleted: false });
+
+    this.saveRequisitionItemsInCurrentStep(values.lineItems, false).then(() => {
+      this.setState({ isSaveCompleted: true });
+    });
+  };
 
   /**
    * Saves list of requisition items in current step (without step change).
@@ -1037,6 +1098,7 @@ class AddItemsPage extends Component {
                   updateRow: this.updateRow,
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
+                  saveProgress: this.saveProgress,
                 }))}
               </div>
               <div className="submit-buttons">
@@ -1058,7 +1120,7 @@ class AddItemsPage extends Component {
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
                     values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
-                    invalid || showOnly
+                    invalid || showOnly || !this.state.isSaveCompleted
                   }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
