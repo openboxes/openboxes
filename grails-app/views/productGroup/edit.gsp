@@ -125,12 +125,9 @@
 		$("#category").change(function() {
 		    $(this).closest("form").submit();
 		});
-
-		$(".tabs").tabs({
-			cookie : {
-                expires : 1
-			}
-		});
+		// Do not set cookie here, because the isProductFamily param is then
+		// wrongly recognized by the Products and Siblings tabs
+		$(".tabs").tabs({});
 	});
 </script>
 

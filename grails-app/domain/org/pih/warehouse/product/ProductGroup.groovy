@@ -25,7 +25,7 @@ class ProductGroup implements Comparable, Serializable {
     Date lastUpdated
 
     static hasMany = [products: Product, siblings: Product]
-    static mappedBy = [products: "productGroups", siblings: 'productFamily']
+    static mappedBy = [products: "productGroups", siblings: "productFamily"]
     static mapping = {
         id generator: 'uuid'
         products joinTable: [name: 'product_group_product', column: 'product_id', key: 'product_group_id']

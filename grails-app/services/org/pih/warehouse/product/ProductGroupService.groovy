@@ -18,7 +18,8 @@ class ProductGroupService {
         ProductGroup productGroup = ProductGroup.get(productGroupId)
         Product product = Product.get(productId)
         if (productGroup && product) {
-            if (product.productFamily) {
+            // If we are adding product family to product and it already has one, throw an exception
+            if (isProductFamily && product.productFamily) {
                 throw new IllegalArgumentException(g.message(code: "productGroup.productFamily.duplicate.error", default: "This product already has a product family"))
             }
             isProductFamily ? productGroup.addToSiblings(product) : productGroup.addToProducts(product)

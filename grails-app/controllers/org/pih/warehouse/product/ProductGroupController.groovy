@@ -242,7 +242,7 @@ class ProductGroupController {
             productGroup = ProductGroup.read(params.id)
             flash.error = e.message
         }
-        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily?productGroup?.siblings:productGroup?.products])
+        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily ? productGroup?.siblings : productGroup?.products])
     }
 
     /**
@@ -265,7 +265,7 @@ class ProductGroupController {
             response.status = 404
         }
 
-        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily?productGroup?.siblings:productGroup.products])
+        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily ? productGroup?.siblings : productGroup.products])
     }
 
 }
