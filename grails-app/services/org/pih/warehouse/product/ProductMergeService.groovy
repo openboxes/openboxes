@@ -26,11 +26,12 @@ class ProductMergeService {
 
     def inventoryService
     def productAvailabilityService
+    def requisitionService
 
     /**
      * Preforms product swapping for a product pairs passed as params
      * */
-    def mergeProduct(Product primary, Product obsolete) {
+    def mergeProduct(String primaryId, String obsoleteId) {
         /**
          * ================================
          * === Swap Product's relations ===
@@ -76,6 +77,9 @@ class ProductMergeService {
          * - OrderSummary - product merge should not affect the order summary data since it is not product bound
          *
          * */
+
+        Product primary = Product.get(primaryId)
+        Product obsolete = Product.get(obsoleteId)
 
         /**
          * SWAP TRIVIAL RELATIONS
@@ -435,6 +439,32 @@ class ProductMergeService {
                     eq("productCode", params.obsoleteProductCode)
                 }
             }
+        }
+    }
+
+    def validateProducts(String primaryId, String obsoleteId) {
+        Product primary = Product.get(primaryId)
+        if (!primary) {
+            throw new IllegalArgumentException("No Product found with ID ${primaryId}")
+        }
+
+        Product obsolete = Product.get(obsoleteId)
+        if (!obsolete) {
+            throw new IllegalArgumentException("No Product found with ID ${obsoleteId}")
+        }
+
+        if (primary == obsolete) {
+            throw new IllegalArgumentException("Cannot merge the product with itself")
+        }
+
+        def primaryRequisitionItems = requisitionService.getPendingRequisitionItems(primary)
+        if (primaryRequisitionItems.size() > 0) {
+            throw new IllegalArgumentException("Primary product has pending stock movements. Please finish these stock movements before merging products.")
+        }
+
+        def obsoleteRequisitionItems = requisitionService.getPendingRequisitionItems(obsolete)
+        if (obsoleteRequisitionItems.size() > 0) {
+            throw new IllegalArgumentException("Obsolete product has pending stock movements. Please finish these stock movements before merging products.")
         }
     }
 }

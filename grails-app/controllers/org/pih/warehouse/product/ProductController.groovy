@@ -1117,23 +1117,12 @@ class ProductController {
         if (!enabled) {
             throw new IllegalArgumentException("Merge products feature is not enabled")
         }
-        Product primaryProduct = Product.get(params.primaryProduct)
-        Product obsoleteProduct = Product.get(params.obsoleteProduct)
 
-        if (!primaryProduct) {
-            throw new IllegalArgumentException("No Product found with ID ${params.primaryProduct}")
-        }
-        if (!obsoleteProduct) {
-            throw new IllegalArgumentException("No Product found with ID ${params.obsoleteProduct}")
-        }
+        productMergeService.validateProducts(params.primaryProduct, params.obsoleteProduct)
 
-        if (primaryProduct == obsoleteProduct) {
-            throw new IllegalArgumentException("Cannot merge the product with itself")
-        }
+        productMergeService.mergeProduct(params.primaryProduct, params.obsoleteProduct)
 
-        productMergeService.mergeProduct(primaryProduct, obsoleteProduct)
-
-        flash.message = "${obsoleteProduct.productCode} Product merge to ${primaryProduct.productCode} has succeeded. " +
+        flash.message = "${params.obsoleteProduct} Product merge to ${params.primaryProduct} has succeeded. " +
             "There are currently running refresh data jobs in the background, that can take some time to process."
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
     }
