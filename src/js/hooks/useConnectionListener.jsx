@@ -11,9 +11,10 @@ const useConnectionListener = () => {
   const timeoutId = useRef(null);
 
   const dispatch = useDispatch();
-  const { translate, online } = useSelector(state => ({
+  const { translate, online, connectionTimeout } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     online: state.connection.online,
+    connectionTimeout: state.session.connectionTimeout,
   }));
   const setOnlineStatus = () => {
     dispatch(setOnline());
@@ -44,7 +45,7 @@ const useConnectionListener = () => {
 
   const onChangedOnlineStatus = () => {
     if (!timeoutId.current) {
-      timeoutId.current = setTimeout(checkOnlineStatus, 5000);
+      timeoutId.current = setTimeout(checkOnlineStatus, connectionTimeout);
     }
   };
 

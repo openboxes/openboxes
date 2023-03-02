@@ -164,6 +164,7 @@ class ApiController {
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
         def logoUrl = location?.logo ? "${createLink(controller: 'location', action: 'viewLogo', id: location?.id)}" : grailsApplication.config.openboxes.logo.url
         def locales = grailsApplication.config.openboxes.locale.supportedLocales
+        def connectionTimeout = grailsApplication.config.openboxes.connection.timeout
         def supportedLocales = locales.collect {
             def name = new Locale(it).getDisplayName()
             [code: it, name: name]
@@ -209,6 +210,7 @@ class ApiController {
                 displayDateFormat        : displayDateFormat,
                 displayDateDefaultValue  : displayDateDefaultValue,
                 notificationAutohideDelay: notificationAutohideDelay,
+                connectionTimeout        : connectionTimeout
             ],
         ] as JSON)
     }
