@@ -24,11 +24,12 @@ const ProductsListTable = ({
   // Columns for react-table
   const columns = useMemo(() => [
     {
-      Header: <Translate id="react.productsList.column.active.label" defaultMessage="Active" />,
+      Header: <Translate id="react.productsList.column.status.label" defaultMessage="Status" />,
       accessor: 'active',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
       maxWidth: 150,
+      fixed: true,
       Cell: row =>
         (<StatusIndicator
           variant={row.original.active ? 'success' : 'danger'}
@@ -42,6 +43,7 @@ const ProductsListTable = ({
       headerClassName: 'header justify-content-center',
       Cell: row => <TableCell {...row} link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`} />,
       maxWidth: 150,
+      fixed: true,
     },
     {
       Header: <Translate id="react.productsList.column.name.label" defaultMessage="Name" />,
@@ -49,6 +51,7 @@ const ProductsListTable = ({
       className: 'active-circle',
       headerClassName: 'header',
       sortable: false,
+      fixed: true,
       Cell: row =>
         (<TableCell
           {...row}
@@ -63,6 +66,32 @@ const ProductsListTable = ({
       Header: <Translate id="react.productsList.filters.category.label" defaultMessage="Category" />,
       accessor: 'category',
       Cell: row => <TableCell {...row} tooltip />,
+    },
+    {
+      Header: <Translate id="react.productsList.filters.glAccount.label" defaultMessage="GL Account" />,
+      accessor: 'glAccount',
+      Cell: row =>
+        (<TableCell
+          {...row}
+          tooltip
+          value={row.value ? `${row.value?.code} - ${row.value?.name}` : null}
+        />),
+    },
+    {
+      Header: <Translate id="react.productsList.filters.catalog.label" defaultMessage="Formulary" />,
+      accessor: 'productCatalogs',
+      Cell: row =>
+        (<TableCell
+          {...row}
+          tooltip
+          value={row.value.map(catalog => catalog.name).join(', ')}
+        />),
+    },
+    {
+      Header: <Translate id="react.productsList.column.dateCreated.label" defaultMessage="Created on" />,
+      accessor: 'dateCreated',
+      maxWidth: 200,
+      Cell: row => <DateCell {...row} />,
     },
     {
       Header: <Translate id="react.productsList.column.updatedBy.label" defaultMessage="Updated by" />,

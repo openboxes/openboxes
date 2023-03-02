@@ -1,4 +1,5 @@
 import CheckboxField from 'components/form-elements/CheckboxField';
+import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 
 export default {
@@ -23,7 +24,7 @@ export default {
     attributes: {
       valueKey: 'id',
       placeholder: 'react.productsList.filters.glAccount.label',
-      defaultPlaceholder: 'Gl Account',
+      defaultPlaceholder: 'GL Account',
       multi: true,
       closeMenuOnSelect: false,
       blurInputOnSelect: false,
@@ -65,6 +66,24 @@ export default {
       options: tags,
     }),
   },
+  dateCreatedAfter: {
+    type: DateFilter,
+    attributes: {
+      label: 'react.productsList.filters.createdAfter.label',
+      defaultMessage: 'Created after',
+      dateFormat: 'MM/DD/YYYY',
+      filterElement: true,
+    },
+  },
+  dateCreatedBefore: {
+    type: DateFilter,
+    attributes: {
+      label: 'react.productsList.filters.createdBefore.label',
+      defaultMessage: 'Created before',
+      dateFormat: 'MM/DD/YYYY',
+      filterElement: true,
+    },
+  },
   includeInactive: {
     type: CheckboxField,
     label: 'react.productsList.includeInactive.label',
@@ -76,7 +95,7 @@ export default {
   includeCategoryChildren: {
     type: CheckboxField,
     label: 'react.productsList.includeSubcategories.label',
-    defaultMessage: 'Include all products in all subcategories',
+    defaultMessage: 'Include all subcategories',
     attributes: {
       filterElement: true,
     },
