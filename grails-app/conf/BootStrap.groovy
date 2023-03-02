@@ -57,6 +57,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductSearchDto
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -271,6 +272,7 @@ class BootStrap {
                 translatedName      : product.translatedName,
                 glAccount           : product.glAccount,
                 productCatalogs     : product.productCatalogs,
+                productFamily       : product.productFamily,
             ]
         }
 
@@ -280,6 +282,14 @@ class BootStrap {
                     code        : productCatalog.code,
                     name        : productCatalog.name,
                     description : productCatalog.description,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(ProductGroup) { ProductGroup productGroup ->
+            [
+                    id          : productGroup.id,
+                    name        : productGroup.name,
+                    description : productGroup.description,
             ]
         }
 

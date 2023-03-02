@@ -24,7 +24,7 @@ const ProductsListTable = ({
   // Columns for react-table
   const columns = useMemo(() => [
     {
-      Header: <Translate id="react.productsList.column.status.label" defaultMessage="Status" />,
+      Header: <Translate id="react.productsList.column.active.label" defaultMessage="Status" />,
       accessor: 'active',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -63,13 +63,21 @@ const ProductsListTable = ({
       minWidth: 200,
     },
     {
+      Header: <Translate id="react.productsList.column.productFamily.label" defaultMessage="Product Family" />,
+      accessor: 'productFamily',
+      minWidth: 150,
+      Cell: row => <TableCell {...row} value={row.value?.name} tooltip />,
+    },
+    {
       Header: <Translate id="react.productsList.filters.category.label" defaultMessage="Category" />,
       accessor: 'category',
+      minWidth: 150,
       Cell: row => <TableCell {...row} tooltip />,
     },
     {
       Header: <Translate id="react.productsList.filters.glAccount.label" defaultMessage="GL Account" />,
       accessor: 'glAccount',
+      minWidth: 150,
       Cell: row =>
         (<TableCell
           {...row}
@@ -80,6 +88,7 @@ const ProductsListTable = ({
     {
       Header: <Translate id="react.productsList.filters.catalog.label" defaultMessage="Formulary" />,
       accessor: 'productCatalogs',
+      minWidth: 150,
       Cell: row =>
         (<TableCell
           {...row}
@@ -91,6 +100,7 @@ const ProductsListTable = ({
       Header: <Translate id="react.productsList.column.dateCreated.label" defaultMessage="Created on" />,
       accessor: 'dateCreated',
       maxWidth: 200,
+      minWidth: 110,
       Cell: row => <DateCell {...row} />,
     },
     {
@@ -101,6 +111,7 @@ const ProductsListTable = ({
       Header: <Translate id="react.productsList.column.lastUpdated.label" defaultMessage="Last updated" />,
       accessor: 'lastUpdated',
       maxWidth: 200,
+      minWidth: 110,
       Cell: row => <DateCell {...row} />,
     },
   ], []);
