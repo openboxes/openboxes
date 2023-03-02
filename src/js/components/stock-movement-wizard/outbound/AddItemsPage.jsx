@@ -95,6 +95,7 @@ const NO_STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
+          onBlur: () => saveProgress({ values }),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -120,7 +121,10 @@ const NO_STOCKLIST_FIELDS = {
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
           onBlur: () => {
             updateRow(values, rowIndex);
-            saveProgress(values);
+            saveProgress({ values });
+          },
+          onFocus: () => {
+            saveProgress({ values, rowIndex });
           },
         }),
       },
@@ -150,7 +154,10 @@ const NO_STOCKLIST_FIELDS = {
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
-            saveProgress(values);
+            saveProgress({ values });
+          },
+          onFocus: () => {
+            saveProgress({ values, rowIndex });
           },
         }),
         attributes: {
@@ -200,7 +207,7 @@ const STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
         }) => ({
-          onBlur: () => saveProgress(values),
+          onBlur: () => saveProgress({ values }),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
@@ -220,7 +227,7 @@ const STOCKLIST_FIELDS = {
           type: 'number',
         },
         getDynamicAttr: ({ saveProgress, values }) => ({
-          onBlur: () => saveProgress(values),
+          onBlur: () => saveProgress({ values }),
         }),
       },
       quantityRequested: {
@@ -249,7 +256,7 @@ const STOCKLIST_FIELDS = {
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
-            saveProgress(values);
+            saveProgress({ values });
           },
         }),
       },
@@ -765,13 +772,30 @@ class AddItemsPage extends Component {
     return Promise.resolve();
   }
 
-  saveProgress = (values) => {
+  saveProgress = ({ values, rowIndex }) => {
     if (actionInProgress) {
       return;
     }
-    this.setState({ isSaveCompleted: false });
 
-    this.saveRequisitionItemsInCurrentStep(values.lineItems, false).then(() => {
+    const isEdited = rowIndex !== undefined;
+    const itemsWithStatuses = values.lineItems.map((item) => {
+      if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
+        return { ...item, status: SaveStatus.NEWLY_CREATED };
+      }
+
+      if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
+        return { ...item, status: SaveStatus.ERROR };
+      }
+      return item;
+    });
+
+    this.setState({ isSaveCompleted: false, values: { ...values, lineItems: itemsWithStatuses } });
+
+    if (isEdited) {
+      return;
+    }
+
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false).then(() => {
       this.setState({ isSaveCompleted: true });
     });
   };

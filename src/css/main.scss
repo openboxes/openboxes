@@ -1353,10 +1353,10 @@ div.search-input:focus-within {
 // Save indicators styling
 
 .indicator {
-  width: 5px;
+  width: 3px;
 
   &.newly_created {
-    background-color: $orange-alpha;
+    background-color: var(--color-yellow);
   }
 
   &.saved {
