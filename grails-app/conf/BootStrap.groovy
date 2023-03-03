@@ -252,21 +252,27 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(Product) { Product product ->
             [
-                id                  : product.id,
-                productCode         : product.productCode,
-                name                : product.name,
-                description         : product.description,
-                category            : product.category?.name,
-                unitOfMeasure       : product.unitOfMeasure,
-                pricePerUnit        : product.pricePerUnit,
-                dateCreated         : product.dateCreated,
-                lastUpdated         : product.lastUpdated,
-                updatedBy           : product.updatedBy?.name,
-                color               : product.color,
-                handlingIcons       : product.handlingIcons,
-                lotAndExpiryControl : product.lotAndExpiryControl,
-                active              : product.active,
-                translatedName      : product.translatedName,
+                    id                 : product.id,
+                    productCode        : product.productCode,
+                    name               : product.name,
+                    description        : product.description,
+                    category           : product.category?.name,
+                    unitOfMeasure      : product.unitOfMeasure,
+                    pricePerUnit       : product.pricePerUnit,
+                    dateCreated        : product.dateCreated,
+                    lastUpdated        : product.lastUpdated,
+                    updatedBy          : product.updatedBy?.name,
+                    color              : product.color,
+                    handlingIcons      : product.handlingIcons,
+                    lotAndExpiryControl: product.lotAndExpiryControl,
+                    active             : product.active,
+                    // FIXME deprecated - remove before release
+                    translatedName     : product.translatedName,
+                    // introduced new aliases object (decided not to use productNames or synonyms)
+                    // this gives us a little more flexibility in case we don't like it or it performs
+                    // poorly. We can also convert it into a DTO class if we end up liking it.
+                    alias              : product.alias,
+                    aliases            : product.aliases,
             ]
         }
 
