@@ -824,6 +824,7 @@ class ProductService {
                 ProductCode         : product.productCode ?: '',
                 ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
+                ProductFamily       : product?.productFamily ?: '',
                 Category            : product?.category?.name,
                 GLAccount           : product?.glAccount?.code ?: '',
                 Description         : product?.description ?: '',
