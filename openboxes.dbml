@@ -721,7 +721,7 @@ Table "order" {
   "id" char(38) [pk, not null, default: ""]
   "version" bigint(20) [not null]
   "date_created" datetime [default: NULL]
-  "date_ordered" varchar(255) [default: NULL]
+  "date_ordered" datetime [default: NULL]
   "description" varchar(255) [default: NULL]
   "destination_id" char(38) [default: NULL]
   "last_updated" datetime [default: NULL]

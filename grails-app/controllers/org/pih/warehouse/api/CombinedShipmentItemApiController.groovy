@@ -60,21 +60,21 @@ class CombinedShipmentItemApiController {
 
     def findOrderItems() {
         List<Order> orders
-        if (params.orderIds) {
-            orders = Order.findAllByIdInList(params.orderIds)
+        if (request.JSON.orderIds) {
+            orders = Order.findAllByIdInList(request.JSON.orderIds)
         } else {
-            def vendor = Location.get(params.vendor)
-            def destination = Location.get(params.destination)
+            def vendor = Location.get(request.JSON.vendor)
+            def destination = Location.get(request.JSON.destination)
             orders = orderService.getOrdersForCombinedShipment(vendor, destination)
         }
-        Product product = Product.get(params.productId)
+        Product product = Product.get(request.JSON.productId)
 
-        def orderItems
+        List<OrderItem> orderItems = []
 
-        if (product) {
-            orderItems = OrderItem.findAllByOrderInListAndProduct(orders, product)
-        } else  {
-            orderItems = OrderItem.findAllByOrderInList(orders)
+        if (orders) {
+            orderItems = product
+                    ? OrderItem.findAllByOrderInListAndProduct(orders, product)
+                    : OrderItem.findAllByOrderInList(orders)
         }
 
         render([orderItems: orderItems.findAll{ it.orderItemStatusCode != OrderItemStatusCode.CANCELED && it.getQuantityRemainingToShip() > 0 }.collect {
