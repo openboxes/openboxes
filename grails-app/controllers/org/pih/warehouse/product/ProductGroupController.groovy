@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.product
 
+import grails.plugin.springcache.annotations.CacheFlush
+
 class ProductGroupController {
 
     def productService
@@ -41,6 +43,7 @@ class ProductGroupController {
         return [productGroupInstance: productGroupInstance]
     }
 
+    @CacheFlush("selectProductFamilyCache")
     def save = {
         println "Save " + params
         def productGroupInstance = ProductGroup.get(params.id)
@@ -124,6 +127,7 @@ class ProductGroupController {
 
     }
 
+    @CacheFlush("selectProductFamilyCache")
     def update = {
 
         log.info "Update product group " + params
@@ -155,6 +159,7 @@ class ProductGroupController {
         }
     }
 
+    @CacheFlush("selectProductFamilyCache")
     def delete = {
         def productGroupInstance = ProductGroup.get(params.id)
         if (productGroupInstance) {
