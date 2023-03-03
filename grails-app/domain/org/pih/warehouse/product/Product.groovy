@@ -252,6 +252,7 @@ class Product implements Comparable, Serializable {
                          "alias",
                          "aliases",
                          "displayName",
+                         "displayNameMap",
                          "displayNameOrDefaultName",
                          "translatedName",
                          "translatedNameWithLocaleCode"
@@ -741,10 +742,8 @@ class Product implements Comparable, Serializable {
         return [
                 locale          : locale,
                 displayName     : getDisplayName(locale),
-                defaultName     : name,
                 alternativeNames: getSynonyms(SynonymTypeCode.ALTERNATE_NAME, locale),
                 brandNames      : getSynonyms(SynonymTypeCode.BRAND_NAME, locale),
-                hasDisplayName  : displayName != null,
         ]
     }
 
@@ -754,10 +753,20 @@ class Product implements Comparable, Serializable {
         def locales = supportedLocales.collect { return new Locale(it) }
         def aliasMap = [:]
         aliasMap.put("default", alias)
-        locales.collect { Locale locale -> aliasMap.put(locale, getAlias(locale)) }
+        locales.each { Locale locale -> aliasMap.put(locale, getAlias(locale)) }
         return aliasMap
     }
 
+    Map getDisplayNameMap() {
+        // FIXME If you cannot retrieve this easily just change the empty string ("") to "default"
+        def data = ["": getDisplayName(LocalizationUtil.currentLocale)]
+        def supportedLocales = ConfigurationHolder.config.openboxes.locale.supportedLocales
+        def locales = supportedLocales.each {
+            Locale locale = new Locale(it)
+            data.put(locale, getDisplayName(locale))
+        }
+        return data
+    }
 
     Map toJson() {
         [

@@ -266,13 +266,13 @@ class BootStrap {
                     handlingIcons      : product.handlingIcons,
                     lotAndExpiryControl: product.lotAndExpiryControl,
                     active             : product.active,
-                    // FIXME deprecated - remove before release
+                    // FIXME deprecated - remove before release (as soon as we're done with cleanup)
                     translatedName     : product.translatedName,
-                    // introduced new aliases object (decided not to use productNames or synonyms)
-                    // this gives us a little more flexibility in case we don't like it or it performs
-                    // poorly. We can also convert it into a DTO class if we end up liking it.
-                    alias              : product.alias,
-                    aliases            : product.aliases,
+                    // Introduced new object (decided not to use productNames or synonyms).
+                    // that includes the display name for all locales. This gives us a little more
+                    // flexibility in case we don't like it or it performs poorly. We can also
+                    // convert it into a DTO class if we end up liking it.
+                    displayName        : product.displayNameMap,
             ]
         }
 
