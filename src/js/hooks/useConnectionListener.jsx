@@ -13,10 +13,10 @@ const useConnectionListener = () => {
   const timeoutId = useRef(null);
 
   const dispatch = useDispatch();
-  const { translate, online, connectionTimeout } = useSelector(state => ({
+  const { translate, online, browserConnectionTimeout } = useSelector(state => ({
     translate: translateWithDefaultMessage(getTranslate(state.localize)),
     online: state.connection.online,
-    connectionTimeout: state.session.connectionTimeout,
+    browserConnectionTimeout: state.session.browserConnectionTimeout,
   }));
   const setOnlineStatus = () => {
     dispatch(setOnline());
@@ -48,7 +48,10 @@ const useConnectionListener = () => {
   };
 
   const checkOnlineStatus = () => {
-    timeoutId.current = null;
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+      timeoutId.current = null;
+    }
 
     if (online !== navigator.onLine) {
       if (navigator.onLine) {
@@ -59,19 +62,23 @@ const useConnectionListener = () => {
     }
   };
 
-  const onChangedOnlineStatus = () => {
+  const onChangeStatusToOnline = () => {
     if (!timeoutId.current) {
-      timeoutId.current = setTimeout(checkOnlineStatus, connectionTimeout);
+      timeoutId.current = setTimeout(checkOnlineStatus, browserConnectionTimeout);
     }
+  };
+
+  const onChangeStatusToOffline = () => {
+    checkOnlineStatus();
   };
 
 
   useEffect(() => {
-    window.addEventListener('offline', onChangedOnlineStatus);
-    window.addEventListener('online', onChangedOnlineStatus);
+    window.addEventListener('offline', onChangeStatusToOffline);
+    window.addEventListener('online', onChangeStatusToOnline);
     return () => {
-      window.removeEventListener('offline', onChangedOnlineStatus);
-      window.removeEventListener('online', onChangedOnlineStatus);
+      window.removeEventListener('offline', onChangeStatusToOffline);
+      window.removeEventListener('online', onChangeStatusToOnline);
       clearTimeout(timeoutId.current);
       timeoutId.current = null;
     };
