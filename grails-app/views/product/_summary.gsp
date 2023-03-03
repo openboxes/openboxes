@@ -23,13 +23,14 @@
 				<td class="middle">
 
 					<div id="product-header" style="float: left;">
+						<g:if test="${productInstance?.productFamily}">
+							<span class="fade">${productInstance.productFamily}</span>
+						</g:if>
 			            <div id="product-title" class="title">
 			            	<small class="font-weight-bold">${productInstance?.productCode }</small>
-			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
 								<span title="${productInstance?.translatedName ? productInstance.name : null}">
 									${productInstance?.translatedName ?: productInstance?.name }
 								</span>
-			                </g:link>
 			            </div>
                         <div id="product-catalogs">
                             <g:each var="productCatalog" in="${productInstance?.productCatalogs }">
