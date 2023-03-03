@@ -78,7 +78,7 @@ const NO_STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), status: SaveStatus.NEWLY_CREATED });
+          addRow({ sortOrder: getSortOrder(), status: SaveStatus.PENDING });
         }
         }
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -96,6 +96,7 @@ const NO_STOCKLIST_FIELDS = {
           fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
           onBlur: () => saveProgress({ values }),
+          onFocus: () => saveProgress({ values, rowIndex }),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -123,9 +124,7 @@ const NO_STOCKLIST_FIELDS = {
             updateRow(values, rowIndex);
             saveProgress({ values });
           },
-          onFocus: () => {
-            saveProgress({ values, rowIndex });
-          },
+          onFocus: () => saveProgress({ values, rowIndex }),
         }),
       },
       recipient: {
@@ -156,9 +155,7 @@ const NO_STOCKLIST_FIELDS = {
             updateRow(values, rowIndex);
             saveProgress({ values });
           },
-          onFocus: () => {
-            saveProgress({ values, rowIndex });
-          },
+          onFocus: () => saveProgress({ values, rowIndex }),
         }),
         attributes: {
           labelKey: 'name',
@@ -190,7 +187,7 @@ const STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), status: SaveStatus.NEWLY_CREATED });
+          addRow({ sortOrder: getSortOrder(), status: SaveStatus.PENDING });
           newItemAdded();
         }}
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -208,6 +205,7 @@ const STOCKLIST_FIELDS = {
           fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
         }) => ({
           onBlur: () => saveProgress({ values }),
+          onFocus: () => saveProgress({ values, rowIndex }),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
@@ -226,8 +224,9 @@ const STOCKLIST_FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ saveProgress, values }) => ({
+        getDynamicAttr: ({ saveProgress, values, rowIndex }) => ({
           onBlur: () => saveProgress({ values }),
+          onFocus: () => saveProgress({ values, rowIndex }),
         }),
       },
       quantityRequested: {
@@ -258,6 +257,7 @@ const STOCKLIST_FIELDS = {
             updateRow(values, rowIndex);
             saveProgress({ values });
           },
+          onFocus: () => saveProgress({ values, rowIndex }),
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -345,13 +345,17 @@ class AddItemsPage extends Component {
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
+      // We wouldn't update items with quantity requested < 0
+      if (parseInt(item.quantityRequested, 10) < 0) {
+        return; // lodash continue
+      }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem?.quantityRequested, 10);
       const newQty = parseInt(item?.quantityRequested, 10);
-      const oldRecipient = oldItem?.recipient && _.isObject(oldItem?.recipient) ?
-        oldItem?.recipient.id : oldItem?.recipient;
-      const newRecipient = item?.recipient && _.isObject(item?.recipient) ?
-        item?.recipient.id : item?.recipient;
+      const oldRecipient = oldItem.recipient && _.isObject(oldItem.recipient) ?
+        oldItem.recipient.id : oldItem.recipient;
+      const newRecipient = item.recipient && _.isObject(item.recipient) ?
+        item.recipient.id : item.recipient;
 
       // Intersection of keys common to both objects (excluding product key)
       const keyIntersection = _.remove(
@@ -405,7 +409,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100, status: SaveStatus.NEWLY_CREATED });
+      lineItemsData = new Array(1).fill({ sortOrder: 100, status: SaveStatus.PENDING });
     } else {
       lineItemsData = _.map(
         data,
@@ -749,9 +753,11 @@ class AddItemsPage extends Component {
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
+                && item.status === SaveStatus.PENDING
               ) {
                 return { ...itemToChange, disabled: true, status: SaveStatus.SAVED };
               }
+
               return item;
             });
             this.setState({
@@ -760,17 +766,19 @@ class AddItemsPage extends Component {
             return;
           }
 
+          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
+
           this.setState({
             values: { ...this.state.values, lineItems: lineItemsBackendData },
             currentLineItems: lineItemsBackendData,
           });
         })
-        .catch((e) => {
+        .catch(() => {
           const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
               item.product &&
-              item.status === SaveStatus.NEWLY_CREATED &&
+              item.status === SaveStatus.PENDING &&
               _.includes(notSavedItemsIds, item.product.id)
             ) {
               return { ...item, status: SaveStatus.ERROR };
@@ -782,19 +790,20 @@ class AddItemsPage extends Component {
         });
     }
 
-    actionInProgress = false;
     return Promise.resolve();
   }
 
+  // if rowIndex is passed, it means that we are editing row
+  // not adding new one
   saveProgress = ({ values, rowIndex }) => {
     if (actionInProgress) {
       return;
     }
-
+    // I can't check rowIndex presence, because it can be 0
     const isEdited = rowIndex !== undefined;
     const itemsWithStatuses = values.lineItems.map((item) => {
       if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
-        return { ...item, status: SaveStatus.NEWLY_CREATED };
+        return { ...item, status: SaveStatus.PENDING };
       }
 
       if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
@@ -936,7 +945,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100, status: SaveStatus.NEWLY_CREATED }),
+            lineItems: new Array(1).fill({ sortOrder: 100, status: SaveStatus.PENDING }),
           },
         });
       })

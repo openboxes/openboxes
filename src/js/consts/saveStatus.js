@@ -1,6 +1,6 @@
 const SaveStatus = {
   SAVED: 'SAVED',
-  NEWLY_CREATED: 'NEWLY_CREATED',
+  PENDING: 'PENDING',
   ERROR: 'ERROR',
 };
 
