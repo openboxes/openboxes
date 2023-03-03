@@ -1669,11 +1669,11 @@ class StockMovementService {
             shipment.addToShipmentItems(shipmentItem)
         }
 
+        shipment.disableRefresh = false
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
 
-        shipment.disableRefresh = false
         return shipment
     }
 
@@ -1807,6 +1807,7 @@ class StockMovementService {
             }
         }
 
+        shipment.disableRefresh = false
         if (shipment.hasErrors() || !shipment.save()) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
@@ -2225,6 +2226,7 @@ class StockMovementService {
         }
 
         shipmentService.createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
+        shipment.disableRefresh = false
         shipment.save()
     }
 
