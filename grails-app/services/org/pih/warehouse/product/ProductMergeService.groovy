@@ -78,12 +78,22 @@ class ProductMergeService {
          *
          * */
 
+        /**
+         * I. VALIDATE PRODUCTS
+         * */
+        validateProducts(primaryId, obsoleteId)
+
+        /**
+         * II. FETCH PRODUCTS
+         * */
         Product primary = Product.get(primaryId)
         Product obsolete = Product.get(obsoleteId)
 
         /**
-         * SWAP TRIVIAL RELATIONS
+         * III. SWAP TRIVIAL RELATIONS
          * */
+
+        // TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
 
         log.info "Merging ${obsolete.productCode} product into ${primary.productCode}"
 
@@ -130,8 +140,10 @@ class ProductMergeService {
         }
 
         /**
-         * TRANSACTIONS, INVENTORY ITEMS AND OTHER "ITEM" RELATIONS
+         * IV. TRANSACTIONS, INVENTORY ITEMS AND OTHER "ITEM" RELATIONS
          * */
+
+        // TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
 
         // 1. Create a new common transaction that will contain current stock of both products. This is required
         //    for inventories that have transaction entries for bot products. If this transaction won't be created,
@@ -341,7 +353,7 @@ class ProductMergeService {
         }
 
         /**
-         * FINAL PROCESSING
+         * V. FINAL PROCESSING
          * */
 
         // 1. Deactivate obsoleted product
@@ -442,6 +454,7 @@ class ProductMergeService {
         }
     }
 
+    // TODO: OBPIH-5484 Refactor this part and split validating products and pending requisitions to separate functions
     def validateProducts(String primaryId, String obsoleteId) {
         Product primary = Product.get(primaryId)
         if (!primary) {
@@ -459,12 +472,16 @@ class ProductMergeService {
 
         def primaryRequisitionItems = requisitionService.getPendingRequisitionItems(primary)
         if (primaryRequisitionItems.size() > 0) {
-            throw new IllegalArgumentException("Primary product has pending stock movements. Please finish these stock movements before merging products.")
+            def primaryPendingRequisitions = primaryRequisitionItems.requisition?.unique()?.requestNumber
+                throw new IllegalArgumentException("Primary product has pending stock movements or requisitions (${primaryPendingRequisitions?.join(', ')}). " +
+                    "Please finish or cancel these stock movements or requisitions before merging products.")
         }
 
         def obsoleteRequisitionItems = requisitionService.getPendingRequisitionItems(obsolete)
         if (obsoleteRequisitionItems.size() > 0) {
-            throw new IllegalArgumentException("Obsolete product has pending stock movements. Please finish these stock movements before merging products.")
+            def obsoletePendingRequisitions = obsoleteRequisitionItems.requisition?.unique()?.requestNumber
+            throw new IllegalArgumentException("Obsolete product has pending stock movements or requisitions (${obsoletePendingRequisitions?.join(', ')}). " +
+                "Please finish or cancel these stock movements or requisitions before merging products.")
         }
     }
 }

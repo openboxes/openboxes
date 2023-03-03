@@ -1118,12 +1118,9 @@ class ProductController {
             throw new IllegalArgumentException("Merge products feature is not enabled")
         }
 
-        productMergeService.validateProducts(params.primaryProduct, params.obsoleteProduct)
-
         productMergeService.mergeProduct(params.primaryProduct, params.obsoleteProduct)
 
-        flash.message = "${params.obsoleteProduct} Product merge to ${params.primaryProduct} has succeeded. " +
-            "There are currently running refresh data jobs in the background, that can take some time to process."
+        flash.message = "${warehouse.message(code: 'product.mergeProducts.success.message', args: [params.primaryProduct, params.obsoleteProduct])}"
         redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
     }
 
