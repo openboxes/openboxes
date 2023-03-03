@@ -617,7 +617,7 @@ class ReportController {
                             "OB QOH"              : row?.quantity ?: 0,
                             "Physical QOH"        : "",
                             "Comment"             : "",
-                            "Generic product"     : row?.genericProduct?.name ?: "",
+                            "Product family"      : product?.productFamily ?: "",
                             "Category"            : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
                             "Formularies"         : product.productCatalogs.join(", ") ?: "",
                             "ABC Classification"  : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
@@ -626,7 +626,7 @@ class ReportController {
                     ] : [
                             productCode       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
                             productName       : row?.product.name ?: "",
-                            genericProduct    : row?.genericProduct?.name ?: "",
+                            productFamily     : product?.productFamily ?: "",
                             category          : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
                             formularies       : product.productCatalogs.join(", ") ?: "",
                             lotNumber         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),

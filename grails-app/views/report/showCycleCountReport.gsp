@@ -45,7 +45,7 @@
                         <tr>
                             <th><warehouse:message code="product.productCode.label" default="Code"/></th>
                             <th><warehouse:message code="product.label" default="Product"/></th>
-                            <th><warehouse:message code="product.genericProduct.label" default="Generic Product"/></th>
+                            <th><warehouse:message code="product.productFamily.label" default="Product Family"/></th>
                             <th><warehouse:message code="product.primaryCategory.label" default="Category"/></th>
                             <th><warehouse:message code="catalogs.label" default="Formularies"/></th>
                             <th><warehouse:message code="inventory.lotNumber.label" default="Lot number"/></th>
@@ -67,7 +67,7 @@
                                         ${row?.productName}
                                     </td>
                                     <td>
-                                        ${row?.genericProduct}
+                                        ${row?.productFamily}
                                     </td>
                                     <td>
                                         ${row?.category}
