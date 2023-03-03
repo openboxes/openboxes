@@ -405,7 +405,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100 });
+      lineItemsData = new Array(1).fill({ sortOrder: 100, status: SaveStatus.NEWLY_CREATED });
     } else {
       lineItemsData = _.map(
         data,
@@ -765,7 +765,21 @@ class AddItemsPage extends Component {
             currentLineItems: lineItemsBackendData,
           });
         })
-        .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
+        .catch((e) => {
+          const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
+          const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
+            if (
+              item.product &&
+              item.status === SaveStatus.NEWLY_CREATED &&
+              _.includes(notSavedItemsIds, item.product.id)
+            ) {
+              return { ...item, status: SaveStatus.ERROR };
+            }
+            return item;
+          });
+          this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
+          return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
+        });
     }
 
     actionInProgress = false;
@@ -922,7 +936,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100 }),
+            lineItems: new Array(1).fill({ sortOrder: 100, status: SaveStatus.NEWLY_CREATED }),
           },
         });
       })
