@@ -86,17 +86,19 @@ export default {
   },
   includeInactive: {
     type: CheckboxField,
-    label: 'react.productsList.includeInactive.label',
-    defaultMessage: 'Include inactive',
     attributes: {
+      withLabel: true,
+      label: 'react.productsList.includeInactive.label',
+      defaultMessage: 'Include inactive',
       filterElement: true,
     },
   },
   includeCategoryChildren: {
     type: CheckboxField,
-    label: 'react.productsList.includeSubcategories.label',
-    defaultMessage: 'Include all subcategories',
     attributes: {
+      withLabel: true,
+      label: 'react.productsList.includeSubcategories.label',
+      defaultMessage: 'Include subcategories',
       filterElement: true,
     },
   },

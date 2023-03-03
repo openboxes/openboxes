@@ -2,8 +2,10 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import Translate from 'utils/Translate';
+
 const Checkbox = ({
-  value, indeterminate, custom, fieldRef, withLabel, label, ...props
+  value, indeterminate, custom, fieldRef, withLabel, label, defaultMessage, ...props
 }) => {
   const onChange = (event) => {
     const { checked } = event.target;
@@ -46,7 +48,9 @@ const Checkbox = ({
           {...props}
           onChange={onChange}
         />
-        <label htmlFor={props.id} style={{ margin: '0 0 0 5px' }}>{label}</label>
+        <label htmlFor={props.id} style={{ margin: '0 0 0 5px' }}>
+          <Translate id={label} defaultMessage={defaultMessage || label} />
+        </label>
       </div>
     );
   }
@@ -81,6 +85,7 @@ Checkbox.propTypes = {
   fieldRef: PropTypes.func,
   withLabel: PropTypes.bool,
   label: PropTypes.string,
+  defaultMessage: PropTypes.string,
 };
 
 Checkbox.defaultProps = {
@@ -92,4 +97,5 @@ Checkbox.defaultProps = {
   fieldRef: undefined,
   withLabel: false,
   label: '',
+  defaultMessage: '',
 };

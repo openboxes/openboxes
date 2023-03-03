@@ -363,9 +363,11 @@ class ProductService {
                 if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
                 if (params.createdById) eq("createdBy.id", params.createdById)
                 if (params.updatedById) eq("updatedBy.id", params.updatedById)
-                and {
-                    if (params.createdAfter) ge("dateCreated", dateCreatedAfter)
-                    if (params.createdBefore) le("dateCreated", dateCreatedBefore)
+                if (params.createdAfter || params.createdBefore) {
+                    and {
+                        if (params.createdAfter) ge("dateCreated", dateCreatedAfter)
+                        if (params.createdBefore) le("dateCreated", dateCreatedBefore)
+                    }
                 }
 
                 if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")

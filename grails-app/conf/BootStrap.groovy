@@ -30,6 +30,7 @@ import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Address
 import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -299,7 +300,16 @@ class BootStrap {
                 name            : glAccount.name,
                 code            : glAccount.code,
                 description     : glAccount.description,
-                glAccountType   : glAccount.glAccountType.glAccountTypeCode.name(),
+                glAccountType   : glAccount.glAccountType,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(GlAccountType) { GlAccountType glAccountType ->
+            return [
+                    id : glAccountType.id,
+                    name : glAccountType.name,
+                    code : glAccountType.code,
+                    accountTypeCode : glAccountType.glAccountTypeCode.name(),
             ]
         }
 
