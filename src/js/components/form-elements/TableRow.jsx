@@ -94,7 +94,7 @@ class TableRow extends Component {
             hideDelay="50"
           >
             <div className="d-flex flex-row border-bottom table-inner-row">
-              {fieldsConfig.showSaveIndicator && <SaveIndicator />}
+              {fieldsConfig.showSaveIndicator && <SaveIndicator lineStatus={rowValues.status} />}
               {this.rowRender(
                 properties, fieldsConfig, focusFieldMap, field, addRow,
                 removeRow, index, rowValues, rowRef,
@@ -104,7 +104,7 @@ class TableRow extends Component {
         )}
         {!tooltip && (
           <div className="d-flex flex-row border-bottom table-inner-row">
-            {fieldsConfig.showSaveIndicator && <SaveIndicator />}
+            {fieldsConfig.showSaveIndicator && <SaveIndicator lineStatus={rowValues.status} />}
             {this.rowRender(
               properties, fieldsConfig, focusFieldMap, field, addRow,
               removeRow, index, rowValues, rowRef,

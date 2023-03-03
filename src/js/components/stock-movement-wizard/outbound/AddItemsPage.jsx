@@ -19,6 +19,7 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import SaveStatus from 'consts/saveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -77,7 +78,7 @@ const NO_STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
+          addRow({ sortOrder: getSortOrder(), status: SaveStatus.NEWLY_CREATED });
         }
         }
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -182,7 +183,7 @@ const STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
+          addRow({ sortOrder: getSortOrder(), status: SaveStatus.NEWLY_CREATED });
           newItemAdded();
         }}
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -742,13 +743,12 @@ class AddItemsPage extends Component {
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
               ) {
-                return { ...itemToChange, disabled: true };
+                return { ...itemToChange, disabled: true, status: SaveStatus.SAVED };
               }
               return item;
             });
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
-              currentLineItems: lineItemsBackendData,
             });
             return;
           }
