@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Input = ({
-  fieldRef, onChange, onFocus, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, isFormElement, ...props
+  fieldRef, onChange, className = '', arrowLeft, arrowUp, arrowRight, arrowDown, copyDown, onTabPress, isFormElement, ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -11,13 +11,12 @@ const Input = ({
     if (onChange) {
       onChange(value);
     }
+
+    return event;
   };
 
-  const handleFocus = (event) => {
-    onFocus();
-    event.target.select();
-  };
-  // const handleFocus = event => event.target.select();
+  const handleFocus = event => event.target.select();
+
   let keys = {};
 
   return (

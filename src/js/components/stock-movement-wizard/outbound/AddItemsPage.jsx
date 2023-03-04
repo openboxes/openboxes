@@ -96,7 +96,6 @@ const NO_STOCKLIST_FIELDS = {
           fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
           onBlur: () => saveProgress({ values }),
-          onFocus: () => saveProgress({ values, rowIndex }),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -124,7 +123,13 @@ const NO_STOCKLIST_FIELDS = {
             updateRow(values, rowIndex);
             saveProgress({ values });
           },
-          onFocus: () => saveProgress({ values, rowIndex }),
+          onChange: (value) => {
+            saveProgress({
+              values,
+              rowIndex,
+              fieldValue: { ...fieldValue, quantityRequested: value },
+            });
+          },
         }),
       },
       recipient: {
@@ -155,7 +160,13 @@ const NO_STOCKLIST_FIELDS = {
             updateRow(values, rowIndex);
             saveProgress({ values });
           },
-          onFocus: () => saveProgress({ values, rowIndex }),
+          onChange: (event) => {
+            saveProgress({
+              values,
+              rowIndex,
+              fieldValue: { ...fieldValue, recipient: event },
+            });
+          },
         }),
         attributes: {
           labelKey: 'name',
@@ -172,6 +183,7 @@ const STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
+    showSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
@@ -205,7 +217,6 @@ const STOCKLIST_FIELDS = {
           fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
         }) => ({
           onBlur: () => saveProgress({ values }),
-          onFocus: () => saveProgress({ values, rowIndex }),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
@@ -224,10 +235,6 @@ const STOCKLIST_FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ saveProgress, values, rowIndex }) => ({
-          onBlur: () => saveProgress({ values }),
-          onFocus: () => saveProgress({ values, rowIndex }),
-        }),
       },
       quantityRequested: {
         type: TextField,
@@ -257,7 +264,13 @@ const STOCKLIST_FIELDS = {
             updateRow(values, rowIndex);
             saveProgress({ values });
           },
-          onFocus: () => saveProgress({ values, rowIndex }),
+          onChange: (event) => {
+            saveProgress({
+              values,
+              rowIndex,
+              fieldValue: { ...values.lineItems[rowIndex], quantityRequested: event },
+            });
+          },
         }),
       },
       deleteButton: DELETE_BUTTON_FIELD,
@@ -352,10 +365,10 @@ class AddItemsPage extends Component {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem?.quantityRequested, 10);
       const newQty = parseInt(item?.quantityRequested, 10);
-      const oldRecipient = oldItem.recipient && _.isObject(oldItem.recipient) ?
-        oldItem.recipient.id : oldItem.recipient;
-      const newRecipient = item.recipient && _.isObject(item.recipient) ?
-        item.recipient.id : item.recipient;
+      const oldRecipient = oldItem?.recipient && _.isObject(oldItem?.recipient) ?
+        oldItem?.recipient.id : oldItem?.recipient;
+      const newRecipient = item?.recipient && _.isObject(item?.recipient) ?
+        item?.recipient.id : item?.recipient;
 
       // Intersection of keys common to both objects (excluding product key)
       const keyIntersection = _.remove(
@@ -773,6 +786,9 @@ class AddItemsPage extends Component {
           });
         })
         .catch(() => {
+          // When there is an error during saving we have to find products which
+          // caused the error. These items are not saved, so we don't have line ID,
+          // and we have to find these items by product ID and SaveStatus
           const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
@@ -794,25 +810,30 @@ class AddItemsPage extends Component {
 
   // if rowIndex is passed, it means that we are editing row
   // not adding new one
-  saveProgress = ({ values, rowIndex }) => {
+  saveProgress = ({ values, rowIndex, fieldValue }) => {
     if (actionInProgress) {
       return;
     }
-    // I can't check rowIndex presence, because it can be 0
+    // I can't check !!rowIndex, because it can be 0,
+    // so there is possibility to return false when the
+    // rowIndex is present
     const isEdited = rowIndex !== undefined;
     const itemsWithStatuses = values.lineItems.map((item) => {
       if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
-        return { ...item, status: SaveStatus.PENDING };
+        return { ...fieldValue, status: SaveStatus.PENDING };
       }
 
       if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
         return { ...item, status: SaveStatus.ERROR };
       }
+
       return item;
     });
 
     this.setState({ isSaveCompleted: false, values: { ...values, lineItems: itemsWithStatuses } });
 
+    // // We don't want to save the item during editing or
+    // // when there is an error in line
     if (isEdited) {
       return;
     }
