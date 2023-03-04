@@ -832,8 +832,8 @@ class AddItemsPage extends Component {
 
     this.setState({ isSaveCompleted: false, values: { ...values, lineItems: itemsWithStatuses } });
 
-    // // We don't want to save the item during editing or
-    // // when there is an error in line
+    // We don't want to save the item during editing or
+    // when there is an error in line
     if (isEdited) {
       return;
     }

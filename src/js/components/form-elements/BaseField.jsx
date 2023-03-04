@@ -40,14 +40,6 @@ class BaseField extends Component {
       input.onChange(value);
     };
 
-    const onFocus = (value) => {
-      if (attr.onFocus) {
-        attr.onFocus(value);
-      }
-
-      input.onFocus(value);
-    };
-
     const onBlur = (value) => {
       this.setState({ touched: true });
 
@@ -61,7 +53,6 @@ class BaseField extends Component {
       value: input.value,
       onChange,
       onBlur,
-      onFocus,
     };
 
     return this.props.renderInput(attributes);
