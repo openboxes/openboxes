@@ -748,7 +748,7 @@ class AddItemsPage extends Component {
               // We don't have to disable edited item, because this
               // line is disabled by default
               if (_.includes(savedItemsIds, item.id)) {
-                return item;
+                return { ...item, status: SaveStatus.SAVED };
               }
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
@@ -757,7 +757,6 @@ class AddItemsPage extends Component {
               ) {
                 return { ...itemToChange, disabled: true, status: SaveStatus.SAVED };
               }
-
               return item;
             });
             this.setState({
