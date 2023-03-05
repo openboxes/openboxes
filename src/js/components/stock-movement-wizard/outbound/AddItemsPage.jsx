@@ -68,7 +68,7 @@ const NO_STOCKLIST_FIELDS = {
         id="addButton"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
-        onClick={() => {
+        onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
         }
@@ -85,9 +85,8 @@ const NO_STOCKLIST_FIELDS = {
         headerAlign: 'left',
         flexWidth: '9.5',
         getDynamicAttr: ({
-          fieldValue, rowIndex, rowCount, originId, focusField, values, saveProgress,
+          fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
-          onBlur: () => saveProgress(values),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -320,17 +319,17 @@ class AddItemsPage extends Component {
     const lineItemsToBeAdded = _.filter(lineItems, item =>
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
-      item.product && !item.disabled);
+      item.product);
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
-      const oldQty = parseInt(oldItem.quantityRequested, 10);
-      const newQty = parseInt(item.quantityRequested, 10);
-      const oldRecipient = oldItem.recipient && _.isObject(oldItem.recipient) ?
-        oldItem.recipient.id : oldItem.recipient;
-      const newRecipient = item.recipient && _.isObject(item.recipient) ?
-        item.recipient.id : item.recipient;
+      const oldQty = parseInt(oldItem?.quantityRequested, 10);
+      const newQty = parseInt(item?.quantityRequested, 10);
+      const oldRecipient = oldItem?.recipient && _.isObject(oldItem?.recipient) ?
+        oldItem?.recipient.id : oldItem?.recipient;
+      const newRecipient = item?.recipient && _.isObject(item?.recipient) ?
+        item?.recipient.id : item?.recipient;
 
       // Intersection of keys common to both objects (excluding product key)
       const keyIntersection = _.remove(
@@ -709,12 +708,15 @@ class AddItemsPage extends Component {
             // We want to disable saved line, so I am looking for product with the same
             // code and quantity higher than 0 in response
             // (to avoid disabling new line with the same productCode)
+
             // TODO: Add new api endpoints in StockMovementItemApiController
             // for POST and PUT (create and update) that returns only updated items data
             // and separate autosave logic from save button logic
-            const savedItems = _.intersectionBy(lineItemsBackendData, itemsToSave, 'product.id');
-            const savedItemsProductCodes = savedItems.map(item => item.productCode);
-            const savedItemsIds = savedItems.map(item => item.id);
+            const savedItemsProductCodes = lineItemsBackendData.map(item => item.productCode);
+            const savedItemsIds = lineItemsBackendData.map(item => item.id);
+            // We are sending item by item to API. Here we have to find
+            // newly saved item to replace its equivalent in state
+            const itemToChange = _.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id')[0];
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
@@ -722,23 +724,23 @@ class AddItemsPage extends Component {
               if (_.includes(savedItemsIds, item.id)) {
                 return item;
               }
-
               if (
-                _.includes(savedItemsProductCodes, item.product.productCode)
+                _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
               ) {
-                return { ...item, disabled: true };
+                return { ...itemToChange, disabled: true };
               }
-
               return item;
             });
-            this.setState({ values: { ...this.state.values, lineItems: lineItemsAfterSave } });
+            this.setState({
+              values: { ...this.state.values, lineItems: lineItemsAfterSave },
+              currentLineItems: lineItemsBackendData,
+            });
             return;
           }
 
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
-
           this.setState({
+            values: { ...this.state.values, lineItems: lineItemsBackendData },
             currentLineItems: lineItemsBackendData,
           });
         })
@@ -1045,15 +1047,17 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid}
+                  disabled={invalid || !this.state.isSaveCompleted}
                   onClick={() => this.save(values)}
+                  onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
                   <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
                 </button>
                 <button
                   type="button"
-                  disabled={invalid}
+                  disabled={invalid || !this.state.isSaveCompleted}
+                  onMouseDown={() => this.saveAndExit(values)}
                   onClick={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1113,6 +1117,11 @@ class AddItemsPage extends Component {
                 <button
                   type="submit"
                   onClick={() => {
+                    if (!invalid) {
+                      this.nextPage(values);
+                    }
+                  }}
+                  onMouseDown={() => {
                     if (!invalid) {
                       this.nextPage(values);
                     }
