@@ -95,7 +95,6 @@ const NO_STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
-          onBlur: () => saveProgress({ values }),
           disabled: !!fieldValue,
           autoFocus: rowIndex === rowCount - 1,
           locationId: originId,
@@ -755,6 +754,7 @@ class AddItemsPage extends Component {
             const savedItemsIds = lineItemsBackendData.map(item => item.id);
             // We are sending item by item to API. Here we have to find
             // newly saved item to replace its equivalent in state
+            console.log(lineItemsBackendData, itemCandidatesToSave)
             const itemToChange = _.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id')[0];
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               // In this case we check if we're editing item
