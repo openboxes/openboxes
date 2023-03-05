@@ -249,6 +249,8 @@ const STOCKLIST_FIELDS = {
   },
 };
 
+let saveInProgress = false;
+
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -747,10 +749,14 @@ class AddItemsPage extends Component {
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
 
+    saveInProgress = false;
     return Promise.resolve();
   }
 
   saveProgress = (values) => {
+    if (saveInProgress) {
+      return;
+    }
     this.setState({ isSaveCompleted: false });
 
     this.saveRequisitionItemsInCurrentStep(values.lineItems, false).then(() => {
@@ -764,6 +770,7 @@ class AddItemsPage extends Component {
    * @public
    */
   save(formValues) {
+    saveInProgress = true;
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
@@ -779,6 +786,7 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndExit(formValues) {
+    saveInProgress = true;
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
@@ -818,7 +826,10 @@ class AddItemsPage extends Component {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
-      .catch(() => this.props.hideSpinner());
+      .catch(() => this.props.hideSpinner())
+      .finally(() => {
+        saveInProgress = false;
+      });
   }
 
   /**
@@ -1048,7 +1059,6 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || !this.state.isSaveCompleted}
-                  onClick={() => this.save(values)}
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1058,7 +1068,6 @@ class AddItemsPage extends Component {
                   type="button"
                   disabled={invalid || !this.state.isSaveCompleted}
                   onMouseDown={() => this.saveAndExit(values)}
-                  onClick={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
