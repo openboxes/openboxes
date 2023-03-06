@@ -750,6 +750,7 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.lotNumber.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.expirationDate.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
@@ -782,6 +783,7 @@ class InventoryController {
             csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocaleCode ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
+            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
