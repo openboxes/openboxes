@@ -88,7 +88,7 @@
 								<td valign="top" class="value ${hasErrors(bean: organizationInstance, field: 'roles', 'errors')}">
 									<ul>
 										<g:each in="${organizationInstance?.roles?}" var="r">
-											<li><g:link controller="partyRole" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
+											<li><g:link controller="partyRole" action="show" id="${r.id}">${r}</g:link></li>
 										</g:each>
 									</ul>
 									<g:link controller="partyRole" action="create" params="['party.id': organizationInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole')])}</g:link>

@@ -29,12 +29,12 @@
                 <g:if test="${(!pageTitle || (pageTitle && pageTitle != requisitionItem?.product?.category)) && sortByCategory}">
                     <g:set var="pageTitle" value="${requisitionItem?.product?.category}" />
                     <tr>
-                        <td colspan="8" class="gray-background b-t0">${pageTitle.encodeAsHTML()}</td>
+                        <td colspan="8" class="gray-background b-t0">${pageTitle}</td>
                     </tr>
                 </g:if>
                 <tr>
                     <wordwrap:td class="b-t0 b-r0">${requisitionItem?.product?.productCode}</wordwrap:td>
-                    <wordwrap:td class="b-t0 b-r0">${(requisitionItem?.product?.displayNameOrDefaultName)?.encodeAsHTML()}</wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0">${requisitionItem?.product?.displayNameOrDefaultName}</wordwrap:td>
                     <wordwrap:td class="b-t0 b-r0">${requisitionItem?.productPackage ? requisitionItem.productPackage.uom?.code + "/" + requisitionItem.productPackage.quantity + " -- " + requisitionItem.productPackage.uom?.name : 'EA/1'}</wordwrap:td>
                     <wordwrap:td class="b-t0 b-r0">${requisitionItem.quantity}</wordwrap:td>
                     <wordwrap:td class="b-t0 b-r0"></wordwrap:td>

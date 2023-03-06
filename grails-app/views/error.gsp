@@ -48,18 +48,18 @@
     <h2>Error Details</h2>
   	<div class="message">
 		<strong>Error ${request?.'javax.servlet.error.status_code'}:</strong>
-    		${request?.'javax.servlet.error.message'?.encodeAsHTML()}<br/>
+    		${request?.'javax.servlet.error.message'}<br/>
 		<strong>Servlet:</strong> ${request?.'javax.servlet.error.servlet_name'}<br/>
 		<strong>URI:</strong> ${request?.'javax.servlet.error.request_uri'}<br/>
 		<g:if test="${exception}">
-	  		<strong>Exception Message:</strong> ${exception.message?.encodeAsHTML()} <br />
-	  		<strong>Caused by:</strong> ${exception.cause?.message?.encodeAsHTML()} <br />
+	  		<strong>Exception Message:</strong> ${exception.message} <br />
+	  		<strong>Caused by:</strong> ${exception.cause?.message} <br />
 	  		<strong>Class:</strong> ${exception.className} <br />
 	  		<strong>At Line:</strong> [${exception.lineNumber}] <br />
 	  		<strong>Code Snippet:</strong><br />
 	  		<div class="snippet">
 	  			<g:each var="cs" in="${exception.codeSnippet}">
-	  				${cs?.encodeAsHTML()}<br />
+	  				${cs}<br />
 	  			</g:each>
 	  		</div>
 		</g:if>
@@ -67,7 +67,7 @@
 	<g:if test="${exception}">
 	    <h2>Stack Trace</h2>
 	    <div class="stack">
-	      <pre><g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each></pre>
+	      <pre><g:each in="${exception.stackTraceLines}">${it}<br/></g:each></pre>
 	    </div>
 	</g:if>
 	<g:set var="targetUri" value="${(request.forwardURI - request.contextPath) + (request.queryString?'?':'') + (request.queryString?:'') }"/>
@@ -79,13 +79,13 @@
                 <g:hiddenField name="reportedBy" value="${session?.user?.username}"/>
                 <g:hiddenField name="targetUri" value="${targetUri}"/>
                 <g:hiddenField name="request.statusCode" value="${request?.'javax.servlet.error.status_code'}"/>
-                <g:hiddenField name="request.errorMessage" value="${request?.'javax.servlet.error.message'?.encodeAsHTML()}"/>
-                <g:hiddenField name="exception.message" value="${exception?.message?.encodeAsHTML()}"/>
+                <g:hiddenField name="request.errorMessage" value="${request?.'javax.servlet.error.message'}"/>
+                <g:hiddenField name="exception.message" value="${exception?.message}"/>
                 <g:hiddenField name="exception.class" value="${exception?.className}"/>
                 <g:hiddenField name="exception.date" value="${new Date() }"/>
                 <g:set var="absoluteTargetUri" value="${g.createLinkTo(url: targetUri, absolute: true) }"/>
                 <g:hiddenField name="absoluteTargetUri" value="${absoluteTargetUri}"/>
-                <g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message?.encodeAsHTML()}"/>
+                <g:set var="summary" value="${exception?.cause?.class?.name?:exception?.className}: ${exception?.cause?.message}"/>
                 <table>
                     <tr class="prop">
                         <td class="name">

@@ -26,9 +26,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productSupplier.product.label" default="Product" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productSupplierInstance?.product?.id}">${productSupplierInstance?.product?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productSupplierInstance?.product?.id}">${productSupplierInstance?.product}</g:link></td>
+
                         </tr>
                     
                         <tr class="prop">
@@ -54,9 +54,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productSupplier.supplier.label" default="Supplier" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="organization" action="show" id="${productSupplierInstance?.supplier?.id}">${productSupplierInstance?.supplier?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="organization" action="show" id="${productSupplierInstance?.supplier?.id}">${productSupplierInstance?.supplier}</g:link></td>
+
                         </tr>
                     
                         <tr class="prop">
@@ -89,9 +89,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productSupplier.manufacturer.label" default="Manufacturer" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="organization" action="show" id="${productSupplierInstance?.manufacturer?.id}">${productSupplierInstance?.manufacturer?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="organization" action="show" id="${productSupplierInstance?.manufacturer?.id}">${productSupplierInstance?.manufacturer}</g:link></td>
+
                         </tr>
                     
                         <tr class="prop">
@@ -131,9 +131,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productSupplier.ratingTypeCode.label" default="Rating Type Code" /></td>
-                            
-                            <td valign="top" class="value">${productSupplierInstance?.ratingTypeCode?.encodeAsHTML()}</td>
-                            
+
+                            <td valign="top" class="value">${productSupplierInstance?.ratingTypeCode}</td>
+
                         </tr>
                     
                         <tr class="prop">
