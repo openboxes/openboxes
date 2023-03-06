@@ -49,19 +49,25 @@ class UrlMappings {
 
         // Category options for filters on  product list page
         "/api/categoryOptions"(parseRequest: true) {
-            controller = { "productApi" }
+            controller = { "selectOptionsApi" }
             action = [GET: "categoryOptions"]
         }
 
         // Catalog options for filters on  product list page
         "/api/catalogOptions"(parseRequest: true) {
-            controller = { "productApi" }
+            controller = { "selectOptionsApi" }
             action = [GET: "catalogOptions"]
+        }
+
+        // Product Group options for filters on  product list page
+        "/api/productGroupOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "productGroupOptions"]
         }
 
         // Tag options for filters on  product list page
         "/api/tagOptions"(parseRequest: true) {
-            controller = { "productApi" }
+            controller = { "selectOptionsApi" }
             action = [GET: "tagOptions"]
         }
 

@@ -7,6 +7,7 @@ import filterFields from 'components/products/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import {
+  fetchProductGroups,
   fetchProductsCatalogs,
   fetchProductsCategories,
   fetchProductsGlAccounts,
@@ -19,6 +20,7 @@ const useProductFilters = () => {
   const [categories, setCategories] = useState([]);
   const [catalogs, setCatalogs] = useState([]);
   const [tags, setTags] = useState([]);
+  const [productGroups, setProductGroups] = useState([]);
   const [glAccounts, setGlAccounts] = useState([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
@@ -49,7 +51,7 @@ const useProductFilters = () => {
     const queryProps = queryString.parse(history.location.search);
 
     const {
-      catalogId, tagId, categoryId, glAccountsId,
+      catalogId, tagId, categoryId, glAccountsId, productFamilyId,
     } = queryProps;
 
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
@@ -65,28 +67,37 @@ const useProductFilters = () => {
     if (queryProps.createdBefore) {
       defaultValues.createdBefore = queryProps.createdBefore;
     }
-    // If there are no values for catalogs, tags, glAccounts or categories
+    // If there are no values for catalogs, tags, glAccounts, categories or product family
     // then set default filters without waiting for those options to load
-    if (!catalogId && !tagId && !categoryId && !glAccountsId) {
+    if (!catalogId && !tagId && !categoryId && !glAccountsId && !productFamilyId) {
       setDefaultFilterValues(defaultValues);
     }
-    const [categoryList, catalogList, tagList, glAccountsList] = await Promise.all([
+    const [
+      categoryList,
+      catalogList,
+      tagList,
+      glAccountsList,
+      productGroupList,
+    ] = await Promise.all([
       fetchProductsCategories(),
       fetchProductsCatalogs(),
       fetchProductsTags(),
       fetchProductsGlAccounts(),
+      fetchProductGroups(),
     ]);
     setCatalogs(catalogList);
     setCategories(categoryList);
     setTags(tagList);
     setGlAccounts(glAccountsList);
+    setProductGroups(productGroupList);
 
     defaultValues.catalogId = setDefaultValue(catalogId, catalogList);
     defaultValues.tagId = setDefaultValue(tagId, tagList);
     defaultValues.categoryId = setDefaultValue(categoryId, categoryList);
     defaultValues.glAccountsId = setDefaultValue(glAccountsId, glAccountsList);
+    defaultValues.productFamilyId = setDefaultValue(productFamilyId, productGroupList);
 
-    if (catalogId || tagId || categoryId || glAccountsId) {
+    if (catalogId || tagId || categoryId || glAccountsId || productFamilyId) {
       setDefaultFilterValues(defaultValues);
     }
     setFiltersInitialized(true);
@@ -105,6 +116,7 @@ const useProductFilters = () => {
       glAccountsId: { name: 'glAccountsId', accessor: 'id' },
       createdAfter: { name: 'createdAfter' },
       createdBefore: { name: 'createdBefore' },
+      productFamilyId: { name: 'productFamilyId', accessor: 'id' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
@@ -116,7 +128,14 @@ const useProductFilters = () => {
   };
 
   return {
-    defaultFilterValues, setFilterValues, categories, catalogs, tags, glAccounts, filterParams,
+    defaultFilterValues,
+    setFilterValues,
+    categories,
+    catalogs,
+    tags,
+    glAccounts,
+    filterParams,
+    productGroups,
   };
 };
 

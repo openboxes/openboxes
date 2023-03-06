@@ -19,7 +19,7 @@ const useProductsListTableData = (filterParams) => {
     sortingParams,
   }) => {
     const {
-      catalogId, categoryId, tagId, glAccountsId,
+      catalogId, categoryId, tagId, glAccountsId, productFamilyId,
     } = filterParams;
     return _.omitBy({
       format: 'list',
@@ -31,6 +31,7 @@ const useProductsListTableData = (filterParams) => {
       categoryId: categoryId && categoryId.map(({ id }) => id),
       tagId: tagId && tagId.map(({ id }) => id),
       glAccountsId: glAccountsId && glAccountsId.map(({ id }) => id),
+      productFamilyId: productFamilyId && productFamilyId.map(({ id }) => id),
     }, (val) => {
       if (typeof val === 'boolean') {
         return !val;

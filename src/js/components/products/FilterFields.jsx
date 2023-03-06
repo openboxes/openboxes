@@ -66,6 +66,22 @@ export default {
       options: tags,
     }),
   },
+  productFamilyId: {
+    type: FilterSelectField,
+    attributes: {
+      valueKey: 'id',
+      filterElement: true,
+      placeholder: 'react.productsList.column.productFamily.label',
+      defaultPlaceholder: 'Product Family',
+      showLabelTooltip: true,
+      multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+    },
+    getDynamicAttr: ({ productGroups }) => ({
+      options: productGroups,
+    }),
+  },
   createdAfter: {
     type: DateFilter,
     attributes: {

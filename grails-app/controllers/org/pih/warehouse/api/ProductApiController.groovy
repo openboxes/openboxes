@@ -19,6 +19,7 @@ import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductListItem
 
 class ProductApiController extends BaseDomainApiController {
@@ -35,6 +36,7 @@ class ProductApiController extends BaseDomainApiController {
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
         def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
         def glAccounts = params.glAccountsId ? GlAccount.getAll(params.list('glAccountsId')) : []
+        def productFamilies = params.productFamilyId ? ProductGroup.getAll(params.list('productFamilyId')) : []
 
         // Following this approach of assigning q into other params for productService.getProducts
         params.name = params.q
@@ -52,7 +54,7 @@ class ProductApiController extends BaseDomainApiController {
             params.max = -1
         }
 
-        def products = productService.getProducts(categories, catalogs, tags, glAccounts, includeInactive, params)
+        def products = productService.getProducts(categories, catalogs, tags, glAccounts, productFamilies, includeInactive, params)
 
         if (params.format == 'csv') {
             boolean includeAttributes = params.boolean("includeAttributes") ?: false
@@ -272,28 +274,4 @@ class ProductApiController extends BaseDomainApiController {
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
     }
 
-    def catalogOptions = {
-        def catalogs = ProductCatalog.list(sort: "name").collect {
-            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
-        }
-
-        render([data: catalogs] as JSON)
-    }
-
-    def categoryOptions = {
-        def categories = Category.list().sort().collect {
-            [id: it.id, label: it.getHierarchyAsString(" > ")]
-        }
-
-        render([data: categories] as JSON)
-
-    }
-
-    def tagOptions = {
-        def tags = Tag.list(sort: "tag").collect {
-            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
-        }
-
-        render([data: tags] as JSON)
-    }
 }
