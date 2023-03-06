@@ -227,3 +227,9 @@ export const fetchProductsGlAccounts = async () => {
   const { data } = await glAccountApi.getGlAccountOptions();
   return data.data;
 };
+
+export const fetchProductGroups = async () => {
+  const { data } = await apiClient.get('/openboxes/api/productGroupOptions');
+  return data.data;
+};
+
