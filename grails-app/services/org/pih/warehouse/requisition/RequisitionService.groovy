@@ -643,12 +643,17 @@ class RequisitionService {
         return transactionEntries
     }
 
+    List<RequisitionItem> getPendingRequisitionItems(Product product) {
+        return getPendingRequisitionItems(null, product)
+    }
 
     List<RequisitionItem> getPendingRequisitionItems(Location origin, Product product) {
         def requisitionItems = RequisitionItem.createCriteria().list() {
             requisition {
                 eq("isTemplate", false)
-                eq("origin", origin)
+                if (origin) {
+                    eq("origin", origin)
+                }
                 not {
                     'in'("status", [RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
                 }
