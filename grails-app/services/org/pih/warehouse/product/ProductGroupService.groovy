@@ -26,4 +26,13 @@ class ProductGroupService {
         }
         return productGroup
     }
+
+    ProductGroup findOrCreateProductGroup(String name) {
+        ProductGroup productGroup = ProductGroup.findByName(name)
+        if (!productGroup) {
+            productGroup = new ProductGroup(name: name)
+            productGroup.save(failOnError: true)
+        }
+        return productGroup
+    }
 }

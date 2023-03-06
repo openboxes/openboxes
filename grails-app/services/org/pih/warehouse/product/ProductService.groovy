@@ -25,6 +25,7 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.util.LocalizationUtil
 import util.ReportUtil
 import java.text.SimpleDateFormat
+import org.pih.warehouse.product.ProductGroup
 /**
  * @author jmiranda*
  */
@@ -35,6 +36,7 @@ class ProductService {
     def identifierService
     def userService
     def dataService
+    ProductGroupService productGroupService
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -641,31 +643,32 @@ class ProductService {
             def productCode = tokens[1]
             def productTypeName = tokens[2]
             def productName = tokens[3]
-            def categoryName = tokens[4]
-            def glAccountCode = tokens[5]
-            def description = tokens[6]
-            def unitOfMeasure = tokens[7]
-            def productTags = tokens[8]?.split(",")
+            def productFamilyName = tokens[4]
+            def categoryName = tokens[5]
+            def glAccountCode = tokens[6]
+            def description = tokens[7]
+            def unitOfMeasure = tokens[8]
+            def productTags = tokens[9]?.split(",")
             def pricePerUnit
             try {
-                pricePerUnit = tokens[9] ? Float.valueOf(tokens[9]) : null
+                pricePerUnit = tokens[10] ? Float.valueOf(tokens[10]) : null
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[9]}')", e)
             }
-            def lotAndExpiryControl = Boolean.valueOf(tokens[10])
-            def coldChain = Boolean.valueOf(tokens[11])
-            def controlledSubstance = Boolean.valueOf(tokens[12])
-            def hazardousMaterial = Boolean.valueOf(tokens[13])
-            def reconditioned = Boolean.valueOf(tokens[14])
-            def manufacturer = tokens[15]
-            def brandName = tokens[16]
-            def manufacturerCode = tokens[17]
-            def manufacturerName = tokens[18]
-            def vendor = tokens[19]
-            def vendorCode = tokens[20]
-            def vendorName = tokens[21]
-            def upc = tokens[22]
-            def ndc = tokens[23]
+            def lotAndExpiryControl = Boolean.valueOf(tokens[11])
+            def coldChain = Boolean.valueOf(tokens[12])
+            def controlledSubstance = Boolean.valueOf(tokens[13])
+            def hazardousMaterial = Boolean.valueOf(tokens[14])
+            def reconditioned = Boolean.valueOf(tokens[15])
+            def manufacturer = tokens[16]
+            def brandName = tokens[17]
+            def manufacturerCode = tokens[18]
+            def manufacturerName = tokens[19]
+            def vendor = tokens[20]
+            def vendorCode = tokens[21]
+            def vendorName = tokens[22]
+            def upc = tokens[23]
+            def ndc = tokens[24]
 
             if (!productName) {
                 throw new RuntimeException("Product name cannot be empty at row " + rowCount)
@@ -693,6 +696,8 @@ class ProductService {
                 throw new RuntimeException("GL Account with code ${glAccountCode} does not exist at row " + rowCount)
             }
 
+            ProductGroup productFamily = productFamilyName ? productGroupService.findOrCreateProductGroup(productFamilyName) : null
+
             def category = findOrCreateCategory(categoryName)
             def product = Product.findByIdOrProductCode(productId, productCode)
 
@@ -701,6 +706,7 @@ class ProductService {
                 id                  : product?.id ?: productId,
                 name                : productName,
                 productType         : productType,
+                productFamily       : productFamily,
                 category            : category,
                 glAccount           : glAccount,
                 description         : description,
