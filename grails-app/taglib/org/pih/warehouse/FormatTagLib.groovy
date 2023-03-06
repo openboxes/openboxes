@@ -47,22 +47,6 @@ class FormatTagLib {
     }
 
     /**
-     *  Formats a Time
-     * @attr obj REQUIRED the date to format
-     */
-    def time = { attrs, body ->
-        if (attrs.obj != null) {
-            DateFormat df = new SimpleDateFormat(Constants.DEFAULT_TIME_FORMAT)
-            TimeZone tz = session.timezone
-            if (tz != null) {
-                df.setTimeZone(tz)
-            }
-            out << df.format(attrs.obj)
-        }
-    }
-
-
-    /**
      * Formats an Expiration Date
      * @attr obj REQUIRED the date to format
      */
@@ -84,6 +68,10 @@ class FormatTagLib {
      * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.openboxes.locale.defaultLocale);
      * 				   if the locale attribute is specified, but set to "null", the "default" name is returned
      *
+     * Currently simply displays the localized name of the product
+     *
+     * Output from this method will be HTML-escaped, which is always what you want
+     * when calling <format:product> but may not be when calling format.product().
      */
     def product = { attrs ->
         if (attrs.product != null) {
@@ -91,11 +79,7 @@ class FormatTagLib {
             // (note that we explicitly do a containsKey test because it is possible that the locale attribute has been specified but has been set to null--which means show the default locale)
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
-            def value = ""
-            value += LocalizationUtil.getLocalizedString(attrs.product.name.encodeAsHTML(), locale)
-
-            // default format is to display the localized name of the product
-            out << value
+            out << LocalizationUtil.getLocalizedString(attrs.product.name, locale).encodeAsHTML()
         }
         // TODO: add more formats
     }
@@ -146,6 +130,9 @@ class FormatTagLib {
      * 				      if the locale attribute is specified, but set to "null", the "default" name is returned
      *
      * Currently simply displays the localized name of the category
+     *
+     * Output from this method will be HTML-escaped, which is always what you want
+     * when calling <format:category> but may not be when calling format.category().
      */
     def category = { attrs ->
         if (attrs.category) {
@@ -155,13 +142,13 @@ class FormatTagLib {
             Locale locale = attrs.containsKey('locale') ? attrs.locale : session?.user?.locale ?: defaultLocale
 
             // default format is to display the localized name of the catergory
-            def value = LocalizationUtil.getLocalizedString(attrs?.category?.name?.encodeAsHTML(), locale)
+            def value = LocalizationUtil.getLocalizedString(attrs?.category?.name, locale)
             if (attrs.shorten) {
                 if (value.length() > 35) {
                     value = value.substring(0, 35) + "..."
                 }
             }
-            out << value
+            out << value.encodeAsHTML()
         }
         // TODO: add more formats
     }
@@ -178,6 +165,8 @@ class FormatTagLib {
      * If the obj is a String, the tag assumes the string is in format "Default Value|fr:French Value|es:Spanish Value"
      * If the obj is an OpenBoxes object, the tag operates on the "name" property of the object, assuming it is a String in the format specified above
      * If the obj is an enum, the tag returns the localized message.properties code "enum.className.value" (ie enum.ShipmentStatusCode.PENDING)
+     *
+     * Output from this method will be HTML-escaped.
      */
     def metadata = { attrs ->
 
@@ -189,7 +178,7 @@ class FormatTagLib {
 
             // handle String; localize the string directly
             if (attrs.obj instanceof String) {
-                out << LocalizationUtil.getLocalizedString(attrs.obj, locale)
+                out << LocalizationUtil.getLocalizedString(attrs.obj, locale).encodeAsHTML()
             }
             // handle Enums; by convention, the localized text for a Enum is stored in the message property enum.className.value  (ie enum.ShipmentStatusCode.PENDING)
             else if (attrs.obj instanceof Enum) {
@@ -200,11 +189,11 @@ class FormatTagLib {
             else {
                 // If there's a 'name' attribute on the object
                 if (attrs?.obj?.properties?.get("name")) {
-                    out << LocalizationUtil.getLocalizedString(attrs?.obj?.name, locale)
+                    out << LocalizationUtil.getLocalizedString(attrs?.obj?.name, locale).encodeAsHTML()
                 }
                 // Otherwise, use value of toString() method (probably just going to return an unlocalized string)
                 else {
-                    out << LocalizationUtil.getLocalizedString(attrs?.obj?.toString(), locale)
+                    out << LocalizationUtil.getLocalizedString(attrs?.obj?.toString(), locale).encodeAsHTML()
                 }
             }
         }

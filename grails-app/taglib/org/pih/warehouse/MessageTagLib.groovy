@@ -9,74 +9,29 @@
  **/
 package org.pih.warehouse
 
-
 import org.pih.warehouse.core.Localization
 
 import java.text.MessageFormat
-
 
 class MessageTagLib {
 
     static namespace = "warehouse"
     def grailsApplication
-    def messageSource
 
     def message = { attrs, body ->
 
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
-
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
-        if (!databaseStoreEnabled) {
-            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
-            out << defaultTagLib.message.call(attrs)
-            return
-        }
 
         // Checks the database to see if there's a localization property for the given code
-        if (session.user) {
+        if (databaseStoreEnabled && session.user) {
             def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
             if (localization) {
-                def message = localization.text
-                // If there are arguments, we need to get the
-                if (attrs?.args) {
-                    message = messageSource.getMessage(attrs.code, null, attrs.default, session?.user?.locale)
-                }
-
-                if (session.useDebugLocale) {
-                    def resolvedMessage = MessageFormat.format(localization.text, attrs?.args?.toArray())
-                    out << """${resolvedMessage}"""
-                    return
-                } else {
-                    message = MessageFormat.format(localization.text, attrs?.args?.toArray())
-                    out << """${message}"""
-                }
+                out << MessageFormat.format(localization.text, attrs?.args?.toArray()).encodeAsHTML()
                 return
             }
         }
 
-        // Display message in debug mode
-        if (session.useDebugLocale) {
-            def locales = grailsApplication.config.openboxes.locale.supportedLocales
-            def localized = [:]
-            def message = ""
-            locales.each {
-                def locale = new Locale(it)
-                // This would be used if we actually wanted to translate the message
-                def localizedMessage = messageSource.getMessage(attrs.code, attrs.args == null ? null : attrs.args.toArray(), attrs.default, locale)
-                localized.put(it, localizedMessage)
-            }
-            def hasOthers = localized.values().findAll { word -> word != localized['en'] }
-
-            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
-
-            def image = (!hasOthers) ? 'decline' : 'accept'
-
-            message = messageSource.getMessage(attrs.code, null, attrs.default, request.locale)
-            def resolvedMessage = "${defaultTagLib.message.call(attrs)}"
-            out << """${resolvedMessage}"""
-        }
         // Display message normally
         else {
             Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
