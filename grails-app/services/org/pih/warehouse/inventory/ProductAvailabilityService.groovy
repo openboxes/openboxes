@@ -46,7 +46,6 @@ class ProductAvailabilityService {
     def productService
     def locationService
     def inventoryService
-    def dataService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
@@ -118,19 +117,20 @@ class ProductAvailabilityService {
     }
 
     def refreshProductAvailability(Location location, Boolean forceRefresh) {
-        log.info "Refreshing product availability location (${location}), forceRefresh (${forceRefresh}) ..."
-        def startTime = System.currentTimeMillis()
-        List binLocations = calculateBinLocations(location)
-        saveProductAvailability(location, null, binLocations, forceRefresh)
-        log.info "Refreshed  ${binLocations?.size()} product availability records for location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        return refreshProductAvailability(location, null, forceRefresh)
     }
 
     def refreshProductAvailability(Location location, Product product, Boolean forceRefresh) {
         log.info "Refreshing product availability location ${location}, product ${product}, forceRefresh ${forceRefresh}..."
         def startTime = System.currentTimeMillis()
-        List binLocations = calculateBinLocations(location, product)
-        saveProductAvailability(location, product, binLocations, forceRefresh)
-        log.info "Refreshed ${binLocations?.size()} product availability records for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        List binLocations = product ? calculateBinLocations(location, product) : calculateBinLocations(location)
+        // FIXME: if this deadlocks, it safe to auto-retry here?
+        boolean success = saveProductAvailability(location, product, binLocations, forceRefresh)
+        if (success) {
+            log.info "Refreshed ${binLocations?.size()} product availability records for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        } else {
+            log.error "Could not refresh ${binLocations?.size()} product availability records for product (${product}) and location (${location}) after ${System.currentTimeMillis() - startTime}ms"
+        }
     }
 
     def calculateBinLocations(Location location, Date date) {
@@ -140,17 +140,18 @@ class ProductAvailabilityService {
     }
 
     def calculateBinLocations(Location location) {
-        def binLocations = inventoryService.getBinLocationDetails(location)
-        def picked = getQuantityPickedByProductAndLocation(location, null)
-        binLocations = transformBinLocations(binLocations, picked)
-        return binLocations
+        return calculateBinLocations(location, null as Product)
     }
 
     def calculateBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
+        def binLocations
+        if (product) {
+            binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
+        } else {
+            binLocations = inventoryService.getBinLocationDetails(location)
+        }
         def picked = getQuantityPickedByProductAndLocation(location, product)
-        binLocations = transformBinLocations(binLocations, picked)
-        return binLocations
+        return transformBinLocations(binLocations, picked)
     }
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
@@ -182,7 +183,7 @@ class ProductAvailabilityService {
         return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
     }
 
-    def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
+    boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
         log.info "Saving product availability for product=${product?.productCode}, location=${location}"
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         def startTime = System.currentTimeMillis()
@@ -191,6 +192,7 @@ class ProductAvailabilityService {
             Sql sql = new Sql(dataSource)
 
             // Execute SQL in batches
+            // FIXME recover from deadlocks
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
                 // If we need to force refresh then we want to set quantity on hand for all
                 // matching records to 0.
@@ -216,8 +218,10 @@ class ProductAvailabilityService {
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
-            throw e;
+            return false
         }
+
+        return true
     }
 
     String generateInsertStatement(Location location, Map entry) {
@@ -268,62 +272,6 @@ class ProductAvailabilityService {
         }
 
         return binLocationsTransformed
-    }
-
-    def deleteProductAvailability() {
-        deleteProductAvailability(null, null)
-    }
-
-    def deleteProductAvailability(Location location) {
-        deleteProductAvailability(location, null)
-    }
-
-    def deleteProductAvailability(Location location, Product product) {
-        Map params = [:]
-
-        String deleteStmt = """delete from ProductAvailability pa where 1=1"""
-
-        if (location) {
-            deleteStmt += " and pa.location = :location"
-            params.put("location", location)
-        }
-
-        if (product) {
-            deleteStmt += " and pa.product = :product"
-            params.put("product", product)
-        }
-
-        def results = ProductAvailability.executeUpdate(deleteStmt, params)
-        log.info "Deleted ${results} records for location ${location}, product ${product}"
-    }
-
-    def refreshInventorySnapshot(Location location, Product product, Boolean forceRefresh) {
-        String productId = product ? "'${product?.id}'" : null
-        if (forceRefresh) {
-            String forceRefreshStatement = """
-                DELETE FROM inventory_snapshot 
-                WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
-                AND location_id = '${location.id}' 
-                AND product_id = IFNULL(${productId}, product_id);
-            """
-            dataService.executeStatement(forceRefreshStatement)
-        }
-        String updateStatement = """
-            REPLACE INTO inventory_snapshot 
-            (
-                id, version, date, location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name, 
-                quantity_on_hand, date_created, last_updated
-            ) 
-            SELECT 
-                id, version, DATE_ADD(CURDATE(),INTERVAL 1 DAY), location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name,
-                quantity_on_hand, date_created, last_updated 
-            FROM product_availability 
-            WHERE location_id = '${location.id}' 
-            AND product_id = IFNULL(${productId}, product_id);
-        """
-        dataService.executeStatement(updateStatement)
     }
 
     def getQuantityOnHand(Location location) {
