@@ -59,6 +59,12 @@ class UrlMappings {
             action = [GET: "catalogOptions"]
         }
 
+        // Product Group options for filters on  product list page
+        "/api/productGroupOptions"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "productGroupOptions"]
+        }
+
         // Tag options for filters on  product list page
         "/api/tagOptions"(parseRequest: true) {
             controller = { "productApi" }
