@@ -19,7 +19,7 @@
 	  			background-color:white;
 	  			border:1px solid black;
 	  			margin:3px;
-	  			font-family:courier;
+                font-family: ui-monospace, monospace, sans-serif;
 	  		}
 	  		.dialog {
 	  			display: none;

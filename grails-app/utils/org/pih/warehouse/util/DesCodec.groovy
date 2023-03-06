@@ -14,7 +14,7 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESKeySpec
 
-class DESCodec {
+class DesCodec {
 
     static encode = { String target ->
         def cipher = getCipher(Cipher.ENCRYPT_MODE)

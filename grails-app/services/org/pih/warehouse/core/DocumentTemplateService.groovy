@@ -27,6 +27,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.util.PdfUtil
 
 class DocumentTemplateService {
 
@@ -59,35 +60,37 @@ class DocumentTemplateService {
     }
 
     def renderOrderDocumentTemplate(Document documentTemplate, Order orderInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
+        try {
+            Boolean isVelocityTemplate = documentTemplate.filename.contains(".vm") || documentTemplate.filename.contains(".vtl")
 
-        Boolean isVelocityTemplate = documentTemplate.filename.contains(".vm") || documentTemplate.filename.contains(".vtl")
-
-        TemplateEngineKind templateEngineKind = isVelocityTemplate ?
+            TemplateEngineKind templateEngineKind = isVelocityTemplate ?
                 TemplateEngineKind.Velocity : TemplateEngineKind.Freemarker
 
-        InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
-        IXDocReport report = XDocReportRegistry.getRegistry().loadReport(inputStream, templateEngineKind);
+            InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+            IXDocReport report = XDocReportRegistry.getRegistry().loadReport(inputStream, templateEngineKind);
 
-        // FIXME Need a better way to handle this generically (consider using config + dataService)
-        IContext context = orderInstance ? createOrderContext(report, orderInstance) : report.createContext();
+            // FIXME Need a better way to handle this generically (consider using config + dataService)
+            IContext context = orderInstance ? createOrderContext(report, orderInstance) : report.createContext();
 
-        ConverterTypeVia sourceDocumentType = (report.kind == "DOCX") ? ConverterTypeVia.DOCX4J :
+            ConverterTypeVia sourceDocumentType = (report.kind == "DOCX") ? ConverterTypeVia.DOCX4J :
                 (report.kind == "ODT") ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
 
-        // Convert to the target type
-        if (targetDocumentType && sourceDocumentType) {
-            Options options = Options.getTo(targetDocumentType).via(sourceDocumentType);
-            report.convert(context, options, outputStream);
+            // Convert to the target type
+            if (targetDocumentType && sourceDocumentType) {
+                Options options = Options.getTo(targetDocumentType).via(sourceDocumentType);
+                report.convert(context, options, outputStream);
+            }
+            // Process document in place
+            else {
+                report.process(context, outputStream)
+            }
+            log.info "Report dump: " + report.dump()
+        } finally {
+            PdfUtil.restoreBaseFonts()
         }
-        // Process document in place
-        else {
-            report.process(context, outputStream)
-        }
-        log.info "Report dump: " + report.dump()
-
     }
 
-    def createOrderContext(IXDocReport report, Order orderInstance) {
+    private createOrderContext(IXDocReport report, Order orderInstance) {
 
         // Add data to the context
         def orderItems = orderInstance?.orderItems?.findAll {

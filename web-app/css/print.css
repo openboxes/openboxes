@@ -98,5 +98,5 @@ thead {display: table-header-group;}
 tr {page-break-inside: avoid; page-break-after: auto;}
 td {vertical-align: top;}
 
-.lotNumber { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
-.binLocation { font-family: "Courier New"; vertical-align: middle; text-transform: uppercase; }
+.lotNumber { font-family: ui-monospace, monospace, sans-serif; vertical-align: middle; text-transform: uppercase; }
+.binLocation { font-family: ui-monospace, monospace, sans-serif; vertical-align: middle; text-transform: uppercase; }
