@@ -142,6 +142,9 @@
                                                                     <td class="${productProperties?.name!=existingProduct?.name?'modified':'' }">
                                                                         <span title="${existingProduct?.name }">${productProperties?.name }</span>
                                                                     </td>
+                                                                    <td class="${productProperties?.productFamily != existingProduct?.productFamily ? 'modified' : '' }">
+                                                                        <span title="${existingProduct?.productFamily}">${productProperties?.productFamily}</span>
+                                                                    </td>
                                                                     <td class="${productProperties?.category!=existingProduct?.category?'modified':'' }">
                                                                         <span title="${existingProduct?.category }">${productProperties?.category }</span>
                                                                     </td>
