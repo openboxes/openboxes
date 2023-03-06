@@ -73,7 +73,7 @@ const NO_STOCKLIST_FIELDS = {
         id="addButton"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
-        // onClick -> onMouseDown
+        // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
@@ -178,7 +178,7 @@ const STOCKLIST_FIELDS = {
         type="button"
         id="addButton"
         className="btn btn-outline-success btn-xs"
-        // onClick -> onMouseDown
+        // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
@@ -1074,7 +1074,7 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || !this.state.isSaveCompleted}
-                  // onClick -> onMouseDown
+                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1083,7 +1083,7 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || !this.state.isSaveCompleted}
-                  // onClick -> onMouseDown
+                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1135,7 +1135,7 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || showOnly}
-                  // onClick -> onMouseDown
+                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
@@ -1148,7 +1148,7 @@ class AddItemsPage extends Component {
                       this.nextPage(values);
                     }
                   }}
-                  // onClick -> onMouseDown
+                  // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => {
                     if (!invalid) {
                       this.nextPage(values);
