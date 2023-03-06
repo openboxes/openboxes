@@ -37,7 +37,12 @@ const DELETE_BUTTON_FIELD = {
   getDynamicAttr: ({
     fieldValue, removeItem, removeRow, showOnly, updateTotalCount,
   }) => ({
-    onClick: fieldValue && fieldValue.id ? () => {
+    // onClick -> onMouseDown, because we can't cancel
+    // function triggered in onBlur (request with items to save).
+    // onClick doesn't work in this case, because element on
+    // which we want to trigger this function has to have focus
+    // but if onBlur takes a little more time, onClick will not be executed
+    onMouseDown: fieldValue && fieldValue.id ? () => {
       removeItem(fieldValue.id).then(() => {
         updateTotalCount(-1);
         removeRow();
@@ -68,6 +73,7 @@ const NO_STOCKLIST_FIELDS = {
         id="addButton"
         className="btn btn-outline-success btn-xs"
         disabled={showOnly}
+        // onClick -> onMouseDown
         onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
@@ -172,7 +178,8 @@ const STOCKLIST_FIELDS = {
         type="button"
         id="addButton"
         className="btn btn-outline-success btn-xs"
-        onClick={() => {
+        // onClick -> onMouseDown
+        onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder() });
           newItemAdded();
@@ -249,7 +256,11 @@ const STOCKLIST_FIELDS = {
   },
 };
 
-let saveInProgress = false;
+// This variable is an indicator
+// if action is in progress to avoid
+// triggering the same transaction twice
+// i.e triggering save button during the autosave
+let actionInProgress = false;
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -749,12 +760,12 @@ class AddItemsPage extends Component {
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
 
-    saveInProgress = false;
+    actionInProgress = false;
     return Promise.resolve();
   }
 
   saveProgress = (values) => {
-    if (saveInProgress) {
+    if (actionInProgress) {
       return;
     }
     this.setState({ isSaveCompleted: false });
@@ -770,7 +781,7 @@ class AddItemsPage extends Component {
    * @public
    */
   save(formValues) {
-    saveInProgress = true;
+    actionInProgress = true;
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
@@ -786,7 +797,7 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndExit(formValues) {
-    saveInProgress = true;
+    actionInProgress = true;
     const errors = this.validate(formValues).lineItems;
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
@@ -828,7 +839,7 @@ class AddItemsPage extends Component {
       })
       .catch(() => this.props.hideSpinner())
       .finally(() => {
-        saveInProgress = false;
+        actionInProgress = false;
       });
   }
 
@@ -876,6 +887,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
+    actionInProgress = true;
     const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
 
     return apiClient.delete(removeItemsUrl)
@@ -892,6 +904,9 @@ class AddItemsPage extends Component {
       .catch(() => {
         this.fetchLineItems();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
+      })
+      .finally(() => {
+        actionInProgress = false;
       });
   }
 
@@ -1059,6 +1074,7 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || !this.state.isSaveCompleted}
+                  // onClick -> onMouseDown
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1067,6 +1083,7 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || !this.state.isSaveCompleted}
+                  // onClick -> onMouseDown
                   onMouseDown={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
@@ -1118,7 +1135,8 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid || showOnly}
-                  onClick={() => this.previousPage(values, invalid)}
+                  // onClick -> onMouseDown
+                  onMouseDown={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
@@ -1130,6 +1148,7 @@ class AddItemsPage extends Component {
                       this.nextPage(values);
                     }
                   }}
+                  // onClick -> onMouseDown
                   onMouseDown={() => {
                     if (!invalid) {
                       this.nextPage(values);
