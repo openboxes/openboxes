@@ -19,6 +19,7 @@ import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductListItem
 
 class ProductApiController extends BaseDomainApiController {
 
@@ -60,6 +61,12 @@ class ProductApiController extends BaseDomainApiController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"${fileName}Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: csv)
+            return
+        }
+
+        if (params.format == 'list') {
+            List<ProductListItem> productListItems = products.collect { Product product -> new ProductListItem(product) }
+            render([data: productListItems, totalCount: products?.totalCount] as JSON)
             return
         }
 

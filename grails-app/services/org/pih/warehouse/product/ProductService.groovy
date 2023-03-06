@@ -293,6 +293,8 @@ class ProductService {
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
+        Date dateCreatedAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date dateCreatedBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
 
         def query = { isCountQuery ->
 
@@ -363,6 +365,12 @@ class ProductService {
                 if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
                 if (params.createdById) eq("createdBy.id", params.createdById)
                 if (params.updatedById) eq("updatedBy.id", params.updatedById)
+                if (params.createdAfter || params.createdBefore) {
+                    and {
+                        if (params.createdAfter) ge("dateCreated", dateCreatedAfter)
+                        if (params.createdBefore) le("dateCreated", dateCreatedBefore)
+                    }
+                }
 
                 if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
                 if (params.productCodeIsNull) isNull("productCode")

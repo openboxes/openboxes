@@ -59,6 +59,12 @@ const useProductFilters = () => {
     if (queryProps.includeCategoryChildren) {
       defaultValues.includeCategoryChildren = queryProps.includeCategoryChildren;
     }
+    if (queryProps.createdAfter) {
+      defaultValues.createdAfter = queryProps.createdAfter;
+    }
+    if (queryProps.createdBefore) {
+      defaultValues.createdBefore = queryProps.createdBefore;
+    }
     // If there are no values for catalogs, tags, glAccounts or categories
     // then set default filters without waiting for those options to load
     if (!catalogId && !tagId && !categoryId && !glAccountsId) {
@@ -97,6 +103,8 @@ const useProductFilters = () => {
       tagId: { name: 'tagId', accessor: 'id' },
       categoryId: { name: 'categoryId', accessor: 'id' },
       glAccountsId: { name: 'glAccountsId', accessor: 'id' },
+      createdAfter: { name: 'createdAfter' },
+      createdBefore: { name: 'createdBefore' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);

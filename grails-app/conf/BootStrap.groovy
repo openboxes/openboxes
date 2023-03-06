@@ -29,6 +29,8 @@ import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Address
+import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -55,6 +57,9 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductListItem
 import org.pih.warehouse.product.ProductSearchDto
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -249,7 +254,6 @@ class BootStrap {
             ]
         }
 
-
         JSON.registerObjectMarshaller(Product) { Product product ->
             [
                 id                  : product.id,
@@ -268,6 +272,46 @@ class BootStrap {
                 active              : product.active,
                 translatedName      : product.translatedName,
             ]
+        }
+
+        JSON.registerObjectMarshaller(ProductCatalog) { ProductCatalog productCatalog ->
+            [
+                    id          : productCatalog.id,
+                    code        : productCatalog.code,
+                    name        : productCatalog.name,
+                    description : productCatalog.description,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(ProductGroup) { ProductGroup productGroup ->
+            [
+                    id          : productGroup.id,
+                    name        : productGroup.name,
+                    description : productGroup.description,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(GlAccount) { GlAccount glAccount ->
+            [
+                id              : glAccount.id,
+                name            : glAccount.name,
+                code            : glAccount.code,
+                description     : glAccount.description,
+                glAccountType   : glAccount.glAccountType,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(GlAccountType) { GlAccountType glAccountType ->
+            return [
+                    id : glAccountType.id,
+                    name : glAccountType.name,
+                    code : glAccountType.code,
+                    accountTypeCode : glAccountType.glAccountTypeCode.name(),
+            ]
+        }
+
+        JSON.registerObjectMarshaller(ProductListItem) { ProductListItem productListItem ->
+            return productListItem.toJson()
         }
 
         JSON.registerObjectMarshaller(ProductSearchDto) { ProductSearchDto productSearchDto ->

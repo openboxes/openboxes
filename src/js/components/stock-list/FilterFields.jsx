@@ -40,9 +40,10 @@ export default {
   },
   isPublished: {
     type: CheckboxField,
-    label: 'react.stocklists.includeUnpublished.label',
-    defaultMessage: 'Include unpublished stocklists',
     attributes: {
+      withLabel: true,
+      label: 'react.stocklists.includeUnpublished.label',
+      defaultMessage: 'Include unpublished stocklists',
       filterElement: true,
     },
   },
