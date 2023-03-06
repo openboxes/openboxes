@@ -30,8 +30,6 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustmentType
@@ -53,7 +51,6 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class SelectTagLib {
 
-    def userService
     def locationService
     def shipmentService
     def requisitionService
@@ -66,22 +63,6 @@ class SelectTagLib {
         attrs.optionValue = {
             it.getHierarchyAsString(" > ")
         }
-        out << g.select(attrs)
-    }
-
-    def selectInventoryItem = { attrs, body ->
-
-        println "attrs.product = " + attrs.product
-        attrs.from = InventoryItem.findAllByProduct(attrs.product)
-        attrs.optionKey = "id"
-        attrs.optionValue = { it.lotNumber }
-        out << g.select(attrs)
-    }
-
-
-    def selectReasonCode = { attrs, body ->
-        attrs.from = ReasonCode.list()
-        attrs.optionValue = { format.metadata(obj: it) }
         out << g.select(attrs)
     }
 
@@ -120,6 +101,7 @@ class SelectTagLib {
         attrs.optionValue = { format.metadata(obj: it) }
         out << g.select(attrs)
     }
+
     @Cacheable("selectTagCache")
     def selectTag = { attrs, body ->
         def tags = Tag.list(sort: "tag").collect {
@@ -412,14 +394,6 @@ class SelectTagLib {
         attrs.optionKey = 'email'
         attrs.optionValue = { it.name }
         out << g.select(attrs)
-    }
-
-    def selectInventory = { attrs, body ->
-        attrs.from = Inventory.list().sort { it.warehouse.name }
-        attrs.optionKey = 'id'
-        attrs.optionValue = { it.warehouse.name }
-        out << g.select(attrs)
-
     }
 
     def selectBinLocation = { attrs, body ->
@@ -738,9 +712,9 @@ class SelectTagLib {
 
                         if (optionValue) {
                             if (optionValue instanceof Closure) {
-                                writer << optionValue(el).toString().encodeAsHTML()
+                                writer << optionValue(el)?.toString()?.encodeAsHTML()
                             } else {
-                                writer << el[optionValue].toString().encodeAsHTML()
+                                writer << el[optionValue]?.toString()?.encodeAsHTML()
                             }
 
                         } else if (valueMessagePrefix) {
@@ -749,14 +723,12 @@ class SelectTagLib {
                             if (message != null) {
                                 writer << message.encodeAsHTML()
                             } else if (keyValue) {
-                                writer << keyValue.encodeAsHTML()
+                                writer << keyValue.toString().encodeAsHTML()
                             } else {
-                                def s = el.toString()
-                                if (s) writer << s.encodeAsHTML()
+                                writer << el?.toString()?.encodeAsHTML()
                             }
                         } else {
-                            def s = el.toString()
-                            if (s) writer << s.encodeAsHTML()
+                            writer << el?.toString()?.encodeAsHTML()
                         }
 
                         writer << '</option>'
@@ -782,7 +754,7 @@ class SelectTagLib {
                 // add value to the option and mark if it's selected
                 writeValueAndCheckIfSelected(keyValue, value, writer)
                 writer << '>'
-                writer << optionValue(it).toString().encodeAsHTML()
+                writer << optionValue(it)?.toString()?.encodeAsHTML()
                 writer << '</option>'
                 writer.println()
             }
@@ -794,7 +766,7 @@ class SelectTagLib {
     void outputAttributes(attrs) {
         attrs.remove('tagName') // Just in case one is left
         attrs.each { k, v ->
-            out << k << "=\"" << v.encodeAsHTML() << "\" "
+            out << "${k?.encodeAsHTML()}=\"${v?.encodeAsHTML()}\""
         }
     }
 
@@ -823,19 +795,10 @@ class SelectTagLib {
 
     def renderNoSelectionOption = { noSelectionKey, noSelectionValue, value ->
         // If a label for the '--Please choose--' first item is supplied, write it out
-        out << '<option value="' << (noSelectionKey == null ? "" : noSelectionKey) << '"'
-        if (noSelectionKey.equals(value)) {
-            out << ' selected="selected" '
+        out << "<option value=\"${noSelectionKey == null ? '' : noSelectionKey}\""
+        if (noSelectionKey == value) {
+            out << ' selected="selected"'
         }
-        out << '>' << noSelectionValue.encodeAsHTML() << '</option>'
+        out << ">${noSelectionValue.encodeAsHTML()}</option>"
     }
-
-    private String optionValueToString(def el, def optionValue) {
-        if (optionValue instanceof Closure) {
-            return optionValue(el).toString().encodeAsHTML()
-        }
-
-        el[optionValue].toString().encodeAsHTML()
-    }
-
 }
