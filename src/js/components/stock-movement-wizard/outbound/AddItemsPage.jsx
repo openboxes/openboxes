@@ -78,7 +78,7 @@ const NO_STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), status: SaveStatus.PENDING });
+          addRow({ sortOrder: getSortOrder(), saveStatus: SaveStatus.PENDING });
         }
         }
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -198,7 +198,7 @@ const STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), status: SaveStatus.PENDING });
+          addRow({ sortOrder: getSortOrder(), saveStatus: SaveStatus.PENDING });
           newItemAdded();
         }}
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -349,6 +349,7 @@ class AddItemsPage extends Component {
    * @param {object} lineItems
    * @public
    */
+
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item =>
       !item.statusCode &&
@@ -421,7 +422,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100, status: SaveStatus.PENDING });
+      lineItemsData = new Array(1).fill({ sortOrder: 100, saveStatus: SaveStatus.PENDING });
     } else {
       lineItemsData = _.map(
         data,
@@ -761,16 +762,16 @@ class AddItemsPage extends Component {
               // line is disabled by default
               if (
                 _.includes(savedItemsIds, item.id) &&
-                item.status !== SaveStatus.ERROR
+                item.saveStatus !== SaveStatus.ERROR
               ) {
-                return { ...item, status: SaveStatus.SAVED };
+                return { ...item, saveStatus: SaveStatus.SAVED };
               }
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
-                && item.status === SaveStatus.PENDING
+                && item.saveStatus === SaveStatus.PENDING
               ) {
-                return { ...itemToChange, disabled: true, status: SaveStatus.SAVED };
+                return { ...itemToChange, disabled: true, saveStatus: SaveStatus.SAVED };
               }
               return item;
             });
@@ -793,10 +794,10 @@ class AddItemsPage extends Component {
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
               item.product &&
-              item.status === SaveStatus.PENDING &&
+              item.saveStatus === SaveStatus.PENDING &&
               _.includes(notSavedItemsIds, item.product.id)
             ) {
-              return { ...item, status: SaveStatus.ERROR };
+              return { ...item, saveStatus: SaveStatus.ERROR };
             }
             return item;
           });
@@ -820,11 +821,11 @@ class AddItemsPage extends Component {
     const isEdited = rowIndex !== undefined;
     const itemsWithStatuses = values.lineItems.map((item) => {
       if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
-        return { ...fieldValue, status: SaveStatus.PENDING };
+        return { ...fieldValue, saveStatus: SaveStatus.PENDING };
       }
 
       if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
-        return { ...item, status: SaveStatus.ERROR };
+        return { ...item, saveStatus: SaveStatus.ERROR };
       }
 
       return item;
@@ -965,7 +966,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100, status: SaveStatus.PENDING }),
+            lineItems: new Array(1).fill({ sortOrder: 100, saveStatus: SaveStatus.PENDING }),
           },
         });
       })
