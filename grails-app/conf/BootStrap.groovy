@@ -271,15 +271,6 @@ class BootStrap {
                 lotAndExpiryControl : product.lotAndExpiryControl,
                 active              : product.active,
                 translatedName      : product.translatedName,
-                // FIXME Remove once we get the UI working properly with the ProductListItem
-                // I think these three properties can probably be added here but they should
-                // include shortened read-only versions, not the full objects
-                //  - glAccount.name
-                //  - product.productCatalogsSummarized
-                //  - product.productFamily.name
-                glAccount           : product.glAccount,
-                productCatalogs     : product.productCatalogs,
-                productFamily       : product.productFamily,
             ]
         }
 

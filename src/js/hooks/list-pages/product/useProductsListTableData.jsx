@@ -22,6 +22,7 @@ const useProductsListTableData = (filterParams) => {
       catalogId, categoryId, tagId, glAccountsId,
     } = filterParams;
     return _.omitBy({
+      format: 'list',
       offset: `${offset}`,
       max: `${state.pageSize}`,
       ...sortingParams,
