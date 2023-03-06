@@ -1261,7 +1261,7 @@ openboxes.ldap.search.searchSubtree = true
 openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
 
 // Merge Products
-openboxes.mergeProducts.enabled = true
+openboxes.mergeProducts.enabled = false
 
 //openboxes.ldap.authorities.retrieveGroupRoles = false
 //openboxes.ldap.authorities.groupSearchBase ='DC=example,DC=com'
