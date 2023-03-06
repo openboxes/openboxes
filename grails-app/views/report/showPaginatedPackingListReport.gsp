@@ -83,7 +83,7 @@
 								${session?.warehouse?.name }
 							</div>
 							<div class="subtitle">
-								${command?.shipment?.name?.encodeAsHTML() }
+								${command?.shipment?.name}
 								--
 								<warehouse:message code="report.shippingReport.title"/>
 							</div>
@@ -106,7 +106,7 @@
 				    				<tr>
 				    					<th colspan="7" style="text-align: center; margin: 0px; padding: 0px;">
 							   				<h2>
-							   					<b>${packingListEntry?.key?.encodeAsHTML() }</b>
+							   					<b>${packingListEntry?.key}</b>
 							   				</h2>
 				    					</th>
 				    				</tr>
@@ -150,20 +150,20 @@
 												<format:product product="${checklistEntry?.shipmentItem?.product}"/>
 											</td>
 											<td>
-												${checklistEntry?.shipmentItem?.lotNumber?.encodeAsHTML()  }
+												${checklistEntry?.shipmentItem?.lotNumber}
 											</td>
 											<td>
 												<format:expirationDate obj="${checklistEntry?.shipmentItem?.expirationDate }"/>
 											</td>
 											<td>
 												<g:if test="${checklistEntry?.shipmentItem?.recipient }">
-													${checklistEntry?.shipmentItem?.recipient?.name?.encodeAsHTML()  }
+													${checklistEntry?.shipmentItem?.recipient?.name}
 												</g:if>
 												<g:elseif test="${checklistEntry?.shipmentItem?.container?.recipient }">
-													${checklistEntry?.shipmentItem?.container?.recipient?.name?.encodeAsHTML()  }
+													${checklistEntry?.shipmentItem?.container?.recipient?.name}
 												</g:elseif>
 												<g:elseif test="${checklistEntry?.shipmentItem?.shipment?.recipient }">
-													${checklistEntry?.shipmentItem?.shipment?.recipient?.name?.encodeAsHTML()  }
+													${checklistEntry?.shipmentItem?.shipment?.recipient?.name}
 												</g:elseif>
 											</td>
 											<td>

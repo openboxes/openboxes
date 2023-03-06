@@ -77,10 +77,10 @@
 	                                  <label for="shipperServices"><warehouse:message code="shipper.shipperServices.label" /></label>
 	                                </td>
 	                                <td valign="top" class="value ${hasErrors(bean: shipperInstance, field: 'shipperServices', 'errors')}">
-	                                    
+
 <ul>
 <g:each in="${shipperInstance?.shipperServices?}" var="s">
-    <li><g:link controller="shipperService" action="show" id="${s.id}">${s?.encodeAsHTML()}</g:link></li>
+    <li><g:link controller="shipperService" action="show" id="${s.id}">${s}</g:link></li>
 </g:each>
 </ul>
 <g:link controller="shipperService" action="create" params="['shipper.id': shipperInstance?.id]">${warehouse.message(code: 'default.add.label', args: [warehouse.message(code: 'shipperService.label', default: 'ShipperService')])}</g:link>

@@ -34,7 +34,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productType.productTypeCode.label" default="Product Type Code" /></td>
 
-                            <td valign="top" class="value">${productTypeInstance?.productTypeCode?.encodeAsHTML()}</td>
+                            <td valign="top" class="value">${productTypeInstance?.productTypeCode}</td>
 
                         </tr>
 
