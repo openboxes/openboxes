@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Tooltip } from 'react-tippy';
 
 import { renderFormField } from 'utils/form-utils';
-import SaveIndicator from 'utils/SaveIndicator';
+import RowSaveIndicator from 'utils/RowSaveIndicator';
 
 
 class TableRow extends Component {
@@ -94,8 +94,8 @@ class TableRow extends Component {
             hideDelay="50"
           >
             <div className="d-flex flex-row border-bottom table-inner-row">
-              {fieldsConfig.showSaveIndicator &&
-                <SaveIndicator lineStatus={rowValues.saveStatus} />}
+              {fieldsConfig.showRowSaveIndicator &&
+                <RowSaveIndicator lineItemSaveStatus={rowValues.saveStatus} />}
               {this.rowRender(
                 properties, fieldsConfig, focusFieldMap, field, addRow,
                 removeRow, index, rowValues, rowRef,
@@ -105,8 +105,8 @@ class TableRow extends Component {
         )}
         {!tooltip && (
           <div className="d-flex flex-row border-bottom table-inner-row">
-            {fieldsConfig.showSaveIndicator &&
-              <SaveIndicator lineStatus={rowValues.saveStatus} />}
+            {fieldsConfig.showRowSaveIndicator &&
+              <RowSaveIndicator lineItemSaveStatus={rowValues.saveStatus} />}
             {this.rowRender(
               properties, fieldsConfig, focusFieldMap, field, addRow,
               removeRow, index, rowValues, rowRef,

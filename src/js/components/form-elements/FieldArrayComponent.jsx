@@ -57,7 +57,7 @@ class FieldArrayComponent extends Component {
     } = this.props;
     const AddButton = fieldsConfig.addButton;
     const {
-      maxTableHeight, virtualized, overflowStyle = 'scroll', showSaveIndicator,
+      maxTableHeight, virtualized, overflowStyle = 'scroll', showRowSaveIndicator,
     } = fieldsConfig;
     const addRow = (row = {}, index = null, shouldScroll = true) => {
       if (index === null) {
@@ -162,7 +162,7 @@ class FieldArrayComponent extends Component {
               ...properties,
               focusField: this.focusField,
               copyDown: this.copyDown,
-              showSaveIndicator,
+              showRowSaveIndicator,
             }}
             addRow={addRow}
             fieldsConfig={fieldsConfig}

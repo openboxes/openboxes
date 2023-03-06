@@ -1,7 +1,7 @@
-const SaveStatus = {
+const RowSaveStatus = {
   SAVED: 'SAVED',
   PENDING: 'PENDING',
   ERROR: 'ERROR',
 };
 
-export default SaveStatus;
+export default RowSaveStatus;

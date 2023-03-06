@@ -19,7 +19,7 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import SaveStatus from 'consts/saveStatus';
+import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -61,7 +61,7 @@ const NO_STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
-    showSaveIndicator: true,
+    showRowSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
@@ -78,7 +78,7 @@ const NO_STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), saveStatus: SaveStatus.PENDING });
+          addRow({ sortOrder: getSortOrder(), saveStatus: RowSaveStatus.PENDING });
         }
         }
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -182,7 +182,7 @@ const STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
-    showSaveIndicator: true,
+    showRowSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
@@ -198,7 +198,7 @@ const STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), saveStatus: SaveStatus.PENDING });
+          addRow({ sortOrder: getSortOrder(), saveStatus: RowSaveStatus.PENDING });
           newItemAdded();
         }}
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -422,7 +422,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100, saveStatus: SaveStatus.PENDING });
+      lineItemsData = new Array(1).fill({ sortOrder: 100, saveStatus: RowSaveStatus.PENDING });
     } else {
       lineItemsData = _.map(
         data,
@@ -762,16 +762,16 @@ class AddItemsPage extends Component {
               // line is disabled by default
               if (
                 _.includes(savedItemsIds, item.id) &&
-                item.saveStatus !== SaveStatus.ERROR
+                item.saveStatus !== RowSaveStatus.ERROR
               ) {
-                return { ...item, saveStatus: SaveStatus.SAVED };
+                return { ...item, saveStatus: RowSaveStatus.SAVED };
               }
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
-                && item.saveStatus === SaveStatus.PENDING
+                && item.saveStatus === RowSaveStatus.PENDING
               ) {
-                return { ...itemToChange, disabled: true, saveStatus: SaveStatus.SAVED };
+                return { ...itemToChange, disabled: true, saveStatus: RowSaveStatus.SAVED };
               }
               return item;
             });
@@ -794,10 +794,10 @@ class AddItemsPage extends Component {
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
               item.product &&
-              item.saveStatus === SaveStatus.PENDING &&
+              item.saveStatus === RowSaveStatus.PENDING &&
               _.includes(notSavedItemsIds, item.product.id)
             ) {
-              return { ...item, saveStatus: SaveStatus.ERROR };
+              return { ...item, saveStatus: RowSaveStatus.ERROR };
             }
             return item;
           });
@@ -821,11 +821,11 @@ class AddItemsPage extends Component {
     const isEdited = rowIndex !== undefined;
     const itemsWithStatuses = values.lineItems.map((item) => {
       if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
-        return { ...fieldValue, saveStatus: SaveStatus.PENDING };
+        return { ...fieldValue, saveStatus: RowSaveStatus.PENDING };
       }
 
       if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
-        return { ...item, saveStatus: SaveStatus.ERROR };
+        return { ...item, saveStatus: RowSaveStatus.ERROR };
       }
 
       return item;
@@ -966,7 +966,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100, saveStatus: SaveStatus.PENDING }),
+            lineItems: new Array(1).fill({ sortOrder: 100, saveStatus: RowSaveStatus.PENDING }),
           },
         });
       })
@@ -1142,7 +1142,7 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid || !this.state.isSaveCompleted}
+                  disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1151,7 +1151,7 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid || !this.state.isSaveCompleted}
+                  disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
