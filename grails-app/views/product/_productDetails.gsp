@@ -61,15 +61,17 @@
                                              value="${productInstance?.category?.id}" />
                    </td>
                 </tr>
-                <tr class="prop">
-                    <td class="name middle">
-                      <label id="productFamily" for="category.id"><warehouse:message code="product.productFamily.label" /></label>
-                    </td>
-                    <td class="value ${hasErrors(bean: productInstance, field: 'productFamily', 'errors')}">
-                        <g:selectProductFamily name="productFamily.id" class="chzn-select-deselect" noSelection="['null':'']"
-                                             value="${productInstance?.productFamily?.id}" />
-                   </td>
-                </tr>
+                <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRODUCT_FAMILY)}">
+                    <tr class="prop">
+                        <td class="name middle">
+                          <label id="productFamily" for="category.id"><warehouse:message code="product.productFamily.label" /></label>
+                        </td>
+                        <td class="value ${hasErrors(bean: productInstance, field: 'productFamily', 'errors')}">
+                            <g:selectProductFamily name="productFamily.id" class="chzn-select-deselect" noSelection="['null':'']"
+                                                 value="${productInstance?.productFamily?.id}" />
+                       </td>
+                    </tr>
+                </g:if>
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.GL_ACCOUNT)}">
                     <tr class="prop">
                         <td class="name middle"><label id="glAccountLabel" id="glAccountLabel" for="glAccount.id"><warehouse:message code="product.glAccount.label"/></label></td>
