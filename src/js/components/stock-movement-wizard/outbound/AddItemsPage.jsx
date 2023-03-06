@@ -759,7 +759,10 @@ class AddItemsPage extends Component {
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
               // line is disabled by default
-              if (_.includes(savedItemsIds, item.id)) {
+              if (
+                _.includes(savedItemsIds, item.id) &&
+                item.status !== SaveStatus.ERROR
+              ) {
                 return { ...item, status: SaveStatus.SAVED };
               }
               if (
@@ -776,8 +779,6 @@ class AddItemsPage extends Component {
             });
             return;
           }
-
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
 
           this.setState({
             values: { ...this.state.values, lineItems: lineItemsBackendData },
