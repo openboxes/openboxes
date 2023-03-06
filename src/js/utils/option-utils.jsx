@@ -2,6 +2,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import productGroupApi from 'api/services/ProductGroupApi';
 import apiClient from 'utils/apiClient';
 
 
@@ -229,7 +230,7 @@ export const fetchProductsGlAccounts = async () => {
 };
 
 export const fetchProductGroups = async () => {
-  const { data } = await apiClient.get('/openboxes/api/productGroupOptions');
+  const { data } = await productGroupApi.getProductGroupsOptions();
   return data.data;
 };
 

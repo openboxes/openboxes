@@ -32,3 +32,6 @@ export const STOCKLIST_UNPUBLISH = id => `${STOCKLIST_API}/${id}/unpublish`;
 
 // GL ACCOUNTS
 export const GL_ACCOUNTS_OPTION = `${API}/glAccountOptions`;
+
+// PRODUCT GROUP
+export const PRODUCT_GROUP_OPTION = `${API}/productGroupOptions`;
