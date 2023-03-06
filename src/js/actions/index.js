@@ -29,6 +29,8 @@ import {
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
+  SET_OFFLINE,
+  SET_ONLINE,
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
@@ -47,6 +49,13 @@ export function hideSpinner() {
     type: HIDE_SPINNER,
     payload: false,
   };
+}
+
+export function setOnline() {
+  return { type: SET_ONLINE };
+}
+export function setOffline() {
+  return { type: SET_OFFLINE };
 }
 
 export function showUserActions() {

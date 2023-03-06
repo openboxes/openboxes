@@ -1,6 +1,9 @@
 export const SHOW_SPINNER = 'SHOW_SPINNER';
 export const HIDE_SPINNER = 'HIDE_SPINNER';
 
+export const SET_ONLINE = 'SET_ONLINE';
+export const SET_OFFLINE = 'SET_OFFLINE';
+
 export const TOGGLE_USER_ACTION_MENU = 'TOGGLE_USER_ACTION_MENU';
 
 export const FETCH_CURRENCIES = 'FETCH_CURRENCIES';

@@ -11,6 +11,7 @@ import { ClimbingBoxLoader } from 'react-spinners';
 import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
 import Loading from 'components/Loading';
+import useConnectionListener from 'hooks/useConnectionListener';
 
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
@@ -177,6 +178,8 @@ const AsyncStockTransferList = Loadable({
 
 
 const Router = (props) => {
+  useConnectionListener();
+
   const Dashboard = !props.supportedActivities.includes('MANAGE_INVENTORY') && props.supportedActivities.includes('SUBMIT_REQUEST')
     ? AsyncStockRequestDashboard
     : AsyncDashboard;

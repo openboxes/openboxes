@@ -11,7 +11,7 @@ import Router from 'components/Router';
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
 const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'productsConfiguration',
-  'locationsConfiguration', 'loadData'];
+  'locationsConfiguration', 'loadData', 'notification'];
 
 // TODO: Refactor fetching app context (fetchSessionInfo)
 // TODO: Refactor fetching menu config
@@ -60,6 +60,7 @@ const mapStateToProps = state => ({
 export default withLocalize(connect(mapStateToProps, {
   fetchTranslations, fetchSessionInfo, fetchMenuConfig,
 })(MainRouter));
+
 
 MainRouter.propTypes = {
   initialize: PropTypes.func.isRequired,

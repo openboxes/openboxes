@@ -1081,6 +1081,9 @@ grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{
 // Default Ajax request timeout
 openboxes.ajaxRequest.timeout = 120000
 
+// connection timeout milliseconds
+openboxes.browser.connection.status.timeout = 8000
+
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"

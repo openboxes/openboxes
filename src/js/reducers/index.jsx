@@ -1,6 +1,7 @@
 import { localizeReducer } from 'react-localize-redux';
 import { combineReducers } from 'redux';
 
+import connectionReducer from 'reducers/connectionReducer';
 import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
@@ -19,6 +20,7 @@ import usersReducer from 'reducers/usersReducer';
 const rootReducer = combineReducers({
   localize: localizeReducer,
   spinner: spinnerReducer,
+  connection: connectionReducer,
   reasonCodes: reasonCodesReducer,
   users: usersReducer,
   session: sessionReducer,
