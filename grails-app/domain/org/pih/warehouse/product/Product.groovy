@@ -758,8 +758,7 @@ class Product implements Comparable, Serializable {
     }
 
     Map getDisplayNameMap() {
-        // FIXME If you cannot retrieve this easily just change the empty string ("") to "default"
-        def data = ["": getDisplayName(LocalizationUtil.currentLocale)]
+        def data = ["default": getDisplayName(LocalizationUtil.currentLocale)]
         def supportedLocales = ConfigurationHolder.config.openboxes.locale.supportedLocales
         def locales = supportedLocales.each {
             Locale locale = new Locale(it)
