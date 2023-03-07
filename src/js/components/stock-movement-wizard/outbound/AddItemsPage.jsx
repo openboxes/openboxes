@@ -19,6 +19,7 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -60,6 +61,7 @@ const NO_STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
+    showRowSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
@@ -76,7 +78,7 @@ const NO_STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
+          addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
         }
         }
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -118,7 +120,14 @@ const NO_STOCKLIST_FIELDS = {
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
           onBlur: () => {
             updateRow(values, rowIndex);
-            saveProgress(values);
+            saveProgress({ values });
+          },
+          onChange: (value) => {
+            saveProgress({
+              values,
+              rowIndex,
+              fieldValue: { ...fieldValue, quantityRequested: value },
+            });
           },
         }),
       },
@@ -148,7 +157,14 @@ const NO_STOCKLIST_FIELDS = {
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
-            saveProgress(values);
+            saveProgress({ values });
+          },
+          onChange: (event) => {
+            saveProgress({
+              values,
+              rowIndex,
+              fieldValue: { ...fieldValue, recipient: event },
+            });
           },
         }),
         attributes: {
@@ -166,6 +182,7 @@ const STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
+    showRowSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
@@ -181,7 +198,7 @@ const STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder() });
+          addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           newItemAdded();
         }}
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -198,7 +215,7 @@ const STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
         }) => ({
-          onBlur: () => saveProgress(values),
+          onBlur: () => saveProgress({ values }),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
@@ -217,9 +234,6 @@ const STOCKLIST_FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ saveProgress, values }) => ({
-          onBlur: () => saveProgress(values),
-        }),
       },
       quantityRequested: {
         type: TextField,
@@ -247,7 +261,14 @@ const STOCKLIST_FIELDS = {
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
-            saveProgress(values);
+            saveProgress({ values });
+          },
+          onChange: (event) => {
+            saveProgress({
+              values,
+              rowIndex,
+              fieldValue: { ...values.lineItems[rowIndex], quantityRequested: event },
+            });
           },
         }),
       },
@@ -328,6 +349,7 @@ class AddItemsPage extends Component {
    * @param {object} lineItems
    * @public
    */
+
   getLineItemsToBeSaved(lineItems) {
     const lineItemsToBeAdded = _.filter(lineItems, item =>
       !item.statusCode &&
@@ -336,6 +358,10 @@ class AddItemsPage extends Component {
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
+      // We wouldn't update items with quantity requested < 0
+      if (parseInt(item.quantityRequested, 10) < 0) {
+        return; // lodash continue
+      }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem?.quantityRequested, 10);
       const newQty = parseInt(item?.quantityRequested, 10);
@@ -396,7 +422,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100 });
+      lineItemsData = new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     } else {
       lineItemsData = _.map(
         data,
@@ -734,20 +760,23 @@ class AddItemsPage extends Component {
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
               // line is disabled by default
-              if (_.includes(savedItemsIds, item.id)) {
-                return item;
+              if (
+                _.includes(savedItemsIds, item.id) &&
+                item.rowSaveStatus !== RowSaveStatus.ERROR
+              ) {
+                return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
               }
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
+                && item.rowSaveStatus === RowSaveStatus.PENDING
               ) {
-                return { ...itemToChange, disabled: true };
+                return { ...itemToChange, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
               return item;
             });
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
-              currentLineItems: lineItemsBackendData,
             });
             return;
           }
@@ -757,20 +786,60 @@ class AddItemsPage extends Component {
             currentLineItems: lineItemsBackendData,
           });
         })
-        .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
+        .catch(() => {
+          // When there is an error during saving we have to find products which
+          // caused the error. These items are not saved, so we don't have line ID,
+          // and we have to find these items by product ID and SaveStatus
+          const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
+          const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
+            if (
+              item.product &&
+              item.rowSaveStatus === RowSaveStatus.PENDING &&
+              _.includes(notSavedItemsIds, item.product.id)
+            ) {
+              return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
+            }
+            return item;
+          });
+          this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
+          return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
+        });
     }
 
-    actionInProgress = false;
     return Promise.resolve();
   }
 
-  saveProgress = (values) => {
+  // if rowIndex is passed, it means that we are editing row
+  // not adding new one
+  saveProgress = ({ values, rowIndex, fieldValue }) => {
     if (actionInProgress) {
       return;
     }
-    this.setState({ isSaveCompleted: false });
+    // I can't check !!rowIndex, because it can be 0,
+    // so there is possibility to return false when the
+    // rowIndex is present
+    const isEdited = rowIndex !== undefined;
+    const itemsWithStatuses = values.lineItems.map((item) => {
+      if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
+        return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
+      }
 
-    this.saveRequisitionItemsInCurrentStep(values.lineItems, false).then(() => {
+      if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
+        return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
+      }
+
+      return item;
+    });
+
+    this.setState({ isSaveCompleted: false, values: { ...values, lineItems: itemsWithStatuses } });
+
+    // We don't want to save the item during editing or
+    // when there is an error in line
+    if (isEdited) {
+      return;
+    }
+
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false).then(() => {
       this.setState({ isSaveCompleted: true });
     });
   };
@@ -897,7 +966,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100 }),
+            lineItems: new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
           },
         });
       })
@@ -1073,7 +1142,7 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid || !this.state.isSaveCompleted}
+                  disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1082,7 +1151,7 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="button"
-                  disabled={invalid || !this.state.isSaveCompleted}
+                  disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.saveAndExit(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1134,7 +1203,7 @@ class AddItemsPage extends Component {
               <div className="submit-buttons">
                 <button
                   type="button"
-                  disabled={invalid || showOnly}
+                  disabled={invalid || showOnly || !this.state.isSaveCompleted}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"

@@ -1350,3 +1350,20 @@ div.search-input:focus-within {
   }
 }
 
+// Save indicators styling
+
+.line-item-save-indicator {
+  width: 3px;
+
+  &.pending {
+    background-color: var(--color-yellow);
+  }
+
+  &.saved {
+    background-color: var(--color-green);
+  }
+
+  &.error {
+    background-color: var(--color-red);
+  }
+}
