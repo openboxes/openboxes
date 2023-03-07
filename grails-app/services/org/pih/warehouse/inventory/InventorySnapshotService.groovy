@@ -515,12 +515,13 @@ class InventorySnapshotService {
                     quantityOutbound
 
             def row = [
-                    "Code"       : product.productCode,
-                    "Name"       : product.translatedNameWithLocaleCode,
-                    "Category"   : product.category.name,
-                    "Formulary"  : product.productCatalogsToString(),
-                    "Tag"        : product.tagsToString(),
-                    "Unit Cost"  : product.pricePerUnit ?: ''
+                    "Code"          : product.productCode,
+                    "Name"          : product.translatedNameWithLocaleCode,
+                    "Product Family": product?.productFamily?.name ?: '',
+                    "Category"      : product.category.name,
+                    "Formulary"     : product.productCatalogsToString(),
+                    "Tag"           : product.tagsToString(),
+                    "Unit Cost"     : product.pricePerUnit ?: ''
             ]
             row.put("Opening", balanceOpening)
             def includeRow = balanceOpening || balanceClosing || quantityAdjustments
