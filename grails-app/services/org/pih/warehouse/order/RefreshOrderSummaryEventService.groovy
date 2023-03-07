@@ -24,6 +24,8 @@ class RefreshOrderSummaryEventService implements ApplicationListener<RefreshOrde
         if (event?.orderIds && !event.disableRefresh) {
             log.info "Refreshing order summary ${event.isDelete ? 'before delete action' : ''} for orders with ids : ${event.orderIds}"
             orderService.refreshOrderSummary(event.orderIds, event.isDelete)
+        } else {
+            log.info "Event not processed because ${!event?.orderIds ? 'lack of purchase order ids.' : 'it was disabled by event publisher.'}"
         }
     }
 }

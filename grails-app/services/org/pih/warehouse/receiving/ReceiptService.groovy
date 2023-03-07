@@ -366,6 +366,7 @@ class ReceiptService {
 
         // Associate the incoming transaction with the shipment
         shipment.addToIncomingTransactions(creditTransaction)
+        shipment.disableRefresh = false
         shipment.save(flush: true)
 
         return creditTransaction
