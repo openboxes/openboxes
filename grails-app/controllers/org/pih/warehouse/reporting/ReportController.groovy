@@ -469,6 +469,9 @@ class ReportController {
                 def csv = new CSVWriter(sw, {
                     "Code" { it.productCode }
                     "Product" { it.productName }
+                    "Product family" { it.productFamily }
+                    "Category" { it.category }
+                    "Formulary" { it.productCatalogs }
                     "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
                     "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
                     "PO Number" { it.orderNumber }
@@ -490,6 +493,9 @@ class ReportController {
                     csv << [
                             productCode  : it.product?.productCode,
                             productName  : it.product?.translatedNameWithLocaleCode,
+                            productFamily : it.product?.productFamily?.name ?: '',
+                            category      : it.product?.category?.name ?: '',
+                            productCatalogs      : it.product?.productCatalogs?.join(", "),
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
@@ -516,6 +522,9 @@ class ReportController {
                 def csv = new CSVWriter(sw, {
                     "Code" { it.productCode }
                     "Product" { it.productName }
+                    "Product family" { it.productFamily }
+                    "Category" { it.category }
+                    "Formulary" { it.productCatalogs }
                     "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
                     "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
                     "Total On Order" { it.totalOnOrder }
