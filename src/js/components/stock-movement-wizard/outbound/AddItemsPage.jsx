@@ -78,7 +78,7 @@ const NO_STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), saveStatus: RowSaveStatus.PENDING });
+          addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
         }
         }
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -198,7 +198,7 @@ const STOCKLIST_FIELDS = {
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
         onMouseDown={() => {
           updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), saveStatus: RowSaveStatus.PENDING });
+          addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           newItemAdded();
         }}
       ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
@@ -422,7 +422,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100, saveStatus: RowSaveStatus.PENDING });
+      lineItemsData = new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     } else {
       lineItemsData = _.map(
         data,
@@ -762,16 +762,16 @@ class AddItemsPage extends Component {
               // line is disabled by default
               if (
                 _.includes(savedItemsIds, item.id) &&
-                item.saveStatus !== RowSaveStatus.ERROR
+                item.rowSaveStatus !== RowSaveStatus.ERROR
               ) {
-                return { ...item, saveStatus: RowSaveStatus.SAVED };
+                return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
               }
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
-                && item.saveStatus === RowSaveStatus.PENDING
+                && item.rowSaveStatus === RowSaveStatus.PENDING
               ) {
-                return { ...itemToChange, disabled: true, saveStatus: RowSaveStatus.SAVED };
+                return { ...itemToChange, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
               return item;
             });
@@ -794,10 +794,10 @@ class AddItemsPage extends Component {
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
               item.product &&
-              item.saveStatus === RowSaveStatus.PENDING &&
+              item.rowSaveStatus === RowSaveStatus.PENDING &&
               _.includes(notSavedItemsIds, item.product.id)
             ) {
-              return { ...item, saveStatus: RowSaveStatus.ERROR };
+              return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
             }
             return item;
           });
@@ -821,11 +821,11 @@ class AddItemsPage extends Component {
     const isEdited = rowIndex !== undefined;
     const itemsWithStatuses = values.lineItems.map((item) => {
       if (isEdited && rowIndex === values.lineItems.indexOf(item)) {
-        return { ...fieldValue, saveStatus: RowSaveStatus.PENDING };
+        return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
 
       if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
-        return { ...item, saveStatus: RowSaveStatus.ERROR };
+        return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
       }
 
       return item;
@@ -966,7 +966,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100, saveStatus: RowSaveStatus.PENDING }),
+            lineItems: new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
           },
         });
       })
