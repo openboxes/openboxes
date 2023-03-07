@@ -1203,7 +1203,7 @@ class AddItemsPage extends Component {
               <div className="submit-buttons">
                 <button
                   type="button"
-                  disabled={invalid || showOnly}
+                  disabled={invalid || showOnly || !this.state.isSaveCompleted}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.previousPage(values, invalid)}
                   className="btn btn-outline-primary btn-form btn-xs"
