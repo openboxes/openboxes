@@ -316,10 +316,10 @@ class ForecastingService {
             [
                     productCode             : it?.product_code,
                     productName             : product?.translatedNameWithLocaleCode ?: it?.product_name,
-                    productFamily           : product?.productFamily?.name,
-                    category                : product?.category,
+                    productFamily           : product?.productFamily?.name ?: '',
+                    category                : product?.category ?: '',
                     productCatalogs         : product?.productCatalogs?.join(", "),
-                    unitPrice               : it?.price_per_unit,
+                    unitPrice               : it?.price_per_unit ?: '',
                     origin                  : it?.origin_name,
                     requestNumber           : it?.request_number,
                     destination             : it?.destination_name,
@@ -328,8 +328,8 @@ class ForecastingService {
                     quantityRequested       : it?.quantity_requested ?: 0,
                     quantityIssued          : it?.quantity_picked ?: 0,
                     quantityDemand          : it?.quantity_demand ?: 0,
-                    reasonCode              : it?.reason_code,
-                    reasonCodeClassification: it?.reason_code_classification,
+                    reasonCode              : it?.reason_code ?: '',
+                    reasonCodeClassification: it?.reason_code_classification ?: '',
             ]
         }
         return data

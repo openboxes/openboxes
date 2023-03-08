@@ -1849,15 +1849,15 @@ class JsonController {
                             destination             : it.destination,
                             productCode             : it.productCode,
                             productName             : it.productName,
-                            productFamily           : it.productFamily ?: '',
-                            category                : it.category ?: '',
-                            productCatalogs         : it.productCatalogs ?: '',
-                            unitPrice               : it.unitPrice ?: '',
+                            productFamily           : it.productFamily,
+                            category                : it.category,
+                            productCatalogs         : it.productCatalogs,
+                            unitPrice               : it.unitPrice,
                             qtyRequested            : it.quantityRequested,
                             qtyIssued               : it.quantityIssued,
                             qtyDemand               : it.quantityDemand,
-                            reasonCode              : it.reasonCode ?: '',
-                            reasonCodeClassification: it.reasonCodeClassification ?: '',
+                            reasonCode              : it.reasonCode,
+                            reasonCodeClassification: it.reasonCodeClassification,
                     ]
                 }
 
