@@ -316,6 +316,9 @@ class ForecastingService {
             [
                     productCode             : it?.product_code,
                     productName             : product?.translatedNameWithLocaleCode ?: it?.product_name,
+                    productFamily           : product?.productFamily?.name,
+                    category                : product?.category,
+                    productCatalogs         : product?.productCatalogs?.join(", "),
                     unitPrice               : it?.price_per_unit,
                     origin                  : it?.origin_name,
                     requestNumber           : it?.request_number,
