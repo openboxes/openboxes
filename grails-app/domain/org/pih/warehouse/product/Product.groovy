@@ -13,6 +13,7 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
@@ -249,9 +250,11 @@ class Product implements Comparable, Serializable {
                          "handlingIcons",
                          "uoms",
                          "displayName",
+                         "displayNames",
                          "displayNameOrDefaultName",
                          "translatedName",
-                         "translatedNameWithLocaleCode"
+                         "translatedNameWithLocaleCode",
+                         "displayNameWithLocaleCode"
     ]
 
     static hasMany = [
@@ -688,12 +691,20 @@ class Product implements Comparable, Serializable {
         return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
+    /**
+     * @deprecated remove once all references have been replaced by displayName
+     */
     String getTranslatedNameWithLocaleCode() {
         String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
-    List<Synonym> getSynonymsByLocale(SynonymTypeCode synonymTypeCode, Locale locale) {
+    String getDisplayNameWithLocaleCode() {
+        String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
+        return "${name}${displayName ? " (${localeTag}: ${displayName})" : ''}"
+    }
+
+    List<Synonym> getSynonyms(SynonymTypeCode synonymTypeCode, Locale locale) {
         return synonyms.findAll { Synonym synonym ->
             synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
         } as List
@@ -711,8 +722,16 @@ class Product implements Comparable, Serializable {
      * @return the display name if it exists or null
      */
     String getDisplayName() {
-        List<Synonym> synonyms = getSynonymsByLocale(SynonymTypeCode.DISPLAY_NAME, LocalizationUtil.currentLocale)
+        return getDisplayName(LocalizationUtil.currentLocale)
+    }
+
+    String getDisplayName(Locale locale) {
+        List<Synonym> synonyms =  getSynonyms(SynonymTypeCode.DISPLAY_NAME, locale)
         return !synonyms.empty ? synonyms.first().name : null
+    }
+
+    List<Synonym> getSynonyms(SynonymTypeCode synonymTypeCode) {
+        return getSynonyms(synonymTypeCode, LocalizationUtil.currentLocale)
     }
 
     /**
@@ -722,6 +741,18 @@ class Product implements Comparable, Serializable {
         return displayName ?: name
     }
 
+    Map getDisplayNames() {
+        def data = ["default": getDisplayName(LocalizationUtil.currentLocale)]
+        List<Locale> locales = LocalizationUtil.supportedLocales
+        locales.each { Locale locale ->
+            String displayName = getDisplayName(locale)
+            // Don't include in the map locales which do not have display name for the product
+            if (displayName) {
+                data.put(locale.toLanguageTag(), displayName)
+            }
+        }
+        return data
+    }
 
     Map toJson() {
         [
