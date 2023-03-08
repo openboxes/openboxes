@@ -42,6 +42,10 @@ module.exports = {
       templateParameters: compilation => ({
         jsSource: `\${createLinkTo(dir:'/js', file:'bundle.${compilation.hash}.js')}`,
         cssSource: `\${createLinkTo(dir:'css/', file:'bundle.${compilation.hash}.css')}`,
+        // eslint-disable-next-line no-template-curly-in-string
+        gaEnabled: '${grailsApplication.config.google.analytics.enabled}',
+        // eslint-disable-next-line no-template-curly-in-string
+        webPropertyID: '${grailsApplication.config.google.analytics.webPropertyID}',
         receivingIfStatement: '',
       }),
     }),
@@ -52,6 +56,10 @@ module.exports = {
       templateParameters: compilation => ({
         jsSource: `\${createLinkTo(dir:'/js', file:'bundle.${compilation.hash}.js')}`,
         cssSource: `\${createLinkTo(dir:'css/', file:'bundle.${compilation.hash}.css')}`,
+        // eslint-disable-next-line no-template-curly-in-string
+        gaEnabled: '${grailsApplication.config.google.analytics.enabled}',
+        // eslint-disable-next-line no-template-curly-in-string
+        webPropertyID: '${grailsApplication.config.google.analytics.webPropertyID}',
         receivingIfStatement:
           // eslint-disable-next-line no-template-curly-in-string
           '<g:if test="${!params.id}">' +

@@ -5,6 +5,10 @@
 </head>
 
 <body>
+    <script>
+      window.GA_ENABLED = "<%= gaEnabled %>";
+      window.WEB_PROPERTY_ID = "<%= webPropertyID %>";
+    </script>
     <div id="root"></div>
     <link rel="stylesheet" href="<%= cssSource %>">
     <script src="<%= jsSource %>" type="text/javascript" ></script>
