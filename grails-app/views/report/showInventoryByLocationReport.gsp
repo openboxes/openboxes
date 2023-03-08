@@ -62,6 +62,7 @@
                         <tr>
                             <th><warehouse:message code="product.productCode.label" default="Code"/></th>
                             <th><warehouse:message code="product.label" default="Product"/></th>
+                            <th><warehouse:message code="product.productFamily.label" default="Product Family"/></th>
                             <th><warehouse:message code="product.primaryCategory.label" default="Category"/></th>
                             <th><warehouse:message code="catalogs.label" default="Formularies"/></th>
                             <th><warehouse:message code="product.tags.label" default="Tags"/></th>
@@ -87,6 +88,9 @@
                                 </td>
                                 <td>
                                     ${product?.name}  <g:renderHandlingIcons product="${product}" />
+                                </td>
+                                <td>
+                                    ${product?.productFamily?.name}
                                 </td>
                                 <td>
                                     ${product?.category?.name}

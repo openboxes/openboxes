@@ -550,6 +550,7 @@ class ReportController {
                 if (command.entries) {
                     sw.append("Code").append(",")
                     sw.append("Product").append(",")
+                    sw.append("Product Family").append(",")
                     sw.append("Category").append(",")
                     sw.append("Formularies").append(",")
                     sw.append("Tags").append(",")
@@ -574,6 +575,7 @@ class ReportController {
 
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.translatedNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
