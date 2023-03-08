@@ -224,8 +224,8 @@ export const fetchProductsTags = async () => {
   return response.data.data;
 };
 
-export const fetchProductsGlAccounts = async () => {
-  const { data } = await glAccountApi.getGlAccountOptions();
+export const fetchProductsGlAccounts = async (params) => {
+  const { data } = await glAccountApi.getGlAccountOptions({ params });
   return data.data;
 };
 
