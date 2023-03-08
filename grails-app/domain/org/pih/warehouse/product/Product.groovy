@@ -249,13 +249,12 @@ class Product implements Comparable, Serializable {
                          "applicationTagLib",
                          "handlingIcons",
                          "uoms",
-                         "alias",
-                         "aliases",
                          "displayName",
-                         "displayNameMap",
+                         "displayNames",
                          "displayNameOrDefaultName",
                          "translatedName",
-                         "translatedNameWithLocaleCode"
+                         "translatedNameWithLocaleCode",
+                         "displayNameWithLocaleCode"
     ]
 
     static hasMany = [
@@ -692,9 +691,17 @@ class Product implements Comparable, Serializable {
         return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
     }
 
+    /**
+     * @deprecated remove once all references have been replaced by displayName
+     */
     String getTranslatedNameWithLocaleCode() {
         String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
         return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
+    }
+
+    String getDisplayNameWithLocaleCode() {
+        String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
+        return "${name}${displayName ? " (${localeTag}: ${displayName})" : ''}"
     }
 
     List<Synonym> getSynonyms(SynonymTypeCode synonymTypeCode, Locale locale) {
@@ -734,35 +741,15 @@ class Product implements Comparable, Serializable {
         return displayName ?: name
     }
 
-    Map getAlias() {
-        return getAlias(LocalizationUtil.currentLocale)
-    }
-
-    Map getAlias(Locale locale) {
-        return [
-                locale          : locale,
-                displayName     : getDisplayName(locale),
-                alternativeNames: getSynonyms(SynonymTypeCode.ALTERNATE_NAME, locale),
-                brandNames      : getSynonyms(SynonymTypeCode.BRAND_NAME, locale),
-        ]
-    }
-
-    // FIXME Come up with a better way to handle this i.e. store Locale objects in memory
-    Map getAliases() {
-        def supportedLocales = ConfigurationHolder.config.openboxes.locale.supportedLocales
-        def locales = supportedLocales.collect { return new Locale(it) }
-        def aliasMap = [:]
-        aliasMap.put("default", alias)
-        locales.each { Locale locale -> aliasMap.put(locale, getAlias(locale)) }
-        return aliasMap
-    }
-
-    Map getDisplayNameMap() {
+    Map getDisplayNames() {
         def data = ["default": getDisplayName(LocalizationUtil.currentLocale)]
-        def supportedLocales = ConfigurationHolder.config.openboxes.locale.supportedLocales
-        def locales = supportedLocales.each {
-            Locale locale = new Locale(it)
-            data.put(locale, getDisplayName(locale))
+        List<Locale> locales = LocalizationUtil.supportedLocales
+        locales.each { Locale locale ->
+            String displayName = getDisplayName(locale)
+            // Don't include in the map locales which do not have display name for the product
+            if (displayName) {
+                data.put(locale.toLanguageTag(), getDisplayName(locale))
+            }
         }
         return data
     }

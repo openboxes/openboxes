@@ -272,7 +272,7 @@ class BootStrap {
                     // that includes the display name for all locales. This gives us a little more
                     // flexibility in case we don't like it or it performs poorly. We can also
                     // convert it into a DTO class if we end up liking it.
-                    displayName        : product.displayNameMap,
+                    displayNames        : product.displayNames,
             ]
         }
 
