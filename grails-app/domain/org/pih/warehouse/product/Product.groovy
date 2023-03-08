@@ -748,7 +748,7 @@ class Product implements Comparable, Serializable {
             String displayName = getDisplayName(locale)
             // Don't include in the map locales which do not have display name for the product
             if (displayName) {
-                data.put(locale.toLanguageTag(), getDisplayName(locale))
+                data.put(locale.toLanguageTag(), displayName)
             }
         }
         return data
