@@ -6,10 +6,11 @@
  * By using this software in any fashion, you are agreeing to be bound by
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
- **/ 
+ **/
 package org.pih.warehouse.product
 
 import grails.test.*
+import org.junit.Test
 import org.pih.warehouse.core.User
 import org.springframework.context.ApplicationEvent
 
@@ -23,12 +24,13 @@ class ProductGroupTests extends GrailsUnitTestCase {
         Product.metaClass.static.withNewSession = {Closure c -> c.call() }
         User.metaClass.static.withNewSession = {Closure c -> c.call() }
         Product.metaClass.publishEvent = { ApplicationEvent event -> }
+		mockDomain(ProductGroup)
     }
 
 	protected void tearDown() {
 		super.tearDown()
 	}
-	
+
 	void testProductGroup() {
 		def productGroup = new ProductGroup()
 		def category = new Category()
@@ -46,38 +48,56 @@ class ProductGroupTests extends GrailsUnitTestCase {
 
 		productGroup = new ProductGroup(name: "Name", description: "Description", category: category)
 	}
-	
-	void testProductGroupHasManyProducts() { 
+
+	void testProductGroupHasManyProducts() {
 		def category = new Category(id:"1", name: "Medicines")
 		def productType = new ProductType(id: "DEFAULT", name: "Default")
 		def product = new Product(id:"1", name: "Ibuprofen", category: category, productType: productType)
 		def productGroup = new ProductGroup(id:"1", name:"Ibuprofen", category: category)
 		mockDomain(Category, [category])
 		mockDomain(ProductGroup, [productGroup])
-		mockDomain(Product, [product])		
+		mockDomain(Product, [product])
 		category.save(failOnError:true,flush:true)
 		product.save(failOnError:true,flush:true)
 		//productGroup.save(failOnError:true,flush:true)
 		println productGroup
-		
+
 		println product
 		println category
 		println product.id
 		println category.id
 		assertNotNull product.id
 		assertNotNull category.id
-		
+
 		product.addToProductGroups(productGroup)
 		product.save(flush:true, failOnError:true)
-		
+
 		assertNotNull product.productGroups
 		assertEquals 1, product.productGroups.size()
-		
+
 		// Apparently the bi-directional association does not work in unit tests
 		productGroup = ProductGroup.get(productGroup.id)
 		println productGroup
 		println productGroup.products
 		//assertNotNull productGroup.products
 		//assertEquals 1, productGroup.products.size()
+	}
+
+	@Test
+	void test_productGroupNameUniqueErrorsCount() {
+		ProductGroup productGroup1 = new ProductGroup(name: "test")
+		productGroup1.save(flush: true)
+		ProductGroup productGroup2 = new ProductGroup(name: "test")
+		productGroup2.validate()
+		assertEquals(1, productGroup2.errors.errorCount)
+	}
+
+	@Test
+	void test_productGroupNameUniqueHasErrorOnNameProperty() {
+		ProductGroup productGroup = new ProductGroup(name: "test")
+		productGroup.save(flush: true)
+		ProductGroup productGroupDuplicate = new ProductGroup(name: "test")
+		productGroupDuplicate.validate()
+		assertTrue(productGroupDuplicate.errors.hasFieldErrors("name"))
 	}
 }
