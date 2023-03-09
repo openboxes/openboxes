@@ -145,15 +145,15 @@ const NO_STOCKLIST_FIELDS = {
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowRight: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowDown: rowCount === rowIndex + 1 ? () => () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
