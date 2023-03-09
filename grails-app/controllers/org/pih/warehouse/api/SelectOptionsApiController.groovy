@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductGroup
@@ -19,37 +20,38 @@ import org.pih.warehouse.product.ProductGroup
 class SelectOptionsApiController {
 
     GenericApiService genericApiService;
+    GlAccountService glAccountService;
 
     def glAccountOptions = {
-        def glAccounts = genericApiService.getList(GlAccount.class.simpleName, [:]).collect {
+        List<GlAccount> glAccounts = glAccountService.getGlAccounts(params).collect {
             [id: it.id, label: "${it.code} - ${it.name}"]
         }
         render([data: glAccounts] as JSON)
     }
 
     def productGroupOptions = {
-        def productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:]).collect {
+        List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:]).collect {
             [id: it.id, label: "${it.name}"]
         }
         render([data: productGroups] as JSON)
     }
 
     def catalogOptions = {
-        def catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
+        List<ProductCatalog> catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
             [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
         }
         render([data: catalogs] as JSON)
     }
 
     def categoryOptions = {
-        def categories = genericApiService.getList(Category.class.simpleName, [:]).collect {
+        List<Category> categories = genericApiService.getList(Category.class.simpleName, [:]).collect {
             [id: it.id, label: it.getHierarchyAsString(" > ")]
         }
         render([data: categories] as JSON)
     }
 
     def tagOptions = {
-        def tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
+        List<Tag> tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
             [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
         }
         render([data: tags] as JSON)

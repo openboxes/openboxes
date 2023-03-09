@@ -82,7 +82,7 @@ const useProductFilters = () => {
       fetchProductsCategories(),
       fetchProductsCatalogs(),
       fetchProductsTags(),
-      fetchProductsGlAccounts(),
+      fetchProductsGlAccounts({ active: true }),
       fetchProductGroups(),
     ]);
     setCatalogs(catalogList);
