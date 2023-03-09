@@ -79,7 +79,7 @@
                     </td>
                     <td class="middle">
                         <g:if test="${j==0}">
-                            <g:translatedProductName product="${orderItem?.product}" />
+                            ${orderItem?.product?.displayNameOrDefaultName}
                         </g:if>
                     </td>
                     <td class="center middle">

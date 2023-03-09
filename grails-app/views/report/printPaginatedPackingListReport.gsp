@@ -167,7 +167,8 @@
                                                     ${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode?:checklistEntry?.shipmentItem?.product?.productCode}
                                                 </td>
                                                 <td>
-                                                    <g:translatedProductName product="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}"/>
+                                                    <g:set var="product" value="${checklistEntry?.shipmentItem?.inventoryItem?.product?:checklistEntry?.shipmentItem?.product}" />
+                                                    ${product?.displayNameOrDefaultName}
                                                 </td>
                                                 <td>
                                                     ${checklistEntry?.shipmentItem?.inventoryItem?.lotNumber?:checklistEntry?.shipmentItem?.lotNumber  }

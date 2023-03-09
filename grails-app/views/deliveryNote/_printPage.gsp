@@ -90,10 +90,10 @@
                             <td class="middle" rowspan="${numInventoryItem}">
                                 <g:if test="${requisitionItem?.parentRequisitionItem?.isSubstituted()}">
                                     <div class="canceled">
-                                        <g:translatedProductName product="${requisitionItem?.parentRequisitionItem?.product}" />
+                                        ${requisitionItem?.parentRequisitionItem?.product?.displayNameOrDefaultName}
                                     </div>
                                 </g:if>
-                                <g:translatedProductName product="${requisitionItem?.product}" />
+                                ${requisitionItem?.product?.displayNameOrDefaultName}
                             </td>
                             <td class="center middle" rowspan="${numInventoryItem}">
                                 <g:if test="${j==0}">
