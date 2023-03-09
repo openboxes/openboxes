@@ -1829,6 +1829,9 @@ class JsonController {
                     "Destination" { it.destination }
                     "Product Code" { it.productCode }
                     "Product Name" { it.productName }
+                    "Product Family" { it.productFamily }
+                    "Category" { it.category }
+                    "Formulary" { it.productCatalogs }
                     "Unit Price" { it.unitPrice }
                     "Quantity Requested" { it.qtyRequested }
                     "Quantity Issued" { it.qtyIssued }
@@ -1846,12 +1849,15 @@ class JsonController {
                             destination             : it.destination,
                             productCode             : it.productCode,
                             productName             : it.productName,
-                            unitPrice               : it.unitPrice ?: '',
+                            productFamily           : it.productFamily,
+                            category                : it.category,
+                            productCatalogs         : it.productCatalogs,
+                            unitPrice               : it.unitPrice,
                             qtyRequested            : it.quantityRequested,
                             qtyIssued               : it.quantityIssued,
                             qtyDemand               : it.quantityDemand,
-                            reasonCode              : it.reasonCode ?: '',
-                            reasonCodeClassification: it.reasonCodeClassification ?: '',
+                            reasonCode              : it.reasonCode,
+                            reasonCodeClassification: it.reasonCodeClassification,
                     ]
                 }
 
