@@ -299,6 +299,7 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isSaveCompleted: true,
+      sentToSave: [],
     };
 
     this.props.showSpinner();
@@ -355,6 +356,13 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
+    // Here we have adding sent items to state, because we want to avoid
+    // sending a request with the same items few times
+    // (this problem occurs only during adding new items, because
+    // items which are already saved have theirs own IDs)
+    this.setState({
+      sentToSave: [...this.state.sentToSave, ...lineItemsToBeAdded],
+    });
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -718,7 +726,10 @@ class AddItemsPage extends Component {
    * @public
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
-    const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
+    // We filter out items which were already sent to save
+    const filteredCandidates = itemCandidatesToSave.filter(candidate =>
+      !this.state.sentToSave.includes(candidate));
+    const itemsToSave = this.getLineItemsToBeSaved(filteredCandidates);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
@@ -805,6 +816,19 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
+
+    // We want to change status to saved if we don't
+    // have items to edit or save, but we made changes
+    // (situation when saved item quantity was changed to
+    // negative number, then we get back to the previous positive number)
+    const newStatusesAfterEdit = itemCandidatesToSave.map((item) => {
+      if (item.rowSaveStatus === RowSaveStatus.PENDING) {
+        return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
+      }
+      return item;
+    });
+
+    this.setState({ values: { ...this.state.values, lineItems: newStatusesAfterEdit } });
 
     return Promise.resolve();
   }
@@ -905,6 +929,7 @@ class AddItemsPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        this.setState({ isSaveCompleted: true });
       })
       .catch(() => this.props.hideSpinner())
       .finally(() => {
