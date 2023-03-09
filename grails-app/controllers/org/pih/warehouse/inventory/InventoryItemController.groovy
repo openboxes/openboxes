@@ -926,7 +926,7 @@ class InventoryItemController {
                     log.error("Sorry, unable to add new item to shipment.  Please try again.")
                     flash.message = "${warehouse.message(code: 'inventoryItem.unableToAddItemToShipment.message')}"
                 } else {
-                    def productDescription = format.product(product: productInstance) + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : ""
+                    def productDescription = format.product(product: productInstance).decodeHTML() + (inventoryItem?.lotNumber) ? " #" + inventoryItem?.lotNumber : ""
                     flash.message = "${warehouse.message(code: 'inventoryItem.addedItemToShipment.message', args: [productDescription, shipmentInstance?.name])}"
                 }
             }
