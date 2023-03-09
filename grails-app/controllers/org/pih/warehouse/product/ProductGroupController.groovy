@@ -151,6 +151,9 @@ class ProductGroupController {
                 redirect(controller: "productGroup", action: "list")
             } else {
                 println productGroupInstance.errors
+                // Refresh the instance from db, to avoid returning to the view productGroupInstance
+                // that is persisted in Hibernate session with the binded properties that didn't pass the validation
+                productGroupInstance.refresh()
                 render(view: "edit", model: [productGroupInstance: productGroupInstance])
             }
         } else {
