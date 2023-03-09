@@ -35,6 +35,7 @@ import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.order.RefreshOrderSummaryEvent
 import org.pih.warehouse.order.ShipOrderCommand
 import org.pih.warehouse.order.ShipOrderItemCommand
 import org.pih.warehouse.picklist.Picklist
@@ -598,7 +599,7 @@ class StockMovementService {
             List<Order> orders = shipmentItem?.purchaseOrders
             removeShipmentItem(shipmentItem)
             // Trigger Order Summary event for POs after deleting the shipment item
-            orders?.each { it.publishRefreshEvent() }
+            publishEvent(new RefreshOrderSummaryEvent(orders))
         }
     }
 
@@ -2066,7 +2067,7 @@ class StockMovementService {
         List<Order> orders = shipment.purchaseOrders
         removeShipmentItems(shipment.shipmentItems)
         // Trigger Order Summary event for POs after deleting the shipment items
-        orders?.each { it.publishRefreshEvent() }
+        publishEvent(new RefreshOrderSummaryEvent(orders))
     }
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {

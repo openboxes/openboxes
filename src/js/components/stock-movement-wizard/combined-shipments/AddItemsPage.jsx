@@ -797,6 +797,7 @@ class AddItemsPage extends Component {
    */
   removeAll() {
     const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+    this.props.showSpinner();
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
@@ -806,10 +807,11 @@ class AddItemsPage extends Component {
             ...this.state.values,
             lineItems: [],
           },
-        });
+        }, () => this.props.hideSpinner());
       })
       .catch(() => {
         this.fetchLineItems();
+        this.props.hideSpinner();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
       });
   }
