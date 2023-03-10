@@ -81,7 +81,7 @@
                                 ${orderItem?.product?.productCode}
                             </td>
                             <td class="center" rowspan="${numInventoryItem}">
-                                <g:translatedProductName product="${orderItem?.product}" />
+                                ${orderItem?.product?.displayNameOrDefaultName}
                             </td>
                         </g:if>
                         <td class="middle center">

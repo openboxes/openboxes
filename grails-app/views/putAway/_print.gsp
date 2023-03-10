@@ -119,7 +119,7 @@
                 <g:if test="${putawayItem.splitItems.empty}">
                     <tr>
                         <wordwrap:td>${putawayItem["product.productCode"]}</wordwrap:td>
-                        <wordwrap:td>${putawayItem["product.translatedName"] ?: putawayItem["product.name"]}</wordwrap:td>
+                        <wordwrap:td>${putawayItem["product.displayNameOrDefaultName"]}</wordwrap:td>
                         <wordwrap:td>${putawayItem["inventoryItem.lotNumber"]}</wordwrap:td>
                         <wordwrap:td>${putawayItem["inventoryItem.expirationDate"]}</wordwrap:td>
                         <wordwrap:td>${putawayItem?.quantity}</wordwrap:td>
@@ -133,7 +133,7 @@
                     <g:each var="splitItem" in="${putawayItem.splitItems}" status="status">
                         <tr>
                             <wordwrap:td>${status==0 ? putawayItem["product.productCode"] : ""}</wordwrap:td>
-                            <wordwrap:td>${status==0 ? (putawayItem["product.translatedName"] ?: putawayItem["product.name"]) : ""}</wordwrap:td>
+                            <wordwrap:td>${status==0 ? putawayItem["product.displayNameOrDefaultName"] : ""}</wordwrap:td>
                             <wordwrap:td>${status==0 ? putawayItem["inventoryItem.lotNumber"]: ""}</wordwrap:td>
                             <wordwrap:td>${status==0 ? putawayItem["inventoryItem.expirationDate"]: ""}</wordwrap:td>
                             <wordwrap:td>${status==0 ? putawayItem?.quantity: ""}</wordwrap:td>

@@ -200,7 +200,8 @@
                                                                        showData="${true}"/>
                                                 </td>
                                                 <td>
-                                                    <g:translatedProductName product="${entry?.shipmentItem?.inventoryItem?.product?:entry?.shipmentItem?.product}"/>
+                                                    <g:set var="product" value="${entry?.shipmentItem?.inventoryItem?.product?:entry?.shipmentItem?.product}" />
+                                                    ${product?.displayNameOrDefaultName}
 
                                                     <g:if test="${entry?.shipmentItem?.inventoryItem?.product?.coldChain }">
                                                             <img src="${resource(dir: 'images/icons', file: 'coldchain.gif')}"

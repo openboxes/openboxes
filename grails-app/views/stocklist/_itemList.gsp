@@ -34,7 +34,7 @@
                 </g:if>
                 <tr>
                     <wordwrap:td class="b-t0 b-r0">${requisitionItem?.product?.productCode}</wordwrap:td>
-                    <wordwrap:td class="b-t0 b-r0">${(requisitionItem?.product?.translatedName ?: requisitionItem?.product?.name)?.encodeAsHTML()}</wordwrap:td>
+                    <wordwrap:td class="b-t0 b-r0">${(requisitionItem?.product?.displayNameOrDefaultName)?.encodeAsHTML()}</wordwrap:td>
                     <wordwrap:td class="b-t0 b-r0">${requisitionItem?.productPackage ? requisitionItem.productPackage.uom?.code + "/" + requisitionItem.productPackage.quantity + " -- " + requisitionItem.productPackage.uom?.name : 'EA/1'}</wordwrap:td>
                     <wordwrap:td class="b-t0 b-r0">${requisitionItem.quantity}</wordwrap:td>
                     <wordwrap:td class="b-t0 b-r0"></wordwrap:td>
