@@ -23,14 +23,21 @@ class RefreshOrderSummaryEvent extends ApplicationEvent {
 
     RefreshOrderSummaryEvent(Order source) {
         super(source)
-        this.orderIds = source?.id ? [source?.id] : []
+        this.orderIds = source?.id && source?.isPurchaseOrder ? [source?.id] : []
         this.isDelete = isDelete
         this.disableRefresh = disableRefresh
     }
 
     RefreshOrderSummaryEvent(Order source, Boolean isDelete) {
         super(source)
-        this.orderIds = source?.id ? [source?.id] : []
+        this.orderIds = source?.id && source?.isPurchaseOrder ? [source?.id] : []
+        this.isDelete = isDelete
+        this.disableRefresh = disableRefresh
+    }
+
+    RefreshOrderSummaryEvent(List<Order> source) {
+        super(source)
+        this.orderIds = source?.findAll {it?.isPurchaseOrder }?.collect { it.id } ?: []
         this.isDelete = isDelete
         this.disableRefresh = disableRefresh
     }
