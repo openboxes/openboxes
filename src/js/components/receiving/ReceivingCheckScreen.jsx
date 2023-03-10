@@ -18,7 +18,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { getReceivingItemValue, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
 
 
@@ -106,11 +106,7 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
-          formatValue: value => (
-            <div className="d-flex">
-              {value?.translatedName ?? value?.name}
-              {renderHandlingIcons(value?.handlingIcons)}
-            </div>),
+          formatValue: value => getReceivingItemValue(value),
         },
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
@@ -357,18 +353,7 @@ class ReceivingCheckScreen extends Component {
 
     const payload = {
       ...formValues,
-      containers: _.map(formValues.containers, container => ({
-        ...container,
-        shipmentItems: _.map(container.shipmentItems, (item) => {
-          if (!_.get(item, 'recipient.id')) {
-            return {
-              ...item, recipient: '',
-            };
-          }
-
-          return item;
-        }),
-      })),
+      containers: getReceivingPayloadContainers(formValues),
     };
 
     return apiClient.post(url, flattenRequest(payload));

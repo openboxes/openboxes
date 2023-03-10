@@ -19,7 +19,7 @@ import EditLineModal from 'components/receiving/modals/EditLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { getReceivingItemValue, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -166,11 +166,7 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
-          formatValue: value => (
-            <div className="d-flex">
-              {value?.translatedName ?? value?.name}
-              {renderHandlingIcons(value?.handlingIcons)}
-            </div>),
+          formatValue: value => getReceivingItemValue(value),
         },
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,
@@ -496,18 +492,7 @@ class PartialReceivingPage extends Component {
 
     const payload = {
       ...formValues,
-      containers: _.map(formValues.containers, container => ({
-        ...container,
-        shipmentItems: _.map(container.shipmentItems, (item) => {
-          if (!_.get(item, 'recipient.id')) {
-            return {
-              ...item, recipient: '',
-            };
-          }
-
-          return item;
-        }),
-      })),
+      containers: getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
   }
@@ -646,18 +631,7 @@ class PartialReceivingPage extends Component {
     const payload = {
       receiptStatus: 'CHECKING',
       ...formValues,
-      containers: _.map(formValues.containers, container => ({
-        ...container,
-        shipmentItems: _.map(container.shipmentItems, (item) => {
-          if (!_.get(item, 'recipient.id')) {
-            return {
-              ...item, recipient: '',
-            };
-          }
-
-          return item;
-        }),
-      })),
+      containers: getReceivingPayloadContainers(formValues),
     };
 
     return apiClient.post(url, flattenRequest(payload));
