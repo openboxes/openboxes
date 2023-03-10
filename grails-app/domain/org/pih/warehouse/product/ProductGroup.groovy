@@ -33,7 +33,7 @@ class ProductGroup implements Comparable, Serializable {
     }
 
     static constraints = {
-        name(nullable: false, blank: false, maxSize: 255)
+        name(nullable: false, blank: false, maxSize: 255, unique: true)
         category(nullable: true)
         description(nullable: true)
     }
