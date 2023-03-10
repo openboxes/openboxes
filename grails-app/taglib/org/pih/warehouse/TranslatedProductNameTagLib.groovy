@@ -10,6 +10,9 @@
 package org.pih.warehouse
 
 class TranslatedProductNameTagLib {
+    /**
+     * @deprecated remove once all references have been replaced by format:product
+     */
     def translatedProductName = { Map attrs ->
         attrs.showProductCode = attrs.showProductCode ?: false
         out << g.render(template: '/taglib/translatedProductName', model: [product: attrs.product, showProductCode: attrs.showProductCode])
