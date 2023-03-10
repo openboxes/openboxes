@@ -1334,10 +1334,10 @@ class ProductService {
             (
                 select s.name from synonym s
                 where s.product_id = product.id
-                and s.synonym_type_code = 'DISPLAY_NAME'
+                and s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}'
                 and s.locale = '${locale}'
                 limit 1
-            ) as translatedName 
+            ) as displayName
             from product """
 
         if (terms && terms.size() > 0) {

@@ -15,6 +15,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
 
@@ -168,20 +169,7 @@ const INVOICE_ITEMS = {
             const rowValue = values?.invoiceItems?.[rowIndex];
             // If it's not an adjustment, but product, and it has a synonym, display it
             // with a tooltip with the original name of the product
-            if (!rowValue?.orderAdjustment && rowValue?.translatedProductName) {
-              return (
-                <Tooltip
-                  html={rowValue?.productName}
-                  theme="transparent"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
-                >
-                  {rowValue.translatedProductName}
-                </Tooltip>
-              );
-            }
-            return params?.fieldValue;
+            return getInvoiceDescription(rowValue);
           },
         }),
       },

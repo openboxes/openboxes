@@ -12,7 +12,7 @@ const Option = option => (
   <Tooltip
     html={<div className="text-truncate">{option.name}</div>}
     theme="transparent"
-    disabled={!option.hasTranslatedName}
+    disabled={!option.displayName}
     position="top-start"
   >
     <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
@@ -25,7 +25,7 @@ const Option = option => (
 const SelectedValue = option => (
   <span className="d-flex align-items-center">
     <span className="text-truncate">
-      {option.label || `${option.productCode} - ${option.translatedName || option.name}`}
+      {option.label || `${option.productCode} - ${option.displayName || option.displayNames?.default || option.name}`}
     </span>
     {renderHandlingIcons(option?.handlingIcons)}
   </span>

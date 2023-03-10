@@ -114,7 +114,7 @@ class InvoiceItemCandidate {
             unitPrice: candidateUnitPrice,
             isAdjustment: adjustment,
             productName: associatedProduct?.name,
-            translatedProductName: associatedProduct?.translatedName
+            displayNames: associatedProduct?.displayNames
         ]
     }
 }
