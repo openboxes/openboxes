@@ -166,7 +166,7 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
-          formatValue: value => getReceivingItemValue(value),
+          formatValue: getReceivingItemValue,
         },
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,

@@ -6,7 +6,7 @@ import { Tooltip } from 'react-tippy';
 import renderHandlingIcons from 'utils/product-handling-icons';
 
 export const getInvoiceDescription = (rowValue) => {
-  if (!rowValue?.orderAdjustment && rowValue?.displayNames?.default) {
+  if (!rowValue?.orderAdjustment && !rowValue.isAdjustment && rowValue?.displayNames?.default) {
     return (
       <Tooltip
         html={rowValue?.productName}

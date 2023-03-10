@@ -107,7 +107,7 @@ class Select extends Component {
       multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
     } = this.props;
 
-    if (value?.displayNames?.default || value?.hasDisplayName) {
+    if (value?.displayNames?.default || value?.displayName) {
       return (
         <div className="p-1">
           {value?.name}

@@ -12,7 +12,7 @@ const Option = option => (
   <Tooltip
     html={<div className="text-truncate">{option.name}</div>}
     theme="transparent"
-    disabled={!option.hasDisplayName}
+    disabled={!option.displayName}
     position="top-start"
   >
     <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
