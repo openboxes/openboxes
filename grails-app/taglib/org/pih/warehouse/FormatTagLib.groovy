@@ -84,7 +84,6 @@ class FormatTagLib {
      * 				   if no current user, the system default locale is used, (specified in grailsApplication.config.openboxes.locale.defaultLocale);
      * 				   if the locale attribute is specified, but set to "null", the "default" name is returned
      *
-     * Currently simply displays the localized name of the product
      */
     def product = { attrs ->
         if (attrs.product != null) {
@@ -99,6 +98,42 @@ class FormatTagLib {
             out << value
         }
         // TODO: add more formats
+    }
+
+    /**
+     * Custom tag to display a product synonym name for DISPLAY_NAME
+     *
+     * Attributes:
+     * product (required): the product to display
+     * type (optional):
+     *          - text (default): returns a string value
+     *          - html: returns span tag with title attribute of default product name
+     * showProductCode (optional): appends a product code to the beginning of the product name
+     * locale (optional): the locale to localize for; if no locale is specified, the current locale is used
+     *
+     */
+    def displayName = { attrs ->
+        attrs.type = attrs.type ?: "text"
+        attrs.locale = attrs.locale ?: "default"
+        attrs.showProductCode = attrs.showProductCode ?: false
+
+        if (attrs.product) {
+            def displayNames = attrs.product?.displayNames
+
+            if (attrs.type == "html") {
+                out << g.render(
+                        template: '/taglib/productDisplayName',
+                        model: [
+                                product         : [ name: attrs.product?.name, productCode: attrs.product?.productCode ],
+                                displayName     : displayNames[attrs.locale],
+                                showProductCode : attrs.showProductCode,
+                        ],
+                )
+            } else {
+                String productDisplayName = displayNames[attrs.locale] ?: attrs.product?.name
+                out << (attrs.showProductCode ? "${attrs.product?.productCode} ${productDisplayName}" : productDisplayName).encodeAsHTML()
+            }
+        }
     }
 
     /**
