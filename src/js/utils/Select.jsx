@@ -107,11 +107,7 @@ class Select extends Component {
       multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
     } = this.props;
 
-    // TODO: We should change this in the future
-    // to check only hasTranslatedName, but for now
-    // we don't have hasTranslatedName in all mappings
-    // discussion connected to OBPIH-5148
-    if (value?.translatedName || value?.hasTranslatedName) {
+    if (value?.displayNames?.default || value?.hasDisplayName) {
       return (
         <div className="p-1">
           {value?.name}
@@ -275,7 +271,7 @@ class Select extends Component {
     const isTooltipDisabled = () => {
       const { value: fieldValue } = this.props;
 
-      if (fieldValue?.translatedName || showLabelTooltip) {
+      if (fieldValue?.displayName || showLabelTooltip) {
         return false;
       }
 

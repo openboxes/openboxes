@@ -8,7 +8,7 @@ class ProductSearchDto {
 
     String name
 
-    String translatedName
+    String displayName
 
     String productCode
 
@@ -45,7 +45,7 @@ class ProductSearchDto {
                 id                 : id,
                 productCode        : productCode,
                 name               : name,
-                translatedName     : translatedName,
+                displayName        : displayName,
                 color              : productColor,
                 handlingIcons      : handlingIcons,
                 lotAndExpiryControl: lotAndExpiryControl,
