@@ -175,7 +175,7 @@ class InvoiceItem implements Serializable {
                 totalPrepaymentAmount: totalPrepaymentAmount,
                 orderAdjustment: orderAdjustment,
                 productName: product?.name,
-                translatedProductName: product?.translatedName
+                displayNames: product?.displayNames
         ]
     }
 }

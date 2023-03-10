@@ -6,7 +6,6 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
-import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -16,6 +15,7 @@ import TextField from 'components/form-elements/TextField';
 import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
 
@@ -118,20 +118,7 @@ const FIELDS = {
             const rowValue = values?.invoiceItems?.[rowIndex];
             // If it's not an adjustment, but product, and it has a synonym, display it
             // with a tooltip with the original name of the product
-            if (!rowValue?.orderAdjustment && rowValue?.translatedProductName) {
-              return (
-                <Tooltip
-                  html={rowValue?.productName}
-                  theme="transparent"
-                  delay="150"
-                  duration="250"
-                  hideDelay="50"
-                >
-                  {rowValue.translatedProductName}
-                </Tooltip>
-              );
-            }
-            return params?.fieldValue;
+            return getInvoiceDescription(rowValue);
           },
         }),
       },
