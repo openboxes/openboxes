@@ -488,7 +488,7 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
+      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -840,7 +840,14 @@ class AddItemsPage extends Component {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveItems(lineItems));
+      this.confirmSave(() => {
+        this.saveItems(lineItems);
+        const filteredLineItems = lineItems.filter(item => item.quantityRequested > 0);
+        this.setState({
+          values: { lineItems: filteredLineItems },
+          totalCount: filteredLineItems.length,
+        });
+      });
     } else {
       this.saveItems(lineItems);
     }
@@ -1203,7 +1210,11 @@ class AddItemsPage extends Component {
               <div className="submit-buttons">
                 <button
                   type="button"
-                  disabled={invalid || showOnly}
+                  disabled={
+                    invalid ||
+                    showOnly ||
+                    _.some(values.lineItems, item => item.quantityRequested <= 0)
+                  }
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => {
                     if (
@@ -1236,8 +1247,11 @@ class AddItemsPage extends Component {
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
-                    invalid || showOnly
+                    values.lineItems.length === 0 ||
+                    (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
+                    invalid ||
+                    showOnly ||
+                    _.some(values.lineItems, item => item.quantityRequested <= 0)
                   }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
