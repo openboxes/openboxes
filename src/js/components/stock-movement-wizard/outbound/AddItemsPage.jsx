@@ -249,15 +249,15 @@ const STOCKLIST_FIELDS = {
         }) => ({
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowRight: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowDown: rowCount === rowIndex + 1 ? () => () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
@@ -299,7 +299,6 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isSaveCompleted: true,
-      sentToSave: [],
     };
 
     this.props.showSpinner();
@@ -356,13 +355,19 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
-    // Here we have adding sent items to state, because we want to avoid
-    // sending a request with the same items few times
-    // (this problem occurs only during adding new items, because
-    // items which are already saved have theirs own IDs)
-    this.setState({
-      sentToSave: [...this.state.sentToSave, ...lineItemsToBeAdded],
-    });
+    // Here I am changing rowSaveStatus from EDITED to SAVING
+    // because all of these lines were sent to save
+    this.setState(previousState => ({
+      values: {
+        ...previousState.values,
+        lineItems: previousState.values.lineItems.map((item) => {
+          if (item.rowSaveStatus === RowSaveStatus.PENDING) {
+            return { ...item, rowSaveStatus: RowSaveStatus.SAVING };
+          }
+          return item;
+        }),
+      },
+    }));
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -386,6 +391,20 @@ class AddItemsPage extends Component {
         ),
         key => key !== 'product',
       );
+
+      if (newQty === oldQty && oldItem.rowSaveStatus === RowSaveStatus.ERROR) {
+        this.setState(prev => ({
+          values: {
+            ...prev.values,
+            lineItems: prev.values.lineItems.map((lineItem) => {
+              if (lineItem.id === item.id) {
+                return { ...lineItem, rowSaveStatus: RowSaveStatus.SAVED };
+              }
+              return lineItem;
+            }),
+          },
+        }));
+      }
 
       if (
         (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) &&
@@ -430,7 +449,8 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
+      lineItemsData = new Array(1)
+        .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     } else {
       lineItemsData = _.map(
         data,
@@ -727,8 +747,8 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
     // We filter out items which were already sent to save
-    const filteredCandidates = itemCandidatesToSave.filter(candidate =>
-      !this.state.sentToSave.includes(candidate));
+    const filteredCandidates = itemCandidatesToSave
+      .filter(item => item.rowSaveStatus !== RowSaveStatus.SAVING);
     const itemsToSave = this.getLineItemsToBeSaved(filteredCandidates);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
@@ -780,7 +800,7 @@ class AddItemsPage extends Component {
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
-                && item.rowSaveStatus === RowSaveStatus.PENDING
+                && item.rowSaveStatus === RowSaveStatus.SAVING
               ) {
                 return { ...itemToChange, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
@@ -805,7 +825,7 @@ class AddItemsPage extends Component {
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
               item.product &&
-              item.rowSaveStatus === RowSaveStatus.PENDING &&
+              item.rowSaveStatus === RowSaveStatus.SAVING &&
               _.includes(notSavedItemsIds, item.product.id)
             ) {
               return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
@@ -816,19 +836,6 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
-
-    // We want to change status to saved if we don't
-    // have items to edit or save, but we made changes
-    // (situation when saved item quantity was changed to
-    // negative number, then we get back to the previous positive number)
-    const newStatusesAfterEdit = itemCandidatesToSave.map((item) => {
-      if (item.rowSaveStatus === RowSaveStatus.PENDING) {
-        return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
-      }
-      return item;
-    });
-
-    this.setState({ values: { ...this.state.values, lineItems: newStatusesAfterEdit } });
 
     return Promise.resolve();
   }
@@ -863,9 +870,10 @@ class AddItemsPage extends Component {
       return;
     }
 
-    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false).then(() => {
-      this.setState({ isSaveCompleted: true });
-    });
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false)
+      .then(() => {
+        this.setState({ isSaveCompleted: true });
+      });
   };
 
   /**
@@ -991,7 +999,8 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
+            lineItems: new Array(1)
+              .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
           },
         });
       })
