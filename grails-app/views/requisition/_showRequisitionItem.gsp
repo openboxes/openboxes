@@ -82,7 +82,7 @@
         <g:if test="${requisitionItem?.isCanceled()}">
             <div class="canceled">
                 <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                    <g:translatedProductName product="${requisitionItem?.product}" />
+                    <format:displayName product="${requisitionItem?.product}" type="html" />
                     <g:renderHandlingIcons product="${requisitionItem?.product}" />
                 </g:link>
             </div>
@@ -90,14 +90,14 @@
         <g:elseif test="${requisitionItem?.isSubstituted()}">
             <div class="canceled">
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <g:translatedProductName product="${requisitionItem?.product}" />
+                <format:displayName product="${requisitionItem?.product}" type="html" />
                 <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
                     <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
-                        <g:translatedProductName product="${substitutionItem?.product}" />
+                        <format:displayName product="${substitutionItem?.product}" type="html" />
                         <g:renderHandlingIcons product="${substitutionItem?.product}" />
                     </g:link>
                 </div>
@@ -105,7 +105,7 @@
         </g:elseif>
         <g:else>
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <g:translatedProductName product="${requisitionItem?.product}" />
+                <format:displayName product="${requisitionItem?.product}" type="html" />
                 <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
         </g:else>

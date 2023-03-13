@@ -33,7 +33,7 @@
 
                         <td>
                             <g:link controller="product" action="edit" id="${productAssociation?.associatedProduct?.id}">
-                                <g:translatedProductName product="${productAssociation?.associatedProduct}" showProductCode="${true}" />
+                                <format:displayName product="${productAssociation?.associatedProduct}" showProductCode="${true}" type="html" />
                             </g:link>
                         </td>
 

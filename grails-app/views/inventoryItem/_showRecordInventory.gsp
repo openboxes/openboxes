@@ -13,7 +13,7 @@
 							<label><warehouse:message code="product.label"/></label>
 						</td>
 						<td>
-							<g:translatedProductName product="${commandInstance?.product}" />
+							<format:displayName product="${commandInstance?.product}" type="html" />
 						</td>
 					</tr>
 					<tr class="prop">

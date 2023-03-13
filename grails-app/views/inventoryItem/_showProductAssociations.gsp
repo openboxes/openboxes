@@ -33,7 +33,7 @@
                         <td>${associatedProduct?.productCode}</td>
                         <td>
                             <g:link controller="inventoryItem" action="showStockCard" id="${associatedProduct.id}" fragment="ui-tabs-1">
-                                <g:translatedProductName product="${associatedProduct}" />
+                                <format:displayName product="${associatedProduct}" type="html" />
                             </g:link>
                         </td>
                         <td class="center">

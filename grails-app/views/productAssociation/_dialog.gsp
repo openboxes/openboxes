@@ -21,7 +21,7 @@
                 </td>
                 <td class="value ">
                     <div id="product">
-                        <g:translatedProductName product="${productAssociation?.product}" showProductCode="${true}" />
+                        <format:displayName product="${productAssociation?.product}" showProductCode="${true}" type="html" />
                     </div>
                 </td>
             </tr>

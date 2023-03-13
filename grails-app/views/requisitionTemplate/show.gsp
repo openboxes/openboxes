@@ -72,7 +72,7 @@
                                 <td>
                                     <g:link controller="inventoryItem" action="showStockCard"
                                             style="color: ${requisitionItem?.product?.color}" id="${requisitionItem?.product?.id}">
-                                        <g:translatedProductName product="${requisitionItem?.product}" />
+                                        <format:displayName product="${requisitionItem?.product}" type="html" />
                                     </g:link>
                                 </td>
                                 <td>

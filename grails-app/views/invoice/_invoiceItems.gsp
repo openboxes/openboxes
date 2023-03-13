@@ -28,7 +28,7 @@
                             ${invoiceItem?.description}
                         </g:if>
                        <g:else>
-                           <g:translatedProductName product="${invoiceItem?.product}" />
+                           <format:displayName product="${invoiceItem?.product}" type="html" />
                        </g:else>
                     </td>
                     <td>

@@ -71,7 +71,7 @@
                                                data-width="1200" data-height="600"
                                                data-title="${g.message(code:'product.label')}"
                                                data-url="${request.contextPath}/consumption/product?id=${product?.id}">
-                                                <g:translatedProductName product="${product}" />
+                                                <format:displayName product="${product}" type="html" />
                                             </a>
                                         </td>
                                         <td class="center">
