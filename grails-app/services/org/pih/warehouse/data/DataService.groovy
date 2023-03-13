@@ -511,7 +511,7 @@ class DataService {
         inventoryLevels.each { inventoryLevel ->
             csv << [
                     productCode       : inventoryLevel?.product?.productCode,
-                    productName       : inventoryLevel?.product?.translatedNameWithLocaleCode,
+                    productName       : inventoryLevel?.product?.displayNameWithLocaleCode,
                     inventory         : inventoryLevel?.inventory?.warehouse?.name,
                     status            : inventoryLevel?.status,
                     binLocation       : inventoryLevel?.binLocation ?: "",

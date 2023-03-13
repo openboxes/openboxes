@@ -315,7 +315,7 @@ class ForecastingService {
             Product product = Product.findByProductCode(it?.product_code)
             [
                     productCode             : it?.product_code,
-                    productName             : product?.translatedNameWithLocaleCode ?: it?.product_name,
+                    productName             : product?.displayNameWithLocaleCode,
                     productFamily           : product?.productFamily?.name ?: '',
                     category                : product?.category ?: '',
                     productCatalogs         : product?.productCatalogs?.join(", "),

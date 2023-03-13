@@ -516,7 +516,7 @@ class InventorySnapshotService {
 
             def row = [
                     "Code"          : product.productCode,
-                    "Name"          : product.translatedNameWithLocaleCode,
+                    "Name"          : product.displayNameWithLocaleCode,
                     "Product Family": product?.productFamily?.name ?: '',
                     "Category"      : product.category.name,
                     "Formulary"     : product.productCatalogsToString(),
@@ -600,7 +600,7 @@ class InventorySnapshotService {
             if (balanceOpening || quantityInbound || quantityOutbound || balanceClosing) {
                 data << [
                             "Code"           : product.productCode,
-                            "Name"           : product.translatedNameWithLocaleCode,
+                            "Name"           : product.displayNameWithLocaleCode,
                             "TranslatedName" : product.translatedName,
                             "Category"       : product.category.name,
                             "Unit Cost"      : product.pricePerUnit ?: '',

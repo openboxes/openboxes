@@ -305,7 +305,7 @@ class ConsumptionController {
 
                 def csvrow = [
                         'Product code'                                : row.product.productCode ?: '',
-                        'Product'                                     : row.product.translatedNameWithLocaleCode,
+                        'Product'                                     : row.product.displayNameWithLocaleCode,
                         'Product family'                              : row.product?.productFamily?.name ?: '',
                         'Category'                                    : row.product?.category?.name,
                         'Formulary'                                   : row.product?.productCatalogsToString(),
