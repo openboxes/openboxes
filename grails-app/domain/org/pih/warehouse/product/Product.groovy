@@ -253,7 +253,6 @@ class Product implements Comparable, Serializable {
                          "displayNames",
                          "displayNameOrDefaultName",
                          "translatedName",
-                         "translatedNameWithLocaleCode",
                          "displayNameWithLocaleCode"
     ]
 
@@ -689,14 +688,6 @@ class Product implements Comparable, Serializable {
 
     List getUoms() {
         return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
-    }
-
-    /**
-     * @deprecated remove once all references have been replaced by displayName
-     */
-    String getTranslatedNameWithLocaleCode() {
-        String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
-        return "${name}${translatedName ? " (${localeTag}: ${translatedName})" : ''}"
     }
 
     String getDisplayNameWithLocaleCode() {
