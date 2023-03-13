@@ -355,7 +355,7 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
-    // Here I am changing rowSaveStatus from EDITED to SAVING
+    // Here I am changing rowSaveStatus from PENDING to SAVING
     // because all of these lines were sent to save
     this.setState(previousState => ({
       values: {
