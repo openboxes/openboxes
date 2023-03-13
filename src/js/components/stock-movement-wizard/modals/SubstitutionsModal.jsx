@@ -223,11 +223,10 @@ class SubstitutionsModal extends Component {
             ...val,
             disabled: true,
             product: {
-              label: `${val.productCode} - ${val.product.translatedName ?? val.productName}`,
               id: `${val.productId}`,
               productCode: `${val.productCode}`,
               name: `${val.productName}`,
-              translatedName: val.product.translatedName,
+              displayName: val.product.displayNames?.default,
               minExpirationDate: `${val.minExpirationDate}`,
               quantityAvailable: `${val.quantityAvailable}`,
               handlingIcons: val.product.handlingIcons,
@@ -245,11 +244,10 @@ class SubstitutionsModal extends Component {
             ...this.state.attr.lineItem,
             originalItem: true,
             product: {
-              label: `${productCode} - ${product.translatedName ?? productName}`,
               id: `${product.id}`,
               productCode: `${productCode}`,
               name: `${productName}`,
-              translatedName: product.translatedName,
+              displayName: product.displayNames?.default,
               minExpirationDate,
               quantityAvailable,
             },
@@ -351,14 +349,14 @@ class SubstitutionsModal extends Component {
             <Tooltip
               html={<div className="text-truncate">{this.state.attr.lineItem.product.name}</div>}
               theme="dark"
-              disabled={!this.state.attr.lineItem.product.translatedName}
+              disabled={!this.state.attr.lineItem.product.displayNames?.default}
               position="top-start"
             >
               <Translate
                 id="react.stockMovement.productName.label"
                 defaultMessage="Product name"
               />: {
-              this.state.attr.lineItem.product.translatedName ??
+              this.state.attr.lineItem.product.displayNames?.default ??
               this.state.attr.lineItem.product.name
               }
             </Tooltip>

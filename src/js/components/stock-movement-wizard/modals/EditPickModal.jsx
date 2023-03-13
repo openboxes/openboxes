@@ -285,7 +285,7 @@ class EditPickModal extends Component {
             quantityRequired: pickPageItem.quantityRequired,
             productCode: pickPageItem.productCode,
             productName: pickPageItem.product.name,
-            productTranslatedName: pickPageItem.product.translatedName,
+            displayName: pickPageItem.product?.displayNames?.default,
           },
         });
 
@@ -322,14 +322,12 @@ class EditPickModal extends Component {
             <Tooltip
               html={<div className="text-truncate">{this.state.formValues.productName}</div>}
               theme="dark"
-              disabled={!this.state.formValues.productTranslatedName}
+              disabled={!this.state.formValues.displayName}
               position="top-start"
             >
               <span className="d-flex">
                 <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />:{' '}
-                {
-                this.state.formValues.productTranslatedName ?? this.state.formValues.productName
-                }
+                {this.state.formValues.displayName ?? this.state.formValues.productName}
               </span>
             </Tooltip>
           </div>

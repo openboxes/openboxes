@@ -137,7 +137,7 @@ class DetailsModal extends Component {
     const {
       productCode,
       productName,
-      translatedProductName,
+      displayName,
       quantityRequested,
       quantityOnHand,
       quantityAvailable,
@@ -157,10 +157,10 @@ class DetailsModal extends Component {
           <Tooltip
             html={<div className="text-truncate">{productName}</div>}
             theme="dark"
-            disabled={!translatedProductName}
+            disabled={!displayName}
             position="top-start"
           >
-            <h5>{productCode} {translatedProductName ?? productName}</h5>
+            <h5>{productCode} {displayName ?? productName}</h5>
           </Tooltip>
           <div>
             <span className="font-weight-bold">

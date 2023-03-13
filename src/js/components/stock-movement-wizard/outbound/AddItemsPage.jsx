@@ -424,17 +424,7 @@ class AddItemsPage extends Component {
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     } else {
-      lineItemsData = _.map(
-        data,
-        val => ({
-          ...val,
-          disabled: true,
-          product: {
-            ...val.product,
-            label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
-          },
-        }),
-      );
+      lineItemsData = _.map(data, val => ({ ...val, disabled: true }));
     }
 
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
@@ -729,17 +719,7 @@ class AddItemsPage extends Component {
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
-          const lineItemsBackendData = _.map(
-            lineItems,
-            val => ({
-              ...val,
-              disabled: true,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
-              },
-            }),
-          );
+          const lineItemsBackendData = _.map(lineItems, val => ({ ...val, disabled: true }));
           // In autosave, we don't modify the state, because
           // lines which have not passed the validation will be
           // deleted during users work

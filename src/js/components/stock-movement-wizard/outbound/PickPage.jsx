@@ -26,7 +26,7 @@ import {
   parseResponse,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -74,19 +74,12 @@ const FIELDS = {
         flexWidth: '3.8',
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue }) => ({
-          showValueTooltip: !!fieldValue?.translatedName,
+          showValueTooltip: !!(fieldValue?.displayName || fieldValue?.displayNames?.default),
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
           className: 'text-left ml-1',
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.translatedName ?? value.name}
-              </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
       },
       lotNumber: {

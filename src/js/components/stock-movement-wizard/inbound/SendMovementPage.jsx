@@ -20,8 +20,8 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -176,19 +176,12 @@ const SUPPLIER_FIELDS = {
         headerAlign: 'left',
         getDynamicAttr: ({ fieldValue, isBoxNameEmpty, isPalletNameEmpty }) => ({
           flexWidth: 12 + (isBoxNameEmpty ? 12 : 0) + (isPalletNameEmpty ? 12 : 0),
-          showValueTooltip: !!fieldValue?.translatedName,
+          showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
           className: 'text-left',
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.translatedName || value.name}
-              </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
       },
       lotNumber: {
