@@ -114,8 +114,8 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
             quantityAvailable: obj.quantityAvailable,
             minExpirationDate: obj.minExpirationDate,
             handlingIcons: obj.product.handlingIcons,
-            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
-            hasTranslatedName: !!obj.translatedName,
+            label: `${obj.productCode} - ${obj?.product.displayNames?.default ?? obj.name}`,
+            hasTranslatedName: !!obj?.product?.displayNames?.default,
             color: obj.color,
           }
         ))))
@@ -136,8 +136,8 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
             name: obj.name,
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
-            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
-            hasTranslatedName: !!obj.translatedName,
+            label: `${obj.productCode} - ${obj.displayNames?.default ?? obj.name}`,
+            hasTranslatedName: !!obj.displayNames?.default,
             color: obj.color,
           }
         ))))

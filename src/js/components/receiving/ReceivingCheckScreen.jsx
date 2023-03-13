@@ -18,7 +18,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { getReceivingItemValue, getReceivingPayloadContainers } from 'utils/form-values-utils';
+import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
 
 
@@ -106,7 +106,7 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
-          formatValue: getReceivingItemValue,
+          formatValue: formatProductDisplayName,
         },
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,

@@ -69,7 +69,7 @@ class CombinedShipmentItemApiController {
         }
         Product product = Product.get(params.productId)
 
-        def orderItems
+        List<OrderItem> orderItems
 
         if (product) {
             orderItems = OrderItem.findAllByOrderInListAndProduct(orders, product)
@@ -84,7 +84,7 @@ class CombinedShipmentItemApiController {
                 orderNumber: it.order?.orderNumber,
                 productCode: it.product?.productCode,
                 productName: it.product?.name,
-                productTranslatedName: it.product?.translatedName,
+                displayName: it.product?.displayName,
                 budgetCode: it.budgetCode?.code,
                 recipient: it.recipient?.name,
                 quantityAvailable: it.getQuantityRemainingToShip(),

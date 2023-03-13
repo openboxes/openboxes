@@ -19,7 +19,7 @@ import EditLineModal from 'components/receiving/modals/EditLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
-import { getReceivingItemValue, getReceivingPayloadContainers } from 'utils/form-values-utils';
+import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -166,7 +166,7 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
-          formatValue: getReceivingItemValue,
+          formatValue: formatProductDisplayName,
         },
         getDynamicAttr: ({ fieldValue }) => ({
           tooltipValue: fieldValue?.name,

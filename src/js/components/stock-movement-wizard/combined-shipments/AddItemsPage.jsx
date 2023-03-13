@@ -197,10 +197,7 @@ const FIELDS = {
           onClick: () => {
             updateTotalCount(1);
             addRow({
-              product: {
-                ...fieldValue.product,
-                label: `${fieldValue.product.productCode} ${fieldValue.product.translatedName || fieldValue.product.name}`,
-              },
+              product: fieldValue.product,
               recipient: fieldValue.recipient,
               sortOrder: fieldValue.sortOrder + 1,
               orderItemId: fieldValue.orderItemId,
@@ -314,10 +311,6 @@ class AddItemsPage extends Component {
       val => ({
         ...val,
         disabled: true,
-        product: {
-          ...val.product,
-          label: `${val.productCode} ${val.product.translatedName || val.product.name}`,
-        },
         referenceId: val.orderItemId,
       }),
     );
@@ -674,14 +667,7 @@ class AddItemsPage extends Component {
 
           const lineItemsBackendData = _.map(
             _.sortBy(lineItems, ['sortOrder']),
-            val => ({
-              ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.translatedName || val.product.name}`,
-              },
-              referenceId: val.orderItemId,
-            }),
+            val => ({ ...val, referenceId: val.orderItemId }),
           );
 
           this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });
