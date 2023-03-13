@@ -614,7 +614,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocaleCode) + ","
+            csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
@@ -780,7 +780,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.translatedNameWithLocaleCode ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
             csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
@@ -832,7 +832,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product.translatedNameWithLocaleCode) + ","
+            csv += StringEscapeUtils.escapeCsv(product.displayNameWithLocaleCode) + ","
             csv += '"' + (product?.productFamily?.name ?: "") + '"' + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","

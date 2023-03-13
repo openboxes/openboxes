@@ -2628,7 +2628,7 @@ class InventoryService implements ApplicationContextAware {
         products.each { product ->
             def csvrow = [
                     'Product code'     : product.productCode ?: '',
-                    'Product'          : product?.translatedNameWithLocaleCode,
+                    'Product'          : product?.displayNameWithLocaleCode,
                     'UOM'              : product.unitOfMeasure,
                     'Generic product'  : product?.genericProduct?.name ?: "",
                     'Category'         : product?.category?.name,

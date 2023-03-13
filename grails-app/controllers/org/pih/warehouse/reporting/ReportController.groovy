@@ -134,7 +134,7 @@ class ReportController {
             String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
             csv += binLocation.status + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.translatedNameWithLocaleCode) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.displayNameWithLocaleCode) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productFamily?.name ?: '') + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
@@ -163,7 +163,7 @@ class ReportController {
             Product product = Product.findByProductCode(it.product.productCode)
             [
                     productCode   : it.product.productCode,
-                    productName   : product.translatedNameWithLocaleCode,
+                    productName   : product.displayNameWithLocaleCode,
                     lotNumber     : it.inventoryItem.lotNumber,
                     expirationDate: it.inventoryItem.expirationDate,
                     binLocation   : it?.binLocation?.name ?: "Default Bin",
@@ -492,7 +492,7 @@ class ReportController {
                     def isOrderItem = it instanceof OrderItem
                     csv << [
                             productCode  : it.product?.productCode,
-                            productName  : it.product?.translatedNameWithLocaleCode,
+                            productName  : it.product?.displayNameWithLocaleCode,
                             productFamily : it.product?.productFamily?.name ?: '',
                             category      : it.product?.category?.name ?: '',
                             productCatalogs      : it.product?.productCatalogs?.join(", "),
@@ -574,7 +574,7 @@ class ReportController {
                             }?.join(",")
 
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.translatedNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.displayNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
@@ -623,7 +623,7 @@ class ReportController {
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
             Map dataRow = params.print ? [
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            "Product name"        : product.translatedNameWithLocaleCode ?: "",
+                            "Product name"        : product.displayNameWithLocaleCode,
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                             "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
@@ -706,7 +706,7 @@ class ReportController {
 
                 def printRow = [
                         'Product code'                    : product.productCode ?: '',
-                        'Name'                            : product.translatedNameWithLocaleCode,
+                        'Name'                            : product.displayNameWithLocaleCode,
                         'Order Period (Days)'             : replenishmentPeriodDays,
                         'Lead Time (Days)'                : leadTimeDays,
                         'Qty On Order'                    : quantityOnOrder,
