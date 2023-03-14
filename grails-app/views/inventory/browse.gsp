@@ -104,7 +104,7 @@
 														</td>
 														<td>
 															<g:link controller="inventoryItem" action="showStockCard" id="${searchResult?.product?.id}" style="color: ${searchResult?.product?.color}">
-																<format:displayName product="${searchResult?.product}" showProductCode="${true}" type="html" />
+																<format:displayName product="${searchResult?.product}" showProductCode="${true}" showTooltip="${true}" />
 																<g:renderHandlingIcons product="${searchResult?.product}" />
 														   	</g:link>
 														</td>

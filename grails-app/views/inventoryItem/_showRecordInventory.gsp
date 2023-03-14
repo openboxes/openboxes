@@ -13,7 +13,7 @@
 							<label><warehouse:message code="product.label"/></label>
 						</td>
 						<td>
-							<format:displayName product="${commandInstance?.product}" type="html" />
+							<format:displayName product="${commandInstance?.product}" showTooltip="${true}" />
 						</td>
 					</tr>
 					<tr class="prop">

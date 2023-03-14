@@ -50,7 +50,7 @@
                 </td>
                 <td>
                     <g:link controller="inventoryItem" action="showStockCard" id="${receiptItem?.product?.id}">
-                        <format:displayName product="${receiptItem?.product}" type="html" />
+                        <format:displayName product="${receiptItem?.product}" showTooltip="${true}" />
                     </g:link>
                 </td>
                 <td>

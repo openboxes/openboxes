@@ -28,9 +28,7 @@
 						</g:if>
 			            <div id="product-title" class="title">
 			            	<small class="font-weight-bold">${productInstance?.productCode }</small>
-								<span title="${productInstance?.translatedName ? productInstance.name : null}">
-									${productInstance?.translatedName ?: productInstance?.name }
-								</span>
+							<format:displayName product="${productInstance}" showTooltip="${true}" />
 			            </div>
                         <div id="product-catalogs">
                             <g:each var="productCatalog" in="${productInstance?.productCatalogs }">

@@ -105,22 +105,20 @@ class FormatTagLib {
      *
      * Attributes:
      * product (required): the product to display
-     * type (optional):
-     *          - text (default): returns a string value
-     *          - html: returns span tag with title attribute of default product name
+     * showTooltip (optional): When true returns span tag with title attribute of default product name
      * showProductCode (optional): appends a product code to the beginning of the product name
      * locale (optional): the locale to localize for; if no locale is specified, the current locale is used
      *
      */
     def displayName = { attrs ->
-        attrs.type = attrs.type ?: "text"
+        attrs.showTooltip = attrs.showTooltip ?: false
         attrs.locale = attrs.locale ?: "default"
         attrs.showProductCode = attrs.showProductCode ?: false
 
         if (attrs.product) {
             def displayNames = attrs.product?.displayNames
 
-            if (attrs.type == "html") {
+            if (attrs.showTooltip) {
                 out << g.render(
                         template: '/taglib/productDisplayName',
                         model: [
