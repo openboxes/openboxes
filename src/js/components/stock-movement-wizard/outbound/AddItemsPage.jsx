@@ -19,6 +19,8 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -298,7 +300,6 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
-      isSaveCompleted: true,
     };
 
     this.props.showSpinner();
@@ -313,6 +314,9 @@ class AddItemsPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.debouncedSave = _.debounce(() => {
+      this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
+    }, 1000);
   }
 
   componentDidMount() {
@@ -549,8 +553,10 @@ class AddItemsPage extends Component {
   confirmTransition(onConfirm, items) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item =>
-        <p key={item.sortOrder}>{item.product.label} {item.quantityRequested}</p>),
+      message: _.map(items, item => (
+        <p key={item.sortOrder}>
+          {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
+        </p>)),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -657,13 +663,13 @@ class AddItemsPage extends Component {
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() =>
-        this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems));
+        this.checkDuplicatesAndTransitionToNextStep(lineItems));
     } else {
-      this.checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems);
+      this.checkDuplicatesAndTransitionToNextStep(lineItems);
     }
   }
 
-  checkDuplicatesSaveAndTransitionToNextStep(formValues, lineItems) {
+  checkDuplicatesAndTransitionToNextStep(lineItems) {
     const itemsMap = {};
     _.forEach(lineItems, (item) => {
       if (itemsMap[item.product.productCode]) {
@@ -676,36 +682,12 @@ class AddItemsPage extends Component {
 
     if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
       this.confirmTransition(
-        () => this.saveAndTransitionToNextStep(formValues, lineItems),
+        () => this.transitionToNextStep(),
         _.reduce(itemsWithSameCode, (a, b) => a.concat(b), []),
       );
     } else {
-      this.saveAndTransitionToNextStep(formValues, lineItems);
+      this.transitionToNextStep();
     }
-  }
-
-  /**
-   * Saves current stock movement progress (line items) and goes to the next stock movement step.
-   * @param {object} formValues
-   * @param {object} lineItems
-   * @public
-   */
-  saveAndTransitionToNextStep(formValues, lineItems) {
-    this.props.showSpinner();
-
-    this.saveRequisitionItems(lineItems)
-      .then((resp) => {
-        let values = formValues;
-        if (resp) {
-          values = { ...formValues, lineItems: resp.data.data.lineItems };
-        }
-        this.transitionToNextStep()
-          .then(() => {
-            this.props.nextPage(values);
-          })
-          .catch(() => this.props.hideSpinner());
-      })
-      .catch(() => this.props.hideSpinner());
   }
 
   /**
@@ -842,18 +824,18 @@ class AddItemsPage extends Component {
       return item;
     });
 
-    this.setState({ isSaveCompleted: false, values: { ...values, lineItems: itemsWithStatuses } });
+    this.setState({ values: { ...values, lineItems: itemsWithStatuses } });
 
     // We don't want to save the item during editing or
     // when there is an error in line
     if (isEdited) {
+      this.debouncedSave();
       return;
     }
 
-    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false)
-      .then(() => {
-        this.setState({ isSaveCompleted: true });
-      });
+    this.debouncedSave.cancel();
+
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false);
   };
 
   /**
@@ -866,7 +848,14 @@ class AddItemsPage extends Component {
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
-      this.confirmSave(() => this.saveItems(lineItems));
+      this.confirmSave(() => {
+        this.saveItems(lineItems);
+        const filteredLineItems = lineItems.filter(item => item.quantityRequested > 0);
+        this.setState({
+          values: { lineItems: filteredLineItems },
+          totalCount: filteredLineItems.length,
+        });
+      });
     } else {
       this.saveItems(lineItems);
     }
@@ -917,7 +906,6 @@ class AddItemsPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
-        this.setState({ isSaveCompleted: true });
       })
       .catch(() => this.props.hideSpinner())
       .finally(() => {
@@ -979,8 +967,7 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1)
-              .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
+            lineItems: new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
           },
         });
       })
@@ -1003,10 +990,15 @@ class AddItemsPage extends Component {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'REQUESTED' };
 
-    if (this.state.values.statusCode === 'CREATED') {
-      return apiClient.post(url, payload);
-    }
-    return Promise.resolve();
+    this.props.showSpinner();
+    new Promise((resolve) => {
+      if (this.state.values.statusCode === 'CREATED') {
+        resolve(apiClient.post(url, payload));
+      }
+      return resolve();
+    })
+      .then(this.props.nextPage(this.state.values))
+      .finally(this.props.hideSpinner());
   }
 
   /**
@@ -1044,6 +1036,15 @@ class AddItemsPage extends Component {
           })
           .catch(() => this.props.hideSpinner());
       });
+  }
+
+  showPendingSaveNotification() {
+    notification(NotificationType.INFO)({
+      message: this.props.translate(
+        'react.notification.autosave.pending.label',
+        'Please wait while your line items are being saved.',
+      ),
+    });
   }
 
   /**
@@ -1217,30 +1218,48 @@ class AddItemsPage extends Component {
               <div className="submit-buttons">
                 <button
                   type="button"
-                  disabled={invalid || showOnly || !this.state.isSaveCompleted}
+                  disabled={
+                    invalid ||
+                    showOnly ||
+                    _.some(values.lineItems, item => item.quantityRequested <= 0)
+                  }
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-                  onMouseDown={() => this.previousPage(values, invalid)}
+                  onMouseDown={() => {
+                    if (
+                      _.some(values.lineItems, lineItem =>
+                        lineItem.rowSaveStatus === RowSaveStatus.PENDING)
+                    ) {
+                      this.showPendingSaveNotification();
+                      return;
+                    }
+                    this.previousPage(values, invalid);
+                  }}
                   className="btn btn-outline-primary btn-form btn-xs"
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
                   type="submit"
-                  onClick={() => {
-                    if (!invalid) {
-                      this.nextPage(values);
-                    }
-                  }}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => {
+                    if (
+                      _.some(values.lineItems, lineItem =>
+                        lineItem.rowSaveStatus === RowSaveStatus.PENDING)
+                    ) {
+                      this.showPendingSaveNotification();
+                      return;
+                    }
                     if (!invalid) {
                       this.nextPage(values);
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
-                    values.lineItems.length === 0 || (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
-                    invalid || showOnly || !this.state.isSaveCompleted
+                    values.lineItems.length === 0 ||
+                    (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
+                    invalid ||
+                    showOnly ||
+                    _.some(values.lineItems, item => item.quantityRequested <= 0)
                   }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
