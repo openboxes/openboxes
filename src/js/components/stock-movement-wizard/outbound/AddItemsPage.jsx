@@ -12,7 +12,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { addNotSavedLine, fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -281,7 +281,7 @@ const STOCKLIST_FIELDS = {
 // This variable is an indicator
 // if action is in progress to avoid
 // triggering the same transaction twice
-// i.e triggering save button during the autosave
+// for example triggering save button during the autosave
 let actionInProgress = false;
 
 /**
@@ -299,6 +299,7 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      workflow: 'outbound',
     };
 
     this.props.showSpinner();
@@ -720,6 +721,7 @@ class AddItemsPage extends Component {
     // We filter out items which were already sent to save
     const filteredCandidates = itemCandidatesToSave
       .filter(item => item.rowSaveStatus !== RowSaveStatus.SAVING);
+    filteredCandidates.forEach(item => this.props.addNotSavedLine(this.state.workflow, item));
     const itemsToSave = this.getLineItemsToBeSaved(filteredCandidates);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
@@ -1281,9 +1283,14 @@ const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
 });
 
-export default (connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchUsers,
-})(AddItemsPage));
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  fetchUsers,
+  addNotSavedLine,
+};
+
+export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
 
 AddItemsPage.propTypes = {
   /** Initial component's data */
@@ -1316,6 +1323,7 @@ AddItemsPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
+  addNotSavedLine: PropTypes.func.isRequired,
 };
 
 AddItemsPage.defaultProps = {

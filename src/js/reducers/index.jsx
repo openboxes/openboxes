@@ -1,6 +1,7 @@
 import { localizeReducer } from 'react-localize-redux';
 import { combineReducers } from 'redux';
 
+import autosaveReducer from 'reducers/autosaveReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
   stockTransfer: stockTransferReducer,
   filterForm: filterFormReducer,
   stockMovementCommon: stockMovementCommonReducer,
+  autosave: autosaveReducer,
 });
 
 export default rootReducer;
