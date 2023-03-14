@@ -68,7 +68,6 @@ const GlobalSearch = ({
     const { selectProps, data } = props;
     const { inputValue } = selectProps;
     const { before, matched, after } = splitMatchingStr(data.label, inputValue);
-    console.log(data);
     return (
       <components.Option {...props}>
         <Tooltip
