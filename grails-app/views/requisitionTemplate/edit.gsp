@@ -294,9 +294,9 @@
                     $('td:eq(0)', nRow).addClass('center middle').css('color', aData["product"].color);
                     $('td:eq(1)', nRow).addClass('middle');
                     $('td:eq(1)', nRow).html('<a style="color: ' + aData["product"].color +
-                        '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + (aData["product"].translatedName ?? aData["product"].name) + '</a>');
-                    // If we display translated name, we want to have tooltip with original name of the product
-                    if (aData?.product?.translatedName) {
+                        '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + (aData["product"].displayName ?? aData["product"].name) + '</a>');
+                    // If we display DISPLAY_NAME, we want to have tooltip with original name of the product
+                    if (aData?.product?.displayName) {
                       $('td:eq(1)', nRow).attr('title', aData?.product?.name);
                     }
                     $('td:eq(2)', nRow).addClass('middle dont-break-out');
@@ -316,9 +316,9 @@
                     $('td:eq(0)', nRow).addClass('center middle').css('color', aData["product"].color);
                     $('td:eq(1)', nRow).addClass('middle');
                     $('td:eq(1)', nRow).html('<a style="color: ' + aData["product"].color +
-                        '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + (aData["product"].translatedName ?? aData["product"].name) + '</a>');
-                    // If we display translated name, we want to have tooltip with original name of the product
-                    if (aData?.product?.translatedName) {
+                        '" href="${request.contextPath}/inventoryItem/showStockCard/' + aData["product"].id + '" target="_blank">' + (aData["product"].displayName ?? aData["product"].name) + '</a>');
+                    // If we display DISPLAY_NAME, we want to have tooltip with original name of the product
+                    if (aData?.product?.displayName) {
                       $('td:eq(1)', nRow).attr('title', aData?.product?.name);
                     }
                     $('td:eq(2)', nRow).addClass('middle dont-break-out');

@@ -601,7 +601,7 @@ class InventorySnapshotService {
                 data << [
                             "Code"           : product.productCode,
                             "Name"           : product.displayNameWithLocaleCode,
-                            "TranslatedName" : product.translatedName,
+                            "DisplayName"    : product.displayName,
                             "Category"       : product.category.name,
                             "Unit Cost"      : product.pricePerUnit ?: '',
                             "Opening"        : balanceOpening,

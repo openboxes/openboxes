@@ -42,6 +42,7 @@
                         <g:if test="${!productInstance}">
                             <g:select name="product.id" class="chzn-select-deselect"
                                       from="${org.pih.warehouse.product.Product.list()}"
+                                      optionValue="${{it?.displayName ?: it?.name}}"
                                       optionKey="id" value="${productInstance}"/>
                         </g:if>
                         <g:else>
@@ -49,8 +50,8 @@
                             <g:select name="displayProduct.id" class="chzn-select-deselect"
                                       from="${[productInstance]}"
                                       optionKey="id" value="${productInstance}" disabled="true"
-                                      optionValue="${{it?.translatedName ?: it?.name}}"
-                                      title="${productInstance?.translatedName ? productInstance?.name : null}"
+                                      optionValue="${{it?.displayName ?: it?.name}}"
+                                      title="${productInstance?.displayName ? productInstance?.name : null}"
                             />
                         </g:else>
                     </td>
