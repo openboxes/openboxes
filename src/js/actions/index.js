@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
-  ADD_NOT_SAVED_LINE,
+  ADD_LINES,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   FETCH_BUYERS,
@@ -27,7 +27,7 @@ import {
   FILTER_FORM_PARAMS_BUILT,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
-  REMOVE_FROM_INDICATORS, REMOVE_SAVED_LINE,
+  REMOVE_FROM_INDICATORS,
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
@@ -548,6 +548,14 @@ export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
   });
 };
 
+export const addLines = (workflow, lines) => dispatch => dispatch({
+  type: ADD_LINES,
+  payload: {
+    workflow,
+    lines,
+  },
+});
+
 export const fetchShipmentTypes = () => async (dispatch) => {
   const response = await genericApi.getShipmentTypes();
   const shipmentTypes = mapShipmentTypes(response?.data?.data);
@@ -556,19 +564,3 @@ export const fetchShipmentTypes = () => async (dispatch) => {
     payload: shipmentTypes,
   });
 };
-
-export const addNotSavedLine = (workflow, line) => dispatch => dispatch({
-  type: ADD_NOT_SAVED_LINE,
-  payload: {
-    workflow,
-    line,
-  },
-});
-
-export const removeSavedLine = (workflow, line) => dispatch => dispatch({
-  type: REMOVE_SAVED_LINE,
-  payload: {
-    workflow,
-    line,
-  },
-});

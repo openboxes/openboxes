@@ -12,7 +12,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { addNotSavedLine, fetchUsers, hideSpinner, removeSavedLine, showSpinner } from 'actions';
+import { addLines, fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -732,13 +732,7 @@ class AddItemsPage extends Component {
       lineItems: itemsToSave,
     };
 
-    itemsToSave.forEach((item) => {
-      const itemToAdd = _.chain(item)
-        .pick(['product.id', 'quantityRequested', 'sortOrder', 'recipient.id'])
-        .set('quantityRequested', _.parseInt(item.quantityRequested))
-        .value();
-      this.props.addNotSavedLine(this.state.workflow, itemToAdd);
-    });
+    this.props.addLines(this.state.workflow, itemCandidatesToSave);
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
@@ -780,10 +774,6 @@ class AddItemsPage extends Component {
               }
               return item;
             });
-
-            if (itemToChange) {
-              this.props.removeSavedLine(this.state.workflow, itemToChange);
-            }
 
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
@@ -853,7 +843,10 @@ class AddItemsPage extends Component {
 
     this.debouncedSave.cancel();
 
-    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false);
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false)
+      .finally(() => {
+        this.props.addLines(this.state.workflow, this.state.values.lineItems);
+      });
   };
 
   /**
@@ -1305,8 +1298,7 @@ const mapDispatchToProps = {
   showSpinner,
   hideSpinner,
   fetchUsers,
-  addNotSavedLine,
-  removeSavedLine,
+  addLines,
 };
 
 export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
@@ -1342,8 +1334,7 @@ AddItemsPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
-  addNotSavedLine: PropTypes.func.isRequired,
-  removeSavedLine: PropTypes.func.isRequired,
+  addLines: PropTypes.func.isRequired,
   savedLineItems: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
