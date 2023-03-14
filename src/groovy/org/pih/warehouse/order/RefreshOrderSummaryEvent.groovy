@@ -65,7 +65,7 @@ class RefreshOrderSummaryEvent extends ApplicationEvent {
 
     RefreshOrderSummaryEvent(Invoice source) {
         super(source)
-        this.orderIds = source?.orders?.findAll {  it?.isPurchaseOrder }?.collect { it.id } ?: []
+        this.orderIds = !source?.isPrepaymentInvoice ? (source?.orders?.findAll {  it?.isPurchaseOrder }?.collect { it.id } ?: []) : []
         this.isDelete = isDelete
         this.disableRefresh = disableRefresh
     }
