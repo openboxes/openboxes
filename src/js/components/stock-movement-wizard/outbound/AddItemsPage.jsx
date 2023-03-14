@@ -314,6 +314,9 @@ class AddItemsPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.debouncedSave = _.debounce(() => {
+      this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
+    }, 1000);
   }
 
   componentDidMount() {
@@ -824,11 +827,11 @@ class AddItemsPage extends Component {
     // We don't want to save the item during editing or
     // when there is an error in line
     if (isEdited) {
-      _.debounce(() => {
-        this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false);
-      }, 1000)();
+      this.debouncedSave();
       return;
     }
+
+    this.debouncedSave.cancel();
 
     this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false);
   };
