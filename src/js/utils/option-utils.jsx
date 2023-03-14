@@ -64,7 +64,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
             url: obj.url,
             label: obj.label,
             color: obj.color,
-            hasTranslatedName: obj.hasTranslatedName,
+            displayName: obj.displayName,
             originalName: obj.value,
           }
         ))))
