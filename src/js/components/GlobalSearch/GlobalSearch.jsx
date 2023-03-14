@@ -73,7 +73,7 @@ const GlobalSearch = ({
         <Tooltip
           html={<div className="custom-tooltip">{data.originalName}</div>}
           theme="transparent"
-          disabled={!data?.hasTranslatedName}
+          disabled={!data?.displayName}
           position="top-start"
         >
           <div style={{ color: data.color }}>
