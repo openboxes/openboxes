@@ -20,7 +20,9 @@ export default function (state = initialState, action) {
         [action.payload.workflow]:
           _.without(
             state[action.payload.workflow],
-            _.find(state[action.payload.workflow], action.payload.line, 0),
+            _.find(state[action.payload.workflow], item =>
+              item['product.id'] === action.payload.line.product.id &&
+              item.quantityRequested === action.payload.line.quantityRequested, 0),
           ),
       };
     default:

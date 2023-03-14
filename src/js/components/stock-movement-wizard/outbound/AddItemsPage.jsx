@@ -12,7 +12,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { addNotSavedLine, fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { addNotSavedLine, fetchUsers, hideSpinner, removeSavedLine, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -295,9 +295,9 @@ class AddItemsPage extends Component {
     this.state = {
       currentLineItems: [],
       sortOrder: 0,
-      values: { ...this.props.initialValues, lineItems: [] },
+      values: { ...this.props.initialValues, lineItems: this.props.savedLineItems },
       newItem: false,
-      totalCount: 0,
+      totalCount: this.props.savedLineItems.length,
       isFirstPageLoaded: false,
       workflow: 'outbound',
     };
@@ -375,7 +375,7 @@ class AddItemsPage extends Component {
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
-      // We wouldn't update items with quantity requested < 0
+      // We wouldn't update items with quantity requested <= 0
       if (parseInt(item.quantityRequested, 10) <= 0) {
         return; // lodash continue
       }
@@ -622,6 +622,10 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchAddItemsPageData() {
+    // if (this.props.savedLineItems.length) {
+    //   this.props.hideSpinner();
+    //   return;
+    // }
     this.props.showSpinner();
 
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
@@ -721,13 +725,20 @@ class AddItemsPage extends Component {
     // We filter out items which were already sent to save
     const filteredCandidates = itemCandidatesToSave
       .filter(item => item.rowSaveStatus !== RowSaveStatus.SAVING);
-    filteredCandidates.forEach(item => this.props.addNotSavedLine(this.state.workflow, item));
     const itemsToSave = this.getLineItemsToBeSaved(filteredCandidates);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
     };
+
+    itemsToSave.forEach((item) => {
+      const itemToAdd = _.chain(item)
+        .pick(['product.id', 'quantityRequested', 'sortOrder', 'recipient.id'])
+        .set('quantityRequested', _.parseInt(item.quantityRequested))
+        .value();
+      this.props.addNotSavedLine(this.state.workflow, itemToAdd);
+    });
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
@@ -769,8 +780,14 @@ class AddItemsPage extends Component {
               }
               return item;
             });
+
+            if (itemToChange) {
+              this.props.removeSavedLine(this.state.workflow, itemToChange);
+            }
+
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
+              currentLineItems: lineItemsAfterSave,
             });
             return;
           }
@@ -1281,6 +1298,7 @@ const mapStateToProps = state => ({
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  savedLineItems: state.autosave.outbound,
 });
 
 const mapDispatchToProps = {
@@ -1288,6 +1306,7 @@ const mapDispatchToProps = {
   hideSpinner,
   fetchUsers,
   addNotSavedLine,
+  removeSavedLine,
 };
 
 export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
@@ -1324,8 +1343,11 @@ AddItemsPage.propTypes = {
   showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
   addNotSavedLine: PropTypes.func.isRequired,
+  removeSavedLine: PropTypes.func.isRequired,
+  savedLineItems: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 AddItemsPage.defaultProps = {
   showOnly: false,
+  savedLineItems: [],
 };
