@@ -260,7 +260,7 @@ class AddItemsPage extends Component {
       apiClient.get(url)
         .then((resp) => {
           const inboundReturn = parseResponse(resp.data.data);
-          const returnItems = inboundReturn.stockTransferItems.length > 0
+          const returnItems = inboundReturn.stockTransferItems.length
             ? inboundReturn.stockTransferItems
             : new Array(1).fill({ sortOrder: 100 });
 

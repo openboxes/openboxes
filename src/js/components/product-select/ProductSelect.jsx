@@ -8,15 +8,19 @@ import { debounceProductsFetch } from 'utils/option-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 
+const productOptionLabel = ({
+  productCode, displayName, displayNames, name,
+}) => (`${productCode} - ${displayName || displayNames?.default || name}`);
+
 const Option = option => (
   <Tooltip
     html={<div className="text-truncate">{option.name}</div>}
     theme="transparent"
-    disabled={!option.displayName}
+    disabled={!(option.displayName || option.displayNames?.default)}
     position="top-start"
   >
     <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-      {option.label}
+      {option.label || productOptionLabel(option)}
         &nbsp;
       {renderHandlingIcons(option.handlingIcons)}
     </strong>
@@ -25,7 +29,7 @@ const Option = option => (
 const SelectedValue = option => (
   <span className="d-flex align-items-center">
     <span className="text-truncate">
-      {option.label || `${option.productCode} - ${option.displayName || option.displayNames?.default || option.name}`}
+      {option.label || productOptionLabel(option)}
     </span>
     {renderHandlingIcons(option?.handlingIcons)}
   </span>
