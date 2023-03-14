@@ -372,7 +372,7 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested < 0
-      if (parseInt(item.quantityRequested, 10) < 0) {
+      if (parseInt(item.quantityRequested, 10) <= 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -392,7 +392,7 @@ class AddItemsPage extends Component {
         key => key !== 'product',
       );
 
-      if (newQty === oldQty && oldItem.rowSaveStatus === RowSaveStatus.ERROR) {
+      if (newQty === oldQty) {
         this.setState(prev => ({
           values: {
             ...prev.values,
