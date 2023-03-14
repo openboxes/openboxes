@@ -794,10 +794,6 @@ class AddItemsPage extends Component {
             quantityOnHand: '',
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            product: {
-              ...val.product,
-              label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
-            },
           };
         },
       );
@@ -813,10 +809,6 @@ class AddItemsPage extends Component {
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
             quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
-            product: {
-              ...val.product,
-              label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
-            },
           };
         },
       );
@@ -827,10 +819,6 @@ class AddItemsPage extends Component {
           ...val,
           disabled: true,
           quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
-          product: {
-            ...val.product,
-            label: `${val.productCode} ${val.product.translatedName ?? val.product.name}`,
-          },
         }),
       );
     }
