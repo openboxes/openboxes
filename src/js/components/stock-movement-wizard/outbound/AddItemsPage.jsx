@@ -145,15 +145,15 @@ const NO_STOCKLIST_FIELDS = {
           disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowRight: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowDown: rowCount === rowIndex + 1 ? () => () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
@@ -249,15 +249,15 @@ const STOCKLIST_FIELDS = {
         }) => ({
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowRight: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           arrowDown: rowCount === rowIndex + 1 ? () => () => {
             updateTotalCount(1);
-            addRow({ sortOrder: getSortOrder() });
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
           } : null,
           onBlur: () => {
             updateRow(values, rowIndex);
@@ -355,11 +355,24 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
+    // Here I am changing rowSaveStatus from PENDING to SAVING
+    // because all of these lines were sent to save
+    this.setState(previousState => ({
+      values: {
+        ...previousState.values,
+        lineItems: previousState.values.lineItems.map((item) => {
+          if (item.rowSaveStatus === RowSaveStatus.PENDING) {
+            return { ...item, rowSaveStatus: RowSaveStatus.SAVING };
+          }
+          return item;
+        }),
+      },
+    }));
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested < 0
-      if (parseInt(item.quantityRequested, 10) < 0) {
+      if (parseInt(item.quantityRequested, 10) <= 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -378,6 +391,20 @@ class AddItemsPage extends Component {
         ),
         key => key !== 'product',
       );
+
+      if (newQty === oldQty) {
+        this.setState(prev => ({
+          values: {
+            ...prev.values,
+            lineItems: prev.values.lineItems.map((lineItem) => {
+              if (lineItem.id === item.id) {
+                return { ...lineItem, rowSaveStatus: RowSaveStatus.SAVED };
+              }
+              return lineItem;
+            }),
+          },
+        }));
+      }
 
       if (
         (this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory) &&
@@ -422,7 +449,8 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
+      lineItemsData = new Array(1)
+        .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     } else {
       lineItemsData = _.map(data, val => ({ ...val, disabled: true }));
     }
@@ -708,7 +736,10 @@ class AddItemsPage extends Component {
    * @public
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
-    const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
+    // We filter out items which were already sent to save
+    const filteredCandidates = itemCandidatesToSave
+      .filter(item => item.rowSaveStatus !== RowSaveStatus.SAVING);
+    const itemsToSave = this.getLineItemsToBeSaved(filteredCandidates);
     const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
@@ -735,7 +766,7 @@ class AddItemsPage extends Component {
             const savedItemsIds = lineItemsBackendData.map(item => item.id);
             // We are sending item by item to API. Here we have to find
             // newly saved item to replace its equivalent in state
-            const itemToChange = _.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id')[0];
+            const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
@@ -749,7 +780,7 @@ class AddItemsPage extends Component {
               if (
                 _.includes(savedItemsProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
-                && item.rowSaveStatus === RowSaveStatus.PENDING
+                && item.rowSaveStatus === RowSaveStatus.SAVING
               ) {
                 return { ...itemToChange, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
@@ -774,7 +805,7 @@ class AddItemsPage extends Component {
           const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
             if (
               item.product &&
-              item.rowSaveStatus === RowSaveStatus.PENDING &&
+              item.rowSaveStatus === RowSaveStatus.SAVING &&
               _.includes(notSavedItemsIds, item.product.id)
             ) {
               return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
@@ -819,9 +850,10 @@ class AddItemsPage extends Component {
       return;
     }
 
-    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false).then(() => {
-      this.setState({ isSaveCompleted: true });
-    });
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false)
+      .then(() => {
+        this.setState({ isSaveCompleted: true });
+      });
   };
 
   /**
@@ -885,6 +917,7 @@ class AddItemsPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
+        this.setState({ isSaveCompleted: true });
       })
       .catch(() => this.props.hideSpinner())
       .finally(() => {
@@ -946,7 +979,8 @@ class AddItemsPage extends Component {
           currentLineItems: [],
           values: {
             ...this.state.values,
-            lineItems: new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
+            lineItems: new Array(1)
+              .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING }),
           },
         });
       })
