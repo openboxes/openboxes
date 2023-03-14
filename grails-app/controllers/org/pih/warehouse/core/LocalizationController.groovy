@@ -156,7 +156,7 @@ class LocalizationController {
         def filename = locale.language == 'en' ? "messages.properties" : "messages_${locale.language}.properties"
         def localizationInstanceList = Localization.findAllByLocale(locale.language)
         response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-        response.contentType = "text/plan"
+        response.contentType = 'text/plain'
         String output = localizationInstanceList.sort { it.code }.collect {
             it.code + " = " + it?.text?.trim()
         }.join("\n")
