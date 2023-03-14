@@ -86,7 +86,7 @@
                                         </td>
                                         <td>
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
-                                                <g:translatedProductName product="${product}" />
+                                                <format:displayName product="${product}" showTooltip="${true}" />
                                                 <g:renderHandlingIcons product="${product}" />
                                             </g:link>
                                         </td>
