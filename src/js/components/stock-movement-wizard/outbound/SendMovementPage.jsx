@@ -23,8 +23,8 @@ import TextField from 'components/form-elements/TextField';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -207,19 +207,12 @@ const FIELDS = {
         defaultMessage: 'Product',
         getDynamicAttr: ({ isBoxNameEmpty, fieldValue, isPalletNameEmpty }) => ({
           flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
-          showValueTooltip: !!fieldValue?.translatedName,
+          showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
           className: 'text-left',
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.translatedName ?? value.name}
-              </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
       },
       lotNumber: {

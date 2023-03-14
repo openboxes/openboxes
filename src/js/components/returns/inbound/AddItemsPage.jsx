@@ -260,14 +260,9 @@ class AddItemsPage extends Component {
       apiClient.get(url)
         .then((resp) => {
           const inboundReturn = parseResponse(resp.data.data);
-          const returnItems = inboundReturn.stockTransferItems.length > 0 ?
-            _.map(inboundReturn.stockTransferItems, item => ({
-              ...item,
-              product: {
-                ...item.product,
-                label: `${item.product.productCode} ${item.product.translatedName ?? item.product.name}`,
-              },
-            })) : new Array(1).fill({ sortOrder: 100 });
+          const returnItems = inboundReturn.stockTransferItems.length
+            ? inboundReturn.stockTransferItems
+            : new Array(1).fill({ sortOrder: 100 });
 
           const sortOrder = _.toInteger(_.last(returnItems).sortOrder) + 100;
 

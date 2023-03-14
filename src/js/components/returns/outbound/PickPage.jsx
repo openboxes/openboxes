@@ -12,7 +12,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -53,11 +53,7 @@ const FIELDS = {
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
-          formatValue: value => (
-            <div className="d-flex">
-              {value?.translatedName ?? value?.name}
-              {renderHandlingIcons(value?.handlingIcons)}
-            </div>),
+          formatValue: formatProductDisplayName,
           className: 'text-left ml-1',
           showValueTooltip: true,
         },

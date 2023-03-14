@@ -22,9 +22,11 @@ export const getInvoiceDescription = (rowValue) => {
   return rowValue?.description;
 };
 
-export const getReceivingItemValue = rowValue => (
+export const formatProductDisplayName = rowValue => (
   <div className="d-flex">
-    {rowValue?.displayNames?.default ?? rowValue?.name}
+    <span className="text-truncate">
+      {rowValue?.displayName || rowValue?.displayNames?.default || rowValue?.name}
+    </span>
     {renderHandlingIcons(rowValue?.handlingIcons)}
   </div>);
 

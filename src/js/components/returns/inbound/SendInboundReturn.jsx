@@ -18,7 +18,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -143,11 +143,7 @@ const FIELDS = {
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
-          formatValue: value => (
-            <div className="d-flex">
-              {value.translatedName ?? value.name}
-              {renderHandlingIcons(value.handlingIcons)}
-            </div>),
+          formatValue: formatProductDisplayName,
           className: 'text-left ml-1',
           showValueTooltip: true,
         },

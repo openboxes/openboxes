@@ -10,8 +10,8 @@ import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceUsersFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate from 'utils/Translate';
 
 
@@ -39,18 +39,11 @@ const FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         getDynamicAttr: ({ fieldValue }) => ({
-          showValueTooltip: !!fieldValue?.translatedName,
+          showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.translatedName ?? value.name}
-              </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
       },
       lotNumber: {

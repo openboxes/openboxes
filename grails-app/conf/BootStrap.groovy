@@ -240,7 +240,7 @@ class BootStrap {
                     "requisitionItem.id"    : picklistItem?.requisitionItem?.id,
                     "inventoryItem.id"      : picklistItem.inventoryItem?.id,
                     "product.name"          : picklistItem?.inventoryItem?.product?.name,
-                    "product.translatedName": picklistItem?.inventoryItem?.product?.translatedName,
+                    "product.displayName"   : picklistItem?.inventoryItem?.product?.displayName,
                     "productCode"           : picklistItem?.inventoryItem?.product?.productCode,
                     lotNumber               : picklistItem?.inventoryItem?.lotNumber,
                     expirationDate          : picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),

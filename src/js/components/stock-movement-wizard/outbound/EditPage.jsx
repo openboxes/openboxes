@@ -21,7 +21,7 @@ import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -82,18 +82,11 @@ const FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {(value.translatedName ?? value.name) || ''}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
         getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
-          showValueTooltip: !!fieldValue?.translatedName,
+          showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
         }),
       },
@@ -184,7 +177,7 @@ const FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
-          translatedProductName: fieldValue?.product?.translatedName,
+          displayName: fieldValue?.product?.displayNames?.default,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,

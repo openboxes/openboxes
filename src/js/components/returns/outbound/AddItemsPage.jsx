@@ -19,8 +19,8 @@ import ProductSelect from 'components/product-select/ProductSelect';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceAvailableItemsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -79,11 +79,7 @@ const FIELDS = {
           tooltipValue: fieldValue?.name,
         }),
         attributes: {
-          formatValue: value => (
-            <div className="d-flex">
-              {value.translatedName ?? value.name}
-              {renderHandlingIcons(value.handlingIcons)}
-            </div>),
+          formatValue: formatProductDisplayName,
           showValueTooltip: true,
           className: 'text-left ml-1',
         },

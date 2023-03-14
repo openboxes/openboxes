@@ -89,7 +89,6 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
             lotAndExpiryControl: obj.lotAndExpiryControl,
-            label: `${obj.productCode} - ${obj.displayName ?? obj.name}`,
             displayName: obj.displayName,
             color: obj.color,
             exactMatch: obj.exactMatch,
@@ -114,8 +113,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
             quantityAvailable: obj.quantityAvailable,
             minExpirationDate: obj.minExpirationDate,
             handlingIcons: obj.product.handlingIcons,
-            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
-            hasTranslatedName: !!obj.translatedName,
+            displayNames: obj?.product?.displayNames,
             color: obj.color,
           }
         ))))
@@ -136,8 +134,7 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
             name: obj.name,
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
-            label: `${obj.productCode} - ${obj.translatedName ?? obj.name}`,
-            hasTranslatedName: !!obj.translatedName,
+            displayNames: obj?.displayNames,
             color: obj.color,
           }
         ))))

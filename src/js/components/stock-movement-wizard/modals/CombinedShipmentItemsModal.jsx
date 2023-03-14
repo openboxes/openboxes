@@ -84,12 +84,11 @@ const FIELDS = {
           className: 'text-left ml-1',
         },
         getDynamicAttr: ({ values, rowIndex }) => {
-          const productTranslatedName = values.orderItems[rowIndex]?.productTranslatedName;
-          const productName = values.orderItems[rowIndex]?.productName;
+          const orderItem = values.orderItems[rowIndex];
           return {
             showValueTooltip: true,
-            tooltipValue: productName,
-            formatValue: () => productTranslatedName || productName,
+            tooltipValue: orderItem?.productName,
+            formatValue: () => orderItem?.displayName || orderItem?.productName,
           };
         },
       },
