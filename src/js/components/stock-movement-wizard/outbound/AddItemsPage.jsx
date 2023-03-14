@@ -553,8 +553,10 @@ class AddItemsPage extends Component {
   confirmTransition(onConfirm, items) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item =>
-        <p key={item.sortOrder}>{item.product.label} {item.quantityRequested}</p>),
+      message: _.map(items, item => (
+        <p key={item.sortOrder}>
+          {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
+        </p>)),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
