@@ -596,10 +596,7 @@ class StockMovementService {
         if (requisitionItem) {
             removeRequisitionItem(requisitionItem)
         } else {
-            List<Order> orders = shipmentItem?.purchaseOrders
             removeShipmentItem(shipmentItem)
-            // Trigger Order Summary event for POs after deleting the shipment item
-            publishEvent(new RefreshOrderSummaryEvent(orders))
         }
     }
 
@@ -1641,7 +1638,6 @@ class StockMovementService {
         shipment.shipmentType = ShipmentType.get(Constants.DEFAULT_SHIPMENT_TYPE_ID)
 
         // Save shipment before adding the items to avoid referencing an unsaved transient instance
-        shipment.disableRefresh = true
         shipment.save()
 
         stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
@@ -1669,7 +1665,6 @@ class StockMovementService {
             shipment.addToShipmentItems(shipmentItem)
         }
 
-        shipment.disableRefresh = false
         if (shipment.hasErrors() || !shipment.save(flush: true)) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
@@ -1807,7 +1802,6 @@ class StockMovementService {
             }
         }
 
-        shipment.disableRefresh = false
         if (shipment.hasErrors() || !shipment.save()) {
             throw new ValidationException("Invalid shipment", shipment.errors)
         }
@@ -2063,10 +2057,7 @@ class StockMovementService {
     }
 
     void removeShipmentItems(Shipment shipment) {
-        List<Order> orders = shipment.purchaseOrders
         removeShipmentItems(shipment.shipmentItems)
-        // Trigger Order Summary event for POs after deleting the shipment items
-        publishEvent(new RefreshOrderSummaryEvent(orders))
     }
 
     void removeShipmentItemsForModifiedRequisitionItem(StockMovementItem stockMovementItem) {
@@ -2226,7 +2217,6 @@ class StockMovementService {
         }
 
         shipmentService.createOrUpdateTrackingNumber(shipment, stockMovement.trackingNumber)
-        shipment.disableRefresh = false
         shipment.save()
     }
 

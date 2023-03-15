@@ -74,6 +74,8 @@ class Invoice implements Serializable {
     User createdBy
     User updatedBy
 
+    Boolean disableRefresh = Boolean.TRUE
+
     static hasMany = [
             referenceNumbers : ReferenceNumber,
             invoiceItems     : InvoiceItem,
@@ -99,7 +101,8 @@ class Invoice implements Serializable {
             'prepaymentInvoices',
             'prepaymentItems',
             'orders',
-            'shipments'
+            'shipments',
+            'disableRefresh'
     ]
 
     static constraints = {
