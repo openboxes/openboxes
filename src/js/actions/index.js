@@ -27,7 +27,7 @@ import {
   FILTER_FORM_PARAMS_BUILT,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
-  REMOVE_FROM_INDICATORS,
+  REMOVE_FROM_INDICATORS, REMOVE_LINES,
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
@@ -548,11 +548,19 @@ export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
   });
 };
 
-export const addLines = (workflow, lines) => dispatch => dispatch({
+export const addLines = (workflow, lines, id) => dispatch => dispatch({
   type: ADD_LINES,
   payload: {
     workflow,
     lines,
+    id,
+  },
+});
+
+export const removeLines = workflow => dispatch => dispatch({
+  type: REMOVE_LINES,
+  payload: {
+    workflow,
   },
 });
 

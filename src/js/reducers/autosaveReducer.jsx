@@ -1,7 +1,7 @@
-import { ADD_LINES } from 'actions/types';
+import { ADD_LINES, REMOVE_LINES } from 'actions/types';
 
 const initialState = {
-  outbound: [],
+  outbound: { id: null, lineItems: [], lastUpdateDate: null },
 };
 
 export default function (state = initialState, action) {
@@ -9,8 +9,14 @@ export default function (state = initialState, action) {
     case ADD_LINES:
       return {
         ...state,
-        [action.payload.workflow]: action.payload.lines,
+        [action.payload.workflow]: {
+          id: action.payload.id,
+          lineItems: action.payload.lines,
+          lastUpdated: new Date(),
+        },
       };
+    case REMOVE_LINES:
+      return initialState;
     default:
       return state;
   }

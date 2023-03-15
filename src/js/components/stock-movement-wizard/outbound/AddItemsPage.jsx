@@ -12,7 +12,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { addLines, fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { addLines, fetchUsers, hideSpinner, removeLines, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -295,10 +295,11 @@ class AddItemsPage extends Component {
     this.state = {
       currentLineItems: [],
       sortOrder: 0,
-      values: { ...this.props.initialValues, lineItems: this.props.savedLineItems },
+      values: { ...this.props.initialValues, lineItems: [] },
       newItem: false,
-      totalCount: this.props.savedLineItems.length,
+      totalCount: 0,
       isFirstPageLoaded: false,
+      isDraftAvailable: false,
       workflow: 'outbound',
     };
 
@@ -622,21 +623,28 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchAddItemsPageData() {
-    if (this.props.savedLineItems.length) {
-      this.props.hideSpinner();
-      this.saveRequisitionItemsInCurrentStep(this.props.savedLineItems, false);
-      return;
-    }
-
     this.props.showSpinner();
 
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
-        const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
-        const { totalCount } = resp.data;
+        const { hasManageInventory, statusCode } = resp.data.data;
+        const { totalCount, lastUpdated } = resp.data;
 
+        // If we are on the same stockMovement as we have in store
+        // we're setting the lines from store to currently lineItems
+        if (this.props.savedStockMovement.id === this.state.values.stockMovementId) {
+          this.setState({
+            values: {
+              ...this.state.values,
+              lineItems: this.props.savedStockMovement.lineItems,
+            },
+            totalCount: this.props.savedStockMovement.lineItems.length,
+            isDraftAvailable: lastUpdated > this.props.savedStockMovement.lastUpdated,
+          });
+          this.props.hideSpinner();
+          return;
+        }
         this.setState({
           values: {
             ...this.state.values,
@@ -734,7 +742,11 @@ class AddItemsPage extends Component {
       lineItems: itemsToSave,
     };
 
-    this.props.addLines(this.state.workflow, itemCandidatesToSave);
+    this.props.addLines(
+      this.state.workflow,
+      itemCandidatesToSave,
+      this.state.values.stockMovementId,
+    );
 
     if (payload.lineItems.length) {
       return apiClient.post(updateItemsUrl, payload)
@@ -847,7 +859,11 @@ class AddItemsPage extends Component {
 
     this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false)
       .finally(() => {
-        this.props.addLines(this.state.workflow, this.state.values.lineItems);
+        this.props.addLines(
+          this.state.workflow,
+          this.state.values.lineItems,
+          this.state.values.stockMovementId,
+        );
       });
   };
 
@@ -959,6 +975,13 @@ class AddItemsPage extends Component {
     const payload = { stockMovementId: this.state.values.stockMovementId };
 
     return apiClient.delete(removeItemsUrl, { data: payload })
+      .then(() => {
+        this.props.addLines(
+          this.state.workflow,
+          this.state.values.lineItems,
+          this.state.stockMovementId,
+        );
+      })
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
@@ -975,6 +998,7 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
+        this.props.removeLines(this.state.workflow);
         this.setState({
           totalCount: 1,
           currentLineItems: [],
@@ -1137,6 +1161,13 @@ class AddItemsPage extends Component {
           <div className="d-flex flex-column">
             { !showOnly ?
               <span className="buttons-container">
+                {this.state.isDraftAvailable &&
+                  <button
+                    type="button"
+                    className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
+                  >
+                  Available draft
+                  </button>}
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1293,7 +1324,7 @@ const mapStateToProps = state => ({
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
-  savedLineItems: state.autosave.outbound,
+  savedStockMovement: state.autosave.outbound,
 });
 
 const mapDispatchToProps = {
@@ -1301,6 +1332,7 @@ const mapDispatchToProps = {
   hideSpinner,
   fetchUsers,
   addLines,
+  removeLines,
 };
 
 export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
@@ -1337,10 +1369,19 @@ AddItemsPage.propTypes = {
   showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
   addLines: PropTypes.func.isRequired,
-  savedLineItems: PropTypes.arrayOf(PropTypes.shape({})),
+  removeLines: PropTypes.func.isRequired,
+  savedStockMovement: PropTypes.shape({
+    id: PropTypes.string,
+    lineItems: PropTypes.arrayOf(PropTypes.shape({})),
+    lastUpdated: PropTypes.string,
+  }),
 };
 
 AddItemsPage.defaultProps = {
   showOnly: false,
-  savedLineItems: [],
+  savedStockMovement: {
+    id: null,
+    lineItems: [],
+    lastUpdated: null,
+  },
 };
