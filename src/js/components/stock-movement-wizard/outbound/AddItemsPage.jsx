@@ -622,10 +622,12 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchAddItemsPageData() {
-    // if (this.props.savedLineItems.length) {
-    //   this.props.hideSpinner();
-    //   return;
-    // }
+    if (this.props.savedLineItems.length) {
+      this.props.hideSpinner();
+      this.saveRequisitionItemsInCurrentStep(this.props.savedLineItems, false);
+      return;
+    }
+
     this.props.showSpinner();
 
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
