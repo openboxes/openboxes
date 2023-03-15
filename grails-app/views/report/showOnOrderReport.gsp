@@ -158,9 +158,9 @@
                 } );
             },
             "fnRowCallback": function( nRow, aData ) {
-                $('td:eq(1)', nRow).text(aData?.translatedProductName ?? aData?.productName);
+                $('td:eq(1)', nRow).text(aData?.displayName ?? aData?.productName);
                 // If we display translated name, we want to have tooltip with original name of the product
-                if (aData?.translatedProductName) {
+                if (aData?.displayName) {
                   $('td:eq(1)', nRow).attr('title', aData?.productName);
                 }
             },

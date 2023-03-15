@@ -215,9 +215,8 @@ const STOCKLIST_FIELDS = {
         headerAlign: 'left',
         flexWidth: '9',
         getDynamicAttr: ({
-          fieldValue, rowIndex, rowCount, newItem, originId, focusField, saveProgress, values,
+          fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
-          onBlur: () => saveProgress({ values }),
           disabled: !!fieldValue,
           autoFocus: newItem && rowIndex === rowCount - 1,
           locationId: originId,
