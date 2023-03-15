@@ -36,7 +36,7 @@
                                         <label for='name'><warehouse:message code="shipping.name.label"/></label>
                                     </td>
                                     <td valign='top' class='value ${hasErrors(bean:shipmentInstance,field:'name','errors')}'>
-                                        <input id="name" type="text" name='name' value="${shipmentInstance?.name?.encodeAsHTML()}" size="80" class="text"/>
+                                        <input id="name" type="text" name='name' value="${shipmentInstance?.name}" size="80" class="text"/>
                                     </td>
                                 </tr>
                                 <g:if test="${!shipmentWorkflow?.isExcluded('shipmentType')}">

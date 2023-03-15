@@ -27,16 +27,16 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productAssociation.code.label" default="Code" /></td>
-                            
-                            <td valign="top" class="value">${productAssociationInstance?.code?.encodeAsHTML()}</td>
-                            
+
+                            <td valign="top" class="value">${productAssociationInstance?.code}</td>
+
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productAssociation.associatedProduct.label" default="Associated Product" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productAssociationInstance?.associatedProduct?.id}">${productAssociationInstance?.associatedProduct?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productAssociationInstance?.associatedProduct?.id}">${productAssociationInstance?.associatedProduct}</g:link></td>
+
                         </tr>
                     
                         <tr class="prop">
@@ -83,9 +83,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productAssociation.product.label" default="Product" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productAssociationInstance?.product?.id}">${productAssociationInstance?.product?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productAssociationInstance?.product?.id}">${productAssociationInstance?.product}</g:link></td>
+
                         </tr>
                     
                     

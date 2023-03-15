@@ -48,7 +48,7 @@
                                                             <warehouse:message code="shipping.pickList.label" default="Pick List"/>
                                                         </div>
                                                         <div class="subtitle">
-                                                            ${command?.shipment?.name?.encodeAsHTML() }
+                                                            ${command?.shipment?.name}
                                                         </div>
                                                     </td>
                                                     <td class="right middle" width="1%">
@@ -65,7 +65,7 @@
 
                                                     </td>
                                                     <td>
-                                                        ${command?.shipment?.shipmentNumber?.encodeAsHTML() }
+                                                        ${command?.shipment?.shipmentNumber}
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
@@ -92,7 +92,7 @@
 
                                                     </td>
                                                     <td>
-                                                        ${command?.shipment?.origin?.name?.encodeAsHTML() }
+                                                        ${command?.shipment?.origin?.name}
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
@@ -100,7 +100,7 @@
                                                         <label><warehouse:message code="shipping.destination.label"/></label>
                                                     </td>
                                                     <td>
-                                                        ${command?.shipment?.destination?.name?.encodeAsHTML() }
+                                                        ${command?.shipment?.destination?.name}
                                                     </td>
                                                 </tr>
                                             </table>

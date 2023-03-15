@@ -81,9 +81,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="document.documentType.label" default="Document Type" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="documentType" action="show" id="${documentInstance?.documentType?.id}">${documentInstance?.documentType?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="documentType" action="show" id="${documentInstance?.documentType?.id}">${documentInstance?.documentType}</g:link></td>
+
                         </tr>
                     
                         <tr class="prop">

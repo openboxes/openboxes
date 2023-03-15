@@ -71,6 +71,7 @@
                             </h2>
 		          			<div class="filter-list-item">
 		           				<label><warehouse:message code="category.label"/></label>
+		           				%{-- not sure what the ${{...}} in optionValue means: it may need to be de-escaped. OBPIH-5506 --}%
 				           		<g:select name="category" class="chzn-select-deselect"
 												from="${categories}"
 												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}"
