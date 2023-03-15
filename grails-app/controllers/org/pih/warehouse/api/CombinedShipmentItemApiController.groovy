@@ -117,7 +117,6 @@ class CombinedShipmentItemApiController {
                 orderItem.addToShipmentItems(shipmentItem)
                 shipment.addToShipmentItems(shipmentItem)
             }
-            shipment.disableRefresh = false
             shipment.save()
         }
         render([data: shipment] as JSON)
