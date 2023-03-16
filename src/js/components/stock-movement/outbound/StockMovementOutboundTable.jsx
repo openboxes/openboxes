@@ -15,8 +15,10 @@ import { connect } from 'react-redux';
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
+import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
+import { mapShipmentTypes } from 'utils/option-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -144,9 +146,22 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
       accessor: 'identifier',
       fixed: 'left',
+      headerClassName: 'header justify-content-center',
       minWidth: 100,
-      Cell: row => (
-        <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
+      Cell: (row) => {
+        const { id, shipmentType } = row.original;
+        return (
+          <TableCell {...row} link={`/openboxes/stockMovement/show/${id}`}>
+            <ShipmentIdentifier
+              shipmentType={mapShipmentTypes({
+                shipmentTypes: shipmentType,
+                translationFunc: translate,
+              })}
+              identifier={row?.value}
+            />
+          </TableCell>
+        );
+      },
     },
     {
       Header: <Translate id="react.stockMovement.column.name.label" defaultMessage="Name" />,
@@ -261,6 +276,7 @@ const mapStateToProps = state => ({
   requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
+  currentLocale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);
