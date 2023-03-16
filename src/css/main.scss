@@ -1371,3 +1371,14 @@ div.search-input:focus-within {
     background-color: var(--color-red);
   }
 }
+
+// Shipment type with identifier styling
+
+.shipment-identifier {
+  gap: 4px;
+
+  svg {
+    min-width: 20px;
+    height: 20px;
+  }
+}
