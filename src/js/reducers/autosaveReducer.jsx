@@ -16,7 +16,10 @@ export default function (state = initialState, action) {
         },
       };
     case REMOVE_LINES:
-      return initialState;
+      return {
+        ...state,
+        [action.payload.workflow]: initialState[action.payload.workflow],
+      };
     default:
       return state;
   }

@@ -70,21 +70,30 @@ const NO_STOCKLIST_FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, updateTotalCount,
+      addRow, getSortOrder, showOnly, updateTotalCount, getStockMovementDraft, isDraftAvailable,
     }) => (
-      <button
-        type="button"
-        id="addButton"
-        className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
+      <>
+        <button
+          type="button"
+          id="addButton"
+          className="btn btn-outline-success btn-xs"
+          disabled={showOnly}
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-        onMouseDown={() => {
+          onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
-        }
-        }
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
+        }}
+        ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+        </button>
+        {isDraftAvailable &&
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-xs draft-button ml-1"
+            onMouseDown={() => getStockMovementDraft()}
+          >
+            <Translate id="react.default.button.availableDraft.label" defaultMessage="Available draft" />
+          </button>}
+      </>
     ),
     fields: {
       product: {
@@ -191,20 +200,31 @@ const STOCKLIST_FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
+      addRow, getSortOrder, newItemAdded, updateTotalCount, isDraftAvailable, getStockMovementDraft,
     }) => (
-      <button
-        type="button"
-        id="addButton"
-        className="btn btn-outline-success btn-xs"
-        // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-        onMouseDown={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
+      <>
+        <button
+          type="button"
+          id="addButton"
+          className="btn btn-outline-success btn-xs"
+          // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
+          onMouseDown={() => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
+            newItemAdded();
+          }}
+        ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+        </button>
+        {isDraftAvailable &&
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-xs draft-button ml-1"
+            onMouseDown={() => getStockMovementDraft()}
+          >
+            <Translate id="react.default.button.availableDraft.label" defaultMessage="Available draft" />
+          </button>}
+      </>
+
     ),
     fields: {
       product: {
@@ -315,6 +335,7 @@ class AddItemsPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.getStockMovementDraft = this.getStockMovementDraft.bind(this);
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -746,13 +767,13 @@ class AddItemsPage extends Component {
       lineItems: itemsToSave,
     };
 
-    this.props.addLines(
-      this.state.workflow,
-      itemCandidatesToSave,
-      this.state.values.stockMovementId,
-    );
-
     if (payload.lineItems.length) {
+      this.props.addLines(
+        this.state.workflow,
+        itemCandidatesToSave,
+        this.state.values.stockMovementId,
+      );
+
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
@@ -805,6 +826,12 @@ class AddItemsPage extends Component {
             currentLineItems: lineItemsBackendData,
           });
         })
+        .then(() => {
+          // There is no need for creating draft
+          // if all of my items are saved correctly
+          // (it means that we have internet connection)
+          this.props.removeLines(this.state.workflow);
+        })
         .catch(() => {
           // When there is an error during saving we have to find products which
           // caused the error. These items are not saved, so we don't have line ID,
@@ -821,6 +848,15 @@ class AddItemsPage extends Component {
             return item;
           });
           this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
+
+          // When there is an error, we are adding items to
+          // state for draft
+          this.props.addLines(
+            this.state.workflow,
+            this.state.values.lineItems,
+            this.state.values.stockMovementId,
+          );
+
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
@@ -861,14 +897,7 @@ class AddItemsPage extends Component {
 
     this.debouncedSave.cancel();
 
-    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false)
-      .finally(() => {
-        this.props.addLines(
-          this.state.workflow,
-          this.state.values.lineItems,
-          this.state.values.stockMovementId,
-        );
-      });
+    this.saveRequisitionItemsInCurrentStep(itemsWithStatuses, false);
   };
 
   /**
@@ -879,15 +908,11 @@ class AddItemsPage extends Component {
   save(formValues) {
     actionInProgress = true;
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
+    this.props.removeLines(this.state.workflow);
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() => {
         this.saveItems(lineItems);
-        const filteredLineItems = lineItems.filter(item => item.quantityRequested > 0);
-        this.setState({
-          values: { lineItems: filteredLineItems },
-          totalCount: filteredLineItems.length,
-        });
       });
     } else {
       this.saveItems(lineItems);
@@ -937,6 +962,7 @@ class AddItemsPage extends Component {
 
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
+        this.fetchLineItems();
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -1165,14 +1191,6 @@ class AddItemsPage extends Component {
           <div className="d-flex flex-column">
             { !showOnly ?
               <span className="buttons-container">
-                {this.state.isDraftAvailable &&
-                  <button
-                    type="button"
-                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                    onMouseDown={() => this.getStockMovementDraft()}
-                  >
-                  Available draft
-                  </button>}
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1262,6 +1280,8 @@ class AddItemsPage extends Component {
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   saveProgress: this.saveProgress,
+                  getStockMovementDraft: this.getStockMovementDraft,
+                  isDraftAvailable: this.state.isDraftAvailable,
                 }))}
               </div>
               <div className="submit-buttons">
