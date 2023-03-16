@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
@@ -124,8 +125,10 @@ class BinTable extends Component {
         pageText=""
         onFetchData={(state) => {
           const offset = state.page > 0 ? (state.page) * state.pageSize : 0;
-          apiClient.get('/openboxes/api/internalLocations/search?locationTypeCode=BIN_LOCATION&locationTypeCode=INTERNAL', {
+          apiClient.get('/openboxes/api/internalLocations/search', {
+            paramsSerializer: parameters => queryString.stringify(parameters),
             params: {
+              locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
               offset: `${offset}`,
               max: `${state.pageSize}`,
               'parentLocation.id': `${this.props.currentLocationId}`,

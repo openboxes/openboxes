@@ -365,6 +365,62 @@ class LocationService {
         return internalLocationsSupportingActivityCodes
     }
 
+    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, Map params) {
+        getInternalLocations(parentLocation, locationTypeCodes, params, null)
+    }
+
+    // FIXME This is a hotfix for issue OBPIH-5466
+    // The issue is with including and excluding certain locations like RECEIVING and HOLD.
+    // An example for this issue was that we needed to include HOlD BINS and to do that
+    // we needed to include LocationTypeCode = BIN_LOCATION and INTERNAL.
+    // By including LocationTypeCode INTERNAL we also get a bunch of Receiving Locations which we don't need in most of the places
+    // so we needed to have a way to exclude them
+    List getInternalLocations(Location parentLocation, LocationTypeCode[] locationTypeCodes, Map params, String[] locationNames) {
+        List<Location> internalLocations = Location.createCriteria().list() {
+            eq("active", Boolean.TRUE)
+            eq("parentLocation", parentLocation)
+            or {
+                locationType {
+                    'in'("locationTypeCode", locationTypeCodes)
+                }
+                if (locationNames) {
+                    'in'("name", locationNames)
+                }
+            }
+        }
+
+        // locations that must be included regardless of the conditions set
+        List<Location> includedLocations = []
+        if (locationNames) {
+            includedLocations = internalLocations.findAll {it.name in locationNames }
+            internalLocations.removeAll(includedLocations)
+
+        }
+
+        // Filter by activity code
+        if (params?.allActivityCodes) {
+            internalLocations = internalLocations.findAll { Location location ->
+                params?.allActivityCodes?.every{ location.supports(it) }
+            }
+        } else if (params?.anyActivityCodes){
+            internalLocations = internalLocations.findAll { Location location ->
+                params?.anyActivityCodes?.any{ location.supports(it) }
+            }
+        }
+        if (params?.ignoreActivityCodes) {
+            internalLocations = internalLocations.findAll { Location location ->
+                params?.ignoreActivityCodes?.every{ !location.supports(it) }
+            }
+        }
+        internalLocations += includedLocations
+
+        // Sort locations by sort order, then name
+        internalLocations = internalLocations.sort { a, b -> a.sortOrder <=> b.sortOrder ?: a.name <=> b.name }
+
+        return internalLocations
+    }
+
+
     List getPutawayLocations(Location parentLocation) {
         return getInternalLocations(parentLocation, [ActivityCode.PUTAWAY_STOCK])
     }
