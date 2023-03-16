@@ -665,7 +665,7 @@ class AddItemsPage extends Component {
       .then((resp) => {
         const { hasManageInventory, statusCode, lastUpdated } = resp.data.data;
         const { totalCount } = resp.data;
-        // if data form backend is newer than the version from local storage
+        // if data from backend is older than the version from local storage
         // we want to allow users use their version
         const isDraftAvailable = (stockMovementId === id) && (lastUpdated < lastSaved);
 
