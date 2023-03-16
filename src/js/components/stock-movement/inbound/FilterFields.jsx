@@ -52,6 +52,23 @@ export default {
       disabled: true,
     },
   },
+  shipmentType: {
+    type: FilterSelectField,
+    attributes: {
+      multi: true,
+      filterElement: true,
+      placeholder: 'react.stockMovement.filters.shipmentType.label',
+      defaultPlaceholder: 'Shipment type',
+      showLabelTooltip: true,
+      options: [],
+      blurInputOnSelect: false,
+      closeMenuOnSelect: false,
+      valueKey: 'id',
+    },
+    getDynamicAttr: ({ shipmentTypes }) => ({
+      options: shipmentTypes,
+    }),
+  },
   requestedBy: {
     type: FilterSelectField,
     attributes: {
