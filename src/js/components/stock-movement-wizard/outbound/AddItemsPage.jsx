@@ -478,6 +478,18 @@ class AddItemsPage extends Component {
     });
   }
 
+  getStockMovementDraft() {
+    this.setState({
+      values: {
+        ...this.state.values,
+        lineItems: this.props.savedStockMovement.lineItems,
+      },
+      totalCount: this.props.savedStockMovement.lineItems.length,
+      isDraftAvailable: false,
+    });
+    this.props.hideSpinner();
+  }
+
   updateTotalCount(value) {
     this.setState({
       totalCount: this.state.totalCount + value === 0 ? 1 : this.state.totalCount + value,
@@ -624,27 +636,18 @@ class AddItemsPage extends Component {
    */
   fetchAddItemsPageData() {
     this.props.showSpinner();
+    const { lastUpdated: lastSaved, id } = this.props.savedStockMovement;
+    const { stockMovementId } = this.state.values;
 
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const url = `/openboxes/api/stockMovements/${stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
-        const { hasManageInventory, statusCode } = resp.data.data;
-        const { totalCount, lastUpdated } = resp.data;
+        const { hasManageInventory, statusCode, lastUpdated } = resp.data.data;
+        const { totalCount } = resp.data;
+        // if data form backend is newer than the version from local storage
+        // we want to allow users use their version
+        const isDraftAvailable = (stockMovementId === id) && (lastUpdated < lastSaved);
 
-        // If we are on the same stockMovement as we have in store
-        // we're setting the lines from store to currently lineItems
-        if (this.props.savedStockMovement.id === this.state.values.stockMovementId) {
-          this.setState({
-            values: {
-              ...this.state.values,
-              lineItems: this.props.savedStockMovement.lineItems,
-            },
-            totalCount: this.props.savedStockMovement.lineItems.length,
-            isDraftAvailable: lastUpdated > this.props.savedStockMovement.lastUpdated,
-          });
-          this.props.hideSpinner();
-          return;
-        }
         this.setState({
           values: {
             ...this.state.values,
@@ -652,6 +655,7 @@ class AddItemsPage extends Component {
             statusCode,
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
+          isDraftAvailable,
         }, () => this.props.hideSpinner());
       });
   }
@@ -1164,7 +1168,8 @@ class AddItemsPage extends Component {
                 {this.state.isDraftAvailable &&
                   <button
                     type="button"
-                    className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                    onMouseDown={() => this.getStockMovementDraft()}
                   >
                   Available draft
                   </button>}
