@@ -521,7 +521,7 @@ class ReportController {
                 def sw = new StringWriter()
                 def csv = new CSVWriter(sw, {
                     "Code" { it.productCode }
-                    "Product" { it.productName }
+                    "Product" { it.displayNameWithLocaleCode }
                     "Product family" { it.productFamily }
                     "Category" { it.category }
                     "Formulary" { it.productCatalogs }

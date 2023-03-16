@@ -679,17 +679,18 @@ class ReportService implements ApplicationContextAware {
             def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
             Product product = Product.findByProductCode(it.productCode)
             [
-                    productCode          : it.productCode,
-                    productName          : product?.displayNameWithLocaleCode,
-                    displayName           : product?.displayName,
-                    productFamily         : product?.productFamily?.name ?: '',
-                    category              : product?.category?.name ?: '',
-                    productCatalogs       : product?.productCatalogs?.join(", "),
-                    qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
-                    qtyShippedNotReceived: qtyShippedNotReceived ?: '',
-                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
-                    totalOnHand          : qtyOnHand,
-                    totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
+                    productCode                 : it.productCode,
+                    productName                 : product?.name,
+                    displayNameWithLocaleCode   : product?.displayNameWithLocaleCode,
+                    displayName                 : product?.displayName,
+                    productFamily               : product?.productFamily?.name ?: '',
+                    category                    : product?.category?.name ?: '',
+                    productCatalogs             : product?.productCatalogs?.join(", "),
+                    qtyOrderedNotShipped        : qtyOrderedNotShipped ?: '',
+                    qtyShippedNotReceived       : qtyShippedNotReceived ?: '',
+                    totalOnOrder                : qtyOrderedNotShipped + qtyShippedNotReceived,
+                    totalOnHand                 : qtyOnHand,
+                    totalOnHandAndOnOrder       : qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
             ]
         }
         return data
