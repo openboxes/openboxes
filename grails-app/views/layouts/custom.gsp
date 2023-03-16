@@ -62,7 +62,7 @@
     <g:render template="/common/fullstory"/>
     <g:render template="/common/hotjar"/>
 
-    <ga:trackPageview/>
+    <g:gtag />
     <r:layoutResources/>
 
     <!-- TODO: replace fontawesowe by remix icons -->

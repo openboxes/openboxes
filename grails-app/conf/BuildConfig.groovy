@@ -218,7 +218,6 @@ grails.project.dependency.resolution = {
         // Not critical to application (might require code changes)
         //build(":codenarc:0.17")
         //compile(":dynamic-controller:0.3")
-        compile(":google-analytics:1.0")
         //compile(":google-visualization:0.6.2")
         //compile(":grails-ui:1.2.3")
         //compile(":clickstream:0.2.0")
