@@ -23,7 +23,14 @@ const useOutboundListTableData = (filterParams) => {
     sortingParams,
   }) => {
     const {
-      requisitionStatusCode, requestType, origin, destination, requestedBy, createdBy, updatedBy,
+      requisitionStatusCode,
+      requestType,
+      origin,
+      destination,
+      requestedBy,
+      createdBy,
+      updatedBy,
+      shipmentType,
     } = filterParams;
     return _.omitBy({
       ...filterParams,
@@ -36,6 +43,7 @@ const useOutboundListTableData = (filterParams) => {
       requestedBy: requestedBy?.id,
       createdBy: createdBy?.id,
       updatedBy: updatedBy?.id,
+      shipmentType: shipmentType?.map?.(({ id }) => id),
       ...sortingParams,
     }, (value) => {
       if (typeof value === 'object' && _.isEmpty(value)) return true;
