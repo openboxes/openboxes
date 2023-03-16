@@ -26,16 +26,16 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="partyRole.party.label" default="Party" /></td>
-
-                            <td valign="top" class="value"><g:link controller="party" action="show" id="${partyRoleInstance?.party?.id}">${partyRoleInstance?.party}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="party" action="show" id="${partyRoleInstance?.party?.id}">${partyRoleInstance?.party?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="partyRole.roleType.label" default="Role Type" /></td>
-
-                            <td valign="top" class="value">${partyRoleInstance?.roleType}</td>
-
+                            
+                            <td valign="top" class="value">${partyRoleInstance?.roleType?.encodeAsHTML()}</td>
+                            
                         </tr>
                     
                         <tr class="prop">

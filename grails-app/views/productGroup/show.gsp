@@ -54,7 +54,7 @@
                                 <ul>
                                 <g:each in="${productGroupInstance.products}" var="p">
                                     <li><g:link controller="inventoryItem" action="showStockCard" id="${p.id}">
-                                        ${p.productCode} ${p}</g:link></li>
+                                        ${p.productCode} ${p?.encodeAsHTML()}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>

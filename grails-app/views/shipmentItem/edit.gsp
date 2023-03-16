@@ -124,7 +124,7 @@
 	                                <td valign="top" class="value ${hasErrors(bean: shipmentItemInstance, field: 'orderItems', 'errors')}">
 										<ul id="orderItems">
 											<g:each in="${shipmentItemInstance?.orderItems?}" var="o">
-												<li><g:link controller="orderItem" action="show" id="${o.id}">${o}</g:link></li>
+												<li><g:link controller="orderItem" action="show" id="${o.id}">${o?.encodeAsHTML()}</g:link></li>
 											</g:each>
 										</ul>
 	                                </td>

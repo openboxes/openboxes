@@ -89,7 +89,7 @@
                     <td colspan="6">
                         <div class="fade empty center">
                             <warehouse:message code="inventory.noItemsCurrentlyInStock.message"
-                                               args="[format.product(product:commandInstance?.product).decodeHTML()]"/>
+                                               args="[format.product(product:commandInstance?.product)]"/>
                         </div>
                     </td>
                 </tr>

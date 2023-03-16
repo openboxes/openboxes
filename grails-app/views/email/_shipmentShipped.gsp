@@ -283,7 +283,7 @@
                                     ${shipmentItem?.inventoryItem?.product?.productCode}
                                 </td>
                                 <td>
-                                    <format:product product="${shipmentItem?.inventoryItem?.product}" />
+                                    ${format.product(product: shipmentItem?.inventoryItem?.product) }
                                 </td>
                                 <td class="center">
                                     ${shipmentItem?.inventoryItem?.product?.unitOfMeasure?:warehouse.message(code:'default.each.label')}

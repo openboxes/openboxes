@@ -50,7 +50,7 @@
                                                             <warehouse:message code="report.shippingReport.title"/>
                                                         </div>
                                                         <div class="subtitle">
-                                                            ${command?.shipment?.name}
+                                                            ${command?.shipment?.name?.encodeAsHTML() }
                                                         </div>
                                                     </td>
                                                     <td class="right middle" width="1%">
@@ -67,7 +67,7 @@
 
                                                     </td>
                                                     <td>
-                                                        ${command?.shipment?.shipmentNumber}
+                                                        ${command?.shipment?.shipmentNumber?.encodeAsHTML() }
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
@@ -94,7 +94,7 @@
 
                                                     </td>
                                                     <td>
-                                                        ${command?.shipment?.origin?.name}
+                                                        ${command?.shipment?.origin?.name?.encodeAsHTML() }
                                                     </td>
                                                 </tr>
                                                 <tr class="prop">
@@ -102,7 +102,7 @@
                                                         <label><warehouse:message code="shipping.destination.label"/></label>
                                                     </td>
                                                     <td>
-                                                        ${command?.shipment?.destination?.name}
+                                                        ${command?.shipment?.destination?.name?.encodeAsHTML() }
                                                     </td>
                                                 </tr>
                                             </table>
@@ -178,13 +178,13 @@
                                                 </td>
                                                 <td>
                                                     <g:if test="${checklistEntry?.shipmentItem?.recipient }">
-                                                        ${checklistEntry?.shipmentItem?.recipient?.name}
+                                                        ${checklistEntry?.shipmentItem?.recipient?.name?.encodeAsHTML()  }
                                                     </g:if>
                                                     <g:elseif test="${checklistEntry?.shipmentItem?.container?.recipient }">
-                                                        ${checklistEntry?.shipmentItem?.container?.recipient?.name}
+                                                        ${checklistEntry?.shipmentItem?.container?.recipient?.name?.encodeAsHTML()  }
                                                     </g:elseif>
                                                     <g:elseif test="${checklistEntry?.shipmentItem?.shipment?.recipient }">
-                                                        ${checklistEntry?.shipmentItem?.shipment?.recipient?.name}
+                                                        ${checklistEntry?.shipmentItem?.shipment?.recipient?.name?.encodeAsHTML()  }
                                                     </g:elseif>
                                                 </td>
                                                 <td>

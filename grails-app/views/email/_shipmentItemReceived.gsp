@@ -80,7 +80,7 @@
                             ${receiptItem?.inventoryItem?.product?.productCode}
                         </td>
                         <td>
-                            <format:product product="${receiptItem?.inventoryItem?.product}" />
+                            ${format.product(product: receiptItem?.inventoryItem?.product) }
                         </td>
                         <td style="text-align: center;">
                             <g:formatNumber number="${receiptItem.quantityReceiving ?: 0}" format="###,##0" />

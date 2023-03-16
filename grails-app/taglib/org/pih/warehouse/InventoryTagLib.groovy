@@ -13,9 +13,18 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.Product
 
+
 class InventoryTagLib {
 
     def inventoryService
+
+
+    def quantityOnHand = { attrs, body ->
+        def product = Product.get(attrs.product)
+        def location = attrs.location ? Location.get(attrs.location) : Location.get(session.warehouse.id)
+        def totalQuantity = inventoryService.getQuantityOnHand(location, product)
+        out << "${totalQuantity} ${product.unitOfMeasure ?: g.message(code: 'default.each.label')}"
+    }
 
     def productStatus = { attrs, body ->
         def product = Product.get(attrs.product)
@@ -25,10 +34,12 @@ class InventoryTagLib {
         out << render(template: "/taglib/productStatus", model: [product: product, inventoryLevel: inventoryLevel, totalQuantity: totalQuantity])
     }
 
+
     def abcClassification = { attrs, body ->
         def location = attrs.location ? Location.get(attrs.location) : Location.get(session.warehouse.id)
         def product = Product.get(attrs.product)
         InventoryLevel inventoryLevel = InventoryLevel.findByProductAndInventory(product, location?.inventory)
         out << "${inventoryLevel?.abcClass ?: product?.abcClass ?: g.message(code: 'default.none.label')}"
     }
+
 }

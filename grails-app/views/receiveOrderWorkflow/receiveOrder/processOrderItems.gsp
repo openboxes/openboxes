@@ -115,7 +115,7 @@
 																	<g:autoSuggest id="productReceived-${i }" name="orderItems[${i }].productReceived"
 																				   jsonUrl="${request.contextPath }/json/findProductByName" styleClass="text"
 																				   width="200" valueId="${orderItem?.productReceived?.id }"
-																				   valueName="${format.product(product:orderItem?.productReceived).decodeHTML()}"/>
+																				   valueName="${format.product(product:orderItem?.productReceived)}"/>
 																</td>
 																<td>
 																	<g:textField name="orderItems[${i }].lotNumber" value="${orderItem?.lotNumber }" size="20" class="text updateable"/>

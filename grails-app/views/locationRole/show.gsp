@@ -26,23 +26,23 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="locationRole.user.label" default="User" /></td>
-
-                            <td valign="top" class="value"><g:link controller="user" action="show" id="${locationRoleInstance?.user?.id}">${locationRoleInstance?.user}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="user" action="show" id="${locationRoleInstance?.user?.id}">${locationRoleInstance?.user?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="locationRole.location.label" default="Location" /></td>
-
-                            <td valign="top" class="value"><g:link controller="location" action="show" id="${locationRoleInstance?.location?.id}">${locationRoleInstance?.location}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="location" action="show" id="${locationRoleInstance?.location?.id}">${locationRoleInstance?.location?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="locationRole.role.label" default="Role" /></td>
-
-                            <td valign="top" class="value"><g:link controller="role" action="show" id="${locationRoleInstance?.role?.id}">${locationRoleInstance?.role}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="role" action="show" id="${locationRoleInstance?.role?.id}">${locationRoleInstance?.role?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                     

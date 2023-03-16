@@ -183,7 +183,9 @@ class ProductController {
 
         if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             log.info("saved product " + productInstance.errors)
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
+            def warehouseInstance = Location.get(session.warehouse.id)
+            def inventoryInstance = warehouseInstance?.inventory
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
             sendProductCreatedNotification(productInstance)
         }
 
@@ -270,7 +272,7 @@ class ProductController {
                 productInstance.validateRequiredFields()
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
                     //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
                     redirect(controller: "product", action: "edit", id: productInstance?.id)
                 } else {

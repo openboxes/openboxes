@@ -43,7 +43,7 @@
 									<warehouse:message code="report.shippingReport.title"/>
 								</div>
 								<div class="subtitle">
-									${command?.shipment?.name}
+									${command?.shipment?.name?.encodeAsHTML() }
 								</div>
 							</td>
 							<td class="right middle" width="1%">

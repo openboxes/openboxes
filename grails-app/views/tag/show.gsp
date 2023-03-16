@@ -34,16 +34,16 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="tag.updatedBy.label" default="Updated By" /></td>
-
-                            <td valign="top" class="value"><g:link controller="user" action="show" id="${tagInstance?.updatedBy?.id}">${tagInstance?.updatedBy}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="user" action="show" id="${tagInstance?.updatedBy?.id}">${tagInstance?.updatedBy?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="tag.createdBy.label" default="Created By" /></td>
-
-                            <td valign="top" class="value"><g:link controller="user" action="show" id="${tagInstance?.createdBy?.id}">${tagInstance?.createdBy}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="user" action="show" id="${tagInstance?.createdBy?.id}">${tagInstance?.createdBy?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
@@ -71,7 +71,7 @@
                                     		${p.productCode }
                                     	</td>
                                 		<td>
-                                    		<g:link controller="product" action="show" id="${p.id}">${p}</g:link>
+                                    		<g:link controller="product" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link>
                                     	</td>
                                     </tr>
                                 </g:each>

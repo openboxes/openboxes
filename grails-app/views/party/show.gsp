@@ -26,9 +26,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="party.partyType.label" default="Party Type" /></td>
-
-                            <td valign="top" class="value"><g:link controller="partyType" action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="partyType" action="show" id="${partyInstance?.partyType?.id}">${partyInstance?.partyType?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
@@ -37,7 +37,7 @@
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${partyInstance.roles}" var="r">
-                                    <li><g:link controller="partyRole" action="show" id="${r.id}">${r}</g:link></li>
+                                    <li><g:link controller="partyRole" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>

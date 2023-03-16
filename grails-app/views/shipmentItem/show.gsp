@@ -28,14 +28,14 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.container.label" default="Container" /></td>
 
-                            <td valign="top" class="value"><g:link controller="container" action="show" id="${shipmentItemInstance?.container?.id}">${shipmentItemInstance?.container}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="container" action="show" id="${shipmentItemInstance?.container?.id}">${shipmentItemInstance?.container?.encodeAsHTML()}</g:link></td>
 
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.product.label" default="Product" /></td>
 
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${shipmentItemInstance?.product?.id}">${shipmentItemInstance?.product}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${shipmentItemInstance?.product?.id}">${shipmentItemInstance?.product?.encodeAsHTML()}</g:link></td>
 
                         </tr>
 
@@ -63,21 +63,21 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.recipient.label" default="Recipient" /></td>
 
-                            <td valign="top" class="value"><g:link controller="person" action="show" id="${shipmentItemInstance?.recipient?.id}">${shipmentItemInstance?.recipient}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="person" action="show" id="${shipmentItemInstance?.recipient?.id}">${shipmentItemInstance?.recipient?.encodeAsHTML()}</g:link></td>
 
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.inventoryItem.label" default="Inventory Item" /></td>
 
-                            <td valign="top" class="value"><g:link controller="inventoryItem" action="show" id="${shipmentItemInstance?.inventoryItem?.id}">${shipmentItemInstance?.inventoryItem}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="inventoryItem" action="show" id="${shipmentItemInstance?.inventoryItem?.id}">${shipmentItemInstance?.inventoryItem?.encodeAsHTML()}</g:link></td>
 
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.donor.label" default="Donor" /></td>
 
-                            <td valign="top" class="value"><g:link controller="donor" action="show" id="${shipmentItemInstance?.donor?.id}">${shipmentItemInstance?.donor}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="donor" action="show" id="${shipmentItemInstance?.donor?.id}">${shipmentItemInstance?.donor?.encodeAsHTML()}</g:link></td>
 
                         </tr>
 
@@ -101,7 +101,7 @@
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                     <g:each in="${shipmentItemInstance.orderItems}" var="o">
-                                        <li><g:link controller="orderItem" action="show" id="${o.id}">${o}</g:link></li>
+                                        <li><g:link controller="orderItem" action="show" id="${o.id}">${o?.encodeAsHTML()}</g:link></li>
                                     </g:each>
                                 </ul>
                             </td>
@@ -111,7 +111,7 @@
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentItem.shipment.label" default="Shipment" /></td>
 
-                            <td valign="top" class="value"><g:link controller="shipment" action="show" id="${shipmentItemInstance?.shipment?.id}">${shipmentItemInstance?.shipment}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="shipment" action="show" id="${shipmentItemInstance?.shipment?.id}">${shipmentItemInstance?.shipment?.encodeAsHTML()}</g:link></td>
 
                         </tr>
 

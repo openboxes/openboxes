@@ -26,9 +26,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productComponent.componentProduct.label" default="Component Product" /></td>
-
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productComponentInstance?.componentProduct?.id}">${productComponentInstance?.componentProduct}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productComponentInstance?.componentProduct?.id}">${productComponentInstance?.componentProduct?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
@@ -40,16 +40,16 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productComponent.unitOfMeasure.label" default="Unit Of Measure" /></td>
-
-                            <td valign="top" class="value"><g:link controller="unitOfMeasure" action="show" id="${productComponentInstance?.unitOfMeasure?.id}">${productComponentInstance?.unitOfMeasure}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="unitOfMeasure" action="show" id="${productComponentInstance?.unitOfMeasure?.id}">${productComponentInstance?.unitOfMeasure?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="productComponent.assemblyProduct.label" default="Assembly Product" /></td>
-
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productComponentInstance?.assemblyProduct?.id}">${productComponentInstance?.assemblyProduct}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${productComponentInstance?.assemblyProduct?.id}">${productComponentInstance?.assemblyProduct?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">

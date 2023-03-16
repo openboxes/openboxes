@@ -46,7 +46,7 @@
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'orderNumber','errors')}'>
                                     <input type="text" id="orderNumber" name='orderNumber'
-                                           value="${order?.orderNumber}" class="text large"
+                                           value="${order?.orderNumber?.encodeAsHTML()}" class="text large"
                                            placeholder="${warehouse.message(code:'order.orderNumber.placeholder')}"/>
                                 </td>
                             </tr>
@@ -56,7 +56,7 @@
                                 </td>
                                 <td class='value ${hasErrors(bean:order,field:'name','errors')}'>
                                     <g:textField type="text" id="name" name='name'
-                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" class="text large" value="${order?.name}"/>
+                                                 placeholder="${warehouse.message(code:'order.description.placeholder')}" class="text large" value="${order?.name?.encodeAsHTML()}"/>
 
                                 </td>
                             </tr>

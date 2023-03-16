@@ -7,8 +7,8 @@
 <h2>Error Details</h2>
 <div class="message">
 	<g:if test="${exception}">
-		<strong>Exception Message:</strong> ${exception.message} <br />
-		<strong>Caused by:</strong> ${exception.cause?.message} <br />
+		<strong>Exception Message:</strong> ${exception.message?.encodeAsHTML()} <br />
+		<strong>Caused by:</strong> ${exception.cause?.message?.encodeAsHTML()} <br />
 		<strong>Class:</strong> ${exception.className} <br />
 	</g:if>
 </div>
@@ -17,7 +17,7 @@
 	<g:if test="${exception}">
 		<div class="stack">
 <pre>
-<g:each in="${exception.stackTraceLines}">${it}<br/></g:each>
+<g:each in="${exception.stackTraceLines}">${it.encodeAsHTML()}<br/></g:each>
 </pre>
 		</div>
 	</g:if>

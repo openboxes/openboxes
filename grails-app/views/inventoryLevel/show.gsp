@@ -27,9 +27,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="inventoryLevel.product.label" default="Product" /></td>
-
-                            <td valign="top" class="value"><g:link controller="product" action="show" id="${inventoryLevelInstance?.product?.id}">${inventoryLevelInstance?.product}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="product" action="show" id="${inventoryLevelInstance?.product?.id}">${inventoryLevelInstance?.product?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">
@@ -62,9 +62,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="inventoryLevel.inventory.label" default="Inventory" /></td>
-
-                            <td valign="top" class="value"><g:link controller="inventory" action="show" id="${inventoryLevelInstance?.inventory?.id}">${inventoryLevelInstance?.inventory}</g:link></td>
-
+                            
+                            <td valign="top" class="value"><g:link controller="inventory" action="show" id="${inventoryLevelInstance?.inventory?.id}">${inventoryLevelInstance?.inventory?.encodeAsHTML()}</g:link></td>
+                            
                         </tr>
                     
                         <tr class="prop">

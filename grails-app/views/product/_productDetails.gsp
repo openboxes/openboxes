@@ -47,7 +47,7 @@
                     <td valign="top"
                         class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
                         <g:autoSuggestString id="name" name="name" class="text large"
-                            jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name}"
+                            jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name?.encodeAsHTML()}"
                             placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
                     </td>
                 </tr>

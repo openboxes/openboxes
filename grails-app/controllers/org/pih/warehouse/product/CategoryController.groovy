@@ -57,7 +57,7 @@ class CategoryController {
         }
 
         if (!categoryInstance.hasErrors() && categoryInstance.save()) {
-            flash.message = "${warehouse.message(code: 'category.saved.message', arg: [format.category(category: categoryInstance).decodeHTML()])}"
+            flash.message = "${warehouse.message(code: 'category.saved.message', arg: [format.category(category: categoryInstance)])}"
             redirect(action: "tree", model: [rootCategory: productService.getRootCategory()])
         } else {
             render(view: "edit", model: [categoryInstance: categoryInstance])
