@@ -600,7 +600,7 @@ class InventorySnapshotService {
             if (balanceOpening || quantityInbound || quantityOutbound || balanceClosing) {
                 data << [
                             "Code"           : product.productCode,
-                            "Name"           : product.displayNameWithLocaleCode,
+                            "Name"           : product.name,
                             "DisplayName"    : product.displayName,
                             "Category"       : product.category.name,
                             "Unit Cost"      : product.pricePerUnit ?: '',
