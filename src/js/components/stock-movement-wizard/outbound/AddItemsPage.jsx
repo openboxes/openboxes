@@ -22,6 +22,7 @@ import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
+import workflows from 'consts/workflows';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -320,7 +321,6 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isDraftAvailable: false,
-      workflow: 'outbound',
     };
 
     this.props.showSpinner();
@@ -768,12 +768,13 @@ class AddItemsPage extends Component {
     };
 
     if (payload.lineItems.length) {
-      this.props.addLines(
-        this.state.workflow,
-        itemCandidatesToSave,
-        this.state.values.stockMovementId,
-      );
-
+      if (!this.props.isOnline) {
+        this.props.addLines({
+          workflow: workflows.OUTBOUND,
+          lines: itemCandidatesToSave,
+          id: this.state.values.stockMovementId,
+        });
+      }
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
@@ -830,7 +831,7 @@ class AddItemsPage extends Component {
           // There is no need for creating draft
           // if all of my items are saved correctly
           // (it means that we have internet connection)
-          this.props.removeLines(this.state.workflow);
+          this.props.removeLines(workflows.OUTBOUND);
         })
         .catch(() => {
           // When there is an error during saving we have to find products which
@@ -849,13 +850,15 @@ class AddItemsPage extends Component {
           });
           this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
 
-          // When there is an error, we are adding items to
-          // state for draft
-          this.props.addLines(
-            this.state.workflow,
-            this.state.values.lineItems,
-            this.state.values.stockMovementId,
-          );
+          if (!this.props.isOnline) {
+            // When there is an error, we are adding items to
+            // state for draft
+            this.props.addLines({
+              workflow: workflows.OUTBOUND,
+              lines: this.state.values.lineItems,
+              id: this.state.values.stockMovementId,
+            });
+          }
 
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
@@ -908,7 +911,7 @@ class AddItemsPage extends Component {
   save(formValues) {
     actionInProgress = true;
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-    this.props.removeLines(this.state.workflow);
+    this.props.removeLines(workflows.OUTBOUND);
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() => {
@@ -1006,11 +1009,13 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(removeItemsUrl, { data: payload })
       .then(() => {
-        this.props.addLines(
-          this.state.workflow,
-          this.state.values.lineItems,
-          this.state.stockMovementId,
-        );
+        if (!this.props.isOnline) {
+          this.props.addLines({
+            workflow: workflows.OUTBOUND,
+            lines: this.state.values.lineItems,
+            id: this.state.stockMovementId,
+          });
+        }
       })
       .catch(() => {
         this.props.hideSpinner();
@@ -1028,7 +1033,7 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
-        this.props.removeLines(this.state.workflow);
+        this.props.removeLines(workflows.OUTBOUND);
         this.setState({
           totalCount: 1,
           currentLineItems: [],
@@ -1296,7 +1301,8 @@ class AddItemsPage extends Component {
                   onMouseDown={() => {
                     if (
                       _.some(values.lineItems, lineItem =>
-                        lineItem.rowSaveStatus === RowSaveStatus.PENDING)
+                        lineItem.rowSaveStatus === RowSaveStatus.PENDING ||
+                        lineItem.rowSaveStatus === RowSaveStatus.SAVING)
                     ) {
                       this.showPendingSaveNotification();
                       return;
@@ -1313,7 +1319,8 @@ class AddItemsPage extends Component {
                   onMouseDown={() => {
                     if (
                       _.some(values.lineItems, lineItem =>
-                        lineItem.rowSaveStatus === RowSaveStatus.PENDING)
+                        lineItem.rowSaveStatus === RowSaveStatus.PENDING ||
+                        lineItem.rowSaveStatus === RowSaveStatus.SAVING)
                     ) {
                       this.showPendingSaveNotification();
                       return;
@@ -1350,6 +1357,7 @@ const mapStateToProps = state => ({
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
   savedStockMovement: state.autosave.outbound,
+  isOnline: state.connection.online,
 });
 
 const mapDispatchToProps = {
@@ -1400,6 +1408,7 @@ AddItemsPage.propTypes = {
     lineItems: PropTypes.arrayOf(PropTypes.shape({})),
     lastUpdated: PropTypes.string,
   }),
+  isOnline: PropTypes.bool,
 };
 
 AddItemsPage.defaultProps = {
@@ -1409,4 +1418,5 @@ AddItemsPage.defaultProps = {
     lineItems: [],
     lastUpdated: null,
   },
+  isOnline: true,
 };
