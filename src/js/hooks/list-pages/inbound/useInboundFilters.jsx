@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
-import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchShipmentStatusCodes } from 'actions';
+import { fetchShipmentStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
-import ShipmentType from 'consts/shipmentType';
-import useShipmentTypesFetch from 'hooks/list-pages/stockMovementCommon/useShipmentTypesFetch';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
-import { translateWithDefaultMessage } from 'utils/Translate';
 
 const useInboundFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -27,23 +23,21 @@ const useInboundFilters = () => {
     currentUser,
     currentLocale,
     shipmentTypes,
-    translate,
   } = useSelector(state => ({
     currentLocation: state.session.currentLocation,
     shipmentStatuses: state.shipmentStatuses.data,
     currentUser: state.session.user,
     currentLocale: state.session.activeLanguage,
     shipmentTypes: state.stockMovementCommon.shipmentTypes,
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
   }));
 
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
     dispatch(fetchShipmentStatusCodes());
+    dispatch(fetchShipmentTypes());
   }, [currentLocale]);
 
-  useShipmentTypesFetch();
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
@@ -106,15 +100,7 @@ const useInboundFilters = () => {
     }
     if (queryProps.shipmentType) {
       const shipTypes = getParamList(queryProps.shipmentType);
-      defaultValues.shipmentType = shipmentTypes
-        .filter(({ id }) => shipTypes.includes(id))
-        .map((type) => {
-          const properties = ShipmentType[type.enumKey ?? 'Default'];
-          return {
-            ...type,
-            label: translate(properties?.messageId, properties?.defaultMessage),
-          };
-        });
+      defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
 
     setDefaultFilterValues(defaultValues);

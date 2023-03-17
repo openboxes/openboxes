@@ -18,7 +18,8 @@ import {
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
-  FETCH_SHIPMENT_STATUS_CODES, FETCH_SHIPMENT_TYPES,
+  FETCH_SHIPMENT_STATUS_CODES,
+  FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
@@ -546,9 +547,9 @@ export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
   });
 };
 
-export const fetchShipmentTypes = translationFunc => async (dispatch) => {
+export const fetchShipmentTypes = () => async (dispatch) => {
   const response = await genericApi.getShipmentTypes();
-  const shipmentTypes = mapShipmentTypes({ shipmentTypes: response?.data?.data, translationFunc });
+  const shipmentTypes = mapShipmentTypes(response?.data?.data);
   return dispatch({
     type: FETCH_SHIPMENT_TYPES,
     payload: shipmentTypes,

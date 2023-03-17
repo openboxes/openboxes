@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.shipping
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.util.LocalizationUtil
+
 /**
  * Represents the type of shipment (Sea, Air, Suitcase)
  */
@@ -29,6 +32,8 @@ class ShipmentType implements java.io.Serializable {
         lastUpdated(display: false)
     }
 
+    static transients = ["displayName"]
+
     static mapping = {
         id generator: 'uuid'
         sort "sortOrder"
@@ -36,5 +41,11 @@ class ShipmentType implements java.io.Serializable {
 
 
     String toString() { name }
+
+    String getDisplayName() {
+        def g = ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+        String defaultName = LocalizationUtil.getDefaultString(name)
+        return g.message(code: "react.stockMovement.shipmentType.${defaultName.toLowerCase()}.label", default: name)
+    }
 
 }

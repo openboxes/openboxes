@@ -154,12 +154,9 @@ const StockMovementInboundTable = ({
         } = row.original;
         const stockMovementId = isReturn ? order?.id : id;
         return (
-          <TableCell{...row} link={`/openboxes/stockMovement/show/${stockMovementId}`}>
+          <TableCell {...row} link={`/openboxes/stockMovement/show/${stockMovementId}`}>
             <ShipmentIdentifier
-              shipmentType={mapShipmentTypes({
-                shipmentTypes: shipmentType,
-                translationFunc: translate,
-              })}
+              shipmentType={mapShipmentTypes(shipmentType)}
               identifier={row?.value}
             />
           </TableCell>);

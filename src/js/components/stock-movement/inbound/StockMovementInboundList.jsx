@@ -32,7 +32,7 @@ const StockMovementInboundList = (props) => {
         formProps={{
           shipmentStatuses: props.shipmentStatuses,
           shipmentTypes: props.shipmentTypes,
-      }}
+        }}
       />
       <StockMovementInboundTable filterParams={filterParams} />
     </div>

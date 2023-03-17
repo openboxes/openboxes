@@ -35,7 +35,7 @@ const StockMovementOutboundList = (props) => {
         formProps={{
           requisitionStatuses: props.requisitionStatuses,
           shipmentTypes: props.shipmentTypes,
-      }}
+        }}
       />
       <StockMovementOutboundTable
         isRequestsOpen={props.isRequestsList}

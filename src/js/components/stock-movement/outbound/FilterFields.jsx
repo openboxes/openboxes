@@ -56,7 +56,7 @@ export default {
     attributes: {
       multi: true,
       filterElement: true,
-      placeholder: 'react.stockMovement.filters.shipmentType.label',
+      placeholder: 'react.stockMovement.shipmentType.label',
       defaultPlaceholder: 'Shipment type',
       showLabelTooltip: true,
       options: [],

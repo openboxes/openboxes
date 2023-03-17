@@ -104,7 +104,8 @@ class BootStrap {
             [
                     id         : shipmentType.id,
                     name       : shipmentType.name,
-                    description: shipmentType.description
+                    description: shipmentType.description,
+                    label      : shipmentType.displayName,
             ]
         }
 

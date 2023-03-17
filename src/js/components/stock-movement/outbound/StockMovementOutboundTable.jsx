@@ -153,10 +153,7 @@ const StockMovementOutboundTable = ({
         return (
           <TableCell {...row} link={`/openboxes/stockMovement/show/${id}`}>
             <ShipmentIdentifier
-              shipmentType={mapShipmentTypes({
-                shipmentTypes: shipmentType,
-                translationFunc: translate,
-              })}
+              shipmentType={mapShipmentTypes(shipmentType)}
               identifier={row?.value}
             />
           </TableCell>
