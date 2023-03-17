@@ -21,7 +21,9 @@ class MessageTagLib {
     def message = { attrs, body ->
 
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
+        Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
+        attrs.locale = attrs?.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
 
         // Checks the database to see if there's a localization property for the given code
         if (databaseStoreEnabled && session.user) {
@@ -32,11 +34,6 @@ class MessageTagLib {
             }
         }
 
-        // Display message normally
-        else {
-            Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-            attrs.locale = attrs.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
-            out << defaultTagLib.message.call(attrs)
-        }
+        out << defaultTagLib.message.call(attrs)
     }
 }
