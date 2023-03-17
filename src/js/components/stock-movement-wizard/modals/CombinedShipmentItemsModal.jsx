@@ -86,6 +86,7 @@ const FIELDS = {
         getDynamicAttr: ({ values, rowIndex }) => {
           const orderItem = values.orderItems[rowIndex];
           return {
+            color: orderItem?.color,
             showValueTooltip: true,
             tooltipValue: orderItem?.productName,
             formatValue: () => orderItem?.displayName || orderItem?.productName,

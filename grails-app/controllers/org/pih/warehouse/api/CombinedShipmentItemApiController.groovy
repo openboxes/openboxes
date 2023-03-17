@@ -91,6 +91,7 @@ class CombinedShipmentItemApiController {
                 quantityToShip: '',
                 uom: it.unitOfMeasure,
                 supplierCode: it.productSupplier?.supplierCode,
+                color: it.product?.color,
             ]
         }] as JSON)
     }
