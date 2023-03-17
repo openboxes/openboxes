@@ -7,20 +7,11 @@ class GoogleAnalyticsTagLib {
     static namespace = "g"
 
     /**
-    * Injecting gtag:
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=TRACKING_ID"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', TRACKING_ID);
-        </script>
-    * */
-    def gtag = {attrs ->
+     * Injecting gtag tracking code to the tamplate
+     * https://developers.google.com/tag-platform/devguides/add-tag?solution=gtag
+     * */
+    def googleSiteTag = {attrs ->
         if (!getTrackingIds()) {
-            out << ""
             return
         }
 
@@ -38,8 +29,9 @@ class GoogleAnalyticsTagLib {
     }
 
     /**
-     * Get tracking ids from config file. Tracking ids can be a single tracking id as string or multiple
-     * tracking ids as list of strings
+     * Get tracking ids from config file. Tracking ids can be a single tracking id as a string or multiple
+     * tracking ids as a list of strings
+     * (https://developers.google.com/analytics/devguides/collection/gtagjs#configure_additional_google_analytics_properties)
      * */
     private getTrackingIds() {
         return ConfigurationHolder.config.google.gtag.trackingIds
@@ -62,6 +54,12 @@ class GoogleAnalyticsTagLib {
         return mainTrackingId
     }
 
+    /**
+     * Inject configuration for each tracking id to the google site tag tracking code:
+     * gtag('config', TRACKING_ID_1);
+     * gtag('config', TRACKING_ID_2);
+     * ...
+     * */
     private injectConfig() {
         def gtagConfig = ""
         def trackingIds = getTrackingIds()
