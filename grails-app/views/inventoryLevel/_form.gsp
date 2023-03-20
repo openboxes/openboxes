@@ -64,7 +64,7 @@
                         <g:hiddenField name="location.id" value="${locationInstance?.id}"/>
                         <g:select name="displayLocation.id" from="${[locationInstance]}"
                             optionKey="id" optionValue="${{format.metadata(obj:it)}}" class="chzn-select-deselect"
-                                                  value="${locationInstance.id}" disabled="${true}"/>
+                                                  value="${locationInstance?.id}" disabled="${true}"/>
                     </td>
                 </tr>
                 <tr class="prop">

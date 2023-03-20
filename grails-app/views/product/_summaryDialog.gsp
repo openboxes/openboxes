@@ -7,7 +7,7 @@
                     <g:if test="${productInstance?.images }">
                         <div class="nailthumb-product">
                             <g:set var="image" value="${productInstance?.images?.sort()?.first()}"/>
-                            <img src="${createLink(controller:'product', action:'renderImage', id:image.id)}" style="display:none" />
+                            <img src="${createLink(controller:'product', action:'renderImage', id:image?.id)}" style="display:none" />
                         </div>
                     </g:if>
                     <g:else>
@@ -32,7 +32,7 @@
 				<td class="right" width="1%">
 					<div id="product-status" class="title">
 						<g:if test="${productInstance?.active}">
-							<g:productStatus product="${productInstance.id}"/>
+							<g:productStatus product="${productInstance?.id}"/>
 						</g:if>
 						<g:else>
 							<span class="tag tag-danger"><g:message code="default.inactive.label"/></span>
