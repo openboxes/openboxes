@@ -934,8 +934,8 @@ class ReportService implements ApplicationContextAware {
                  "UOM": "", "Cost per UOM (${currencyCode})": "", "Qty Ordered not shipped (UOM)": "",
                  "Qty Ordered not shipped (Each)": "", "Value ordered not shipped": "", "Qty Shipped not Invoiced (UOM)": "",
                  "Qty Shipped not Invoiced (Each)": "", "Value Shipped not invoiced": "", "Total Qty not Invoiced (UOM)": "",
-                 "Total Qty not Invoiced (Each)": "", "Total Value not invoiced": "", "Budget Code": "", "Recipient": "",
-                 "Estimated Ready Date": "", "Actual Ready Date": ""]]
+                 "Total Qty not Invoiced (Each)": "", "Total Value not invoiced": "", "Budget Code": "", "Payment Terms": "",
+                 "Recipient": "", "Estimated Ready Date": "", "Actual Ready Date": ""]]
         }
 
         return rows.sort { it["PO Number"] }
@@ -980,6 +980,7 @@ class ReportService implements ApplicationContextAware {
                 "Total Qty not Invoiced (Each)"                     : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
                 "Total Value not invoiced"                          : currencyNumberFormat.format(quantityNotInvoiced * (orderItem?.unitPrice ?: 0)),
                 "Budget Code"                                       : orderItem?.budgetCode?.code,
+                "Payment Terms"                                     : orderItem?.order.paymentTerm?.name,
                 "Recipient"                                         : orderItem?.recipient?.name,
                 "Estimated Ready Date"                              : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
                 "Actual Ready Date"                                 : orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
@@ -1021,6 +1022,7 @@ class ReportService implements ApplicationContextAware {
                 "Total Qty not Invoiced (Each)"                     : 1,
                 "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
                 "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
+                "Payment Terms"                                     : orderAdjustment?.order?.paymentTerm?.name,
                 "Recipient"                                         : "",
                 "Estimated Ready Date"                              : "",
                 "Actual Ready Date"                                 : "",
