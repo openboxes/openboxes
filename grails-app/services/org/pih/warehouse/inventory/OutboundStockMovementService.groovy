@@ -38,7 +38,7 @@ class OutboundStockMovementService {
         def offset = params.offset ? params.int("offset") : null
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
-        List<ShipmentType> shipmentTypes = params.list("shipmentType")?.collect{ ShipmentType.read(it) } ?: null
+        List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
 
         def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
 

@@ -104,7 +104,7 @@ class Select extends Component {
   }
   getTooltipHtml() {
     const {
-      multi, placeholder, showLabelTooltip, value, defaultPlaceholder,
+      multi, placeholder, showLabelTooltip, value, defaultPlaceholder, labelKey,
     } = this.props;
 
     if (value?.displayNames?.default || value?.displayName) {
@@ -115,7 +115,8 @@ class Select extends Component {
     }
 
     if (showLabelTooltip) {
-      const valueMapped = multi && value ? this.props.value.map(v => v && v.label) : [];
+      const valueMapped = multi && value ?
+        this.props.value.map(v => v?.[labelKey] ?? v?.label) : [];
       const valueLabel = multi ? valueMapped.join(', ') : (value.label || value.name);
       return (
         <div className="p-1">
@@ -407,6 +408,7 @@ Select.propTypes = {
   classNamePrefix: PropTypes.string,
   translate: PropTypes.func.isRequired,
   defaultPlaceholder: PropTypes.string,
+  labelKey: PropTypes.string,
 };
 
 Select.defaultProps = {
@@ -433,4 +435,5 @@ Select.defaultProps = {
   valueRenderer: null,
   customSelectComponents: {},
   classNamePrefix: 'react-select',
+  labelKey: null,
 };

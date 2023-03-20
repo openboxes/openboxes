@@ -63,6 +63,7 @@ export default {
       blurInputOnSelect: false,
       closeMenuOnSelect: false,
       valueKey: 'id',
+      labelKey: 'displayName',
     },
     getDynamicAttr: ({ shipmentTypes }) => ({
       options: shipmentTypes,
