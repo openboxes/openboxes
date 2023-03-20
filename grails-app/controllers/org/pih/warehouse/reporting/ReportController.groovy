@@ -475,6 +475,7 @@ class ReportController {
                     "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
                     "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
                     "PO Number" { it.orderNumber }
+                    "Payment Terms" { it.paymentTerm }
                     "PO Description" { it.orderDescription }
                     "Supplier Organization" { it.supplierOrganization }
                     "Supplier Location" { it.supplierLocation }
@@ -499,6 +500,7 @@ class ReportController {
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
+                            paymentTerm  : isOrderItem ? (it.order.paymentTerm?.name ?: '') : (it.shipment.isFromPurchaseOrder ? (it?.paymentTerm ?: '') : ''),
                             orderDescription  : isOrderItem ? it.order.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
                             supplierOrganization  : isOrderItem ? it.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
                             supplierLocation  : isOrderItem ? it.order.origin.name : it.shipment.origin.name,
