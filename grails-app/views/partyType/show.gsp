@@ -54,9 +54,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="partyType.partyTypeCode.label" default="Party Type Code" /></td>
-                            
-                            <td valign="top" class="value">${partyTypeInstance?.partyTypeCode?.encodeAsHTML()}</td>
-                            
+
+                            <td valign="top" class="value">${partyTypeInstance?.partyTypeCode}</td>
+
                         </tr>
                     
                     

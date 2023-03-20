@@ -120,7 +120,7 @@
                                                         <td class="center">${p.productCode }</td>
                                                         <td>
                                                             <g:link controller="inventoryItem" action="showStockCard" id="${p.id}">
-                                                                ${p?.name?.encodeAsHTML()}
+                                                                ${p?.name}
                                                             </g:link>
                                                         </td>
                                                         <td class="right">

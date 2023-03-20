@@ -49,8 +49,8 @@
 								</td>
 								<td valign='top'class='value'>
 									<warehouse:message code="order.youAreAboutToCreateANewShipment.message"
-										args="[format.metadata(obj:orderCommand?.shipmentType), orderCommand?.order?.origin?.name?.encodeAsHTML(),
-										orderCommand?.order?.destination?.name?.encodeAsHTML(),format.date(obj:orderCommand?.deliveredOn)]"/>
+										args="[format.metadata(obj:orderCommand?.shipmentType), orderCommand?.order?.origin?.name,
+										orderCommand?.order?.destination?.name, format.date(obj:orderCommand?.deliveredOn)]"/>
 								</td>
 							</tr>
 							<tr class='prop'>
@@ -68,13 +68,13 @@
 							<tr class='prop'>
 								<td valign='top' class='name'><label for='source'>Order from:</label></td>
 								<td valign='top' class='value'>
-									${orderCommand?.order?.origin?.name?.encodeAsHTML()}
+									${orderCommand?.order?.origin?.name}
 								</td>
 							</tr>
 							<tr class='prop'>
 								<td valign='top' class='name'><label for="destination">Destination:</label></td>
 								<td valign='top' class='value'>
-									${orderCommand?.order?.destination?.name?.encodeAsHTML()}
+									${orderCommand?.order?.destination?.name}
 								</td>
 							</tr>
 

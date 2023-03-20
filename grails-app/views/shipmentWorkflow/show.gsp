@@ -40,9 +40,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="shipmentWorkflow.shipmentType.label" default="Shipment Type" /></td>
-                            
-                            <td valign="top" class="value"><g:link controller="shipmentType" action="show" id="${shipmentWorkflowInstance?.shipmentType?.id}">${shipmentWorkflowInstance?.shipmentType?.encodeAsHTML()}</g:link></td>
-                            
+
+                            <td valign="top" class="value"><g:link controller="shipmentType" action="show" id="${shipmentWorkflowInstance?.shipmentType?.id}">${shipmentWorkflowInstance?.shipmentType}</g:link></td>
+
                         </tr>
                     
                         <tr class="prop">
@@ -79,7 +79,7 @@
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${shipmentWorkflowInstance.referenceNumberTypes}" var="r">
-                                    <li><g:link controller="referenceNumberType" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></li>
+                                    <li><g:link controller="referenceNumberType" action="show" id="${r.id}">${r}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>
@@ -92,7 +92,7 @@
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${shipmentWorkflowInstance.containerTypes}" var="c">
-                                    <li><g:link controller="containerType" action="show" id="${c.id}">${c?.encodeAsHTML()}</g:link></li>
+                                    <li><g:link controller="containerType" action="show" id="${c.id}">${c}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>
@@ -105,7 +105,7 @@
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${shipmentWorkflowInstance.documentTemplates}" var="d">
-                                    <li><g:link controller="document" action="show" id="${d.id}">${d?.encodeAsHTML()}</g:link></li>
+                                    <li><g:link controller="document" action="show" id="${d.id}">${d}</g:link></li>
                                 </g:each>
                                 </ul>
                             </td>

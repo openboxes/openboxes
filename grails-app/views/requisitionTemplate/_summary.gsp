@@ -15,11 +15,11 @@
 						<div>
 							<span id="origin">
 								<warehouse:message code="requisition.origin.label"/>:
-								<label>${requisition?.origin?.name?.encodeAsHTML()?:warehouse.message(code: 'default.none.label')}</label>
+								<label>${requisition?.origin?.name ?: warehouse.message(code: 'default.none.label')}</label>
 							</span>
 							<span id="destination">
 								<warehouse:message code="requisition.destination.label"/>:
-	                            <label>${requisition?.destination?.name?.encodeAsHTML()?:session?.warehouse?.name}</label>
+	                            <label>${requisition?.destination?.name ?: session?.warehouse?.name}</label>
 							</span>
 							<span class="request-items">
 								<warehouse:message code="requisition.requisitionItems.label"/>:

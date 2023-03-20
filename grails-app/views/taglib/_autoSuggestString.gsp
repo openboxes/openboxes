@@ -3,7 +3,7 @@
 	type="text" size="${attrs.size }" 
 	class="autocomplete ${attrs.class}" 
 	placeholder="${attrs.placeholder }"
-	name="${attrs.name}" value="${attrs?.value?.encodeAsHTML()}">
+	name="${attrs.name}" value="${attrs?.value}">
 
 <script type="text/javascript" language="javascript">
 	$(document).ready(function() {

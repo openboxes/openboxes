@@ -48,16 +48,16 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="eventType.eventCode.label" default="Event Status" /></td>
-                            
-                            <td valign="top" class="value">${eventTypeInstance?.eventCode?.encodeAsHTML()}</td>
-                            
+
+                            <td valign="top" class="value">${eventTypeInstance?.eventCode}</td>
+
                         </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="eventType.activityType.label" default="Activity Type" /></td>
-                            
-                            <td valign="top" class="value">${eventTypeInstance?.activityType?.encodeAsHTML()}</td>
-                            
+
+                            <td valign="top" class="value">${eventTypeInstance?.activityType}</td>
+
                         </tr>
                     
                         <tr class="prop">
@@ -90,9 +90,9 @@
                     
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="eventType.eventType.label" default="Event Type" /></td>
-                            
-                            <td valign="top" class="value">${eventTypeInstance?.eventType?.encodeAsHTML()}</td>
-                            
+
+                            <td valign="top" class="value">${eventTypeInstance?.eventType}</td>
+
                         </tr>
                     
                     
