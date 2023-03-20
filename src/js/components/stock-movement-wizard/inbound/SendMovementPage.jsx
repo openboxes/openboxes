@@ -86,6 +86,7 @@ const SHIPMENT_FIELDS = {
       required: true,
       showTimeSelect: true,
       autoComplete: 'off',
+      showError: true,
     },
     getDynamicAttr: ({ issued, showOnly }) => ({
       disabled: issued || showOnly,
@@ -680,7 +681,8 @@ class SendMovementPage extends Component {
       errors.expectedDeliveryDate = 'react.default.error.requiredField.label';
     }
     if (moment(dateShipped).diff(expectedDeliveryDate) > 0) {
-      errors.expectedDeliveryDate = 'react.stockMovement.error.pastDate.label';
+      errors.expectedDeliveryDate = 'react.stockMovement.error.deliveryDateBeforeShipDate.label';
+      errors.dateShipped = 'react.stockMovement.error.deliveryDateBeforeShipDate.label';
     }
 
     return errors;
