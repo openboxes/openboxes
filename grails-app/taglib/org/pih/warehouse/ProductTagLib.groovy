@@ -11,8 +11,6 @@ package org.pih.warehouse
 
 class ProductTagLib {
 
-    def container = { attrs, body -> }
-
     def renderHandlingIcons = { attrs, body ->
         if (!attrs.product) {
             out << ""

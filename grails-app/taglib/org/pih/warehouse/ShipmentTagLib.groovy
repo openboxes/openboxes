@@ -11,12 +11,6 @@ package org.pih.warehouse
 
 class ShipmentTagLib {
 
-
-    def container = { attrs, body ->
-
-
-    }
-
     def getShipmentTypeIcon = { attrs, body ->
         if (!attrs.shipmentType) {
             out << ""
