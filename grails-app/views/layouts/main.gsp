@@ -10,6 +10,7 @@
         </script>
         <script type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>
     </g:if>
+    <g:googleSiteTag />
 </head>
 <body class="d-flex flex-column">
     <div style="flex: 1">
