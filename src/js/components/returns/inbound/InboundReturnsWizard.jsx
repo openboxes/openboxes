@@ -28,6 +28,7 @@ class InboundReturns extends Component {
 
   componentDidMount() {
     this.props.fetchTranslations('', 'inboundReturns');
+    this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.inboundReturnsTranslationsFetched) {
       this.dataFetched = true;
@@ -39,6 +40,7 @@ class InboundReturns extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'inboundReturns');
+      this.props.fetchTranslations(nextProps.locale, 'stockMovement');
     }
 
     if (nextProps.inboundReturnsTranslationsFetched && !this.dataFetched) {
