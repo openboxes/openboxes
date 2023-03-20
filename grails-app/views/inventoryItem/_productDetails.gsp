@@ -303,7 +303,7 @@
                 </tr>
             </g:if>
             <g:set var="status" value="${0 }"/>
-            <g:each var="productAttribute" in="${productInstance?.attributes}">
+            <g:each var="productAttribute" in="${productInstance?.attributes?.findAll{ !it?.productSupplier }}">
                 <tr class="prop">
                     <td class="label left">
                         <label><format:metadata obj="${productAttribute?.attribute}"/></label>
