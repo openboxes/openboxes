@@ -10,6 +10,7 @@
 package org.pih.warehouse
 
 import org.pih.warehouse.core.Localization
+import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.MessageFormat
 
@@ -21,13 +22,12 @@ class MessageTagLib {
     def message = { attrs, body ->
 
         def defaultTagLib = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ValidationTagLib')
-        Locale defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
         boolean databaseStoreEnabled = grailsApplication.config.openboxes.locale.custom.enabled
-        attrs.locale = attrs?.locale ?: session?.locale ?: session?.user?.locale ?: defaultLocale
+        attrs.locale = attrs?.locale ?: LocalizationUtil.currentLocale  // set a locale if none is provided
 
         // Checks the database to see if there's a localization property for the given code
         if (databaseStoreEnabled && session.user) {
-            def localization = Localization.findByCodeAndLocale(attrs.code, session?.user?.locale?.toString())
+            Localization localization = Localization.findByCodeAndLocale(attrs.code, attrs.locale.toString())
             if (localization) {
                 out << MessageFormat.format(localization.text, attrs?.args?.toArray()).encodeAsHTML()
                 return
