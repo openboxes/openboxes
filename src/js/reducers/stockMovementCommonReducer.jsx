@@ -2,7 +2,6 @@ import { FETCH_SHIPMENT_TYPES } from 'actions/types';
 
 const initialState = {
   shipmentTypes: [],
-  shipmentTypesFetched: false,
 };
 
 export default function stockMovementCommonReducer(state = initialState, action) {
@@ -11,7 +10,6 @@ export default function stockMovementCommonReducer(state = initialState, action)
       return {
         ...state,
         shipmentTypes: action.payload,
-        shipmentTypesFetched: true,
       };
     default:
       return state;
