@@ -4,6 +4,7 @@ import queryString from 'query-string';
 import glAccountApi from 'api/services/GlAccountApi';
 import productGroupApi from 'api/services/ProductGroupApi';
 import apiClient from 'utils/apiClient';
+import splitTranslation from 'utils/translation-utils';
 
 
 export const debounceUsersFetch = (waitTime, minSearchLength) =>
@@ -231,3 +232,20 @@ export const fetchProductGroups = async () => {
   return data.data;
 };
 
+const mapShipmentType = (shipmentType) => {
+  // Enum keys can be e.g. AIR, LAND, SEA etc.
+  const enumKey = splitTranslation(shipmentType.name, null)?.toUpperCase();
+  return {
+    ...shipmentType,
+    value: shipmentType.id,
+    enumKey,
+  };
+};
+
+// Shipment types arg can be an array or a single element (passed from table cell)
+export const mapShipmentTypes = (shipmentTypes) => {
+  if (_.isArray(shipmentTypes)) {
+    return shipmentTypes.map(shipmentType => mapShipmentType(shipmentType));
+  }
+  return mapShipmentType(shipmentTypes);
+};

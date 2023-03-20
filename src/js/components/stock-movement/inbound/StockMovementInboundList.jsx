@@ -14,7 +14,10 @@ import useTranslation from 'hooks/useTranslation';
 
 const StockMovementInboundList = (props) => {
   const {
-    selectFiltersForMyStockMovements, defaultFilterValues, setFilterValues, filterParams,
+    selectFiltersForMyStockMovements,
+    defaultFilterValues,
+    setFilterValues,
+    filterParams,
   } = useInboundFilters();
 
   useTranslation('stockMovement', 'reactTable');
@@ -26,7 +29,10 @@ const StockMovementInboundList = (props) => {
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
         filterFields={filterFields}
-        formProps={{ shipmentStatuses: props.shipmentStatuses }}
+        formProps={{
+          shipmentStatuses: props.shipmentStatuses,
+          shipmentTypes: props.shipmentTypes,
+        }}
       />
       <StockMovementInboundTable filterParams={filterParams} />
     </div>
@@ -36,7 +42,7 @@ const StockMovementInboundList = (props) => {
 const mapStateToProps = state => ({
   shipmentStatuses: state.shipmentStatuses.data,
   isShipmentStatusesFetched: state.shipmentStatuses.fetched,
-
+  shipmentTypes: state.stockMovementCommon.shipmentTypes,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -49,5 +55,11 @@ StockMovementInboundList.propTypes = {
     name: PropTypes.string,
     variant: PropTypes.string,
     label: PropTypes.string,
+  })).isRequired,
+  shipmentTypes: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    label: PropTypes.string,
+    description: PropTypes.string,
   })).isRequired,
 };

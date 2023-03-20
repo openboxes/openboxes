@@ -1,4 +1,5 @@
 const API = '/openboxes/api';
+const GENERIC_API = `${API}/generic`;
 
 // PURCHASE ORDER
 export const PURCHASE_ORDER_API = `${API}/purchaseOrders`;
@@ -35,3 +36,6 @@ export const GL_ACCOUNTS_OPTION = `${API}/glAccountOptions`;
 
 // PRODUCT GROUP
 export const PRODUCT_GROUP_OPTION = `${API}/productGroupOptions`;
+
+// SHIPMENT TYPES
+export const SHIPMENT_TYPES = `${GENERIC_API}/shipmentType`;

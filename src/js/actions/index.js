@@ -19,6 +19,7 @@ import {
   FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
   FETCH_SHIPMENT_STATUS_CODES,
+  FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
@@ -35,7 +36,10 @@ import {
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
+import genericApi from 'api/services/GenericApi';
 import apiClient, { parseResponse } from 'utils/apiClient';
+import { mapShipmentTypes } from 'utils/option-utils';
+
 
 export function showSpinner() {
   return {
@@ -540,5 +544,14 @@ export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
   // otherwise we want to unmark it to the "standby" (false) position
   return dispatch({
     type: FILTER_FORM_PARAMS_BUILT,
+  });
+};
+
+export const fetchShipmentTypes = () => async (dispatch) => {
+  const response = await genericApi.getShipmentTypes();
+  const shipmentTypes = mapShipmentTypes(response?.data?.data);
+  return dispatch({
+    type: FETCH_SHIPMENT_TYPES,
+    payload: shipmentTypes,
   });
 };
