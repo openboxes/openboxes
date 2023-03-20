@@ -34,7 +34,7 @@ class GoogleAnalyticsTagLib {
      * (https://developers.google.com/analytics/devguides/collection/gtagjs#configure_additional_google_analytics_properties)
      * */
     private getTrackingIds() {
-        return ConfigurationHolder.config.google.gtag.trackingIds
+        return ConfigurationHolder.config.google.analytics.webPropertyID
     }
 
     /**
