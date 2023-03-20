@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 
 class DatePickerTagLib {
 
-    def datePicker = { attrs, body ->
+    Closure datePicker = { attrs, body ->
         def datePickerTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormTagLib')
         out << datePickerTagLib.datePicker.call(attrs)
     }

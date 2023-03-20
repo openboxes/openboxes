@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse
 
-
 import org.ocpsoft.prettytime.PrettyTime
 import groovy.time.TimeDuration
 import org.pih.warehouse.core.Constants
@@ -23,7 +22,7 @@ class DateTagLib {
         out << (new Date().format(org.pih.warehouse.core.Constants.DEFAULT_YEAR_FORMAT))
     }
 
-    def formatDate = { attrs, body ->
+    Closure formatDate = { attrs, body ->
         def formatTagLib = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.FormatTagLib')
 
         if (!attrs.format) {
