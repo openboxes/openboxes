@@ -1,8 +1,6 @@
 package org.pih.warehouse
 
 import util.ConfigHelper
-import org.pih.warehouse.RoleInterceptor
-import org.pih.warehouse.SecurityInterceptor
 
 class LinkTagLib {
 
