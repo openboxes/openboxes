@@ -402,6 +402,7 @@ class CombinedShipmentItemsModal extends Component {
           />
           &nbsp;
           <ProductSelect
+            showSelectedOptionColor
             placeholder={translate('react.combinedShipments.selectProduct.label', 'Select product...')}
             loadOptions={this.debounceProductsInOrders}
             onChange={value => this.setSelectedProduct(value)}
