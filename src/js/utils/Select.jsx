@@ -171,7 +171,8 @@ class Select extends Component {
       options: selectOptions, value: selectValue = this.state.value,
       multi = false, delimiter = ';', async = false, showValueTooltip, showLabelTooltip,
       clearable = true, arrowLeft, arrowUp, arrowRight, arrowDown, fieldRef, onTabPress,
-      onEnterPress, customSelectComponents, optionRenderer, classNamePrefix, ...attributes
+      onEnterPress, customSelectComponents, optionRenderer, classNamePrefix,
+      showSelectedOptionColor, ...attributes
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
@@ -221,7 +222,7 @@ class Select extends Component {
     const SingleValue = props => (
       <components.SingleValue {...props}>
         {this.props.valueRenderer ? (
-          this.props.valueRenderer(props.data)
+          this.props.valueRenderer({ ...props.data, showSelectedOptionColor })
         ) : (
           <div>{props.data.label}</div>
         )}
@@ -408,6 +409,7 @@ Select.propTypes = {
   classNamePrefix: PropTypes.string,
   translate: PropTypes.func.isRequired,
   defaultPlaceholder: PropTypes.string,
+  showSelectedOptionColor: PropTypes.bool,
   labelKey: PropTypes.string,
 };
 
@@ -433,6 +435,7 @@ Select.defaultProps = {
   onEnterPress: null,
   optionRenderer: null,
   valueRenderer: null,
+  showSelectedOptionColor: false,
   customSelectComponents: {},
   classNamePrefix: 'react-select',
   labelKey: null,

@@ -105,6 +105,7 @@ const FIELDS = {
         flexWidth: '4',
         required: true,
         attributes: {
+          showSelectedOptionColor: true,
           showValueTooltip: true,
           disabled: true,
         },

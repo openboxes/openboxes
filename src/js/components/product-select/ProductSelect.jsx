@@ -28,7 +28,7 @@ const Option = option => (
 
 const SelectedValue = option => (
   <span className="d-flex align-items-center">
-    <span style={{ color: option.color }} className="text-truncate">
+    <span style={{ color: option.showSelectedOptionColor && option.color }} className="text-truncate">
       {option.label || productOptionLabel(option)}
     </span>
     {renderHandlingIcons(option?.handlingIcons)}

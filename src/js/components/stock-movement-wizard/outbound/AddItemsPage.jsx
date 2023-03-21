@@ -109,6 +109,9 @@ const NO_STOCKLIST_FIELDS = {
         defaultMessage: 'Requested product',
         headerAlign: 'left',
         flexWidth: '9.5',
+        attributes: {
+          showSelectedOptionColor: true,
+        },
         getDynamicAttr: ({
           fieldValue, rowIndex, rowCount, originId, focusField,
         }) => ({
@@ -240,6 +243,9 @@ const STOCKLIST_FIELDS = {
         defaultMessage: 'Requested product',
         headerAlign: 'left',
         flexWidth: '9',
+        attributes: {
+          showSelectedOptionColor: true,
+        },
         getDynamicAttr: ({
           fieldValue, rowIndex, rowCount, newItem, originId, focusField,
         }) => ({
