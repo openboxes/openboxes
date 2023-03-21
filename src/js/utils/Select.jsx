@@ -435,7 +435,7 @@ Select.defaultProps = {
   onEnterPress: null,
   optionRenderer: null,
   valueRenderer: null,
-  showSelectedOptionColor: null,
+  showSelectedOptionColor: false,
   customSelectComponents: {},
   classNamePrefix: 'react-select',
   labelKey: null,
