@@ -1226,8 +1226,7 @@ class AddItemsPage extends Component {
                   onMouseDown={() => {
                     if (
                       _.some(values.lineItems, lineItem =>
-                        lineItem.rowSaveStatus === RowSaveStatus.PENDING &&
-                        lineItem.product)
+                        lineItem.rowSaveStatus === RowSaveStatus.PENDING)
                     ) {
                       this.showPendingSaveNotification();
                       return;
