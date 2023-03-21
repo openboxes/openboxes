@@ -12,7 +12,13 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import {
+  addStockMovementDraft,
+  fetchUsers,
+  hideSpinner,
+  removeStockMovementDraft,
+  showSpinner,
+} from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -70,21 +76,30 @@ const NO_STOCKLIST_FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, showOnly, updateTotalCount,
+      addRow, getSortOrder, showOnly, updateTotalCount, getStockMovementDraft, isDraftAvailable,
     }) => (
-      <button
-        type="button"
-        id="addButton"
-        className="btn btn-outline-success btn-xs"
-        disabled={showOnly}
+      <>
+        <button
+          type="button"
+          id="addButton"
+          className="btn btn-outline-success btn-xs"
+          disabled={showOnly}
         // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-        onMouseDown={() => {
+          onMouseDown={() => {
           updateTotalCount(1);
           addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
-        }
-        }
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
+        }}
+        ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+        </button>
+        {isDraftAvailable &&
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-xs draft-button ml-1"
+            onMouseDown={() => getStockMovementDraft()}
+          >
+            <Translate id="react.default.button.availableDraft.label" defaultMessage="Available draft" />
+          </button>}
+      </>
     ),
     fields: {
       product: {
@@ -191,20 +206,31 @@ const STOCKLIST_FIELDS = {
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, newItemAdded, updateTotalCount,
+      addRow, getSortOrder, newItemAdded, updateTotalCount, isDraftAvailable, getStockMovementDraft,
     }) => (
-      <button
-        type="button"
-        id="addButton"
-        className="btn btn-outline-success btn-xs"
-        // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-        onMouseDown={() => {
-          updateTotalCount(1);
-          addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
-          newItemAdded();
-        }}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
+      <>
+        <button
+          type="button"
+          id="addButton"
+          className="btn btn-outline-success btn-xs"
+          // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
+          onMouseDown={() => {
+            updateTotalCount(1);
+            addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
+            newItemAdded();
+          }}
+        ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+        </button>
+        {isDraftAvailable &&
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-xs draft-button ml-1"
+            onMouseDown={() => getStockMovementDraft()}
+          >
+            <Translate id="react.default.button.availableDraft.label" defaultMessage="Available draft" />
+          </button>}
+      </>
+
     ),
     fields: {
       product: {
@@ -281,7 +307,7 @@ const STOCKLIST_FIELDS = {
 // This variable is an indicator
 // if action is in progress to avoid
 // triggering the same transaction twice
-// i.e triggering save button during the autosave
+// for example triggering save button during the autosave
 let actionInProgress = false;
 
 /**
@@ -299,6 +325,7 @@ class AddItemsPage extends Component {
       newItem: false,
       totalCount: 0,
       isFirstPageLoaded: false,
+      isDraftAvailable: false,
     };
 
     this.props.showSpinner();
@@ -313,6 +340,7 @@ class AddItemsPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
+    this.getStockMovementDraft = this.getStockMovementDraft.bind(this);
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -374,7 +402,7 @@ class AddItemsPage extends Component {
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
-      // We wouldn't update items with quantity requested < 0
+      // We wouldn't update items with quantity requested <= 0
       if (parseInt(item.quantityRequested, 10) <= 0) {
         return; // lodash continue
       }
@@ -474,6 +502,18 @@ class AddItemsPage extends Component {
       }
       this.props.hideSpinner();
     });
+  }
+
+  getStockMovementDraft() {
+    this.setState({
+      values: {
+        ...this.state.values,
+        lineItems: this.props.savedStockMovement.lineItems,
+      },
+      totalCount: this.props.savedStockMovement.lineItems.length,
+      isDraftAvailable: false,
+    });
+    this.props.hideSpinner();
   }
 
   updateTotalCount(value) {
@@ -622,13 +662,23 @@ class AddItemsPage extends Component {
    */
   fetchAddItemsPageData() {
     this.props.showSpinner();
+    const {
+      lastUpdated: lastSaved,
+      statusCode: savedStatusCode,
+      id,
+    } = this.props.savedStockMovement;
+    const { stockMovementId } = this.state.values;
 
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
+    const url = `/openboxes/api/stockMovements/${stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
-        const { hasManageInventory } = resp.data.data;
-        const { statusCode } = resp.data.data;
+        const { hasManageInventory, statusCode, lastUpdated } = resp.data.data;
         const { totalCount } = resp.data;
+        // if data from backend is older than the version from local storage
+        // we want to allow users use their version
+        const isDraftAvailable = (stockMovementId === id) &&
+                                 (lastUpdated < lastSaved) &&
+                                 (savedStatusCode === statusCode);
 
         this.setState({
           values: {
@@ -637,6 +687,7 @@ class AddItemsPage extends Component {
             statusCode,
           },
           totalCount: totalCount === 0 ? 1 : totalCount,
+          isDraftAvailable,
         }, () => this.props.hideSpinner());
       });
   }
@@ -728,6 +779,13 @@ class AddItemsPage extends Component {
     };
 
     if (payload.lineItems.length) {
+      if (!this.props.isOnline) {
+        this.props.addStockMovementDraft({
+          lineItems: itemCandidatesToSave,
+          id: this.state.values.stockMovementId,
+          statusCode: this.state.values.statusCode,
+        });
+      }
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
@@ -767,8 +825,10 @@ class AddItemsPage extends Component {
               }
               return item;
             });
+
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
+              currentLineItems: lineItemsAfterSave,
             });
             return;
           }
@@ -777,6 +837,12 @@ class AddItemsPage extends Component {
             values: { ...this.state.values, lineItems: lineItemsBackendData },
             currentLineItems: lineItemsBackendData,
           });
+        })
+        .then(() => {
+          // There is no need for creating draft
+          // if all of my items are saved correctly
+          // (it means that we have internet connection)
+          this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         })
         .catch(() => {
           // When there is an error during saving we have to find products which
@@ -794,6 +860,17 @@ class AddItemsPage extends Component {
             return item;
           });
           this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
+
+          if (!this.props.isOnline) {
+            // When there is an error, we are adding items to
+            // state for draft
+            this.props.addStockMovementDraft({
+              lineItems: this.state.values.lineItems,
+              id: this.state.values.stockMovementId,
+              statusCode: this.state.values.statusCode,
+            });
+          }
+
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
@@ -849,11 +926,6 @@ class AddItemsPage extends Component {
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() => {
         this.saveItems(lineItems);
-        const filteredLineItems = lineItems.filter(item => item.quantityRequested > 0);
-        this.setState({
-          values: { lineItems: filteredLineItems },
-          totalCount: filteredLineItems.length,
-        });
       });
     } else {
       this.saveItems(lineItems);
@@ -903,6 +975,8 @@ class AddItemsPage extends Component {
 
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
+        this.fetchLineItems();
+        this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -945,6 +1019,15 @@ class AddItemsPage extends Component {
     const payload = { stockMovementId: this.state.values.stockMovementId };
 
     return apiClient.delete(removeItemsUrl, { data: payload })
+      .then(() => {
+        if (!this.props.isOnline) {
+          this.props.addStockMovementDraft({
+            lineItems: this.state.values.lineItems,
+            id: this.state.values.stockMovementId,
+            statusCode: this.state.values.statusCode,
+          });
+        }
+      })
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.stockMovement.error.deleteRequisitionItem.label'));
@@ -961,6 +1044,7 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
+        this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         this.setState({
           totalCount: 1,
           currentLineItems: [],
@@ -1212,6 +1296,8 @@ class AddItemsPage extends Component {
                   values,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   saveProgress: this.saveProgress,
+                  getStockMovementDraft: this.getStockMovementDraft,
+                  isDraftAvailable: this.state.isDraftAvailable,
                 }))}
               </div>
               <div className="submit-buttons">
@@ -1226,7 +1312,8 @@ class AddItemsPage extends Component {
                   onMouseDown={() => {
                     if (
                       _.some(values.lineItems, lineItem =>
-                        lineItem.rowSaveStatus === RowSaveStatus.PENDING &&
+                        (lineItem.rowSaveStatus === RowSaveStatus.PENDING ||
+                        lineItem.rowSaveStatus === RowSaveStatus.SAVING) &&
                         lineItem.product)
                     ) {
                       this.showPendingSaveNotification();
@@ -1244,7 +1331,8 @@ class AddItemsPage extends Component {
                   onMouseDown={() => {
                     if (
                       _.some(values.lineItems, lineItem =>
-                        lineItem.rowSaveStatus === RowSaveStatus.PENDING)
+                        lineItem.rowSaveStatus === RowSaveStatus.PENDING ||
+                        lineItem.rowSaveStatus === RowSaveStatus.SAVING)
                     ) {
                       this.showPendingSaveNotification();
                       return;
@@ -1272,7 +1360,7 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, ownProps) => ({
   recipients: state.users.data,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
@@ -1280,11 +1368,19 @@ const mapStateToProps = state => ({
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   isPaginated: state.session.isPaginated,
   pageSize: state.session.pageSize,
+  savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
+  isOnline: state.connection.online,
 });
 
-export default (connect(mapStateToProps, {
-  showSpinner, hideSpinner, fetchUsers,
-})(AddItemsPage));
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  fetchUsers,
+  addStockMovementDraft,
+  removeStockMovementDraft,
+};
+
+export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
 
 AddItemsPage.propTypes = {
   /** Initial component's data */
@@ -1317,8 +1413,24 @@ AddItemsPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
+  addStockMovementDraft: PropTypes.func.isRequired,
+  removeStockMovementDraft: PropTypes.func.isRequired,
+  savedStockMovement: PropTypes.shape({
+    id: PropTypes.string,
+    lineItems: PropTypes.arrayOf(PropTypes.shape({})),
+    lastUpdated: PropTypes.string,
+    statusCode: null,
+  }),
+  isOnline: PropTypes.bool,
 };
 
 AddItemsPage.defaultProps = {
   showOnly: false,
+  savedStockMovement: {
+    id: null,
+    lineItems: [],
+    lastUpdated: null,
+    statusCode: null,
+  },
+  isOnline: true,
 };

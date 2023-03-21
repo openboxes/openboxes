@@ -14,6 +14,7 @@ import sessionReducer from 'reducers/sessionReducer';
 import shipmentStatusCodes from 'reducers/shipmentStatusCodes';
 import spinnerReducer from 'reducers/spinnerReducer';
 import stockMovementCommonReducer from 'reducers/stockMovementCommonReducer';
+import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
 import usersReducer from 'reducers/usersReducer';
 
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
   requisitionStatuses: requisitionStatusCodes,
   stockTransfer: stockTransferReducer,
   filterForm: filterFormReducer,
+  stockMovementDraft: stockMovementDraftReducer,
   stockMovementCommon: stockMovementCommonReducer,
 });
 
