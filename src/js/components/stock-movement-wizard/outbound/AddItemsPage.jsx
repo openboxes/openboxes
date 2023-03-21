@@ -1359,21 +1359,18 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  console.log(state.stockMovementDraft)
+const mapStateToProps = (state, ownProps) => ({
+  recipients: state.users.data,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+  minimumExpirationDate: state.session.minimumExpirationDate,
+  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+  isPaginated: state.session.isPaginated,
+  pageSize: state.session.pageSize,
+  savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
+  isOnline: state.connection.online,
+});
 
-  return ({
-    recipients: state.users.data,
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
-    stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
-    minimumExpirationDate: state.session.minimumExpirationDate,
-    hasPackingSupport: state.session.currentLocation.hasPackingSupport,
-    isPaginated: state.session.isPaginated,
-    pageSize: state.session.pageSize,
-    savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
-    isOnline: state.connection.online,
-  });
-};
 
 const mapDispatchToProps = {
   showSpinner,
