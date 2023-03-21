@@ -1,6 +1,5 @@
 import { applyMiddleware, createStore } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
-import autoMergeLevel1 from 'redux-persist/es/stateReconciler/autoMergeLevel1';
 import storage from 'redux-persist/lib/storage';
 import ReduxPromise from 'redux-promise';
 import reduxThunk from 'redux-thunk';
@@ -16,7 +15,6 @@ const persistConfig = {
   // hence there is need to temporarily disable the indicator reducer
   // from the persisted reducers.
   blacklist: ['indicators', 'spinner', 'connection'],
-  stateReconciler: autoMergeLevel1,
 };
 
 const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);
