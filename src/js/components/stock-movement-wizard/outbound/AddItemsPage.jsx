@@ -12,7 +12,13 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { addLines, fetchUsers, hideSpinner, removeLines, showSpinner } from 'actions';
+import {
+  addStockMovementDraft,
+  fetchUsers,
+  hideSpinner,
+  removeStockMovementDraft,
+  showSpinner,
+} from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -22,7 +28,6 @@ import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
-import workflows from 'consts/workflows';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -657,7 +662,11 @@ class AddItemsPage extends Component {
    */
   fetchAddItemsPageData() {
     this.props.showSpinner();
-    const { lastUpdated: lastSaved, id } = this.props.savedStockMovement;
+    const {
+      lastUpdated: lastSaved,
+      statusCode: savedStatusCode,
+      id,
+    } = this.props.savedStockMovement;
     const { stockMovementId } = this.state.values;
 
     const url = `/openboxes/api/stockMovements/${stockMovementId}`;
@@ -667,7 +676,9 @@ class AddItemsPage extends Component {
         const { totalCount } = resp.data;
         // if data from backend is older than the version from local storage
         // we want to allow users use their version
-        const isDraftAvailable = (stockMovementId === id) && (lastUpdated < lastSaved);
+        const isDraftAvailable = (stockMovementId === id) &&
+                                 (lastUpdated < lastSaved) &&
+                                 (savedStatusCode === statusCode);
 
         this.setState({
           values: {
@@ -769,10 +780,10 @@ class AddItemsPage extends Component {
 
     if (payload.lineItems.length) {
       if (!this.props.isOnline) {
-        this.props.addLines({
-          workflow: workflows.OUTBOUND,
-          lines: itemCandidatesToSave,
+        this.props.addStockMovementDraft({
+          lineItems: itemCandidatesToSave,
           id: this.state.values.stockMovementId,
+          statusCode: this.state.values.statusCode,
         });
       }
       return apiClient.post(updateItemsUrl, payload)
@@ -831,7 +842,7 @@ class AddItemsPage extends Component {
           // There is no need for creating draft
           // if all of my items are saved correctly
           // (it means that we have internet connection)
-          this.props.removeLines(workflows.OUTBOUND);
+          this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         })
         .catch(() => {
           // When there is an error during saving we have to find products which
@@ -853,10 +864,10 @@ class AddItemsPage extends Component {
           if (!this.props.isOnline) {
             // When there is an error, we are adding items to
             // state for draft
-            this.props.addLines({
-              workflow: workflows.OUTBOUND,
-              lines: this.state.values.lineItems,
+            this.props.addStockMovementDraft({
+              lineItems: this.state.values.lineItems,
               id: this.state.values.stockMovementId,
+              statusCode: this.state.values.statusCode,
             });
           }
 
@@ -911,7 +922,6 @@ class AddItemsPage extends Component {
   save(formValues) {
     actionInProgress = true;
     const lineItems = _.filter(formValues.lineItems, item => !_.isEmpty(item));
-    this.props.removeLines(workflows.OUTBOUND);
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() => {
@@ -966,6 +976,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.fetchLineItems();
+        this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockMovement.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
       })
@@ -1010,10 +1021,10 @@ class AddItemsPage extends Component {
     return apiClient.delete(removeItemsUrl, { data: payload })
       .then(() => {
         if (!this.props.isOnline) {
-          this.props.addLines({
-            workflow: workflows.OUTBOUND,
-            lines: this.state.values.lineItems,
-            id: this.state.stockMovementId,
+          this.props.addStockMovementDraft({
+            lineItems: this.state.values.lineItems,
+            id: this.state.values.stockMovementId,
+            statusCode: this.state.values.statusCode,
           });
         }
       })
@@ -1033,7 +1044,7 @@ class AddItemsPage extends Component {
 
     return apiClient.delete(removeItemsUrl)
       .then(() => {
-        this.props.removeLines(workflows.OUTBOUND);
+        this.props.removeStockMovementDraft(this.state.values.stockMovementId);
         this.setState({
           totalCount: 1,
           currentLineItems: [],
@@ -1348,24 +1359,28 @@ class AddItemsPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  recipients: state.users.data,
-  translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
-  minimumExpirationDate: state.session.minimumExpirationDate,
-  hasPackingSupport: state.session.currentLocation.hasPackingSupport,
-  isPaginated: state.session.isPaginated,
-  pageSize: state.session.pageSize,
-  savedStockMovement: state.autosave.outbound,
-  isOnline: state.connection.online,
-});
+const mapStateToProps = (state, ownProps) => {
+  console.log(state.stockMovementDraft)
+
+  return ({
+    recipients: state.users.data,
+    translate: translateWithDefaultMessage(getTranslate(state.localize)),
+    stockMovementTranslationsFetched: state.session.fetchedTranslations.stockMovement,
+    minimumExpirationDate: state.session.minimumExpirationDate,
+    hasPackingSupport: state.session.currentLocation.hasPackingSupport,
+    isPaginated: state.session.isPaginated,
+    pageSize: state.session.pageSize,
+    savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
+    isOnline: state.connection.online,
+  });
+};
 
 const mapDispatchToProps = {
   showSpinner,
   hideSpinner,
   fetchUsers,
-  addLines,
-  removeLines,
+  addStockMovementDraft,
+  removeStockMovementDraft,
 };
 
 export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
@@ -1401,12 +1416,13 @@ AddItemsPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool,
   pageSize: PropTypes.number.isRequired,
-  addLines: PropTypes.func.isRequired,
-  removeLines: PropTypes.func.isRequired,
+  addStockMovementDraft: PropTypes.func.isRequired,
+  removeStockMovementDraft: PropTypes.func.isRequired,
   savedStockMovement: PropTypes.shape({
     id: PropTypes.string,
     lineItems: PropTypes.arrayOf(PropTypes.shape({})),
     lastUpdated: PropTypes.string,
+    statusCode: null,
   }),
   isOnline: PropTypes.bool,
 };
@@ -1417,6 +1433,7 @@ AddItemsPage.defaultProps = {
     id: null,
     lineItems: [],
     lastUpdated: null,
+    statusCode: null,
   },
   isOnline: true,
 };

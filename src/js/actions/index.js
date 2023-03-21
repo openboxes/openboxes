@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
-  ADD_LINES,
+  ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   FETCH_BUYERS,
@@ -28,7 +28,7 @@ import {
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
-  REMOVE_LINES,
+  REMOVE_STOCK_MOVEMENT_DRAFT,
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
@@ -549,19 +549,25 @@ export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
   });
 };
 
-export const addLines = ({ workflow, lines, id }) => dispatch => dispatch({
-  type: ADD_LINES,
+export const addStockMovementDraft = ({
+  workflow,
+  lineItems,
+  id,
+  statusCode,
+}) => dispatch => dispatch({
+  type: ADD_STOCK_MOVEMENT_DRAFT,
   payload: {
     workflow,
-    lines,
+    lineItems,
+    statusCode,
     id,
   },
 });
 
-export const removeLines = workflow => dispatch => dispatch({
-  type: REMOVE_LINES,
+export const removeStockMovementDraft = id => dispatch => dispatch({
+  type: REMOVE_STOCK_MOVEMENT_DRAFT,
   payload: {
-    workflow,
+    id,
   },
 });
 

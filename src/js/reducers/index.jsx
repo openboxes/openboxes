@@ -1,7 +1,6 @@
 import { localizeReducer } from 'react-localize-redux';
 import { combineReducers } from 'redux';
 
-import autosaveReducer from 'reducers/autosaveReducer';
 import connectionReducer from 'reducers/connectionReducer';
 import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
@@ -14,6 +13,7 @@ import requisitionStatusCodes from 'reducers/requisitionStatusCodes';
 import sessionReducer from 'reducers/sessionReducer';
 import shipmentStatusCodes from 'reducers/shipmentStatusCodes';
 import spinnerReducer from 'reducers/spinnerReducer';
+import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
 import stockMovementCommonReducer from 'reducers/stockMovementCommonReducer';
 import stockTransferReducer from 'reducers/stockTransferReducer';
 import usersReducer from 'reducers/usersReducer';
@@ -35,8 +35,8 @@ const rootReducer = combineReducers({
   requisitionStatuses: requisitionStatusCodes,
   stockTransfer: stockTransferReducer,
   filterForm: filterFormReducer,
+  stockMovementDraft: stockMovementDraftReducer,
   stockMovementCommon: stockMovementCommonReducer,
-  autosave: autosaveReducer,
 });
 
 export default rootReducer;
