@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import DatePicker from 'react-datepicker';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
@@ -353,13 +354,20 @@ class AddItemsPage extends Component {
 
   fetchBins() {
     this.props.showSpinner();
-    const url = `/openboxes/api/internalLocations?location.id=${this.props.locationId}&locationTypeCode=BIN_LOCATION`;
+    const url = '/openboxes/api/internalLocations';
 
     const mapBins = bins => (_.chain(bins)
       .orderBy(['name'], ['asc']).value()
     );
 
-    return apiClient.get(url)
+    return apiClient.get(url, {
+      paramsSerializer: parameters => queryString.stringify(parameters),
+      params: {
+        locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
+        ignoreActivityCodes: ['RECEIVE_STOCK'],
+        'location.id': this.props.locationId,
+      },
+    })
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')
