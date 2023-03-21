@@ -1371,7 +1371,6 @@ const mapStateToProps = (state, ownProps) => ({
   isOnline: state.connection.online,
 });
 
-
 const mapDispatchToProps = {
   showSpinner,
   hideSpinner,
