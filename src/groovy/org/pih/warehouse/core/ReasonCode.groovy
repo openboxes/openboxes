@@ -67,7 +67,7 @@ enum ReasonCode {
     CLINICAL_JUDGMENT(35),
     INSUFFICIENT_QUANTITY_AVAILABLE(36),
     BACKORDER(37),
-    REPEAT_REQUEST(38),
+    DUPLICATE_REQUEST(38),
     OTHER(100)
 
 
@@ -105,7 +105,7 @@ enum ReasonCode {
                 REQUEST_ERROR,
                 NOT_NEEDED_BASED_ON_CONSUMPTION,
                 BACKORDER,
-                REPEAT_REQUEST,
+                DUPLICATE_REQUEST,
                 OTHER
         ]
     }
@@ -122,7 +122,7 @@ enum ReasonCode {
                 REQUEST_ERROR,
                 NOT_NEEDED_BASED_ON_CONSUMPTION,
                 BACKORDER,
-                REPEAT_REQUEST,
+                DUPLICATE_REQUEST,
         ]
     }
 
