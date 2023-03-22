@@ -25,6 +25,7 @@ import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import FilterInput from "components/form-elements/FilterInput";
 
 
 const BTN_CLASS_MAPPER = {
@@ -871,24 +872,11 @@ class EditItemsPage extends Component {
           <div className="d-flex flex-column">
             { !showOnly ?
               <span className="buttons-container">
-                <div className="d-flex mr-auto justify-content-center align-items-center">
-                  <input
-                    value={itemFilter}
-                    onChange={event => this.setState({ itemFilter: event.target.value })}
-                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
-                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
-                  />
-                  {itemFilter &&
-                    <i
-                      role="button"
-                      className="fa fa-times-circle"
-                      style={{ color: 'grey', cursor: 'pointer' }}
-                      onClick={() => this.setState({ itemFilter: '' })}
-                      onKeyPress={() => this.setState({ itemFilter: '' })}
-                      tabIndex={0}
-                    />
-                  }
-                </div>
+                <FilterInput
+                  itemFilter={itemFilter}
+                  onChangeFunc={e => this.setState({ itemFilter: e.target.value })}
+                  clearFunc={() => this.setState({ itemFilter: '' })}
+                />
                 <button
                   type="button"
                   onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}
