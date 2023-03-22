@@ -55,3 +55,7 @@ export const transformFilterParams = (filterValues, filterAccessors) => Object.k
 
 // Transforms value into an Array
 export const getParamList = value => [].concat(value);
+
+
+export const getShipmentTypeTooltip = (translate, shipmentType) =>
+  `${translate('react.stockMovement.shipmentType.label', 'Shipment type')}: ${shipmentType ?? 'Default'}`;

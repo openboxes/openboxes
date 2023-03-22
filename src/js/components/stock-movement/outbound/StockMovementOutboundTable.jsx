@@ -18,6 +18,7 @@ import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
+import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -151,7 +152,12 @@ const StockMovementOutboundTable = ({
       Cell: (row) => {
         const { id, shipmentType } = row.original;
         return (
-          <TableCell {...row} link={`/openboxes/stockMovement/show/${id}`}>
+          <TableCell
+            {...row}
+            link={`/openboxes/stockMovement/show/${id}`}
+            tooltip
+            tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
+          >
             <ShipmentIdentifier
               shipmentType={mapShipmentTypes(shipmentType)}
               identifier={row?.value}
