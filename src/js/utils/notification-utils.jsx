@@ -6,7 +6,7 @@ import translate from 'utils/Translate';
 
 export default function triggerDeletionNotification(queryParams) {
   const parsedQueryParams = queryString.parse(queryParams);
-  if (parsedQueryParams.deleted === 'true') {
+  if (parsedQueryParams.deleted) {
     notification(NotificationType.SUCCESS)({
       message: translate({
         id: 'react.stockMovement.deleted.success.message.label',

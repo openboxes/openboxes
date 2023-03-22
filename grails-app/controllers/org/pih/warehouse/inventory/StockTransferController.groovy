@@ -98,6 +98,7 @@ class StockTransferController {
         }
 
         try {
+            throw new IllegalArgumentException("Order instance not found for this stock transfer")
             stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
         } catch (IllegalArgumentException e) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
