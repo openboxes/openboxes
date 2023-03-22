@@ -65,6 +65,9 @@ const FIELDS = {
     defaultMessage: 'Requested product',
     headerAlign: 'left',
     flexWidth: '9',
+    attributes: {
+      showSelectedOptionColor: true,
+    },
   },
   quantityOnHand: {
     type: LabelField,
