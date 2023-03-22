@@ -235,6 +235,8 @@ class StockMovementController {
         params.direction = (currentLocation == stockMovement.origin) ? StockMovementDirection.OUTBOUND :
                 (currentLocation == stockMovement.destination) ? StockMovementDirection.INBOUND : "ALL"
 
+        params.deleted = 'true'
+
         redirect(action: "list", params:params)
     }
 

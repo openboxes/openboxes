@@ -104,11 +104,11 @@ class StockTransferController {
         }
 
         if (direction == StockMovementDirection.INBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND])
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND, 'deleted': 'true'])
         } else if (direction == StockMovementDirection.OUTBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND, 'deleted': 'true'])
         } else {
-            redirect(action: "list")
+            redirect(action: "list", params: ['deleted': 'true'])
         }
 
     }
