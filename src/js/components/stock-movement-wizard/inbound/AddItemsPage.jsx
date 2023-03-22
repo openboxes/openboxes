@@ -106,6 +106,9 @@ const VENDOR_FIELDS = {
         headerAlign: 'left',
         flexWidth: '4',
         required: true,
+        attributes: {
+          showSelectedOptionColor: true,
+        },
         getDynamicAttr: ({
           updateRow, rowIndex, values, originId, focusField,
         }) => ({
