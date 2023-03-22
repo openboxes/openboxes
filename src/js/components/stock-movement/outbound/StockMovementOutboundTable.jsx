@@ -156,7 +156,7 @@ const StockMovementOutboundTable = ({
             {...row}
             link={`/openboxes/stockMovement/show/${id}`}
             tooltip
-            tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName ?? 'Default')}
+            tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
           >
             <ShipmentIdentifier
               shipmentType={mapShipmentTypes(shipmentType)}
