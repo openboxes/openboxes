@@ -21,15 +21,12 @@ class FieldArrayComponent extends Component {
     this.copyDown = this.copyDown.bind(this);
   }
 
-  focusField(index, fieldName, options = {}) {
+  focusField(index, fieldName) {
     const field = _.get(this.fieldRefs, `[${index}].${fieldName}`);
     // 8 - the amount of rows shown in the table on 1360x786 resolution
     const fieldToScroll = _.get(this.fieldRefs, `[${index - 8 > 0 ? index - 8 : 0}].${fieldName}`);
 
     if (field) {
-      if (options.enable) {
-        field.disabled = false;
-      }
       field.focus();
       if (fieldToScroll) {
         fieldToScroll.scrollIntoView();

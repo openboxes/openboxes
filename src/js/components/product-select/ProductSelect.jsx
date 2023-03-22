@@ -76,13 +76,12 @@ const ProductSelect = ({
         if (matchedByProductCode) exactMatchProduct = matchedByProductCode;
       }
 
-      if (onExactProductSelected) {
-        onExactProductSelected({ product: exactMatchProduct });
-      }
       if (exactMatchProduct) {
         selectRef.current.select.select.setValue(exactMatchProduct);
       }
-
+      if (onExactProductSelected) {
+        setTimeout(() => onExactProductSelected({ product: exactMatchProduct }), 0);
+      }
       setIsExactMatch(false);
       setLoadedOptions([]);
     }
