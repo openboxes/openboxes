@@ -28,18 +28,20 @@ class TableBodyVirtualized extends Component {
 
   getHeight() {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
-    const { totalCount } = properties;
     let height = 0;
     const maxTableHeight = window.innerHeight < 900 ?
       // 0.35 * window.innerHeight = 35vh from table-content class in StockMovement.scss
       0.35 * window.innerHeight : 0.40 * window.innerHeight;
 
     if (!subfieldKey) {
-      if (totalCount * 28 > maxTableHeight) {
-        height = maxTableHeight;
-      } else if (totalCount > 0) {
-        height = totalCount * 28;
-      }
+      height = fields.value.reduce((acc, field) => {
+        const dynamicAttr = getDynamicRowAttr ?
+          getDynamicRowAttr({ ...properties, rowValues: field }) : {};
+        if (dynamicAttr.hideRow || height > maxTableHeight) {
+          return acc;
+        }
+        return acc + 28;
+      }, height);
     } else {
       _.forEach(fields.value, (field) => {
         const dynamicAttr = getDynamicRowAttr ?
@@ -59,29 +61,29 @@ class TableBodyVirtualized extends Component {
         }
       });
     }
-
     return height || 28;
   }
 
   getRowHeight({ index }) {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
+    const rowValues = fields.value ? fields.value[index] : null;
+
+    const dynamicAttr = getDynamicRowAttr && rowValues ?
+      getDynamicRowAttr({ ...properties, index, rowValues }) : {};
+
+    if (dynamicAttr.hideRow) {
+      return 0;
+    }
 
     if (!subfieldKey) {
       return 28;
     }
 
-    const rowValues = fields.value ? fields.value[index] : null;
+
     const subfields = rowValues ? rowValues[subfieldKey] : null;
 
     if (!subfields) {
       return 28;
-    }
-
-    const dynamicAttr = getDynamicRowAttr ?
-      getDynamicRowAttr({ ...properties, index, rowValues }) : {};
-
-    if (dynamicAttr.hideRow) {
-      return 0;
     }
 
     if (dynamicAttr.hideSubfields) {
