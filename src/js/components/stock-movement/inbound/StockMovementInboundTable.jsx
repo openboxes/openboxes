@@ -155,7 +155,12 @@ const StockMovementInboundTable = ({
         } = row.original;
         const stockMovementId = isReturn ? order?.id : id;
         return (
-          <TableCell {...row} link={`/openboxes/stockMovement/show/${stockMovementId}`} tooltip tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}>
+          <TableCell
+            {...row}
+            link={`/openboxes/stockMovement/show/${stockMovementId}`}
+            tooltip
+            tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName ?? 'Default')}
+          >
             <ShipmentIdentifier
               shipmentType={mapShipmentTypes(shipmentType)}
               identifier={row?.value}

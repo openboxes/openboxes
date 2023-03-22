@@ -234,10 +234,10 @@ export const fetchProductGroups = async () => {
 
 const mapShipmentType = (shipmentType) => {
   // Enum keys can be e.g. AIR, LAND, SEA etc.
-  const enumKey = splitTranslation(shipmentType.name, null)?.toUpperCase();
+  const enumKey = splitTranslation(shipmentType?.name, null)?.toUpperCase();
   return {
     ...shipmentType,
-    value: shipmentType.id,
+    value: shipmentType?.id,
     enumKey,
   };
 };
