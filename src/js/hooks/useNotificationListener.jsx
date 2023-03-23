@@ -7,7 +7,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 
-const useDeleteNotificationListener = () => {
+const useNotificationListener = () => {
   const { search } = useLocation();
   const history = useHistory();
   const parsedQuerySearch = queryString.parse(search);
@@ -27,4 +27,4 @@ const useDeleteNotificationListener = () => {
   }, []);
 };
 
-export default useDeleteNotificationListener;
+export default useNotificationListener;

@@ -10,7 +10,6 @@ import StockMovementOutboundFilters from 'components/stock-movement/outbound/Sto
 import StockMovementOutboundHeader from 'components/stock-movement/outbound/StockMovementOutboundHeader';
 import StockMovementOutboundTable from 'components/stock-movement/outbound/StockMovementOutboundTable';
 import useOutboundFilters from 'hooks/list-pages/outbound/useOutboundFilters';
-import useDeleteNotificationListener from 'hooks/useDeleteNotificationListener';
 import useTranslation from 'hooks/useTranslation';
 
 const StockMovementOutboundList = (props) => {
@@ -22,7 +21,6 @@ const StockMovementOutboundList = (props) => {
   } = useOutboundFilters(props.isRequestsList);
 
   useTranslation('stockMovement', 'StockMovementType', 'reactTable');
-  useDeleteNotificationListener();
 
   return (
     <div className="d-flex flex-column list-page-main">

@@ -10,7 +10,6 @@ import StockMovementInboundFilters from 'components/stock-movement/inbound/Stock
 import StockMovementInboundHeader from 'components/stock-movement/inbound/StockMovementInboundHeader';
 import StockMovementInboundTable from 'components/stock-movement/inbound/StockMovementInboundTable';
 import useInboundFilters from 'hooks/list-pages/inbound/useInboundFilters';
-import useDeleteNotificationListener from 'hooks/useDeleteNotificationListener';
 import useTranslation from 'hooks/useTranslation';
 
 const StockMovementInboundList = (props) => {
@@ -22,7 +21,6 @@ const StockMovementInboundList = (props) => {
   } = useInboundFilters();
 
   useTranslation('stockMovement', 'reactTable');
-  useDeleteNotificationListener();
 
   return (
     <div className="d-flex flex-column list-page-main">
