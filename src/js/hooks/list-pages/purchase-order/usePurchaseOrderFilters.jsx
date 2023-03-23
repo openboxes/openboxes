@@ -4,7 +4,7 @@ import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchBuyers, fetchPurchaseOrderStatuses } from 'actions';
+import { fetchBuyers, fetchPaymentTerms, fetchPurchaseOrderStatuses } from 'actions';
 import filterFields from 'components/purchaseOrder/FilterFields';
 import usePurchaseOrderFiltersCleaner from 'hooks/list-pages/purchase-order/usePurchaseOrderFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -22,6 +22,7 @@ const usePurchaseOrderFilters = () => {
     buyers,
     currentLocation,
     statuses,
+    paymentTerms,
     currentUser,
     currentLocale,
   } = useSelector(state => ({
@@ -29,6 +30,7 @@ const usePurchaseOrderFilters = () => {
     buyers: state.organizations.buyers,
     currentLocation: state.session.currentLocation,
     statuses: state.purchaseOrder.statuses,
+    paymentTerms: state.purchaseOrder.paymentTerms,
     currentUser: state.session.user,
     currentLocale: state.session.activeLanguage,
   }));
@@ -38,6 +40,7 @@ const usePurchaseOrderFilters = () => {
     // TODO: If editing organizations is in React,
     //  fetch only if !buyers || buyers.length === 0
     dispatch(fetchBuyers());
+    dispatch(fetchPaymentTerms());
   }, []);
 
   useEffect(() => {
@@ -70,6 +73,7 @@ const usePurchaseOrderFilters = () => {
     }
 
     const queryProps = queryString.parse(history.location.search);
+
     // IF VALUE IS IN A SEARCH QUERY SET DEFAULT VALUES
     if (queryProps.status) {
       const statusesFromParams = getParamList(queryProps.status);
@@ -93,6 +97,11 @@ const usePurchaseOrderFilters = () => {
         : await fetchLocationById(queryProps.destination);
     } else if (!isCentralPurchasingEnabled && queryProps.destination === undefined) {
       defaultValues.destination = currentLocationOption;
+    }
+    if (queryProps.paymentTerm) {
+      const paymentTermsFromParams = getParamList(queryProps.paymentTerm);
+      defaultValues.paymentTerm = paymentTerms
+        .filter(({ id }) => paymentTermsFromParams.includes(id));
     }
     if (queryProps.destinationParty) {
       defaultValues.destinationParty = buyers
@@ -128,6 +137,7 @@ const usePurchaseOrderFilters = () => {
       statusStartDate: { name: 'statusStartDate' },
       statusEndDate: { name: 'statusEndDate' },
       destinationParty: { name: 'destinationParty', accessor: 'id' },
+      paymentTerm: { name: 'paymentTerm', accessor: 'id' },
       orderedBy: { name: 'orderedBy', accessor: 'id' },
       createdBy: { name: 'createdBy', accessor: 'id' },
     };

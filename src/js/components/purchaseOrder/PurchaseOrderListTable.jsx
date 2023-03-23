@@ -205,6 +205,15 @@ const PurchaseOrderListTable = ({
     },
     {
       Header: <Translate
+        id="react.purchaseOrder.column.paymentTerms.label"
+        defaultMessage="Payment Terms"
+      />,
+      accessor: 'paymentTerm',
+      minWidth: 150,
+      Cell: row => <TableCell {...row} value={row.value?.name} />,
+    },
+    {
+      Header: <Translate
         id="react.purchaseOrder.column.orderedOn.label"
         defaultMessage="Ordered On"
       />,

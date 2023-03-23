@@ -77,6 +77,11 @@ class UrlMappings {
             action = [GET: "glAccountOptions"]
         }
 
+        "/api/paymentTermOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "paymentTermOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list"]

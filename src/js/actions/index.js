@@ -15,6 +15,7 @@ import {
   FETCH_INVOICE_TYPE_CODES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
+  FETCH_PAYMENT_TERMS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
@@ -39,6 +40,7 @@ import {
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
 import genericApi from 'api/services/GenericApi';
+import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
@@ -418,6 +420,17 @@ export function fetchPurchaseOrderStatuses() {
     apiClient.get('/openboxes/api/orderSummaryStatus').then((res) => {
       dispatch({
         type: FETCH_PURCHASE_ORDER_STATUSES,
+        payload: res.data.data,
+      });
+    });
+  };
+}
+
+export function fetchPaymentTerms() {
+  return (dispatch) => {
+    purchaseOrderApi.getPaymentTerms().then((res) => {
+      dispatch({
+        type: FETCH_PAYMENT_TERMS,
         payload: res.data.data,
       });
     });

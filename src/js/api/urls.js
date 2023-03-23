@@ -39,3 +39,6 @@ export const PRODUCT_GROUP_OPTION = `${API}/productGroupOptions`;
 
 // SHIPMENT TYPES
 export const SHIPMENT_TYPES = `${GENERIC_API}/shipmentType`;
+
+// PAYMENT TERMS
+export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
