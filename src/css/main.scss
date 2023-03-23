@@ -1356,15 +1356,15 @@ div.search-input:focus-within {
   width: 3px;
 
   &.saving {
-    background-color: var(--color-yellow);
+    background-color: var(--gray-301);
   }
 
   &.pending {
-    background-color: var(--color-yellow);
+    background-color: var(--gray-301);
   }
 
   &.saved {
-    background-color: var(--color-green);
+    background-color: var(--blue-primary);
   }
 
   &.error {
