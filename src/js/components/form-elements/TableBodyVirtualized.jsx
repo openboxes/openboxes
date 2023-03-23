@@ -66,7 +66,7 @@ class TableBodyVirtualized extends Component {
 
   getRowHeight({ index }) {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
-    const rowValues = fields.value ? fields.value[index] : null;
+    const rowValues = fields?.value?.[index];
 
     const dynamicAttr = getDynamicRowAttr && rowValues ?
       getDynamicRowAttr({ ...properties, index, rowValues }) : {};
