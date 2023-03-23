@@ -12,6 +12,7 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import org.grails.plugins.csv.CSVWriter
+import org.pih.warehouse.api.NotificationType
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -210,8 +211,11 @@ class StockMovementController {
             if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
                 try {
                     stockMovementService.deleteStockMovement(params.id)
-                    flash.message = "Successfully deleted stock movement with ID ${params.id}"
-                    params.deleted = 'true'
+                    params.notificationMessage = g.message(
+                            code: 'react.stockMovement.deleted.success.message.label',
+                            body: 'Stock Movement has been deleted successfully',
+                    )
+                    params.notificationType = NotificationType.SUCCESS
                 } catch (Exception e) {
                     log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
                     flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
@@ -241,7 +245,7 @@ class StockMovementController {
                 (currentLocation == stockMovement.destination) ? StockMovementDirection.INBOUND : "ALL"
 
 
-        redirect(action: "list", params:params)
+        redirect(action: "list", params: params)
     }
 
     def requisition = {

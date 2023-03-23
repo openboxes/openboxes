@@ -10,6 +10,7 @@
 
 package org.pih.warehouse.inventory
 
+import org.pih.warehouse.api.NotificationType
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
@@ -99,6 +100,11 @@ class StockTransferController {
 
         try {
             stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
+            params.notificationMessage = g.message(
+                    code: 'react.stockMovement.deleted.success.message.label',
+                    body: 'Stock Movement has been deleted successfully',
+            )
+            params.notificationType = NotificationType.SUCCESS
         } catch (Exception e) {
             flash.message = "${warehouse.message(code: 'stockMovement.delete.error.message')}"
             redirect(controller: "stockMovement", action: "show", id: params.id)
@@ -106,9 +112,11 @@ class StockTransferController {
         }
 
         if (direction == StockMovementDirection.INBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND, 'deleted': true])
+            params.direction = StockMovementDirection.INBOUND
+            redirect(controller: "stockMovement", action: "list", params: params)
         } else if (direction == StockMovementDirection.OUTBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND, 'deleted': true])
+            params.direction = StockMovementDirection.OUTBOUND
+            redirect(controller: "stockMovement", action: "list", params: params)
         } else {
             redirect(action: "list", params: ['deleted': true])
         }
