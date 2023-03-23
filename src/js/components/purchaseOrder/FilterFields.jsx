@@ -93,6 +93,22 @@ export default {
       disabled: isCentralPurchasingEnabled,
     }),
   },
+  paymentTerm: {
+    type: FilterSelectField,
+    attributes: {
+      valueKey: 'id',
+      filterElement: true,
+      placeholder: 'react.purchaseOrder.column.paymentTerms.label',
+      defaultPlaceholder: 'Payment Terms',
+      showLabelTooltip: true,
+      multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+    },
+    getDynamicAttr: ({ paymentTerms }) => ({
+      options: paymentTerms,
+    }),
+  },
   orderedBy: {
     type: FilterSelectField,
     attributes: {

@@ -27,6 +27,7 @@ const PurchaseOrderList = (props) => {
         setFilterParams={setFilterValues}
         filterFields={filterFields}
         formProps={{
+          paymentTerms: props.paymentTerms,
           statuses: props.statuses,
           buyers: props.buyers,
           isCentralPurchasingEnabled,
@@ -40,6 +41,7 @@ const PurchaseOrderList = (props) => {
 const mapStateToProps = state => ({
   buyers: state.organizations.buyers,
   statuses: state.purchaseOrder.statuses,
+  paymentTerms: state.purchaseOrder.paymentTerms,
 });
 
 export default connect(mapStateToProps, {
@@ -50,6 +52,12 @@ export default connect(mapStateToProps, {
 
 PurchaseOrderList.propTypes = {
   statuses: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    value: PropTypes.string,
+    label: PropTypes.string,
+    variant: PropTypes.string,
+  })).isRequired,
+  paymentTerms: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     value: PropTypes.string,
     label: PropTypes.string,

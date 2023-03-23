@@ -27,7 +27,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
     sortingParams,
   }) => {
     const {
-      status, origin, orderedBy, createdBy, destinationParty, destination,
+      status, origin, orderedBy, createdBy, destinationParty, destination, paymentTerm,
     } = filterParams;
     return {
       ..._.omitBy({
@@ -35,6 +35,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
         max: `${state.pageSize}`,
         ...sortingParams,
         ...filterParams,
+        paymentTerm: paymentTerm && paymentTerm.map(term => term.id),
         status: status && status.map(statusElement => statusElement.value),
         origin: origin?.id,
         orderedBy: orderedBy?.id,
