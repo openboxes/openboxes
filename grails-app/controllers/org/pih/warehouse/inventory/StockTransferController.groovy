@@ -118,7 +118,7 @@ class StockTransferController {
             params.direction = StockMovementDirection.OUTBOUND
             redirect(controller: "stockMovement", action: "list", params: params)
         } else {
-            redirect(action: "list", params: ['deleted': true])
+            redirect(action: "list", params: params)
         }
     }
 
