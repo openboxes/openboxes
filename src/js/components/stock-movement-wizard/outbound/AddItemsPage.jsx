@@ -429,7 +429,7 @@ class AddItemsPage extends Component {
         key => key !== 'product',
       );
 
-      if (newQty === oldQty) {
+      if (newQty === oldQty && newRecipient === oldRecipient) {
         this.setState(prev => ({
           values: {
             ...prev.values,
