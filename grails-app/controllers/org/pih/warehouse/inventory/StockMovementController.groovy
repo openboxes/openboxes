@@ -211,12 +211,17 @@ class StockMovementController {
                 try {
                     stockMovementService.deleteStockMovement(params.id)
                     flash.message = "Successfully deleted stock movement with ID ${params.id}"
+                    params.deleted = 'true'
                 } catch (Exception e) {
                     log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
                     flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                    redirect(action: "show", id: params.id)
+                    return
                 }
             } else {
                 flash.message = "You cannot delete a shipment with status ${stockMovement?.shipment?.currentStatus}"
+                redirect(action: "show", id: params.id)
+                return
             }
         }
         else {
@@ -235,7 +240,6 @@ class StockMovementController {
         params.direction = (currentLocation == stockMovement.origin) ? StockMovementDirection.OUTBOUND :
                 (currentLocation == stockMovement.destination) ? StockMovementDirection.INBOUND : "ALL"
 
-        params.deleted = 'true'
 
         redirect(action: "list", params:params)
     }

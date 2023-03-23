@@ -98,20 +98,20 @@ class StockTransferController {
         }
 
         try {
-            throw new IllegalArgumentException("Order instance not found for this stock transfer")
             stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
-        } catch (IllegalArgumentException e) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+        } catch (Exception e) {
+            flash.message = "${warehouse.message(code: 'stockMovement.delete.error.message')}"
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
         }
 
         if (direction == StockMovementDirection.INBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND, 'deleted': 'true'])
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND, 'deleted': true])
         } else if (direction == StockMovementDirection.OUTBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND, 'deleted': 'true'])
+            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND, 'deleted': true])
         } else {
-            redirect(action: "list", params: ['deleted': 'true'])
+            redirect(action: "list", params: ['deleted': true])
         }
-
     }
 
     def rollback = {
