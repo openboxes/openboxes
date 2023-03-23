@@ -1,4 +1,4 @@
-import { FETCH_PURCHASE_ORDER_STATUSES } from 'actions/types';
+import { FETCH_PAYMENT_TERMS, FETCH_PURCHASE_ORDER_STATUSES } from 'actions/types';
 
 const initialState = {
   statuses: [],
@@ -10,6 +10,11 @@ export default function purchaseOrderReducer(state = initialState, action) {
       return {
         ...state,
         statuses: action.payload,
+      };
+    case FETCH_PAYMENT_TERMS:
+      return {
+        ...state,
+        paymentTerms: action.payload,
       };
     default:
       return state;

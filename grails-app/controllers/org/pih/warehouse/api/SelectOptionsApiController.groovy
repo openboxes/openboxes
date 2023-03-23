@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
@@ -55,6 +56,13 @@ class SelectOptionsApiController {
             [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
         }
         render([data: tags] as JSON)
+    }
+
+    def paymentTermOptions = {
+        List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {
+            [id: it.id, label: it.name, value: it.id ]
+        }
+        render([data: paymentTerms] as JSON)
     }
 
 }
