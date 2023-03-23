@@ -514,11 +514,13 @@ class AddItemsPage extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        lineItems: this.props.savedStockMovement.lineItems,
+        lineItems: this.props.savedStockMovement.lineItems
+          .map(item => ({ ...item, rowSaveStatus: RowSaveStatus.PENDING })),
       },
       totalCount: this.props.savedStockMovement.lineItems.length,
       isDraftAvailable: false,
     });
+    this.saveRequisitionItemsInCurrentStep(this.props.savedStockMovement.lineItems, true);
     this.props.hideSpinner();
   }
 
