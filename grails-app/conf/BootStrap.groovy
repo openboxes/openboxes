@@ -38,6 +38,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PartyType
+import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -181,6 +182,7 @@ class BootStrap {
                 id: orderSummary?.order?.id,
                 orderNumber: orderSummary?.order?.orderNumber,
                 name: orderSummary?.order?.name,
+                paymentTerm: orderSummary?.order?.paymentTerm,
                 origin: orderSummary?.order?.origin?.name + (origOrgCode ? " (${origOrgCode})" : ""),
                 destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
                 dateOrdered: orderSummary?.order?.dateOrdered,
@@ -195,6 +197,10 @@ class BootStrap {
                 totalNormalized: "${orderSummary?.order?.totalNormalized?.setScale(2, RoundingMode.HALF_UP)} ${defaultCurrencyCode}",
                 shipmentsCount: orderSummary?.order?.shipments?.size(),
             ]
+        }
+
+        JSON.registerObjectMarshaller(PaymentTerm) { PaymentTerm paymentTerm ->
+            return paymentTerm.toJson()
         }
 
         JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->

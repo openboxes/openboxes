@@ -106,6 +106,11 @@ class OrderService {
                     if (params.createdBy) {
                         eq("createdBy.id", params.createdBy)
                     }
+                    if (params.paymentTerm) {
+                        paymentTerm {
+                            'in'("id", params.list("paymentTerm"))
+                        }
+                    }
                 }
 
                 if (params.sort && params.sort != 'status') {
@@ -121,6 +126,10 @@ class OrderService {
                         orderedBy {
                             order("firstName", params.order ?: 'asc')
                             order("lastName", params.order ?: 'asc')
+                        }
+                    } else if (params.sort == 'paymentTerm') {
+                        paymentTerm {
+                            order("name", params.order ?: 'asc')
                         }
                     } else {
                         order(params.sort, params.order ?: 'asc')
