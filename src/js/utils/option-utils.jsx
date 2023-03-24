@@ -3,11 +3,12 @@ import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
 import productGroupApi from 'api/services/ProductGroupApi';
+import userApi from 'api/services/UserApi';
 import apiClient from 'utils/apiClient';
 import splitTranslation from 'utils/translation-utils';
 
 
-export const debounceUsersFetch = (waitTime, minSearchLength) =>
+export const debouncePeopleFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get('/openboxes/api/persons', { params: { name: searchTerm, status: true } })
@@ -22,6 +23,27 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
     } else {
       callback([]);
     }
+  }, waitTime);
+
+export const debounceUsersFetch = (waitTime, minSearchLength) =>
+  _.debounce((searchTerm, callback) => {
+    if (searchTerm?.length >= minSearchLength) {
+      const config = {
+        params: {
+          searchTerm,
+          active: true,
+        },
+      };
+      userApi.getUsersOptions(config).then((users) => {
+        callback(users?.data?.data?.map?.(user => ({
+          ...user,
+          value: user.id,
+          label: user.name,
+        })));
+      });
+      return;
+    }
+    callback([]);
   }, waitTime);
 
 export const debounceLocationsFetch = (
