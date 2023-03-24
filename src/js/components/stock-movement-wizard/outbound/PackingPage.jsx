@@ -472,8 +472,8 @@ class PackingPage extends Component {
               <span className="buttons-container">
                 <FilterInput
                   itemFilter={itemFilter}
-                  onChangeFunc={e => this.setState({ itemFilter: e.target.value })}
-                  clearFunc={() => this.setState({ itemFilter: '' })}
+                  onChange={e => this.setState({ itemFilter: e.target.value })}
+                  onClear={() => this.setState({ itemFilter: '' })}
                 />
                 <button
                   type="button"

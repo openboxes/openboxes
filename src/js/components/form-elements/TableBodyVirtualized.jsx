@@ -10,6 +10,9 @@ import TableRow from 'components/form-elements/TableRow';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 
+const ROW_HEIGHT = 28;
+
+
 class TableBodyVirtualized extends Component {
   constructor(props) {
     super(props);
@@ -40,7 +43,7 @@ class TableBodyVirtualized extends Component {
         if (dynamicAttr.hideRow || height > maxTableHeight) {
           return acc;
         }
-        return acc + 28;
+        return acc + ROW_HEIGHT;
       }, height);
     } else {
       _.forEach(fields.value, (field) => {
@@ -53,15 +56,15 @@ class TableBodyVirtualized extends Component {
         }
 
         if (!height) {
-          height = 28 * (subfields.length + 1);
-        } else if (height + (28 * (subfields.length + 1)) > maxTableHeight) {
+          height = ROW_HEIGHT * (subfields.length + 1);
+        } else if (height + (ROW_HEIGHT * (subfields.length + 1)) > maxTableHeight) {
           height = maxTableHeight;
         } else {
-          height += (28 * (subfields.length + 1));
+          height += (ROW_HEIGHT * (subfields.length + 1));
         }
       });
     }
-    return height || 28;
+    return height || ROW_HEIGHT;
   }
 
   getRowHeight({ index }) {
@@ -76,21 +79,21 @@ class TableBodyVirtualized extends Component {
     }
 
     if (!subfieldKey) {
-      return 28;
+      return ROW_HEIGHT;
     }
 
 
     const subfields = rowValues ? rowValues[subfieldKey] : null;
 
     if (!subfields) {
-      return 28;
+      return ROW_HEIGHT;
     }
 
     if (dynamicAttr.hideSubfields) {
-      return 28;
+      return ROW_HEIGHT;
     }
 
-    return 28 * (subfields.length + 1);
+    return ROW_HEIGHT * (subfields.length + 1);
   }
 
   rowRenderer({
