@@ -69,7 +69,7 @@ class ForecastingService {
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             Map params = [startDate: startDate, endDate: endDate]
-            String translatedNameSubquery = """
+            String productDisplayNameSubQuery = """
                 (SELECT s.name FROM synonym s 
                 WHERE s.product_id = pdd.product_id 
                 AND s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' 
@@ -92,7 +92,7 @@ class ForecastingService {
                     product_code,
                     CONCAT(product_name, 
                         IFNULL(
-                            CONCAT(' (', '${currentLocale?.toLanguageTag()?.toUpperCase()}', ': ', ${translatedNameSubquery}, ')'), 
+                            CONCAT(' (', '${currentLocale?.toLanguageTag()?.toUpperCase()}', ': ', ${productDisplayNameSubQuery}, ')'), 
                             ''
                         ), 
                     '') AS product_name,

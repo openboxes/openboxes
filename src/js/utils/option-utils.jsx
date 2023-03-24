@@ -75,9 +75,6 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
     }
   }, waitTime);
 
-// TODO: We don't have access to translatedName directly
-// so it can be added in the future
-// discussion connected to OBPIH-5148
 export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {

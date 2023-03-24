@@ -46,7 +46,7 @@ export const getReceivingPayloadContainers = formValues =>
        *  product.displayNames.default: XYZ, to the update method, but it's not a
        *  writable property.
        *  With deprecated product.translatedName it was not the case, because
-       *  it was recognizing the transient and we didn't access product.translatedName.something
+       *  it was recognizing the transient, and we didn't access product.translatedName.something
        *  but product.translatedName directly
        * */
       return _.omit(item, 'product.displayNames');
