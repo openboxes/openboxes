@@ -25,7 +25,7 @@ class ProductListItem {
                 handlingIcons       : product.handlingIcons,
                 lotAndExpiryControl : product.lotAndExpiryControl,
                 active              : product.active,
-                translatedName      : product.translatedName,
+                displayName         : product.displayName,
                 glAccount           : product.glAccount,
                 productCatalogs     : product.productCatalogs,
         ]

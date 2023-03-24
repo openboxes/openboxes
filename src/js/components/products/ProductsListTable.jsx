@@ -55,7 +55,7 @@ const ProductsListTable = ({
       Cell: row =>
         (<TableCell
           {...row}
-          value={row.original.translatedName ?? row.value}
+          value={row.original.displayName ?? row.value}
           tooltip
           tooltipLabel={row.value}
           link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`}
