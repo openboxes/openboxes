@@ -26,6 +26,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import ActivityCode from 'consts/activityCode';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
@@ -69,11 +70,11 @@ const NO_STOCKLIST_FIELDS = {
     type: ArrayField,
     arrowsNavigation: true,
     virtualized: true,
-    showRowSaveIndicator: true,
     totalCount: ({ totalCount }) => totalCount,
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    showRowSaveIndicator: true,
     addButton: ({
       // eslint-disable-next-line react/prop-types
       addRow, getSortOrder, showOnly, updateTotalCount, getStockMovementDraft, isDraftAvailable,
@@ -684,7 +685,8 @@ class AddItemsPage extends Component {
         const { totalCount } = resp.data;
         // if data from backend is older than the version from local storage
         // we want to allow users use their version
-        const isDraftAvailable = (stockMovementId === id) &&
+        const isDraftAvailable = this.props.isAutosaveEnabled &&
+                                 (stockMovementId === id) &&
                                  (lastUpdated < lastSaved) &&
                                  (savedStatusCode === statusCode);
 
@@ -889,6 +891,10 @@ class AddItemsPage extends Component {
   // if rowIndex is passed, it means that we are editing row
   // not adding new one
   saveProgress = ({ values, rowIndex, fieldValue }) => {
+    if (!this.props.isAutosaveEnabled) {
+      return;
+    }
+
     if (actionInProgress) {
       return;
     }
@@ -1306,6 +1312,7 @@ class AddItemsPage extends Component {
                   saveProgress: this.saveProgress,
                   getStockMovementDraft: this.getStockMovementDraft,
                   isDraftAvailable: this.state.isDraftAvailable,
+                  isAutosaveEnabled: this.props.isAutosaveEnabled,
                 }))}
               </div>
               <div className="submit-buttons">
@@ -1378,6 +1385,7 @@ const mapStateToProps = (state, ownProps) => ({
   pageSize: state.session.pageSize,
   savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
   isOnline: state.connection.online,
+  isAutosaveEnabled: state.session.supportedActivities.includes(ActivityCode.AUTOSAVE),
 });
 
 const mapDispatchToProps = {
@@ -1430,6 +1438,7 @@ AddItemsPage.propTypes = {
     statusCode: null,
   }),
   isOnline: PropTypes.bool,
+  isAutosaveEnabled: PropTypes.bool,
 };
 
 AddItemsPage.defaultProps = {
@@ -1441,4 +1450,5 @@ AddItemsPage.defaultProps = {
     statusCode: null,
   },
   isOnline: true,
+  isAutosaveEnabled: false,
 };

@@ -1308,6 +1308,9 @@ openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 // delay is in ms
 openboxes.client.notification.autohide.delay = 8000
 
+// Autosave configuration
+openboxes.autosave.enabled = true
+
 // Global megamenu configuration
 
 openboxes.menuSectionsUrlParts = [

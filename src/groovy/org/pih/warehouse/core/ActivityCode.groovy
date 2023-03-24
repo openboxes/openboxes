@@ -58,8 +58,9 @@ enum ActivityCode {
     SUBMIT_REQUEST('SUBMIT_REQUEST'),
 
     // Dynamic creation
-    DYNAMIC_CREATION('DYNAMIC_CREATION')
+    DYNAMIC_CREATION('DYNAMIC_CREATION'),
 
+    AUTOSAVE('AUTOSAVE')
 
     final String id
 
@@ -89,7 +90,8 @@ enum ActivityCode {
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,
                 SUBMIT_REQUEST,
-                DYNAMIC_CREATION
+                DYNAMIC_CREATION,
+                AUTOSAVE
         ]
     }
 
