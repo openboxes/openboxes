@@ -82,6 +82,11 @@ class UrlMappings {
             action = [GET: "paymentTermOptions"]
         }
 
+        "/api/users" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "usersOptions"]
+        }
+
         "/api/products"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "list"]
