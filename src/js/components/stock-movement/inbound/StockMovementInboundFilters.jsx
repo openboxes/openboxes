@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
-import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationsFetch, debouncePeopleFetch, debounceUsersFetch } from 'utils/option-utils';
 
 const StockMovementInboundFilters = ({
   setFilterParams,
@@ -18,6 +18,11 @@ const StockMovementInboundFilters = ({
     debounceUsersFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
+  const fetchPeople = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
+    [debounceTime, minSearchLength],
+  );
+
   const fetchLocations = useCallback(debounceLocationsFetch(
     debounceTime,
     minSearchLength,
@@ -42,6 +47,7 @@ const StockMovementInboundFilters = ({
           ...formProps,
           fetchUsers,
           fetchLocations,
+          fetchPeople,
         }}
       />
     </div>
