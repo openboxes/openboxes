@@ -277,8 +277,6 @@ class BootStrap {
                     handlingIcons      : product.handlingIcons,
                     lotAndExpiryControl: product.lotAndExpiryControl,
                     active             : product.active,
-                    // FIXME deprecated - remove before release (as soon as we're done with cleanup)
-                    translatedName     : product.translatedName,
                     // Introduced new object (decided not to use productNames or synonyms).
                     // that includes the display name for all locales. This gives us a little more
                     // flexibility in case we don't like it or it performs poorly. We can also

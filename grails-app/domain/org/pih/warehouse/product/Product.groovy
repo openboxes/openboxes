@@ -252,7 +252,6 @@ class Product implements Comparable, Serializable {
                          "displayName",
                          "displayNames",
                          "displayNameOrDefaultName",
-                         "translatedName",
                          "displayNameWithLocaleCode"
     ]
 
@@ -699,14 +698,6 @@ class Product implements Comparable, Serializable {
         return synonyms.findAll { Synonym synonym ->
             synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
         } as List
-    }
-
-    /**
-     * @deprecated remove once all references have been replaced by displayName
-     * @return
-     */
-    String getTranslatedName() {
-        return displayName
     }
 
     /**
