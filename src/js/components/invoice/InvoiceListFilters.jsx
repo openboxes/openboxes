@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import FilterForm from 'components/Filter/FilterForm';
 import filterFields from 'components/invoice/FilterFields';
 import useInvoiceFilters from 'hooks/list-pages/invoice/useInvoiceFilters';
-import { debounceUsersFetch } from 'utils/option-utils';
+import { debouncePeopleFetch } from 'utils/option-utils';
 
 const InvoiceListFilters = ({
   setFilterParams,
@@ -20,8 +20,8 @@ const InvoiceListFilters = ({
   const { defaultValues, setFilterValues } =
     useInvoiceFilters({ setFilterParams });
 
-  const debouncedUsersFetch = useCallback(
-    debounceUsersFetch(debounceTime, minSearchLength),
+  const debouncedPeopleFetch = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
 
@@ -32,7 +32,7 @@ const InvoiceListFilters = ({
         updateFilterParams={values => setFilterValues({ ...values })}
         formProps={{
           statuses,
-          debouncedUsersFetch,
+          debouncedPeopleFetch,
           suppliers,
           typeCodes,
           organization: currentLocation.organization,

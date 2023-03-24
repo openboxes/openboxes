@@ -86,9 +86,9 @@ export default {
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
-      debouncedUsersFetch,
+      debouncedPeopleFetch,
     }) => ({
-      loadOptions: debouncedUsersFetch,
+      loadOptions: debouncedPeopleFetch,
     }),
   },
 };
