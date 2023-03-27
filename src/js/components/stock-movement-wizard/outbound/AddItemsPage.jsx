@@ -74,7 +74,6 @@ const NO_STOCKLIST_FIELDS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
-    showRowSaveIndicator: true,
     addButton: ({
       // eslint-disable-next-line react/prop-types
       addRow, getSortOrder, showOnly, updateTotalCount, getStockMovementDraft, isDraftAvailable,
@@ -348,6 +347,8 @@ class AddItemsPage extends Component {
     this.updateTotalCount = this.updateTotalCount.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.getStockMovementDraft = this.getStockMovementDraft.bind(this);
+    this.transitionToNextStep = this.transitionToNextStep.bind(this);
+    this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -723,13 +724,15 @@ class AddItemsPage extends Component {
 
     if (_.some(lineItems, item => !item.quantityRequested || item.quantityRequested === '0')) {
       this.confirmSave(() =>
-        this.checkDuplicatesAndTransitionToNextStep(lineItems));
+        this.checkDuplicatesAndTransitionToNextStep(lineItems, formValues));
     } else {
-      this.checkDuplicatesAndTransitionToNextStep(lineItems);
+      this.checkDuplicatesAndTransitionToNextStep(lineItems, formValues);
     }
   }
 
-  checkDuplicatesAndTransitionToNextStep(lineItems) {
+  checkDuplicatesAndTransitionToNextStep(lineItems, formValues) {
+    const transitionFunction = this.props.isAutosaveEnabled ?
+      this.transitionToNextStep : this.saveAndTransitionToNextStep;
     const itemsMap = {};
     _.forEach(lineItems, (item) => {
       if (itemsMap[item.product.productCode]) {
@@ -742,12 +745,38 @@ class AddItemsPage extends Component {
 
     if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
       this.confirmTransition(
-        () => this.transitionToNextStep(),
+        () => transitionFunction(formValues, lineItems),
         _.reduce(itemsWithSameCode, (a, b) => a.concat(b), []),
       );
     } else {
-      this.transitionToNextStep();
+      transitionFunction(formValues, lineItems);
     }
+  }
+
+  saveAndTransitionToNextStep(formValues, lineItems) {
+    this.props.showSpinner();
+
+    this.saveRequisitionItems(lineItems)
+      .then((resp) => {
+        if (resp) {
+          this.transitionToNextStep({
+            values: { ...formValues, lineItems: resp.data.data.lineItems },
+          });
+          return;
+        }
+        this.transitionToNextStep({ values: formValues });
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  transitionToNextStep2() {
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const payload = { status: 'REQUESTED' };
+
+    if (this.state.values.statusCode === 'CREATED') {
+      return apiClient.post(url, payload);
+    }
+    return Promise.resolve();
   }
 
   /**
@@ -789,7 +818,7 @@ class AddItemsPage extends Component {
     };
 
     if (payload.lineItems.length) {
-      if (!this.props.isOnline) {
+      if (!this.props.isOnline && this.props.isAutosaveEnabled) {
         this.props.addStockMovementDraft({
           lineItems: itemCandidatesToSave,
           id: this.state.values.stockMovementId,
@@ -803,7 +832,7 @@ class AddItemsPage extends Component {
           // In autosave, we don't modify the state, because
           // lines which have not passed the validation will be
           // deleted during users work
-          if (!withStateChange) {
+          if (!withStateChange && this.props.isAutosaveEnabled) {
             // We want to disable saved line, so I am looking for product with the same
             // code and quantity higher than 0 in response
             // (to avoid disabling new line with the same productCode)
@@ -849,38 +878,41 @@ class AddItemsPage extends Component {
           });
         })
         .then(() => {
-          // There is no need for creating draft
-          // if all of my items are saved correctly
-          // (it means that we have internet connection)
-          this.props.removeStockMovementDraft(this.state.values.stockMovementId);
+          if (this.props.isAutosaveEnabled) {
+            // There is no need for creating draft
+            // if all of my items are saved correctly
+            // (it means that we have internet connection)
+            this.props.removeStockMovementDraft(this.state.values.stockMovementId);
+          }
         })
         .catch(() => {
-          // When there is an error during saving we have to find products which
-          // caused the error. These items are not saved, so we don't have line ID,
-          // and we have to find these items by product ID and SaveStatus
-          const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
-          const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
-            if (
-              item.product &&
-              item.rowSaveStatus === RowSaveStatus.SAVING &&
-              _.includes(notSavedItemsIds, item.product.id)
-            ) {
-              return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
-            }
-            return item;
-          });
-          this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
-
-          if (!this.props.isOnline) {
-            // When there is an error, we are adding items to
-            // state for draft
-            this.props.addStockMovementDraft({
-              lineItems: this.state.values.lineItems,
-              id: this.state.values.stockMovementId,
-              statusCode: this.state.values.statusCode,
+          if (this.props.isAutosaveEnabled) {
+            // When there is an error during saving we have to find products which
+            // caused the error. These items are not saved, so we don't have line ID,
+            // and we have to find these items by product ID and SaveStatus
+            const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
+            const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
+              if (
+                item.product &&
+                item.rowSaveStatus === RowSaveStatus.SAVING &&
+                _.includes(notSavedItemsIds, item.product.id)
+              ) {
+                return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
+              }
+              return item;
             });
-          }
+            this.setState({ values: { ...this.state.values, lineItems: lineItemsWithErrors } });
 
+            if (!this.props.isOnline) {
+              // When there is an error, we are adding items to
+              // state for draft
+              this.props.addStockMovementDraft({
+                lineItems: this.state.values.lineItems,
+                id: this.state.values.stockMovementId,
+                statusCode: this.state.values.statusCode,
+              });
+            }
+          }
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
@@ -987,7 +1019,7 @@ class AddItemsPage extends Component {
   saveItems(lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStep(lineItems)
+    this.saveRequisitionItemsInCurrentStepWithoutAutosave(lineItems)
       .then(() => {
         this.fetchLineItems();
         this.props.removeStockMovementDraft(this.state.values.stockMovementId);
@@ -1083,7 +1115,7 @@ class AddItemsPage extends Component {
    * - 'VERIFYING' if origin type is other than supplier.
    * @public
    */
-  transitionToNextStep() {
+  transitionToNextStep({ values }) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'REQUESTED' };
 
@@ -1094,7 +1126,7 @@ class AddItemsPage extends Component {
       }
       return resolve();
     })
-      .then(this.props.nextPage(this.state.values))
+      .then(this.props.nextPage(values || this.state.values))
       .finally(this.props.hideSpinner());
   }
 
@@ -1326,6 +1358,7 @@ class AddItemsPage extends Component {
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => {
                     if (
+                      this.props.isAutosaveEnabled &&
                       _.some(values.lineItems, lineItem =>
                         (lineItem.rowSaveStatus === RowSaveStatus.PENDING ||
                         lineItem.rowSaveStatus === RowSaveStatus.SAVING) &&
@@ -1345,6 +1378,7 @@ class AddItemsPage extends Component {
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => {
                     if (
+                      this.props.isAutosaveEnabled &&
                       _.some(values.lineItems, lineItem =>
                         lineItem.rowSaveStatus === RowSaveStatus.PENDING ||
                         lineItem.rowSaveStatus === RowSaveStatus.SAVING)
