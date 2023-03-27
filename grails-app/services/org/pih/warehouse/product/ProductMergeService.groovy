@@ -498,21 +498,21 @@ class ProductMergeService {
         }
 
         def primaryRequisitionItems = requisitionService.getPendingRequisitionItems(primary)
-        if (primaryRequisitionItems.size() > 0) {
+        if (primaryRequisitionItems) {
             def primaryPendingRequisitions = primaryRequisitionItems.requisition?.unique()?.requestNumber
                 throw new IllegalArgumentException("Primary product has pending stock movements or requisitions (${primaryPendingRequisitions?.join(', ')}). " +
                     "Please finish or cancel these stock movements or requisitions before merging products.")
         }
 
         def obsoleteRequisitionItems = requisitionService.getPendingRequisitionItems(obsolete)
-        if (obsoleteRequisitionItems.size() > 0) {
+        if (obsoleteRequisitionItems) {
             def obsoletePendingRequisitions = obsoleteRequisitionItems.requisition?.unique()?.requestNumber
             throw new IllegalArgumentException("Obsolete product has pending stock movements or requisitions (${obsoletePendingRequisitions?.join(', ')}). " +
                 "Please finish or cancel these stock movements or requisitions before merging products.")
         }
         
         def pendingInvoiceItems = invoiceService.getPendingInvoiceItems(obsolete)
-        if (pendingInvoiceItems.size() > 0) {
+        if (pendingInvoiceItems) {
             def pendingInvoiceNumbers = pendingInvoiceItems.invoice?.unique()?.invoiceNumber
             throw new IllegalArgumentException("Obsolete product has pending invoices (${pendingInvoiceNumbers?.join(', ')}). " +
                 "Please post these invoices before merging products.")
