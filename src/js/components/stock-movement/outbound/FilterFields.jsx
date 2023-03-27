@@ -86,9 +86,9 @@ export default {
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
-      fetchUsers,
+      fetchPeople,
     }) => ({
-      loadOptions: fetchUsers,
+      loadOptions: fetchPeople,
     }),
   },
   createdBy: {

@@ -25,7 +25,7 @@ import {
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
-import { debounceUsersFetch } from 'utils/option-utils';
+import { debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -124,7 +124,7 @@ const FIELDS = {
           filterOptions: options => options,
         },
         getDynamicAttr: props => ({
-          loadOptions: props.debouncedUsersFetch,
+          loadOptions: props.debouncedPeopleFetch,
           disabled: props.showOnly,
         }),
       },
@@ -208,8 +208,8 @@ class PackingPage extends Component {
 
     apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
 
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.props.showSpinner();
   }
@@ -505,7 +505,7 @@ class PackingPage extends Component {
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                   onSave: this.saveSplitLines,
                   formValues: values,
-                  debouncedUsersFetch: this.debouncedUsersFetch,
+                  debouncedPeopleFetch: this.debouncedPeopleFetch,
                   hasBinLocationSupport: this.props.hasBinLocationSupport,
                   totalCount: this.state.totalCount,
                   loadMoreRows: this.loadMoreRows,

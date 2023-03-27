@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
-import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 
 
 const PurchaseOrderListFilters = ({
@@ -37,8 +37,8 @@ const PurchaseOrderListFilters = ({
     [debounceTime, minSearchLength],
   );
 
-  const debouncedUsersFetch = useCallback(
-    debounceUsersFetch(debounceTime, minSearchLength),
+  const debouncedPeopleFetch = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
 
@@ -53,7 +53,7 @@ const PurchaseOrderListFilters = ({
           ...formProps,
           debouncedOriginLocationsFetch,
           debouncedDestinationLocationsFetch,
-          debouncedUsersFetch,
+          debouncedPeopleFetch,
         }}
         ignoreClearFilters={filtersToIgnore}
         defaultValues={defaultValues}

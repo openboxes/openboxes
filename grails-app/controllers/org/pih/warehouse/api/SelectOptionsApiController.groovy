@@ -13,6 +13,8 @@ import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Tag
+import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
@@ -22,6 +24,7 @@ class SelectOptionsApiController {
 
     GenericApiService genericApiService;
     GlAccountService glAccountService;
+    UserService userService
 
     def glAccountOptions = {
         List<GlAccount> glAccounts = glAccountService.getGlAccounts(params).collect {
@@ -63,6 +66,11 @@ class SelectOptionsApiController {
             [id: it.id, label: it.name, value: it.id ]
         }
         render([data: paymentTerms] as JSON)
+    }
+
+    def usersOptions = {
+        List<User> users = userService.findUsers(params)
+        render([data: users] as JSON)
     }
 
 }

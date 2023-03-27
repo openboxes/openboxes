@@ -20,7 +20,7 @@ import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { convertToBase64 } from 'utils/file-utils';
 import { renderFormField } from 'utils/form-utils';
-import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -141,8 +141,8 @@ const FIELDS = {
       labelKey: 'name',
       filterOptions: options => options,
     },
-    getDynamicAttr: ({ debouncedUsersFetch }) => ({
-      loadOptions: debouncedUsersFetch,
+    getDynamicAttr: ({ debouncedPeopleFetch }) => ({
+      loadOptions: debouncedPeopleFetch,
     }),
   },
 };
@@ -191,8 +191,8 @@ class LocationDetails extends Component {
     };
     this.openNewOrganizationModal = this.openNewOrganizationModal.bind(this);
     this.openNewLocationGroupModal = this.openNewLocationGroupModal.bind(this);
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedLocationGroupsFetch =
       debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -454,7 +454,7 @@ class LocationDetails extends Component {
                         active: values.active,
                         debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
                         debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                        debouncedUsersFetch: this.debouncedUsersFetch,
+                        debouncedPeopleFetch: this.debouncedPeopleFetch,
                         openNewOrganizationModal: this.openNewOrganizationModal,
                         openNewLocationGroupModal: this.openNewLocationGroupModal,
                         injectionData: this.state.supportLinks,
