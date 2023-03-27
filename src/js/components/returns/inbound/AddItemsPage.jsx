@@ -54,17 +54,19 @@ const FIELDS = {
     arrowsNavigation: true,
     addButton: ({
       // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder,
+      addRow, getSortOrder, values, updateFormValues,
     }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        onClick={() => addRow({
-          sortOrder: getSortOrder(),
-        })}
-      ><span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
-      </button>
-    ),
+        onClick={() => {
+          const row = { sortOrder: getSortOrder() };
+          addRow(row);
+          updateFormValues(update(values, { returnItems: { $push: [row] } }));
+        }}
+      >
+        <span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
+      </button>),
     fields: {
       product: {
         type: ProductSelectField,
@@ -74,7 +76,7 @@ const FIELDS = {
         flexWidth: '4',
         required: true,
         getDynamicAttr: ({
-          updateRow, rowIndex, values, originId, focusField,
+          updateFormValues, rowIndex, values, originId, focusField,
         }) => ({
           locationId: originId,
           onExactProductSelected: ({ product }) => {
@@ -82,7 +84,7 @@ const FIELDS = {
               focusField(rowIndex, 'quantity');
             }
           },
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => updateFormValues(values),
         }),
       },
       lotNumber: {
@@ -90,8 +92,8 @@ const FIELDS = {
         label: 'react.inboundReturns.lot.label',
         defaultMessage: 'Lot',
         flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+        getDynamicAttr: ({ values, updateFormValues }) => ({
+          onBlur: () => updateFormValues(values),
         }),
       },
       expirationDate: {
@@ -104,8 +106,8 @@ const FIELDS = {
           autoComplete: 'off',
           placeholderText: 'MM/DD/YYYY',
         },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+        getDynamicAttr: ({ values, updateFormValues }) => ({
+          onBlur: () => updateFormValues(values),
         }),
       },
       quantity: {
@@ -117,8 +119,8 @@ const FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+        getDynamicAttr: ({ values, updateFormValues }) => ({
+          onBlur: () => updateFormValues(values),
         }),
       },
       recipient: {
@@ -127,7 +129,7 @@ const FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder, updateRow, values,
+          recipients, addRow, rowCount, rowIndex, getSortOrder, updateFormValues, values,
         }) => ({
           options: recipients,
           onTabPress: rowCount === rowIndex + 1 ? () =>
@@ -136,7 +138,7 @@ const FIELDS = {
             addRow({ sortOrder: getSortOrder() }) : null,
           arrowDown: rowCount === rowIndex + 1 ? () =>
             addRow({ sortOrder: getSortOrder() }) : null,
-          onBlur: () => updateRow(values, rowIndex),
+          onBlur: () => updateFormValues(values),
         }),
         attributes: {
           labelKey: 'name',
@@ -163,7 +165,7 @@ class AddItemsPage extends Component {
     this.getSortOrder = this.getSortOrder.bind(this);
     this.confirmSave = this.confirmSave.bind(this);
     this.validate = this.validate.bind(this);
-    this.updateRow = this.updateRow.bind(this);
+    this.updateFormValues = this.updateFormValues.bind(this);
   }
 
   componentDidMount() {
@@ -190,13 +192,8 @@ class AddItemsPage extends Component {
     return this.state.sortOrder;
   }
 
-  updateRow(values, index) {
-    const item = values.returnItems[index];
-    this.setState({
-      formValues: update(values, {
-        returnItems: { [index]: { $set: item } },
-      }),
-    });
+  updateFormValues(values) {
+    this.setState({ formValues: values });
   }
 
   dataFetched = false;
@@ -478,7 +475,7 @@ class AddItemsPage extends Component {
                     recipients: this.props.recipients,
                     removeItem: this.removeItem,
                     getSortOrder: this.getSortOrder,
-                    updateRow: this.updateRow,
+                    updateFormValues: this.updateFormValues,
                     originId: this.props.initialValues.origin.id,
                     values,
                   }))}

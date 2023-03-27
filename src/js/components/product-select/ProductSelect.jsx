@@ -76,13 +76,15 @@ const ProductSelect = ({
         if (matchedByProductCode) exactMatchProduct = matchedByProductCode;
       }
 
-      if (onExactProductSelected) {
-        onExactProductSelected({ product: exactMatchProduct });
-      }
       if (exactMatchProduct) {
         selectRef.current.select.select.setValue(exactMatchProduct);
       }
-
+      if (onExactProductSelected) {
+        /* There are cases when we want to call this callback right after the state change.
+         * Wrapping this callback inside a setTimeout puts it in an event que just like the setState
+         * unlike the regular code which is being executed immediately. */
+        setTimeout(() => onExactProductSelected({ product: exactMatchProduct }), 0);
+      }
       setIsExactMatch(false);
       setLoadedOptions([]);
     }
