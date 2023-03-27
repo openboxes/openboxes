@@ -16,6 +16,7 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
+import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.receiving.ReceiptItem
@@ -25,6 +26,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 class ProductMergeService {
 
     def inventoryService
+    def invoiceService
     def productAvailabilityService
     def requisitionService
 
@@ -54,6 +56,7 @@ class ProductMergeService {
          * - ShipmentItem
          * - OrderItem
          * - ReceiptItem
+         * - InvoiceItem
          *
          * === Ignored relations (see: https://pihemr.atlassian.net/browse/OBPIH-3187 description) ===
          * - Document
@@ -352,6 +355,20 @@ class ProductMergeService {
             obsoleteReceiptItem.save(flush: true)
         }
 
+        // 4.5 InvoiceItem
+        def invoiceItemCriteria = InvoiceItem.createCriteria()
+        List<InvoiceItem> obsoleteInvoiceItems = getRelatedObjectsForProduct(invoiceItemCriteria, obsolete, false)
+        log.info "Moving ${obsoleteInvoiceItems?.size() ?: 0} Invoice items"
+        obsoleteInvoiceItems?.each { InvoiceItem obsoleteInvoiceItem ->
+            logProductMergeData(primary, obsolete, obsoleteInvoiceItem)
+
+            // Swap product
+            obsoleteInvoiceItem.product = primary
+
+            // Note: needs flush because of "User.locationRoles not processed by flush"
+            obsoleteInvoiceItem.save(flush: true)
+        }
+
         /**
          * V. FINAL PROCESSING
          * */
@@ -410,15 +427,25 @@ class ProductMergeService {
     }
 
     /**
-     * For getting RequisitionItems, ShipmentItems, OrderItems, ReceiptItems, TransactionEntries, by given product
-     * under product or inventoryItem.product
+     * For getting related object by given product under product or inventoryItem.product (used for RequisitionItems,
+     * ShipmentItems, OrderItems, ReceiptItems, TransactionEntries)
      * */
     def getRelatedObjectsForProduct(def criteria, Product product) {
+        getRelatedObjectsForProduct(criteria, product, true)
+    }
+
+    /**
+     * For getting related objects by given product under product or inventoryItem.product (if that related object
+     * has inventory item)
+     * */
+    def getRelatedObjectsForProduct(def criteria, Product product, boolean hasInventoryItem) {
         criteria.list {
             or {
                 eq("product", product)
-                inventoryItem {
-                    eq("product", product)
+                if (hasInventoryItem) {
+                    inventoryItem {
+                        eq("product", product)
+                    }
                 }
             }
         }
@@ -482,6 +509,13 @@ class ProductMergeService {
             def obsoletePendingRequisitions = obsoleteRequisitionItems.requisition?.unique()?.requestNumber
             throw new IllegalArgumentException("Obsolete product has pending stock movements or requisitions (${obsoletePendingRequisitions?.join(', ')}). " +
                 "Please finish or cancel these stock movements or requisitions before merging products.")
+        }
+        
+        def pendingInvoiceItems = invoiceService.getPendingInvoiceItems(obsolete)
+        if (pendingInvoiceItems.size() > 0) {
+            def pendingInvoiceNumbers = pendingInvoiceItems.invoice?.unique()?.invoiceNumber
+            throw new IllegalArgumentException("Obsolete product has pending invoices (${pendingInvoiceNumbers?.join(', ')}). " +
+                "Please post these invoices before merging products.")
         }
     }
 }

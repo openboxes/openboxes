@@ -395,4 +395,14 @@ class InvoiceService {
         invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
     }
+
+    List<InvoiceItem> getPendingInvoiceItems(Product product) {
+        return InvoiceItem.createCriteria().list() {
+            invoice {
+                isNull("datePaid")
+                isNull("datePosted")
+            }
+            eq("product", product)
+        }
+    }
 }
