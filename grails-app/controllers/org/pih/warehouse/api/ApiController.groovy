@@ -165,6 +165,7 @@ class ApiController {
         def logoUrl = location?.logo ? "${createLink(controller: 'location', action: 'viewLogo', id: location?.id)}" : grailsApplication.config.openboxes.logo.url
         def locales = grailsApplication.config.openboxes.locale.supportedLocales
         def browserConnectionTimeout = grailsApplication.config.openboxes.browser.connection.status.timeout
+        def isAutosaveEnabled = grailsApplication.config.openboxes.autosave.enabled
         def supportedLocales = locales.collect {
             def name = new Locale(it).getDisplayName()
             [code: it, name: name]
@@ -210,7 +211,8 @@ class ApiController {
                 displayDateFormat        : displayDateFormat,
                 displayDateDefaultValue  : displayDateDefaultValue,
                 notificationAutohideDelay: notificationAutohideDelay,
-                browserConnectionTimeout : browserConnectionTimeout
+                browserConnectionTimeout : browserConnectionTimeout,
+                isAutosaveEnabled        : isAutosaveEnabled
             ],
         ] as JSON)
     }

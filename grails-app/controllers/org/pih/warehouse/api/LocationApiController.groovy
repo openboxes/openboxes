@@ -133,12 +133,7 @@ class LocationApiController extends BaseDomainApiController {
 
     def supportedActivities = {
         boolean isAutosaveSupported = grailsApplication.config.openboxes.autosave.enabled
-        def data = ActivityCode.list()
-
-        if (!isAutosaveSupported) {
-            data.removeAll { it == ActivityCode.AUTOSAVE }
-        }
-
+        def data = isAutosaveSupported ? ActivityCode.listWithAutosave() : ActivityCode.list()
         render ([data: data.collect { it.name() }] as JSON)
     }
 

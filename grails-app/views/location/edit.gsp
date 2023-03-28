@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.LocationTypeCode; org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode; org.pih.warehouse.core.LocationTypeCode; org.pih.warehouse.core.Location" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -301,7 +301,7 @@
                                     </g:else>
 
                                     <g:set var="activityList"
-                                           value="${org.pih.warehouse.core.ActivityCode.list()}"/>
+                                           value="${grailsApplication.config.openboxes.autosave.enabled ? ActivityCode.listWithAutosave() : ActivityCode.list()}"/>
                                     <div class="buttons button-group right">
                                         <g:link controller="locationType" action="edit"
                                                 id="${locationInstance?.locationType?.id}"

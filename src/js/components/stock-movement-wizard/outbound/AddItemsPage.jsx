@@ -394,19 +394,23 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
-    // Here I am changing rowSaveStatus from PENDING to SAVING
-    // because all of these lines were sent to save
-    this.setState(previousState => ({
-      values: {
-        ...previousState.values,
-        lineItems: previousState.values.lineItems.map((item) => {
-          if (item.rowSaveStatus === RowSaveStatus.PENDING) {
-            return { ...item, rowSaveStatus: RowSaveStatus.SAVING };
-          }
-          return item;
-        }),
-      },
-    }));
+
+    if (this.props.isAutosaveEnabled) {
+      // Here I am changing rowSaveStatus from PENDING to SAVING
+      // because all of these lines were sent to save
+      this.setState(previousState => ({
+        values: {
+          ...previousState.values,
+          lineItems: previousState.values.lineItems.map((item) => {
+            if (item.rowSaveStatus === RowSaveStatus.PENDING) {
+              return { ...item, rowSaveStatus: RowSaveStatus.SAVING };
+            }
+            return item;
+          }),
+        },
+      }));
+    }
+
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -431,7 +435,11 @@ class AddItemsPage extends Component {
         key => key !== 'product',
       );
 
-      if (newQty === oldQty && newRecipient === oldRecipient) {
+      if (
+        newQty === oldQty &&
+        newRecipient === oldRecipient &&
+        this.props.isAutosaveEnabled
+      ) {
         this.setState(prev => ({
           values: {
             ...prev.values,
@@ -1019,7 +1027,7 @@ class AddItemsPage extends Component {
   saveItems(lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItemsInCurrentStepWithoutAutosave(lineItems)
+    this.saveRequisitionItemsInCurrentStep(lineItems)
       .then(() => {
         this.fetchLineItems();
         this.props.removeStockMovementDraft(this.state.values.stockMovementId);
@@ -1419,7 +1427,7 @@ const mapStateToProps = (state, ownProps) => ({
   pageSize: state.session.pageSize,
   savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
   isOnline: state.connection.online,
-  isAutosaveEnabled: state.session.supportedActivities.includes(ActivityCode.AUTOSAVE),
+  isAutosaveEnabled: state.session.isAutosaveEnabled,
 });
 
 const mapDispatchToProps = {

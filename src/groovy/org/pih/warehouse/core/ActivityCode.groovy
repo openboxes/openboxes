@@ -90,9 +90,12 @@ enum ActivityCode {
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,
                 SUBMIT_REQUEST,
-                DYNAMIC_CREATION,
-                AUTOSAVE
+                DYNAMIC_CREATION
         ]
+    }
+
+    static listWithAutosave() {
+        list() + AUTOSAVE
     }
 
     static binTrackingList() {
