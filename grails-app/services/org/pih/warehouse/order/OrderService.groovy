@@ -107,8 +107,13 @@ class OrderService {
                         eq("createdBy.id", params.createdBy)
                     }
                     if (params.paymentTerm) {
-                        paymentTerm {
-                            'in'("id", params.list("paymentTerm"))
+                        or {
+                            if (params.list("paymentTerm").find{ it.equalsIgnoreCase("null")}) {
+                                isNull("paymentTerm")
+                            }
+                            paymentTerm {
+                                'in'("id", params.list("paymentTerm"))
+                            }
                         }
                     }
                 }

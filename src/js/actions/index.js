@@ -426,16 +426,21 @@ export function fetchPurchaseOrderStatuses() {
   };
 }
 
-export function fetchPaymentTerms() {
-  return (dispatch) => {
-    purchaseOrderApi.getPaymentTerms().then((res) => {
-      dispatch({
-        type: FETCH_PAYMENT_TERMS,
-        payload: res.data.data,
-      });
-    });
+export const fetchPaymentTerms = ({ translate }) => async (dispatch) => {
+  const blankPaymentTermOption = {
+    id: 'null',
+    value: 'null',
+    label: translate?.(
+      'react.purchaseOrder.column.blankPaymentTermOption.label',
+      'Blank Payment Term',
+    ),
   };
-}
+  const response = await purchaseOrderApi.getPaymentTerms();
+  return dispatch({
+    type: FETCH_PAYMENT_TERMS,
+    payload: [blankPaymentTermOption, ...response?.data?.data],
+  });
+};
 
 export function fetchSuppliers(active = false) {
   return (dispatch) => {

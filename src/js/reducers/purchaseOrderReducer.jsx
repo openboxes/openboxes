@@ -2,6 +2,7 @@ import { FETCH_PAYMENT_TERMS, FETCH_PURCHASE_ORDER_STATUSES } from 'actions/type
 
 const initialState = {
   statuses: [],
+  paymentTerms: [],
 };
 
 export default function purchaseOrderReducer(state = initialState, action) {
