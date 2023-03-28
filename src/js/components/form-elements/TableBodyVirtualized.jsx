@@ -40,9 +40,13 @@ class TableBodyVirtualized extends Component {
       height = fields.value.reduce((acc, field) => {
         const dynamicAttr = getDynamicRowAttr ?
           getDynamicRowAttr({ ...properties, rowValues: field }) : {};
-        if (dynamicAttr.hideRow || height > maxTableHeight) {
+        // If a row is supposed to be hidden or the height is already higher than max height,
+        // return this height without increasing it
+        if (dynamicAttr.hideRow || acc > maxTableHeight) {
           return acc;
         }
+        // If a row is not hidden and height has not yet reached maximum,
+        // increase it by the row height
         return acc + ROW_HEIGHT;
       }, height);
     } else {
