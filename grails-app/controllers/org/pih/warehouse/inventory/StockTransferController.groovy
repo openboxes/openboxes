@@ -10,14 +10,11 @@
 
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.api.NotificationType
+import grails.converters.JSON
+
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderType
-import org.pih.warehouse.order.OrderTypeCode
-import org.pih.warehouse.shipping.Shipment
 
 class StockTransferController {
 
@@ -100,17 +97,17 @@ class StockTransferController {
 
         try {
             stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
-            params.notificationMessage = g.message(
+            flash.message = g.message(
                     code: 'react.stockMovement.deleted.success.message.label',
                     body: 'Stock Movement has been deleted successfully',
             )
-            params.notificationType = NotificationType.SUCCESS
         } catch (Exception e) {
             flash.message = "${warehouse.message(code: 'stockMovement.delete.error.message')}"
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
         }
 
+        params = params << ["flash": flash as JSON]
         if (direction == StockMovementDirection.INBOUND) {
             params.direction = StockMovementDirection.INBOUND
             redirect(controller: "stockMovement", action: "list", params: params)

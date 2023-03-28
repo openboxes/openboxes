@@ -12,7 +12,7 @@ import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
 import Loading from 'components/Loading';
 import useConnectionListener from 'hooks/useConnectionListener';
-import NotificationListenerWrapper from 'wrappers/NotificationListenerWrapper';
+import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
 import 'react-s-alert/dist/s-alert-default.css';
 import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
@@ -188,7 +188,7 @@ const Router = (props) => {
   return (
     <div>
       <BrowserRouter>
-        <NotificationListenerWrapper>
+        <FlashScopeListenerWrapper>
           <Switch>
             <MainLayoutRoute path="/**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="/**/stockMovement/list" component={StockMovementList} />
@@ -223,7 +223,7 @@ const Router = (props) => {
             <MainLayoutRoute path="/**/dashboard/:configId?" component={Dashboard} />
             <MainLayoutRoute path="/**/" component={Dashboard} />
           </Switch>
-        </NotificationListenerWrapper>
+        </FlashScopeListenerWrapper>
       </BrowserRouter>
       <div className="spinner-container">
         <ClimbingBoxLoader
