@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import queryString from 'query-string';
-import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -10,7 +9,6 @@ import filterFields from 'components/purchaseOrder/FilterFields';
 import usePurchaseOrderFiltersCleaner from 'hooks/list-pages/purchase-order/usePurchaseOrderFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
-import { translateWithDefaultMessage } from 'utils/Translate';
 
 const usePurchaseOrderFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -27,9 +25,7 @@ const usePurchaseOrderFilters = () => {
     paymentTerms,
     currentUser,
     currentLocale,
-    translate,
   } = useSelector(state => ({
-    translate: translateWithDefaultMessage(getTranslate(state.localize)),
     supportedActivities: state.session.supportedActivities,
     buyers: state.organizations.buyers,
     currentLocation: state.session.currentLocation,
@@ -50,7 +46,7 @@ const usePurchaseOrderFilters = () => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
     dispatch(fetchPurchaseOrderStatuses());
-    dispatch(fetchPaymentTerms({ translate }));
+    dispatch(fetchPaymentTerms());
   }, [currentLocale]);
 
   const clearFilterValues = () => {

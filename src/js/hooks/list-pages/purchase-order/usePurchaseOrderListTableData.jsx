@@ -35,7 +35,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
         max: `${state.pageSize}`,
         ...sortingParams,
         ...filterParams,
-        paymentTerm: paymentTerm && paymentTerm.map(term => term.id),
+        paymentTerm: paymentTerm && paymentTerm.map(({ id }) => id),
         status: status && status.map(statusElement => statusElement.value),
         origin: origin?.id,
         orderedBy: orderedBy?.id,

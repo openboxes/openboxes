@@ -65,7 +65,12 @@ class SelectOptionsApiController {
         List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {
             [id: it.id, label: it.name, value: it.id ]
         }
-        render([data: paymentTerms] as JSON)
+        Map blankPaymentTermOption = [
+                id: 'null',
+                value: 'null',
+                label: g.message(code: 'paymentTerms.option.blank.label', default: 'Blank Payment Term'),
+        ]
+        render([data: [blankPaymentTermOption] + paymentTerms] as JSON)
     }
 
     def usersOptions = {

@@ -426,19 +426,11 @@ export function fetchPurchaseOrderStatuses() {
   };
 }
 
-export const fetchPaymentTerms = ({ translate }) => async (dispatch) => {
-  const blankPaymentTermOption = {
-    id: 'null',
-    value: 'null',
-    label: translate?.(
-      'react.purchaseOrder.column.blankPaymentTermOption.label',
-      'Blank Payment Term',
-    ),
-  };
+export const fetchPaymentTerms = () => async (dispatch) => {
   const response = await purchaseOrderApi.getPaymentTerms();
   return dispatch({
     type: FETCH_PAYMENT_TERMS,
-    payload: [blankPaymentTermOption, ...response?.data?.data],
+    payload: response?.data?.data,
   });
 };
 
