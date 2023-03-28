@@ -1309,7 +1309,7 @@ openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 openboxes.client.notification.autohide.delay = 8000
 
 // Autosave configuration
-openboxes.autosave.enabled = true
+openboxes.autosave.enabled = false
 
 // Global megamenu configuration
 

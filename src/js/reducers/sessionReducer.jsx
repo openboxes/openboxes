@@ -82,6 +82,11 @@ const initialState = {
   isAutosaveEnabled: false,
 };
 
+const isAutosaveSupported = (payload) => {
+  const { isAutosaveEnabled, supportedActivities } = payload?.payload?.data?.data;
+  return isAutosaveEnabled && supportedActivities.includes(ActivityCode.AUTOSAVE);
+};
+
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_SESSION_INFO:
@@ -123,8 +128,7 @@ export default function (state = initialState, action) {
         displayDateDefaultValue: _.get(action, 'payload.data.data.displayDateDefaultValue', '-'),
         notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
-        isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled') &&
-          _.includes(_.get(action, 'payload.data.data.supportedActivities'), ActivityCode.AUTOSAVE),
+        isAutosaveEnabled: isAutosaveSupported(action),
       };
     case FETCH_MENU_CONFIG:
       return {
