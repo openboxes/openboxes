@@ -13,8 +13,8 @@ const useFlashScopeListener = () => {
   const parsedQuerySearch = queryString.parse(search);
   const { flash } = parsedQuerySearch;
 
-  const clearQuerySearch = (...pathToSkip) => {
-    const clearedQuerySearch = _.omit(parsedQuerySearch, pathToSkip);
+  const clearQuerySearch = (...pathToOmit) => {
+    const clearedQuerySearch = _.omit(parsedQuerySearch, pathToOmit);
     const parsedClearedQuerySearch = queryString.stringify(clearedQuerySearch);
     history.replace({
       search: parsedClearedQuerySearch,
