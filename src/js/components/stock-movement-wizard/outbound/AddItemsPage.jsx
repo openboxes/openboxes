@@ -776,16 +776,6 @@ class AddItemsPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  transitionToNextStep2() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
-    const payload = { status: 'REQUESTED' };
-
-    if (this.state.values.statusCode === 'CREATED') {
-      return apiClient.post(url, payload);
-    }
-    return Promise.resolve();
-  }
-
   /**
    * Saves list of stock movement items with post method.
    * @param {object} lineItems
@@ -839,7 +829,7 @@ class AddItemsPage extends Component {
           // In autosave, we don't modify the state, because
           // lines which have not passed the validation will be
           // deleted during users work
-          if (!withStateChange && this.props.isAutosaveEnabled) {
+          if (!withStateChange) {
             // We want to disable saved line, so I am looking for product with the same
             // code and quantity higher than 0 in response
             // (to avoid disabling new line with the same productCode)
