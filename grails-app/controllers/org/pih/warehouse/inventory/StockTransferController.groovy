@@ -107,15 +107,14 @@ class StockTransferController {
             return
         }
 
-        params = params << ["flash": flash as JSON]
         if (direction == StockMovementDirection.INBOUND) {
             params.direction = StockMovementDirection.INBOUND
-            redirect(controller: "stockMovement", action: "list", params: params)
+            redirect(controller: "stockMovement", action: "list", params: params << ["flash": flash as JSON])
         } else if (direction == StockMovementDirection.OUTBOUND) {
             params.direction = StockMovementDirection.OUTBOUND
-            redirect(controller: "stockMovement", action: "list", params: params)
+            redirect(controller: "stockMovement", action: "list", params: params << ["flash": flash as JSON])
         } else {
-            redirect(action: "list", params: params)
+            redirect(action: "list", params: params << ["flash": flash as JSON])
         }
     }
 
