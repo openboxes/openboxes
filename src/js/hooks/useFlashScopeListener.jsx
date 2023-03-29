@@ -25,9 +25,12 @@ const useFlashScopeListener = () => {
     if (!flash) {
       return;
     }
-    const { message } = JSON.parse(flash);
+    const { message, error } = JSON.parse(flash);
     if (message) {
       notification(NotificationType.SUCCESS)({ message });
+    }
+    if (error) {
+      notification(NotificationType.ERROR)({ error });
     }
     clearQuerySearch('flash');
   }, []);
