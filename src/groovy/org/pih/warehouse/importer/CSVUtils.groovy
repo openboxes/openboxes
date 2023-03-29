@@ -9,6 +9,7 @@
  */
 package org.pih.warehouse.importer
 
+import au.com.bytecode.opencsv.CSVParser
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
@@ -148,5 +149,17 @@ class CSVUtils {
      */
     static CSVPrinter getCSVPrinter() {
         return new CSVPrinter(new StringBuilder(), CSVFormat.DEFAULT)
+    }
+
+    /**
+    * Return a CSV separator character based on provided data and expected number of column
+    * */
+    static char getSeparator(String text, Integer columNumber) {
+        def otherSeparator = ';'
+        String firstLine = text.split("\\r?\\n").first()
+        if (firstLine.contains(otherSeparator) && firstLine.split(otherSeparator).size() == columNumber) {
+            return otherSeparator
+        }
+        return CSVParser.DEFAULT_SEPARATOR
     }
 }

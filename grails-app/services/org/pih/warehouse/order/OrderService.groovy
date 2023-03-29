@@ -888,10 +888,7 @@ class OrderService {
 
         List orderItems = []
 
-        try {
-            def settings = [skipLines: 1]
-            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
-            csvMapReader.fieldKeys = [
+        def fieldKeys = [
                 'id',
                 'productCode',
                 'productName',
@@ -908,7 +905,14 @@ class OrderService {
                 'estimatedReadyDate',
                 'actualReadyDate',
                 'budgetCode'
-            ]
+        ]
+
+        char dataSeparator =  CSVUtils.getSeparator(text, fieldKeys.size())
+
+        try {
+            def settings = [skipLines: 1, separatorChar: dataSeparator]
+            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
+            csvMapReader.fieldKeys = fieldKeys
             orderItems = csvMapReader.toList()
 
         } catch (Exception e) {
