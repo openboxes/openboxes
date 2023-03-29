@@ -86,7 +86,7 @@
                                         <g:sortableColumn property="locationGroup" title="${warehouse.message(code: 'location.locationGroup.label')}" class="bottom"/>
                                         <g:sortableColumn property="status" title="${warehouse.message(code: 'location.status.label')}" class="bottom"/>
                                         <th class="bottom"><span class="vertical-text"><warehouse:message code="warehouse.active.label" /></span></th>
-                                        <g:each var="activity" in="${grailsApplication.config.openboxes.autosave.enabled ? ActivityCode.listWithAutosave() : ActivityCode.list()}">
+                                        <g:each var="activity" in="${ActivityCode.list()}">
                                             <th class="bottom">
                                                 <span class="vertical-text"><warehouse:message code="enum.ActivityCode.${activity}"/></span>
                                             </th>
@@ -122,7 +122,7 @@
                                                 </g:else>
 
                                             </td>
-                                            <g:each var="activity" in="${grailsApplication.config.openboxes.autosave.enabled ? ActivityCode.listWithAutosave() : ActivityCode.list()}">
+                                            <g:each var="activity" in="${ActivityCode.list()}">
                                                 <td class="left middle">
                                                     <g:if test="${locationInstance?.supports(activity) }">
                                                         <img class="middle" src="${createLinkTo(dir:'images/icons/silk',file:'tick.png')}" alt="${warehouse.message(code: 'default.yes.label') }" title="${warehouse.message(code: 'default.yes.label') }"/>

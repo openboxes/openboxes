@@ -8,7 +8,6 @@ import {
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
-import ActivityCode from 'consts/activityCode';
 
 const initialState = {
   currentLocation: {
@@ -82,11 +81,6 @@ const initialState = {
   isAutosaveEnabled: false,
 };
 
-const isAutosaveSupported = (payload) => {
-  const { isAutosaveEnabled, supportedActivities } = payload?.payload?.data?.data;
-  return isAutosaveEnabled && supportedActivities.includes(ActivityCode.AUTOSAVE);
-};
-
 export default function (state = initialState, action) {
   switch (action.type) {
     case FETCH_SESSION_INFO:
@@ -128,7 +122,7 @@ export default function (state = initialState, action) {
         displayDateDefaultValue: _.get(action, 'payload.data.data.displayDateDefaultValue', '-'),
         notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
-        isAutosaveEnabled: isAutosaveSupported(action),
+        isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled', false),
       };
     case FETCH_MENU_CONFIG:
       return {

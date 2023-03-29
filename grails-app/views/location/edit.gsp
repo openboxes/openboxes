@@ -301,7 +301,7 @@
                                     </g:else>
 
                                     <g:set var="activityList"
-                                           value="${grailsApplication.config.openboxes.autosave.enabled ? ActivityCode.listWithAutosave() : ActivityCode.list()}"/>
+                                           value="${ActivityCode.list()}"/>
                                     <div class="buttons button-group right">
                                         <g:link controller="locationType" action="edit"
                                                 id="${locationInstance?.locationType?.id}"
