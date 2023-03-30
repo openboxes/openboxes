@@ -327,7 +327,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
 		// FIXME Export code appends column delimiter for every column (even the last)
 		def expectedHeader = Constants.EXPORT_PRODUCT_COLUMNS.join(",").replace("\n", "") + ","
-		def actualHeader = lines[0]
+		def actualHeader = lines[0].replace("\uFEFF", "")
 		assertNotNull lines
 		assertEquals expectedHeader, actualHeader
 	}
@@ -340,7 +340,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		def lines = csv.split(/[\r\n]/)
 
 		// Remove quotes
-		def columns = lines[0].replaceAll("\"", "").split(",")
+		def columns = lines[0].replaceAll("\"|\uFEFF", "").split(",")
 		println columns
 		columns.eachWithIndex { String entry, int i ->
 			assertEquals Constants.EXPORT_PRODUCT_COLUMNS[i], entry

@@ -177,4 +177,8 @@ class CSVUtils {
         }
         return Constants.DEFAULT_COLUMN_SEPARATOR;
     }
+
+    static String addBOMToCSVString(String csvString) {
+        return '\uFEFF' + csvString
+    }
 }

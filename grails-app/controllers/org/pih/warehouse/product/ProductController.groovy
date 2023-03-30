@@ -782,7 +782,7 @@ class ProductController {
                     "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
             println "export products: " + csv
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             response.sendError(404)
         }
@@ -800,7 +800,7 @@ class ProductController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             render(text: 'No products found', status: 404)
         }

@@ -18,6 +18,7 @@ import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.inventory.Inventory
@@ -525,7 +526,7 @@ class DataService {
                     unitOfMeasure     : inventoryLevel?.product?.unitOfMeasure ?: "EA"
             ]
         }
-        return csv.writer.toString()
+        return CSVUtils.addBOMToCSVString(csv.writer.toString())
     }
 
 
@@ -612,7 +613,7 @@ class DataService {
             ]
             csvWriter << row
         }
-        return sw.toString()
+        return CSVUtils.addBOMToCSVString(sw.toString())
     }
 
     String exportRequisitionItems(requisitions) {
@@ -668,7 +669,7 @@ class DataService {
                 csvWriter << row
             }
         }
-        return sw.toString()
+        return CSVUtils.addBOMToCSVString(sw.toString())
     }
 
     def transformObjects(List objects, List includeFields) {
@@ -730,7 +731,7 @@ class DataService {
                 sw.append("\n")
             }
         }
-        return sw.toString()
+        return CSVUtils.addBOMToCSVString(sw.toString())
     }
 
 }

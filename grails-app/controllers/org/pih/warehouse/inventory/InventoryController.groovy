@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -248,7 +249,7 @@ class InventoryController {
                 response.contentType = "text/csv"
                 def csv = inventoryService.exportBaselineQoH(command.products, quantityMapByDate)
                 println "export products: " + csv
-                render csv
+                render(contentType: "text/csv", text:  csv, encoding: "UTF-8")
             } else {
                 render(text: 'No products found', status: 404)
             }
@@ -633,7 +634,7 @@ class InventoryController {
             csv += "\n"
         }
 
-        render(contentType: "text/csv", text: csv)
+        render(contentType: "text/csv", text: CSVUtils.addBOMToCSVString(csv))
     }
 
     def listQuantityOnHandZero = {
@@ -797,7 +798,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return csv
+        return CSVUtils.addBOMToCSVString(csv)
     }
 
     def getCsvForProductMap(inventoryItems) {
@@ -848,7 +849,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return csv
+        return CSVUtils.addBOMToCSVString(csv)
     }
 
 
