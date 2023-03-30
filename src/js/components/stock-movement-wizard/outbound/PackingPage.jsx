@@ -13,6 +13,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
+import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
@@ -40,6 +41,10 @@ const FIELDS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    getDynamicRowAttr: ({ rowValues, itemFilter }) => {
+      const hideRow = itemFilter && !rowValues?.productCode.includes(itemFilter);
+      return { hideRow };
+    },
     fields: {
       productCode: {
         type: LabelField,
@@ -199,6 +204,7 @@ class PackingPage extends Component {
       isFirstPageLoaded: false,
       showAlert: false,
       alertMessage: '',
+      itemFilter: '',
     };
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
@@ -452,6 +458,7 @@ class PackingPage extends Component {
 
   render() {
     const { showOnly } = this.props;
+    const { itemFilter } = this.state;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -463,6 +470,11 @@ class PackingPage extends Component {
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
+                <FilterInput
+                  itemFilter={itemFilter}
+                  onChange={e => this.setState({ itemFilter: e.target.value })}
+                  onClear={() => this.setState({ itemFilter: '' })}
+                />
                 <button
                   type="button"
                   onClick={() => this.refresh()}
@@ -513,6 +525,7 @@ class PackingPage extends Component {
                   isPaginated: this.props.isPaginated,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   showOnly,
+                  itemFilter,
                 }))}
               </div>
               <div className="submit-buttons">

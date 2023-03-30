@@ -15,6 +15,7 @@ import Alert from 'react-s-alert';
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
+import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
@@ -641,24 +642,11 @@ class PickPage extends Component {
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
-                <div className="d-flex mr-auto justify-content-center align-items-center">
-                  <input
-                    value={itemFilter}
-                    onChange={event => this.setState({ itemFilter: event.target.value })}
-                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
-                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
-                  />
-                  {itemFilter &&
-                    <i
-                      role="button"
-                      className="fa fa-times-circle"
-                      style={{ color: 'grey', cursor: 'pointer' }}
-                      onClick={() => this.setState({ itemFilter: '' })}
-                      onKeyPress={() => this.setState({ itemFilter: '' })}
-                      tabIndex={0}
-                    />
-                  }
-                </div>
+                <FilterInput
+                  itemFilter={itemFilter}
+                  onChange={e => this.setState({ itemFilter: e.target.value })}
+                  onClear={() => this.setState({ itemFilter: '' })}
+                />
                 <label
                   htmlFor="csvInput"
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"

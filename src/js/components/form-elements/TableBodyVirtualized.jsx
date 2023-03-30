@@ -10,6 +10,9 @@ import TableRow from 'components/form-elements/TableRow';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 
+const ROW_HEIGHT = 28;
+
+
 class TableBodyVirtualized extends Component {
   constructor(props) {
     super(props);
@@ -28,18 +31,24 @@ class TableBodyVirtualized extends Component {
 
   getHeight() {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
-    const { totalCount } = properties;
     let height = 0;
     const maxTableHeight = window.innerHeight < 900 ?
       // 0.35 * window.innerHeight = 35vh from table-content class in StockMovement.scss
       0.35 * window.innerHeight : 0.40 * window.innerHeight;
 
     if (!subfieldKey) {
-      if (totalCount * 28 > maxTableHeight) {
-        height = maxTableHeight;
-      } else if (totalCount > 0) {
-        height = totalCount * 28;
-      }
+      height = fields.value.reduce((acc, field) => {
+        const dynamicAttr = getDynamicRowAttr ?
+          getDynamicRowAttr({ ...properties, rowValues: field }) : {};
+        // If a row is supposed to be hidden or the height is already higher than max height,
+        // return this height without increasing it
+        if (dynamicAttr.hideRow || acc > maxTableHeight) {
+          return acc;
+        }
+        // If a row is not hidden and height has not yet reached maximum,
+        // increase it by the row height
+        return acc + ROW_HEIGHT;
+      }, height);
     } else {
       _.forEach(fields.value, (field) => {
         const dynamicAttr = getDynamicRowAttr ?
@@ -51,44 +60,44 @@ class TableBodyVirtualized extends Component {
         }
 
         if (!height) {
-          height = 28 * (subfields.length + 1);
-        } else if (height + (28 * (subfields.length + 1)) > maxTableHeight) {
+          height = ROW_HEIGHT * (subfields.length + 1);
+        } else if (height + (ROW_HEIGHT * (subfields.length + 1)) > maxTableHeight) {
           height = maxTableHeight;
         } else {
-          height += (28 * (subfields.length + 1));
+          height += (ROW_HEIGHT * (subfields.length + 1));
         }
       });
     }
-
-    return height || 28;
+    return height || ROW_HEIGHT;
   }
 
   getRowHeight({ index }) {
     const { fieldsConfig: { subfieldKey, getDynamicRowAttr }, fields, properties } = this.props;
+    const rowValues = fields?.value?.[index];
 
-    if (!subfieldKey) {
-      return 28;
-    }
-
-    const rowValues = fields.value ? fields.value[index] : null;
-    const subfields = rowValues ? rowValues[subfieldKey] : null;
-
-    if (!subfields) {
-      return 28;
-    }
-
-    const dynamicAttr = getDynamicRowAttr ?
+    const dynamicAttr = getDynamicRowAttr && rowValues ?
       getDynamicRowAttr({ ...properties, index, rowValues }) : {};
 
     if (dynamicAttr.hideRow) {
       return 0;
     }
 
-    if (dynamicAttr.hideSubfields) {
-      return 28;
+    if (!subfieldKey) {
+      return ROW_HEIGHT;
     }
 
-    return 28 * (subfields.length + 1);
+
+    const subfields = rowValues ? rowValues[subfieldKey] : null;
+
+    if (!subfields) {
+      return ROW_HEIGHT;
+    }
+
+    if (dynamicAttr.hideSubfields) {
+      return ROW_HEIGHT;
+    }
+
+    return ROW_HEIGHT * (subfields.length + 1);
   }
 
   rowRenderer({
