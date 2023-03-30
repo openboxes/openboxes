@@ -122,6 +122,7 @@ module.exports = {
       store: path.resolve(SRC, 'store'),
       css: path.resolve(ROOT, 'css'),
       api: path.resolve(SRC, 'api'),
+      wrappers: path.resolve(SRC, 'wrappers'),
     },
     extensions: ['.js', '.jsx'],
   },
