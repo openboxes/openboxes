@@ -919,16 +919,6 @@ class OrderService {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
         }
 
-        // FIXME it's not entirely clear why we reformat strings here like this
-        orderItems.each { orderItem ->
-            if (orderItem.unitOfMeasure) {
-                String[] uomParts = orderItem.unitOfMeasure.split("/")
-                def quantityUom = CSVUtils.parseNumber(uomParts[1], "unitOfMeasure")
-                orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
-            }
-            orderItem.unitPrice = orderItem.unitPrice ? CSVUtils.parseNumber(orderItem.unitPrice, "unitPrice").setScale(4, RoundingMode.FLOOR).toString() : ''
-        }
-
         return orderItems
     }
 
