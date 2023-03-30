@@ -43,6 +43,13 @@
                                     <span class="tag tag-success" title="${g.message(code: 'tag.label', default: 'Tag')}">${tag.tag }</span>
                                 </g:link>
                             </g:each>
+							<g:if test="${productInstance?.productEvents?.productMergeEvents}">
+								<g:link controller="inventoryItem" action="showStockCard" params="['id': productInstance?.productEvents?.otherProductId]">
+									<span class="tag tag-danger" title="${productInstance?.productEvents?.productMergeSummary}">
+										<g:message code="product.mergeProducts.merged.label"/>
+									</span>
+								</g:link>
+							</g:if>
                         </div>
 
         			</div>
