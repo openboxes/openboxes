@@ -78,6 +78,7 @@ const initialState = {
   displayDateDefaultValue: '-',
   notificationAutohideDelay: 8000,
   browserConnectionTimeout: 0,
+  isAutosaveEnabled: false,
 };
 
 export default function (state = initialState, action) {
@@ -121,6 +122,7 @@ export default function (state = initialState, action) {
         displayDateDefaultValue: _.get(action, 'payload.data.data.displayDateDefaultValue', '-'),
         notificationAutohideDelay: _.get(action, 'payload.data.data.notificationAutohideDelay', 8000),
         browserConnectionTimeout: _.get(action, 'payload.data.data.browserConnectionTimeout', 0),
+        isAutosaveEnabled: _.get(action, 'payload.data.data.isAutosaveEnabled', false),
       };
     case FETCH_MENU_CONFIG:
       return {

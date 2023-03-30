@@ -133,8 +133,7 @@ class LocationApiController extends BaseDomainApiController {
 
     def supportedActivities = {
         def data = ActivityCode.list().collect { it.name() }
-
-        render ([data:data] as JSON)
+        render ([data: data] as JSON)
     }
 
     def create = { Location location ->
