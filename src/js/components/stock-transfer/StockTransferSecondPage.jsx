@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 import ReactTable from 'react-table';
@@ -267,13 +268,20 @@ class StockTransferSecondPage extends Component {
    */
   fetchBins() {
     this.props.showSpinner();
-    const url = `/openboxes/api/internalLocations?location.id=${this.props.location.id}&locationTypeCode=BIN_LOCATION`;
+    const url = '/openboxes/api/internalLocations';
 
     const mapBins = bins => (_.chain(bins)
       .orderBy(['label'], ['asc']).value()
     );
 
-    return apiClient.get(url)
+    return apiClient.get(url, {
+      paramsSerializer: parameters => queryString.stringify(parameters),
+      params: {
+        'location.id': this.props.location.id,
+        locationTypeCode: ['BIN_LOCATION', 'INTERNAL'],
+        ignoreActivityCodes: ['RECEIVE_STOCK'],
+      },
+    })
       .then((response) => {
         const binGroups = _.partition(response.data.data, bin => (bin.zoneName));
         const binsWithZone = _.chain(binGroups[0]).groupBy('zoneName')

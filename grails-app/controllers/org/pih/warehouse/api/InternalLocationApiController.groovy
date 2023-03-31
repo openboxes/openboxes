@@ -25,9 +25,14 @@ class InternalLocationApiController {
             throw new IllegalArgumentException("Must provide location.id as a request parameter")
         }
 
-        ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.INTERNAL, LocationTypeCode.BIN_LOCATION]
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes)
+
+        Map activityCodeParams = [:]
+        activityCodeParams.allActivityCodes = params.allActivityCodes ? params.list("allActivityCodes") as ActivityCode[]: []
+        activityCodeParams.anyActivityCodes = params.anyActivityCodes ? params.list("anyActivityCodes") as ActivityCode[]: []
+        activityCodeParams.ignoreActivityCodes = params.ignoreActivityCodes ? params.list("ignoreActivityCodes") as ActivityCode[] : []
+
+        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodeParams)
         render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
@@ -48,11 +53,16 @@ class InternalLocationApiController {
             throw new IllegalArgumentException("Must provide shipmentNumber as a request parameter")
         }
 
-        ActivityCode[] activityCodes = params.activityCode ? params.list("activityCode") : null
         LocationTypeCode[] locationTypeCodes = params.locationTypeCode ? params.list("locationTypeCode") : [LocationTypeCode.BIN_LOCATION]
 
+        Map activityCodeParams = [:]
+        activityCodeParams.allActivityCodes = params.allActivityCodes ? params.list("allActivityCodes") as ActivityCode[]: []
+        activityCodeParams.anyActivityCodes = params.anyActivityCodes ? params.list("anyActivityCodes") as ActivityCode[]: []
+        activityCodeParams.ignoreActivityCodes = params.ignoreActivityCodes ? params.list("ignoreActivityCodes") as ActivityCode[] : [ActivityCode.RECEIVE_STOCK]
+
         String[] receivingLocationNames = [locationService.getReceivingLocationName(shipmentNumber), "Receiving ${shipmentNumber}"]
-        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodes, receivingLocationNames)
+        List<Location> locations = locationService.getInternalLocations(parentLocation, locationTypeCodes, activityCodeParams, receivingLocationNames)
+
         render([data: locations?.collect { [id: it.id, name: it.name, zoneId: it.zone?.id, zoneName: it.zone?.name] }] as JSON)
     }
 
