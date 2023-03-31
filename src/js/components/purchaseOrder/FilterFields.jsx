@@ -104,6 +104,9 @@ export default {
       multi: true,
       closeMenuOnSelect: false,
       blurInputOnSelect: false,
+      nullOption: true,
+      nullOptionLabel: 'react.purchaseOrder.filters.option.blankPaymentTerm.label',
+      nullOptionDefaultLabel: 'Blank Payment Term',
     },
     getDynamicAttr: ({ paymentTerms }) => ({
       options: paymentTerms,

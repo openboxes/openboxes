@@ -210,7 +210,7 @@ const PurchaseOrderListTable = ({
       />,
       accessor: 'paymentTerm',
       minWidth: 150,
-      Cell: row => <TableCell {...row} value={row.value?.name} />,
+      Cell: row => <TableCell {...row} tooltip value={row.value?.name} />,
     },
     {
       Header: <Translate

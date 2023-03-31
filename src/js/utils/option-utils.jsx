@@ -268,3 +268,5 @@ export const mapShipmentTypes = (shipmentTypes) => {
   }
   return mapShipmentType(shipmentTypes);
 };
+
+export const selectNullOption = { id: 'null', value: 'null' };

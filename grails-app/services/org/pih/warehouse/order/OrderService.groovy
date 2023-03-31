@@ -108,7 +108,7 @@ class OrderService {
                     }
                     if (params.paymentTerm) {
                         or {
-                            if (params.list("paymentTerm").find{ it.equalsIgnoreCase("null")}) {
+                            if (params.list("paymentTerm").contains("null")) {
                                 isNull("paymentTerm")
                             }
                             paymentTerm {
