@@ -103,8 +103,6 @@ const useOutboundListTableData = (filterParams) => {
         Alert.success(successMessage);
         fireFetchData();
       }
-    } catch {
-      throw new Error('asdasd');
     } finally {
       dispatch(hideSpinner());
     }
