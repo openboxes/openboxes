@@ -52,3 +52,12 @@ export const getReceivingPayloadContainers = formValues =>
       return _.omit(item, 'product.displayNames');
     }),
   }));
+
+/** Expects to have filterValue already in lower case */
+export const matchesProductCodeOrName = ({
+  productCode, productName, displayName, filterValue,
+}) =>
+  (productCode?.toLowerCase()?.includes(filterValue) ||
+    productName?.toLowerCase()?.includes(filterValue) ||
+      displayName?.toLowerCase()?.includes(filterValue)
+  );

@@ -25,7 +25,7 @@ import {
   handleSuccess,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import { debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -42,7 +42,14 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
-      const hideRow = itemFilter && !rowValues?.productCode.includes(itemFilter);
+      const { productCode, productName } = rowValues;
+      const hideRow = itemFilter &&
+        !matchesProductCodeOrName({
+          productCode,
+          productName,
+          displayName: rowValues?.product?.displayNames?.default,
+          filterValue: itemFilter?.toLowerCase(),
+        });
       return { hideRow };
     },
     fields: {
@@ -206,6 +213,8 @@ class PackingPage extends Component {
       alertMessage: '',
       itemFilter: '',
     };
+
+    this.inputRef = React.createRef();
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
@@ -407,6 +416,41 @@ class PackingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  confirmHiddenLinesAndGoToNextPage(formValues) {
+    const { packPageItems } = formValues;
+    const isAnyLineHidden = this.state.itemFilter &&
+      packPageItems.some((rowValue) => {
+        const { productCode, productName, product } = rowValue;
+        return !matchesProductCodeOrName({
+          productCode,
+          productName,
+          displayName: product?.displayNames?.default,
+          filterValue: this.state.itemFilter.toLowerCase(),
+        });
+      });
+    if (isAnyLineHidden) {
+      confirmAlert({
+        title: this.props.translate('react.stockMovement.confirmHiddenLines.label', 'Confirm hidden lines'),
+        message: this.props.translate(
+          'react.stockMovement.confirmHiddenLines.message',
+          'Are you sure you have filled all the lines? Some lines are hidden.',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => this.nextPage(formValues),
+          },
+          {
+            label: this.props.translate('react.default.no.label', 'No'),
+            onClick: () => this.inputRef.current?.focus(),
+          },
+        ],
+      });
+      return;
+    }
+    this.nextPage(formValues);
+  }
+
   /**
    * Saves packing data
    * @param {object} packPageItems
@@ -474,6 +518,7 @@ class PackingPage extends Component {
                   itemFilter={itemFilter}
                   onChange={e => this.setState({ itemFilter: e.target.value })}
                   onClear={() => this.setState({ itemFilter: '' })}
+                  inputRef={this.inputRef}
                 />
                 <button
                   type="button"
@@ -538,7 +583,7 @@ class PackingPage extends Component {
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
+                <button type="button" onClick={() => this.confirmHiddenLinesAndGoToNextPage(values)} className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

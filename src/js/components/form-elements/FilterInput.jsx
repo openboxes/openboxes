@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const FilterInput = ({
-  itemFilter, onChange, onClear, translate,
+  itemFilter, onChange, onClear, translate, inputRef,
 }) => (
   <div className="d-flex mr-auto justify-content-center align-items-center">
     <input
@@ -15,6 +15,7 @@ const FilterInput = ({
       onChange={onChange}
       className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
       placeholder={translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
+      ref={inputRef}
     />
     {itemFilter &&
       <i
@@ -41,4 +42,8 @@ FilterInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  inputRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  ]).isRequired,
 };
