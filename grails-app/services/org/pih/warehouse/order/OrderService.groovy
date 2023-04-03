@@ -893,10 +893,7 @@ class OrderService {
 
         List orderItems = []
 
-        try {
-            def settings = [skipLines: 1]
-            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
-            csvMapReader.fieldKeys = [
+        def fieldKeys = [
                 'id',
                 'productCode',
                 'productName',
@@ -913,21 +910,18 @@ class OrderService {
                 'estimatedReadyDate',
                 'actualReadyDate',
                 'budgetCode'
-            ]
+        ]
+
+        char dataSeparator =  CSVUtils.getSeparator(text, fieldKeys.size())
+
+        try {
+            def settings = [skipLines: 1, separatorChar: dataSeparator]
+            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
+            csvMapReader.fieldKeys = fieldKeys
             orderItems = csvMapReader.toList()
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
-        }
-
-        // FIXME it's not entirely clear why we reformat strings here like this
-        orderItems.each { orderItem ->
-            if (orderItem.unitOfMeasure) {
-                String[] uomParts = orderItem.unitOfMeasure.split("/")
-                def quantityUom = CSVUtils.parseNumber(uomParts[1], "unitOfMeasure")
-                orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
-            }
-            orderItem.unitPrice = orderItem.unitPrice ? CSVUtils.parseNumber(orderItem.unitPrice, "unitPrice").setScale(4, RoundingMode.FLOOR).toString() : ''
         }
 
         return orderItems

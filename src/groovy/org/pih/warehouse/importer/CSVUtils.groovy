@@ -12,6 +12,8 @@ package org.pih.warehouse.importer
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
+import org.grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DecimalFormat
@@ -148,5 +150,31 @@ class CSVUtils {
      */
     static CSVPrinter getCSVPrinter() {
         return new CSVPrinter(new StringBuilder(), CSVFormat.DEFAULT)
+    }
+
+    /**
+    * Return a CSV separator character based on provided data and expected number of columns.
+    *
+    * Depending on configuration of users preferred csv editor like Excel or Libre office,
+    * when saving a csv file it might reformat the file with a different data separator.
+    * Using this utils function we want to figure out which character is used as a data separator in the file.
+    *
+    * The function takes the first line (which is usually a header) as a sample text to check if it contains the CUSTOM_COLUMN_SEPARATOR character.
+    * If it does contain this character, then there is a change that this is the right separator.
+    * Then we initialize the field keys based on the provided sample
+    * and if the amount of keys matches the expected number columns
+    * we can assume that this file uses CUSTOM_COLUMN_SEPARATOR character as a separator
+    * */
+    static char getSeparator(String text, Integer columnCount) {
+        String firstLine = text.split("\\r?\\n").first()
+
+        if (firstLine.contains(Constants.CUSTOM_COLUMN_SEPARATOR)) {
+            def csvMapReader = new CSVMapReader(new StringReader(firstLine), [separatorChar: Constants.CUSTOM_COLUMN_SEPARATOR])
+
+            if (csvMapReader.initFieldKeys().size() == columnCount) {
+                return Constants.CUSTOM_COLUMN_SEPARATOR
+            }
+        }
+        return Constants.DEFAULT_COLUMN_SEPARATOR;
     }
 }
