@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import ReactSelect, { Async, components } from 'react-select';
 import { Tooltip } from 'react-tippy';
 
+import { selectNullOption } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-tippy/dist/tippy.css';
@@ -101,23 +102,60 @@ class Select extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.getTooltipHtml = this.getTooltipHtml.bind(this);
+    this.getValueLabel = this.getValueLabel.bind(this);
+    this.mapOptions = this.mapOptions.bind(this);
   }
-  getTooltipHtml() {
-    const {
-      multi, placeholder, showLabelTooltip, value, defaultPlaceholder, labelKey,
-    } = this.props;
 
-    if (value?.displayNames?.default || value?.displayName) {
-      return (
-        <div className="p-1">
-          {value?.name}
-        </div>);
+  get options() {
+    const valuesOptions = this.mapOptions(this.props.options);
+    if (this.props.nullOption) {
+      const nullOption = {
+        ...selectNullOption,
+        label: this.props.translate(
+          this.props.nullOptionLabel,
+          this.props.nullOptionDefaultLabel,
+        ),
+      };
+      valuesOptions.unshift(nullOption);
+    }
+    return valuesOptions;
+  }
+
+  getValueLabel() {
+    const { multi, value, labelKey } = this.props;
+
+    if (!value) {
+      return '';
     }
 
+    if (value?.displayNames?.default || value?.displayName) {
+      return value?.name;
+    }
+
+    if (multi) {
+      return this.props.value
+        .map((v) => {
+          const label = v?.[labelKey] ?? v?.label;
+          if (label) {
+            return label;
+          }
+          // if there are no labels on value item
+          // then try to extract these labels from select options
+          const option = this.options.find(it => it?.id && (it?.id === v?.id));
+          return option?.[labelKey] ?? option?.label;
+        })
+        .join(', ');
+    }
+
+    return value.label ?? value.name;
+  }
+
+  getTooltipHtml() {
+    const { placeholder, showLabelTooltip, defaultPlaceholder } = this.props;
+
+    const valueLabel = this.getValueLabel();
+
     if (showLabelTooltip) {
-      const valueMapped = multi && value ?
-        this.props.value.map(v => v?.[labelKey] ?? v?.label) : [];
-      const valueLabel = multi ? valueMapped.join(', ') : (value.label || value.name);
       return (
         <div className="p-1">
           {`${this.props.translate(placeholder, defaultPlaceholder ?? placeholder)}${valueLabel ? `: ${valueLabel}` : ''}`}
@@ -125,7 +163,29 @@ class Select extends Component {
       );
     }
 
-    return (value && <div className="p-1">{value.label ?? value?.name}</div>);
+    return (
+      <div className="p-1">
+        {valueLabel}
+      </div>);
+  }
+
+
+  mapOptions(values) {
+    return (_.map(values, (value) => {
+      if (typeof value === 'string') {
+        return { value, label: value };
+      }
+      if (value.options) {
+        return { ...value, options: this.mapOptions(value.options) };
+      }
+      if (value && this.props.labelKey && !value.label) {
+        return { ...value, label: value[this.props.labelKey] };
+      }
+      if (value && this.props.valueKey && !value.value) {
+        return { ...value, value: value[this.props.valueKey] };
+      }
+      return value;
+    }));
   }
 
   handleChange(value) {
@@ -176,34 +236,10 @@ class Select extends Component {
     } = this.props;
     const { formatValue, className, showLabel = false } = attributes;
 
-    const mapOptions = vals => (_.map(vals, (value) => {
-      let option = value;
-
-      if (typeof value === 'string') {
-        return { value, label: value };
-      }
-
-      if (value && attributes.valueKey && !option.value) {
-        option = { ...option, value: option[attributes.valueKey] };
-      }
-
-      if (value && attributes.labelKey && !option.label) {
-        option = { ...option, label: option[attributes.labelKey] };
-      }
-
-      if (option.options) {
-        option = { ...option, options: mapOptions(option.options) };
-      }
-
-      return option;
-    }));
-
-    const options = mapOptions(selectOptions);
-
     let value = selectValue || null;
 
     if (selectValue && typeof selectValue === 'string') {
-      const selectedOption = _.find(options, o => o.value === selectValue);
+      const selectedOption = _.find(this.options, o => o.value === selectValue);
       value = { value: selectValue, label: selectedOption ? selectedOption.label : '' };
     }
 
@@ -297,13 +333,13 @@ class Select extends Component {
             {...attributes}
             placeholder={getPlaceholder()}
             isDisabled={attributes.disabled}
-            options={(value?.length && this.state.sortedOptionsByChecked) || options}
+            options={(value?.length && this.state.sortedOptionsByChecked) || this.options}
             isMulti={multi}
             isClearable={clearable}
             title=""
             delimiter={delimiter}
             onMenuClose={() => {
-              if (multi) this.sortOptionsByChecked(options, value);
+              if (multi) this.sortOptionsByChecked(this.options, value);
               if (this.props.onMenuClose) this.props.onMenuClose();
             }}
             value={value}
@@ -411,6 +447,10 @@ Select.propTypes = {
   defaultPlaceholder: PropTypes.string,
   showSelectedOptionColor: PropTypes.bool,
   labelKey: PropTypes.string,
+  valueKey: PropTypes.string,
+  nullOption: PropTypes.bool,
+  nullOptionLabel: PropTypes.string,
+  nullOptionDefaultLabel: PropTypes.string,
 };
 
 Select.defaultProps = {
@@ -439,4 +479,8 @@ Select.defaultProps = {
   customSelectComponents: {},
   classNamePrefix: 'react-select',
   labelKey: null,
+  valueKey: null,
+  nullOption: false,
+  nullOptionLabel: '',
+  nullOptionDefaultLabel: 'null',
 };

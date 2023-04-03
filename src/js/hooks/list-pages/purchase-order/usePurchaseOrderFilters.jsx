@@ -8,7 +8,7 @@ import { fetchBuyers, fetchPaymentTerms, fetchPurchaseOrderStatuses } from 'acti
 import filterFields from 'components/purchaseOrder/FilterFields';
 import usePurchaseOrderFiltersCleaner from 'hooks/list-pages/purchase-order/usePurchaseOrderFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
-import { fetchLocationById, fetchUserById } from 'utils/option-utils';
+import { fetchLocationById, fetchUserById, selectNullOption } from 'utils/option-utils';
 
 const usePurchaseOrderFilters = () => {
   const [filterParams, setFilterParams] = useState({});
@@ -40,13 +40,13 @@ const usePurchaseOrderFilters = () => {
     // TODO: If editing organizations is in React,
     //  fetch only if !buyers || buyers.length === 0
     dispatch(fetchBuyers());
-    dispatch(fetchPaymentTerms());
   }, []);
 
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
     dispatch(fetchPurchaseOrderStatuses());
+    dispatch(fetchPaymentTerms());
   }, [currentLocale]);
 
   const clearFilterValues = () => {
@@ -102,6 +102,10 @@ const usePurchaseOrderFilters = () => {
       const paymentTermsFromParams = getParamList(queryProps.paymentTerm);
       defaultValues.paymentTerm = paymentTerms
         .filter(({ id }) => paymentTermsFromParams.includes(id));
+
+      if (paymentTermsFromParams.includes(selectNullOption.id)) {
+        defaultValues.paymentTerm.push(selectNullOption);
+      }
     }
     if (queryProps.destinationParty) {
       defaultValues.destinationParty = buyers

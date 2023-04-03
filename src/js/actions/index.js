@@ -426,16 +426,13 @@ export function fetchPurchaseOrderStatuses() {
   };
 }
 
-export function fetchPaymentTerms() {
-  return (dispatch) => {
-    purchaseOrderApi.getPaymentTerms().then((res) => {
-      dispatch({
-        type: FETCH_PAYMENT_TERMS,
-        payload: res.data.data,
-      });
-    });
-  };
-}
+export const fetchPaymentTerms = () => async (dispatch) => {
+  const response = await purchaseOrderApi.getPaymentTerms();
+  return dispatch({
+    type: FETCH_PAYMENT_TERMS,
+    payload: response?.data?.data,
+  });
+};
 
 export function fetchSuppliers(active = false) {
   return (dispatch) => {
