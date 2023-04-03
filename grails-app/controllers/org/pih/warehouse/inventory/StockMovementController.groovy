@@ -213,7 +213,7 @@ class StockMovementController {
                     )
                 } catch (Exception e) {
                     log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
-                    flash.message = "${warehouse.message(code: 'stockMovement.delete.error.message')}"
+                    flash.message = "${g.message(code: 'stockMovement.delete.error.message', body: 'The Stock Movement could not be deleted')}"
                     redirect(action: "show", id: params.id)
                     return
                 }
