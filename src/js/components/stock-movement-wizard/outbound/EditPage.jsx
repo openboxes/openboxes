@@ -22,7 +22,7 @@ import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import {formatProductDisplayName, matchesProductCodeOrName} from 'utils/form-values-utils';
+import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
