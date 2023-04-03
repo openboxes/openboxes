@@ -24,13 +24,13 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ProductSynonymExcelImporter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
-import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
@@ -858,9 +858,11 @@ class ProductController {
                     localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                     uploadFile?.transferTo(localFile)
                     session.localFile = localFile
+                    //Detect CSV encoding
+                    String fileEncoding = CSVUtils.detectCSVCharset(localFile) ?: "MacRoman"
+                    // Get CSV content in UTF-8 encoding
+                    def csv = localFile.getText(fileEncoding)
 
-                    // Get CSV content
-                    def csv = localFile.getText()
                     columns = productService.getColumns(csv)
                     println "CSV " + csv
 
@@ -905,7 +907,8 @@ class ProductController {
 
         if (params.importNow && session.localFile) {
             try {
-                def csv = session.localFile.getText()
+                String fileEncoding = CSVUtils.detectCSVCharset(session.localFile) ?: "MacRoman"
+                def csv = session.localFile.getText(fileEncoding)
 
                 // Get columns
                 columns = productService.getColumns(csv)
