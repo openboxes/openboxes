@@ -42,13 +42,10 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     getDynamicRowAttr: ({ rowValues, itemFilter }) => {
-      const { productCode, productName } = rowValues;
       const hideRow = itemFilter &&
         !matchesProductCodeOrName({
-          productCode,
-          productName,
-          displayName: rowValues?.product?.displayNames?.default,
-          filterValue: itemFilter?.toLowerCase(),
+          product: rowValues?.product,
+          filterValue: itemFilter,
         });
       return { hideRow };
     },
@@ -420,12 +417,10 @@ class PackingPage extends Component {
     const { packPageItems } = formValues;
     const isAnyLineHidden = this.state.itemFilter &&
       packPageItems.some((rowValue) => {
-        const { productCode, productName, product } = rowValue;
+        const { product } = rowValue;
         return !matchesProductCodeOrName({
-          productCode,
-          productName,
-          displayName: product?.displayNames?.default,
-          filterValue: this.state.itemFilter.toLowerCase(),
+          product,
+          filterValue: this.state.itemFilter,
         });
       });
     if (isAnyLineHidden) {

@@ -46,15 +46,12 @@ const FIELDS = {
     getDynamicRowAttr: ({
       rowValues, subfield, showOnlyErroredItems, itemFilter,
     }) => {
-      const { productCode } = rowValues;
       let className = rowValues.initial ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
       const filterOutItems = itemFilter &&
         !matchesProductCodeOrName({
-          productCode,
-          productName: rowValues?.product?.name,
-          displayName: rowValues?.product?.displayNames?.default,
-          filterValue: itemFilter?.toLowerCase(),
+          product: rowValues?.product,
+          filterValue: itemFilter,
         });
       const hideRow = (
         (showOnlyErroredItems && !rowValues.hasError) || filterOutItems

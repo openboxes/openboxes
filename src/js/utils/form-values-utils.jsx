@@ -53,11 +53,14 @@ export const getReceivingPayloadContainers = formValues =>
     }),
   }));
 
-/** Expects to have filterValue already in lower case */
 export const matchesProductCodeOrName = ({
-  productCode, productName, displayName, filterValue,
-}) =>
-  (productCode?.toLowerCase()?.includes(filterValue) ||
-    productName?.toLowerCase()?.includes(filterValue) ||
-      displayName?.toLowerCase()?.includes(filterValue)
+  product, filterValue,
+}) => {
+  const { productCode, name, displayNames } = product;
+  const value = filterValue?.toLowerCase();
+  return (productCode?.toLowerCase()?.includes(value) ||
+    name?.toLowerCase()?.includes(value) ||
+    displayNames?.default?.toLowerCase()?.includes(value)
   );
+};
+
