@@ -46,6 +46,7 @@ class ProductAvailabilityService {
     def productService
     def locationService
     def inventoryService
+    def dataService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
