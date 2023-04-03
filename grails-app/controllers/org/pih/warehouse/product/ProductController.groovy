@@ -907,7 +907,8 @@ class ProductController {
 
         if (params.importNow && session.localFile) {
             try {
-                def csv = session.localFile.getText()
+                String fileEncoding = CSVUtils.detectCSVCharset(session.localFile) ?: "MacRoman"
+                def csv = session.localFile.getText(fileEncoding)
 
                 // Get columns
                 columns = productService.getColumns(csv)
