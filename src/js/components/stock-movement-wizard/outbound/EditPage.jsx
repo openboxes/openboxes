@@ -22,7 +22,7 @@ import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -52,10 +52,11 @@ const FIELDS = {
       if (rowValues.quantityAvailable < rowValues.quantityRequested) {
         className += 'font-weight-bold';
       }
-      const filterOutItems = itemFilter && !(
-        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
-        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
-      );
+      const filterOutItems = itemFilter &&
+        !matchesProductCodeOrName({
+          product: rowValues?.product,
+          filterValue: itemFilter,
+        });
       const hideRow = (
         (showOnlyErroredItems && !rowValues.hasError) || filterOutItems
       ) && !subfield;

@@ -27,7 +27,7 @@ import {
   parseResponse,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -48,10 +48,11 @@ const FIELDS = {
     }) => {
       let className = rowValues.initial ? 'crossed-out ' : '';
       if (!subfield) { className += 'font-weight-bold'; }
-      const filterOutItems = itemFilter && !(
-        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
-        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
-      );
+      const filterOutItems = itemFilter &&
+        !matchesProductCodeOrName({
+          product: rowValues?.product,
+          filterValue: itemFilter,
+        });
       const hideRow = (
         (showOnlyErroredItems && !rowValues.hasError) || filterOutItems
       ) && !subfield;

@@ -52,3 +52,15 @@ export const getReceivingPayloadContainers = formValues =>
       return _.omit(item, 'product.displayNames');
     }),
   }));
+
+export const matchesProductCodeOrName = ({
+  product, filterValue,
+}) => {
+  const { productCode, name, displayNames } = product;
+  const value = filterValue?.toLowerCase();
+  return (productCode?.toLowerCase()?.includes(value) ||
+    name?.toLowerCase()?.includes(value) ||
+    displayNames?.default?.toLowerCase()?.includes(value)
+  );
+};
+
