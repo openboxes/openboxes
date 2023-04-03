@@ -124,7 +124,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncePeopleFetch,
+      loadOptions: props.debouncedPeopleFetch,
     }),
   },
   dateRequested: {
