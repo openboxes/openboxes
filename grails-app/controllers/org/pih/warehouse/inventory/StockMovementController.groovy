@@ -209,11 +209,11 @@ class StockMovementController {
                     stockMovementService.deleteStockMovement(params.id)
                     flash.message = g.message(
                             code: 'react.stockMovement.deleted.success.message.label',
-                            body: 'Stock Movement has been deleted successfully',
+                            default: 'Stock Movement has been deleted successfully',
                     )
                 } catch (Exception e) {
                     log.error("Unable to delete stock movement with ID ${params.id}: " + e.message, e)
-                    flash.message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                    flash.message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                     redirect(action: "show", id: params.id)
                     return
                 }

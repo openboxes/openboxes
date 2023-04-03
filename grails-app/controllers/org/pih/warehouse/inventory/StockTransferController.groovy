@@ -99,10 +99,10 @@ class StockTransferController {
             stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
             flash.message = g.message(
                     code: 'react.stockMovement.deleted.success.message.label',
-                    body: 'Stock Movement has been deleted successfully',
+                    default: 'Stock Movement has been deleted successfully',
             )
         } catch (Exception e) {
-            flash.message = "${warehouse.message(code: 'stockMovement.delete.error.message')}"
+            flash.message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
             redirect(controller: "stockMovement", action: "show", id: params.id)
             return
         }
