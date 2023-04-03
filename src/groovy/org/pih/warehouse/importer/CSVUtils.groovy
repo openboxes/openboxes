@@ -9,10 +9,10 @@
  */
 package org.pih.warehouse.importer
 
-import au.com.bytecode.opencsv.CSVParser
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DecimalFormat
@@ -152,14 +152,17 @@ class CSVUtils {
     }
 
     /**
-    * Return a CSV separator character based on provided data and expected number of column
+    * Return a CSV separator character based on provided data and expected number of columns.
+    *
+    * Depending on configuration of users preferred csv editor like Excel or Libre office,
+    * when saving a csv file it might reformat the file with a different data separator.
+    * Using this utils function we want to figure out which character is used as a data separator in the file.
     * */
     static char getSeparator(String text, Integer columNumber) {
-        def otherSeparator = ';'
         String firstLine = text.split("\\r?\\n").first()
-        if (firstLine.contains(otherSeparator) && firstLine.split(otherSeparator).size() == columNumber) {
-            return otherSeparator
+        if (firstLine.contains(Constants.CUSTOM_COLUMN_SEPARATOR) && firstLine.split(Constants.CUSTOM_COLUMN_SEPARATOR).size() == columNumber) {
+            return Constants.CUSTOM_COLUMN_SEPARATOR
         }
-        return CSVParser.DEFAULT_SEPARATOR
+        return Constants.DEFAULT_COLUMN_SEPARATOR;
     }
 }
