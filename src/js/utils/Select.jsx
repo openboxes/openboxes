@@ -102,9 +102,9 @@ class Select extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.getTooltipHtml = this.getTooltipHtml.bind(this);
+    this.getValueLabel = this.getValueLabel.bind(this);
     this.mapOptions = this.mapOptions.bind(this);
   }
-
 
   get options() {
     const valuesOptions = this.mapOptions(this.props.options);
@@ -120,39 +120,42 @@ class Select extends Component {
     }
     return valuesOptions;
   }
-  getTooltipHtml() {
-    const {
-      multi, placeholder, showLabelTooltip, value, defaultPlaceholder, labelKey,
-    } = this.props;
 
-    if (value?.displayNames?.default || value?.displayName) {
-      return (
-        <div className="p-1">
-          {value?.name}
-        </div>);
+  getValueLabel() {
+    const { multi, value, labelKey } = this.props;
+
+    if (!value) {
+      return '';
     }
 
-    if (showLabelTooltip) {
-      let valueLabel = '';
-      if (value) {
-        if (multi) {
-          valueLabel = this.props.value
-            .map((v) => {
-              const label = v?.[labelKey] ?? v?.label;
-              if (label) {
-                return label;
-              }
-              // if there are no labels on value item
-              // then try to extract these labels from select options
-              const option = this.options.find(it => it?.id && (it?.id === v?.id));
-              return option?.[labelKey] ?? option.label;
-            })
-            .join(', ');
-        } else {
-          valueLabel = value.label || value.name;
-        }
-      }
+    if (value?.displayNames?.default || value?.displayName) {
+      return value?.name;
+    }
 
+    if (multi) {
+      return this.props.value
+        .map((v) => {
+          const label = v?.[labelKey] ?? v?.label;
+          if (label) {
+            return label;
+          }
+          // if there are no labels on value item
+          // then try to extract these labels from select options
+          const option = this.options.find(it => it?.id && (it?.id === v?.id));
+          return option?.[labelKey] ?? option?.label;
+        })
+        .join(', ');
+    }
+
+    return value.label ?? value.name;
+  }
+
+  getTooltipHtml() {
+    const { placeholder, showLabelTooltip, defaultPlaceholder } = this.props;
+
+    const valueLabel = this.getValueLabel();
+
+    if (showLabelTooltip) {
       return (
         <div className="p-1">
           {`${this.props.translate(placeholder, defaultPlaceholder ?? placeholder)}${valueLabel ? `: ${valueLabel}` : ''}`}
@@ -160,8 +163,12 @@ class Select extends Component {
       );
     }
 
-    return (value && <div className="p-1">{value.label ?? value?.name}</div>);
+    return (
+      <div className="p-1">
+        {valueLabel}
+      </div>);
   }
+
 
   mapOptions(values) {
     return (_.map(values, (value) => {
