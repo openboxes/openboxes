@@ -176,7 +176,7 @@ class StockMovementApiController {
             try {
                 stockTransferService.deleteStockTransfer(params.id)
             } catch (Exception e) {
-                def message = "${g.message(code: 'stockMovement.delete.error.message', body: 'The Stock Movement could not be deleted')}"
+                def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                 response.status = 400
                 render([errorMessage: message] as JSON)
                 return
@@ -195,7 +195,7 @@ class StockMovementApiController {
                     try {
                         stockMovementService.deleteStockMovement(params.id)
                     } catch (Exception e) {
-                        def message = "${g.message(code: 'stockMovement.delete.error.message', body: 'The Stock Movement could not be deleted')}"
+                        def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                         response.status = 400
                         render([errorMessage: message] as JSON)
                         return
