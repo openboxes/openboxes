@@ -7,8 +7,7 @@
 .select-xs {
   height: 42px !important;
 
-  // 0.5rem = 8px
   .react-select__single-value {
-    padding-bottom: 8px !important;
+    padding-bottom: 0.5rem !important;
   }
 }
