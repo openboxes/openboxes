@@ -12,6 +12,7 @@ package org.pih.warehouse.importer
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
+import org.mozilla.universalchardet.UniversalDetector
 import org.pih.warehouse.util.LocalizationUtil
 
 import java.text.DecimalFormat
@@ -148,5 +149,13 @@ class CSVUtils {
      */
     static CSVPrinter getCSVPrinter() {
         return new CSVPrinter(new StringBuilder(), CSVFormat.DEFAULT)
+    }
+
+    static String detectCSVCharset(File file) {
+        def detector = new UniversalDetector(null)
+        byte[] fileBytes = file.bytes
+        detector.handleData(fileBytes, 0, fileBytes.length - 1);
+        detector.dataEnd();
+        return detector.getDetectedCharset();
     }
 }
