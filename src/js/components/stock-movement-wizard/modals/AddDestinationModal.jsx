@@ -54,7 +54,7 @@ const FIELDS = {
     label: 'Location Type',
     defaultMessage: 'Location Type',
     attributes: {
-      className: 'multi-select',
+      className: 'multi-select location-select',
       required: true,
       valueKey: 'id',
     },
