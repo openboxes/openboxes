@@ -53,6 +53,7 @@ class InvoiceController {
                 invoiceService.refreshInvoiceItems(invoiceInstance)
             }
 
+            invoiceInstance.disableRefresh = invoiceInstance.isPrepaymentInvoice
             invoiceInstance.save()
             flash.message = "${warehouse.message(code: 'invoices.successfulRollback.message')}"
             redirect(action: "show", id: params.id)
@@ -66,14 +67,17 @@ class InvoiceController {
                 invoiceInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
                 redirect(action: "list")
+                return
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
                 redirect(action: "list", id: params.id)
+                return
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
             redirect(action: "list")
+            return
         }
         redirect(action: "list", id: params.id)
     }
