@@ -4,10 +4,14 @@
   column-gap: 1rem;
 }
 
-.select-xs {
-  height: 42px !important;
+.location-select {
 
-  .react-select__single-value {
-    padding-bottom: 0.5rem !important;
+  .select-xs {
+    height: 42px !important;
+
+    .react-select__single-value {
+      padding-bottom: 0.5rem !important;
+    }
   }
 }
+
