@@ -179,15 +179,20 @@ class CSVUtils {
         return Constants.DEFAULT_COLUMN_SEPARATOR;
     }
 
-    static String addBOMToCSVString(String csvString) {
+    static String prependBOMToCSVString(String csvString) {
         return '\uFEFF' + csvString
     }
+
+    static String stripBOMIfPresent(String csvString) {
+        return csvString.replace("\uFEFF", "")
+    }
+
 
     static String detectCSVCharset(File file) {
         def detector = new UniversalDetector(null)
         byte[] fileBytes = file.bytes
         detector.handleData(fileBytes, 0, fileBytes.length - 1);
         detector.dataEnd();
-        return detector.getDetectedCharset();
+        return detector.getDetectedCharset() ?: 'MacRoman';
     }
 }

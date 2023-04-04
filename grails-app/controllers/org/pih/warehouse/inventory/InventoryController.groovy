@@ -634,7 +634,7 @@ class InventoryController {
             csv += "\n"
         }
 
-        render(contentType: "text/csv", text: CSVUtils.addBOMToCSVString(csv))
+        render(contentType: "text/csv", text: CSVUtils.prependBOMToCSVString(csv))
     }
 
     def listQuantityOnHandZero = {
@@ -798,7 +798,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return CSVUtils.addBOMToCSVString(csv)
+        return CSVUtils.prependBOMToCSVString(csv)
     }
 
     def getCsvForProductMap(inventoryItems) {
@@ -849,7 +849,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return CSVUtils.addBOMToCSVString(csv)
+        return CSVUtils.prependBOMToCSVString(csv)
     }
 
 

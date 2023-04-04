@@ -260,7 +260,7 @@ class LocationApiController extends BaseDomainApiController {
         def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description\n"
 
         response.setHeader("Content-disposition", "attachment; filename=\"Location_template.csv\"")
-        render(contentType: "text/csv", text: CSVUtils.addBOMToCSVString(csv.toString()), encoding: "UTF-8")
+        render(contentType: "text/csv", text: CSVUtils.prependBOMToCSVString(csv.toString()), encoding: "UTF-8")
     }
 
     def importCsv = { ImportDataCommand command ->

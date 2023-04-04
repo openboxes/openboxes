@@ -515,7 +515,7 @@ class ReportController {
                 }
 
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
-                render(contentType: "text/csv", text: CSVUtils.addBOMToCSVString(sw.toString()), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBOMToCSVString(sw.toString()), encoding: "UTF-8")
             }
         } else if(params.downloadAction == "downloadSummaryOnOrderReport") {
             def location = Location.get(session.warehouse.id)
@@ -538,7 +538,7 @@ class ReportController {
                 data = data.sort { it.productCode }
                 csv.writeAll(data)
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
-                render(contentType: "text/csv", text: CSVUtils.addBOMToCSVString(sw.toString()), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBOMToCSVString(sw.toString()), encoding: "UTF-8")
             }
         }
     }
@@ -600,7 +600,7 @@ class ReportController {
             }
 
             response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: CSVUtils.addBOMToCSVString(sw.toString()), encoding: "UTF-8")
+            render(contentType: "text/csv", text: CSVUtils.prependBOMToCSVString(sw.toString()), encoding: "UTF-8")
         }
 
         render(view: 'showInventoryByLocationReport', model: [command: command])

@@ -39,7 +39,7 @@ class ReportUtil {
             csv += "\n"
         }
 
-        return CSVUtils.addBOMToCSVString(csv)
+        return CSVUtils.prependBOMToCSVString(csv)
     }
 
 
@@ -60,7 +60,7 @@ class ReportUtil {
                 sb.append(System.lineSeparator())
             }
         }
-        return CSVUtils.addBOMToCSVString(sb.toString())
+        return CSVUtils.prependBOMToCSVString(sb.toString())
     }
 
 
@@ -74,7 +74,7 @@ class ReportUtil {
                 csv += csvRow(entry)
             }
         }
-        return CSVUtils.addBOMToCSVString(csv)
+        return CSVUtils.prependBOMToCSVString(csv)
     }
 
 
