@@ -1795,6 +1795,10 @@ class ShipmentService {
         eventInstance.delete()
         shipmentInstance.currentEvent = null
         shipmentInstance.currentStatus = null
+        if (shipmentInstance.isFromPurchaseOrder) {
+            // Set disable refresh to false to refresh order summary
+            shipmentInstance.disableRefresh = false
+        }
         shipmentInstance.save()
     }
 
