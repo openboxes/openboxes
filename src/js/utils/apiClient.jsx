@@ -55,12 +55,12 @@ export const handleSuccess = response => response;
 
 export const handleError = (error) => {
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
-  const errorMessages = _.map(_.get(error, 'response.data.errorMessages', ''), message => `${message}, `);
+  const errorMessages = _.get(error, 'response.data.errorMessages', '').join(', ');
   switch (error.response.status) {
     case 400: {
       notification(NotificationType.ERROR_OUTLINED)({
         message: 'Bad request',
-        details: errorMessage ?? errorMessages,
+        details: errorMessage || errorMessages,
       });
       break;
     }
@@ -73,25 +73,25 @@ export const handleError = (error) => {
     case 403:
       notification(NotificationType.WARNING)({
         message: 'Access denied',
-        details: errorMessage ?? errorMessages,
+        details: errorMessage || errorMessages,
       });
       break;
     case 404:
       notification(NotificationType.ERROR_OUTLINED)({
         message: 'Not found',
-        details: errorMessage ?? errorMessages,
+        details: errorMessage || errorMessages,
       });
       break;
     case 500:
       notification(NotificationType.ERROR_FILLED)({
         message: 'Internal server error',
-        details: errorMessage ?? errorMessages,
+        details: errorMessage || errorMessages,
       });
       break;
     default:
       notification(NotificationType.ERROR_FILLED)({
         message: error,
-        details: errorMessage ?? errorMessages,
+        details: errorMessage || errorMessages,
       });
   }
   return Promise.reject(error);
