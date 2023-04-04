@@ -210,13 +210,13 @@ class InvoiceService {
 
     def submitInvoice(Invoice invoice) {
         invoice.dateSubmitted = new Date()
-        invoice.disableRefresh = false
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
         invoice.save()
     }
 
     def postInvoice(Invoice invoice) {
         invoice.datePosted = new Date()
-        invoice.disableRefresh = false
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
         invoice.save()
     }
 
