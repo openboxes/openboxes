@@ -2212,6 +2212,7 @@ class StockMovementService {
         shipment.shipmentType = stockMovement.shipmentType
         shipment.driverName = stockMovement.driverName
         shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
+        shipment.expectedShippingDate = stockMovement.dateShipped
         if (stockMovement.comments) {
             shipment.addToComments(new Comment(comment: stockMovement.comments))
         }
