@@ -179,17 +179,17 @@ class CSVUtils {
         return Constants.DEFAULT_COLUMN_SEPARATOR;
     }
 
-    static String prependBOMToCSVString(String csvString) {
+    static String prependBomToCsvString(String csvString) {
         return '\uFEFF' + csvString
     }
 
-    static String stripBOMIfPresent(String csvString) {
+    static String stripBomIfPresent(String csvString) {
         return csvString.replace("\uFEFF", "")
     }
 
 
-    static String detectCSVCharset(File file) {
-        def detector = new UniversalDetector(null)
+    static String detectCsvCharset(File file) {
+        def detector = new UniversalDetector()
         byte[] fileBytes = file.bytes
         detector.handleData(fileBytes, 0, fileBytes.length - 1);
         detector.dataEnd();

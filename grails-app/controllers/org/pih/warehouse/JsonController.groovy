@@ -1862,7 +1862,7 @@ class JsonController {
                 }
 
                 response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
-                render(contentType: "text/csv", text: CSVUtils.prependBOMToCSVString(sw.toString()), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
                 return
             }
             render([aaData: data] as JSON)

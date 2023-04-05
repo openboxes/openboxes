@@ -859,7 +859,7 @@ class ProductController {
                     uploadFile?.transferTo(localFile)
                     session.localFile = localFile
                     //Detect CSV encoding
-                    String fileEncoding = CSVUtils.detectCSVCharset(localFile)
+                    String fileEncoding = CSVUtils.detectCsvCharset(localFile)
                     // Get CSV content in UTF-8 encoding
                     def csv = localFile.getText(fileEncoding)
 
@@ -907,7 +907,7 @@ class ProductController {
 
         if (params.importNow && session.localFile) {
             try {
-                String fileEncoding = CSVUtils.detectCSVCharset(session.localFile)
+                String fileEncoding = CSVUtils.detectCsvCharset(session.localFile)
                 def csv = session.localFile.getText(fileEncoding)
 
                 // Get columns

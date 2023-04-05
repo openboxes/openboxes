@@ -526,7 +526,7 @@ class DataService {
                     unitOfMeasure     : inventoryLevel?.product?.unitOfMeasure ?: "EA"
             ]
         }
-        return CSVUtils.prependBOMToCSVString(csv.writer.toString())
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
 
 
@@ -613,7 +613,7 @@ class DataService {
             ]
             csvWriter << row
         }
-        return CSVUtils.prependBOMToCSVString(sw.toString())
+        return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
     String exportRequisitionItems(requisitions) {
@@ -669,7 +669,7 @@ class DataService {
                 csvWriter << row
             }
         }
-        return CSVUtils.prependBOMToCSVString(sw.toString())
+        return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
     def transformObjects(List objects, List includeFields) {
@@ -731,7 +731,7 @@ class DataService {
                 sw.append("\n")
             }
         }
-        return CSVUtils.prependBOMToCSVString(sw.toString())
+        return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
 }
