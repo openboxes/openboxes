@@ -122,9 +122,8 @@ class CreateInvoicePage extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.currenciesFetched) {
-      this.props.fetchCurrencies();
-    }
+    // TODO: If full React, fetch only if not fetched yet
+    this.props.fetchCurrencies();
   }
 
   checkInvoiceChange(newValues) {
@@ -248,7 +247,6 @@ class CreateInvoicePage extends Component {
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   currencies: state.currencies.data,
-  currenciesFetched: state.currencies.fetched,
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
 });
@@ -272,7 +270,6 @@ CreateInvoicePage.propTypes = {
     push: PropTypes.func,
   }).isRequired,
   translate: PropTypes.func.isRequired,
-  currenciesFetched: PropTypes.bool.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
