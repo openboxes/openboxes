@@ -4,7 +4,6 @@ import { FETCH_CURRENCIES } from 'actions/types';
 
 const initialState = {
   data: [],
-  fetched: false,
 };
 
 export default function (state = initialState, action) {
@@ -14,7 +13,7 @@ export default function (state = initialState, action) {
         const currencies = _.map(action.payload.data, currency => (
           { id: currency.id, name: currency.name }
         ));
-        return { ...state, data: currencies, fetched: true };
+        return { ...state, data: currencies };
       }
       return state;
     default:
