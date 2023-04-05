@@ -11,5 +11,11 @@
         r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
         a.appendChild(r);
     })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+
+    // Hotjar user attributes
+    // https://help.hotjar.com/hc/en-us/articles/4402892526487-What-are-User-Attributes-
+    // https://help.hotjar.com/hc/en-us/articles/360038394053-How-to-Set-Up-User-Attributes
+    var userId = '${session?.user?.username}' || null;
+    window.hj('identify', userId, {});
 </script>
 </g:if>
