@@ -55,7 +55,7 @@ export const handleSuccess = response => response;
 
 export const handleError = (error) => {
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
-  const errorMessages = _.get(error, 'response.data.errorMessages', '').join(', ');
+  const errorMessages = _.get(error, 'response.data.errorMessages', []).join(', ');
   switch (error.response.status) {
     case 400: {
       notification(NotificationType.ERROR_OUTLINED)({
