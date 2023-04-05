@@ -12,6 +12,7 @@ package org.pih.warehouse.importer
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.lang.StringUtils
+import org.mozilla.universalchardet.UniversalDetector
 import org.grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.util.LocalizationUtil
@@ -176,5 +177,22 @@ class CSVUtils {
             }
         }
         return Constants.DEFAULT_COLUMN_SEPARATOR;
+    }
+
+    static String prependBomToCsvString(String csvString) {
+        return '\uFEFF' + csvString
+    }
+
+    static String stripBomIfPresent(String csvString) {
+        return csvString.replace("\uFEFF", "")
+    }
+
+
+    static String detectCsvCharset(File file) {
+        def detector = new UniversalDetector()
+        byte[] fileBytes = file.bytes
+        detector.handleData(fileBytes, 0, fileBytes.length - 1);
+        detector.dataEnd();
+        return detector.getDetectedCharset() ?: 'MacRoman';
     }
 }

@@ -19,6 +19,7 @@ import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
@@ -259,7 +260,7 @@ class LocationApiController extends BaseDomainApiController {
         def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description\n"
 
         response.setHeader("Content-disposition", "attachment; filename=\"Location_template.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(csv.toString()), encoding: "UTF-8")
     }
 
     def importCsv = { ImportDataCommand command ->

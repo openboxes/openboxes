@@ -26,6 +26,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
@@ -1861,7 +1862,7 @@ class JsonController {
                 }
 
                 response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
                 return
             }
             render([aaData: data] as JSON)

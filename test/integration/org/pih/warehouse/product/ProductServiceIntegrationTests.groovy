@@ -8,6 +8,7 @@ import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import testutils.DbHelper
 
 class ProductServiceIntegrationTests extends GroovyTestCase {
@@ -327,7 +328,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 
 		// FIXME Export code appends column delimiter for every column (even the last)
 		def expectedHeader = Constants.EXPORT_PRODUCT_COLUMNS.join(",").replace("\n", "") + ","
-		def actualHeader = lines[0]
+		def actualHeader = CSVUtils.stripBomIfPresent(lines[0])
 		assertNotNull lines
 		assertEquals expectedHeader, actualHeader
 	}
@@ -340,7 +341,7 @@ class ProductServiceIntegrationTests extends GroovyTestCase {
 		def lines = csv.split(/[\r\n]/)
 
 		// Remove quotes
-		def columns = lines[0].replaceAll("\"", "").split(",")
+		def columns = CSVUtils.stripBomIfPresent(lines[0]).replaceAll("\"", "").split(",")
 		println columns
 		columns.eachWithIndex { String entry, int i ->
 			assertEquals Constants.EXPORT_PRODUCT_COLUMNS[i], entry

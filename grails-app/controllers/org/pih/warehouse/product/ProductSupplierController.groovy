@@ -394,7 +394,7 @@ class ProductSupplierController {
                 response.contentType = "text/csv"
                 response.setHeader("Content-disposition",
                     "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-                render dataService.generateCsv(data)
+                render(contentType: "text/csv", text: dataService.generateCsv(data))
                 response.outputStream.flush()
                 return;
         }

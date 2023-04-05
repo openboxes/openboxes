@@ -24,13 +24,13 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ProductSynonymExcelImporter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
-import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
@@ -782,7 +782,7 @@ class ProductController {
                     "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
             println "export products: " + csv
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             response.sendError(404)
         }
@@ -800,7 +800,7 @@ class ProductController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             render(text: 'No products found', status: 404)
         }
@@ -858,9 +858,11 @@ class ProductController {
                     localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                     uploadFile?.transferTo(localFile)
                     session.localFile = localFile
+                    //Detect CSV encoding
+                    String fileEncoding = CSVUtils.detectCsvCharset(localFile)
+                    // Get CSV content in UTF-8 encoding
+                    def csv = localFile.getText(fileEncoding)
 
-                    // Get CSV content
-                    def csv = localFile.getText()
                     columns = productService.getColumns(csv)
                     println "CSV " + csv
 
@@ -905,7 +907,8 @@ class ProductController {
 
         if (params.importNow && session.localFile) {
             try {
-                def csv = session.localFile.getText()
+                String fileEncoding = CSVUtils.detectCsvCharset(session.localFile)
+                def csv = session.localFile.getText(fileEncoding)
 
                 // Get columns
                 columns = productService.getColumns(csv)
