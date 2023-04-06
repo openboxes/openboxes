@@ -45,3 +45,7 @@ export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
 
 // USERS
 export const USERS_OPTIONS = `${API}/users`;
+
+// LOCATIONS
+export const LOCATION_API = `${API}/locations`;
+export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;

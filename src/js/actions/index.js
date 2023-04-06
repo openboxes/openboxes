@@ -13,6 +13,7 @@ import {
   FETCH_GRAPHS,
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
+  FETCH_LOCATION_TYPES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_PAYMENT_TERMS,
@@ -40,6 +41,7 @@ import {
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
 import genericApi from 'api/services/GenericApi';
+import locationApi from 'api/services/LocationApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
@@ -587,5 +589,14 @@ export const fetchShipmentTypes = () => async (dispatch) => {
   return dispatch({
     type: FETCH_SHIPMENT_TYPES,
     payload: shipmentTypes,
+  });
+};
+
+export const fetchLocationTypes = config => async (dispatch) => {
+  const response = await locationApi.getLocationTypes(config);
+  const data = response?.data?.data;
+  return dispatch({
+    type: FETCH_LOCATION_TYPES,
+    payload: data,
   });
 };
