@@ -16,6 +16,7 @@ import ActivityCode from 'consts/activityCode';
 import apiClient, { flattenRequest } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'components/locations-configuration/modals/ConfigurationModal.scss';
 import './AddDestinationModal.scss';
@@ -108,10 +109,10 @@ class AddDestinationModal extends Component {
     this.props.fetchLocationTypes({ params: { activityCode: ActivityCode.DYNAMIC_CREATION } });
   }
   mapToOptionsList(list) {
-    return _.map(list, (locationType) => {
-      const [en, fr] = _.split(locationType.name, '|fr:');
-      return { ...locationType, label: this.props.locale === 'fr' && fr ? fr : en };
-    });
+    return _.map(list, locationType => ({
+      ...locationType,
+      label: splitTranslation(locationType.name, this.props.locale),
+    }));
   }
 
   save(values) {
