@@ -590,11 +590,26 @@ class PartialReceivingPage extends Component {
 
   exportTemplate() {
     this.props.showSpinner();
-
-    const { shipmentId } = this.state.values;
+    const { values } = this.state;
+    const { shipmentId } = values;
     const url = `/openboxes/api/partialReceiving/exportCsv/${shipmentId}`;
-
-    apiClient.post(url, flattenRequest(this.state.values))
+    /** We have to omit product.displayNames, due to an error
+     *  while binding bindData(partialReceiptItem, shipmentItemMap)
+     *  it expects product.displayNames to have a setter, as we pass
+     *  product.displayNames.default: XYZ, to the update method, but it's not a
+     *  writable property.
+     *  With deprecated product.translatedName it was not the case, because
+     *  it was recognizing the transient and we didn't access product.translatedName.something
+     *  but product.translatedName directly
+     * */
+    const valuesWithoutDisplayNames = {
+      ...values,
+      containers: values?.containers?.map?.(container => ({
+        ...container,
+        shipmentItems: container?.shipmentItems?.map?.(item => _.omit(item, 'product.displayNames')),
+      })),
+    };
+    apiClient.post(url, flattenRequest(valuesWithoutDisplayNames))
       .then((response) => {
         fileDownload(response.data, `PartialReceiving${shipmentId ? `-${shipmentId}` : ''}.csv`, 'text/csv');
         this.props.hideSpinner();
