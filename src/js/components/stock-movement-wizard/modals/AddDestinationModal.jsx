@@ -9,9 +9,10 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import { fetchLocationTypes, fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ActivityCode from 'consts/activityCode';
 import apiClient, { flattenRequest } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -51,7 +52,7 @@ const FIELDS = {
   },
   locationType: {
     type: SelectField,
-    label: 'Location Type',
+    label: 'react.locationsConfiguration.locationType.label',
     defaultMessage: 'Location Type',
     attributes: {
       className: 'multi-select location-select',
@@ -100,31 +101,17 @@ const ADDRESS_FIELDS = {
 class AddDestinationModal extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      locationTypes: [],
-    };
-
-    this.fetchLocationTypes = this.fetchLocationTypes.bind(this);
+    this.mapToOptionsList = this.mapToOptionsList.bind(this);
   }
 
   componentDidMount() {
-    this.fetchLocationTypes();
+    this.props.fetchLocationTypes({ params: { activityCode: ActivityCode.DYNAMIC_CREATION } });
   }
-
-
-  fetchLocationTypes() {
-    const url = '/openboxes/api/locations/locationTypes?activityCode=DYNAMIC_CREATION';
-
-    apiClient.get(url)
-      .then((response) => {
-        const resp = response.data.data;
-        const locationTypes = _.map(resp, (locationType) => {
-          const [en, fr] = _.split(locationType.name, '|fr:');
-          return { ...locationType, label: this.props.locale === 'fr' && fr ? fr : en };
-        });
-
-        this.setState({ locationTypes });
-      });
+  mapToOptionsList(list) {
+    return _.map(list, (locationType) => {
+      const [en, fr] = _.split(locationType.name, '|fr:');
+      return { ...locationType, label: this.props.locale === 'fr' && fr ? fr : en };
+    });
   }
 
   save(values) {
@@ -181,8 +168,7 @@ class AddDestinationModal extends Component {
                       FIELDS,
                       (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                         values,
-                        locationTypes: this.state.locationTypes,
-                        testValue: this.state.testValue,
+                        locationTypes: this.mapToOptionsList(this.props.locationTypes),
                       }),
                     )}
                     {_.map(
@@ -215,12 +201,14 @@ class AddDestinationModal extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  locationTypes: state.location.locationTypes,
 });
 
 export default withRouter(connect(mapStateToProps, {
   showSpinner,
   hideSpinner,
   fetchTranslations,
+  fetchLocationTypes,
 })(AddDestinationModal));
 
 AddDestinationModal.propTypes = {
@@ -231,4 +219,6 @@ AddDestinationModal.propTypes = {
   onResponse: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  fetchLocationTypes: PropTypes.func.isRequired,
+  locationTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
