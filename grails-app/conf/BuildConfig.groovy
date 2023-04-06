@@ -67,10 +67,10 @@ grails.project.dependency.resolution = {
         runtime "org.slf4j:jul-to-slf4j:1.7.33"
 
         // Required by database connection
-        compile 'mysql:mysql-connector-java:5.1.47'
+        compile 'mysql:mysql-connector-java:5.1.49'
 
         // Required by database connection pool
-        compile 'com.mchange:c3p0:0.9.5.3'
+        compile 'com.mchange:c3p0:0.9.5.5'
 
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
@@ -131,10 +131,15 @@ grails.project.dependency.resolution = {
          */
         test("com.icegreen:greenmail:1.5.10") { excludes "junit" }
 
-        // Required for GPars
+        build 'org.codehaus.gpars:gpars:0.12'  // otherwise early build chain uses 0.9
         compile "org.codehaus.gpars:gpars:0.12"
+        // Required for GPars
         compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
+
+        compile('org.quartz-scheduler:quartz:2.1.6') {
+            exclude 'c3p0'  // otherwise Quartz pulls in an ancient release from 2007
+        }
 
         // Unknown
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
