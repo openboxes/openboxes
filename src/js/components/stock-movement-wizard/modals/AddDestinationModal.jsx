@@ -9,12 +9,14 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
-import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
+import { fetchLocationTypes, fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ActivityCode from 'consts/activityCode';
 import apiClient, { flattenRequest } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
+import splitTranslation from 'utils/translation-utils';
 
 import 'components/locations-configuration/modals/ConfigurationModal.scss';
 import './AddDestinationModal.scss';
@@ -51,7 +53,7 @@ const FIELDS = {
   },
   locationType: {
     type: SelectField,
-    label: 'Location Type',
+    label: 'react.locationsConfiguration.locationType.label',
     defaultMessage: 'Location Type',
     attributes: {
       className: 'multi-select location-select',
@@ -67,32 +69,32 @@ const FIELDS = {
 const ADDRESS_FIELDS = {
   address: {
     type: TextField,
-    label: 'address.address.label',
+    label: 'react.locationsConfiguration.address.street.label',
     defaultMessage: 'Street address',
   },
   address2: {
     type: TextField,
-    label: 'address.address2.label',
+    label: 'react.locationsConfiguration.address.street2.label',
     defaultMessage: 'Street address 2',
   },
   city: {
     type: TextField,
-    label: 'address.city.label',
+    label: 'react.locationsConfiguration.address.city.label',
     defaultMessage: 'City',
   },
   stateOrProvince: {
     type: TextField,
-    label: 'address.stateOrProvince.label',
+    label: 'react.locationsConfiguration.address.stateOrProvince.label',
     defaultMessage: 'State/Province',
   },
   postalCode: {
     type: TextField,
-    label: 'address.postalCode.label',
+    label: 'react.locationsConfiguration.address.postalCode.label',
     defaultMessage: 'Postal code',
   },
   country: {
     type: TextField,
-    label: 'address.country.label',
+    label: 'react.locationsConfiguration.address.country.label',
     defaultMessage: 'Country',
   },
 };
@@ -100,31 +102,17 @@ const ADDRESS_FIELDS = {
 class AddDestinationModal extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      locationTypes: [],
-    };
-
-    this.fetchLocationTypes = this.fetchLocationTypes.bind(this);
+    this.mapToOptionsList = this.mapToOptionsList.bind(this);
   }
 
   componentDidMount() {
-    this.fetchLocationTypes();
+    this.props.fetchLocationTypes({ params: { activityCode: ActivityCode.DYNAMIC_CREATION } });
   }
-
-
-  fetchLocationTypes() {
-    const url = '/openboxes/api/locations/locationTypes?activityCode=DYNAMIC_CREATION';
-
-    apiClient.get(url)
-      .then((response) => {
-        const resp = response.data.data;
-        const locationTypes = _.map(resp, (locationType) => {
-          const [en, fr] = _.split(locationType.name, '|fr:');
-          return { ...locationType, label: this.props.locale === 'fr' && fr ? fr : en };
-        });
-
-        this.setState({ locationTypes });
-      });
+  mapToOptionsList(list) {
+    return _.map(list, locationType => ({
+      ...locationType,
+      label: splitTranslation(locationType.name, this.props.locale),
+    }));
   }
 
   save(values) {
@@ -181,8 +169,7 @@ class AddDestinationModal extends Component {
                       FIELDS,
                       (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                         values,
-                        locationTypes: this.state.locationTypes,
-                        testValue: this.state.testValue,
+                        locationTypes: this.mapToOptionsList(this.props.locationTypes),
                       }),
                     )}
                     {_.map(
@@ -196,10 +183,10 @@ class AddDestinationModal extends Component {
                       className="btn btn-outline-primary ml-1"
                       onClick={() => this.props.onClose()}
                     >
-                      <Translate id="default.button.cancel.label" defaultMessage="Cancel" />
+                      <Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
                     </button>
                     <button type="submit" className="btn btn-primary align-self-end">
-                      <Translate id="default.button.save.label" defaultMessage="Save" />
+                      <Translate id="react.default.button.save.label" defaultMessage="Save" />
                     </button>
                   </div>
                 </form>
@@ -215,12 +202,14 @@ class AddDestinationModal extends Component {
 const mapStateToProps = state => ({
   locale: state.session.activeLanguage,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
+  locationTypes: state.location.locationTypes,
 });
 
 export default withRouter(connect(mapStateToProps, {
   showSpinner,
   hideSpinner,
   fetchTranslations,
+  fetchLocationTypes,
 })(AddDestinationModal));
 
 AddDestinationModal.propTypes = {
@@ -231,4 +220,6 @@ AddDestinationModal.propTypes = {
   onResponse: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired,
+  fetchLocationTypes: PropTypes.func.isRequired,
+  locationTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

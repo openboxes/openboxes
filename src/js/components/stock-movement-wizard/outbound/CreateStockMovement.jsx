@@ -107,9 +107,11 @@ const FIELDS = {
       origin,
       fetchStockLists,
       openNewLocationModal,
+      locationTypes,
     }) => ({
       loadOptions: debouncedLocationsFetch,
       newOptionModalOpen: openNewLocationModal,
+      createNewFromModal: !!locationTypes.length,
       onChange: (value) => {
         if (value && origin && origin.id) {
           fetchStockLists(origin, value);
@@ -445,6 +447,7 @@ class CreateStockMovement extends Component {
                     requestTypes: this.state.requestTypes,
                     setRequestType: this.setRequestType,
                     openNewLocationModal: this.openAddDestinationModal,
+                    locationTypes: this.props.locationTypes,
                     values,
                   }),
                 )}
@@ -468,6 +471,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  locationTypes: state.location.locationTypes,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -516,4 +520,5 @@ CreateStockMovement.propTypes = {
   translate: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  locationTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

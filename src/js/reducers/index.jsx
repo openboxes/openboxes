@@ -6,6 +6,7 @@ import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
+import locationReducer from 'reducers/locationReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   filterForm: filterFormReducer,
   stockMovementDraft: stockMovementDraftReducer,
   stockMovementCommon: stockMovementCommonReducer,
+  location: locationReducer,
 });
 
 export default rootReducer;
