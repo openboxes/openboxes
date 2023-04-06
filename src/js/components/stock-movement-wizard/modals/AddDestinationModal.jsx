@@ -68,32 +68,32 @@ const FIELDS = {
 const ADDRESS_FIELDS = {
   address: {
     type: TextField,
-    label: 'address.address.label',
+    label: 'react.locationsConfiguration.address.street.label',
     defaultMessage: 'Street address',
   },
   address2: {
     type: TextField,
-    label: 'address.address2.label',
+    label: 'react.locationsConfiguration.address.street2.label',
     defaultMessage: 'Street address 2',
   },
   city: {
     type: TextField,
-    label: 'address.city.label',
+    label: 'react.locationsConfiguration.address.city.label',
     defaultMessage: 'City',
   },
   stateOrProvince: {
     type: TextField,
-    label: 'address.stateOrProvince.label',
+    label: 'react.locationsConfiguration.address.stateOrProvince.label',
     defaultMessage: 'State/Province',
   },
   postalCode: {
     type: TextField,
-    label: 'address.postalCode.label',
+    label: 'react.locationsConfiguration.address.postalCode.label',
     defaultMessage: 'Postal code',
   },
   country: {
     type: TextField,
-    label: 'address.country.label',
+    label: 'react.locationsConfiguration.address.country.label',
     defaultMessage: 'Country',
   },
 };
@@ -182,10 +182,10 @@ class AddDestinationModal extends Component {
                       className="btn btn-outline-primary ml-1"
                       onClick={() => this.props.onClose()}
                     >
-                      <Translate id="default.button.cancel.label" defaultMessage="Cancel" />
+                      <Translate id="react.default.button.cancel.label" defaultMessage="Cancel" />
                     </button>
                     <button type="submit" className="btn btn-primary align-self-end">
-                      <Translate id="default.button.save.label" defaultMessage="Save" />
+                      <Translate id="react.default.button.save.label" defaultMessage="Save" />
                     </button>
                   </div>
                 </form>
