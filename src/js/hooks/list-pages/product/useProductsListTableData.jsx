@@ -75,7 +75,7 @@ const useProductsListTableData = (filterParams) => {
     const date = new Date();
     const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
     const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-    fileDownload(data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
+    fileDownload(`\uFEFF${data}`, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
   };
   return {
     tableData, tableRef, loading, onFetchHandler, exportProducts,
