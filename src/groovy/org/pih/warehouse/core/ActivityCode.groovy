@@ -69,7 +69,7 @@ enum ActivityCode {
     ActivityCode(String id) { this.id = id }
 
     static list() {
-        def activityCodes = [
+         [
                 MANAGE_INVENTORY,
                 ADJUST_INVENTORY,
                 APPROVE_ORDER,
@@ -92,10 +92,9 @@ enum ActivityCode {
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,
                 SUBMIT_REQUEST,
-                DYNAMIC_CREATION
+                DYNAMIC_CREATION,
+                AUTOSAVE,
         ]
-
-        return CH.config.openboxes.client.autosave.enabled ? activityCodes + [AUTOSAVE] : activityCodes
     }
 
     static binTrackingList() {
