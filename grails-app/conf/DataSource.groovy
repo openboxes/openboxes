@@ -18,43 +18,21 @@ dataSource {
     format_sql = false
     use_sql_comments = false
 
-    // Basic Pool Configuration
-    acquireIncrement = 5
-    initialPoolSize = 10
-    minPoolSize = 5
-    maxPoolSize = 100
-
-    // Statement Pooling
-    maxStatements = 180
-    maxStatementsPerConnection = 0
-    statementCacheNumDeferredCloseThreads = 1
-
-    // Connection Testing
-    testConnectionOnCheckin = false
-    testConnectionOnCheckout = false
-    preferredTestQuery = "SELECT 1"
-    idleConnectionTestPeriod = 7200
-
-    // Pool Size and Connection Age
-    maxIdleTime = 0
-    maxConnectionAge = 14400
-    maxIdleTimeExcessConnections = 1800
-
-    // Unreturned Connections
-    unreturnedConnectionTimeout = 0
-    debugUnreturnedConnectionStackTraces = false
-
-    // Recovery from Database Outages
-    acquireRetryAttempts = 30
-    acquireRetryDelay = 1000
-    breakAfterAcquireFailure = false
-
-    // Other Configuration
-    checkoutTimeout = 0
-    numHelperThreads = 3
-    maxAdministrativeTaskTime = 0
-    privilegeSpawnedThreads = false
-    contextClassLoaderSource = "caller"
+    // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.3%20The%20DataSource
+    // https://javadoc.io/doc/commons-dbcp/commons-dbcp/1.4/index.html
+    properties {
+        initialSize = 5
+        maxActive = 100
+        maxIdle = 10
+        minEvictableIdleTimeMillis = 120 * 1000
+        minIdle = 5
+        numTestsPerEvictionRun = 5
+        testOnBorrow = false
+        testOnReturn = false
+        testWhileIdle = true
+        timeBetweenEvictionRunsMillis = 60 * 1000
+        validationQueryTimeout = 1
+    }
 }
 
 // Hibernate caching properties

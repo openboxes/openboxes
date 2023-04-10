@@ -69,9 +69,6 @@ grails.project.dependency.resolution = {
         // Required by database connection
         compile 'mysql:mysql-connector-java:5.1.49'
 
-        // Required by database connection pool
-        compile 'com.mchange:c3p0:0.9.5.5'
-
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
             excludes 'commons-codec', 'commons-io'
@@ -137,7 +134,7 @@ grails.project.dependency.resolution = {
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
 
         compile('org.quartz-scheduler:quartz:2.1.6') {
-            exclude 'c3p0'  // otherwise Quartz pulls in an ancient release from 2007
+            exclude 'c3p0'  // Grails 1.3.9 uses commons-dbcp
         }
 
         // Unknown
@@ -179,7 +176,18 @@ grails.project.dependency.resolution = {
         compile 'com.github.librepdf:openpdf:1.2.0'
 
         compile 'com.github.albfernandez:juniversalchardet:2.4.0'
+
         compile 'com.newrelic.agent.java:newrelic-api:6.5.4'
+
+        /*
+         * Match the DBCP pooling implementation used in Tomcat 7.109.
+         * This brings in JDBC 4 support.
+         *
+         * https://commons.apache.org/proper/commons-dbcp/changes-report.html
+         * https://tomcat.apache.org/tomcat-7.0-doc/changelog.html
+         */
+        runtime 'commons-dbcp:commons-dbcp:1.4'
+        runtime 'commons-pool:commons-pool:1.5.7'
     }
     plugins {
 
