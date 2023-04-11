@@ -23,7 +23,7 @@ const ActivityCode = {
   SUBMIT_REQUEST: 'SUBMIT_REQUEST',
   DYNAMIC_CREATION: 'DYNAMIC_CREATION',
   AUTOSAVE: 'AUTOSAVE',
-  NONE: 'NONE'
+  NONE: 'NONE',
 };
 
 export default ActivityCode;
