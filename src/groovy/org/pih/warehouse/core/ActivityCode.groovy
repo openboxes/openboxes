@@ -62,7 +62,9 @@ enum ActivityCode {
     // Dynamic creation
     DYNAMIC_CREATION('DYNAMIC_CREATION'),
 
-    AUTOSAVE('AUTOSAVE')
+    AUTOSAVE('AUTOSAVE'),
+
+    NONE('NONE')
 
     final String id
 
@@ -94,6 +96,7 @@ enum ActivityCode {
                 SUBMIT_REQUEST,
                 DYNAMIC_CREATION,
                 AUTOSAVE,
+                NONE,
         ]
     }
 

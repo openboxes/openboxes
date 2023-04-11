@@ -82,6 +82,10 @@ class LocationController {
             if (selectedOrganization && (selectedOrganization?.id != currentOrganization?.id) && !selectedOrganization?.active) {
                 throw new IllegalArgumentException("The organization ${selectedOrganization?.name} is inactive, you can't assign it to the location")
             }
+            // If none supported activities are chosen, assign "None"
+            if (locationInstance?.id) {
+                params.supportedActivities = params.supportedActivities ?: [ActivityCode.NONE.id]
+            }
             locationInstance.properties = params
 
             if (!locationInstance.id && !locationInstance.organization) {
