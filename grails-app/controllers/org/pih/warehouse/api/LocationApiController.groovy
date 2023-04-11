@@ -167,6 +167,12 @@ class LocationApiController extends BaseDomainApiController {
         if (!existingLocation) {
             throw new IllegalArgumentException("No Location found for location ID ${params.id}")
         }
+        // We only want to assign "None" if we go next from the Details step
+        // Without having this if, we would assign "None" when going from Address step to Details (previous step)
+        // because the jsonObject wouldn't contain supportedActivities
+        if (params.step == "1") {
+            jsonObject.supportedActivities = jsonObject.supportedActivities ?: [ActivityCode.NONE.id]
+        }
 
         bindLocationData(existingLocation, jsonObject)
 

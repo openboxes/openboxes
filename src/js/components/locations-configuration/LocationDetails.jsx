@@ -16,6 +16,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AddLocationGroupModal from 'components/locations-configuration/modals/AddLocationGroupModal';
 import AddOrganizationModal from 'components/locations-configuration/modals/AddOrganizationModal';
+import ActivityCode from 'consts/activityCode';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { convertToBase64 } from 'utils/file-utils';
@@ -41,6 +42,12 @@ function validate(values) {
 
   if (!values.locationType) {
     errors.locationType = 'react.default.error.requiredField.label';
+  }
+
+  // Don't allow having NONE supported activity in combination with any other supported activity
+  if (values.supportedActivities?.length > 1 &&
+    values.supportedActivities?.find(activity => activity.value === ActivityCode.NONE)) {
+    errors.supportedActivities = 'react.locationsConfiguration.error.supportedActivities.label';
   }
 
   return errors;
@@ -362,7 +369,7 @@ class LocationDetails extends Component {
         fgColor: values.fgColor || '',
       };
 
-      apiClient.post(locationUrl, payload)
+      apiClient.post(locationUrl, payload, { params: { step: 1 } })
         .then((response) => {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
