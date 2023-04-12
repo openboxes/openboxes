@@ -10,10 +10,11 @@ import Logo from 'components/Layout/Logo';
 import Menu from 'components/Layout/menu/Menu';
 import NavbarIcons from 'components/Layout/NavbarIcons';
 import LocationChooser from 'components/location/LocationChooser';
+import NewFeatureBar from 'components/newFeaturesInfo/NewFeatureBar';
 
 import 'components/Layout/HeaderStyles.scss';
 
-const Header = ({ isImpersonated, localizationModeEnabled }) => (
+const Header = ({ isImpersonated, localizationModeEnabled, features }) => (
   <div className="navbar p-0">
     {isImpersonated && <ImpersonateInfo />}
     {localizationModeEnabled && <LocalizationModeInfo />}
@@ -42,11 +43,23 @@ const Header = ({ isImpersonated, localizationModeEnabled }) => (
         </ul>
       </div>
     </nav>
+    {Object.entries(features)?.map((([feature, values]) => {
+        if (values.show) {
+          return (
+            <NewFeatureBar
+              {...values}
+              key={feature}
+            />
+          );
+        }
+        return null;
+      }))}
   </div>);
 
 const mapStateToProps = state => ({
   isImpersonated: state.session.isImpersonated,
   localizationModeEnabled: state.session.localizationModeEnabled,
+  features: state.newFeatures.features,
 });
 
 export default connect(mapStateToProps)(Header);
@@ -54,4 +67,17 @@ export default connect(mapStateToProps)(Header);
 Header.propTypes = {
   isImpersonated: PropTypes.bool.isRequired,
   localizationModeEnabled: PropTypes.bool.isRequired,
+  features: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    show: PropTypes.bool.isRequired,
+    closed: PropTypes.bool,
+    title: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+    versionLabel: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+  })).isRequired,
 };
