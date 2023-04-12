@@ -1284,6 +1284,14 @@ class AddItemsPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
+                  onClick={() => this.removeAll()}
+                  className="float-right mb-1 btn btn-outline-danger align-self-end ml-1 btn-xs"
+                >
+                  <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
+                </button>
+                <button
+                  type="button"
+                  disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
@@ -1298,14 +1306,6 @@ class AddItemsPage extends Component {
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
-                  onClick={() => this.removeAll()}
-                  className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs"
-                >
-                  <span><i className="fa fa-remove pr-2" /><Translate id="react.default.button.deleteAll.label" defaultMessage="Delete all" /></span>
                 </button>
               </span>
               :
