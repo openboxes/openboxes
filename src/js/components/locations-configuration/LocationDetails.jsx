@@ -369,7 +369,7 @@ class LocationDetails extends Component {
         fgColor: values.fgColor || '',
       };
 
-      apiClient.post(locationUrl, payload, { params: { step: 1 } })
+      apiClient.post(locationUrl, payload)
         .then((response) => {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
