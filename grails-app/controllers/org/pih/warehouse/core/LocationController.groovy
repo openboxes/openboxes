@@ -84,8 +84,9 @@ class LocationController {
             }
             // If none supported activities are chosen, assign "None"
             // [""].empty would evaluate to false, so we want to filter out falsy values with findAll{it}
-            if (locationInstance?.id && params.list("supportedActivities").findAll{ it }?.empty) {
-                params.supportedActivities = params.supportedActivities ?: [ActivityCode.NONE.id]
+            List supportedActivities = params.list("supportedActivities").findAll{ it }
+            if (locationInstance?.id && supportedActivities?.empty) {
+                params.supportedActivities = [ActivityCode.NONE.id]
             }
             locationInstance.properties = params
 
