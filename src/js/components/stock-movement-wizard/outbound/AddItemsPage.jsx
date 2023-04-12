@@ -19,7 +19,8 @@ import {
   fetchUsers,
   hideNewFeatureBar,
   hideSpinner,
-  removeStockMovementDraft, showNewFeatureBar,
+  removeStockMovementDraft,
+  showNewFeatureBar,
   showSpinner,
 } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
