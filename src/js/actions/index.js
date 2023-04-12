@@ -3,9 +3,10 @@ import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
+  ADD_FEATURE_BAR,
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
-  CHANGE_CURRENT_LOCATION,
+  CHANGE_CURRENT_LOCATION, CLOSE_FEATURE_BAR,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -26,7 +27,7 @@ import {
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
-  FILTER_FORM_PARAMS_BUILT,
+  FILTER_FORM_PARAMS_BUILT, HIDE_FEATURE, HIDE_FEATURE_BAR,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
@@ -35,7 +36,7 @@ import {
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
   SET_OFFLINE,
-  SET_ONLINE,
+  SET_ONLINE, SHOW_FEATURE, SHOW_FEATURE_BAR, SHOW_FEATURE_BAR_MODAL,
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
@@ -600,3 +601,37 @@ export const fetchLocationTypes = config => async (dispatch) => {
     payload: data,
   });
 };
+
+export const createNewFeatureBar = ({
+  name, versionLabel, title,
+}) => ({
+  type: ADD_FEATURE_BAR,
+  payload: {
+    name,
+    versionLabel,
+    title,
+    show: true,
+  },
+});
+
+export const hideNewFeatureBar = name => ({
+  type: HIDE_FEATURE_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const closeNewFeatureBar = name => ({
+  type: CLOSE_FEATURE_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const showNewFeatureBar = name => ({
+  type: SHOW_FEATURE_BAR,
+  payload: {
+    name,
+  },
+});
+
