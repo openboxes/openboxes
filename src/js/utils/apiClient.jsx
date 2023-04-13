@@ -60,7 +60,7 @@ export const handleError = (error) => {
     case 400: {
       notification(NotificationType.ERROR_OUTLINED)({
         message: 'Bad request',
-        details: errorMessage || errorMessages,
+        details: errorMessages || errorMessage,
       });
       break;
     }
