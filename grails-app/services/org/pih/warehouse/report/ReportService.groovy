@@ -675,8 +675,8 @@ class ReportService implements ApplicationContextAware {
                 (
                 select s.name from synonym s
                 where s.product_id = product.id
-                and s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}'
-                and s.locale = '${locale}'
+                and s.synonym_type_code = :synonymTypeCode
+                and s.locale = :locale
                 limit 1
                 ) as displayName,
                 (
@@ -694,12 +694,13 @@ class ReportService implements ApplicationContextAware {
                 and ps.location_id = oos.destination_id)
             where destination_id = :locationId
             """
-        def results = dataService.executeQuery(query,  [locationId: location.id])
+        def results = dataService.executeQuery(query,  [synonymTypeCode: SynonymTypeCode.DISPLAY_NAME.name(), locale: locale, locationId: location.id])
         def data = results.collect {
             def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
             def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
             def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
             def displayNameWithLocaleCode = "${it.productName}${it.displayName ? " (${locale?.toUpperCase()}: ${it.displayName})" : ''}"
+            println displayNameWithLocaleCode
             [
                     productCode                 : it.productCode,
                     productName                 : it.productName,
