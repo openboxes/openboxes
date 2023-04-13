@@ -376,6 +376,8 @@ class AddItemsPage extends Component {
     if (this.shouldShowAutosaveFeatureBar()) {
       this.props.showInfoBar(InfoBar.AUTOSAVE);
     }
+    // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
+    // react router redirects, not for "links" (<a href>)
     window.addEventListener('beforeunload', this.componentCleanup);
   }
 
@@ -392,6 +394,8 @@ class AddItemsPage extends Component {
     // We want to hide the feature bar when unmounting the component
     // not to show it on any other page
     this.props.hideInfoBar(InfoBar.AUTOSAVE);
+    // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
+    // react router redirects, not for "links" (<a href>)
     window.removeEventListener('beforeunload', this.componentCleanup);
   }
 
