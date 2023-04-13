@@ -13,7 +13,7 @@ import {
   RiListUnordered,
   RiPencilLine,
   RiUploadLine,
-} from 'react-icons/all';
+} from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 

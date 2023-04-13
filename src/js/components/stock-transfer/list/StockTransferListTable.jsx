@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {
   RiDeleteBinLine,
   RiInformationLine,
-} from 'react-icons/all';
+} from 'react-icons/ri';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';

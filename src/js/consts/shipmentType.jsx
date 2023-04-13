@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RiFlightTakeoffLine, RiInformationLine, RiShipLine, RiSuitcaseLine, RiTruckLine } from 'react-icons/all';
+import { RiFlightTakeoffLine, RiInformationLine, RiShipLine, RiSuitcaseLine, RiTruckLine } from 'react-icons/ri';
 
 
 const ShipmentType = {

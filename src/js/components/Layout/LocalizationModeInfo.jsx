@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RiGlobalLine, RiLogoutBoxRLine } from 'react-icons/all';
+import { RiGlobalLine, RiLogoutBoxRLine } from 'react-icons/ri';
 
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';

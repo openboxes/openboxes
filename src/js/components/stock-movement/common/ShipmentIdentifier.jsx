@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { RiInformationLine } from 'react-icons/all';
+import { RiInformationLine } from 'react-icons/ri';
 
 import ShipmentType from 'consts/shipmentType';
 

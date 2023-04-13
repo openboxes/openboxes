@@ -71,8 +71,7 @@ const DELETE_BUTTON_FIELD = {
 
 const ROW_SAVE_ICON_FIELD = {
   type: RowSaveIconIndicator,
-  flexWidth: '1',
-  lineItemSaveStatus: 'test',
+  flexWidth: '0.2',
 };
 
 const NO_STOCKLIST_FIELDS = {
@@ -411,8 +410,16 @@ class AddItemsPage extends Component {
    */
   getFields() {
     const fields = _.get(this.state.values.stocklist, 'id') ? STOCKLIST_FIELDS : NO_STOCKLIST_FIELDS;
-    return this.props.isAutosaveEnabled ?
-      { lineItems: { ...fields.lineItems, rowSaveIcon: ROW_SAVE_ICON_FIELD } } : fields;
+    const fieldsWithRowSaveIcon = {
+      lineItems: {
+        ...fields.lineItems,
+        fields: {
+          ...fields.lineItems.fields,
+          rowSaveStatusIcon: ROW_SAVE_ICON_FIELD,
+        },
+      },
+    };
+    return this.props.isAutosaveEnabled ? fieldsWithRowSaveIcon : fields;
   }
 
   /**
