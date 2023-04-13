@@ -192,6 +192,11 @@ class LocationApiController extends BaseDomainApiController {
     }
 
     Location bindLocationData(Location location, JSONObject jsonObject) {
+        // We only want to set the supportedActivities if we provide it in the payload
+        if (jsonObject.containsKey("supportedActivities")) {
+            jsonObject.supportedActivities = jsonObject.supportedActivities ?: [ActivityCode.NONE.id]
+        }
+
         bindData(location, jsonObject)
 
         String logo = jsonObject.logo

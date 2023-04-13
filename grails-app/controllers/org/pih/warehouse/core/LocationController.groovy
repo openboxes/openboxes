@@ -82,6 +82,12 @@ class LocationController {
             if (selectedOrganization && (selectedOrganization?.id != currentOrganization?.id) && !selectedOrganization?.active) {
                 throw new IllegalArgumentException("The organization ${selectedOrganization?.name} is inactive, you can't assign it to the location")
             }
+            // If none supported activities are chosen, assign "None"
+            // [""].empty would evaluate to false, so we want to filter out falsy values with findAll{it}
+            List supportedActivities = params.list("supportedActivities").findAll{ it }
+            if (locationInstance?.id && supportedActivities?.empty) {
+                params.supportedActivities = [ActivityCode.NONE.id]
+            }
             locationInstance.properties = params
 
             if (!locationInstance.id && !locationInstance.organization) {
@@ -121,6 +127,8 @@ class LocationController {
                     return
                 }
             } else {
+                // Refresh to avoid saving binded, not validated data to the persisted object
+                locationInstance.refresh()
                 render(view: "edit", model: [locationInstance: locationInstance])
                 return
             }

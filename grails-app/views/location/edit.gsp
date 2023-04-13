@@ -287,7 +287,7 @@
                                 </td>
                                 <td valign="top" class="value">
                                     <g:set var="sameAsDefaults"
-                                           value="${locationInstance?.locationType?.supportedActivities.equals(locationInstance?.supportedActivities)}"/>
+                                           value="${locationInstance?.locationType?.supportedActivities?.equals(locationInstance?.supportedActivities)}"/>
                                     <g:set var="useDefault"
                                            value="${locationInstance?.supportedActivities?.isEmpty() || sameAsDefaults}"/>
 

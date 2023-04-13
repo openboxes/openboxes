@@ -93,6 +93,13 @@ class Location implements Comparable<Location>, java.io.Serializable {
         dateCreated(display: false)
         lastUpdated(display: false)
         sortOrder(nullable: true)
+        supportedActivities(validator: { Set<String> activities, Location location ->
+            // Don't allow having NONE supported activity in combination with any other supported activity
+            if (activities?.contains(ActivityCode.NONE.id) && activities?.size() > 1) {
+                return ['invalid.supportedActivities']
+            }
+            return true
+        })
     }
 
     static uniqueNameValidator = { String name, Location obj ->
