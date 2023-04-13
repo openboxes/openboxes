@@ -35,6 +35,7 @@ import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -42,7 +43,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
-  label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
   flexWidth: '1',
   fieldKey: '',
@@ -67,6 +67,12 @@ const DELETE_BUTTON_FIELD = {
   attributes: {
     className: 'btn btn-outline-danger',
   },
+};
+
+const ROW_SAVE_ICON_FIELD = {
+  type: RowSaveIconIndicator,
+  flexWidth: '1',
+  lineItemSaveStatus: 'test',
 };
 
 const NO_STOCKLIST_FIELDS = {
@@ -404,11 +410,9 @@ class AddItemsPage extends Component {
    * @public
    */
   getFields() {
-    if (_.get(this.state.values.stocklist, 'id')) {
-      return STOCKLIST_FIELDS;
-    }
-
-    return NO_STOCKLIST_FIELDS;
+    const fields = _.get(this.state.values.stocklist, 'id') ? STOCKLIST_FIELDS : NO_STOCKLIST_FIELDS;
+    return this.props.isAutosaveEnabled ?
+      { lineItems: { ...fields.lineItems, rowSaveIcon: ROW_SAVE_ICON_FIELD } } : fields;
   }
 
   /**
