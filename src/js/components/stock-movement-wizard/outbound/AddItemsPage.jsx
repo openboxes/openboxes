@@ -355,6 +355,7 @@ class AddItemsPage extends Component {
     this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
     this.shouldShowAutosaveFeatureBar = this.shouldShowAutosaveFeatureBar.bind(this);
     this.shouldCreateAutosaveFeatureBar = this.shouldCreateAutosaveFeatureBar.bind(this);
+    this.componentCleanup = this.componentCleanup.bind(this);
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -375,6 +376,7 @@ class AddItemsPage extends Component {
     if (this.shouldShowAutosaveFeatureBar()) {
       this.props.showInfoBar(InfoBar.AUTOSAVE);
     }
+    window.addEventListener('beforeunload', this.componentCleanup);
   }
 
 
@@ -390,6 +392,7 @@ class AddItemsPage extends Component {
     // We want to hide the feature bar when unmounting the component
     // not to show it on any other page
     this.props.hideInfoBar(InfoBar.AUTOSAVE);
+    window.removeEventListener('beforeunload', this.componentCleanup);
   }
 
   /**
@@ -554,6 +557,11 @@ class AddItemsPage extends Component {
     });
     this.saveRequisitionItemsInCurrentStep(this.props.savedStockMovement.lineItems, true);
     this.props.hideSpinner();
+  }
+
+
+  componentCleanup() {
+    this.props.hideInfoBar(InfoBar.AUTOSAVE);
   }
 
   shouldCreateAutosaveFeatureBar() {
