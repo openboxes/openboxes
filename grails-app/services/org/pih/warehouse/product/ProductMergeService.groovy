@@ -48,7 +48,7 @@ class ProductMergeService {
          * - InventoryItem <-- find inventory items and replace product only for InventoryItems with lotNumber that are not exisitng for primary product
          *                     But if we're gonna use the InventoryItem from primary Product, then obsoleted InventoryItem relations should be updated accordingly.
          *                     (ShipmentItems, TransactionEntries and so on)
-         * - InventorySnapshot <-- Adjusted during InventoryItems management for specific inventory items and products
+         * - InventorySnapshot <-- Skipped for now
          * - ProductAvailability <-- Adjusted during InventoryItems management for specific inventory items and products
          * - TransactionEntry
          *
@@ -218,9 +218,6 @@ class ProductMergeService {
 
             int productAvailabilitiesCount = ProductAvailability.countByInventoryItem(obsoleteInventoryItem)
             if (primaryInventoryItem) {
-                // if product inventory item already exists, then check if obsolete InventoryItem has InventorySnapshot
-                // FIXME: Temporary disabled inventory snapshot update
-
                 // if product inventory item already exists, then check if obsolete InventoryItem has ProductAvailability
                 if (productAvailabilitiesCount > 0) {
                     productAvailabilityService.updateProductAvailabilityOnMergeProduct(primaryInventoryItem, obsoleteInventoryItem, primary, obsolete)
@@ -242,9 +239,6 @@ class ProductMergeService {
             obsoleteInventoryItem.disableRefresh = true
             // Note: needs flush because of "User.locationRoles not processed by flush"
             obsoleteInventoryItem.save(flush: true)
-
-            // Swap inventory snapshot product for the records with inventory item that had changed products
-            // FIXME: Temporary removed inventory snapshot update
 
             // Swap product availability product for the records with inventory item that had changed products
             if (productAvailabilitiesCount) {
@@ -382,13 +376,8 @@ class ProductMergeService {
             throw new Exception("Cannot save primary product due to: " + primary.errors?.toString())
         }
 
-        // 2. Trigger refresh of product_demand, stockout_fact, product_summary views
-        // Skipped for now because demand data might take too long and other are not that relevant (plus InventorySnapshot
-        // and ProductAvailability are handled during inventory items swap).
-        // TODO / FIXME: Consider running these sequentionally in a separate job if needed
-        // RefreshStockoutDataJob.triggerNow()
-        // RefreshDemandDataJob.triggerNow() // <- FIXME: probably can be skipped if takes too long time to process
-        // RefreshOrderSummaryJob.triggerNow() // <- FIXME: maybe do a refresh by list of affected orders instead of full table
+        // 2. Trigger refresh of inventory_snapshot, product_demand, stockout_fact, product_summary views
+        // TODO / FIXME: Skipped for now. If needed, consider running these sequentionally in a separate job
     }
 
     /**
