@@ -17,6 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -27,6 +28,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.util.LocalizationUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -659,33 +661,54 @@ class ReportService implements ApplicationContextAware {
     }
 
     List getOnOrderSummary(Location location) {
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+
         String query = """
             select 
                 product.product_code as productCode, 
                 product.name as productName, 
                 oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
                 oos.quantity_shipped_not_received as qtyShippedNotReceived, 
-                ps.quantity_on_hand as qtyOnHand
+                ps.quantity_on_hand as qtyOnHand,
+                product_group.name as productFamilyName,
+                category.name as productCategoryName,
+                (
+                select s.name from synonym s
+                where s.product_id = product.id
+                and s.synonym_type_code = :synonymTypeCode
+                and s.locale = :locale
+                limit 1
+                ) as displayName,
+                (
+                select group_concat(product_catalog.name separator ', ')
+                from product_catalog_item
+                left outer join product_catalog on product_catalog_item.product_catalog_id = product_catalog.id
+                where product_catalog_item.product_id = product.id
+                group by product.name
+                ) as productCatalogs
             from on_order_summary oos
             join product on oos.product_id = product.id
+            left outer join product_group on product.product_family_id = product_group.id
+            left outer join category on product.category_id = category.id
             left outer join product_snapshot ps on (product.id = ps.product_id 
                 and ps.location_id = oos.destination_id)
             where destination_id = :locationId
             """
-        def results = dataService.executeQuery(query,  [locationId: location.id])
+        def results = dataService.executeQuery(query,  [synonymTypeCode: SynonymTypeCode.DISPLAY_NAME.name(), locale: locale, locationId: location.id])
         def data = results.collect {
             def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
             def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
             def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
-            Product product = Product.findByProductCode(it.productCode)
+            def displayNameWithLocaleCode = "${it.productName}${it.displayName ? " (${locale?.toUpperCase()}: ${it.displayName})" : ''}"
+            println displayNameWithLocaleCode
             [
                     productCode                 : it.productCode,
-                    productName                 : product?.name,
-                    displayNameWithLocaleCode   : product?.displayNameWithLocaleCode,
-                    displayName                 : product?.displayName,
-                    productFamily               : product?.productFamily?.name ?: '',
-                    category                    : product?.category?.name ?: '',
-                    productCatalogs             : product?.productCatalogs?.join(", "),
+                    productName                 : it.productName,
+                    displayNameWithLocaleCode   : displayNameWithLocaleCode,
+                    displayName                 : it.displayName,
+                    productFamily               : it.productFamilyName ?: '',
+                    category                    : it.productCategoryName ?: '',
+                    productCatalogs             : it.productCatalogs ?: '',
                     qtyOrderedNotShipped        : qtyOrderedNotShipped ?: '',
                     qtyShippedNotReceived       : qtyShippedNotReceived ?: '',
                     totalOnOrder                : qtyOrderedNotShipped + qtyShippedNotReceived,
