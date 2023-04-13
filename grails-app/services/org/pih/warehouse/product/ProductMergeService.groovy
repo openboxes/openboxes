@@ -98,7 +98,7 @@ class ProductMergeService {
 
         // TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
 
-        log.info "Merging ${obsolete.productCode} product into ${primary.productCode}"
+        logProductMergeData(primary, obsolete, null)
 
         // 1. ProductSupplier
         List<ProductSupplier> obsoletedSuppliers = ProductSupplier.findAllByProduct(obsolete)
@@ -455,12 +455,18 @@ class ProductMergeService {
         ProductMergeLogger productMergeLogger = new ProductMergeLogger(
             primaryProduct: primary,
             obsoleteProduct: obsolete,
-            relatedObjectId: relatedObject?.id,
-            relatedObjectClassName: relatedObject?.class?.toString(),
+            relatedObjectId: relatedObject?.id ?: "",
+            relatedObjectClassName: relatedObject?.class?.toString() ?: "",
             dateMerged: new Date()
         )
-        log.info "Product merge logger - swapping product, from ${obsolete?.productCode} to ${primary?.productCode}" +
-            " for ${relatedObject?.class?.toString()} with ID: ${relatedObject?.id}"
+
+        if (relatedObject) {
+            log.info "Product merge logger - swapping product, from ${obsolete?.productCode} to ${primary?.productCode}" +
+                " for ${relatedObject?.class?.toString()} with ID: ${relatedObject?.id}"
+        } else {
+            log.info "Merging ${obsolete?.productCode} product into ${primary?.productCode}"
+        }
+
         if (!productMergeLogger.save(flush: true)) {
             throw new Exception("Cannot save product merge logger due to: " + productMergeLogger.errors?.toString())
         }
