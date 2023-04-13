@@ -1,55 +1,55 @@
 import {
-  ADD_FEATURE_BAR,
-  CLOSE_FEATURE_BAR,
-  HIDE_FEATURE_BAR,
-  SHOW_FEATURE_BAR,
+  ADD_INFO_BAR,
+  CLOSE_INFO_BAR,
+  HIDE_INFO_BAR,
+  SHOW_INFO_BAR,
 } from 'actions/types';
 
 const initialState = {
-  features: {},
+  bars: {},
 };
 
-const editProperty = ({ features, name, propertyToChange }) => ({
-  ...features,
+const editProperty = ({ bars, name, propertyToChange }) => ({
+  ...bars,
   [name]: {
-    ...features[name],
+    ...bars[name],
     ...propertyToChange,
   },
 });
 
-export default function newFeaturesReducer(state = initialState, action) {
+export default function infoBarReducer(state = initialState, action) {
   switch (action.type) {
-    case ADD_FEATURE_BAR:
+    case ADD_INFO_BAR:
       return {
         ...state,
-        features: {
-          ...state.features,
+        bars: {
+          ...state.bars,
           [action.payload.name]: action.payload,
         },
       };
-    case HIDE_FEATURE_BAR:
+    case HIDE_INFO_BAR:
       return {
         ...state,
-        features: editProperty({
-          features: state.features,
+        bars: editProperty({
+          bars: state.bars,
           name: action.payload.name,
           propertyToChange: { show: false },
         }),
       };
-    case CLOSE_FEATURE_BAR:
+    case CLOSE_INFO_BAR:
       return {
         ...state,
-        features: editProperty({
-          features: state.features,
+        bars: editProperty({
+          bars: state.bars,
           name: action.payload.name,
           propertyToChange: { show: false, closed: true },
         }),
       };
-    case SHOW_FEATURE_BAR:
+    case SHOW_INFO_BAR:
       return {
         ...state,
-        features: editProperty({
-          features: state.features,
+        bars: editProperty({
+          bars: state.bars,
           name: action.payload.name,
           propertyToChange: { show: true },
         }),

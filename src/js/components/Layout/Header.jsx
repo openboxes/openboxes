@@ -4,17 +4,17 @@ import PropTypes from 'prop-types';
 import { RiMenuLine } from 'react-icons/ri';
 import { connect } from 'react-redux';
 
+import InfoBar from 'components/infoBar/InfoBar';
 import ImpersonateInfo from 'components/Layout/ImpersonateInfo';
 import LocalizationModeInfo from 'components/Layout/LocalizationModeInfo';
 import Logo from 'components/Layout/Logo';
 import Menu from 'components/Layout/menu/Menu';
 import NavbarIcons from 'components/Layout/NavbarIcons';
 import LocationChooser from 'components/location/LocationChooser';
-import NewFeatureBar from 'components/newFeaturesInfo/NewFeatureBar';
 
 import 'components/Layout/HeaderStyles.scss';
 
-const Header = ({ isImpersonated, localizationModeEnabled, features }) => (
+const Header = ({ isImpersonated, localizationModeEnabled, bars }) => (
   <div className="navbar p-0">
     {isImpersonated && <ImpersonateInfo />}
     {localizationModeEnabled && <LocalizationModeInfo />}
@@ -43,12 +43,12 @@ const Header = ({ isImpersonated, localizationModeEnabled, features }) => (
         </ul>
       </div>
     </nav>
-    {Object.entries(features)?.map((([feature, values]) => {
+    {Object.entries(bars)?.map((([bar, values]) => {
         if (values.show) {
           return (
-            <NewFeatureBar
+            <InfoBar
               {...values}
-              key={feature}
+              key={bar}
             />
           );
         }
@@ -59,7 +59,7 @@ const Header = ({ isImpersonated, localizationModeEnabled, features }) => (
 const mapStateToProps = state => ({
   isImpersonated: state.session.isImpersonated,
   localizationModeEnabled: state.session.localizationModeEnabled,
-  features: state.newFeatures.features,
+  bars: state.infoBar.bars,
 });
 
 export default connect(mapStateToProps)(Header);
@@ -67,7 +67,7 @@ export default connect(mapStateToProps)(Header);
 Header.propTypes = {
   isImpersonated: PropTypes.bool.isRequired,
   localizationModeEnabled: PropTypes.bool.isRequired,
-  features: PropTypes.arrayOf(PropTypes.shape({
+  bars: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     show: PropTypes.bool.isRequired,
     closed: PropTypes.bool,

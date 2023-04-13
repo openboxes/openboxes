@@ -4,33 +4,33 @@ import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
 import { useDispatch } from 'react-redux';
 
-import { closeNewFeatureBar } from 'actions';
-import NewFeatureBarTitle from 'components/newFeaturesInfo/NewFeatureBarTitle';
-import NewFeatureBarVersionBox from 'components/newFeaturesInfo/NewFeatureBarVersionBox';
+import { closeInfoBar } from 'actions';
+import InfoBarTitle from 'components/infoBar/InfoBarTitle';
+import InfoBarVersionBox from 'components/infoBar/InfoBarVersionBox';
 import useTranslation from 'hooks/useTranslation';
 
-const NewFeatureBar = ({
+const InfoBar = ({
   name,
   versionLabel,
   title,
 }) => {
-  useTranslation('newFeature');
+  useTranslation('infoBar');
   const dispatch = useDispatch();
 
   return (
-    <div className="new-feature-bar">
+    <div className="info-bar">
       <div className="d-flex justify-content-center gap-8 align-items-center">
-        <NewFeatureBarVersionBox versionLabel={versionLabel} />
-        <NewFeatureBarTitle title={title} />
+        <InfoBarVersionBox versionLabel={versionLabel} />
+        <InfoBarTitle title={title} />
       </div>
-      <RiCloseFill onClick={() => dispatch(closeNewFeatureBar(name))} cursor="pointer" />
+      <RiCloseFill onClick={() => dispatch(closeInfoBar(name))} cursor="pointer" />
     </div>
   );
 };
 
-export default NewFeatureBar;
+export default InfoBar;
 
-NewFeatureBar.propTypes = {
+InfoBar.propTypes = {
   name: PropTypes.string.isRequired,
   title: PropTypes.shape({
     label: PropTypes.string.isRequired,

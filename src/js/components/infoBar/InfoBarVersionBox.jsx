@@ -5,16 +5,16 @@ import { RiInformationLine } from 'react-icons/all';
 
 import Translate from 'utils/Translate';
 
-const NewFeatureBarVersionBox = ({ versionLabel }) => (
+const InfoBarVersionBox = ({ versionLabel }) => (
   <div className="version-box">
     <RiInformationLine />
     <Translate id={versionLabel?.label} defaultMessage={versionLabel?.defaultLabel} />
   </div>
 );
 
-export default NewFeatureBarVersionBox;
+export default InfoBarVersionBox;
 
-NewFeatureBarVersionBox.propTypes = {
+InfoBarVersionBox.propTypes = {
   versionLabel: PropTypes.shape({
     label: PropTypes.string.isRequired,
     defaultLabel: PropTypes.string.isRequired,
