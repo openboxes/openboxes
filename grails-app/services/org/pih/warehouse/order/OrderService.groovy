@@ -1239,7 +1239,7 @@ class OrderService {
             // Drop mv temp table if somehow it still exists
             "DROP TABLE IF EXISTS order_summary_mv_temp;",
             // Create temp mv table from sql view (to shorten the time when MV is unavailable)
-            "CREATE TABLE order_summary_mv_temp AS SELECT * FROM order_summary;",
+            "CREATE TABLE order_summary_mv_temp AS SELECT DISTINCT * FROM order_summary;",
             "DROP TABLE IF EXISTS order_summary_mv;",
             // Copy data from temp mv table into mv table
             "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
@@ -1266,6 +1266,17 @@ class OrderService {
         }
 
         if (statements) {
+            try {
+                // Check if table exists.
+                dataService.executeQuery("SELECT * FROM order_summary_mv LIMIT 1")
+            } catch (Exception e) {
+                // UndeclaredThrowableException caused by MySQLSyntaxErrorException is thrown when
+                // the table 'order_summary_mv' doesn't exist. Then just simply refresh entire table
+                log.info "Refreshing order summary for ${orderIds} failed due to: ${e?.cause?.message}. Refreshing entire table now."
+                refreshOrderSummary()
+                return
+            }
+
             dataService.executeStatements(statements)
         }
     }
