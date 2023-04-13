@@ -52,8 +52,8 @@ class ProductMergeLogger implements Serializable {
     static constraints = {
         primaryProduct(nullable: false)
         obsoleteProduct(nullable: false)
-        relatedObjectId(nullable: false)
-        relatedObjectClassName(nullable: false)
+        relatedObjectId(nullable: false, blank: true)
+        relatedObjectClassName(nullable: false, blank: true)
         dateMerged(nullable: false)
         dateReverted(nullable: true)
         comments(nullable: true)
