@@ -49,3 +49,8 @@ export const REMOVE_STOCK_MOVEMENT_DRAFT = 'REMOVE_STOCK_MOVEMENT_DRAFT';
 
 export const FETCH_LOCATION_TYPES = 'FETCH_LOCATION_TYPES';
 
+// Info bars
+export const ADD_INFO_BAR = 'ADD_INFO_BAR';
+export const SHOW_INFO_BAR = 'SHOW_INFO_BAR';
+export const HIDE_INFO_BAR = 'HIDE_INFO_BAR';
+export const CLOSE_INFO_BAR = 'CLOSE_INFO_BAR';

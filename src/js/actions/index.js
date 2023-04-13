@@ -3,9 +3,11 @@ import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
+  ADD_INFO_BAR,
   ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
+  CLOSE_INFO_BAR,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -27,6 +29,7 @@ import {
   FETCH_SUPPLIERS,
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
+  HIDE_INFO_BAR,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
@@ -36,6 +39,7 @@ import {
   SET_ACTIVE_CONFIG,
   SET_OFFLINE,
   SET_ONLINE,
+  SHOW_INFO_BAR,
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
@@ -600,3 +604,37 @@ export const fetchLocationTypes = config => async (dispatch) => {
     payload: data,
   });
 };
+
+export const createInfoBar = ({
+  name, versionLabel, title,
+}) => ({
+  type: ADD_INFO_BAR,
+  payload: {
+    name,
+    versionLabel,
+    title,
+    show: true,
+  },
+});
+
+export const hideInfoBar = name => ({
+  type: HIDE_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const closeInfoBar = name => ({
+  type: CLOSE_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const showInfoBar = name => ({
+  type: SHOW_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+

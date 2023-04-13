@@ -1382,3 +1382,38 @@ div.search-input:focus-within {
     height: 20px;
   }
 }
+
+// Info bars styling
+.info-bar {
+  height: 50px;
+  background-color: var(--blue-primary);
+  color: #FFFFFF;
+  width: 100%;
+  padding: 12px 32px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .version-box {
+    background-color: var(--blue-100);
+    border-radius: 40px;
+    padding: 4px 8px;
+    color: var(--blue-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .read-more-label {
+    text-decoration: underline;
+    font-weight: 500;
+  }
+}

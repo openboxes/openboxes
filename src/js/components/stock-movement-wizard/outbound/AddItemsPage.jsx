@@ -14,9 +14,13 @@ import Alert from 'react-s-alert';
 
 import {
   addStockMovementDraft,
+  closeInfoBar,
+  createInfoBar,
   fetchUsers,
+  hideInfoBar,
   hideSpinner,
   removeStockMovementDraft,
+  showInfoBar,
   showSpinner,
 } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -26,6 +30,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
@@ -348,10 +353,14 @@ class AddItemsPage extends Component {
     this.getStockMovementDraft = this.getStockMovementDraft.bind(this);
     this.transitionToNextStep = this.transitionToNextStep.bind(this);
     this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
+    this.shouldShowAutosaveFeatureBar = this.shouldShowAutosaveFeatureBar.bind(this);
+    this.shouldCreateAutosaveFeatureBar = this.shouldCreateAutosaveFeatureBar.bind(this);
+    this.componentCleanup = this.componentCleanup.bind(this);
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
   }
+
 
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
@@ -359,7 +368,19 @@ class AddItemsPage extends Component {
 
       this.fetchAllData();
     }
+    // If the feature bar has not yet been triggered, try to add it to the redux store
+    if (this.shouldCreateAutosaveFeatureBar()) {
+      this.props.createInfoBar(InfoBarConfigs[InfoBar.AUTOSAVE]);
+    }
+    // If the feature bar has not yet been closed by the user, show it
+    if (this.shouldShowAutosaveFeatureBar()) {
+      this.props.showInfoBar(InfoBar.AUTOSAVE);
+    }
+    // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
+    // react router redirects, not for "links" (<a href>)
+    window.addEventListener('beforeunload', this.componentCleanup);
   }
+
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
@@ -367,6 +388,15 @@ class AddItemsPage extends Component {
 
       this.fetchAllData();
     }
+  }
+
+  componentWillUnmount() {
+    // We want to hide the feature bar when unmounting the component
+    // not to show it on any other page
+    this.props.hideInfoBar(InfoBar.AUTOSAVE);
+    // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
+    // react router redirects, not for "links" (<a href>)
+    window.removeEventListener('beforeunload', this.componentCleanup);
   }
 
   /**
@@ -531,6 +561,24 @@ class AddItemsPage extends Component {
     });
     this.saveRequisitionItemsInCurrentStep(this.props.savedStockMovement.lineItems, true);
     this.props.hideSpinner();
+  }
+
+
+  componentCleanup() {
+    this.props.hideInfoBar(InfoBar.AUTOSAVE);
+  }
+
+  shouldCreateAutosaveFeatureBar() {
+    const { bars, isAutosaveEnabled } = this.props;
+    // Create the feature bar if it has not been yet created and the autosave is enabled
+    return isAutosaveEnabled && !bars?.[InfoBar.AUTOSAVE];
+  }
+
+  shouldShowAutosaveFeatureBar() {
+    const { bars } = this.props;
+    // Show the autosave feature bar if it has been created (added to store)
+    // and has not yet been closed by a user
+    return bars?.[InfoBar.AUTOSAVE] && !bars[InfoBar.AUTOSAVE].closed;
   }
 
   updateTotalCount(value) {
@@ -1417,6 +1465,8 @@ const mapStateToProps = (state, ownProps) => ({
   savedStockMovement: state.stockMovementDraft[ownProps.initialValues.id],
   isOnline: state.connection.online,
   isAutosaveEnabled: state.session.isAutosaveEnabled,
+  bars: state.infoBar.bars,
+  supportedActivities: state.session.supportedActivities,
 });
 
 const mapDispatchToProps = {
@@ -1425,6 +1475,10 @@ const mapDispatchToProps = {
   fetchUsers,
   addStockMovementDraft,
   removeStockMovementDraft,
+  createInfoBar,
+  hideInfoBar,
+  closeInfoBar,
+  showInfoBar,
 };
 
 export default (connect(mapStateToProps, mapDispatchToProps)(AddItemsPage));
@@ -1470,6 +1524,22 @@ AddItemsPage.propTypes = {
   }),
   isOnline: PropTypes.bool,
   isAutosaveEnabled: PropTypes.bool,
+  createInfoBar: PropTypes.func.isRequired,
+  bars: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    show: PropTypes.bool.isRequired,
+    closed: PropTypes.bool,
+    title: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+    versionLabel: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      defaultLabel: PropTypes.string.isRequired,
+    }),
+  })).isRequired,
+  showInfoBar: PropTypes.func.isRequired,
+  hideInfoBar: PropTypes.func.isRequired,
 };
 
 AddItemsPage.defaultProps = {
