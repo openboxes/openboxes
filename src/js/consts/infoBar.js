@@ -16,3 +16,8 @@ export const InfoBarConfigs = {
   },
 };
 
+export const InfoBarVersionBoxVariant = {
+  FILLED: 'filled',
+  OUTLINED: 'outlined',
+};
+
