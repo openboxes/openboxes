@@ -1372,6 +1372,66 @@ div.search-input:focus-within {
   }
 }
 
+.line-item-icon-save-indicator {
+  width: 21px;
+  height: 21px;
+  border-radius: 16px;
+  background-color: var(--gray-101);
+  padding: 3px;
+  position: relative;
+  right: 5px;
+
+  &.saving {
+    color: var(--blue-500);
+
+    div {
+      width: 14.85px;
+      height: 14.85px;
+      font-size: 2px;
+    }
+  }
+
+  &.pending {
+    color: var(--gray-350);
+  }
+
+  &.saved {
+    color: var(--blue-primary);
+  }
+
+  &.error {
+    background-color: var(--red-500);
+    padding: 0;
+    height: 18px;
+    width: 18px;
+
+    svg {
+      position: relative;
+      bottom: 3px;
+      right: 3px;
+      width: 24px;
+      height: 24px;
+      color: var(--gray-101);
+    }
+  }
+}
+
+.saving-button {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    margin: 1px 3px 0 0;
+    width: 14.85px;
+    height: 14.85px;
+    font-size: 2px;
+  }
+
+  i {
+    margin-top: 3px;
+  }
+}
+
 // Shipment type with identifier styling
 
 .shipment-identifier {

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
   RiArrowGoBackLine,
   RiChat3Line,
+  RiCloseLine,
   RiDeleteBinLine,
   RiDownload2Line,
   RiFileLine,
@@ -12,8 +13,7 @@ import {
   RiPencilLine,
   RiPrinterLine,
   RiShoppingCartLine,
-} from 'react-icons/all';
-import { RiCloseLine } from 'react-icons/ri';
+} from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 

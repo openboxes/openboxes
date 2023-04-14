@@ -30,11 +30,13 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import Spinner from 'components/spinner/Spinner';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -42,7 +44,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
-  label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
   flexWidth: '1',
   fieldKey: '',
@@ -67,6 +68,11 @@ const DELETE_BUTTON_FIELD = {
   attributes: {
     className: 'btn btn-outline-danger',
   },
+};
+
+const ROW_SAVE_ICON_FIELD = {
+  type: params => <RowSaveIconIndicator lineItemSaveStatus={params.fieldValue} />,
+  flexWidth: '0.2',
 };
 
 const NO_STOCKLIST_FIELDS = {
@@ -404,11 +410,17 @@ class AddItemsPage extends Component {
    * @public
    */
   getFields() {
-    if (_.get(this.state.values.stocklist, 'id')) {
-      return STOCKLIST_FIELDS;
-    }
-
-    return NO_STOCKLIST_FIELDS;
+    const fields = _.get(this.state.values.stocklist, 'id') ? STOCKLIST_FIELDS : NO_STOCKLIST_FIELDS;
+    const fieldsWithRowSaveIcon = {
+      lineItems: {
+        ...fields.lineItems,
+        fields: {
+          ...fields.lineItems.fields,
+          rowSaveStatus: ROW_SAVE_ICON_FIELD,
+        },
+      },
+    };
+    return this.props.isAutosaveEnabled ? fieldsWithRowSaveIcon : fields;
   }
 
   /**
@@ -1344,7 +1356,13 @@ class AddItemsPage extends Component {
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                  <span className="saving-button">
+                    {_.some(
+                      values.lineItems,
+                      item => item.rowSaveStatus === RowSaveStatus.SAVING,
+                    ) ? <Spinner /> : <i className="fa fa-save pr-2" />}
+                    <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                  </span>
                 </button>
                 <button
                   type="button"
