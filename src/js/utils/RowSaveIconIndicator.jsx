@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import RowSaveStatus from 'consts/rowSaveStatus';
-import SaveStatusIcons from 'consts/SaveStatusIcons';
+import SaveStatusIcons from 'consts/saveStatusIcons';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 const RowSaveIconIndicator = ({ lineItemSaveStatus }) => {

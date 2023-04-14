@@ -71,7 +71,7 @@ const DELETE_BUTTON_FIELD = {
 };
 
 const ROW_SAVE_ICON_FIELD = {
-  type: (params) => <RowSaveIconIndicator lineItemSaveStatus={params.fieldValue} />,
+  type: params => <RowSaveIconIndicator lineItemSaveStatus={params.fieldValue} />,
   flexWidth: '0.2',
 };
 
