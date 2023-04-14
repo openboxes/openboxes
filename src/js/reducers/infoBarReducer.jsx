@@ -35,7 +35,7 @@ export default function infoBarReducer(state = initialState, action) {
         bars: editProperty({
           bars: state.bars,
           name: action.payload.name,
-          propertyToChange: { show: false },
+          propertyToChange: { show: false, isModalOpen: false },
         }),
       };
     case CLOSE_INFO_BAR:

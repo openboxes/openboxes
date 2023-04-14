@@ -32,7 +32,7 @@ const AutosaveFeatureModal = ({ isOpen }) => {
 
 const mapStateToProps = state => ({
   isOpen: state.infoBar.bars?.[InfoBar.AUTOSAVE]?.isModalOpen,
-  versionLabel: state.infoBar.bars?.[InfoBar.AUTOSAVE].versionLabel,
+  versionLabel: state.infoBar.bars?.[InfoBar.AUTOSAVE]?.versionLabel,
 });
 
 const mapDispatchToProps = {
