@@ -1355,20 +1355,20 @@ class AddItemsPage extends Component {
                     type="button"
                     disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
-                  onMouseDown={() => this.save(values)}
-                  className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
-                >
-                  <span className="saving-button">
-                    {_.some(
+                    onMouseDown={() => this.save(values)}
+                    className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
+                  >
+                    <span className="saving-button">
+                      {_.some(
                       values.lineItems,
                       item => item.rowSaveStatus === RowSaveStatus.SAVING,
                     ) ? <Spinner /> : <i className="fa fa-save pr-2" />}
-                    <Translate id="react.default.button.save.label" defaultMessage="Save" />
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  disabled={invalid}
+                      <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={invalid}
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                     onMouseDown={() => this.saveAndExit(values)}
                     className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
