@@ -30,6 +30,7 @@ import {
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
   HIDE_INFO_BAR,
+  HIDE_INFO_BAR_MODAL,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
@@ -40,6 +41,7 @@ import {
   SET_OFFLINE,
   SET_ONLINE,
   SHOW_INFO_BAR,
+  SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
@@ -633,6 +635,20 @@ export const closeInfoBar = name => ({
 
 export const showInfoBar = name => ({
   type: SHOW_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const showInfoBarModal = name => ({
+  type: SHOW_INFO_BAR_MODAL,
+  payload: {
+    name,
+  },
+});
+
+export const hideInfoBarModal = name => ({
+  type: HIDE_INFO_BAR_MODAL,
   payload: {
     name,
   },

@@ -2,7 +2,9 @@ import {
   ADD_INFO_BAR,
   CLOSE_INFO_BAR,
   HIDE_INFO_BAR,
+  HIDE_INFO_BAR_MODAL,
   SHOW_INFO_BAR,
+  SHOW_INFO_BAR_MODAL,
 } from 'actions/types';
 
 const initialState = {
@@ -33,7 +35,7 @@ export default function infoBarReducer(state = initialState, action) {
         bars: editProperty({
           bars: state.bars,
           name: action.payload.name,
-          propertyToChange: { show: false },
+          propertyToChange: { show: false, isModalOpen: false },
         }),
       };
     case CLOSE_INFO_BAR:
@@ -52,6 +54,24 @@ export default function infoBarReducer(state = initialState, action) {
           bars: state.bars,
           name: action.payload.name,
           propertyToChange: { show: true },
+        }),
+      };
+    case SHOW_INFO_BAR_MODAL:
+      return {
+        ...state,
+        bars: editProperty({
+          bars: state.bars,
+          name: action.payload.name,
+          propertyToChange: { isModalOpen: true },
+        }),
+      };
+    case HIDE_INFO_BAR_MODAL:
+      return {
+        ...state,
+        bars: editProperty({
+          bars: state.bars,
+          name: action.payload.name,
+          propertyToChange: { isModalOpen: false },
         }),
       };
     default:

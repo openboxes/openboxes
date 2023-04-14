@@ -1462,18 +1462,72 @@ div.search-input:focus-within {
     height: 18px;
   }
 
-  .version-box {
-    background-color: var(--blue-100);
-    border-radius: 40px;
-    padding: 4px 8px;
-    color: var(--blue-primary);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
   .read-more-label {
     text-decoration: underline;
     font-weight: 500;
+  }
+}
+
+.version-box {
+  border-radius: 40px;
+}
+
+.version-box-outlined {
+  background-color: var(--blue-100);
+  padding: 4px 8px;
+  color: var(--blue-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.version-box-filled {
+  background-color: var(--blue-primary);
+  padding: 4px 12px;
+  color: #FFFFFF;
+}
+
+// Feature Modal icons styling
+
+#feature-modal-paragraph {
+  display: flex;
+
+  span {
+    margin-left: 5px;
+    margin-right: 8px;
+  }
+
+  div {
+    border-radius: 16px;
+    width: 21px;
+    height: 21px;
+    padding: 3px;
+    background-color: var(--gray-101);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .feature-modal-paragraph-saved {
+    color: var(--blue-primary);
+  }
+
+  .feature-modal-paragraph-draft {
+    color: var(--gray-350);
+  }
+
+  .feature-modal-paragraph-error {
+    background-color: var(--red-500);
+    padding: 0;
+    height: 18px;
+    width: 17px;
+    margin-right: 3px;
+
+    svg {
+      color: var(--gray-101);
+      transform: scale(1.9);
+      position: relative;
+      left: 2px;
+    }
   }
 }
