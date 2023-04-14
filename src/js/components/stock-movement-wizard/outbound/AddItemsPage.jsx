@@ -71,7 +71,7 @@ const DELETE_BUTTON_FIELD = {
 };
 
 const ROW_SAVE_ICON_FIELD = {
-  type: RowSaveIconIndicator,
+  type: (params) => <RowSaveIconIndicator lineItemSaveStatus={params.fieldValue} />,
   flexWidth: '0.2',
 };
 
@@ -416,7 +416,7 @@ class AddItemsPage extends Component {
         ...fields.lineItems,
         fields: {
           ...fields.lineItems.fields,
-          rowSaveStatusIcon: ROW_SAVE_ICON_FIELD,
+          rowSaveStatus: ROW_SAVE_ICON_FIELD,
         },
       },
     };

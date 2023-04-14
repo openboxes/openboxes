@@ -27,6 +27,6 @@ RowSaveIconIndicator.propTypes = {
 };
 
 RowSaveIconIndicator.defaultProps = {
-  lineItemSaveStatus: RowSaveStatus.SAVING,
+  lineItemSaveStatus: RowSaveStatus.SAVED,
 };
 
