@@ -117,7 +117,7 @@
 								<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}"/>&nbsp;
 								<g:message code="default.button.next.label" default="Next"/>
 							</g:link>
-							<g:if test="${grailsApplication.config.openboxes.mergeProducts.enabled}">
+							<g:if test="${grailsApplication.config.openboxes.products.merge.enabled}">
 								<button class="btn-show-dialog button" data-title="${g.message(code:'product.mergeProducts.label')}"
 								   data-url="${request.contextPath}/product/showMergeProductDialog?primaryProduct=${productInstance?.id}&template=mergeProducts">
 									<img src="${resource(dir: 'images/icons/silk', file: 'share.png')}"/>&nbsp;

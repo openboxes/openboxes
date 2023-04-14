@@ -1209,8 +1209,8 @@ class ProductController {
         render(template: params.template, model: [ primaryProduct: primaryProduct ])
     }
 
-    def mergeProduct = {
-        Boolean enabled = ConfigurationHolder.config.openboxes.mergeProducts.enabled
+    def merge = {
+        Boolean enabled = ConfigurationHolder.config.openboxes.products.merge.enabled
         if (!enabled) {
             throw new IllegalArgumentException("Merge products feature is not enabled")
         }
