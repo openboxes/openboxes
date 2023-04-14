@@ -30,6 +30,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import Spinner from 'components/spinner/Spinner';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
@@ -1355,7 +1356,13 @@ class AddItemsPage extends Component {
                   onMouseDown={() => this.save(values)}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                 >
-                  <span><i className="fa fa-save pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+                  <span className="saving-button">
+                    {_.some(
+                      values.lineItems,
+                      item => item.rowSaveStatus === RowSaveStatus.SAVING,
+                    ) ? <Spinner /> : <i className="fa fa-save pr-2" />}
+                    <Translate id="react.default.button.save.label" defaultMessage="Save" />
+                  </span>
                 </button>
                 <button
                   type="button"

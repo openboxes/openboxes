@@ -2,6 +2,7 @@ import React from 'react';
 
 import { RiCheckFill, RiErrorWarningFill, RiSubtractFill } from 'react-icons/ri';
 
+import Spinner from 'components/spinner/Spinner';
 import RowSaveStatus from 'consts/rowSaveStatus';
 
 const SaveStatusIcons = {
@@ -21,7 +22,7 @@ const SaveStatusIcons = {
     defaultMessage: 'Item not saved. Correct the error',
   },
   [RowSaveStatus.SAVING]: {
-    icon: <div className="circle-spinner" />,
+    icon: <Spinner />,
     id: 'react.stockMovement.tooltip.pendingSave.label',
     defaultMessage: 'Saving in progress',
   },

@@ -1382,6 +1382,13 @@ div.search-input:focus-within {
   right: 5px;
 
   &.saving {
+    color: var(--blue-500);
+
+    div {
+      width: 14.85px;
+      height: 14.85px;
+      font-size: 2px;
+    }
   }
 
   &.pending {
@@ -1409,6 +1416,21 @@ div.search-input:focus-within {
   }
 }
 
+.saving-button {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    margin: 1px 3px 0 0;
+    width: 14.85px;
+    height: 14.85px;
+    font-size: 2px;
+  }
+
+  i {
+    margin-top: 3px;
+  }
+}
 
 // Shipment type with identifier styling
 
