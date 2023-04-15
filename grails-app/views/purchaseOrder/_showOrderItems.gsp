@@ -677,6 +677,12 @@
           return $("#adjustmentsRowTemplate").tmpl(data);
         }
 
+        // https://stackoverflow.com/a/34064434
+        function htmlDecode(input) {
+          var doc = new DOMParser().parseFromString(input, 'text/html');
+          return doc.documentElement.textContent;
+        }
+
         // Update source code column with product supplier source codes based on product chosen by user
         function productChanged(productId, supplierId, destinationPartyId, sourceId = null) {
           $.ajax({
@@ -709,7 +715,7 @@
               .trigger('change')
               .removeAttr("disabled");
               if (!$('#productSupplier').find("option[value='" + CREATE_NEW + "']").length) {
-                  $('#productSupplier').append(new Option(CREATE_NEW, CREATE_NEW, false, false)).trigger('change');
+                  $('#productSupplier').append(new Option(htmlDecode(CREATE_NEW), htmlDecode(CREATE_NEW), false, false)).trigger('change');
               }
               if (sourceId) {
                 $('#productSupplier').val(sourceId).trigger('change');
