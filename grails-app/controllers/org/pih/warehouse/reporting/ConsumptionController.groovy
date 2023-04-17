@@ -41,6 +41,7 @@ class ConsumptionController {
     InventoryService inventoryService
     ConsumptionService consumptionService
     UserService userService
+    def productAvailabilityService
 
     def show = { ShowConsumptionCommand command ->
 
@@ -269,7 +270,7 @@ class ConsumptionController {
             if (!fromLocationsEmpty && command.includeQuantityOnHand) {
                 command.fromLocations.each { location ->
                     if (location.inventory) {
-                        def onHandQuantityMap = inventoryService.getQuantityByProductMap(location.inventory, products)
+                        def onHandQuantityMap = productAvailabilityService.getCurrentInventory(location)
 
                         // For each product, add to the onhand quantity map
                         products.each { product ->
