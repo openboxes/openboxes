@@ -14,6 +14,7 @@ import reasonCodesReducer from 'reducers/reasonCodesReducer';
 import requisitionStatusCodes from 'reducers/requisitionStatusCodes';
 import sessionReducer from 'reducers/sessionReducer';
 import shipmentStatusCodes from 'reducers/shipmentStatusCodes';
+import showBarReducer from 'reducers/showBarReducer';
 import spinnerReducer from 'reducers/spinnerReducer';
 import stockMovementCommonReducer from 'reducers/stockMovementCommonReducer';
 import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
   stockMovementCommon: stockMovementCommonReducer,
   location: locationReducer,
   infoBar: infoBarReducer,
+  showBar: showBarReducer,
 });
 
 export default rootReducer;

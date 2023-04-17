@@ -35,7 +35,7 @@ export default function infoBarReducer(state = initialState, action) {
         bars: editProperty({
           bars: state.bars,
           name: action.payload.name,
-          propertyToChange: { show: false, isModalOpen: false },
+          propertyToChange: { isModalOpen: false },
         }),
       };
     case CLOSE_INFO_BAR:
@@ -44,7 +44,7 @@ export default function infoBarReducer(state = initialState, action) {
         bars: editProperty({
           bars: state.bars,
           name: action.payload.name,
-          propertyToChange: { show: false, closed: true },
+          propertyToChange: { closed: true },
         }),
       };
     case SHOW_INFO_BAR:
@@ -53,7 +53,6 @@ export default function infoBarReducer(state = initialState, action) {
         bars: editProperty({
           bars: state.bars,
           name: action.payload.name,
-          propertyToChange: { show: true },
         }),
       };
     case SHOW_INFO_BAR_MODAL:
