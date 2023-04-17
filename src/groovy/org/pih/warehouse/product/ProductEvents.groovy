@@ -63,7 +63,7 @@ class ProductEvents {
     }
 
     def getOtherProductId() {
-        ProductMergeEvent mergeEvent = productMergeEvents?.first()
+        ProductMergeEvent mergeEvent = productMergeEvents?.last()
 
         if (!mergeEvent) {
             return null

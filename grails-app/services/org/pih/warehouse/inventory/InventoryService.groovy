@@ -3374,7 +3374,10 @@ class InventoryService implements ApplicationContextAware {
      * Get list of unique inventories that have TransactionEntries for given product
      * */
     List<Inventory> getInventoriesWithTransactionsByProduct(Product product) {
-        List<Transaction> transactions = Transaction.createCriteria().listDistinct {
+        return Transaction.createCriteria().listDistinct {
+            projections {
+                property "inventory"
+            }
             transactionEntries {
                 or {
                     eq("product", product)
@@ -3384,7 +3387,5 @@ class InventoryService implements ApplicationContextAware {
                 }
             }
         }
-
-        return transactions?.collect { it.inventory }?.unique()
     }
 }

@@ -32,6 +32,7 @@ class ProductMergeService {
 
     /**
      * Preforms product swapping for a product pairs passed as params
+     * TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
      * */
     def mergeProduct(String primaryId, String obsoleteId) {
         /**
@@ -95,9 +96,6 @@ class ProductMergeService {
         /**
          * III. SWAP TRIVIAL RELATIONS
          * */
-
-        // TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
-
         logProductMergeData(primary, obsolete, null)
 
         // 1. ProductSupplier
@@ -145,8 +143,6 @@ class ProductMergeService {
         /**
          * IV. TRANSACTIONS, INVENTORY ITEMS AND OTHER "ITEM" RELATIONS
          * */
-
-        // TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
 
         // 1. Create a new common transaction that will contain current stock of both products. This is required
         //    for inventories that have transaction entries for bot products. If this transaction won't be created,

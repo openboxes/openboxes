@@ -42,7 +42,7 @@
   function mergeProduct(primaryProduct, obsoleteProduct) {
       $(".loading").show();
       $.ajax({
-        url: "${g.createLink(controller:'product', action:'mergeProduct')}",
+        url: "${g.createLink(controller:'product', action:'merge')}",
         type: "POST",
         data: {
           primaryProduct,
