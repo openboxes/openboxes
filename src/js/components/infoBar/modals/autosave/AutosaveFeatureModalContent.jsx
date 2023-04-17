@@ -11,12 +11,6 @@ const AutosaveFeatureModalContent = () => (
     <div>
       <p>
         <Translate
-          id="react.autosaveFeatureModal.content.paragraph1.label"
-          defaultMessage={'Autosave is a new feature available in the "Create Outbound" section.'}
-        />
-      </p>
-      <p>
-        <Translate
           id="react.autosaveFeatureModal.content.paragraph2.label"
           defaultMessage="Every completed item will be saved automatically. Each row has now an indicator helping you track the autosaved items:"
         />

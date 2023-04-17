@@ -20,7 +20,7 @@ const InfoBar = ({
   return (
     <div className="info-bar">
       <div className="d-flex justify-content-center gap-8 align-items-center">
-        <InfoBarVersionBox versionLabel={versionLabel} />
+        <InfoBarVersionBox versionLabel={versionLabel} name={name} />
         <InfoBarTitle title={title} name={name} />
       </div>
       <RiCloseFill onClick={() => dispatch(closeInfoBar(name))} cursor="pointer" />

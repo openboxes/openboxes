@@ -1465,11 +1465,18 @@ div.search-input:focus-within {
   .read-more-label {
     text-decoration: underline;
     font-weight: 500;
+    cursor: pointer;
   }
 }
 
 .version-box {
   border-radius: 40px;
+  cursor: pointer;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .version-box-outlined {
@@ -1527,7 +1534,7 @@ div.search-input:focus-within {
       color: var(--gray-101);
       transform: scale(1.9);
       position: relative;
-      left: 2px;
+      left: 1px;
     }
   }
 }

@@ -372,7 +372,6 @@ class AddItemsPage extends Component {
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchAllData();
     }
     // If the feature bar has not yet been triggered, try to add it to the redux store
@@ -382,6 +381,10 @@ class AddItemsPage extends Component {
     // If the feature bar has not yet been closed by the user, show it
     if (this.shouldShowAutosaveFeatureBar()) {
       this.props.showInfoBar(InfoBar.AUTOSAVE);
+    }
+    // If the autosave is disabled, hide the bar
+    if (!this.props.isAutosaveEnabled) {
+      this.props.hideInfoBar(InfoBar.AUTOSAVE);
     }
     // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
     // react router redirects, not for "links" (<a href>)
