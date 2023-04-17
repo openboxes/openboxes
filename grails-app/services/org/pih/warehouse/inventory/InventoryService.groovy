@@ -3370,4 +3370,22 @@ class InventoryService implements ApplicationContextAware {
         return availableItems
     }
 
+    /**
+     * Get list of unique inventories that have TransactionEntries for given product
+     * */
+    List<Inventory> getInventoriesWithTransactionsByProduct(Product product) {
+        return Transaction.createCriteria().listDistinct {
+            projections {
+                property "inventory"
+            }
+            transactionEntries {
+                or {
+                    eq("product", product)
+                    inventoryItem {
+                        eq("product", product)
+                    }
+                }
+            }
+        }
+    }
 }

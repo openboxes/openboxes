@@ -252,7 +252,8 @@ class Product implements Comparable, Serializable {
                          "displayName",
                          "displayNames",
                          "displayNameOrDefaultName",
-                         "displayNameWithLocaleCode"
+                         "displayNameWithLocaleCode",
+                         "productEvents"
     ]
 
     static hasMany = [
@@ -734,6 +735,10 @@ class Product implements Comparable, Serializable {
             }
         }
         return data
+    }
+
+    def getProductEvents() {
+        return ProductEvents.createFromProduct(this)
     }
 
     Map toJson() {

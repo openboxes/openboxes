@@ -30,6 +30,7 @@ class InventorySnapshotService {
 
     boolean transactional = true
 
+    def dataService
     def dataSource
     def gparsService
     def locationService

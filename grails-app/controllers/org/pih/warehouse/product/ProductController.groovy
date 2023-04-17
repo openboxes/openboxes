@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
@@ -44,6 +45,7 @@ class ProductController {
     def documentService
     def inventoryService
     def barcodeService
+    def productMergeService
     UploadService uploadService
     def localizationService
 
@@ -1203,7 +1205,32 @@ class ProductController {
 
         redirect(controller: 'product', action: 'edit', id: params['product.id'])
     }
+
+    def showMergeProductDialog = {
+        // TODO: ADD WARNING IF PRODUCT HAS PENDING ORDER/SHIPMENT/RECEIPT/whatever
+        Product primaryProduct = Product.get(params.primaryProduct)
+        render(template: params.template, model: [ primaryProduct: primaryProduct ])
+    }
+
+    def merge = {
+        Boolean enabled = ConfigurationHolder.config.openboxes.products.merge.enabled
+        if (!enabled) {
+            throw new IllegalArgumentException("Merge products feature is not enabled")
+        }
+
+        productMergeService.mergeProduct(params.primaryProduct, params.obsoleteProduct)
+
+        flash.message = "${warehouse.message(code: 'product.mergeProducts.success.message', args: [params.primaryProduct, params.obsoleteProduct])}"
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
+    }
+
+    /**
+     * Temporary helper for testing and looking at Product Merge logs for QA
+     * */
+    def productMergeLogs = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def productMergeLogs = productMergeService.getProductMergeLogs(params)
+        render(view: "productMergeLogs", model: [productMergeLogs: productMergeLogs ?: []], params: params)
+    }
 }
-
-
-

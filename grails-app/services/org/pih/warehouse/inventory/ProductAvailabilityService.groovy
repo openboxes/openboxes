@@ -46,6 +46,7 @@ class ProductAvailabilityService {
     def productService
     def locationService
     def inventoryService
+    def dataService
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
@@ -886,5 +887,102 @@ class ProductAvailabilityService {
         }
 
         return quantityAvailableToPromiseByProductNotInBin ?: 0
+    }
+
+    /**
+     * Used for product merge feature (when primary product *had not*
+     * the same lot as obsolete product). Change product to primary for rows
+     * with given inventory item
+     * */
+    void updateProductAvailabilityOnMergeProduct(InventoryItem obsoleteInventoryItem, Product primaryProduct, Product obsoleteProduct) {
+        if (!obsoleteProduct?.id || !primaryProduct?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
+        String updateStatement = """
+            UPDATE IGNORE product_availability
+            SET product_code = '${primaryProduct.productCode}', 
+                product_id = '${primaryProduct.id}' 
+            WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
+        """
+        dataService.executeStatement(updateStatement)
+        log.info "Updated product availabilities for product: ${primaryProduct?.productCode} and " +
+            "inventory item: ${obsoleteInventoryItem?.id}"
+
+        // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, null)
+    }
+
+    /**
+     * Used for product merge feature (when primary product *had* the same lot as obsolete)
+     * Change product and inventory to primary for rows with given obsolete inventory item
+     * */
+    void updateProductAvailabilityOnMergeProduct(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product primaryProduct, Product obsoleteProduct) {
+        if (!primaryProduct?.id || !primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
+        String updateStatement = """
+            UPDATE IGNORE product_availability
+            SET product_code = '${primaryProduct.productCode}', 
+                product_id = '${primaryProduct.id}', 
+                inventory_item_id = '${primaryInventoryItem.id}', 
+                lot_number = '${primaryInventoryItem.lotNumber ?: 'DEFAULT'}' 
+            WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
+        """
+        dataService.executeStatement(updateStatement)
+        log.info "Updated product availabilities for product: ${primaryProduct?.productCode} and " +
+            "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
+
+        // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, primaryInventoryItem)
+    }
+
+    /**
+     * Used for product merge feature when initial update of product and inventory item was ignored due to the
+     * unique product_availability_uniq_idx violation.
+     * */
+    void processIgnoredProductAvailabilitiesOnProductMerge(Product primaryProduct, InventoryItem obsoleteInventoryItem, InventoryItem primaryInventoryItem) {
+        // Get all remaining obsolete product availabilities with obsolete inventory item
+        List<ProductAvailability> remainingProductAvailabilities = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
+        remainingProductAvailabilities?.each { ProductAvailability remainingProductAvailability ->
+            // Check if product availabilities are already existing for a product_availability_uniq_idx
+            ProductAvailability existingProductAvailability = ProductAvailability.createCriteria().get {
+                eq("location", remainingProductAvailability.location)
+                eq("productCode", primaryProduct.productCode)
+                eq("lotNumber", remainingProductAvailability.lotNumber?.trim() ?: 'DEFAULT')
+                eq("binLocationName", remainingProductAvailability.binLocationName)
+            }
+
+            // If exists, then add quantities from obsolete PA to the new main one
+            if (existingProductAvailability) {
+                existingProductAvailability.quantityOnHand += remainingProductAvailability.quantityOnHand
+                existingProductAvailability.quantityAllocated += remainingProductAvailability.quantityAllocated
+                existingProductAvailability.quantityNotPicked += remainingProductAvailability.quantityNotPicked
+                existingProductAvailability.quantityOnHold += remainingProductAvailability.quantityOnHold
+                existingProductAvailability.quantityAvailableToPromise += remainingProductAvailability.quantityAvailableToPromise
+                existingProductAvailability.save(flush: true)
+
+                remainingProductAvailability.quantityOnHand = 0
+                remainingProductAvailability.quantityAllocated = 0
+                remainingProductAvailability.quantityNotPicked = 0
+                remainingProductAvailability.quantityOnHold = 0
+                remainingProductAvailability.quantityAvailableToPromise = 0
+                remainingProductAvailability.save(flush: true)
+
+                return
+            }
+
+            // Otherwise swap product (and inventory item) on the remaining obsolete PA with primary ones
+            remainingProductAvailability.product = primaryProduct
+            remainingProductAvailability.productCode = primaryProduct.productCode
+            if (primaryInventoryItem) {
+                remainingProductAvailability.inventoryItem = primaryInventoryItem
+                remainingProductAvailability.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
+            }
+            remainingProductAvailability.save(flush: true)
+        }
     }
 }
