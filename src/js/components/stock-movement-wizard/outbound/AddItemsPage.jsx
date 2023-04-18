@@ -362,7 +362,6 @@ class AddItemsPage extends Component {
     this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
     this.shouldShowAutosaveFeatureBar = this.shouldShowAutosaveFeatureBar.bind(this);
     this.shouldCreateAutosaveFeatureBar = this.shouldCreateAutosaveFeatureBar.bind(this);
-    this.componentCleanup = this.componentCleanup.bind(this);
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -386,9 +385,6 @@ class AddItemsPage extends Component {
     if (!this.props.isAutosaveEnabled) {
       this.props.hideInfoBar(InfoBar.AUTOSAVE);
     }
-    // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
-    // react router redirects, not for "links" (<a href>)
-    window.addEventListener('beforeunload', this.componentCleanup);
   }
 
 
@@ -404,9 +400,6 @@ class AddItemsPage extends Component {
     // We want to hide the feature bar when unmounting the component
     // not to show it on any other page
     this.props.hideInfoBar(InfoBar.AUTOSAVE);
-    // This event acts like React's componentWillUnmount, but componentWillUnmount works only for
-    // react router redirects, not for "links" (<a href>)
-    window.removeEventListener('beforeunload', this.componentCleanup);
   }
 
   /**
@@ -577,11 +570,6 @@ class AddItemsPage extends Component {
     });
     this.saveRequisitionItemsInCurrentStep(this.props.savedStockMovement.lineItems, true);
     this.props.hideSpinner();
-  }
-
-
-  componentCleanup() {
-    this.props.hideInfoBar(InfoBar.AUTOSAVE);
   }
 
   shouldCreateAutosaveFeatureBar() {
@@ -1473,7 +1461,7 @@ class AddItemsPage extends Component {
             </div>
         )}
         />
-        <AutosaveFeatureModal />
+        {this.props.autoSaveInfoBarVisibility && <AutosaveFeatureModal />}
       </>
     );
   }
@@ -1491,6 +1479,7 @@ const mapStateToProps = (state, ownProps) => ({
   isOnline: state.connection.online,
   isAutosaveEnabled: state.session.isAutosaveEnabled,
   bars: state.infoBar.bars,
+  autoSaveInfoBarVisibility: state.infoBarVisibility[InfoBar.AUTOSAVE],
   supportedActivities: state.session.supportedActivities,
 });
 
@@ -1563,6 +1552,7 @@ AddItemsPage.propTypes = {
       defaultLabel: PropTypes.string.isRequired,
     }),
   })).isRequired,
+  autoSaveInfoBarVisibility: PropTypes.bool.isRequired,
   showInfoBar: PropTypes.func.isRequired,
   hideInfoBar: PropTypes.func.isRequired,
 };

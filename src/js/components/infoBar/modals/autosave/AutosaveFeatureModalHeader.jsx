@@ -31,7 +31,6 @@ const AutosaveFeatureModalHeader = ({ versionLabel, handleClose }) => (
 );
 
 const mapStateToProps = state => ({
-  isOpen: state.infoBar.bars?.[InfoBar.AUTOSAVE]?.isModalOpen,
   versionLabel: state.infoBar.bars?.[InfoBar.AUTOSAVE].versionLabel,
 });
 

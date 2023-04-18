@@ -6,6 +6,7 @@ import currenciesReducer from 'reducers/currenciesReducer';
 import filterFormReducer from 'reducers/filterFormReducer';
 import indicatorsReducer from 'reducers/indicatorsReducer';
 import infoBarReducer from 'reducers/infoBarReducer';
+import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
 import locationReducer from 'reducers/locationReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
@@ -14,7 +15,6 @@ import reasonCodesReducer from 'reducers/reasonCodesReducer';
 import requisitionStatusCodes from 'reducers/requisitionStatusCodes';
 import sessionReducer from 'reducers/sessionReducer';
 import shipmentStatusCodes from 'reducers/shipmentStatusCodes';
-import showBarReducer from 'reducers/showBarReducer';
 import spinnerReducer from 'reducers/spinnerReducer';
 import stockMovementCommonReducer from 'reducers/stockMovementCommonReducer';
 import stockMovementDraftReducer from 'reducers/stockMovementDraftReducer';
@@ -42,7 +42,7 @@ const rootReducer = combineReducers({
   stockMovementCommon: stockMovementCommonReducer,
   location: locationReducer,
   infoBar: infoBarReducer,
-  showBar: showBarReducer,
+  infoBarVisibility: infoBarVisibilityReducer,
 });
 
 export default rootReducer;
