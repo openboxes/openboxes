@@ -437,22 +437,6 @@ class AddItemsPage extends Component {
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
 
-    if (this.props.isAutosaveEnabled) {
-      // Here I am changing rowSaveStatus from PENDING to SAVING
-      // because all of these lines were sent to save
-      this.setState(previousState => ({
-        values: {
-          ...previousState.values,
-          lineItems: previousState.values.lineItems.map((item) => {
-            if (item.rowSaveStatus === RowSaveStatus.PENDING) {
-              return { ...item, rowSaveStatus: RowSaveStatus.SAVING };
-            }
-            return item;
-          }),
-        },
-      }));
-    }
-
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
@@ -508,7 +492,7 @@ class AddItemsPage extends Component {
       }
     });
 
-    return [].concat(
+    const lineItemsToSave = [].concat(
       _.map(lineItemsToBeAdded, item => ({
         'product.id': item.product.id,
         quantityRequested: item.quantityRequested,
@@ -523,6 +507,26 @@ class AddItemsPage extends Component {
         sortOrder: item.sortOrder,
       })),
     );
+
+    if (this.props.isAutosaveEnabled && lineItemsToSave.length) {
+      // Here I am changing rowSaveStatus from PENDING to SAVING
+      // because all of these lines were sent to save
+      this.setState(previousState => ({
+        values: {
+          ...previousState.values,
+          lineItems: previousState.values.lineItems.map((item) => {
+            if (item.rowSaveStatus === RowSaveStatus.PENDING &&
+                item.product &&
+                item.quantityRequested) {
+              return { ...item, rowSaveStatus: RowSaveStatus.SAVING };
+            }
+            return item;
+          }),
+        },
+      }));
+    }
+
+    return lineItemsToSave;
   }
 
   getSortOrder() {
