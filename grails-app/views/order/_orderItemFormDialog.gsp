@@ -356,7 +356,7 @@
     </table>
 </g:form>
 <script>
-    const CREATE_NEW = "${g.message(code: 'default.createNew.label', default: 'Create New')}";
+  const CREATE_NEW = htmlDecode("${g.message(code: 'default.createNew.label', default: 'Create New')}");
 
   function validateForm() {
     var budgetCode = $("#dlgBudgetCode").val();

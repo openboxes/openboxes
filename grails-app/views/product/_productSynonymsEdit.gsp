@@ -64,6 +64,7 @@
         </button>
     </div>
 </g:form>
+<script src="${createLinkTo(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
 <script type="text/javascript">
   function isValid() {
     const localeFieldValue = $("#locale-dlg").val()
@@ -72,14 +73,14 @@
 
     if (!localeFieldValue) {
       $("#locale_dlg_chosen")
-        .notify('${g.message(code: "default.field.required.label", default: "This field is required")}')
+        .notify(htmlDecode('${g.message(code: "default.field.required.label", default: "This field is required")}'))
     }
     if (!synonymTypeCodeFieldValue) {
       $("#synonymTypeCode_dlg_chosen")
-        .notify('${g.message(code: "default.field.required.label", default: "This field is required")}')
+        .notify(htmlDecode('${g.message(code: "default.field.required.label", default: "This field is required")}'))
     }
     if (!synonymFieldValue) {$("#synonym-dlg")
-      .notify('${g.message(code: "default.field.required.label", default: "This field is required")}')
+      .notify(htmlDecode('${g.message(code: "default.field.required.label", default: "This field is required")}'))
     }
 
     return localeFieldValue && synonymTypeCodeFieldValue && synonymFieldValue
