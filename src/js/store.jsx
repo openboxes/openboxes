@@ -14,7 +14,7 @@ const persistConfig = {
   // (see reference in the comments section in the: OBPIH-4735),
   // hence there is need to temporarily disable the indicator reducer
   // from the persisted reducers.
-  blacklist: ['indicators', 'spinner', 'connection'],
+  blacklist: ['indicators', 'spinner', 'connection', 'infoBarVisibility'],
 };
 
 const createStoreWithMiddleware = applyMiddleware(ReduxPromise, reduxThunk)(createStore);

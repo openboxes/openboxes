@@ -14,7 +14,9 @@ import LocationChooser from 'components/location/LocationChooser';
 
 import 'components/Layout/HeaderStyles.scss';
 
-const Header = ({ isImpersonated, localizationModeEnabled, bars }) => (
+const Header = ({
+  isImpersonated, localizationModeEnabled, infoBarVisibility, bars,
+}) => (
   <div className="navbar p-0">
     {isImpersonated && <ImpersonateInfo />}
     {localizationModeEnabled && <LocalizationModeInfo />}
@@ -43,23 +45,17 @@ const Header = ({ isImpersonated, localizationModeEnabled, bars }) => (
         </ul>
       </div>
     </nav>
-    {Object.entries(bars)?.map((([bar, values]) => {
-        if (values.show) {
-          return (
-            <InfoBar
-              {...values}
-              key={bar}
-            />
-          );
-        }
-        return null;
-      }))}
+    {Object.entries(bars)?.map((([bar, values]) => (infoBarVisibility[values.name]
+      ? <InfoBar {...values} key={bar} />
+      : null
+    )))}
   </div>);
 
 const mapStateToProps = state => ({
   isImpersonated: state.session.isImpersonated,
   localizationModeEnabled: state.session.localizationModeEnabled,
   bars: state.infoBar.bars,
+  infoBarVisibility: state.infoBarVisibility,
 });
 
 export default connect(mapStateToProps)(Header);
@@ -80,4 +76,6 @@ Header.propTypes = {
       defaultLabel: PropTypes.string.isRequired,
     }),
   })).isRequired,
+  infoBarVisibility: PropTypes.shape(Object.keys(InfoBar)
+    .reduce((acc, bar) => ({ ...acc, [bar]: PropTypes.string }), {})).isRequired,
 };
