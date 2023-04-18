@@ -11,13 +11,11 @@ package org.pih.warehouse.order
 
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
-import org.pih.warehouse.core.ActivityCode
-import org.pih.warehouse.core.SynonymTypeCode
-
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
@@ -29,12 +27,14 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductPackage
@@ -1265,19 +1265,23 @@ class OrderService {
             }
         }
 
-        if (statements) {
-            try {
-                // Check if table exists.
-                dataService.executeQuery("SELECT * FROM order_summary_mv LIMIT 1")
-            } catch (Exception e) {
-                // UndeclaredThrowableException caused by MySQLSyntaxErrorException is thrown when
-                // the table 'order_summary_mv' doesn't exist. Then just simply refresh entire table
-                log.info "Refreshing order summary for ${orderIds} failed due to: ${e?.cause?.message}. Refreshing entire table now."
-                refreshOrderSummary()
-                return
-            }
-
+        if (statements && checkIfOrderSummaryExists()) {
             dataService.executeStatements(statements)
+        }
+    }
+
+    Boolean checkIfOrderSummaryExists() {
+        try {
+            // Check if table exists.
+            dataService.executeQuery("SELECT * FROM order_summary_mv LIMIT 1")
+            return true
+        } catch (Exception e) {
+            // UndeclaredThrowableException caused by MySQLSyntaxErrorException is thrown when
+            // the table 'order_summary_mv' doesn't exist. Then just simply refresh entire table
+            log.info "Refreshing order summary failed due to: ${e?.cause?.message}. Refreshing entire table now."
+
+            RefreshOrderSummaryJob.triggerNow()
+            return false
         }
     }
 }
