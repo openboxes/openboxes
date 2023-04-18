@@ -612,7 +612,7 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
+      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -1001,7 +1001,7 @@ class AddItemsPage extends Component {
         return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
 
-      if (item.product && parseInt(item.quantityRequested, 10) <= 0) {
+      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) <= 0)) {
         return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
       }
 
