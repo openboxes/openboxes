@@ -172,19 +172,20 @@ class Select extends Component {
 
   mapOptions(values) {
     return (_.map(values, (value) => {
+      const newValue = value;
       if (typeof value === 'string') {
         return { value, label: value };
       }
       if (value.options) {
-        return { ...value, options: this.mapOptions(value.options) };
+        newValue.options = this.mapOptions(value.options);
       }
       if (value && this.props.labelKey && !value.label) {
-        return { ...value, label: value[this.props.labelKey] };
+        newValue.label = value[this.props.labelKey];
       }
       if (value && this.props.valueKey && !value.value) {
-        return { ...value, value: value[this.props.valueKey] };
+        newValue.value = value[this.props.valueKey];
       }
-      return value;
+      return newValue;
     }));
   }
 
