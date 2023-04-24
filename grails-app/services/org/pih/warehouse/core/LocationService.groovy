@@ -697,4 +697,20 @@ class LocationService {
 
         locationDataService.importData(command)
     }
+
+    def deleteLocation(Location existingLocation) {
+        Location parentLocation = existingLocation.parentLocation
+        if (parentLocation) {
+            existingLocation.parentLocation = null
+            parentLocation.removeFromLocations(existingLocation)
+            parentLocation.save()
+        }
+        Location zone = existingLocation.zone
+        if (zone) {
+            existingLocation.zone = null
+            zone.removeFromLocations(existingLocation)
+            zone.save()
+        }
+        existingLocation.delete(flush: true)
+    }
 }
