@@ -766,7 +766,7 @@ class ProductAvailabilityService {
                     def quantityGreaterThanZero = Subqueries.lt(0, aggregatedQuantityQuery)
                     // productType in (:searchableProductTypes)
                     def inSearchableProductTypes = Restrictions.in("productType", searchableProductTypes)
-                    // productType in (:searchableProductTypes)
+                    // productType in (:searchableNoStockProductTypes)
                     def inSearchableNoStockProductTypes = Restrictions.in("productType", searchableNoStockProductTypes)
 
                     // Create a disjunction with none, one or both of the searchable product type restrictions
