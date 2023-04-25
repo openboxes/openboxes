@@ -1087,11 +1087,13 @@ class StockMovementService {
         Picklist picklist = requisitionItem?.requisition?.picklist
         if (picklist) {
             log.info "Clear picklist"
+            def binLocations = []
             picklist.picklistItems.findAll {
                 it.requisitionItem == requisitionItem
             }.toArray().each {
                 it.disableRefresh = Boolean.TRUE
                 picklist.removeFromPicklistItems(it)
+                binLocations << it.binLocation?.id
                 requisitionItem.removeFromPicklistItems(it)
                 it.delete()
             }
@@ -1100,7 +1102,7 @@ class StockMovementService {
             // Save requisition item before PA refresh
             requisitionItem.save(flush: true)
 
-            productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], false)
+            productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [requisitionItem?.product?.id], binLocations?.unique(), false)
         } else {
             requisitionItem.save(flush: true)
         }
@@ -1285,7 +1287,7 @@ class StockMovementService {
         }
         picklist.save(flush: true)
 
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [inventoryItem?.product?.id], false)
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, [inventoryItem?.product?.id], [binLocation?.id], false)
     }
 
     void createOrUpdatePicklistItem(StockMovement stockMovement, List<PickPageItem> pickPageItems) {
@@ -2102,6 +2104,7 @@ class StockMovementService {
 
         // Find all products for which qty ATP needs to be recalculated
         def productsToRefresh = []
+        def binLocations = []
         productsToRefresh.add(requisitionItem?.product?.id)
 
         // Find all picklist items associated with the given requisition item
@@ -2117,13 +2120,14 @@ class StockMovementService {
             picklistItem.disableRefresh = Boolean.TRUE
             picklistItem.picklist?.removeFromPicklistItems(picklistItem)
             picklistItem.requisitionItem?.removeFromPicklistItems(picklistItem)
+            binLocations.add(picklistItems?.binLocation?.id)
             picklistItem.delete()
         }
 
         // Save requisition item before PA refresh
         requisitionItem.save(flush: true)
 
-        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, productsToRefresh, false)
+        productAvailabilityService.refreshProductsAvailability(requisitionItem?.requisition?.origin?.id, productsToRefresh, binLocations?.unique(), false)
     }
 
     void updateAdjustedItems(StockMovement stockMovement, String adjustedProductCode) {

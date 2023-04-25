@@ -66,6 +66,7 @@ class PicklistService {
 
     void clearPicklist(OrderItem orderItem) {
         Picklist picklist = orderItem?.order?.picklist
+        def binLocations = []
 
         if (picklist) {
             picklist.picklistItems.findAll {
@@ -74,12 +75,13 @@ class PicklistService {
                 it.disableRefresh = Boolean.TRUE
                 picklist.removeFromPicklistItems(it)
                 orderItem.removeFromPicklistItems(it)
+                binLocations.add(it.binLocation?.id)
                 it.delete()
             }
             picklist.save()
         }
 
-        productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [orderItem?.product?.id], false)
+        productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [orderItem?.product?.id], binLocations?.unique(), false)
     }
 
     void createPicklist(Order order) {
@@ -164,7 +166,7 @@ class PicklistService {
         }
         picklist.save(flush: true)
 
-        productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [inventoryItem?.product?.id], false)
+        productAvailabilityService.refreshProductsAvailability(orderItem?.order?.origin?.id, [inventoryItem?.product?.id], [binLocation?.id], false)
     }
 
     List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested, Location warehouse) {

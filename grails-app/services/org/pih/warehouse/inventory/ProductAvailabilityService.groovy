@@ -85,6 +85,33 @@ class ProductAvailabilityService {
         }
     }
 
+    def refreshProductsAvailability(String locationId, List<String> productIds, List<String> binLocationIds, Boolean forceRefresh) {
+        if (locationId && productIds && !binLocationIds) {
+            refreshProductsAvailability(locationId, productIds, forceRefresh)
+            return
+        }
+
+        if (!locationId || !productIds) {
+            log.info "Stopping refreshing product availability because of lack of location id or product id"
+            return
+        }
+
+        Location location = Location.load(locationId)
+        List<Location> binLocations = []
+        binLocationIds.unique().each {
+            if (it) {
+                binLocations << Location.load(it)
+            } else {
+                binLocations << null
+            }
+        }
+
+        productIds.each { String productId ->
+            Product product = Product.load(productId)
+            refreshProductAvailability(location, product, binLocations, forceRefresh)
+        }
+    }
+
     def refreshProductAvailability(Boolean forceRefresh) {
         // Compute bin locations from transaction entries for all products over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
@@ -134,6 +161,19 @@ class ProductAvailabilityService {
         }
     }
 
+    def refreshProductAvailability(Location location, Product product, List<Location> binLocations, Boolean forceRefresh) {
+        log.info "Refreshing product availability location ${location}, product ${product}, binLocations ${binLocations}, forceRefresh ${forceRefresh}..."
+        def startTime = System.currentTimeMillis()
+        List calculatedBinLocations = calculateBinLocations(location, product, binLocations)
+        // FIXME: if this deadlocks, it safe to auto-retry here?
+        boolean success = saveProductAvailability(location, product, calculatedBinLocations, forceRefresh)
+        if (success) {
+            log.info "Refreshed ${binLocations?.size()} product availability records for product (${product}), binLocations ${binLocations} and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        } else {
+            log.error "Could not refresh ${binLocations?.size()} product availability records for product (${product}) and location (${location}) after ${System.currentTimeMillis() - startTime}ms"
+        }
+    }
+
     def calculateBinLocations(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
         binLocations = transformBinLocations(binLocations, [])
@@ -153,6 +193,17 @@ class ProductAvailabilityService {
         }
         def picked = getQuantityPickedByProductAndLocation(location, product)
         return transformBinLocations(binLocations, picked)
+    }
+
+    def calculateBinLocations(Location location, Product product, List<Location> binLocations) {
+        def binLocationsWithQuantity = inventoryService.getProductQuantityByBinLocation(location, product, binLocations, Boolean.TRUE)
+        // cleanse bin locations, to ensure that we accidentally don't overwrite
+        // (in case INVENTORY or PRODUCT_INVENTORY transaction had entries with other bins)
+        if (binLocations) {
+            binLocationsWithQuantity = binLocationsWithQuantity.findAll { binLocations*.id?.contains(it.id) }
+        }
+        def picked = getQuantityPickedByProductAndLocation(location, product)
+        return transformBinLocations(binLocationsWithQuantity, picked)
     }
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
