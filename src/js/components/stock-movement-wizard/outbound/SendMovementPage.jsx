@@ -848,7 +848,7 @@ class SendMovementPage extends Component {
                             {...document}
                             key={idx}
                             onClick={() => this.saveValues(values)}
-                            disabled={showOnly}
+                            disabled={invalid}
                           />);
                         },
                       )}
