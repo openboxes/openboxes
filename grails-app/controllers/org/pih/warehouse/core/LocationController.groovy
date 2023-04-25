@@ -155,21 +155,8 @@ class LocationController {
                     redirect(action: "edit", id: params.id)
                     return
                 }
-
-                def parentLocation = locationInstance.parentLocation
-                if (parentLocation) {
-                    locationInstance.parentLocation = null
-                    parentLocation.removeFromLocations(locationInstance)
-                    parentLocation.save(flush: true)
-                }
-                def zone = locationInstance.zone
-                if (zone) {
-                    locationInstance.zone = null
-                    zone.removeFromLocations(locationInstance)
-                    zone.save(flush: true)
-                }
-
-                locationInstance.delete(flush: true)
+                Location parentLocation = locationInstance.parentLocation
+                locationService.deleteLocation(locationInstance)
 
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
 
