@@ -761,12 +761,24 @@ class ProductAvailabilityService {
             // return products with product type with activity searchable no stock OR (searchable AND qoh > 0)
             else {
                 if (!command.showOutOfStockProducts) {
-                    add(Restrictions.disjunction().
-                            add(Restrictions.in("productType", searchableNoStockProductTypes)).
-                            add(Restrictions.conjunction().
-                                    add(Subqueries.lt(0, aggregatedQuantityQuery)).
-                                    add(Restrictions.in("productType", searchableProductTypes))
-                            ))
+
+                    // SUM(product availability.quantity_on_hand) > 0
+                    def quantityGreaterThanZero = Subqueries.lt(0, aggregatedQuantityQuery)
+                    // productType in (:searchableProductTypes)
+                    def inSearchableProductTypes = Restrictions.in("productType", searchableProductTypes)
+                    // productType in (:searchableNoStockProductTypes)
+                    def inSearchableNoStockProductTypes = Restrictions.in("productType", searchableNoStockProductTypes)
+
+                    // Create a disjunction with none, one or both of the searchable product type restrictions
+                    def disjunction = Restrictions.disjunction()
+
+                    if (searchableNoStockProductTypes)
+                        disjunction.add(inSearchableNoStockProductTypes)
+
+                    if (searchableProductTypes)
+                        disjunction.add(Restrictions.conjunction().add(quantityGreaterThanZero).add(inSearchableProductTypes))
+
+                    add(disjunction)
                 }
             }
 
