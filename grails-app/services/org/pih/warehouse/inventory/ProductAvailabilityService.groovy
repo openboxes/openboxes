@@ -206,33 +206,66 @@ class ProductAvailabilityService {
         return transformBinLocations(binLocationsWithQuantity, picked)
     }
 
+    /**
+     * Get quantity allocated for bin locations and inventory items for a specific location (origin) and product.
+     * Data is pulled from:
+     *  1. Picklist items from pending requisitions (outbound stock movements) with origin being provided location
+     *     that are *NOT* having RECALLED inventory item (inventoryItem.lotStatus) or bin location *WITHOUT*
+     *     HOLD_STOCK in the supported activity (location.supportedActivities).
+     *  2. Picklist items from pending orders (outbound returns) with origin being provided location.
+     *     (IMPORTANT: Outbound returns can have picked items with RECALLED lots and bins with HOLD_STOCK activity)
+     * */
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
-        def results = Picklist.executeQuery("""
-            SELECT
-                pli.binLocation,
-                pli.inventoryItem,
-                sum(pli.quantity)*((count(distinct pli.requisitionItem) + count(distinct pli.orderItem) )/ count(*))
-            FROM PicklistItem pli
-            INNER JOIN pli.picklist pl
-            LEFT JOIN pli.requisitionItem ri
-            LEFT JOIN pl.requisition r
-            LEFT JOIN pli.orderItem oi
-            LEFT JOIN pl.order o
-            LEFT JOIN pli.inventoryItem ii
-            LEFT JOIN pli.binLocation l
-            LEFT JOIN l.supportedActivities s
-            WHERE ((r.origin = :location AND r.status IN (:pendingRequisitionStatus)) OR (o.origin = :location AND o.status IN (:pendingOrderStatus)))
-              AND (oi IS NOT NULL OR (ri IS NOT NULL AND (ii.lotStatus IS NULL OR ii.lotStatus != 'RECALLED') AND NOT ('HOLD_STOCK' IN ELEMENTS(l.supportedActivities))))
-              AND (:product = '' OR ri.product.id = :product OR oi.product.id = :product)
-            GROUP BY pli.binLocation, pli.inventoryItem
-        """, [
-                location                    : location,
-                pendingRequisitionStatus    : RequisitionStatus.listPending(),
-                pendingOrderStatus          : OrderStatus.listPending(),
-                product                     : product?.id ?: ''
-        ], [readOnly: true])
+        def query = """
+            SELECT bin_location_id, inventory_item_id, SUM(quantity) FROM (
+                SELECT
+                    pli.bin_location_id as bin_location_id,
+                    pli.inventory_item_id as inventory_item_id,
+                    sum(pli.quantity) as quantity
+                FROM picklist_item pli
+                    INNER JOIN picklist p ON pli.picklist_id = p.id
+                    LEFT JOIN requisition_item ri ON pli.requisition_item_id = ri.id
+                    LEFT JOIN requisition r ON p.requisition_id = r.id
+                    LEFT JOIN inventory_item ii ON pli.inventory_item_id = ii.id
+                    LEFT JOIN location l ON pli.bin_location_id = l.id
+                    LEFT JOIN (
+                        SELECT
+                            GROUP_CONCAT(lsa_select.supported_activities_string) as activities,
+                            lsa_select.location_id as location_id
+                        FROM location_supported_activities lsa_select
+                        GROUP BY lsa_select.location_id
+                    ) lsa ON lsa.location_id = l.id
+                WHERE (r.origin_id = :locationId AND r.status IN (${RequisitionStatus.listPending().collect { "'$it'" }.join(',')}))
+                  AND (ri.id IS NOT NULL AND (ii.lot_status IS NULL OR ii.lot_status != 'RECALLED') AND (lsa.activities IS NULL OR lsa.activities NOT LIKE '%HOLD_STOCK%'))
+                  AND (:productId = '' OR ri.product_id = :productId)
+                GROUP BY pli.bin_location_id, pli.inventory_item_id
+                UNION
+                SELECT
+                    pli.bin_location_id as bin_location_id,
+                    pli.inventory_item_id as inventory_item_id,
+                    sum(pli.quantity) as quantity
+                FROM picklist_item pli
+                    INNER JOIN picklist p ON pli.picklist_id = p.id
+                    LEFT JOIN order_item oi ON pli.order_item_id = oi.id
+                    LEFT JOIN `order` o ON p.order_id = o.id
+                    LEFT JOIN inventory_item ii ON pli.inventory_item_id = ii.id
+                WHERE (o.origin_id = :locationId AND o.status IN (${OrderStatus.listPending().collect { "'$it'" }.join(',')}))
+                  AND (oi.id IS NOT NULL)
+                  AND (:productId = '' OR oi.product_id = :productId)
+                GROUP BY pli.bin_location_id, pli.inventory_item_id
+            ) as requisition_order_union
+            GROUP BY bin_location_id, inventory_item_id;
+        """
 
-        return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
+        def results = dataService.executeQuery(
+            query,
+            [
+                locationId                  : location?.id,
+                productId                   : product?.id ?: ''
+            ]
+        )
+
+        return results?.collect { [binLocation: it[0], inventoryItem: it[1], quantityAllocated: it[2]] }
     }
 
     boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
