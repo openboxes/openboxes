@@ -362,41 +362,25 @@ class Location implements Comparable<Location>, java.io.Serializable {
         ]
     }
 
-    Map toJson(LocationTypeCode locationTypeCode) {
+    Map toJson(locationTypeCode) {
+        def json = [
+                id: id,
+                name: name,
+                locationNumber: locationNumber,
+                active: active,
+                locationType: locationType,
+                locationTypeCode: locationType?.locationTypeCode?.name(),
+        ]
         switch (locationTypeCode) {
-            case LocationTypeCode.DEPOT:
-                return [
-                        id: id,
-                        name: name,
-                        locationNumber: locationNumber,
-                        locationType: locationType,
-                        locationTypeCode: locationType?.locationTypeCode?.name(),
-                        active: active
-                ]
             case LocationTypeCode.INTERNAL:
             case LocationTypeCode.BIN_LOCATION:
-                return [
-                        id: id,
-                        name: name,
-                        locationNumber: locationNumber,
-                        locationType: locationType?.name,
-                        locationTypeCode: locationType?.locationTypeCode?.name(),
+               json += [
                         zoneId: zone?.id,
                         zoneName: zone?.name,
                         active: active
                 ]
-            case LocationTypeCode.ZONE:
-                return [
-                        id: id,
-                        name: name,
-                        locationNumber: locationNumber,
-                        locationType: locationType?.name,
-                        locationTypeCode: locationType?.locationTypeCode?.name(),
-                        active: active
-                ]
-            default:
-                return toJson()
         }
+        return json
     }
 
     static Map toJson(Location location) {
