@@ -1191,7 +1191,20 @@ button.action-btn, button.previous, button.next {
 /* temporarily hide the nav bar until we figure out whether we want to keep it or not */
 .nav { display: none; }
 
-li.ui-menu-item { text-align: left; font-weight: bold; }
+#product-suggest-wrapper > ul.ui-autocomplete {
+    width: auto !important;
+}
+
+#product-suggest-wrapper > ul > li.ui-menu-item {
+    height: auto;
+    font-weight: normal;
+}
+
+li.ui-menu-item {
+    text-align: left;
+    font-weight: bold;
+}
+
 h3 {
     color: #666;
     font-size: 1.2em;
