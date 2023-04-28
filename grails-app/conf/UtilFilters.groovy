@@ -22,16 +22,11 @@ class UtilFilters {
                 request._timeBeforeRequest = System.currentTimeMillis()
             }
 
-            after = { Map model ->
+            after = {
                 request._timeAfterRequest = System.currentTimeMillis()
             }
 
-            afterView = { Exception e ->
-
-                if (e) {
-                    log.info("Request for (${controllerName}/${actionName}) failed with an uncaught exception: ${e.message}")
-                    return
-                }
+            afterView = {
 
                 if (actionName == "logout") {
                     return
@@ -40,9 +35,8 @@ class UtilFilters {
                     session?._showTime = params.showTime == "on"
                 }
                 if (session._showTime) {
-                    def actionDuration = (request?._timeAfterRequest && request?._timeBeforeRequest) ?
-                            (request?._timeAfterRequest - request?._timeBeforeRequest) : null
-                    def viewDuration = request?._timeAfterRequest ? (System.currentTimeMillis() - request?._timeAfterRequest) : null
+                    def actionDuration = request?._timeAfterRequest - request?._timeBeforeRequest
+                    def viewDuration = System.currentTimeMillis() - request?._timeAfterRequest
 
                     request?.actionDuration = actionDuration
                     request?.viewDuration = viewDuration
