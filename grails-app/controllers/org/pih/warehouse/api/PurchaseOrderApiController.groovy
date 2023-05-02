@@ -23,6 +23,7 @@ import java.math.RoundingMode
 class PurchaseOrderApiController {
 
     def orderService
+    def invoiceService
 
     def list = {
         def purchaseOrders = orderService.getPurchaseOrders(params)
@@ -136,13 +137,13 @@ class PurchaseOrderApiController {
             "Total Amount (Default Currency)"
         )
 
-        purchaseOrders?.each {
-            def order = it.order
+        purchaseOrders?.each { OrderSummary orderSummary ->
+            Order order = orderSummary.order
             Integer lineItemsSize = order?.orderItems?.findAll {item -> item.orderItemStatusCode != OrderItemStatusCode.CANCELED }.size() ?: 0
             BigDecimal totalPrice = new BigDecimal(order?.total).setScale(2, RoundingMode.HALF_UP)
             BigDecimal totalPriceNormalized = order?.totalNormalized.setScale(2, RoundingMode.HALF_UP)
             csv.printRecord(
-                it.derivedStatus ?: order.status,
+                orderSummary.derivedStatus ?: order.status,
                 order?.orderNumber,
                 order?.name,
                 "${order?.origin?.name} (${order?.origin?.organization?.code})",
@@ -155,7 +156,7 @@ class PurchaseOrderApiController {
                 order?.orderedOrderItems?.size() ?: 0,
                 order?.shippedOrderItems?.size() ?: 0,
                 order?.receivedOrderItems?.size() ?: 0,
-                order?.invoiceItems?.size() ?: 0,
+                invoiceService.countInvoicedOrderItems(order)?:0,
                 order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
                 "${totalPrice} ${order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
                 "${totalPriceNormalized} ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
