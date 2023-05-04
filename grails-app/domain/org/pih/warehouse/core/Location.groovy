@@ -335,6 +335,17 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
     }
 
+    Map toBaseJson() {
+        return [
+                id: id,
+                name: name,
+                locationNumber: locationNumber,
+                active: active,
+                locationType: locationType,
+                locationTypeCode: locationType?.locationTypeCode?.name(),
+        ]
+    }
+
     Map toJson() {
         return [
                 id                         : id,
@@ -363,14 +374,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     Map toJson(locationTypeCode) {
-        def json = [
-                id: id,
-                name: name,
-                locationNumber: locationNumber,
-                active: active,
-                locationType: locationType,
-                locationTypeCode: locationType?.locationTypeCode?.name(),
-        ]
+        Map json = toBaseJson()
         switch (locationTypeCode) {
             case LocationTypeCode.INTERNAL:
             case LocationTypeCode.BIN_LOCATION:
