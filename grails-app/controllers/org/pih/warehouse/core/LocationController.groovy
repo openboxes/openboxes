@@ -128,7 +128,10 @@ class LocationController {
                 }
             } else {
                 // Refresh to avoid saving binded, not validated data to the persisted object
-                locationInstance.refresh()
+                // Refresh only if editing, not creating a brand new location, thus if has id
+                if (locationInstance?.id) {
+                    locationInstance.refresh()
+                }
                 render(view: "edit", model: [locationInstance: locationInstance])
                 return
             }
