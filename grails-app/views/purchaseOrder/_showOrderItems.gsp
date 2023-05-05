@@ -232,7 +232,7 @@
                 </div>
                 <div class="right">
                     <g:if test="${!order?.isPlaced()}">
-                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button validate" >
+                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
                             <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
                             ${warehouse.message(code: 'order.wizard.placeOrder.label')}
                         </g:link>
@@ -260,6 +260,9 @@
           if (isFormDirty()) {
             $.notify(htmlDecode("${g.message(code: 'order.errors.saveItem.message', default: 'Please save item before proceeding')}"));
             return false;
+          } else {
+            // This seems to be the best way to proceed after stopping propagation
+            window.location = $(this).attr("href");
           }
         });
 
