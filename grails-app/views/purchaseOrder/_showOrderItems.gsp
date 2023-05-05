@@ -260,9 +260,6 @@
           if (isFormDirty()) {
             $.notify(htmlDecode("${g.message(code: 'order.errors.saveItem.message', default: 'Please save item before proceeding')}"));
             return false;
-          } else {
-            // This seems to be the best way to proceed after stopping propagation
-            window.location = $(this).attr("href");
           }
         });
 
