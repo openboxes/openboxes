@@ -1348,6 +1348,15 @@ div.search-input:focus-within {
       color: var(--gray-600);
     }
   }
+
+  .array-errors-wrapper {
+    grid-column: span 2;
+    grid-row: 2;
+
+    p {
+      padding: 4px;
+    }
+  }
 }
 
 // Save indicators styling
