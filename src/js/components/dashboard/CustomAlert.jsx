@@ -31,6 +31,14 @@ const CustomAlert = ({
           {getIcon()}
         </div>
         <span className="alert-title">{message}</span>
+        {customFields?.detailsArray?.length ?
+          (
+            <div className="d-flex flex-column array-errors-wrapper">
+              {customFields.detailsArray
+                .filter(Boolean)
+                .map(detail => (<p key={detail}>{detail}</p>))}
+            </div>
+          ) : null}
         {customFields?.details && <span className="alert-details">{customFields?.details}</span>}
         <div className="alert-close-icon">
           <span role="presentation" onClick={handleClose}>

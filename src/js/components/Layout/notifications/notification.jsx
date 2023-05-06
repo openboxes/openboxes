@@ -5,11 +5,14 @@ import Alert from 'react-s-alert';
 
 import NotificationType from 'consts/notificationTypes';
 
-const notification = type => ({ message, details, icon }) => {
+const notification = type => ({
+  message, details, icon, detailsArray,
+}) => {
   const alertsProps = {
     customFields: {
       details,
       icon,
+      detailsArray,
     },
   };
   switch (type) {

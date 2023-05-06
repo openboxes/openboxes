@@ -3,6 +3,8 @@ import React from 'react';
 import _ from 'lodash';
 import { Tooltip } from 'react-tippy';
 
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import renderHandlingIcons from 'utils/product-handling-icons';
 
 export const getInvoiceDescription = (rowValue) => {
@@ -64,3 +66,15 @@ export const matchesProductCodeOrName = ({
   );
 };
 
+export const showOutboundEditValidationErrors = ({ translate, errors }) => {
+  const errorMessage = `${translate('react.stockMovement.errors.errorInLine.label', 'Error occurred in line')}:`;
+  const errorDetails = errors.reduce((acc, message, key) => [
+    ...acc,
+    `${message && `${key + 1} - ${_.map(message, val => translate(`${val}`))}`}`,
+  ], []);
+
+  notification(NotificationType.ERROR_OUTLINED)({
+    message: errorMessage,
+    detailsArray: errorDetails,
+  });
+};
