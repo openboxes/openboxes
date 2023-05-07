@@ -18,6 +18,7 @@ import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.Inventory
+import org.pih.warehouse.util.LocalizationUtil
 
 import javax.annotation.Nullable
 
@@ -144,7 +145,12 @@ class LocationDataService {
         }
         def locationType = null
         if (params.locationType) {
-            locationType = LocationType.findByIdOrName(params.locationType, params.locationType)
+            String locationTypeName = LocalizationUtil.getDefaultString(params.locationType as String)
+            // TODO: Replace with a single GORM .find with Closure when in Grails 3 (available since Grails 2.0)
+            LocationType matchedLocationType = LocationType
+                    .findAllByNameLike(locationTypeName + "%")
+                    .find{ LocalizationUtil.getDefaultString(it.name) == locationTypeName}
+            locationType = matchedLocationType
         }
 
         def currentLocationType = location.locationType

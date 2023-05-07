@@ -34,6 +34,7 @@ class LoadDataService {
     def productSupplierDataService
     def productCatalogService
     def inventoryService
+    def identifierService
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -69,7 +70,7 @@ class LoadDataService {
 
             Organization organization = new Organization(
                     name: organizationName,
-                    code: partyRole.substring(0, 3), // FIXME: Should code be provided or generated?
+                    code: identifierService.generateOrganizationIdentifier(organizationName),
                     partyType: PartyType.findByCode("ORG") // FIXME: Should party type be provided?
             )
 
