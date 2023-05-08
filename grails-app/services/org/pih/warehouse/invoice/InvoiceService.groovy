@@ -413,42 +413,59 @@ class InvoiceService {
     def countInvoicedOrderItems(Order order) {
         String query = """        
             select 
-                count(distinct order_item_id)
+                count(order_item_id) 
             from
-            ( 
-                select 
-                `order`.id as order_id,
-                order_item.id as order_item_id
-                from shipment_invoice
-                join invoice_item on invoice_item.id = shipment_invoice.invoice_item_id
-                join shipment_item on shipment_invoice.shipment_item_id = shipment_item.id
-                join order_shipment on shipment_item.id = order_shipment.shipment_item_id
-                join order_item on order_shipment.order_item_id = order_item.id
-                join `order` on `order`.id = order_item.order_id
-                join invoice on invoice.id = invoice_item.invoice_id
-                where `order`.id = :orderId
-                and invoice.date_posted is not null
-            
-                union all 
-            
-                select 
-                `order`.id as order_id,
-                order_item.id
-                from order_invoice
-                join invoice_item on order_invoice.invoice_item_id = invoice_item.id
-                join order_item on order_item.id = order_invoice.order_item_id
-                join `order` on `order`.id = order_item.order_id
-                join invoice on invoice.id = invoice_item.invoice_id
-                where `order`.id = :orderId
-                and invoice.date_posted is not null
-            ) as order_invoice_union
+            (
+                select distinct 
+                    order_id, 
+                    order_number,
+                    order_item_id,
+                    quantity_ordered,
+                    sum(quantity_invoiced) as quantity_invoiced,
+                    sum(quantity_invoiced) >= quantity_ordered as invoiced
+                from
+                ( 
+                    select distinct
+                        `order`.id as order_id,
+                        `order`.order_number as order_number,
+                        order_item.id as order_item_id,
+                        order_item.quantity as quantity_ordered,
+                        invoice_item.quantity as quantity_invoiced
+                    from shipment_invoice
+                    join invoice_item on invoice_item.id = shipment_invoice.invoice_item_id
+                    join shipment_item on shipment_invoice.shipment_item_id = shipment_item.id
+                    join order_shipment on shipment_item.id = order_shipment.shipment_item_id
+                    join order_item on order_shipment.order_item_id = order_item.id
+                    join `order` on `order`.id = order_item.order_id
+                    join invoice on invoice.id = invoice_item.invoice_id
+                    where invoice.date_posted is not null
+                
+                    union all 
+                
+                    select distinct 
+                        `order`.id as order_id,
+                        order_item.id,
+                        `order`.order_number as order_number,
+                        order_item.quantity as quantity_ordered,
+                        invoice_item.quantity as quantity_invoiced\t
+                    from order_invoice
+                    join invoice_item on order_invoice.invoice_item_id = invoice_item.id
+                    join order_item on order_item.id = order_invoice.order_item_id
+                    join `order` on `order`.id = order_item.order_id
+                    join invoice on invoice.id = invoice_item.invoice_id
+                    where invoice.date_posted is not null
+                ) as order_item_invoice_union
+                where order_id = :orderId
+                group by order_id, order_number, order_item_id, quantity_ordered
+                having invoiced = 1
+            ) as order_item_invoice_summary
         """
         SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
-        final results = sqlQuery.with {
+        final count = sqlQuery.with {
             setString("orderId", order.id)
             uniqueResult()
         }
-        return results
+        return count
     }
 
 
