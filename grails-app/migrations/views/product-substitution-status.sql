@@ -2,7 +2,15 @@ CREATE OR REPLACE VIEW product_substitution_status AS
     SELECT
         p_a.product_id as product_id, -- original product
         p_s.location_id as location_id, -- substitution product location
-        IF(MIN(original_inventory_item.expiration_date) > MIN(subsitution_inventory_item.expiration_date), 'EARLIER', 'YES') AS substitution_status
+        IF(
+            MIN(original_inventory_item.expiration_date) IS NULL AND MIN(subsitution_inventory_item.expiration_date) IS NOT NULL,
+            'EARLIER',
+            IF (
+                MIN(original_inventory_item.expiration_date) > MIN(subsitution_inventory_item.expiration_date),
+                'EARLIER',
+                'YES'
+            )
+        ) AS substitution_status
     FROM product_association as p_a
 
              -- product_availability join (used for getting substitute product location and substitution product qoh)
