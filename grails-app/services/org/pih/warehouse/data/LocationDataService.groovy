@@ -39,7 +39,11 @@ class LocationDataService {
             Location location = params.id ? Location.findById(params.id) : null
             Location parentLocation = params.parentLocation ? Location.findByName(params.parentLocation) : null
             LocationGroup locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
-            LocationType locationType = params.locationType ? LocationType.findByIdOrName(params.locationType, params.locationType) : null
+            String locationTypeName = LocalizationUtil.getDefaultString(params.locationType as String)
+            // TODO: Replace with a single GORM .find with Closure when in Grails 3 (available since Grails 2.0)
+            LocationType locationType = LocationType
+                    .findAllByNameLike(locationTypeName + "%")
+                    .find{ LocalizationUtil.getDefaultString(it.name) == locationTypeName}
             List<Organization> organizations = params.organization ? Organization.findAllByCodeOrName(params.organization, params.organization) : null
 
             if (params.id && !location) {
