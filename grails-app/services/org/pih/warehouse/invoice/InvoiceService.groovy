@@ -438,8 +438,9 @@ class InvoiceService {
                     join order_item on order_shipment.order_item_id = order_item.id
                     join `order` on `order`.id = order_item.order_id
                     join invoice on invoice.id = invoice_item.invoice_id
-                    where invoice.date_posted is not null
-                
+                    join invoice_type on invoice_type.id = invoice.invoice_type_id
+                    where invoice.date_posted is not null and invoice_type.code <> :prepaymentTypeCode
+                    
                     union all 
                 
                     select distinct 
@@ -453,7 +454,8 @@ class InvoiceService {
                     join order_item on order_item.id = order_invoice.order_item_id
                     join `order` on `order`.id = order_item.order_id
                     join invoice on invoice.id = invoice_item.invoice_id
-                    where invoice.date_posted is not null
+                    join invoice_type on invoice_type.id = invoice.invoice_type_id
+                    where invoice.date_posted is not null and invoice_type.code <> :prepaymentTypeCode
                 ) as order_item_invoice_union
                 where order_id = :orderId
                 group by order_id, order_number, order_item_id, quantity_ordered
@@ -463,6 +465,7 @@ class InvoiceService {
         SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
         final count = sqlQuery.with {
             setString("orderId", order.id)
+            setString("prepaymentTypeCode", InvoiceTypeCode.PREPAYMENT_INVOICE.toString())
             uniqueResult()
         }
         return count
