@@ -444,8 +444,8 @@ class InvoiceService {
                 
                     select distinct 
                         `order`.id as order_id,
-                        order_item.id,
                         `order`.order_number as order_number,
+                         order_item.id as order_item_id,
                         order_item.quantity as quantity_ordered,
                         invoice_item.quantity as quantity_invoiced\t
                     from order_invoice
