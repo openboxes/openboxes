@@ -9,7 +9,7 @@ import { withRouter } from 'react-router-dom';
 import { hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { parseResponse } from 'utils/apiClient';
+import apiClient, { parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
@@ -199,7 +199,7 @@ class CreateInboundReturn extends Component {
             this.setState({
               values: resp,
             }, () => {
-              this.props.history.push(`/stockTransfer/createInboundReturn/${this.state.values.id}`);
+              this.props.history.push(stringUrlInterceptor(`/stockTransfer/createInboundReturn/${this.state.values.id}`));
               this.props.nextPage(this.state.values);
             });
           }
