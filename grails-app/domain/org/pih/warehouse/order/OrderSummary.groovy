@@ -20,6 +20,11 @@ class OrderSummary {
     Integer quantityCanceled
     Integer quantityInvoiced
 
+    Integer itemsOrdered
+    Integer itemsShipped
+    Integer itemsReceived
+    Integer itemsInvoiced
+
     String orderStatus
     String receiptStatus
     String shipmentStatus
@@ -41,6 +46,11 @@ class OrderSummary {
         quantityReceived(nullable: true)
         quantityCanceled(nullable: true)
         quantityInvoiced(nullable: true)
+
+        itemsOrdered(nullable: true)
+        itemsShipped(nullable: true)
+        itemsReceived(nullable: true)
+        itemsInvoiced(nullable: true)
 
         orderStatus(nullable:true)
         receiptStatus(nullable:true)
