@@ -2,9 +2,9 @@ name: Integration tests
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ develop, 'release/**' ]
   push:
-    branches: [ develop ]
+    branches: [ develop, 'release/**' ]
 
 jobs:
   build:
