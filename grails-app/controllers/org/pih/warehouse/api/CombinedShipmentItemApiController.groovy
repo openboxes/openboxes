@@ -38,7 +38,7 @@ class CombinedShipmentItemApiController {
             return
         }
         def orderItems = orderService.getProductsInOrders(terms, destination, vendor)
-        def products = orderItems*.findAll{ it.getQuantityRemainingToShip() > 0 }.flatten().toArray().collect { it.product }.unique()
+        def products = orderItems.findAll{ it.getQuantityRemainingToShip() > 0 }.flatten().toArray().collect { it.product }.unique()
 
         render([data: products] as JSON)
     }
