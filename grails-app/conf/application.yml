@@ -34,6 +34,8 @@ grails:
             - ~/.grails/openboxes-config.groovy
             - ~/.grails/openboxes.yml
     plugin:
+        console:
+            enabled: true  # https://github.com/sheehan/grails-console#security
         databasemigration:
             updateOnStart: false
             updateOnStartFileName: changelog.groovy
