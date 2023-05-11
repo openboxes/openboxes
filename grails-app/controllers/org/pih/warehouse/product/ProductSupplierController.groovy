@@ -374,7 +374,7 @@ class ProductSupplierController {
         // Now, let's take the data we've gathered and build the model to use for
         productSuppliers.collect { Map entry ->
             ProductSupplier productSupplier = ProductSupplier.load(entry.id)
-            entry["product"] = ["productCode": entry["productCode"], "name": entry["productName"]]
+            entry["product"] = ["productCode": entry["productCode"], "name": productSupplier?.product?.displayNameWithLocaleCode ?: entry["productName"]]
             entry["productCode"] = entry["legacyProductCode"]
             entry["defaultProductPackage"] = defaultProductPackages[productSupplier?.id]
             entry["globalProductSupplierPreference"] = globalPreferencesByProductSupplier[productSupplier?.id]
@@ -394,7 +394,7 @@ class ProductSupplierController {
                 response.contentType = "text/csv"
                 response.setHeader("Content-disposition",
                     "attachment; filename=\"ProductSuppliers-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-                render dataService.generateCsv(data)
+                render(contentType: "text/csv", text: dataService.generateCsv(data))
                 response.outputStream.flush()
                 return;
         }

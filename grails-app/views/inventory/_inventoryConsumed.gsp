@@ -113,7 +113,7 @@
                                             ${entry?.product?.productCode}
                                         </td>
 										<td>
-											<format:product product="${entry?.product }"/>
+                                            <format:displayName product="${entry?.product}" showTooltip="${true}" />
 										</td>
 										<td>
 											${entry?.binLocation?.name}

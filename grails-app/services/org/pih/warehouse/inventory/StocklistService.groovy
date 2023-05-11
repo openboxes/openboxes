@@ -130,8 +130,7 @@ class StocklistService {
             sw.append(g.message(code: 'product.primaryCategory.label')).append(",")
 
             requisitions.each { requisition ->
-                String stocklistName = StringEscapeUtils.escapeCsv(requisition?.name)
-                sw.append(stocklistName).append(" [").append(requisition?.isPublished ? "Published" : "Draft").append("]").append(",")
+                sw.append(StringEscapeUtils.escapeCsv("${requisition?.name} [${requisition?.isPublished ? 'Published' : 'Draft'}]")).append(",")
             }
 
             if (hasRoleFinance) {

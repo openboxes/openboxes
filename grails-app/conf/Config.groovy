@@ -1034,6 +1034,7 @@ openboxes.security.rbac.rules = [
         [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_APPROVER]]],
         [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
         [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+        [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
         // Other controller actions that might need explicit rules
         //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
@@ -1080,6 +1081,9 @@ grails.plugin.raven.dsn = "https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{
 
 // Default Ajax request timeout
 openboxes.ajaxRequest.timeout = 120000
+
+// connection timeout milliseconds
+openboxes.browser.connection.status.timeout = 8000
 
 // Google analytics and feedback have been removed until I can improve performance.
 //google.analytics.enabled = false
@@ -1256,6 +1260,9 @@ openboxes.ldap.search.filter = "(uid={0})"
 openboxes.ldap.search.searchSubtree = true
 openboxes.ldap.search.attributesToReturn = ['mail', 'givenName']
 
+// Merge Products
+openboxes.products.merge.enabled = false
+
 //openboxes.ldap.authorities.retrieveGroupRoles = false
 //openboxes.ldap.authorities.groupSearchBase ='DC=example,DC=com'
 //openboxes.ldap.authorities.groupSearchFilter = 'member={0}'
@@ -1295,6 +1302,18 @@ openboxes.inventorySnapshot.batchSize = 100
 // Minimum date for expiration date
 openboxes.expirationDate.minValue = new Date("01/01/2000")
 openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
+
+// Date configuration
+openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
+openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
+
+// Notifications configuration
+
+// delay is in ms
+openboxes.client.notification.autohide.delay = 8000
+
+// Autosave configuration
+openboxes.client.autosave.enabled = false
 
 // Global megamenu configuration
 

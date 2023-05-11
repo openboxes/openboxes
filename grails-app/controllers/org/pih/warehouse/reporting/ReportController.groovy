@@ -16,6 +16,7 @@ import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
@@ -108,6 +109,7 @@ class ReportController {
             csv += g.message(code: 'default.status.label') + ","
             csv += g.message(code: 'product.productCode.label') + ","
             csv += g.message(code: 'product.label') + ","
+            csv += g.message(code: 'product.productFamily.label') + ","
             csv += g.message(code: 'category.label') + ","
             csv += g.message(code: 'product.formulary.label') + ","
             csv += g.message(code: 'tag.label') + ","
@@ -127,12 +129,14 @@ class ReportController {
 
     def binLocationCsvRow = { binLocation ->
         String csv = ""
+
         if (binLocation) {
             String defaultBinLocation = g.message(code: 'default.label')
             String expirationDate = g.formatDate(date: binLocation?.inventoryItem?.expirationDate, format: "dd/MMM/yyyy")
             csv += binLocation.status + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCode) + ","
-            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.displayNameWithLocaleCode) + ","
+            csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productFamily?.name ?: '') + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.category?.name) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.productCatalogsToString()) + ","
             csv += StringEscapeUtils.escapeCsv(binLocation?.product?.tagsToString()) + ","
@@ -157,9 +161,10 @@ class ReportController {
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         def products = binLocations.collect { it.product.productCode }.unique()
         binLocations = binLocations.collect {
+            Product product = Product.findByProductCode(it.product.productCode)
             [
                     productCode   : it.product.productCode,
-                    productName   : it.product.name,
+                    productName   : product.displayNameWithLocaleCode,
                     lotNumber     : it.inventoryItem.lotNumber,
                     expirationDate: it.inventoryItem.expirationDate,
                     binLocation   : it?.binLocation?.name ?: "Default Bin",
@@ -465,9 +470,13 @@ class ReportController {
                 def csv = new CSVWriter(sw, {
                     "Code" { it.productCode }
                     "Product" { it.productName }
+                    "Product family" { it.productFamily }
+                    "Category" { it.category }
+                    "Formulary" { it.productCatalogs }
                     "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
                     "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
                     "PO Number" { it.orderNumber }
+                    "Payment Terms" { it.paymentTerm }
                     "PO Description" { it.orderDescription }
                     "Supplier Organization" { it.supplierOrganization }
                     "Supplier Location" { it.supplierLocation }
@@ -485,10 +494,14 @@ class ReportController {
                     def isOrderItem = it instanceof OrderItem
                     csv << [
                             productCode  : it.product?.productCode,
-                            productName  : it.product?.name,
+                            productName  : it.product?.displayNameWithLocaleCode,
+                            productFamily : it.product?.productFamily?.name ?: '',
+                            category      : it.product?.category?.name ?: '',
+                            productCatalogs      : it.product?.productCatalogs?.join(", "),
                             qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                             qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                             orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
+                            paymentTerm  : isOrderItem ? (it.order.paymentTerm?.name ?: '') : (it.shipment.isFromPurchaseOrder ? (it?.paymentTerm ?: '') : ''),
                             orderDescription  : isOrderItem ? it.order.name : (it.shipment.isFromPurchaseOrder ? it.orderName : ''),
                             supplierOrganization  : isOrderItem ? it.order?.origin?.organization?.name : it.shipment?.origin?.organization?.name,
                             supplierLocation  : isOrderItem ? it.order.origin.name : it.shipment.origin.name,
@@ -502,17 +515,19 @@ class ReportController {
                 }
 
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
             }
         } else if(params.downloadAction == "downloadSummaryOnOrderReport") {
             def location = Location.get(session.warehouse.id)
             def data = reportService.getOnOrderSummary(location)
             if (data) {
-
                 def sw = new StringWriter()
                 def csv = new CSVWriter(sw, {
                     "Code" { it.productCode }
-                    "Product" { it.productName }
+                    "Product" { it.displayNameWithLocaleCode }
+                    "Product family" { it.productFamily }
+                    "Category" { it.category }
+                    "Formulary" { it.productCatalogs }
                     "Quantity Ordered Not Shipped" { it.qtyOrderedNotShipped }
                     "Quantity Shipped Not Received" { it.qtyShippedNotReceived }
                     "Total On Order" { it.totalOnOrder }
@@ -523,7 +538,7 @@ class ReportController {
                 data = data.sort { it.productCode }
                 csv.writeAll(data)
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
             }
         }
     }
@@ -538,6 +553,7 @@ class ReportController {
                 if (command.entries) {
                     sw.append("Code").append(",")
                     sw.append("Product").append(",")
+                    sw.append("Product Family").append(",")
                     sw.append("Category").append(",")
                     sw.append("Formularies").append(",")
                     sw.append("Tags").append(",")
@@ -550,7 +566,9 @@ class ReportController {
                     sw.append("QoH Total").append(",")
                     sw.append("Quantity Available Total")
                     sw.append("\n")
+
                     command.entries.each { entry ->
+
                         if (entry.key) {
                             def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
                             def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
@@ -559,7 +577,8 @@ class ReportController {
                             }?.join(",")
 
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.displayNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
@@ -581,7 +600,7 @@ class ReportController {
             }
 
             response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+            render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
         }
 
         render(view: 'showInventoryByLocationReport', model: [command: command])
@@ -600,7 +619,6 @@ class ReportController {
         String dateFormat = grailsApplication.config.openboxes.expirationDate.format
 
         List rows = binLocations.collect { row ->
-
             // Required in order to avoid lazy initialization exception that occurs because all
             // of the querying / session work that was done above was executed in worker threads
             Product product = Product.load(row?.product?.id)
@@ -608,14 +626,14 @@ class ReportController {
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
             Map dataRow = params.print ? [
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            "Product name"        : row?.product.name ?: "",
+                            "Product name"        : product.displayNameWithLocaleCode,
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                             "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(dateFormat) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
                             "OB QOH"              : row?.quantity ?: 0,
                             "Physical QOH"        : "",
                             "Comment"             : "",
-                            "Generic product"     : row?.genericProduct?.name ?: "",
+                            "Product family"      : product?.productFamily ?: "",
                             "Category"            : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
                             "Formularies"         : product.productCatalogs.join(", ") ?: "",
                             "ABC Classification"  : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
@@ -624,7 +642,7 @@ class ReportController {
                     ] : [
                             productCode       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
                             productName       : row?.product.name ?: "",
-                            genericProduct    : row?.genericProduct?.name ?: "",
+                            productFamily     : product?.productFamily ?: "",
                             category          : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
                             formularies       : product.productCatalogs.join(", ") ?: "",
                             lotNumber         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
@@ -691,7 +709,7 @@ class ReportController {
 
                 def printRow = [
                         'Product code'                    : product.productCode ?: '',
-                        'Name'                            : product.name,
+                        'Name'                            : product.displayNameWithLocaleCode,
                         'Order Period (Days)'             : replenishmentPeriodDays,
                         'Lead Time (Days)'                : leadTimeDays,
                         'Qty On Order'                    : quantityOnOrder,

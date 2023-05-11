@@ -13,6 +13,7 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
+import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
@@ -24,8 +25,8 @@ import {
   handleSuccess,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { debounceUsersFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
+import { debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -40,6 +41,14 @@ const FIELDS = {
     isRowLoaded: ({ isRowLoaded }) => isRowLoaded,
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
+    getDynamicRowAttr: ({ rowValues, itemFilter }) => {
+      const hideRow = itemFilter &&
+        !matchesProductCodeOrName({
+          product: rowValues?.product,
+          filterValue: itemFilter,
+        });
+      return { hideRow };
+    },
     fields: {
       productCode: {
         type: LabelField,
@@ -56,16 +65,13 @@ const FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product Name',
         flexWidth: '3.5',
+        getDynamicAttr: ({ fieldValue }) => ({
+          showValueTooltip: !!fieldValue?.displayNames?.default,
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
           className: 'text-left ml-1',
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name}
-              </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
       },
       binLocation: {
@@ -127,7 +133,7 @@ const FIELDS = {
           filterOptions: options => options,
         },
         getDynamicAttr: props => ({
-          loadOptions: props.debouncedUsersFetch,
+          loadOptions: props.debouncedPeopleFetch,
           disabled: props.showOnly,
         }),
       },
@@ -202,7 +208,10 @@ class PackingPage extends Component {
       isFirstPageLoaded: false,
       showAlert: false,
       alertMessage: '',
+      itemFilter: '',
     };
+
+    this.inputRef = React.createRef();
 
     this.saveSplitLines = this.saveSplitLines.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
@@ -211,8 +220,8 @@ class PackingPage extends Component {
 
     apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
 
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.props.showSpinner();
   }
@@ -404,6 +413,39 @@ class PackingPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  confirmHiddenLinesAndGoToNextPage(formValues) {
+    const { packPageItems } = formValues;
+    const isAnyLineHidden = this.state.itemFilter &&
+      packPageItems.some((rowValue) => {
+        const { product } = rowValue;
+        return !matchesProductCodeOrName({
+          product,
+          filterValue: this.state.itemFilter,
+        });
+      });
+    if (isAnyLineHidden) {
+      confirmAlert({
+        title: this.props.translate('react.stockMovement.confirmHiddenLines.label', 'Confirm hidden lines'),
+        message: this.props.translate(
+          'react.stockMovement.confirmHiddenLines.message',
+          'Are you sure you have filled all the lines? Some lines are hidden.',
+        ),
+        buttons: [
+          {
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => this.nextPage(formValues),
+          },
+          {
+            label: this.props.translate('react.default.no.label', 'No'),
+            onClick: () => this.inputRef.current?.focus(),
+          },
+        ],
+      });
+      return;
+    }
+    this.nextPage(formValues);
+  }
+
   /**
    * Saves packing data
    * @param {object} packPageItems
@@ -455,6 +497,7 @@ class PackingPage extends Component {
 
   render() {
     const { showOnly } = this.props;
+    const { itemFilter } = this.state;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -466,6 +509,12 @@ class PackingPage extends Component {
             <AlertMessage show={this.state.showAlert} message={this.state.alertMessage} danger />
             { !showOnly ?
               <span className="buttons-container">
+                <FilterInput
+                  itemFilter={itemFilter}
+                  onChange={e => this.setState({ itemFilter: e.target.value })}
+                  onClear={() => this.setState({ itemFilter: '' })}
+                  inputRef={this.inputRef}
+                />
                 <button
                   type="button"
                   onClick={() => this.refresh()}
@@ -508,7 +557,7 @@ class PackingPage extends Component {
                 {_.map(FIELDS, (fieldConfig, fieldName) => renderFormField(fieldConfig, fieldName, {
                   onSave: this.saveSplitLines,
                   formValues: values,
-                  debouncedUsersFetch: this.debouncedUsersFetch,
+                  debouncedPeopleFetch: this.debouncedPeopleFetch,
                   hasBinLocationSupport: this.props.hasBinLocationSupport,
                   totalCount: this.state.totalCount,
                   loadMoreRows: this.loadMoreRows,
@@ -516,6 +565,7 @@ class PackingPage extends Component {
                   isPaginated: this.props.isPaginated,
                   isFirstPageLoaded: this.state.isFirstPageLoaded,
                   showOnly,
+                  itemFilter,
                 }))}
               </div>
               <div className="submit-buttons">
@@ -528,7 +578,7 @@ class PackingPage extends Component {
                 >
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
-                <button type="submit" className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
+                <button type="button" onClick={() => this.confirmHiddenLinesAndGoToNextPage(values)} className="btn btn-outline-primary btn-form float-right btn-xs" disabled={showOnly || invalid}>
                   <Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

@@ -11,9 +11,8 @@ import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import DateField from 'components/form-elements/DateField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
-import SelectField from 'components/form-elements/SelectField';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
-import { debounceProductsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
@@ -30,10 +29,7 @@ const FIELDS = {
         onClick={() => addRow({
           shipmentItemId,
           binLocation,
-          product: {
-            ...product,
-           label: `${product.productCode} - ${product.name}`,
-          },
+          product,
           receiptItemId: null,
           newLine: true,
         })}
@@ -42,23 +38,12 @@ const FIELDS = {
     ),
     fields: {
       product: {
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         fieldKey: 'disabled',
-        attributes: {
-          className: 'text-left',
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          showValueTooltip: true,
-        },
-        getDynamicAttr: ({ fieldValue, debouncedProductsFetch }) => ({
+        getDynamicAttr: ({ fieldValue }) => ({
           disabled: fieldValue,
-          loadOptions: debouncedProductsFetch,
         }),
       },
       lotNumber: {
@@ -109,12 +94,6 @@ class EditLineModal extends Component {
     this.onSave = this.onSave.bind(this);
     this.save = this.save.bind(this);
     this.validate = this.validate.bind(this);
-
-    this.debouncedProductsFetch = debounceProductsFetch(
-      this.props.debounceTime,
-      this.props.minSearchLength,
-      this.props.locationId,
-    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -136,10 +115,6 @@ class EditLineModal extends Component {
       formValues: {
         lines: _.map([this.state.attr.fieldValue], value => ({
           ...value,
-          product: {
-            ...value.product,
-            label: `${_.get(value, 'product.productCode')} - ${_.get(value, 'product.name')}`,
-          },
           disabled: true,
           originalLine: true,
         })),
@@ -241,9 +216,9 @@ class EditLineModal extends Component {
         validate={this.validate}
         initialValues={this.state.formValues}
         fields={FIELDS}
+        wrapperClassName={this.props.wrapperClassName}
         formProps={{
           shipmentItemId: this.state.attr.fieldValue.shipmentItemId,
-          debouncedProductsFetch: this.debouncedProductsFetch,
           binLocation: this.state.attr.fieldValue.binLocation,
           product: this.state.attr.fieldValue.product,
         }}
@@ -259,8 +234,6 @@ class EditLineModal extends Component {
 }
 
 const mapStateToProps = state => ({
-  debounceTime: state.session.searchConfig.debounceTime,
-  minSearchLength: state.session.searchConfig.minSearchLength,
   minimumExpirationDate: state.session.minimumExpirationDate,
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
@@ -282,8 +255,11 @@ EditLineModal.propTypes = {
   rowIndex: PropTypes.number.isRequired,
   /** Location ID (destination). Needs to be used in /api/products request. */
   locationId: PropTypes.string.isRequired,
-  debounceTime: PropTypes.number.isRequired,
-  minSearchLength: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired,
+  wrapperClassName: PropTypes.string,
+};
+
+EditLineModal.defaultProps = {
+  wrapperClassName: null,
 };

@@ -19,7 +19,6 @@ class PicklistController {
     def scaffold = true
 
     def picklistService
-    def pdfRenderingService
 
     def save = {
         def jsonRequest = request.JSON
@@ -55,7 +54,6 @@ class PicklistController {
 
         renderPdf(
                 template: "/picklist/print",
-                //locale:locale,
                 model: [requisition: requisition, picklist: picklist, location: location, sorted: params.sorted],
                 filename: "Picklist - ${requisition.requestNumber}"
         )

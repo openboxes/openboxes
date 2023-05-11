@@ -23,11 +23,12 @@
 				<td class="middle">
 
 					<div id="product-header" style="float: left;">
+						<g:if test="${productInstance?.productFamily}">
+							<span class="fade">${productInstance.productFamily}</span>
+						</g:if>
 			            <div id="product-title" class="title">
 			            	<small class="font-weight-bold">${productInstance?.productCode }</small>
-			            	<g:link controller="inventoryItem" action="showStockCard" params="['product.id': productInstance?.id]">
-			                	${productInstance?.name }
-			                </g:link>
+							<format:displayName product="${productInstance}" showTooltip="${true}" />
 			            </div>
                         <div id="product-catalogs">
                             <g:each var="productCatalog" in="${productInstance?.productCatalogs }">
@@ -42,6 +43,13 @@
                                     <span class="tag tag-success" title="${g.message(code: 'tag.label', default: 'Tag')}">${tag.tag }</span>
                                 </g:link>
                             </g:each>
+							<g:if test="${productInstance?.productEvents?.productMergeEvents}">
+								<g:link controller="inventoryItem" action="showStockCard" params="['id': productInstance?.productEvents?.otherProductId]">
+									<span class="tag tag-danger" title="${productInstance?.productEvents?.productMergeSummary}">
+										<g:message code="product.mergeProducts.merged.label"/>
+									</span>
+								</g:link>
+							</g:if>
                         </div>
 
         			</div>
@@ -109,6 +117,13 @@
 								<img src="${resource(dir: 'images/icons/silk', file: 'resultset_next.png')}"/>&nbsp;
 								<g:message code="default.button.next.label" default="Next"/>
 							</g:link>
+							<g:if test="${grailsApplication.config.openboxes.products.merge.enabled}">
+								<button class="btn-show-dialog button" data-title="${g.message(code:'product.mergeProducts.label')}"
+								   data-url="${request.contextPath}/product/showMergeProductDialog?primaryProduct=${productInstance?.id}&template=mergeProducts">
+									<img src="${resource(dir: 'images/icons/silk', file: 'share.png')}"/>&nbsp;
+									<g:message code="product.mergeProducts.label" default="Merge Products"/>
+								</button>
+							</g:if>
 						</div>
 					</g:isSuperuser>
 					<div class="button-group right">

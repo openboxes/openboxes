@@ -2,6 +2,7 @@ package util
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.importer.CSVUtils
 
 class ReportUtil {
 
@@ -38,7 +39,7 @@ class ReportUtil {
             csv += "\n"
         }
 
-        return csv
+        return CSVUtils.prependBomToCsvString(csv)
     }
 
 
@@ -59,7 +60,7 @@ class ReportUtil {
                 sb.append(System.lineSeparator())
             }
         }
-        return sb.toString()
+        return CSVUtils.prependBomToCsvString(sb.toString())
     }
 
 
@@ -73,7 +74,7 @@ class ReportUtil {
                 csv += csvRow(entry)
             }
         }
-        return csv
+        return CSVUtils.prependBomToCsvString(csv)
     }
 
 

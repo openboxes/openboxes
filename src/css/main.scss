@@ -1253,3 +1253,297 @@ div.search-input:focus-within {
   overflow: hidden;
 }
 
+.edit-button-cell {
+  width: 100%;
+
+  button {
+    width: 100%;
+    max-width: 70px;
+  }
+}
+
+// Styling of custom alerts
+
+.s-alert-box {
+  width: 388px;
+  max-width: 388px;
+  color: var(--gray-600);
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  background-color: #FFFFFF;
+}
+
+.no-details {
+  padding-bottom: 4px;
+}
+
+.s-alert-info {
+  border: 1px solid var(--gray-500);
+}
+
+.s-alert-success {
+  border: 1px solid var(--color-green);
+
+  svg {
+    color: var(--color-green);
+  }
+}
+
+.s-alert-warning {
+  border: 1px solid var(--color-yellow);
+
+  svg {
+    color: var(--color-yellow);
+  }
+}
+
+.s-alert-error {
+  border: 1px solid var(--color-red);
+
+  svg {
+    color: var(--color-red);
+  }
+}
+
+
+.s-alert-box-inner {
+  display: grid;
+  grid-template-columns: 1fr 8fr 1fr;
+  grid-template-rows: auto auto;
+  row-gap: 13px;
+  font-size: 14px;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .alert-start-icon {
+    grid-column: 1;
+  }
+
+  .alert-title {
+    grid-column: 2;
+    grid-row: 1;
+    font-weight: 600;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .alert-details {
+    grid-column: 2;
+    grid-row: 2;
+    font-weight: 400;
+    line-height: 21px;
+  }
+
+  .alert-close-icon {
+    grid-column: 3;
+    display: flex;
+    justify-content: flex-end;
+
+    svg {
+      cursor: pointer;
+      color: var(--gray-600);
+    }
+  }
+
+  .array-errors-wrapper {
+    grid-column: span 2;
+    grid-row: 2;
+
+    p {
+      padding: 4px;
+    }
+  }
+}
+
+// Save indicators styling
+
+.line-item-save-indicator {
+  width: 3px;
+
+  &.saving {
+    background-color: var(--gray-301);
+  }
+
+  &.pending {
+    background-color: var(--gray-301);
+  }
+
+  &.saved {
+    background-color: var(--blue-primary);
+  }
+
+  &.error {
+    background-color: var(--color-red);
+  }
+}
+
+.line-item-icon-save-indicator {
+  width: 21px;
+  height: 21px;
+  border-radius: 16px;
+  background-color: var(--gray-101);
+  padding: 3px;
+  position: relative;
+  right: 5px;
+
+  &.saving {
+    color: var(--blue-500);
+
+    div {
+      width: 14.85px;
+      height: 14.85px;
+      font-size: 2px;
+    }
+  }
+
+  &.pending {
+    color: var(--gray-350);
+  }
+
+  &.saved {
+    color: var(--blue-primary);
+  }
+
+  &.error {
+    background-color: var(--red-500);
+    padding: 0;
+    height: 18px;
+    width: 18px;
+
+    svg {
+      position: relative;
+      bottom: 3px;
+      right: 3px;
+      width: 24px;
+      height: 24px;
+      color: var(--gray-101);
+    }
+  }
+}
+
+.saving-button {
+  display: flex;
+  flex-direction: row;
+
+  div {
+    margin: 1px 3px 0 0;
+    width: 14.85px;
+    height: 14.85px;
+    font-size: 2px;
+  }
+
+  i {
+    margin-top: 3px;
+  }
+}
+
+// Shipment type with identifier styling
+
+.shipment-identifier {
+  gap: 4px;
+
+  svg {
+    min-width: 20px;
+    height: 20px;
+  }
+}
+
+// Info bars styling
+.info-bar {
+  height: 50px;
+  background-color: var(--blue-primary);
+  color: #FFFFFF;
+  width: 100%;
+  padding: 12px 32px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .read-more-label {
+    text-decoration: underline;
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+
+.version-box {
+  border-radius: 40px;
+  cursor: pointer;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.version-box-outlined {
+  background-color: var(--blue-100);
+  padding: 4px 8px;
+  color: var(--blue-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.version-box-filled {
+  background-color: var(--blue-primary);
+  padding: 4px 12px;
+  color: #FFFFFF;
+}
+
+// Feature Modal icons styling
+
+#feature-modal-paragraph {
+  display: flex;
+
+  span {
+    margin-left: 5px;
+    margin-right: 8px;
+  }
+
+  div {
+    border-radius: 16px;
+    width: 21px;
+    height: 21px;
+    padding: 3px;
+    background-color: var(--gray-101);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .feature-modal-paragraph-saved {
+    color: var(--blue-primary);
+  }
+
+  .feature-modal-paragraph-draft {
+    color: var(--gray-350);
+  }
+
+  .feature-modal-paragraph-error {
+    background-color: var(--red-500);
+    padding: 0;
+    height: 18px;
+    width: 17px;
+    margin-right: 3px;
+
+    svg {
+      color: var(--gray-101);
+      transform: scale(1.9);
+      position: relative;
+      left: 1px;
+    }
+  }
+}

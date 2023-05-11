@@ -18,6 +18,7 @@ import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UnitOfMeasureClass
 import org.pih.warehouse.core.UnitOfMeasureType
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.InventoryLevelExcelImporter
 import org.pih.warehouse.inventory.Inventory
@@ -494,38 +495,38 @@ class DataService {
     String exportInventoryLevels(Collection inventoryLevels) {
         def sw = new StringWriter()
         def csv = new CSVWriter(sw, {
-            "Product Code" { it.productCode }
-            "Product Name" { it.productName }
-            "Inventory" { it.inventory }
-            "Status" { it.status }
-            "Bin Location" { it.binLocation }
-            "Preferred" { it.preferred }
-            "ABC Class" { it.abcClass }
-            "Min Quantity" { it.minQuantity }
-            "Reorder Quantity" { it.reorderQuantity }
-            "Max Quantity" { it.maxQuantity }
-            "Forecast Quantity" { it.forecastQuantity }
-            "Forecast Period" { it.forecastPeriodDays }
-            "UOM" { it.unitOfMeasure }
+            "Product Code" { it?.productCode }
+            "Product Name" { it?.productName }
+            "Inventory" { it?.inventory }
+            "Status" { it?.status }
+            "Bin Location" { it?.binLocation }
+            "Preferred" { it?.preferred }
+            "ABC Class" { it?.abcClass }
+            "Min Quantity" { it?.minQuantity }
+            "Reorder Quantity" { it?.reorderQuantity }
+            "Max Quantity" { it?.maxQuantity }
+            "Forecast Quantity" { it?.forecastQuantity }
+            "Forecast Period" { it?.forecastPeriodDays }
+            "UOM" { it?.unitOfMeasure }
         })
         inventoryLevels.each { inventoryLevel ->
             csv << [
-                    productCode       : inventoryLevel.product.productCode,
-                    productName       : inventoryLevel.product.name,
-                    inventory         : inventoryLevel.inventory.warehouse.name,
-                    status            : inventoryLevel.status,
-                    binLocation       : inventoryLevel.binLocation ?: "",
-                    preferred         : inventoryLevel.preferred ?: "",
-                    abcClass          : inventoryLevel.abcClass ?: "",
-                    minQuantity       : inventoryLevel.minQuantity ?: "",
-                    reorderQuantity   : inventoryLevel.reorderQuantity ?: "",
-                    maxQuantity       : inventoryLevel.maxQuantity ?: "",
-                    forecastQuantity  : inventoryLevel.forecastQuantity ?: "",
-                    forecastPeriodDays: inventoryLevel.forecastPeriodDays ?: "",
+                    productCode       : inventoryLevel?.product?.productCode,
+                    productName       : inventoryLevel?.product?.displayNameWithLocaleCode,
+                    inventory         : inventoryLevel?.inventory?.warehouse?.name,
+                    status            : inventoryLevel?.status,
+                    binLocation       : inventoryLevel?.binLocation ?: "",
+                    preferred         : inventoryLevel?.preferred ?: "",
+                    abcClass          : inventoryLevel?.abcClass ?: "",
+                    minQuantity       : inventoryLevel?.minQuantity ?: "",
+                    reorderQuantity   : inventoryLevel?.reorderQuantity ?: "",
+                    maxQuantity       : inventoryLevel?.maxQuantity ?: "",
+                    forecastQuantity  : inventoryLevel?.forecastQuantity ?: "",
+                    forecastPeriodDays: inventoryLevel?.forecastPeriodDays ?: "",
                     unitOfMeasure     : inventoryLevel?.product?.unitOfMeasure ?: "EA"
             ]
         }
-        return csv.writer.toString()
+        return CSVUtils.prependBomToCsvString(csv.writer.toString())
     }
 
 
@@ -612,7 +613,7 @@ class DataService {
             ]
             csvWriter << row
         }
-        return sw.toString()
+        return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
     String exportRequisitionItems(requisitions) {
@@ -668,7 +669,7 @@ class DataService {
                 csvWriter << row
             }
         }
-        return sw.toString()
+        return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
     def transformObjects(List objects, List includeFields) {
@@ -730,7 +731,7 @@ class DataService {
                 sw.append("\n")
             }
         }
-        return sw.toString()
+        return CSVUtils.prependBomToCsvString(sw.toString())
     }
 
 }

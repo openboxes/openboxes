@@ -173,6 +173,9 @@ class InvoiceItem implements Serializable {
                 unitPrice: unitPrice,
                 totalAmount: totalAmount,
                 totalPrepaymentAmount: totalPrepaymentAmount,
+                orderAdjustment: orderAdjustment,
+                productName: product?.name,
+                displayNames: product?.displayNames
         ]
     }
 }

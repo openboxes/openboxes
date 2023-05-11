@@ -10,9 +10,9 @@ import { connect } from 'react-redux';
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
-import apiClient from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -43,24 +43,19 @@ const FIELDS = {
         defaultMessage: 'Code',
         flexWidth: '0.5',
       },
-      'product.name': {
-        type: (params) => {
-          const { rowIndex, values } = params;
-          const handlingIcons = values.picklistItems[rowIndex]['product.handlingIcons'];
-          const productNameWithIcons = (
-            <div className="d-flex">
-              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-              {renderHandlingIcons(handlingIcons)}
-            </div>);
-          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
-        },
+      product: {
+        type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         flexWidth: '2',
         headerAlign: 'left',
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
-          showValueTooltip: true,
+          formatValue: formatProductDisplayName,
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       originZone: {
@@ -175,7 +170,8 @@ class PickPage extends Component {
   }
 
   render() {
-    const { outboundReturn } = this.state.values;
+    // There is a parseResponse to avoid affecting outboundReturn in state
+    const { outboundReturn } = parseResponse(this.state.values);
     const picklistItems = _.flatten(_.map(outboundReturn.stockTransferItems, 'picklistItems'));
 
     return (

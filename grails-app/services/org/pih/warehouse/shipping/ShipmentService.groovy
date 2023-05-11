@@ -740,14 +740,9 @@ class ShipmentService {
                 String errorMessage = "The pick for product code(s) ${shipmentItem.product.productCode} is no longer valid. " +
                         "This can occur if a stock count, transfer, or recall has been performed on the product since the initial pick was generated. " +
                         "To address this issue, edit the pick to select a new lot or reduce the pick quantity and add a reason code."
-                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.cannotExceedAvailableQuantity",
+                shipmentItem.errors.rejectValue("quantity", "shipmentItem.quantity.pickNotValid",
                         [
-                                shipmentItem.quantity + " " + shipmentItem?.product?.unitOfMeasure,
-                                quantityAvailableWithPicked + " " + shipmentItem?.product?.unitOfMeasure,
                                 shipmentItem?.product?.productCode,
-                                shipmentItem?.inventoryItem?.lotNumber,
-                                origin.name,
-                                shipmentItem?.binLocation?.name ?: 'Default'
                         ].toArray(), errorMessage)
                 throw new ValidationException("Shipment item is invalid", shipmentItem.errors)
             }
@@ -1795,6 +1790,10 @@ class ShipmentService {
         eventInstance.delete()
         shipmentInstance.currentEvent = null
         shipmentInstance.currentStatus = null
+        if (shipmentInstance.isFromPurchaseOrder) {
+            // Set disable refresh to false to refresh order summary
+            shipmentInstance.disableRefresh = false
+        }
         shipmentInstance.save()
     }
 

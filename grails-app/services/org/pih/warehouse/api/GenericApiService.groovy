@@ -136,5 +136,4 @@ class GenericApiService {
                 throw new UnsupportedOperationException("Operator ${operator} is not supported at this time")
         }
     }
-
 }

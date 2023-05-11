@@ -18,6 +18,7 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
@@ -627,7 +628,7 @@ class RequisitionController {
             response.contentType = "text/csv"
             def csv = dataService.exportRequisitions(requisitions)
             println "export requisitions: " + csv
-            render csv
+            render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
             render(text: 'No requisitions found', status: 404)
         }
@@ -643,7 +644,7 @@ class RequisitionController {
             response.contentType = "text/csv"
             def csv = dataService.exportRequisitionItems(requisitions)
             println "export requisitions: " + csv
-            render csv
+            render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
             render(text: 'No requisitions found', status: 404)
         }
@@ -659,7 +660,7 @@ class RequisitionController {
             response.contentType = "text/csv"
             def csv = dataService.exportRequisitions(requisitions)
             println "export requisitions: " + csv
-            render csv
+            render(contentType: "text/csv", text: csv, encoding: "UTF-8")
         } else {
             render(text: 'No requisitions found', status: 404)
         }

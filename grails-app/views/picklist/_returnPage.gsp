@@ -79,7 +79,7 @@
                     </td>
                     <td class="middle">
                         <g:if test="${j==0}">
-                            ${StringEscapeUtils.escapeXml(orderItem?.product?.name)}
+                            ${orderItem?.product?.displayNameOrDefaultName}
                         </g:if>
                     </td>
                     <td class="center middle">

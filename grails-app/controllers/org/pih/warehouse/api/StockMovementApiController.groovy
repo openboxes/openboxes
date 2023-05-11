@@ -54,7 +54,7 @@ class StockMovementApiController {
         stockMovement.stockMovementDirection = direction
         stockMovement.origin = origin
         stockMovement.destination = destination
-        stockMovement.requestedBy = params.requestedBy ? User.get(params.requestedBy) : null
+        stockMovement.requestedBy = params.requestedBy ? Person.get(params.requestedBy) : null
         stockMovement.createdBy = params.createdBy ? User.get(params.createdBy) : null
         stockMovement.updatedBy = params.updatedBy ? User.get(params.updatedBy) : null
         stockMovement.receiptStatusCodes = params.receiptStatusCode ? params?.list("receiptStatusCode") as ShipmentStatusCode[] : null
@@ -176,7 +176,7 @@ class StockMovementApiController {
             try {
                 stockTransferService.deleteStockTransfer(params.id)
             } catch (Exception e) {
-                def message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                 response.status = 400
                 render([errorMessage: message] as JSON)
                 return
@@ -195,7 +195,7 @@ class StockMovementApiController {
                     try {
                         stockMovementService.deleteStockMovement(params.id)
                     } catch (Exception e) {
-                        def message = "Unable to delete stock movement with ID ${params.id}: " + e.message
+                        def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                         response.status = 400
                         render([errorMessage: message] as JSON)
                         return

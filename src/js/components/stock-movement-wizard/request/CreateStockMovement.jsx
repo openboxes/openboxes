@@ -16,7 +16,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -124,7 +124,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncedUsersFetch,
+      loadOptions: props.debouncedPeopleFetch,
     }),
   },
   dateRequested: {
@@ -187,8 +187,8 @@ class CreateStockMovement extends Component {
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
 
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength, ['FULFILL_REQUEST']);
@@ -413,7 +413,7 @@ class CreateStockMovement extends Component {
                 origin: values.origin,
                 destination: values.destination,
                 isSuperuser: this.props.isSuperuser,
-                debouncedUsersFetch: this.debouncedUsersFetch,
+                debouncedPeopleFetch: this.debouncedPeopleFetch,
                 debouncedLocationsFetch: this.debouncedLocationsFetch,
                 requestTypes: this.state.requestTypes,
                 setRequestType: this.setRequestType,

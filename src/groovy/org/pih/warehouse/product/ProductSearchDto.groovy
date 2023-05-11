@@ -8,6 +8,8 @@ class ProductSearchDto {
 
     String name
 
+    String displayName
+
     String productCode
 
     Boolean coldChain = Boolean.FALSE
@@ -43,6 +45,7 @@ class ProductSearchDto {
                 id                 : id,
                 productCode        : productCode,
                 name               : name,
+                displayName        : displayName,
                 color              : productColor,
                 handlingIcons      : handlingIcons,
                 lotAndExpiryControl: lotAndExpiryControl,

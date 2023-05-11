@@ -18,7 +18,7 @@ const LabelField = (props) => {
   const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
   const attr = { ...attributes, ...dynamicAttr };
   const {
-    formatValue, tooltipValue, showValueTooltip, url, numberField, ...otherAttr
+    formatValue, color, tooltipValue, showValueTooltip, url, numberField, ...otherAttr
   } = attr;
   const className = `text-truncate ${otherAttr.className ? otherAttr.className : ''} ${numberField ? 'text-right mr-2' : ''}`;
 
@@ -71,7 +71,7 @@ const LabelField = (props) => {
               </a>
             </div>
             :
-            <div {...otherAttr} className={`font-size-xs ${className}`}>
+            <div style={{ color }} {...otherAttr} className={`font-size-xs ${className}`}>
               {formattedValue}
             </div>
           }

@@ -40,15 +40,13 @@
                     </td>
                     <td valign="top" class="value ${hasErrors(bean: inventoryLevelInstance, field: 'product', 'errors')}">
                         <g:if test="${!productInstance}">
-                            <g:select name="product.id" class="chzn-select-deselect"
-                                      from="${org.pih.warehouse.product.Product.list()}"
-                                      optionKey="id" value="${productInstance}"/>
+                            <g:autoSuggest name="product" class="medium text"
+                                   placeholder="${g.message(code:'product.search.label', default: 'Choose product')}"
+                                   jsonUrl="${request.contextPath }/json/findProductByName" />
                         </g:if>
                         <g:else>
                             <g:hiddenField name="product.id" value="${productInstance?.id}"/>
-                            <g:select name="displayProduct.id" class="chzn-select-deselect"
-                                      from="${[productInstance]}"
-                                      optionKey="id" value="${productInstance}" disabled="true"/>
+                            ${productInstance?.displayName?:productInstance?.name}
                         </g:else>
                     </td>
                 </tr>

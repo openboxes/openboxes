@@ -78,7 +78,10 @@
         .data("autocomplete")._renderItem = function (ul, item) {
         const { before, matched, after } = splitMatchingStr(item.label, $("#global-search-input").val());
         var link = $("<a></a>").css("color", item.color);
-
+        // If we display translated name, we want to have tooltip with original name of the product
+        if (item.displayName) {
+          link.attr('title', item.value)
+        }
         if (before) link.append("<span>" + before + "</span>");
         if (matched) link.append("<strong class='font-weight-bold'>" + matched + "</strong>");
         if (after) link.append("<span>" + after + "</span>");

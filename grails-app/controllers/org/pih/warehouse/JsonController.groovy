@@ -26,6 +26,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.Transaction
@@ -853,7 +854,7 @@ class JsonController {
                     inventoryItemList = inventoryItemList.sort { it?.expirationDate }
                 }
 
-                def localizedName = localizationService.getLocalizedString(product.name)
+                def localizedName = product?.displayName ?: product?.name
 
 
                 // Convert product attributes to JSON object attributes
@@ -870,7 +871,8 @@ class JsonController {
                         desc          : product.description,
                         inventoryItems: inventoryItemList,
                         handlingIcons : product?.getHandlingIcons(),
-                        color         : product?.color
+                        color         : product?.color,
+                        tooltip       : product?.displayName ? product?.name : null
                 ]
             }
         }
@@ -1079,8 +1081,9 @@ class JsonController {
                     type : product.class,
                     url  : request.contextPath + "/" + type + "/redirect/" + product.id,
                     value: product.name,
-                    label: product.productCode + " " + product.name + " " + quantity,
-                    color: product.color
+                    label: product.productCode + " " + (product.displayName ?: product.name) + " " + quantity,
+                    color: product.color,
+                    displayName: product.displayName
             ]
         }
         render json.findAll { it != null } as JSON
@@ -1362,6 +1365,7 @@ class JsonController {
                     status                      : g.message(code: "binLocationSummary.${it.status}.label"),
                     productCode                 : it.product?.productCode,
                     productName                 : it?.product?.name,
+                    displayName                 : it?.product?.displayName,
                     productGroup                : it?.product?.genericProduct?.name,
                     category                    : it?.product?.category?.name,
                     lotNumber                   : it?.inventoryItem?.lotNumber,
@@ -1391,6 +1395,7 @@ class JsonController {
             [
                     productCode  : it.product?.productCode,
                     productName  : it.product?.name,
+                    displayName : it.product?.displayName,
                     qtyOrderedNotShipped : isOrderItem ? it.quantityRemaining * it.quantityPerUom : '',
                     qtyShippedNotReceived : isOrderItem ? '' : it.quantityRemaining,
                     orderNumber  : isOrderItem ? it.order.orderNumber : (it.shipment.isFromPurchaseOrder ? it.orderNumber : ''),
@@ -1824,6 +1829,9 @@ class JsonController {
                     "Destination" { it.destination }
                     "Product Code" { it.productCode }
                     "Product Name" { it.productName }
+                    "Product Family" { it.productFamily }
+                    "Category" { it.category }
+                    "Formulary" { it.productCatalogs }
                     "Unit Price" { it.unitPrice }
                     "Quantity Requested" { it.qtyRequested }
                     "Quantity Issued" { it.qtyIssued }
@@ -1841,17 +1849,20 @@ class JsonController {
                             destination             : it.destination,
                             productCode             : it.productCode,
                             productName             : it.productName,
-                            unitPrice               : it.unitPrice ?: '',
+                            productFamily           : it.productFamily,
+                            category                : it.category,
+                            productCatalogs         : it.productCatalogs,
+                            unitPrice               : it.unitPrice,
                             qtyRequested            : it.quantityRequested,
                             qtyIssued               : it.quantityIssued,
                             qtyDemand               : it.quantityDemand,
-                            reasonCode              : it.reasonCode ?: '',
-                            reasonCodeClassification: it.reasonCodeClassification ?: '',
+                            reasonCode              : it.reasonCode,
+                            reasonCodeClassification: it.reasonCodeClassification,
                     ]
                 }
 
                 response.setHeader("Content-disposition", "attachment; filename=\"Request-Detail-Report.csv\"")
-                render(contentType: "text/csv", text: sw.toString(), encoding: "UTF-8")
+                render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
                 return
             }
             render([aaData: data] as JSON)

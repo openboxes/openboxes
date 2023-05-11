@@ -11,9 +11,12 @@ const Input = ({
     if (onChange) {
       onChange(value);
     }
+
+    return event;
   };
 
   const handleFocus = event => event.target.select();
+
   let keys = {};
 
   return (

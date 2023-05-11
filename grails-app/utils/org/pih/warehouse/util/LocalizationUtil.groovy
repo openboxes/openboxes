@@ -10,6 +10,7 @@
 package org.pih.warehouse.util
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.LocalizationService
 import org.pih.warehouse.inventory.Transaction
 
@@ -20,6 +21,15 @@ class LocalizationUtil {
 
     static LocalizationService getLocalizationService() {
         return ApplicationHolder?.application?.mainContext?.getBean("localizationService")
+    }
+
+    static Locale getCurrentLocale() {
+        return localizationService.currentLocale
+    }
+
+    static List<Locale> getSupportedLocales() {
+        def supportedLocales = ConfigurationHolder.config.openboxes.locale.supportedLocales
+        return supportedLocales.collect { new Locale(it) }
     }
 
     static String getLocalizedString(Transaction transaction) {
@@ -42,7 +52,7 @@ class LocalizationUtil {
      * If locale is null, returns the default value
      */
     static String getLocalizedString(String str) {
-        return getLocalizedString(str, localizationService.getCurrentLocale())
+        return getLocalizedString(str, localizationService.currentLocale)
     }
 
     /**

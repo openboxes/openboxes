@@ -11,10 +11,10 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TextField from 'components/form-elements/TextField';
+import ProductSelect from 'components/product-select/ProductSelect';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { debounceProductsInOrders } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Select from 'utils/Select';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -82,7 +82,15 @@ const FIELDS = {
         flexWidth: '3',
         attributes: {
           className: 'text-left ml-1',
-          showValueTooltip: true,
+        },
+        getDynamicAttr: ({ values, rowIndex }) => {
+          const orderItem = values.orderItems[rowIndex];
+          return {
+            color: orderItem?.color,
+            showValueTooltip: true,
+            tooltipValue: orderItem?.productName,
+            formatValue: () => orderItem?.displayName || orderItem?.productName,
+          };
         },
       },
       supplierCode: {
@@ -393,34 +401,11 @@ class CombinedShipmentItemsModal extends Component {
             cache={false}
           />
           &nbsp;
-          <Select
-            async
+          <ProductSelect
+            showSelectedOptionColor
             placeholder={translate('react.combinedShipments.selectProduct.label', 'Select product...')}
-            options={[]}
-            classes=""
-            showValueTooltip
             loadOptions={this.debounceProductsInOrders}
             onChange={value => this.setSelectedProduct(value)}
-            openOnClick={false}
-            autoload={false}
-            filterOption={options => options}
-            cache={false}
-            optionRenderer={option => (
-              <strong style={{ color: option.color || 'black' }} className="d-flex align-items-center">
-                {option.label}
-                &nbsp;
-                {renderHandlingIcons(option.handlingIcons)}
-              </strong>
-            )}
-            valueRenderer={option => (
-              <span className="d-flex align-items-center">
-                <span className="text-truncate">
-                  {option.label}
-                </span>
-                &nbsp;
-                {renderHandlingIcons(option ? option.handlingIcons : [])}
-              </span>
-            )}
           />
         </div>
       </ModalWrapper>

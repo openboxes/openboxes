@@ -11,7 +11,6 @@ package org.pih.warehouse.inventory
 
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.core.ApplicationExceptionEvent
@@ -31,7 +30,9 @@ class InventorySnapshotService {
 
     boolean transactional = true
 
+    def dataService
     def dataSource
+    def gparsService
     def locationService
     def productAvailabilityService
     def persistenceInterceptor
@@ -46,7 +47,7 @@ class InventorySnapshotService {
 
         // Compute bin locations from transaction entries for given location and date
         // Uses GPars to improve performance
-        GParsPool.withPool {
+        gparsService.withPool('PopulateInventorySnapshots') {
             def depotLocations = locationService.getDepots()
             results = depotLocations.collectParallel { Location loc ->
                 def binLocations
@@ -409,7 +410,7 @@ class InventorySnapshotService {
     }
 
     void updateInventorySnapshots(Product product) {
-        if (!product?.id) {
+        if (!product?.id || !product?.productCode) {
             return
         }
         def results = InventorySnapshot.executeUpdate(
@@ -515,12 +516,13 @@ class InventorySnapshotService {
                     quantityOutbound
 
             def row = [
-                    "Code"       : product.productCode,
-                    "Name"       : product.name,
-                    "Category"   : product.category.name,
-                    "Formulary"  : product.productCatalogsToString(),
-                    "Tag"        : product.tagsToString(),
-                    "Unit Cost"  : product.pricePerUnit ?: ''
+                    "Code"          : product.productCode,
+                    "Name"          : product.displayNameWithLocaleCode,
+                    "Product Family": product?.productFamily?.name ?: '',
+                    "Category"      : product.category.name,
+                    "Formulary"     : product.productCatalogsToString(),
+                    "Tag"           : product.tagsToString(),
+                    "Unit Cost"     : product.pricePerUnit ?: ''
             ]
             row.put("Opening", balanceOpening)
             def includeRow = balanceOpening || balanceClosing || quantityAdjustments
@@ -598,15 +600,16 @@ class InventorySnapshotService {
             // Transform data into inventory balance rows
             if (balanceOpening || quantityInbound || quantityOutbound || balanceClosing) {
                 data << [
-                            "Code"       : product.productCode,
-                            "Name"       : product.name,
-                            "Category"   : product.category.name,
-                            "Unit Cost"  : product.pricePerUnit ?: '',
-                            "Opening"    : balanceOpening,
-                            "Credits"    : quantityInbound,
-                            "Debits"     : quantityOutbound,
-                            "Adjustments": quantityAdjustments,
-                            "Closing"    : balanceClosing,
+                            "Code"           : product.productCode,
+                            "Name"           : product.name,
+                            "DisplayName"    : product.displayName,
+                            "Category"       : product.category.name,
+                            "Unit Cost"      : product.pricePerUnit ?: '',
+                            "Opening"        : balanceOpening,
+                            "Credits"        : quantityInbound,
+                            "Debits"         : quantityOutbound,
+                            "Adjustments"    : quantityAdjustments,
+                            "Closing"        : balanceClosing,
                         ]
             }
         }

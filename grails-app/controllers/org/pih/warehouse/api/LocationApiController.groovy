@@ -19,6 +19,7 @@ import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.product.ProductAvailability
@@ -133,8 +134,7 @@ class LocationApiController extends BaseDomainApiController {
 
     def supportedActivities = {
         def data = ActivityCode.list().collect { it.name() }
-
-        render ([data:data] as JSON)
+        render ([data: data] as JSON)
     }
 
     def create = { Location location ->
@@ -192,6 +192,11 @@ class LocationApiController extends BaseDomainApiController {
     }
 
     Location bindLocationData(Location location, JSONObject jsonObject) {
+        // We only want to set the supportedActivities if we provide it in the payload
+        if (jsonObject.containsKey("supportedActivities")) {
+            jsonObject.supportedActivities = jsonObject.supportedActivities ?: [ActivityCode.NONE.id]
+        }
+
         bindData(location, jsonObject)
 
         String logo = jsonObject.logo
@@ -239,19 +244,7 @@ class LocationApiController extends BaseDomainApiController {
         if (existingLocation.isZoneLocation() && Location.findAllByZone(existingLocation)) {
             throw new IllegalArgumentException("You cannot delete zone that is assigned to a bin location ${params.id}")
         }
-        def parentLocation = existingLocation.parentLocation
-        if (parentLocation) {
-            existingLocation.parentLocation = null
-            parentLocation.removeFromLocations(existingLocation)
-            parentLocation.save(flush: true)
-        }
-        def zone = existingLocation.zone
-        if (zone) {
-            existingLocation.zone = null
-            zone.removeFromLocations(existingLocation)
-            zone.save(flush: true)
-        }
-        existingLocation.delete(flush: true)
+        locationService.deleteLocation(existingLocation)
 
         render(status: 204)
     }
@@ -260,7 +253,7 @@ class LocationApiController extends BaseDomainApiController {
         def csv = "id,name,active,locationNumber,locationType,locationGroup,parentLocation,organization,streetAddress,streetAddress2,city,stateOrProvince,postalCode,country,description\n"
 
         response.setHeader("Content-disposition", "attachment; filename=\"Location_template.csv\"")
-        render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
+        render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(csv.toString()), encoding: "UTF-8")
     }
 
     def importCsv = { ImportDataCommand command ->

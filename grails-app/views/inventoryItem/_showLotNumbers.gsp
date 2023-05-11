@@ -18,7 +18,7 @@
 					<tr class="even" style="min-height: 100px;">
 						<td colspan="3" style="text-align: center; vertical-align: middle">
 							<warehouse:message code="inventory.noItemsCurrentlyInStock.message"
-											   args="[format.product(product:commandInstance?.product)]"/>
+											   args="[format.product(product:commandInstance?.product).decodeHTML()]"/>
 						</td>
 					</tr>
 				</g:if>

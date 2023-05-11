@@ -11,20 +11,23 @@ const TableCell = ({
 
   if (tooltip) {
     cellValue = (
-      <Tooltip
-        arrow="true"
-        delay="150"
-        duration="250"
-        hideDelay="50"
-        html={tooltipLabel || value}
-      >
-        {cellValue}
-      </Tooltip>
+      <div className="d-flex">
+        <Tooltip
+          arrow="true"
+          delay="150"
+          duration="250"
+          hideDelay="50"
+          className="text-overflow-ellipsis"
+          html={tooltipLabel || value}
+        >
+          {cellValue}
+        </Tooltip>
+      </div>
     );
   }
   const elementClasses = `${className} text-overflow-ellipsis`;
 
-  let cellElement = <div className={elementClasses}>{cellValue}</div>;
+  let cellElement = <div className={elementClasses} data-testid="table-cell">{cellValue}</div>;
 
   if (link && typeof link === 'string') {
     if (reactLink) {

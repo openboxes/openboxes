@@ -36,6 +36,7 @@ class LocationTests extends GrailsUnitTestCase {
         mockDomain(LocationType, [depot, supplier, ward])
         mockDomain(Location, [location1, location2, location3, location4])
         Location.metaClass.publishEvent = { ApplicationEvent event -> }
+        Location.metaClass.static.withNewSession = { Closure c -> c.call() }
     }
 
     void test_supports() {
@@ -83,7 +84,7 @@ class LocationTests extends GrailsUnitTestCase {
         binLocation2.save()
 
         assertFalse "Should not validate with the same name and same parent location", binLocation4.validate()
-        assertEquals "unique", binLocation4.errors["name"]
+        assertEquals "validator.unique", binLocation4.errors["name"]
     }
 
 

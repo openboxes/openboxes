@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
   RiArrowGoBackLine,
   RiChat3Line,
+  RiCloseLine,
   RiDeleteBinLine,
   RiDownload2Line,
   RiFileLine,
@@ -12,12 +13,12 @@ import {
   RiPencilLine,
   RiPrinterLine,
   RiShoppingCartLine,
-} from 'react-icons/all';
-import { RiCloseLine } from 'react-icons/ri';
+} from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
@@ -204,11 +205,21 @@ const PurchaseOrderListTable = ({
     },
     {
       Header: <Translate
+        id="react.purchaseOrder.column.paymentTerms.label"
+        defaultMessage="Payment Terms"
+      />,
+      accessor: 'paymentTerm',
+      minWidth: 150,
+      Cell: row => <TableCell {...row} tooltip value={row.value?.name} />,
+    },
+    {
+      Header: <Translate
         id="react.purchaseOrder.column.orderedOn.label"
         defaultMessage="Ordered On"
       />,
       accessor: 'dateOrdered',
       minWidth: 120,
+      Cell: row => <DateCell {...row} />,
     },
     {
       Header: <Translate
@@ -278,7 +289,7 @@ const PurchaseOrderListTable = ({
       className: 'text-right',
       headerClassName: 'justify-content-end',
       sortable: false,
-      minWidth: 230,
+      minWidth: 260,
     },
   ], [supportedActivities, highestRole, actions]);
 

@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 import {
   RiDeleteBinLine,
   RiInformationLine,
-} from 'react-icons/all';
+} from 'react-icons/ri';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import DateCell from 'components/DataTable/DateCell';
 import StockTransferStatus from 'components/stock-transfer/list/StockTransferStatus';
 import useStockTransferListTableData from 'hooks/list-pages/stock-transfer/useStockTransferListTableData';
 import ActionDots from 'utils/ActionDots';
@@ -101,7 +102,7 @@ const StockTransferListTable = ({
       Header: <Translate id="react.stockTransfer.column.dateCreated.label" defaultMessage="Date created" />,
       accessor: 'dateCreated',
       className: 'd-flex align-items-center',
-      Cell: row => <TableCell {...row} tooltip />,
+      Cell: row => <DateCell {...row} tooltip />,
     },
   ], [highestRole, statuses]);
 

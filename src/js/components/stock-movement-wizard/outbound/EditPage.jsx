@@ -13,6 +13,7 @@ import Alert from 'react-s-alert';
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
+import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
@@ -21,7 +22,7 @@ import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName, matchesProductCodeOrName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -51,10 +52,11 @@ const FIELDS = {
       if (rowValues.quantityAvailable < rowValues.quantityRequested) {
         className += 'font-weight-bold';
       }
-      const filterOutItems = itemFilter && !(
-        rowValues.product.name.toLowerCase().includes(itemFilter.toLowerCase()) ||
-        rowValues.productCode.toLowerCase().includes(itemFilter.toLowerCase())
-      );
+      const filterOutItems = itemFilter &&
+        !matchesProductCodeOrName({
+          product: rowValues?.product,
+          filterValue: itemFilter,
+        });
       const hideRow = (
         (showOnlyErroredItems && !rowValues.hasError) || filterOutItems
       ) && !subfield;
@@ -82,17 +84,12 @@ const FIELDS = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name || ''}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          showValueTooltip: !!fieldValue?.displayNames?.default,
+          tooltipValue: fieldValue?.name,
         }),
       },
       quantityRequested: {
@@ -182,6 +179,7 @@ const FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          displayName: fieldValue?.product?.displayNames?.default,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -341,7 +339,6 @@ class EditItemsPage extends Component {
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchAllData(false);
     }
   }
@@ -613,16 +610,7 @@ class EditItemsPage extends Component {
     const errors = validateForSave(formValues).editPageItems;
 
     if (errors.length) {
-      let errorMessage = `${this.props.translate('react.stockMovement.errors.errorInLine.label', 'Error occurred in line')}:</br>`;
-      errorMessage += _.reduce(
-        errors,
-        (message, value, key) => (
-          `${message}${value ? `${key + 1} - ${_.map(value, val => this.props.translate(`${val}`))}</br>` : ''}`
-        ),
-        '',
-      );
-
-      Alert.error(errorMessage);
+      showOutboundEditValidationErrors({ translate: this.props.translate, errors });
 
       this.props.hideSpinner();
       return null;
@@ -876,24 +864,11 @@ class EditItemsPage extends Component {
           <div className="d-flex flex-column">
             { !showOnly ?
               <span className="buttons-container">
-                <div className="d-flex mr-auto justify-content-center align-items-center">
-                  <input
-                    value={itemFilter}
-                    onChange={event => this.setState({ itemFilter: event.target.value })}
-                    className="float-left btn btn-outline-secondary btn-xs filter-input mr-1 mb-1"
-                    placeholder={this.props.translate('react.stockMovement.searchPlaceholder.label', 'Search...')}
-                  />
-                  {itemFilter &&
-                    <i
-                      role="button"
-                      className="fa fa-times-circle"
-                      style={{ color: 'grey', cursor: 'pointer' }}
-                      onClick={() => this.setState({ itemFilter: '' })}
-                      onKeyPress={() => this.setState({ itemFilter: '' })}
-                      tabIndex={0}
-                    />
-                  }
-                </div>
+                <FilterInput
+                  itemFilter={itemFilter}
+                  onChange={e => this.setState({ itemFilter: e.target.value })}
+                  onClear={() => this.setState({ itemFilter: '' })}
+                />
                 <button
                   type="button"
                   onClick={() => this.setState({ showOnlyErroredItems: !showOnlyErroredItems })}

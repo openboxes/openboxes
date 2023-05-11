@@ -18,20 +18,24 @@ class InventorySnapshotEvent extends ApplicationEvent {
     Product product
     Location binLocation
     InventoryItem inventoryItem
+    Boolean disableRefresh = Boolean.FALSE
 
     InventorySnapshotEvent(InventoryItem source) {
         super(source)
         this.inventoryItem = source
+        this.disableRefresh = source.disableRefresh
     }
 
     InventorySnapshotEvent(Location source) {
         super(source)
         this.binLocation = source
+        this.disableRefresh = disableRefresh
     }
 
     InventorySnapshotEvent(Product source) {
         super(source)
         this.product = source
+        this.disableRefresh = disableRefresh
     }
 
 }

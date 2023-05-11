@@ -9,9 +9,12 @@
  **/
 package org.pih.warehouse.product
 
+import grails.plugin.springcache.annotations.CacheFlush
+
 class ProductGroupController {
 
     def productService
+    ProductGroupService productGroupService
 
     def index = {
         redirect(action: "list", params: params)
@@ -40,6 +43,7 @@ class ProductGroupController {
         return [productGroupInstance: productGroupInstance]
     }
 
+    @CacheFlush("selectProductFamilyCache")
     def save = {
         println "Save " + params
         def productGroupInstance = ProductGroup.get(params.id)
@@ -123,6 +127,7 @@ class ProductGroupController {
 
     }
 
+    @CacheFlush("selectProductFamilyCache")
     def update = {
 
         log.info "Update product group " + params
@@ -146,6 +151,9 @@ class ProductGroupController {
                 redirect(controller: "productGroup", action: "list")
             } else {
                 println productGroupInstance.errors
+                // Refresh the instance from db, to avoid returning to the view productGroupInstance
+                // that is persisted in Hibernate session with the binded properties that didn't pass the validation
+                productGroupInstance.refresh()
                 render(view: "edit", model: [productGroupInstance: productGroupInstance])
             }
         } else {
@@ -154,6 +162,7 @@ class ProductGroupController {
         }
     }
 
+    @CacheFlush("selectProductFamilyCache")
     def delete = {
         def productGroupInstance = ProductGroup.get(params.id)
         if (productGroupInstance) {
@@ -210,25 +219,19 @@ class ProductGroupController {
      */
 
     def removeProductsFromProductGroup = {
-        println params
-
         def productGroupInstance = ProductGroup.get(params.id)
         def products = productService.getProducts(params['delete-product.id'])
         products.each { product ->
             productGroupInstance.removeFromProducts(product)
         }
-
         render(view: "edit", model: [productGroupInstance: productGroupInstance])
     }
     def addProductsToProductGroup = {
-        println params
-
         def productGroupInstance = ProductGroup.get(params.id)
         def products = productService.getProducts(params['add-product.id'])
         products.each { product ->
             productGroupInstance.addToProducts(product)
         }
-
         render(view: "edit", model: [productGroupInstance: productGroupInstance])
     }
 
@@ -239,34 +242,38 @@ class ProductGroupController {
      * @return
      */
     def addProductToProductGroup = {
-        println "addProductToProductGroup() " + params
-        def productGroup = ProductGroup.get(params.id)
-        if (productGroup) {
-            def product = Product.get(params.product.id)
-            if (product) {
-                productGroup.addToProducts(product)
-                productGroup.save()
-            }
+        Boolean isProductFamily = params.boolean("isProductFamily") ?: false
+        ProductGroup productGroup = null
+        try {
+            productGroup = productGroupService.addProductToProductGroup(params.id, params.product?.id, isProductFamily)
+        } catch (IllegalArgumentException e) {
+            productGroup = ProductGroup.read(params.id)
+            flash.error = e.message
         }
-        render(template: 'products', model: [productGroup: productGroup, products: productGroup.products])
+        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily ? productGroup?.siblings : productGroup?.products])
     }
 
     /**
      * Delete product group from database
      */
     def deleteProductFromProductGroup = {
-        println "deleteProductFromProductGroup() " + params
+        Boolean isProductFamily = params.boolean("isProductFamily") ?: false
         def productGroup = ProductGroup.get(params.id)
         def product = Product.get(params?.product?.id)
         if (product && productGroup) {
-            product.removeFromProductGroups(productGroup)
-            productGroup.removeFromProducts(product)
+            if (isProductFamily) {
+                product.productFamily = null
+            }
+            else {
+                product.removeFromProductGroups(productGroup)
+                productGroup.removeFromProducts(product)
+            }
             product.save(flush: true)
         } else {
             response.status = 404
         }
 
-        render(template: 'products', model: [productGroup: productGroup, products: productGroup.products])
+        render(template: 'products', model: [productGroup: productGroup, products: isProductFamily ? productGroup?.siblings : productGroup.products])
     }
 
 }

@@ -17,6 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.inventory.Inventory
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -27,6 +28,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
+import org.pih.warehouse.util.LocalizationUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer
@@ -659,32 +661,59 @@ class ReportService implements ApplicationContextAware {
     }
 
     List getOnOrderSummary(Location location) {
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+
         String query = """
             select 
                 product.product_code as productCode, 
                 product.name as productName, 
                 oos.quantity_ordered_not_shipped as qtyOrderedNotShipped,
                 oos.quantity_shipped_not_received as qtyShippedNotReceived, 
-                ps.quantity_on_hand as qtyOnHand
+                ps.quantity_on_hand as qtyOnHand,
+                product_group.name as productFamilyName,
+                category.name as productCategoryName,
+                (
+                select s.name from synonym s
+                where s.product_id = product.id
+                and s.synonym_type_code = :synonymTypeCode
+                and s.locale = :locale
+                limit 1
+                ) as displayName,
+                (
+                select group_concat(product_catalog.name separator ', ')
+                from product_catalog_item
+                left outer join product_catalog on product_catalog_item.product_catalog_id = product_catalog.id
+                where product_catalog_item.product_id = product.id
+                group by product.name
+                ) as productCatalogs
             from on_order_summary oos
             join product on oos.product_id = product.id
+            left outer join product_group on product.product_family_id = product_group.id
+            left outer join category on product.category_id = category.id
             left outer join product_snapshot ps on (product.id = ps.product_id 
                 and ps.location_id = oos.destination_id)
             where destination_id = :locationId
             """
-        def results = dataService.executeQuery(query,  [locationId: location.id])
+        def results = dataService.executeQuery(query,  [synonymTypeCode: SynonymTypeCode.DISPLAY_NAME.name(), locale: locale, locationId: location.id])
         def data = results.collect {
             def qtyOnHand = it.qtyOnHand ? it.qtyOnHand.toInteger() : 0
             def qtyOrderedNotShipped = it.qtyOrderedNotShipped ? it.qtyOrderedNotShipped.toInteger() : 0
             def qtyShippedNotReceived = it.qtyShippedNotReceived ? it.qtyShippedNotReceived : 0
+            def displayNameWithLocaleCode = "${it.productName}${it.displayName ? " (${locale?.toUpperCase()}: ${it.displayName})" : ''}"
+            println displayNameWithLocaleCode
             [
-                    productCode          : it.productCode,
-                    productName          : it.productName,
-                    qtyOrderedNotShipped : qtyOrderedNotShipped ?: '',
-                    qtyShippedNotReceived: qtyShippedNotReceived ?: '',
-                    totalOnOrder         : qtyOrderedNotShipped + qtyShippedNotReceived,
-                    totalOnHand          : qtyOnHand,
-                    totalOnHandAndOnOrder: qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
+                    productCode                 : it.productCode,
+                    productName                 : it.productName,
+                    displayNameWithLocaleCode   : displayNameWithLocaleCode,
+                    displayName                 : it.displayName,
+                    productFamily               : it.productFamilyName ?: '',
+                    category                    : it.productCategoryName ?: '',
+                    productCatalogs             : it.productCatalogs ?: '',
+                    qtyOrderedNotShipped        : qtyOrderedNotShipped ?: '',
+                    qtyShippedNotReceived       : qtyShippedNotReceived ?: '',
+                    totalOnOrder                : qtyOrderedNotShipped + qtyShippedNotReceived,
+                    totalOnHand                 : qtyOnHand,
+                    totalOnHandAndOnOrder       : qtyOrderedNotShipped + qtyShippedNotReceived + qtyOnHand,
             ]
         }
         return data
@@ -928,8 +957,8 @@ class ReportService implements ApplicationContextAware {
                  "UOM": "", "Cost per UOM (${currencyCode})": "", "Qty Ordered not shipped (UOM)": "",
                  "Qty Ordered not shipped (Each)": "", "Value ordered not shipped": "", "Qty Shipped not Invoiced (UOM)": "",
                  "Qty Shipped not Invoiced (Each)": "", "Value Shipped not invoiced": "", "Total Qty not Invoiced (UOM)": "",
-                 "Total Qty not Invoiced (Each)": "", "Total Value not invoiced": "", "Budget Code": "", "Recipient": "",
-                 "Estimated Ready Date": "", "Actual Ready Date": ""]]
+                 "Total Qty not Invoiced (Each)": "", "Total Value not invoiced": "", "Budget Code": "", "Payment Terms": "",
+                 "Recipient": "", "Estimated Ready Date": "", "Actual Ready Date": ""]]
         }
 
         return rows.sort { it["PO Number"] }
@@ -961,19 +990,20 @@ class ReportService implements ApplicationContextAware {
                 "PO Number"                                         : orderItem?.order?.orderNumber,
                 "Type"                                              : "Item",
                 "Code"                                              : orderItem?.product?.productCode,
-                "Description"                                       : orderItem?.product?.description,
+                "Product name"                                      : orderItem?.product?.displayNameOrDefaultName,
                 "UOM"                                               : orderItem?.unitOfMeasure,
-                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice),
+                "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format(orderItem?.unitPrice ?: 0),
                 "Qty Ordered not shipped (UOM)"                     : integerFormat.format(orderedNotShipped),
                 "Qty Ordered not shipped (Each)"                    : integerFormat.format(orderedNotShipped * orderItem?.quantityPerUom),
-                "Value ordered not shipped"                         : currencyNumberFormat.format((orderedNotShipped * orderItem?.unitPrice) ?: 0),
+                "Value ordered not shipped"                         : currencyNumberFormat.format(orderedNotShipped * (orderItem?.unitPrice ?: 0)),
                 "Qty Shipped not Invoiced (UOM)"                    : integerFormat.format(shippedNotInvoiced),
                 "Qty Shipped not Invoiced (Each)"                   : integerFormat.format(shippedNotInvoiced * orderItem?.quantityPerUom),
-                "Value Shipped not invoiced"                        : currencyNumberFormat.format((shippedNotInvoiced * orderItem?.unitPrice) ?: 0),
+                "Value Shipped not invoiced"                        : currencyNumberFormat.format(shippedNotInvoiced * (orderItem?.unitPrice ?: 0)),
                 "Total Qty not Invoiced (UOM)"                      : integerFormat.format(quantityNotInvoiced),
                 "Total Qty not Invoiced (Each)"                     : integerFormat.format(quantityNotInvoiced * orderItem?.quantityPerUom),
-                "Total Value not invoiced"                          : currencyNumberFormat.format((quantityNotInvoiced * orderItem?.unitPrice) ?: 0),
+                "Total Value not invoiced"                          : currencyNumberFormat.format(quantityNotInvoiced * (orderItem?.unitPrice ?: 0)),
                 "Budget Code"                                       : orderItem?.budgetCode?.code,
+                "Payment Terms"                                     : orderItem?.order.paymentTerm?.name,
                 "Recipient"                                         : orderItem?.recipient?.name,
                 "Estimated Ready Date"                              : orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
                 "Actual Ready Date"                                 : orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
@@ -1002,7 +1032,7 @@ class ReportService implements ApplicationContextAware {
                 "PO Number"                                         : orderAdjustment?.order?.orderNumber,
                 "Type"                                              : "Adjustment",
                 "Code"                                              : orderAdjustment?.orderItem?.product?.productCode ?: "",
-                "Description"                                       : orderAdjustment?.description,
+                "Product name"                                      : orderAdjustment?.orderItem?.product?.displayNameOrDefaultName,
                 "UOM"                                               : "",
                 "Cost per UOM (${currencyNumberFormat.currency})"   : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
                 "Qty Ordered not shipped (UOM)"                     : "",
@@ -1015,6 +1045,7 @@ class ReportService implements ApplicationContextAware {
                 "Total Qty not Invoiced (Each)"                     : 1,
                 "Total Value not invoiced"                          : currencyNumberFormat.format((orderAdjustment?.totalAdjustments) ?: 0),
                 "Budget Code"                                       : orderAdjustment?.budgetCode?.code,
+                "Payment Terms"                                     : orderAdjustment?.order?.paymentTerm?.name,
                 "Recipient"                                         : "",
                 "Estimated Ready Date"                              : "",
                 "Actual Ready Date"                                 : "",

@@ -375,6 +375,7 @@ class StockMovementService {
         def offset = params.offset ? params.int("offset") : null
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
+        List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
 
         def shipments = Shipment.createCriteria().list(max: max, offset: offset) {
 
@@ -416,6 +417,9 @@ class StockMovementService {
             }
             if(createdBefore) {
                 le("dateCreated", createdBefore)
+            }
+            if (shipmentTypes) {
+                'in'("shipmentType", shipmentTypes)
             }
 
             if (params.sort) {
@@ -2208,6 +2212,7 @@ class StockMovementService {
         shipment.shipmentType = stockMovement.shipmentType
         shipment.driverName = stockMovement.driverName
         shipment.expectedDeliveryDate = stockMovement.expectedDeliveryDate
+        shipment.expectedShippingDate = stockMovement.dateShipped
         if (stockMovement.comments) {
             shipment.addToComments(new Comment(comment: stockMovement.comments))
         }
@@ -2720,6 +2725,7 @@ class StockMovementService {
     }
 
     List buildStockMovementItemList(StockMovement stockMovement) {
+
         // We need to create at least one row to ensure an empty template
         if (stockMovement?.lineItems?.empty) {
             stockMovement?.lineItems.add(new StockMovementItem())
@@ -2729,7 +2735,7 @@ class StockMovementService {
             [
                 "Requisition item id"            : it?.id ?: "",
                 "Product code (required)"     : it?.product?.productCode ?: "",
-                "Product name"                  : it?.product?.name ?: "",
+                "Product name"                  : it?.product?.displayNameWithLocaleCode ?: "",
                 "Pack level 1"                   : it?.palletName ?: "",
                 "Pack level 2"                      : it?.boxName ?: "",
                 "Lot number"                    : it?.lotNumber ?: "",

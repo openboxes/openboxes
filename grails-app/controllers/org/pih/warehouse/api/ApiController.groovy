@@ -90,6 +90,10 @@ class ApiController {
         def locale = localizationService.getCurrentLocale()
         Object[] emptyArgs = [] as Object []
         def localizationModeLocale = grailsApplication.config.openboxes.locale.localizationModeLocale
+        def displayDateFormat = grailsApplication.config.openboxes.display.date.format
+        def displayDateDefaultValue = grailsApplication.config.openboxes.display.date.defaultValue
+        // Notification disappear time in miliseconds
+        def notificationAutohideDelay = grailsApplication.config.openboxes.client.notification.autohide.delay
 
         if (session.useDebugLocale) {
 
@@ -160,6 +164,9 @@ class ApiController {
         def pageSize = grailsApplication.config.openboxes.api.pagination.pageSize
         def logoUrl = location?.logo ? "${createLink(controller: 'location', action: 'viewLogo', id: location?.id)}" : grailsApplication.config.openboxes.logo.url
         def locales = grailsApplication.config.openboxes.locale.supportedLocales
+        def browserConnectionTimeout = grailsApplication.config.openboxes.browser.connection.status.timeout
+        def isAutosaveEnabled = grailsApplication.config.openboxes.client.autosave.enabled &&
+                supportedActivities.contains(ActivityCode.AUTOSAVE.name());
         def supportedLocales = locales.collect {
             def name = new Locale(it).getDisplayName()
             [code: it, name: name]
@@ -200,8 +207,13 @@ class ApiController {
                 currencyCode         : currencyCode,
                 localizedHelpScoutKey: localizedHelpScoutKey,
                 isHelpScoutEnabled   : isHelpScoutEnabled,
-                localizationModeEnabled : localizationModeEnabled,
-                localizationModeLocale : localizationModeLocale
+                localizationModeEnabled  : localizationModeEnabled,
+                localizationModeLocale   : localizationModeLocale,
+                displayDateFormat        : displayDateFormat,
+                displayDateDefaultValue  : displayDateDefaultValue,
+                notificationAutohideDelay: notificationAutohideDelay,
+                browserConnectionTimeout : browserConnectionTimeout,
+                isAutosaveEnabled        : isAutosaveEnabled
             ],
         ] as JSON)
     }

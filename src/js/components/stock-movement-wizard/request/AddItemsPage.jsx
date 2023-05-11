@@ -65,6 +65,9 @@ const FIELDS = {
     defaultMessage: 'Requested product',
     headerAlign: 'left',
     flexWidth: '9',
+    attributes: {
+      showSelectedOptionColor: true,
+    },
   },
   quantityOnHand: {
     type: LabelField,
@@ -168,7 +171,7 @@ const DELETE_BUTTON_FIELD = {
   type: ButtonField,
   label: 'react.default.button.delete.label',
   defaultMessage: 'Delete',
-  flexWidth: '0.5',
+  flexWidth: '1',
   fieldKey: '',
   buttonLabel: 'react.default.button.delete.label',
   buttonDefaultMessage: 'Delete',
@@ -794,10 +797,6 @@ class AddItemsPage extends Component {
             quantityOnHand: '',
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            product: {
-              ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
-            },
           };
         },
       );
@@ -813,10 +812,6 @@ class AddItemsPage extends Component {
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
             quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
-            product: {
-              ...val.product,
-              label: `${val.productCode} ${val.product.name}`,
-            },
           };
         },
       );
@@ -827,10 +822,6 @@ class AddItemsPage extends Component {
           ...val,
           disabled: true,
           quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
-          product: {
-            ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
-          },
         }),
       );
     }
@@ -1015,8 +1006,10 @@ class AddItemsPage extends Component {
   confirmTransition(onConfirm, items) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item =>
-        <p key={item.sortOrder}>{item.product.label} {item.quantityRequested}</p>),
+      message: _.map(items, item => (
+        <p key={item.sortOrder}>
+          {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
+        </p>)),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -1718,7 +1711,10 @@ class AddItemsPage extends Component {
                   type="submit"
                   onClick={() => this.submitRequest(values.lineItems)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={invalid}
+                  disabled={
+                    invalid || !_.some(values.lineItems, item =>
+                        item.product && _.parseInt(item.quantityRequested))
+                  }
                 ><Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
                 </button>
               </div>

@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchRequisitionStatusCodes } from 'actions';
+import { fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -23,18 +23,22 @@ const useOutboundFilters = (isRequestsList) => {
     currentLocation,
     currentUser,
     currentLocale,
+    shipmentTypes,
   } = useSelector(state => ({
     requisitionStatuses: state.requisitionStatuses.data,
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
     currentLocale: state.session.activeLanguage,
+    shipmentTypes: state.stockMovementCommon.shipmentTypes,
   }));
 
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
     dispatch(fetchRequisitionStatusCodes());
+    dispatch(fetchShipmentTypes());
   }, [currentLocale]);
+
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
@@ -100,6 +104,10 @@ const useOutboundFilters = (isRequestsList) => {
     if (queryProps.createdBefore) {
       defaultValues.createdBefore = queryProps.createdBefore;
     }
+    if (queryProps.shipmentType) {
+      const shipTypes = getParamList(queryProps.shipmentType);
+      defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
+    }
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
@@ -146,6 +154,7 @@ const useOutboundFilters = (isRequestsList) => {
       createdBefore: { name: 'createdBefore' },
       requisitionStatusCode: { name: 'requisitionStatusCode', accessor: 'id' },
       receiptStatusCode: { name: 'receiptStatusCode' },
+      shipmentType: { name: 'shipmentType', accessor: 'id' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
@@ -158,7 +167,10 @@ const useOutboundFilters = (isRequestsList) => {
   };
 
   return {
-    selectFiltersForMyStockMovements, defaultFilterValues, setFilterValues, filterParams,
+    selectFiltersForMyStockMovements,
+    defaultFilterValues,
+    setFilterValues,
+    filterParams,
   };
 };
 

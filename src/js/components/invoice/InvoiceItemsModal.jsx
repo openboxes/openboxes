@@ -13,6 +13,7 @@ import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
+import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Select from 'utils/Select';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -92,6 +93,15 @@ const FIELDS = {
         attributes: {
           className: 'text-left',
         },
+        getDynamicAttr: params => ({
+          formatValue: () => {
+            const { values, rowIndex } = params;
+            const rowValue = values?.invoiceItems?.[rowIndex];
+            // If it's not an adjustment, but product, and it has a synonym, display it
+            // with a tooltip with the original name of the product
+            return getInvoiceDescription(rowValue);
+          },
+        }),
       },
       supplierCode: {
         type: LabelField,

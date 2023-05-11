@@ -66,7 +66,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     static mappedBy = [locations: "parentLocation"]
 
     static constraints = {
-        name(nullable: false, blank: false, maxSize: 255, unique: 'parentLocation')
+        name(nullable: false, blank: false, maxSize: 255, validator: uniqueNameValidator)
         description(nullable: true)
         address(nullable: true)
         organization(nullable: true, validator: { organization, Location obj ->
@@ -93,6 +93,31 @@ class Location implements Comparable<Location>, java.io.Serializable {
         dateCreated(display: false)
         lastUpdated(display: false)
         sortOrder(nullable: true)
+        supportedActivities(validator: { Set<String> activities, Location location ->
+            // Don't allow having NONE supported activity in combination with any other supported activity
+            if (activities?.contains(ActivityCode.NONE.id) && activities?.size() > 1) {
+                return ['invalid.supportedActivities']
+            }
+            return true
+        })
+    }
+
+    static uniqueNameValidator = { String name, Location obj ->
+        Location.withNewSession {
+            List<Location> otherLocations
+            if (obj.parentLocation) {
+                otherLocations = Location.findAllByNameAndParentLocation(name, obj.parentLocation)
+            } else {
+                otherLocations = Location.findAllByNameAndParentLocationIsNull(name)
+            }
+
+            // Exclude edited location from otherLocations (since it is validated withNewSession)
+            if (obj.id) {
+                otherLocations = otherLocations?.findAll { it.id != obj.id}
+            }
+
+            return otherLocations?.size() > 0 ? ['validator.unique'] : true
+        }
     }
 
     static mapping = {
@@ -310,6 +335,17 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
     }
 
+    Map toBaseJson() {
+        return [
+                id: id,
+                name: name,
+                locationNumber: locationNumber,
+                active: active,
+                locationType: locationType,
+                locationTypeCode: locationType?.locationTypeCode?.name(),
+        ]
+    }
+
     Map toJson() {
         return [
                 id                         : id,
@@ -337,41 +373,18 @@ class Location implements Comparable<Location>, java.io.Serializable {
         ]
     }
 
-    Map toJson(LocationTypeCode locationTypeCode) {
+    Map toJson(locationTypeCode) {
+        Map json = toBaseJson()
         switch (locationTypeCode) {
-            case LocationTypeCode.DEPOT:
-                return [
-                        id: id,
-                        name: name,
-                        locationNumber: locationNumber,
-                        locationType: locationType,
-                        locationTypeCode: locationType?.locationTypeCode?.name(),
-                        active: active
-                ]
             case LocationTypeCode.INTERNAL:
             case LocationTypeCode.BIN_LOCATION:
-                return [
-                        id: id,
-                        name: name,
-                        locationNumber: locationNumber,
-                        locationType: locationType?.name,
-                        locationTypeCode: locationType?.locationTypeCode?.name(),
+               json += [
                         zoneId: zone?.id,
                         zoneName: zone?.name,
                         active: active
                 ]
-            case LocationTypeCode.ZONE:
-                return [
-                        id: id,
-                        name: name,
-                        locationNumber: locationNumber,
-                        locationType: locationType?.name,
-                        locationTypeCode: locationType?.locationTypeCode?.name(),
-                        active: active
-                ]
-            default:
-                return toJson()
         }
+        return json
     }
 
     static Map toJson(Location location) {

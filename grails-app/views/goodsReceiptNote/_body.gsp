@@ -65,7 +65,7 @@
                                 </g:if>
                                 <g:else>
                                     <div class="product-name">
-                                        ${receiptItem?.product?.name}
+                                        ${receiptItem?.product?.displayNameOrDefaultName}
                                     </div>
                                 </g:else>
                             </td>

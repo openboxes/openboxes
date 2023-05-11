@@ -22,6 +22,8 @@ const ActivityCode = {
   HOLD_STOCK: 'HOLD_STOCK',
   SUBMIT_REQUEST: 'SUBMIT_REQUEST',
   DYNAMIC_CREATION: 'DYNAMIC_CREATION',
+  AUTOSAVE: 'AUTOSAVE',
+  NONE: 'NONE',
 };
 
 export default ActivityCode;

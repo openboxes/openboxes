@@ -548,7 +548,7 @@ class DocumentService {
             row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode)
             row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
-            row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name)
+            row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.displayNameWithLocaleCode)
             row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
             row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.lotNumber)
@@ -910,7 +910,7 @@ class DocumentService {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
-                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name)
+                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.displayNameWithLocaleCode)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
 
@@ -1173,7 +1173,7 @@ class DocumentService {
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
-                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.name)
+                row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.displayNameWithLocaleCode)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.unitOfMeasure)

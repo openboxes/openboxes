@@ -210,13 +210,13 @@ class InvoiceService {
 
     def submitInvoice(Invoice invoice) {
         invoice.dateSubmitted = new Date()
-        invoice.disableRefresh = false
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
         invoice.save()
     }
 
     def postInvoice(Invoice invoice) {
         invoice.datePosted = new Date()
-        invoice.disableRefresh = false
+        invoice.disableRefresh = invoice.isPrepaymentInvoice
         invoice.save()
     }
 
@@ -396,5 +396,15 @@ class InvoiceService {
         )
         invoiceItem.addToOrderAdjustments(orderAdjustment)
         return invoiceItem
+    }
+
+    List<InvoiceItem> getPendingInvoiceItems(Product product) {
+        return InvoiceItem.createCriteria().list() {
+            invoice {
+                isNull("datePaid")
+                isNull("datePosted")
+            }
+            eq("product", product)
+        }
     }
 }

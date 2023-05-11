@@ -13,11 +13,13 @@ import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.User
@@ -28,6 +30,7 @@ import org.pih.warehouse.inventory.InventorySnapshotEvent
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.util.LocalizationUtil
 
 /**
  * An product is an instance of a generic.  For instance,
@@ -231,6 +234,10 @@ class Product implements Comparable, Serializable {
 
     String color
 
+    ProductGroup productFamily
+
+    static belongsTo = ProductGroup
+
     static transients = ["associations",
                          "rootCategory",
                          "categoriesList",
@@ -241,7 +248,12 @@ class Product implements Comparable, Serializable {
                          "substitutions",
                          "applicationTagLib",
                          "handlingIcons",
-                         "uoms"
+                         "uoms",
+                         "displayName",
+                         "displayNames",
+                         "displayNameOrDefaultName",
+                         "displayNameWithLocaleCode",
+                         "productEvents"
     ]
 
     static hasMany = [
@@ -315,6 +327,7 @@ class Product implements Comparable, Serializable {
         updatedBy(nullable: true)
         glAccount(nullable: true)
         color(nullable: true)
+        productFamily(nullable: true)
     }
 
     /**
@@ -674,7 +687,58 @@ class Product implements Comparable, Serializable {
     }
 
     List getUoms() {
-       return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+        return packages.collect { [uom: it.uom.code, quantity: it.quantity] }.unique()
+    }
+
+    String getDisplayNameWithLocaleCode() {
+        String localeTag = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag().toUpperCase()
+        return "${name}${displayName ? " (${localeTag}: ${displayName})" : ''}"
+    }
+
+    List<Synonym> getSynonyms(SynonymTypeCode synonymTypeCode, Locale locale) {
+        return synonyms.findAll { Synonym synonym ->
+            synonym.synonymTypeCode == synonymTypeCode && synonym.locale == locale
+        } as List
+    }
+
+    /**
+     * @return the display name if it exists or null
+     */
+    String getDisplayName() {
+        return getDisplayName(LocalizationUtil.currentLocale)
+    }
+
+    String getDisplayName(Locale locale) {
+        List<Synonym> synonyms =  getSynonyms(SynonymTypeCode.DISPLAY_NAME, locale)
+        return !synonyms.empty ? synonyms.first().name : null
+    }
+
+    List<Synonym> getSynonyms(SynonymTypeCode synonymTypeCode) {
+        return getSynonyms(synonymTypeCode, LocalizationUtil.currentLocale)
+    }
+
+    /**
+     * @return the display name if it exists or the default name
+     */
+    String getDisplayNameOrDefaultName() {
+        return displayName ?: name
+    }
+
+    Map getDisplayNames() {
+        def data = ["default": getDisplayName(LocalizationUtil.currentLocale)]
+        List<Locale> locales = LocalizationUtil.supportedLocales
+        locales.each { Locale locale ->
+            String displayName = getDisplayName(locale)
+            // Don't include in the map locales which do not have display name for the product
+            if (displayName) {
+                data.put(locale.toLanguageTag(), displayName)
+            }
+        }
+        return data
+    }
+
+    def getProductEvents() {
+        return ProductEvents.createFromProduct(this)
     }
 
     Map toJson() {

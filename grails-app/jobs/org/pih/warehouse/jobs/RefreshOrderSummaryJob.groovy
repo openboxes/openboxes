@@ -7,6 +7,8 @@ import org.quartz.JobExecutionContext
 @DisallowConcurrentExecution
 class RefreshOrderSummaryJob {
 
+    def concurrent = false  // make `static` in Grails 3
+
     def orderService
 
     static triggers = {

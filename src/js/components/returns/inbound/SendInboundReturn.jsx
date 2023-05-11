@@ -18,7 +18,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -49,6 +49,7 @@ const SHIPMENT_FIELDS = {
       dateFormat: 'MM/DD/YYYY',
       required: true,
       autoComplete: 'off',
+      showError: true,
     },
     getDynamicAttr: ({ issued }) => ({
       disabled: issued,
@@ -133,24 +134,19 @@ const FIELDS = {
         defaultMessage: 'Code',
         flexWidth: '1',
       },
-      'product.name': {
-        type: (params) => {
-          const { rowIndex, values } = params;
-          const handlingIcons = _.get(values, `stockTransferItems[${rowIndex}].product.handlingIcons`, []);
-          const productNameWithIcons = (
-            <div className="d-flex">
-              <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-              {renderHandlingIcons(handlingIcons)}
-            </div>);
-          return (<LabelField {...params} fieldValue={productNameWithIcons} />);
-        },
+      product: {
+        type: LabelField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         flexWidth: '2',
         headerAlign: 'left',
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
-          showValueTooltip: true,
+          formatValue: formatProductDisplayName,
           className: 'text-left ml-1',
+          showValueTooltip: true,
         },
       },
       lotNumber: {
@@ -310,7 +306,8 @@ class SendMovementPage extends Component {
       errors.expectedDeliveryDate = 'react.default.error.requiredField.label';
     }
     if (moment(dateShipped).diff(expectedDeliveryDate) > 0) {
-      errors.expectedDeliveryDate = 'react.stockMovement.error.pastDate.label';
+      errors.expectedDeliveryDate = 'react.stockMovement.error.deliveryDateBeforeShipDate.label';
+      errors.dateShipped = 'react.stockMovement.error.deliveryDateBeforeShipDate.label';
     }
 
     return errors;
@@ -346,7 +343,14 @@ class SendMovementPage extends Component {
   save(values) {
     this.saveValues(values)
       .then((resp) => {
-        const inboundReturn = parseResponse(resp.data.data);
+        const { data } = resp.data;
+        const inboundReturn = {
+          ...parseResponse(data),
+          shipmentType: {
+            ...data.shipmentType,
+            label: splitTranslation(data.shipmentType.name, this.props.locale),
+          },
+        };
         this.setState({
           values: {
             inboundReturn,

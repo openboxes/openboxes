@@ -11,6 +11,7 @@ export default {
       defaultPlaceholder: 'Status',
       showLabelTooltip: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ statuses }) => ({
       options: statuses,
@@ -92,6 +93,25 @@ export default {
       disabled: isCentralPurchasingEnabled,
     }),
   },
+  paymentTerm: {
+    type: FilterSelectField,
+    attributes: {
+      valueKey: 'id',
+      filterElement: true,
+      placeholder: 'react.purchaseOrder.column.paymentTerms.label',
+      defaultPlaceholder: 'Payment Terms',
+      showLabelTooltip: true,
+      multi: true,
+      closeMenuOnSelect: false,
+      blurInputOnSelect: false,
+      nullOption: true,
+      nullOptionLabel: 'react.purchaseOrder.filters.option.blankPaymentTerm.label',
+      nullOptionDefaultLabel: 'Blank Payment Term',
+    },
+    getDynamicAttr: ({ paymentTerms }) => ({
+      options: paymentTerms,
+    }),
+  },
   orderedBy: {
     type: FilterSelectField,
     attributes: {
@@ -109,9 +129,9 @@ export default {
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
-      debouncedUsersFetch,
+      debouncedPeopleFetch,
     }) => ({
-      loadOptions: debouncedUsersFetch,
+      loadOptions: debouncedPeopleFetch,
     }),
   },
   createdBy: {
@@ -131,9 +151,9 @@ export default {
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
-      debouncedUsersFetch,
+      debouncedPeopleFetch,
     }) => ({
-      loadOptions: debouncedUsersFetch,
+      loadOptions: debouncedPeopleFetch,
     }),
   },
 };

@@ -34,6 +34,8 @@ class Constants {
     static final String EXPIRATION_DATE_FORMAT = "MM/dd/yyyy"
     static final String DELIVERY_DATE_FORMAT = "MM/dd/yyyy HH:mm XXX"
     static final String EUROPEAN_DATE_FORMAT = "dd/MM/yyyy"
+    static final String DISPLAY_DATE_FORMAT = "MMM DD, yyyy"
+    static final String DISPLAY_DATE_DEFAULT_VALUE = "-"
 
 
     static final DateFormat DEFAULT_DATE_FORMATTER = new SimpleDateFormat(DEFAULT_DATE_FORMAT)
@@ -64,7 +66,7 @@ class Constants {
 
     static final ArrayList COLORS = ['FFFFFF', 'FFDFDF', 'FFBFBF', 'FF9F9F', 'FF7F7F', 'FF5F5F', 'FF3F3F', 'FF1F1F', 'FF0000', 'DF1F00', 'C33B00', 'A75700', '8B7300', '6F8F00', '53AB00', '37C700', '1BE300', '00FF00', '00DF1F', '00C33B', '00A757', '008B73', '006F8F', '0053AB', '0037C7', '001BE3', '0000FF', '0000df', '0000c3', '0000a7', '00008b', '00006f', '000053', '000037', '00001b', '000000']
 
-    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
+    static final ArrayList EXPORT_PRODUCT_COLUMNS = ["Id", "ProductCode", "ProductType", "Name", "ProductFamily", "Category", "GLAccount", "Description", "UnitOfMeasure", "Tags", "UnitCost", "LotAndExpiryControl", "ColdChain", "ControlledSubstance", "HazardousMaterial", "Reconditioned", "Manufacturer", "BrandName", "ManufacturerCode", "ManufacturerName", "Vendor", "VendorCode", "VendorName", "UPC", "NDC", "Created", "Updated"]
 
     // these are direct references to transaction types by primary key
     static final String CONSUMPTION_TRANSACTION_TYPE_ID = "2"
@@ -104,6 +106,7 @@ class Constants {
 
     // Default character used to separate columns and newlines in exports
     static final String DEFAULT_COLUMN_SEPARATOR = ","
+    static final String CUSTOM_COLUMN_SEPARATOR = ";"
     static final String DEFAULT_LINE_SEPARATOR = "\n"
 
     // Characters that should be included with each of the random number types

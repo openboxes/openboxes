@@ -231,7 +231,7 @@ class ProductCatalogController {
                         "Category": it?.product?.category?.name,
                 ]
             }
-            render dataService.generateCsv(data)
+            render(contentType: "text/csv", text: dataService.generateCsv(data))
         } else {
             response.sendError(404)
         }

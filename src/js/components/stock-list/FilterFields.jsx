@@ -12,6 +12,7 @@ export default {
       defaultPlaceholder: 'Origin',
       showLabelTooltip: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
       valueKey: 'id',
       labelKey: 'name',
     },
@@ -29,6 +30,7 @@ export default {
       defaultPlaceholder: 'Destination',
       showLabelTooltip: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
       valueKey: 'id',
       labelKey: 'name',
     },
@@ -38,9 +40,10 @@ export default {
   },
   isPublished: {
     type: CheckboxField,
-    label: 'react.stocklists.includeUnpublished.label',
-    defaultMessage: 'Include unpublished stocklists',
     attributes: {
+      withLabel: true,
+      label: 'react.stocklists.includeUnpublished.label',
+      defaultMessage: 'Include unpublished stocklists',
       filterElement: true,
     },
   },

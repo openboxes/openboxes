@@ -16,11 +16,12 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AddLocationGroupModal from 'components/locations-configuration/modals/AddLocationGroupModal';
 import AddOrganizationModal from 'components/locations-configuration/modals/AddOrganizationModal';
+import ActivityCode from 'consts/activityCode';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { convertToBase64 } from 'utils/file-utils';
 import { renderFormField } from 'utils/form-utils';
-import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationGroupsFetch, debounceOrganizationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -41,6 +42,12 @@ function validate(values) {
 
   if (!values.locationType) {
     errors.locationType = 'react.default.error.requiredField.label';
+  }
+
+  // Don't allow having NONE supported activity in combination with any other supported activity
+  if (values.supportedActivities?.length > 1 &&
+    values.supportedActivities?.find(activity => activity.value === ActivityCode.NONE)) {
+    errors.supportedActivities = 'react.locationsConfiguration.error.supportedActivities.label';
   }
 
   return errors;
@@ -141,8 +148,8 @@ const FIELDS = {
       labelKey: 'name',
       filterOptions: options => options,
     },
-    getDynamicAttr: ({ debouncedUsersFetch }) => ({
-      loadOptions: debouncedUsersFetch,
+    getDynamicAttr: ({ debouncedPeopleFetch }) => ({
+      loadOptions: debouncedPeopleFetch,
     }),
   },
 };
@@ -191,8 +198,8 @@ class LocationDetails extends Component {
     };
     this.openNewOrganizationModal = this.openNewOrganizationModal.bind(this);
     this.openNewLocationGroupModal = this.openNewLocationGroupModal.bind(this);
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedLocationGroupsFetch =
       debounceLocationGroupsFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -454,7 +461,7 @@ class LocationDetails extends Component {
                         active: values.active,
                         debouncedLocationGroupsFetch: this.debouncedLocationGroupsFetch,
                         debouncedOrganizationsFetch: this.debouncedOrganizationsFetch,
-                        debouncedUsersFetch: this.debouncedUsersFetch,
+                        debouncedPeopleFetch: this.debouncedPeopleFetch,
                         openNewOrganizationModal: this.openNewOrganizationModal,
                         openNewLocationGroupModal: this.openNewLocationGroupModal,
                         injectionData: this.state.supportLinks,

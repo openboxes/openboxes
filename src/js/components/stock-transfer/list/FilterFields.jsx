@@ -12,6 +12,7 @@ export default {
       showLabelTooltip: true,
       multi: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ statuses }) => ({
       options: statuses,
@@ -34,9 +35,9 @@ export default {
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
-      debouncedUsersFetch,
+      debouncedPeopleFetch,
     }) => ({
-      loadOptions: debouncedUsersFetch,
+      loadOptions: debouncedPeopleFetch,
     }),
   },
   lastUpdatedStartDate: {

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
@@ -283,7 +284,8 @@ class EditPickModal extends Component {
             reasonCode: '',
             quantityRequired: pickPageItem.quantityRequired,
             productCode: pickPageItem.productCode,
-            productName: pickPageItem['product.name'],
+            productName: pickPageItem.product.name,
+            displayName: pickPageItem.product?.displayNames?.default,
           },
         });
 
@@ -317,7 +319,17 @@ class EditPickModal extends Component {
             <Translate id="react.stockMovement.productCode.label" defaultMessage="Product code" />: {this.state.formValues.productCode}
           </div>
           <div className="font-weight-bold">
-            <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />: {this.state.formValues.productName}
+            <Tooltip
+              html={<div className="text-truncate">{this.state.formValues.productName}</div>}
+              theme="dark"
+              disabled={!this.state.formValues.displayName}
+              position="top-start"
+            >
+              <span className="d-flex">
+                <Translate id="react.stockMovement.productName.label" defaultMessage="Product name" />:{' '}
+                {this.state.formValues.displayName ?? this.state.formValues.productName}
+              </span>
+            </Tooltip>
           </div>
           <div className="font-weight-bold">
             <Translate id="react.stockMovement.quantityRequired.label" defaultMessage="Qty Required" />: {this.state.formValues.quantityRequired}

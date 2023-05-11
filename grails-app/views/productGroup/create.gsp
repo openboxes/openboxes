@@ -34,7 +34,7 @@
 </head>
 <body>
 	<div class="body">
-	
+
 		<g:if test="${flash.message}">
 			<div class="message">
 				${flash.message}
@@ -46,16 +46,27 @@
 			</div>
 		</g:hasErrors>
 
-		<div class="buttonBar">
-			<g:link class="button icon log" action="list"><warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
-	        <g:link class="button icon add" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label').toLowerCase()]"/></g:link>
+		<div class="summary">
+			<h1 class="title"><g:message code="default.create.label" args="[g.message(code: 'productGroup.label')]"/></h1>
 		</div>
+
+		<div class="buttonBar">
+			<g:link class="button" action="list">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"/>&nbsp;
+				<warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroups.label')]"/>
+			</g:link>
+			<g:link class="button" action="create">
+				<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
+				<warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label')]"/>
+			</g:link>
+		</div>
+
 		<g:form action="save" method="post">
 
 				<div class="box">
-				
+
 				    <h2><warehouse:message code="productGroup.label"/></h2>
-					
+
 					<table>
 						<tbody>
 
@@ -66,10 +77,10 @@
 								</td>
 								<td valign="middle"
 									class="value ${hasErrors(bean: productGroupInstance, field: 'name', 'errors')}">
-									
-									<g:if test="${productGroups }">	
-										<div>										
-											<g:select name="id" from="${productGroups }" 
+
+									<g:if test="${productGroups }">
+										<div>
+											<g:select name="id" from="${productGroups }"
 												optionKey="id" optionValue="name" value="${productGroupInstance?.id }" noSelection="['null':'']"/>
 										</div>
 									</g:if>
@@ -79,8 +90,8 @@
 												value="${productGroupInstance?.name}" />
 										</div>
 									</g:else>
-										
-									
+
+
 								</td>
 							</tr>
                             <tr class="prop">
@@ -125,9 +136,9 @@
 														<g:checkBox id="productId" name="product.id" value="${product?.id }"/>
 													</td>
 													<td class="checkable middle">
-														<span class="fade">${product?.productCode }</span>	
+														<span class="fade">${product?.productCode }</span>
 													</td>
-													<td class="checkable middle">			
+													<td class="checkable middle">
 														<g:link name="productLink" controller="inventoryItem" action="showStockCard" params="['product.id':product?.id]" fragment="inventory" style="z-index: 999">
 															<span title="${product?.name }">
 																<g:if test="${product?.name?.trim()}">
@@ -137,20 +148,20 @@
 																	<warehouse:message code="product.untitled.label"/>
 																</g:else>
 															</span>
-														</g:link> 
+														</g:link>
 													</td>
 													<td class="checkable middle left">
 														<span class="fade">${product?.manufacturer }</span>
 													</td>
 													<td class="checkable middle left">
-														<span class="fade">${product?.brandName}</span>	
+														<span class="fade">${product?.brandName}</span>
 													</td>
 													<td class="checkable middle left">
 														<span class="fade">${product?.manufacturerCode }</span>
 													</td>
-													
-													
-												</tr>																					
+
+
+												</tr>
 											</g:each>
 										</table>
 									</td>
@@ -177,6 +188,6 @@
 
 		</g:form>
 	</div>
-	
+
 </body>
 </html>

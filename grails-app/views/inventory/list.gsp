@@ -56,8 +56,8 @@
                                 <th class="center"><warehouse:message code="inventoryLevel.status.label" default="Status"/></th>
                                 <th><warehouse:message code="product.productCode.label" default="Code"/></th>
                                 <th><warehouse:message code="product.label" default="Product"/></th>
+                                <th class="left"><warehouse:message code="product.productFamily.label" default="Product Family"/></th>
                                 <th><warehouse:message code="category.label" default="Category"/></th>
-                                <th class="left"><warehouse:message code="inventoryLevel.binLocation.label" default="Bin location"/></th>
                                 <th class="left"><warehouse:message code="inventoryLevel.abcClass.label" default="ABC Class"/></th>
                                 <th><warehouse:message code="product.unitOfMeasure.label" default="Unit of measure"/></th>
                                 <th class="center"><warehouse:message code="inventoryLevel.minimumQuantity.label" default="Minimum quantity"/></th>
@@ -86,14 +86,15 @@
                                         </td>
                                         <td>
                                             <g:link controller="inventoryItem" action="showStockCard" id="${product?.id}">
-                                                ${product?.name} <g:renderHandlingIcons product="${product}" />
+                                                <format:displayName product="${product}" showTooltip="${true}" />
+                                                <g:renderHandlingIcons product="${product}" />
                                             </g:link>
+                                        </td>
+                                        <td class="left">
+                                            ${product?.productFamily?.name?:""}
                                         </td>
                                         <td>
                                             ${product?.category?.name}
-                                        </td>
-                                        <td class="left">
-                                            ${inventoryLevel?.binLocation?:""}
                                         </td>
                                         <td class="center">
                                             ${inventoryLevel?.abcClass?:""}

@@ -35,6 +35,16 @@
 
             <div class="box">
                 <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
+                <g:form action="list" method="get">
+                    <div class="filter">
+                        <label><warehouse:message code="default.search.label"/></label>
+                        <g:textField name="q" size="45" value="${params.q}" class="text"/>
+                        <button type="submit" class="button"><img
+                                src="${createLinkTo(dir:'images/icons/silk',file:'zoom.png')}" style="vertical-align: middle;"
+                                alt="Find" /> ${warehouse.message(code: 'default.button.find.label')}
+                        </button>
+                    </div>
+                </g:form>
                 <table>
                     <thead>
                         <tr>
@@ -87,7 +97,7 @@
                     </tbody>
                 </table>
                 <div class="paginateButtons">
-                    <g:paginate total="${budgetCodesTotal}" />
+                    <g:paginate total="${budgetCodesTotal}" params="${params}"/>
                 </div>
             </div>
         </div>

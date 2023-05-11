@@ -17,7 +17,7 @@ import TextField from 'components/form-elements/TextField';
 import AddDestinationModal from 'components/stock-movement-wizard/modals/AddDestinationModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { debounceLocationsFetch, debounceUsersFetch } from 'utils/option-utils';
+import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -107,9 +107,11 @@ const FIELDS = {
       origin,
       fetchStockLists,
       openNewLocationModal,
+      locationTypes,
     }) => ({
       loadOptions: debouncedLocationsFetch,
       newOptionModalOpen: openNewLocationModal,
+      createNewFromModal: !!locationTypes.length,
       onChange: (value) => {
         if (value && origin && origin.id) {
           fetchStockLists(origin, value);
@@ -133,7 +135,7 @@ const FIELDS = {
       filterOptions: options => options,
     },
     getDynamicAttr: props => ({
-      loadOptions: props.debouncedUsersFetch,
+      loadOptions: props.debouncedPeopleFetch,
     }),
   },
   dateRequested: {
@@ -193,8 +195,8 @@ class CreateStockMovement extends Component {
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
 
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -440,11 +442,12 @@ class CreateStockMovement extends Component {
                     origin: values.origin,
                     destination: values.destination,
                     isSuperuser: this.props.isSuperuser,
-                    debouncedUsersFetch: this.debouncedUsersFetch,
+                    debouncedPeopleFetch: this.debouncedPeopleFetch,
                     debouncedLocationsFetch: this.debouncedLocationsFetch,
                     requestTypes: this.state.requestTypes,
                     setRequestType: this.setRequestType,
                     openNewLocationModal: this.openAddDestinationModal,
+                    locationTypes: this.props.locationTypes,
                     values,
                   }),
                 )}
@@ -468,6 +471,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   debounceTime: state.session.searchConfig.debounceTime,
   minSearchLength: state.session.searchConfig.minSearchLength,
+  locationTypes: state.location.locationTypes,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -516,4 +520,5 @@ CreateStockMovement.propTypes = {
   translate: PropTypes.func.isRequired,
   debounceTime: PropTypes.number.isRequired,
   minSearchLength: PropTypes.number.isRequired,
+  locationTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };

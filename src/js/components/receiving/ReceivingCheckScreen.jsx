@@ -18,7 +18,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
 
 
@@ -97,24 +97,8 @@ const TABLE_FIELDS = {
           className: 'text-left ml-1',
         },
       },
-      'product.name': {
-        type: (params) => {
-          if (params.subfield) {
-            const { parentIndex, rowIndex } = params;
-            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
-            const handlingIcons = _.get(params.values, fieldPath);
-
-            const productNameWithIcons = (
-              <div className="d-flex">
-                <span className="text-truncate">
-                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-                </span>
-                {renderHandlingIcons(handlingIcons)}
-              </div>);
-            return <LabelField {...params} fieldValue={productNameWithIcons} />;
-          }
-          return null;
-        },
+      product: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -122,7 +106,11 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
+          formatValue: formatProductDisplayName,
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -365,18 +353,7 @@ class ReceivingCheckScreen extends Component {
 
     const payload = {
       ...formValues,
-      containers: _.map(formValues.containers, container => ({
-        ...container,
-        shipmentItems: _.map(container.shipmentItems, (item) => {
-          if (!_.get(item, 'recipient.id')) {
-            return {
-              ...item, recipient: '',
-            };
-          }
-
-          return item;
-        }),
-      })),
+      containers: getReceivingPayloadContainers(formValues),
     };
 
     return apiClient.post(url, flattenRequest(payload));

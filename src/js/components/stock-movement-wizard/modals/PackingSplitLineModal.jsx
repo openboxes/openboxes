@@ -10,8 +10,8 @@ import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import { debounceUsersFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName } from 'utils/form-values-utils';
+import { debouncePeopleFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
 
 
@@ -38,15 +38,12 @@ const FIELDS = {
         type: LabelField,
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
+        getDynamicAttr: ({ fieldValue }) => ({
+          showValueTooltip: !!fieldValue?.displayNames?.default,
+          tooltipValue: fieldValue?.name,
+        }),
         attributes: {
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name}
-              </span>
-              {renderHandlingIcons(value.handlingIcons)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
       },
       lotNumber: {
@@ -101,7 +98,7 @@ const FIELDS = {
           filterOptions: options => options,
         },
         getDynamicAttr: props => ({
-          loadOptions: props.debouncedUsersFetch,
+          loadOptions: props.debouncedPeopleFetch,
         }),
       },
       palletName: {
@@ -164,8 +161,8 @@ class PackingSplitLineModal extends Component {
     this.onOpen = this.onOpen.bind(this);
     this.validate = this.validate.bind(this);
 
-    this.debouncedUsersFetch =
-      debounceUsersFetch(this.props.debounceTime, this.props.minSearchLength);
+    this.debouncedPeopleFetch =
+      debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -229,7 +226,7 @@ class PackingSplitLineModal extends Component {
         initialValues={this.state.formValues}
         formProps={{
           lineItem: this.state.attr.lineItem,
-          debouncedUsersFetch: this.debouncedUsersFetch,
+          debouncedPeopleFetch: this.debouncedPeopleFetch,
           hasBinLocationSupport: this.props.hasBinLocationSupport,
         }}
         validate={this.validate}

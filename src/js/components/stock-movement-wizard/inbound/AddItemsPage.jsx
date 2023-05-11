@@ -106,6 +106,9 @@ const VENDOR_FIELDS = {
         headerAlign: 'left',
         flexWidth: '4',
         required: true,
+        attributes: {
+          showSelectedOptionColor: true,
+        },
         getDynamicAttr: ({
           updateRow, rowIndex, values, originId, focusField,
         }) => ({
@@ -321,10 +324,6 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          product: {
-            ...val.product,
-            label: `${val.productCode} ${val.product.name}`,
-          },
         }),
       );
     }
@@ -447,8 +446,10 @@ class AddItemsPage extends Component {
   confirmTransition(onConfirm, items) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.confirmTransition.label', 'You have entered the same code twice. Do you want to continue?'),
-      message: _.map(items, item =>
-        <p key={item.sortOrder}>{item.product.label} {item.quantityRequested}</p>),
+      message: _.map(items, item => (
+        <p key={item.sortOrder}>
+          {`${item.product.productCode} ${item.product.displayNames?.default || item.product.name} ${item.quantityRequested}`}
+        </p>)),
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
@@ -683,10 +684,6 @@ class AddItemsPage extends Component {
             lineItems,
             val => ({
               ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
             }),
           );
 
@@ -1061,7 +1058,10 @@ class AddItemsPage extends Component {
                     }
                   }}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
-                  disabled={!_.some(values.lineItems, item => !_.isEmpty(item))}
+                  disabled={
+                    !_.some(values.lineItems, item =>
+                      item.product && _.parseInt(item.quantityRequested))
+                  }
                 ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                 </button>
               </div>

@@ -14,6 +14,7 @@ const TableBody = (props) => {
     fieldsConfig,
     properties,
     fields,
+    showRowSaveIndicator,
     tableRef = () => {
     },
     addRow = (row = {}) => fields.push(row),
@@ -51,6 +52,7 @@ const TableBody = (props) => {
         properties={{
           ...properties,
           rowCount: fields.length || 0,
+          showRowSaveIndicator,
         }}
         addRow={addRow}
         fieldsConfig={fieldsConfig}

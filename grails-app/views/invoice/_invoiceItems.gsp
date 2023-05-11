@@ -24,7 +24,12 @@
                         ${invoiceItem?.product?.productCode?:g.message(code:'default.all.label')}
                     </td>
                     <td>
-                        ${invoiceItem?.description}
+                        <g:if test="${invoiceItem?.orderAdjustment}">
+                            ${invoiceItem?.description}
+                        </g:if>
+                       <g:else>
+                           <format:displayName product="${invoiceItem?.product}" showTooltip="${true}" />
+                       </g:else>
                     </td>
                     <td>
                         ${invoiceItem?.order?.orderNumber}

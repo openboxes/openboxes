@@ -106,7 +106,7 @@
 
                         <td>
                             <g:if test="${defaultProductPackage}">
-                                <g:hasRoleFinance>
+                                <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
                                     <g:formatNumber number="${defaultProductPackage?.productPrice?.price}" />
                                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
                                 </g:hasRoleFinance>
@@ -114,8 +114,10 @@
                         </td>
 
                         <td>
-                            <g:formatNumber number="${productSupplier?.contractPrice?.price}"/>
-                            ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                            <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
+                                <g:formatNumber number="${productSupplier?.contractPrice?.price}"/>
+                                ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                            </g:hasRoleFinance>
                         </td>
 
                         <td>

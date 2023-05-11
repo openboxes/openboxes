@@ -119,6 +119,7 @@ class StockTransferItem {
                 "product.id"                    : product?.id,
                 "product.productCode"           : product?.productCode,
                 "product.name"                  : product?.name,
+                "product.displayName"           : product?.displayName,
                 "product.handlingIcons"         : product?.handlingIcons,
                 "inventoryItem.id"              : inventoryItem?.id,
                 "lotNumber"                     : inventoryItem?.lotNumber,

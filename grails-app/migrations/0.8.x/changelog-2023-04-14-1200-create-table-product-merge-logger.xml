@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="1404202312000-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <tableExists tableName="product_merge_logger"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="product_merge_logger">
+      <column name="id" type="CHAR(38)">
+        <constraints nullable="false" primaryKey="true" />
+      </column>
+      <column name="primary_product_id" type="CHAR(38)">
+        <constraints nullable="false" />
+      </column>
+      <column name="obsolete_product_id" type="CHAR(38)">
+        <constraints nullable="false" />
+      </column>
+      <!-- related_object_id is a string, not a FK -->
+      <column name="related_object_id" type="CHAR(38)">
+        <constraints nullable="false" />
+      </column>
+      <column name="related_object_class_name" type="VARCHAR(255)">
+        <constraints nullable="false" />
+      </column>
+      <column name="date_merged" type="DATETIME">
+        <constraints nullable="false" />
+      </column>
+      <column name="date_reverted" type="DATETIME">
+        <constraints nullable="true" />
+      </column>
+      <column name="comments" type="VARCHAR(255)">
+        <constraints nullable="true" />
+      </column>
+      <column name="date_created" type="DATETIME">
+        <constraints nullable="false" />
+      </column>
+      <column name="last_updated" type="DATETIME">
+        <constraints nullable="false" />
+      </column>
+      <column name="created_by_id" type="CHAR(38)">
+        <constraints nullable="false" />
+      </column>
+      <column name="updated_by_id" type="CHAR(38)">
+        <constraints nullable="true" />
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1404202312000-1">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_merge_logger_primary_product"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="primary_product_id" baseTableName="product_merge_logger"
+      constraintName="fk_product_merge_logger_primary_product" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1404202312000-2">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_merge_logger_obsolete_product"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="obsolete_product_id" baseTableName="product_merge_logger"
+      constraintName="fk_product_merge_logger_obsolete_product" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="product" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1404202312000-3">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_merge_logger_created_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="created_by_id" baseTableName="product_merge_logger"
+      constraintName="fk_product_merge_logger_created_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+  <changeSet author="awalkowiak" id="1404202312000-4">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <foreignKeyConstraintExists foreignKeyName="fk_product_merge_logger_updated_by"/>
+      </not>
+    </preConditions>
+    <addForeignKeyConstraint baseColumnNames="updated_by_id" baseTableName="product_merge_logger"
+      constraintName="fk_product_merge_logger_updated_by" deferrable="false" initiallyDeferred="false"
+      referencedColumnNames="id" referencedTableName="user" />
+  </changeSet>
+
+</databaseChangeLog>

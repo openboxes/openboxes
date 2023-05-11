@@ -241,7 +241,7 @@
                                             ${orderItem?.product?.productCode}
                                         </td>
                                         <td>
-                                            <format:product product="${orderItem?.product}"/>
+                                            ${orderItem?.product?.displayNameOrDefaultName}
                                         </td>
                                         <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
                                             <td>

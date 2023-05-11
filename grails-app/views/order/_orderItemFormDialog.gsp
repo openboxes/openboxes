@@ -119,7 +119,7 @@
                     <label for="dlgUnitPrice"><warehouse:message code="orderItem.unitPrice.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <input type="text" id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" class="text" />
+                    <g:decimalNumberField id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" />
                     <span class="fade"><warehouse:message code="order.unitPrice.hint"/></span>
                 </td>
             </tr>
@@ -271,7 +271,7 @@
                 </g:if>
                 <g:else>
                     <td valign="top" class="value">
-                        <input type="text" id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" class="text" />
+                        <g:decimalNumberField id="dlgUnitPrice" name="unitPrice" value="${orderItem.unitPrice}" size="10" />
                         <span class="fade"><warehouse:message code="order.unitPrice.hint"/></span>
                     </td>
                 </g:else>
@@ -356,7 +356,7 @@
     </table>
 </g:form>
 <script>
-    const CREATE_NEW = "${g.message(code: 'default.createNew.label', default: 'Create New')}";
+  const CREATE_NEW = htmlDecode("${g.message(code: 'default.createNew.label', default: 'Create New')}");
 
   function validateForm() {
     var budgetCode = $("#dlgBudgetCode").val();

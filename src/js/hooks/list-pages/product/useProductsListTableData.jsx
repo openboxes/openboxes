@@ -18,8 +18,11 @@ const useProductsListTableData = (filterParams) => {
     state,
     sortingParams,
   }) => {
-    const { catalogId, categoryId, tagId } = filterParams;
+    const {
+      catalogId, categoryId, tagId, glAccountsId, productFamilyId,
+    } = filterParams;
     return _.omitBy({
+      format: 'list',
       offset: `${offset}`,
       max: `${state.pageSize}`,
       ...sortingParams,
@@ -27,6 +30,8 @@ const useProductsListTableData = (filterParams) => {
       catalogId: catalogId && catalogId.map(({ id }) => id),
       categoryId: categoryId && categoryId.map(({ id }) => id),
       tagId: tagId && tagId.map(({ id }) => id),
+      glAccountsId: glAccountsId && glAccountsId.map(({ id }) => id),
+      productFamilyId: productFamilyId && productFamilyId.map(({ id }) => id),
     }, (val) => {
       if (typeof val === 'boolean') {
         return !val;
@@ -70,7 +75,7 @@ const useProductsListTableData = (filterParams) => {
     const date = new Date();
     const [month, day, year] = [date.getMonth(), date.getDate(), date.getFullYear()];
     const [hour, minutes, seconds] = [date.getHours(), date.getMinutes(), date.getSeconds()];
-    fileDownload(data, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
+    fileDownload(`\uFEFF${data}`, `Products-${year}${month}${day}-${hour}${minutes}${seconds}`, 'text/csv');
   };
   return {
     tableData, tableRef, loading, onFetchHandler, exportProducts,

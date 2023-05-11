@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.core
 
+import org.codehaus.groovy.grails.commons.ConfigurationHolder as CH
+
 enum ActivityCode {
 
     MANAGE_INVENTORY('MANAGE_INVENTORY'),   // FIXME should change to MANAGE_STOCK
@@ -58,15 +60,18 @@ enum ActivityCode {
     SUBMIT_REQUEST('SUBMIT_REQUEST'),
 
     // Dynamic creation
-    DYNAMIC_CREATION('DYNAMIC_CREATION')
+    DYNAMIC_CREATION('DYNAMIC_CREATION'),
 
+    AUTOSAVE('AUTOSAVE'),
+
+    NONE('NONE')
 
     final String id
 
     ActivityCode(String id) { this.id = id }
 
     static list() {
-        [
+         [
                 MANAGE_INVENTORY,
                 ADJUST_INVENTORY,
                 APPROVE_ORDER,
@@ -89,7 +94,9 @@ enum ActivityCode {
                 ENABLE_CENTRAL_PURCHASING,
                 HOLD_STOCK,
                 SUBMIT_REQUEST,
-                DYNAMIC_CREATION
+                DYNAMIC_CREATION,
+                AUTOSAVE,
+                NONE,
         ]
     }
 

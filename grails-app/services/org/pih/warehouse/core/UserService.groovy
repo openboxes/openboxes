@@ -265,6 +265,25 @@ class UserService {
         }
     }
 
+    List<User> findUsers(Map params) {
+        List<String> terms = params.searchTerm?.split(",| ")
+        return User.createCriteria().list() {
+            if (params.active != null) {
+                eq("active", Boolean.valueOf(params.active))
+            }
+            if (terms) {
+                or {
+                    terms.each { String term ->
+                        ilike("firstName", "%" + term + "%")
+                        ilike("lastName", "%" + term + "%")
+                        ilike("email", "%" + term + "%")
+                    }
+                }
+            }
+            order("lastName", "desc")
+        }
+    }
+
     def findPersons(String[] terms) {
         return findPersons(terms, [:])
     }

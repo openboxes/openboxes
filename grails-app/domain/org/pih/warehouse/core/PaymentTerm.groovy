@@ -35,4 +35,13 @@ class PaymentTerm implements Serializable {
         prepaymentPercent(nullable: true)
         daysToPayment(nullable: true)
     }
+
+    Map toJson() {
+        return [
+            id          : id,
+            code        : code,
+            name        : name,
+            description : description,
+        ]
+    }
 }

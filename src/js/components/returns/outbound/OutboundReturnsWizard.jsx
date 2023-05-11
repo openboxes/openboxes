@@ -29,6 +29,7 @@ class OutboundReturns extends Component {
 
   componentDidMount() {
     this.props.fetchTranslations('', 'outboundReturns');
+    this.props.fetchTranslations('', 'stockMovement');
 
     if (this.props.outboundReturnsTranslationsFetched) {
       this.dataFetched = true;
@@ -40,6 +41,7 @@ class OutboundReturns extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'outboundReturns');
+      this.props.fetchTranslations(nextProps.locale, 'stockMovement');
     }
 
     if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {

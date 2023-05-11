@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <title><warehouse:message code="order.addOrderItems.label"/></title>
+<script src="${createLinkTo(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
 <style>
     .dlg { display: none; }
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
@@ -231,7 +232,7 @@
                 </div>
                 <div class="right">
                     <g:if test="${!order?.isPlaced()}">
-                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button validate" >
+                        <g:link controller="order" action="placeOrder" id="${order?.id}" class="button" >
                             <img src="${resource(dir: 'images/icons/silk', file: 'cart_go.png')}" />&nbsp;
                             ${warehouse.message(code: 'order.wizard.placeOrder.label')}
                         </g:link>
@@ -253,12 +254,11 @@
         </div>
     </div>
     <script type="text/javascript">
-        const CREATE_NEW = "${g.message(code: 'default.createNew.label', default: 'Create New')}";
-
+        const CREATE_NEW = htmlDecode("${g.message(code: 'default.createNew.label', default: 'Create New')}");
         // Validate the create line item form in case someone forgot to
         $(".validate").click(function (event) {
           if (isFormDirty()) {
-            $.notify("${g.message(code: 'order.errors.saveItem.message', default: 'Please save item before proceeding')}");
+            $.notify(htmlDecode("${g.message(code: 'order.errors.saveItem.message', default: 'Please save item before proceeding')}"));
             return false;
           } else {
             // This seems to be the best way to proceed after stopping propagation
@@ -326,7 +326,7 @@
               clearOrderAdjustments();
               loadOrderAdjustments();
               $('#orderItems').html('<option></option>').trigger('change');
-              $.notify("${g.message(code: 'order.successDeleteItem.label', default: 'Successfully deleted item')} " + id, "success")
+              $.notify(htmlDecode("${g.message(code: 'order.successDeleteItem.label', default: 'Successfully deleted item')} ") + id, "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -349,7 +349,7 @@
             success: function () {
               clearOrderAdjustments();
               loadOrderAdjustments();
-              $.notify("${g.message(code: 'order.successDeleteAdjustment.label', default: 'Successfully deleted adjustment')}", "success")
+              $.notify(htmlDecode("${g.message(code: 'order.successDeleteAdjustment.label', default: 'Successfully deleted adjustment')}"), "success")
             },
             error: function (jqXHR, textStatus, errorThrown) {
               if (jqXHR.responseText) {
@@ -443,13 +443,13 @@
           var budgetCode = $("#budgetCode").val();
           var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
-          if (!product) $("#product-suggest").notify("${g.message(code: 'default.required.label', default: 'Required')}")
-          if (!quantity) $("#quantity").notify("${g.message(code: 'default.required.label', default: 'Required')}")
-          if (!unitPrice) $("#unitPrice").notify("${g.message(code: 'default.required.label', default: 'Required')}")
-          if (!quantityUom) $("#quantityUom_chosen").notify("${g.message(code: 'default.required.label', default: 'Required')}")
-          if (!quantityPerUom) $("#quantityPerUom").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+          if (!product) $("#product-suggest").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
+          if (!quantity) $("#quantity").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
+          if (!unitPrice) $("#unitPrice").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
+          if (!quantityUom) $("#quantityUom_chosen").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
+          if (!quantityPerUom) $("#quantityPerUom").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
           if (!budgetCode && isAccountingRequired) {
-            $("#budgetCode").notify("${g.message(code: 'default.required.label', default: 'Required')}")
+            $("#budgetCode").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
             return false
           }
 
@@ -495,7 +495,7 @@
             var data = $("#orderItemForm").serialize();
             data += '&orderIndex=' + $("#orderItemsTable tbody tr").length;
             if (validateItemsForm()) {
-              if ($("#validationCode").val() == 'WARN' && !confirm('${warehouse.message(code: 'orderItem.warningSupplier.label').replaceAll( /(')/, '\\\\$1' )}')) {
+              if ($("#validationCode").val() == 'WARN' && !confirm(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label').replaceAll( /(')/, '\\\\$1' )}"))) {
                 return false
               } else {
                 $.ajax({
@@ -508,7 +508,7 @@
                     $('#supplierCode').text('');
                     $('#manufacturerCode').text('');
                     $('#manufacturer').text('');
-                    $.notify("${g.message(code: 'order.successItemSave.label', default: 'Successfully saved new item')}", "success")
+                    $.notify(htmlDecode("${g.message(code: 'order.successItemSave.label', default: 'Successfully saved new item')}"), "success")
                   },
                   error: function(jqXHR, textStatus, errorThrown) {
                     if (jqXHR.responseText) {
@@ -530,7 +530,7 @@
               }
             }
             else {
-              $.notify("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}");
+              $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}"));
             }
             return false
         }
@@ -545,7 +545,7 @@
                         clearOrderAdjustments();
                         loadOrderAdjustments();
                         clearOrderAdjustmentForm();
-                        $.notify("${g.message(code: 'order.successAdjustmentSave.label', default: 'Successfully saved new adjustment')}", "success");
+                        $.notify(htmlDecode("${g.message(code: 'order.successAdjustmentSave.label', default: 'Successfully saved new adjustment')}"), "success");
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         if (jqXHR.responseText) {
@@ -556,7 +556,7 @@
                     }
                 });
             } else {
-                $.notify("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}");
+                $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a value for all required fields')}"));
             }
             return false;
         }
@@ -811,7 +811,7 @@
             autoOpen: false,
             modal: true,
             width: 800,
-            title: "${g.message(code: 'order.editItem.label', default: 'Edit line item')}"
+            title: htmlDecode("${g.message(code: 'order.editItem.label', default: 'Edit line item')}")
           });
 
           $("#create-product-source-dialog").dialog({
@@ -976,7 +976,6 @@
             }
           );
         });
-
     </script>
 
 

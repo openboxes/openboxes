@@ -151,6 +151,7 @@ class OutboundStockMovementListItem implements Serializable {
                 isPending           : pending,
                 isReturn            : fromReturnOrder,
                 isElectronicType    : electronicType,
+                shipmentType        : shipment?.shipmentType,
         ]
     }
 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
-import { debounceUsersFetch } from 'utils/option-utils';
+import { debouncePeopleFetch } from 'utils/option-utils';
 
 
 const StockTransferListFilters = ({
@@ -15,8 +15,8 @@ const StockTransferListFilters = ({
   filterFields,
   defaultValues,
 }) => {
-  const debouncedUsersFetch = useCallback(
-    debounceUsersFetch(debounceTime, minSearchLength),
+  const debouncedPeopleFetch = useCallback(
+    debouncePeopleFetch(debounceTime, minSearchLength),
     [debounceTime, minSearchLength],
   );
 
@@ -27,7 +27,7 @@ const StockTransferListFilters = ({
         updateFilterParams={values => setFilterParams({ ...values })}
         formProps={{
           ...formProps,
-          debouncedUsersFetch,
+          debouncedPeopleFetch,
         }}
         defaultValues={defaultValues}
         searchFieldPlaceholder="react.stockTransfer.filters.searchField.placeholder.label"

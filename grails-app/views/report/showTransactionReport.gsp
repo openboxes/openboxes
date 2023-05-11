@@ -298,6 +298,11 @@
 			"bUseRendered": false,
 			"dom": '<"top"i>rt<"bottom"flp><"clear">',
             "fnRowCallback": function (nRow, aData) {
+				$('td:eq(1)', nRow).text(aData?.DisplayName ?? aData?.Name);
+				// If we display DisplayName, we want to have tooltip with original name of the product
+				if (aData?.DisplayName) {
+					$('td:eq(1)', nRow).attr('title', aData?.Name);
+				}
                 $('td:eq(3)', nRow).html(Number(aData["Opening"]).toLocaleString('en-US'));
                 $('td:eq(4)', nRow).html(Number(aData["Credits"]).toLocaleString('en-US'));
                 $('td:eq(5)', nRow).html(Number(aData["Debits"]).toLocaleString('en-US'));

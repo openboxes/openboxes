@@ -47,7 +47,7 @@
                     <td valign="top"
                         class="value ${hasErrors(bean: productInstance, field: 'name', 'errors')}">
                         <g:autoSuggestString id="name" name="name" class="text large"
-                            jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name?.encodeAsHTML()}"
+                            jsonUrl="${request.contextPath}/json/autoSuggest" value="${productInstance?.name}"
                             placeholder="Product title (e.g. Ibuprofen, 200 mg, tablet)"/>
                     </td>
                 </tr>
@@ -61,6 +61,17 @@
                                              value="${productInstance?.category?.id}" />
                    </td>
                 </tr>
+                <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.PRODUCT_FAMILY)}">
+                    <tr class="prop">
+                        <td class="name middle">
+                          <label id="productFamily" for="category.id"><warehouse:message code="product.productFamily.label" /></label>
+                        </td>
+                        <td class="value ${hasErrors(bean: productInstance, field: 'productFamily', 'errors')}">
+                            <g:selectProductFamily name="productFamily.id" class="chzn-select-deselect" noSelection="['null':'']"
+                                                 value="${productInstance?.productFamily?.id}" />
+                       </td>
+                    </tr>
+                </g:if>
                 <g:if test="${!productInstance?.productType || productInstance.productType.isFieldDisplayed(ProductField.GL_ACCOUNT)}">
                     <tr class="prop">
                         <td class="name middle"><label id="glAccountLabel" id="glAccountLabel" for="glAccount.id"><warehouse:message code="product.glAccount.label"/></label></td>

@@ -15,6 +15,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
 
@@ -162,6 +163,15 @@ const INVOICE_ITEMS = {
         attributes: {
           className: 'text-left',
         },
+        getDynamicAttr: params => ({
+          formatValue: () => {
+            const { values, rowIndex } = params;
+            const rowValue = values?.invoiceItems?.[rowIndex];
+            // If it's not an adjustment, but product, and it has a synonym, display it
+            // with a tooltip with the original name of the product
+            return getInvoiceDescription(rowValue);
+          },
+        }),
       },
       quantity: {
         type: LabelField,
@@ -432,7 +442,7 @@ class ConfirmInvoicePage extends Component {
                   type="submit"
                   onClick={() => { this.submitInvoice(); }}
                   className="btn btn-outline-success float-right btn-form btn-xs"
-                  disabled={this.state.values.dateSubmitted}
+                  disabled={this.state.values.dateSubmitted || this.state.values.datePosted}
                 >
                   <Translate id="react.invoice.submit.label" defaultMessage="Submit for Approval" />
                 </button>

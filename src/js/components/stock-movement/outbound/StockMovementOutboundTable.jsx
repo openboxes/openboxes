@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
 import _ from 'lodash';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import {
   RiArrowRightSLine,
@@ -9,14 +8,18 @@ import {
   RiDownload2Line,
   RiInformationLine,
   RiPencilLine,
-} from 'react-icons/all';
+} from 'react-icons/ri';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
+import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
+import { getShipmentTypeTooltip } from 'utils/list-utils';
+import { mapShipmentTypes } from 'utils/option-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -144,9 +147,24 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
       accessor: 'identifier',
       fixed: 'left',
+      headerClassName: 'header justify-content-center',
       minWidth: 100,
-      Cell: row => (
-        <TableCell {...row} link={`/openboxes/stockMovement/show/${row.original.id}`} />),
+      Cell: (row) => {
+        const { id, shipmentType } = row.original;
+        return (
+          <TableCell
+            {...row}
+            link={`/openboxes/stockMovement/show/${id}`}
+            tooltip
+            tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
+          >
+            <ShipmentIdentifier
+              shipmentType={mapShipmentTypes(shipmentType)}
+              identifier={row?.value}
+            />
+          </TableCell>
+        );
+      },
     },
     {
       Header: <Translate id="react.stockMovement.column.name.label" defaultMessage="Name" />,
@@ -193,13 +211,13 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
-      Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
+      Cell: row => (<DateCell {...row} />),
     },
     {
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
       width: 150,
-      Cell: row => (<TableCell {...row} value={moment(row.value).format('MMM DD, yyyy')} />),
+      Cell: row => (<DateCell {...row} />),
     },
   ], [requisitionStatuses]);
 
@@ -261,6 +279,7 @@ const mapStateToProps = state => ({
   requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
+  currentLocale: state.session.activeLanguage,
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);

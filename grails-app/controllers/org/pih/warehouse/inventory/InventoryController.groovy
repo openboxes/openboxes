@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.InventoryExcelImporter
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -248,7 +249,7 @@ class InventoryController {
                 response.contentType = "text/csv"
                 def csv = inventoryService.exportBaselineQoH(command.products, quantityMapByDate)
                 println "export products: " + csv
-                render csv
+                render(contentType: "text/csv", text:  csv, encoding: "UTF-8")
             } else {
                 render(text: 'No products found', status: 404)
             }
@@ -614,7 +615,7 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode) + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
@@ -633,7 +634,7 @@ class InventoryController {
             csv += "\n"
         }
 
-        render(contentType: "text/csv", text: csv)
+        render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(csv))
     }
 
     def listQuantityOnHandZero = {
@@ -750,6 +751,7 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.lotNumber.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.expirationDate.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
@@ -771,15 +773,18 @@ class InventoryController {
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = inventoryLevel?.statusMessage(quantity ?: 0)
+
             if (!statusMessage) {
                 def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
                 statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
             }
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
+            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
@@ -793,7 +798,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return csv
+        return CSVUtils.prependBomToCsvString(csv)
     }
 
     def getCsvForProductMap(inventoryItems) {
@@ -803,9 +808,9 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
@@ -828,10 +833,10 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
+            csv += StringEscapeUtils.escapeCsv(product.displayNameWithLocaleCode) + ","
+            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ","
             csv += '"' + (product?.category?.name ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
-            csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
             csv += (inventoryLevel?.minQuantity ?: "") + ","
@@ -844,7 +849,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return csv
+        return CSVUtils.prependBomToCsvString(csv)
     }
 
 

@@ -43,7 +43,7 @@
 									<warehouse:message code="report.shippingReport.title"/>
 								</div>
 								<div class="subtitle">
-									${command?.shipment?.name?.encodeAsHTML() }
+									${command?.shipment?.name}
 								</div>
 							</td>
 							<td class="right middle" width="1%">
@@ -154,7 +154,7 @@
 											${checklistEntry?.shipmentItem?.inventoryItem?.product?.productCode}
 										</td>
 										<td>
-											<format:product product="${checklistEntry?.shipmentItem?.inventoryItem?.product}"/>
+											${checklistEntry?.shipmentItem?.inventoryItem?.product?.displayNameOrDefaultName}
 										</td>
 										<td>
 											${checklistEntry?.shipmentItem?.inventoryItem?.lotNumber }

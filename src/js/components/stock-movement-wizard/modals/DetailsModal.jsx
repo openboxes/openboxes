@@ -135,7 +135,12 @@ class DetailsModal extends Component {
     const { attr, formValues } = this.state;
     const { pendingRequisitionDetails } = formValues;
     const {
-      productCode, productName, quantityRequested, quantityOnHand, quantityAvailable,
+      productCode,
+      productName,
+      displayName,
+      quantityRequested,
+      quantityOnHand,
+      quantityAvailable,
     } = attr;
     const averageMonthlyDemand = _.sumBy(pendingRequisitionDetails, 'averageMonthlyDemand');
     const totalQtyRequested = _.sumBy(pendingRequisitionDetails, item => item.quantityRequested + _.sumBy(item.requisitions, 'quantityRequested'));
@@ -149,7 +154,14 @@ class DetailsModal extends Component {
         initialValues={formValues}
       >
         <div className="mb-2">
-          <h5>{productCode} {productName}</h5>
+          <Tooltip
+            html={<div className="text-truncate">{productName}</div>}
+            theme="dark"
+            disabled={!displayName}
+            position="top-start"
+          >
+            <h5>{productCode} {displayName ?? productName}</h5>
+          </Tooltip>
           <div>
             <span className="font-weight-bold">
               <Translate id="react.stockMovement.requested.label" defaultMessage="Requested" />:&nbsp;&nbsp;

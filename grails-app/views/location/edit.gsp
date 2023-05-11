@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.LocationTypeCode; org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode; org.pih.warehouse.core.LocationTypeCode; org.pih.warehouse.core.Location" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -287,7 +287,7 @@
                                 </td>
                                 <td valign="top" class="value">
                                     <g:set var="sameAsDefaults"
-                                           value="${locationInstance?.locationType?.supportedActivities.equals(locationInstance?.supportedActivities)}"/>
+                                           value="${locationInstance?.locationType?.supportedActivities?.equals(locationInstance?.supportedActivities)}"/>
                                     <g:set var="useDefault"
                                            value="${locationInstance?.supportedActivities?.isEmpty() || sameAsDefaults}"/>
 
@@ -301,7 +301,7 @@
                                     </g:else>
 
                                     <g:set var="activityList"
-                                           value="${org.pih.warehouse.core.ActivityCode.list()}"/>
+                                           value="${ActivityCode.list()}"/>
                                     <div class="buttons button-group right">
                                         <g:link controller="locationType" action="edit"
                                                 id="${locationInstance?.locationType?.id}"

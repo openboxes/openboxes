@@ -5,7 +5,7 @@ import {
   RiFileLine,
   RiInformationLine,
   RiPencilLine,
-} from 'react-icons/all';
+} from 'react-icons/ri';
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';

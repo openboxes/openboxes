@@ -10,13 +10,11 @@
 
 package org.pih.warehouse.inventory
 
+import grails.converters.JSON
+
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
-import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.order.OrderType
-import org.pih.warehouse.order.OrderTypeCode
-import org.pih.warehouse.shipping.Shipment
 
 class StockTransferController {
 
@@ -99,18 +97,25 @@ class StockTransferController {
 
         try {
             stockTransferService.deleteStockTransfer(params.orderId ?: params.id)
-        } catch (IllegalArgumentException e) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.stockTransfer.label', default: 'Stock Transfer'), params.id])}"
+            flash.message = g.message(
+                    code: 'react.stockMovement.deleted.success.message.label',
+                    default: 'Stock Movement has been deleted successfully',
+            )
+        } catch (Exception e) {
+            flash.message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
+            redirect(controller: "stockMovement", action: "show", id: params.id)
+            return
         }
 
         if (direction == StockMovementDirection.INBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.INBOUND])
+            params.direction = StockMovementDirection.INBOUND
+            redirect(controller: "stockMovement", action: "list", params: params << ["flash": flash as JSON])
         } else if (direction == StockMovementDirection.OUTBOUND) {
-            redirect(controller: "stockMovement", action: "list", params: ['direction': StockMovementDirection.OUTBOUND])
+            params.direction = StockMovementDirection.OUTBOUND
+            redirect(controller: "stockMovement", action: "list", params: params << ["flash": flash as JSON])
         } else {
-            redirect(action: "list")
+            redirect(action: "list", params: params << ["flash": flash as JSON])
         }
-
     }
 
     def rollback = {

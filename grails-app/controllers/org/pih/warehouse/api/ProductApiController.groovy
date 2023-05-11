@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
@@ -18,6 +19,8 @@ import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductListItem
 
 class ProductApiController extends BaseDomainApiController {
 
@@ -32,6 +35,8 @@ class ProductApiController extends BaseDomainApiController {
         def categories = params.categoryId ? Category.findAllByIdInList(params.list("categoryId")) : null
         def tags = params.tagId ? Tag.getAll(params.list("tagId")) : []
         def catalogs = params.catalogId ? ProductCatalog.getAll(params.list("catalogId")) : []
+        def glAccounts = params.glAccountsId ? GlAccount.getAll(params.list('glAccountsId')) : []
+        def productFamilies = params.productFamilyId ? ProductGroup.getAll(params.list('productFamilyId')) : []
 
         // Following this approach of assigning q into other params for productService.getProducts
         params.name = params.q
@@ -49,7 +54,7 @@ class ProductApiController extends BaseDomainApiController {
             params.max = -1
         }
 
-        def products = productService.getProducts(categories, catalogs, tags, includeInactive, params)
+        def products = productService.getProducts(categories, catalogs, tags, glAccounts, productFamilies, includeInactive, params)
 
         if (params.format == 'csv') {
             boolean includeAttributes = params.boolean("includeAttributes") ?: false
@@ -58,6 +63,12 @@ class ProductApiController extends BaseDomainApiController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"${fileName}Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: csv)
+            return
+        }
+
+        if (params.format == 'list') {
+            List<ProductListItem> productListItems = products.collect { Product product -> new ProductListItem(product) }
+            render([data: productListItems, totalCount: products?.totalCount] as JSON)
             return
         }
 
@@ -97,7 +108,6 @@ class ProductApiController extends BaseDomainApiController {
     }
 
     def search = {
-
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
 
         if (params.name && params.name.size() < minLength) {
@@ -106,11 +116,13 @@ class ProductApiController extends BaseDomainApiController {
         }
 
         String[] terms = params?.name?.split(",| ")?.findAll { it }
-        def products
+        def products, availableItems = []
         if(params.availableItems) {
-            products = productService.searchProducts(terms, [])
             def location = Location.get(session.warehouse.id)
-            def availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            products = productService.searchProducts(terms, [])
+            if (products) {
+                availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
+            }
             products = []
             availableItems.each { k, v ->
                 products += [
@@ -130,7 +142,6 @@ class ProductApiController extends BaseDomainApiController {
         } else {
             products = productService.searchProductDtos(terms)
         }
-
         render([data: products] as JSON)
     }
 
@@ -262,28 +273,4 @@ class ProductApiController extends BaseDomainApiController {
         render([monthlyDemand: demand.monthlyDemand, quantityOnHand: quantityOnHand] as JSON)
     }
 
-    def catalogOptions = {
-        def catalogs = ProductCatalog.list(sort: "name").collect {
-            [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
-        }
-
-        render([data: catalogs] as JSON)
-    }
-
-    def categoryOptions = {
-        def categories = Category.list().sort().collect {
-            [id: it.id, label: it.getHierarchyAsString(" > ")]
-        }
-
-        render([data: categories] as JSON)
-
-    }
-
-    def tagOptions = {
-        def tags = Tag.list(sort: "tag").collect {
-            [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
-        }
-
-        render([data: tags] as JSON)
-    }
 }

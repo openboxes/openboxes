@@ -1,10 +1,11 @@
 <span id="${attrs.id}-span" class="span" style="text-align: left; display: ${attrs.spanDisplay};">${attrs.valueName}</span>
 <input id="${attrs.id}-id" class="value" type="hidden" name="${attrs.name}.id" value="${attrs.valueId}" ${attrs.valueDataBind}/>
 <input id="${attrs.id}-value" class="value" type="hidden" name="${attrs.name}.value" value="${attrs.valueId}" ${attrs.valueDataBind }/>
-<input id="${attrs.id}-suggest" type="text" ${attrs.textDataBind}
-       class="autocomplete text ${attrs.styleClass}" name="${attrs.name}-name" placeholder="${attrs.placeholder}" value="${attrs.valueName}"
-       style="width: ${attrs.width}; display: ${attrs.suggestDisplay};" size="${attrs.size}">
-
+<div id="${attrs.id}-suggest-wrapper">
+    <input id="${attrs.id}-suggest" type="text" ${attrs.textDataBind}
+           class="autocomplete text ${attrs.styleClass}" name="${attrs.name}-name" placeholder="${attrs.placeholder}" value="${attrs.valueName}"
+           style="width: ${attrs.width}; display: ${attrs.suggestDisplay};" size="${attrs.size}">
+</div>
 <script language="javascript">
     $(document).ready(function() {
 
@@ -24,6 +25,7 @@
             autoFocus: true,
             selectFirst: true,
             dataType: 'json',
+            appendTo: '#${attrs.id}-suggest-wrapper',
             //define callback to format results
             source: function(req, add){
                 var $element = $(this.element);
@@ -88,6 +90,16 @@
                 // Set focus on the next field
                 $(this).focusNextInputField();
 
+                const setTooltip = (tooltip) => {
+                  if (tooltip) {
+                    $("#${attrs.id}-suggest").attr('title', tooltip);
+                    return;
+                  }
+                  $("#${attrs.id}-suggest").attr('title', null);
+                }
+
+                // If the tooltip property is passed from the API, assign it to the input
+                setTooltip(ui?.item?.tooltip)
                 // Trigger the select
                 $("#${attrs.id}-suggest").trigger("selected");
                 return false;

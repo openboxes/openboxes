@@ -17,6 +17,7 @@ import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
+import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
@@ -97,27 +98,17 @@ const FIELDS = {
         },
       },
       product: {
-        type: SelectField,
+        type: ProductSelectField,
         label: 'react.stockMovement.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
         flexWidth: '4',
         required: true,
         attributes: {
-          className: 'text-left',
-          async: true,
-          openOnClick: false,
-          autoload: false,
-          filterOptions: options => options,
-          cache: false,
-          options: [],
-          disabled: true,
+          showSelectedOptionColor: true,
           showValueTooltip: true,
-          optionRenderer: option => <strong style={{ color: option.color ? option.color : 'black' }}>{option.label}</strong>,
+          disabled: true,
         },
-        getDynamicAttr: ({ debouncedProductsFetch }) => ({
-          loadOptions: debouncedProductsFetch,
-        }),
       },
       lotNumber: {
         type: TextField,
@@ -207,10 +198,7 @@ const FIELDS = {
           onClick: () => {
             updateTotalCount(1);
             addRow({
-              product: {
-                ...fieldValue.product,
-                label: `${fieldValue.product.productCode} ${fieldValue.product.name}`,
-              },
+              product: fieldValue.product,
               recipient: fieldValue.recipient,
               sortOrder: fieldValue.sortOrder + 1,
               orderItemId: fieldValue.orderItemId,
@@ -275,13 +263,13 @@ class AddItemsPage extends Component {
       this.props.debounceTime,
       this.props.minSearchLength,
       this.props.initialValues.origin.id,
+
     );
   }
 
   componentDidMount() {
     if (this.props.stockMovementTranslationsFetched) {
       this.dataFetched = true;
-
       this.fetchAllData();
     }
   }
@@ -324,10 +312,6 @@ class AddItemsPage extends Component {
       val => ({
         ...val,
         disabled: true,
-        product: {
-          ...val.product,
-          label: `${val.productCode} ${val.product.name}`,
-        },
         referenceId: val.orderItemId,
       }),
     );
@@ -684,14 +668,7 @@ class AddItemsPage extends Component {
 
           const lineItemsBackendData = _.map(
             _.sortBy(lineItems, ['sortOrder']),
-            val => ({
-              ...val,
-              product: {
-                ...val.product,
-                label: `${val.productCode} ${val.product.name}`,
-              },
-              referenceId: val.orderItemId,
-            }),
+            val => ({ ...val, referenceId: val.orderItemId }),
           );
 
           this.setState({ values: { ...this.state.values, lineItems: lineItemsBackendData } });

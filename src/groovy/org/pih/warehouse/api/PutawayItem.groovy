@@ -111,6 +111,7 @@ class PutawayItem {
                 "product.id"                  : product?.id,
                 "product.productCode"         : product?.productCode,
                 "product.name"                : product?.name,
+                "product.displayNameOrDefaultName" : product?.displayNameOrDefaultName,
                 "inventoryItem.id"            : inventoryItem?.id,
                 "inventoryItem.lotNumber"     : inventoryItem?.lotNumber,
                 "inventoryItem.expirationDate": inventoryItem?.expirationDate?.format("MM/dd/yyyy"),

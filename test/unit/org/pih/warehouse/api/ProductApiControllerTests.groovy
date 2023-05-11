@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.orm.PagedResultList
 import grails.test.ControllerUnitTestCase
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
+import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -20,6 +21,7 @@ import org.pih.warehouse.core.Tag
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductGroup
 import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.product.ProductTypeCode
 
@@ -112,7 +114,7 @@ class ProductApiControllerTests extends ControllerUnitTestCase {
         // GIVEN
         controller.params.q = "Product"
         controller.productService = [
-            getProducts: { List<Category> categories, List< ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params ->
+            getProducts: { List<Category> categories, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, List<GlAccount> glAccounts, List<ProductGroup> productFamilies, boolean includeInactive, Map params ->
                 def results = [product]
                 return new PagedResultList(results, results.size())
             }

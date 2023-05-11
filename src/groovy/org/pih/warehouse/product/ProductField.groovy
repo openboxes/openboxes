@@ -27,7 +27,8 @@ enum ProductField {
     VENDOR('vendor'),
     VENDOR_CODE('vendorCode'),
     VENDOR_NAME('vendorName'),
-    PRICE_PER_UNIT('pricePerUnit')
+    PRICE_PER_UNIT('pricePerUnit'),
+    PRODUCT_FAMILY('productFamily')
 
     final String fieldName
 

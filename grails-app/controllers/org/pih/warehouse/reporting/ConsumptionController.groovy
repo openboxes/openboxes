@@ -41,6 +41,7 @@ class ConsumptionController {
     InventoryService inventoryService
     ConsumptionService consumptionService
     UserService userService
+    def productAvailabilityService
 
     def show = { ShowConsumptionCommand command ->
 
@@ -269,7 +270,7 @@ class ConsumptionController {
             if (!fromLocationsEmpty && command.includeQuantityOnHand) {
                 command.fromLocations.each { location ->
                     if (location.inventory) {
-                        def onHandQuantityMap = inventoryService.getQuantityByProductMap(location.inventory, products)
+                        def onHandQuantityMap = productAvailabilityService.getCurrentInventory(location)
 
                         // For each product, add to the onhand quantity map
                         products.each { product ->
@@ -305,7 +306,8 @@ class ConsumptionController {
 
                 def csvrow = [
                         'Product code'                                : row.product.productCode ?: '',
-                        'Product'                                     : row.product.name,
+                        'Product'                                     : row.product.displayNameWithLocaleCode,
+                        'Product family'                              : row.product?.productFamily?.name ?: '',
                         'Category'                                    : row.product?.category?.name,
                         'Formulary'                                   : row.product?.productCatalogsToString(),
                         'Tag'                                         : row.product?.tagsToString(),

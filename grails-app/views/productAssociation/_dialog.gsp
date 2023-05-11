@@ -21,8 +21,7 @@
                 </td>
                 <td class="value ">
                     <div id="product">
-                        ${productAssociation?.product?.productCode}
-                        <format:product product="${productAssociation?.product}"/>
+                        <format:displayName product="${productAssociation?.product}" showProductCode="${true}" showTooltip="${true}" />
                     </div>
                 </td>
             </tr>

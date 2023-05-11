@@ -15,11 +15,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.util.DateUtil
+import org.pih.warehouse.util.LocalizationUtil
 
 import java.math.RoundingMode
 import java.sql.Timestamp
 import java.text.DateFormatSymbols
 import java.text.NumberFormat
+import org.pih.warehouse.core.SynonymTypeCode
 
 class ForecastingService {
 
@@ -62,10 +64,18 @@ class ForecastingService {
     }
 
     def getDemandDetails(Location origin, Location destination, Product product, Date startDate, Date endDate) {
+        Locale currentLocale = LocalizationUtil.localizationService.getCurrentLocale()
         List data = []
         boolean forecastingEnabled = grailsApplication.config.openboxes.forecasting.enabled ?: false
         if (forecastingEnabled) {
             Map params = [startDate: startDate, endDate: endDate]
+            String productDisplayNameSubQuery = """
+                (SELECT s.name FROM synonym s 
+                WHERE s.product_id = pdd.product_id 
+                AND s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' 
+                AND s.locale = '${currentLocale}'
+                LIMIT 1)
+            """
             String query = """
                 select 
                     request_id,
@@ -80,7 +90,12 @@ class ForecastingService {
                     origin_name,
                     destination_name,
                     product_code,
-                    product_name,
+                    CONCAT(product_name, 
+                        IFNULL(
+                            CONCAT(' (', '${currentLocale?.toLanguageTag()?.toUpperCase()}', ': ', ${productDisplayNameSubQuery}, ')'), 
+                            ''
+                        ), 
+                    '') AS product_name,
                     quantity_requested,
                     quantity_canceled,
                     quantity_approved,
@@ -88,7 +103,7 @@ class ForecastingService {
                     quantity_picked,
                     quantity_demand,
                     reason_code_classification
-                FROM product_demand_details
+                FROM product_demand_details pdd
                 WHERE date_issued BETWEEN :startDate AND :endDate
                 """
             if (product) {
@@ -107,7 +122,6 @@ class ForecastingService {
             Sql sql = new Sql(dataSource)
             try {
                 data = sql.rows(query, params)
-
             } catch (Exception e) {
                 log.error("Unable to execute query: " + e.message, e)
             }
@@ -298,10 +312,14 @@ class ForecastingService {
         }
 
         data = data.collect {
+            Product product = Product.findByProductCode(it?.product_code)
             [
                     productCode             : it?.product_code,
-                    productName             : it?.product_name,
-                    unitPrice               : it?.price_per_unit,
+                    productName             : product?.displayNameWithLocaleCode,
+                    productFamily           : product?.productFamily?.name ?: '',
+                    category                : product?.category ?: '',
+                    productCatalogs         : product?.productCatalogs?.join(", "),
+                    unitPrice               : it?.price_per_unit ?: '',
                     origin                  : it?.origin_name,
                     requestNumber           : it?.request_number,
                     destination             : it?.destination_name,
@@ -310,8 +328,8 @@ class ForecastingService {
                     quantityRequested       : it?.quantity_requested ?: 0,
                     quantityIssued          : it?.quantity_picked ?: 0,
                     quantityDemand          : it?.quantity_demand ?: 0,
-                    reasonCode              : it?.reason_code,
-                    reasonCodeClassification: it?.reason_code_classification,
+                    reasonCode              : it?.reason_code ?: '',
+                    reasonCodeClassification: it?.reason_code_classification ?: '',
             ]
         }
         return data

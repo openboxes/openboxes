@@ -11,12 +11,11 @@ package org.pih.warehouse.order
 
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
-import org.pih.warehouse.core.ActivityCode
-
 import java.math.RoundingMode
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Event
@@ -28,12 +27,14 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.Transaction
+import org.pih.warehouse.jobs.RefreshOrderSummaryJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductException
 import org.pih.warehouse.product.ProductPackage
@@ -105,6 +106,16 @@ class OrderService {
                     if (params.createdBy) {
                         eq("createdBy.id", params.createdBy)
                     }
+                    if (params.paymentTerm) {
+                        or {
+                            if (params.list("paymentTerm").contains("null")) {
+                                isNull("paymentTerm")
+                            }
+                            paymentTerm {
+                                'in'("id", params.list("paymentTerm"))
+                            }
+                        }
+                    }
                 }
 
                 if (params.sort && params.sort != 'status') {
@@ -120,6 +131,10 @@ class OrderService {
                         orderedBy {
                             order("firstName", params.order ?: 'asc')
                             order("lastName", params.order ?: 'asc')
+                        }
+                    } else if (params.sort == 'paymentTerm') {
+                        paymentTerm {
+                            order("name", params.order ?: 'asc')
                         }
                     } else {
                         order(params.sort, params.order ?: 'asc')
@@ -878,10 +893,7 @@ class OrderService {
 
         List orderItems = []
 
-        try {
-            def settings = [skipLines: 1]
-            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
-            csvMapReader.fieldKeys = [
+        def fieldKeys = [
                 'id',
                 'productCode',
                 'productName',
@@ -898,21 +910,18 @@ class OrderService {
                 'estimatedReadyDate',
                 'actualReadyDate',
                 'budgetCode'
-            ]
+        ]
+
+        char dataSeparator =  CSVUtils.getSeparator(text, fieldKeys.size())
+
+        try {
+            def settings = [skipLines: 1, separatorChar: dataSeparator]
+            def csvMapReader = new CSVMapReader(new StringReader(text), settings)
+            csvMapReader.fieldKeys = fieldKeys
             orderItems = csvMapReader.toList()
 
         } catch (Exception e) {
             throw new RuntimeException("Error parsing order item CSV: " + e.message, e)
-        }
-
-        // FIXME it's not entirely clear why we reformat strings here like this
-        orderItems.each { orderItem ->
-            if (orderItem.unitOfMeasure) {
-                String[] uomParts = orderItem.unitOfMeasure.split("/")
-                def quantityUom = CSVUtils.parseNumber(uomParts[1], "unitOfMeasure")
-                orderItem.unitOfMeasure = "${uomParts[0]}/${quantityUom}"
-            }
-            orderItem.unitPrice = orderItem.unitPrice ? CSVUtils.parseNumber(orderItem.unitPrice, "unitPrice").setScale(4, RoundingMode.FLOOR).toString() : ''
         }
 
         return orderItems
@@ -1011,6 +1020,12 @@ class OrderService {
                         term = term + "%"
                         or {
                             ilike("name", "%" + term)
+                            synonyms {
+                                and {
+                                    ilike("name", "%" + term)
+                                    eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                                }
+                            }
                             ilike("productCode", term)
                             ilike("description", "%" + term)
                         }
@@ -1224,7 +1239,7 @@ class OrderService {
             // Drop mv temp table if somehow it still exists
             "DROP TABLE IF EXISTS order_summary_mv_temp;",
             // Create temp mv table from sql view (to shorten the time when MV is unavailable)
-            "CREATE TABLE order_summary_mv_temp AS SELECT * FROM order_summary;",
+            "CREATE TABLE order_summary_mv_temp AS SELECT DISTINCT * FROM order_summary;",
             "DROP TABLE IF EXISTS order_summary_mv;",
             // Copy data from temp mv table into mv table
             "CREATE TABLE IF NOT EXISTS order_summary_mv LIKE order_summary_mv_temp;",
@@ -1250,8 +1265,23 @@ class OrderService {
             }
         }
 
-        if (statements) {
+        if (statements && checkIfOrderSummaryExists()) {
             dataService.executeStatements(statements)
+        }
+    }
+
+    Boolean checkIfOrderSummaryExists() {
+        try {
+            // Check if table exists.
+            dataService.executeQuery("SELECT * FROM order_summary_mv LIMIT 1")
+            return true
+        } catch (Exception e) {
+            // UndeclaredThrowableException caused by MySQLSyntaxErrorException is thrown when
+            // the table 'order_summary_mv' doesn't exist. Then just simply refresh entire table
+            log.info "Refreshing order summary failed due to: ${e?.cause?.message}. Refreshing entire table now."
+
+            RefreshOrderSummaryJob.triggerNow()
+            return false
         }
     }
 }

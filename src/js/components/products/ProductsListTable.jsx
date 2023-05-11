@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiDownload2Line } from 'react-icons/all';
+import { RiDownload2Line } from 'react-icons/ri';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import useProductsListTableData from 'hooks/list-pages/product/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
@@ -23,11 +24,12 @@ const ProductsListTable = ({
   // Columns for react-table
   const columns = useMemo(() => [
     {
-      Header: <Translate id="react.productsList.column.active.label" defaultMessage="Active" />,
+      Header: <Translate id="react.productsList.column.active.label" defaultMessage="Status" />,
       accessor: 'active',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
       maxWidth: 150,
+      fixed: true,
       Cell: row =>
         (<StatusIndicator
           variant={row.original.active ? 'success' : 'danger'}
@@ -41,6 +43,7 @@ const ProductsListTable = ({
       headerClassName: 'header justify-content-center',
       Cell: row => <TableCell {...row} link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`} />,
       maxWidth: 150,
+      fixed: true,
     },
     {
       Header: <Translate id="react.productsList.column.name.label" defaultMessage="Name" />,
@@ -48,13 +51,57 @@ const ProductsListTable = ({
       className: 'active-circle',
       headerClassName: 'header',
       sortable: false,
-      Cell: row => <TableCell {...row} tooltip link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`} />,
+      fixed: true,
+      Cell: row =>
+        (<TableCell
+          {...row}
+          value={row.original.displayName ?? row.value}
+          tooltip
+          tooltipLabel={row.value}
+          link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`}
+        />),
       minWidth: 200,
+    },
+    {
+      Header: <Translate id="react.productsList.column.productFamily.label" defaultMessage="Product Family" />,
+      accessor: 'productFamily',
+      minWidth: 150,
+      Cell: row => <TableCell {...row} value={row.value?.name} tooltip />,
     },
     {
       Header: <Translate id="react.productsList.filters.category.label" defaultMessage="Category" />,
       accessor: 'category',
+      minWidth: 150,
       Cell: row => <TableCell {...row} tooltip />,
+    },
+    {
+      Header: <Translate id="react.productsList.filters.glAccount.label" defaultMessage="GL Account" />,
+      accessor: 'glAccount',
+      minWidth: 150,
+      Cell: row =>
+        (<TableCell
+          {...row}
+          tooltip
+          value={row.value ? `${row.value?.code} - ${row.value?.name}` : null}
+        />),
+    },
+    {
+      Header: <Translate id="react.productsList.filters.catalog.label" defaultMessage="Formulary" />,
+      accessor: 'productCatalogs',
+      minWidth: 200,
+      Cell: row =>
+        (<TableCell
+          {...row}
+          tooltip
+          value={row.value.map(catalog => catalog.name).join(', ')}
+        />),
+    },
+    {
+      Header: <Translate id="react.productsList.column.dateCreated.label" defaultMessage="Created on" />,
+      accessor: 'dateCreated',
+      maxWidth: 200,
+      minWidth: 110,
+      Cell: row => <DateCell {...row} />,
     },
     {
       Header: <Translate id="react.productsList.column.updatedBy.label" defaultMessage="Updated by" />,
@@ -64,6 +111,8 @@ const ProductsListTable = ({
       Header: <Translate id="react.productsList.column.lastUpdated.label" defaultMessage="Last updated" />,
       accessor: 'lastUpdated',
       maxWidth: 200,
+      minWidth: 110,
+      Cell: row => <DateCell {...row} />,
     },
   ], []);
 

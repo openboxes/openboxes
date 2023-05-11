@@ -26,6 +26,12 @@ grails.project.dependency.resolution = {
     inherits("global") {
         // https://grails.github.io/grails2-doc/1.3.9/guide/single.html#3.7.1%20Configurations%20and%20Dependencies
         excludes(
+                /*
+                 * N.B. dependencies excluded here can still be silently pulled
+                 * in by a plugin; see, for example, the rendering plugin below.
+                 * If editing this block, be sure to run `grails dependency-report`
+                 * to verify the dependency is actually excluded!
+                 */
                 "commons-logging",  // use jcl-over-slf4j instead
                 "core-renderer", // use flying-saucer-core instead
                 "itext",  // use flying-saucer-pdf-openpdf instead
@@ -61,10 +67,10 @@ grails.project.dependency.resolution = {
         runtime "org.slf4j:jul-to-slf4j:1.7.33"
 
         // Required by database connection
-        compile 'mysql:mysql-connector-java:5.1.47'
+        compile 'mysql:mysql-connector-java:5.1.49'
 
         // Required by database connection pool
-        compile 'com.mchange:c3p0:0.9.5.3'
+        compile 'com.mchange:c3p0:0.9.5.5'
 
         // Required by docx4j functionality
         compile('org.docx4j:docx4j:2.8.1') {
@@ -125,10 +131,15 @@ grails.project.dependency.resolution = {
          */
         test("com.icegreen:greenmail:1.5.10") { excludes "junit" }
 
-        // Required for GPars
+        build 'org.codehaus.gpars:gpars:0.12'  // otherwise early build chain uses 0.9
         compile "org.codehaus.gpars:gpars:0.12"
+        // Required for GPars
         compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
+
+        compile('org.quartz-scheduler:quartz:2.1.6') {
+            exclude 'c3p0'  // otherwise Quartz pulls in an ancient release from 2007
+        }
 
         // Unknown
         build('org.jboss.tattletale:tattletale-ant:1.2.0.Beta2') { excludes "ant", "javassist" }
@@ -167,6 +178,7 @@ grails.project.dependency.resolution = {
         compile 'org.xhtmlrenderer:flying-saucer-core:9.1.15'
         compile 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.15'
         compile 'com.github.librepdf:openpdf:1.2.0'
+        compile 'com.github.albfernandez:juniversalchardet:2.4.0'
     }
     plugins {
 
@@ -177,7 +189,7 @@ grails.project.dependency.resolution = {
         // Required by functionality (need to be upgraded or replaced)
         runtime(":jquery:1.7.2")
         runtime(":jquery-ui:1.8.7") { excludes 'jquery' }
-        compile ":rendering:0.4.4"
+        compile(':rendering:0.4.4') { excludes 'core-renderer', 'itext' }
         compile ":raven:0.5.8"
         runtime(':excel-import:0.3') { excludes 'poi-contrib', 'poi-scratchpad' }
         runtime(':external-config-reload:1.4.0') { exclude 'spock-grails-support' }

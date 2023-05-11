@@ -11,6 +11,7 @@ export default {
       defaultPlaceholder: 'Requisition Status',
       showLabelTooltip: true,
       closeMenuOnSelect: false,
+      blurInputOnSelect: false,
     },
     getDynamicAttr: ({ requisitionStatuses }) => ({
       options: requisitionStatuses,
@@ -50,6 +51,24 @@ export default {
       loadOptions: fetchLocations,
     }),
   },
+  shipmentType: {
+    type: FilterSelectField,
+    attributes: {
+      multi: true,
+      filterElement: true,
+      placeholder: 'react.stockMovement.shipmentType.label',
+      defaultPlaceholder: 'Shipment type',
+      showLabelTooltip: true,
+      options: [],
+      blurInputOnSelect: false,
+      closeMenuOnSelect: false,
+      valueKey: 'id',
+      labelKey: 'displayName',
+    },
+    getDynamicAttr: ({ shipmentTypes }) => ({
+      options: shipmentTypes,
+    }),
+  },
   requestedBy: {
     type: FilterSelectField,
     attributes: {
@@ -67,9 +86,9 @@ export default {
       showLabelTooltip: true,
     },
     getDynamicAttr: ({
-      fetchUsers,
+      fetchPeople,
     }) => ({
-      loadOptions: fetchUsers,
+      loadOptions: fetchPeople,
     }),
   },
   createdBy: {

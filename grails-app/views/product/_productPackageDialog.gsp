@@ -7,7 +7,7 @@
 				<tr class="prop">
 					<td class="name"><label><warehouse:message code="product.label"/></label></td>
 					<td class="value">
-						<format:product product="${productInstance}" />
+						<format:displayName product="${productInstance}" showTooltip="${true}" />
 					</td>
 				</tr>
 			</g:if>

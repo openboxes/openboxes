@@ -13,6 +13,7 @@ import com.google.zxing.BarcodeFormat
 import grails.converters.JSON
 import grails.validation.ValidationException
 import org.apache.commons.io.FilenameUtils
+import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
@@ -24,10 +25,13 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.ProductSynonymExcelImporter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
-import org.springframework.web.servlet.support.RequestContextUtils as RCU
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
@@ -41,7 +45,9 @@ class ProductController {
     def documentService
     def inventoryService
     def barcodeService
+    def productMergeService
     UploadService uploadService
+    def localizationService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -179,9 +185,7 @@ class ProductController {
 
         if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
             log.info("saved product " + productInstance.errors)
-            def warehouseInstance = Location.get(session.warehouse.id)
-            def inventoryInstance = warehouseInstance?.inventory
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
+            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
             sendProductCreatedNotification(productInstance)
         }
 
@@ -268,7 +272,7 @@ class ProductController {
                 productInstance.validateRequiredFields()
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product'), format.product(product: productInstance)])}"
+                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
                     //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
                     redirect(controller: "product", action: "edit", id: productInstance?.id)
                 } else {
@@ -780,7 +784,7 @@ class ProductController {
                     "attachment; filename=\"Products-${date.format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
             println "export products: " + csv
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             response.sendError(404)
         }
@@ -798,10 +802,28 @@ class ProductController {
             response.setHeader("Content-disposition",
                     "attachment; filename=\"Products-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             response.contentType = "text/csv"
-            render csv
+            render(contentType: "text/csv", text: csv)
         } else {
             render(text: 'No products found', status: 404)
         }
+    }
+
+    /**
+     * Export Synonym Template Excel
+     */
+    def exportSynonymTemplate = {
+        List<Map> objects = [[]]
+        // return a template with filled in product code
+        if (params.productCode) {
+            objects = [ ['product': [ 'productCode': params.productCode ]] ]
+        }
+        def data = dataService.transformObjects(objects, Synonym.PROPERTIES)
+
+
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader 'Content-disposition', "attachment; filename=\"productSynonyms.xls\""
+        documentService.generateExcel(response.outputStream, data)
+        response.outputStream.flush()
     }
 
     /**
@@ -838,9 +860,11 @@ class ProductController {
                     localFile = uploadService.createLocalFile(uploadFile.originalFilename)
                     uploadFile?.transferTo(localFile)
                     session.localFile = localFile
+                    //Detect CSV encoding
+                    String fileEncoding = CSVUtils.detectCsvCharset(localFile)
+                    // Get CSV content in UTF-8 encoding
+                    def csv = localFile.getText(fileEncoding)
 
-                    // Get CSV content
-                    def csv = localFile.getText()
                     columns = productService.getColumns(csv)
                     println "CSV " + csv
 
@@ -885,7 +909,8 @@ class ProductController {
 
         if (params.importNow && session.localFile) {
             try {
-                def csv = session.localFile.getText()
+                String fileEncoding = CSVUtils.detectCsvCharset(session.localFile)
+                def csv = session.localFile.getText(fileEncoding)
 
                 // Get columns
                 columns = productService.getColumns(csv)
@@ -992,12 +1017,47 @@ class ProductController {
      */
     def addSynonymToProduct = {
         println "addSynonymToProduct() " + params
-        def product = Product.get(params.id)
-        if (product) {
-            product.addToSynonyms(new Synonym(name: params.synonym, locale: RCU.getLocale(request)))
-            product.save(flush: true, failOnError: true)
+        Product product = null
+        def inputValues = null
+        try {
+            product = productService.addSynonymToProduct(params.id, params.synonymTypeCode, params.synonym, params.locale)
+        } catch (ValidationException e) {
+            // If adding a synonym fails, we still want to return the product to the view
+            product = Product.read(params.id)
+            // If a validation error occurs, we want to return those values to the view,
+            // and set them as initialValues of the form, so a user can correct him/herself
+            inputValues = params
+            product.errors = e.errors
         }
-        render(template: 'productSynonyms', model: [productInstance: product])
+        render(template: 'productSynonyms', model: [productInstance: product, inputValues: inputValues])
+    }
+
+    /**
+     * Edit existing product synonym
+     */
+    def editProductSynonym = {
+        println "editProductSynonym() " + params
+        try {
+            productService.editProductSynonym(params['synonym.id'], params.synonymTypeCode, params.synonym, params.locale)
+            render (status: 200, text: "successfully edited synonym")
+        } catch (ValidationException e) {
+            def errorMessages = e.errors.allErrors.collect {
+                g.message(error: it, locale: localizationService.currentLocale)
+            }
+            response.status = 400
+            render([ errorMessages: errorMessages ] as JSON)
+        }
+    }
+
+    def editProductSynonymDialog = {
+        Synonym synonym = Synonym.read(params.id)
+        if (!synonym) {
+            throw new RuntimeException("Synonym does not exist")
+        }
+        if (!synonym.product) {
+            throw new RuntimeException("Product does not exist")
+        }
+        render(template: 'productSynonymsEdit', model: [product: synonym.product, synonym: synonym])
     }
 
     /**
@@ -1103,7 +1163,74 @@ class ProductController {
         }
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
+
+    def importProductSynonyms = { ImportDataCommand command ->
+
+        log.info params
+        log.info command?.location
+
+        if (request.method == "POST") {
+            File localFile = null
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
+            CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file")
+
+            if (uploadFile?.empty) {
+                flash.error = "Please upload a non-empty file"
+                redirect(controller: 'product', action: 'edit', id: params['product.id'])
+                return
+            }
+            try {
+                command.filename = uploadFile.originalFilename
+                localFile = uploadService.createLocalFile(uploadFile.originalFilename)
+                uploadFile.transferTo(localFile)
+            } catch (Exception e) {
+                flash.error = "Unable to upload file due to exception: " + e.message
+                redirect(controller: 'product', action: 'edit', id: params['product.id'])
+                return
+            }
+
+            def excelImporter = new ProductSynonymExcelImporter(localFile.absolutePath)
+            command.data = excelImporter.data
+
+            command.errors = null
+            excelImporter.validateData(command)
+
+            if (command.errors.allErrors) {
+                flash.errors = command.errors
+            } else {
+                flash.message = "Succesfully imported product synonyms"
+                excelImporter.importData(command)
+            }
+        }
+
+        redirect(controller: 'product', action: 'edit', id: params['product.id'])
+    }
+
+    def showMergeProductDialog = {
+        // TODO: ADD WARNING IF PRODUCT HAS PENDING ORDER/SHIPMENT/RECEIPT/whatever
+        Product primaryProduct = Product.get(params.primaryProduct)
+        render(template: params.template, model: [ primaryProduct: primaryProduct ])
+    }
+
+    def merge = {
+        Boolean enabled = ConfigurationHolder.config.openboxes.products.merge.enabled
+        if (!enabled) {
+            throw new IllegalArgumentException("Merge products feature is not enabled")
+        }
+
+        productMergeService.mergeProduct(params.primaryProduct, params.obsoleteProduct)
+
+        flash.message = "${warehouse.message(code: 'product.mergeProducts.success.message', args: [params.primaryProduct, params.obsoleteProduct])}"
+        redirect(controller: "inventoryItem", action: "showStockCard", id: params.primaryProduct)
+    }
+
+    /**
+     * Temporary helper for testing and looking at Product Merge logs for QA
+     * */
+    def productMergeLogs = {
+        params.max = params.max?:10
+        params.offset = params.offset?:0
+        def productMergeLogs = productMergeService.getProductMergeLogs(params)
+        render(view: "productMergeLogs", model: [productMergeLogs: productMergeLogs ?: []], params: params)
+    }
 }
-
-
-

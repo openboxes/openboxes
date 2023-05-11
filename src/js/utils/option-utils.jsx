@@ -1,10 +1,14 @@
 import _ from 'lodash';
 import queryString from 'query-string';
 
+import glAccountApi from 'api/services/GlAccountApi';
+import productGroupApi from 'api/services/ProductGroupApi';
+import userApi from 'api/services/UserApi';
 import apiClient from 'utils/apiClient';
+import splitTranslation from 'utils/translation-utils';
 
 
-export const debounceUsersFetch = (waitTime, minSearchLength) =>
+export const debouncePeopleFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
       apiClient.get('/openboxes/api/persons', { params: { name: searchTerm, status: true } })
@@ -19,6 +23,27 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
     } else {
       callback([]);
     }
+  }, waitTime);
+
+export const debounceUsersFetch = (waitTime, minSearchLength) =>
+  _.debounce((searchTerm, callback) => {
+    if (searchTerm?.length >= minSearchLength) {
+      const config = {
+        params: {
+          searchTerm,
+          active: true,
+        },
+      };
+      userApi.getUsersOptions(config).then((users) => {
+        callback(users?.data?.data?.map?.(user => ({
+          ...user,
+          value: user.id,
+          label: user.name,
+        })));
+      });
+      return;
+    }
+    callback([]);
   }, waitTime);
 
 export const debounceLocationsFetch = (
@@ -62,6 +87,8 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
             url: obj.url,
             label: obj.label,
             color: obj.color,
+            displayName: obj.displayName,
+            originalName: obj.value,
           }
         ))))
         .catch(() => callback([]));
@@ -82,7 +109,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
             lotAndExpiryControl: obj.lotAndExpiryControl,
-            label: `${obj.productCode} - ${obj.name}`,
+            displayName: obj.displayName,
             color: obj.color,
             exactMatch: obj.exactMatch,
           }
@@ -106,7 +133,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
             quantityAvailable: obj.quantityAvailable,
             minExpirationDate: obj.minExpirationDate,
             handlingIcons: obj.product.handlingIcons,
-            label: `${obj.productCode} - ${obj.name}`,
+            displayNames: obj?.product?.displayNames,
             color: obj.color,
           }
         ))))
@@ -127,7 +154,7 @@ export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, dest
             name: obj.name,
             productCode: obj.productCode,
             handlingIcons: obj.handlingIcons,
-            label: `${obj.productCode} - ${obj.name}`,
+            displayNames: obj?.displayNames,
             color: obj.color,
           }
         ))))
@@ -213,3 +240,33 @@ export const fetchProductsTags = async () => {
   const response = await apiClient.get('/openboxes/api/tagOptions');
   return response.data.data;
 };
+
+export const fetchProductsGlAccounts = async (params) => {
+  const { data } = await glAccountApi.getGlAccountOptions({ params });
+  return data.data;
+};
+
+export const fetchProductGroups = async () => {
+  const { data } = await productGroupApi.getProductGroupsOptions();
+  return data.data;
+};
+
+const mapShipmentType = (shipmentType) => {
+  // Enum keys can be e.g. AIR, LAND, SEA etc.
+  const enumKey = splitTranslation(shipmentType?.name, null)?.toUpperCase();
+  return {
+    ...shipmentType,
+    value: shipmentType?.id,
+    enumKey,
+  };
+};
+
+// Shipment types arg can be an array or a single element (passed from table cell)
+export const mapShipmentTypes = (shipmentTypes) => {
+  if (_.isArray(shipmentTypes)) {
+    return shipmentTypes.map(shipmentType => mapShipmentType(shipmentType));
+  }
+  return mapShipmentType(shipmentTypes);
+};
+
+export const selectNullOption = { id: 'null', value: 'null' };

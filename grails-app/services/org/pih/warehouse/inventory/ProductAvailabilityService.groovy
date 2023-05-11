@@ -12,20 +12,25 @@ package org.pih.warehouse.inventory
 import grails.orm.PagedResultList
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
+import org.pih.warehouse.product.ProductType
 import org.pih.warehouse.requisition.RequisitionStatus
 
 import java.text.SimpleDateFormat
@@ -35,8 +40,10 @@ class ProductAvailabilityService {
     boolean transactional = true
 
     def dataSource
+    def gparsService
     def grailsApplication
     def persistenceInterceptor
+    def productService
     def locationService
     def inventoryService
     def dataService
@@ -82,7 +89,7 @@ class ProductAvailabilityService {
         // Compute bin locations from transaction entries for all products over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
-        GParsPool.withPool {
+        gparsService.withPool('RefreshAllProducts') {
             locationService.depots.eachParallel { Location loc ->
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
@@ -98,7 +105,7 @@ class ProductAvailabilityService {
         // Compute bin locations from transaction entries for specific product over all depot locations
         // Uses GPars to improve performance (OBNAV Benchmark: 5 minutes without, 45 seconds with)
         def startTime = System.currentTimeMillis()
-        GParsPool.withPool {
+        gparsService.withPool('RefreshSingleProduct') {
             locationService.depots.eachParallel { Location loc ->
                 persistenceInterceptor.init()
                 Location location = Location.get(loc.id)
@@ -111,19 +118,20 @@ class ProductAvailabilityService {
     }
 
     def refreshProductAvailability(Location location, Boolean forceRefresh) {
-        log.info "Refreshing product availability location (${location}), forceRefresh (${forceRefresh}) ..."
-        def startTime = System.currentTimeMillis()
-        List binLocations = calculateBinLocations(location)
-        saveProductAvailability(location, null, binLocations, forceRefresh)
-        log.info "Refreshed  ${binLocations?.size()} product availability records for location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        return refreshProductAvailability(location, null, forceRefresh)
     }
 
     def refreshProductAvailability(Location location, Product product, Boolean forceRefresh) {
         log.info "Refreshing product availability location ${location}, product ${product}, forceRefresh ${forceRefresh}..."
         def startTime = System.currentTimeMillis()
-        List binLocations = calculateBinLocations(location, product)
-        saveProductAvailability(location, product, binLocations, forceRefresh)
-        log.info "Refreshed ${binLocations?.size()} product availability records for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        List binLocations = product ? calculateBinLocations(location, product) : calculateBinLocations(location)
+        // FIXME: if this deadlocks, it safe to auto-retry here?
+        boolean success = saveProductAvailability(location, product, binLocations, forceRefresh)
+        if (success) {
+            log.info "Refreshed ${binLocations?.size()} product availability records for product (${product}) and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        } else {
+            log.error "Could not refresh ${binLocations?.size()} product availability records for product (${product}) and location (${location}) after ${System.currentTimeMillis() - startTime}ms"
+        }
     }
 
     def calculateBinLocations(Location location, Date date) {
@@ -133,17 +141,18 @@ class ProductAvailabilityService {
     }
 
     def calculateBinLocations(Location location) {
-        def binLocations = inventoryService.getBinLocationDetails(location)
-        def picked = getQuantityPickedByProductAndLocation(location, null)
-        binLocations = transformBinLocations(binLocations, picked)
-        return binLocations
+        return calculateBinLocations(location, null as Product)
     }
 
     def calculateBinLocations(Location location, Product product) {
-        def binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
+        def binLocations
+        if (product) {
+            binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
+        } else {
+            binLocations = inventoryService.getBinLocationDetails(location)
+        }
         def picked = getQuantityPickedByProductAndLocation(location, product)
-        binLocations = transformBinLocations(binLocations, picked)
-        return binLocations
+        return transformBinLocations(binLocations, picked)
     }
 
     def getQuantityPickedByProductAndLocation(Location location, Product product) {
@@ -175,7 +184,7 @@ class ProductAvailabilityService {
         return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
     }
 
-    def saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
+    boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
         log.info "Saving product availability for product=${product?.productCode}, location=${location}"
         def batchSize = ConfigurationHolder.config.openboxes.inventorySnapshot.batchSize ?: 1000
         def startTime = System.currentTimeMillis()
@@ -184,6 +193,7 @@ class ProductAvailabilityService {
             Sql sql = new Sql(dataSource)
 
             // Execute SQL in batches
+            // FIXME recover from deadlocks
             sql.withBatch(batchSize) { BatchingStatementWrapper stmt ->
                 // If we need to force refresh then we want to set quantity on hand for all
                 // matching records to 0.
@@ -209,8 +219,10 @@ class ProductAvailabilityService {
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
             publishEvent(new ApplicationExceptionEvent(e, location))
-            throw e;
+            return false
         }
+
+        return true
     }
 
     String generateInsertStatement(Location location, Map entry) {
@@ -261,62 +273,6 @@ class ProductAvailabilityService {
         }
 
         return binLocationsTransformed
-    }
-
-    def deleteProductAvailability() {
-        deleteProductAvailability(null, null)
-    }
-
-    def deleteProductAvailability(Location location) {
-        deleteProductAvailability(location, null)
-    }
-
-    def deleteProductAvailability(Location location, Product product) {
-        Map params = [:]
-
-        String deleteStmt = """delete from ProductAvailability pa where 1=1"""
-
-        if (location) {
-            deleteStmt += " and pa.location = :location"
-            params.put("location", location)
-        }
-
-        if (product) {
-            deleteStmt += " and pa.product = :product"
-            params.put("product", product)
-        }
-
-        def results = ProductAvailability.executeUpdate(deleteStmt, params)
-        log.info "Deleted ${results} records for location ${location}, product ${product}"
-    }
-
-    def refreshInventorySnapshot(Location location, Product product, Boolean forceRefresh) {
-        String productId = product ? "'${product?.id}'" : null
-        if (forceRefresh) {
-            String forceRefreshStatement = """
-                DELETE FROM inventory_snapshot 
-                WHERE date = DATE_ADD(CURDATE(),INTERVAL 1 DAY)
-                AND location_id = '${location.id}' 
-                AND product_id = IFNULL(${productId}, product_id);
-            """
-            dataService.executeStatement(forceRefreshStatement)
-        }
-        String updateStatement = """
-            REPLACE INTO inventory_snapshot 
-            (
-                id, version, date, location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name, 
-                quantity_on_hand, date_created, last_updated
-            ) 
-            SELECT 
-                id, version, DATE_ADD(CURDATE(),INTERVAL 1 DAY), location_id, product_id, product_code, 
-                inventory_item_id, lot_number, bin_location_id, bin_location_name,
-                quantity_on_hand, date_created, last_updated 
-            FROM product_availability 
-            WHERE location_id = '${location.id}' 
-            AND product_id = IFNULL(${productId}, product_id);
-        """
-        dataService.executeStatement(updateStatement)
     }
 
     def getQuantityOnHand(Location location) {
@@ -748,7 +704,7 @@ class ProductAvailabilityService {
     }
 
     void updateProductAvailability(Product product) {
-        if (!product?.id) {
+        if (!product?.id || !product?.productCode) {
             return
         }
         def results = ProductAvailability.executeUpdate(
@@ -775,74 +731,96 @@ class ProductAvailabilityService {
         List searchTerms = (command?.searchTerms ? Arrays.asList(command?.searchTerms?.split(" ")) : null)
 
         // Only search if there are search terms otherwise the list of product IDs includes all products
-        def innerProductIds = !searchTerms ? [] : Product.createCriteria().list {
-            eq("active", true)
-            projections {
-                distinct 'id'
-            }
-            and {
-                searchTerms.each { searchTerm ->
-                    or {
-                        ilike("name", "%" + searchTerm + "%")
-                        inventoryItems {
-                            ilike("lotNumber", "%" + searchTerm + "%")
-                        }
-                    }
-                }
-            }
+        def innerProductIds = searchTerms ?
+                productService.searchProducts(searchTerms.toArray(), [])?.collect { it.id } : []
+
+        // Retrieve all product types with SEARCHABLE and SEARCHABLE_NO_STOCK activity codes
+        String productTypeQuery = "select pt from ProductType pt left join pt.supportedActivities sa where sa=:productActivityCode"
+        def searchableProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE])
+        def searchableNoStockProductTypes = ProductType.executeQuery(productTypeQuery, [productActivityCode: ProductActivityCode.SEARCHABLE_NO_STOCK])
+
+        // Detached criteria used as a subquery to get aggregated quantity on hand value for a product location pair
+        DetachedCriteria aggregatedQuantityQuery = DetachedCriteria.forClass(ProductAvailability, 'pa').with {
+            setProjection Projections.sum('pa.quantityOnHand')
+            add(Restrictions.eqProperty('pa.product.id', 'this.id'))
+            add(Restrictions.eq('pa.location.id', command.location.id))
         }
 
-        def paginationParams = searchTerms ? [:] : [max: command.maxResults, offset: command.offset]
-
-        def products = Product.createCriteria().list(paginationParams) {
+        def products = Product.createCriteria().list([max: command.maxResults, offset: command.offset]) {
             eq("active", true)
-            and {
-                if (categories) {
-                    'in'("category", categories)
-                }
-                if (command.tags) {
-                    tags {
-                        'in'("id", command.tags*.id)
-                    }
-                }
-                if (command.catalogs) {
-                    productCatalogItems {
-                        productCatalog {
-                            'in'("id", command.catalogs*.id)
-                        }
-                    }
-                }
-                // This is pretty inefficient if the previous query does not narrow the results
-                // if the inner products list is empty, but there are search terms then return empty results
-                if (innerProductIds || searchTerms) {
-                    'in'("id", innerProductIds ?: [null])
+
+            // Restrict products by selected product types
+            if (command.productTypes) {
+                'in'("productType", command.productTypes)
+                if (!command.showOutOfStockProducts) {
+                    // Read: 0 is less than result from subquery
+                    add Subqueries.lt(0, aggregatedQuantityQuery)
                 }
             }
+            // Or apply default product type restrictions:
+            // return products with product type with activity searchable no stock OR (searchable AND qoh > 0)
+            else {
+                if (!command.showOutOfStockProducts) {
+
+                    // SUM(product availability.quantity_on_hand) > 0
+                    def quantityGreaterThanZero = Subqueries.lt(0, aggregatedQuantityQuery)
+                    // productType in (:searchableProductTypes)
+                    def inSearchableProductTypes = Restrictions.in("productType", searchableProductTypes)
+                    // productType in (:searchableNoStockProductTypes)
+                    def inSearchableNoStockProductTypes = Restrictions.in("productType", searchableNoStockProductTypes)
+
+                    // Create a disjunction with none, one or both of the searchable product type restrictions
+                    def disjunction = Restrictions.disjunction()
+
+                    if (searchableNoStockProductTypes)
+                        disjunction.add(inSearchableNoStockProductTypes)
+
+                    if (searchableProductTypes)
+                        disjunction.add(Restrictions.conjunction().add(quantityGreaterThanZero).add(inSearchableProductTypes))
+
+                    add(disjunction)
+                }
+            }
+
+            // Restrict products by selected categories
+            if (categories) {
+                'in'("category", categories)
+            }
+
+            // Restrict products by selected tags
+            if (command.tags) {
+                tags {
+                    'in'("id", command.tags*.id)
+                }
+            }
+
+            // Restrict products by selected catalogs
+            if (command.catalogs) {
+                productCatalogItems {
+                    productCatalog {
+                        'in'("id", command.catalogs*.id)
+                    }
+                }
+            }
+
+            // This is pretty inefficient if the previous query does not narrow the results
+            // if the inner products list is empty, but there are search terms then return empty results
+            if (innerProductIds || searchTerms) {
+                'in'("id", innerProductIds ?: [null])
+            }
+            order("productCode")
         }
 
-        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : []
-
-        def items = []
-
-        products.each { Product product ->
-            def quantity = quantityMap[product] ?: 0
-
-            if (product.productType && !product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE_NO_STOCK)) {
-                if (!product.productType.supportedActivities?.contains(ProductActivityCode.SEARCHABLE)) {
-                    return
-                } else if (quantity == 0) {
-                    return
-                }
-            }
-
-            items << [
+        def quantityMap = products ? getQuantityOnHandByProduct(command.location, products) : [:]
+        def items = products.collect { Product product ->
+            [
                 id   : product.id,
                 product: product,
-                quantityOnHand: quantity
+                quantityOnHand: quantityMap[product] ?: 0
             ]
         }
 
-        return searchTerms ? items : new PagedResultList(items, products.totalCount)
+        return new PagedResultList(items, products.totalCount)
     }
 
     List<ProductAvailability> getStockTransferCandidates(Location location) {
@@ -921,5 +899,102 @@ class ProductAvailabilityService {
         }
 
         return quantityAvailableToPromiseByProductNotInBin ?: 0
+    }
+
+    /**
+     * Used for product merge feature (when primary product *had not*
+     * the same lot as obsolete product). Change product to primary for rows
+     * with given inventory item
+     * */
+    void updateProductAvailabilityOnMergeProduct(InventoryItem obsoleteInventoryItem, Product primaryProduct, Product obsoleteProduct) {
+        if (!obsoleteProduct?.id || !primaryProduct?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
+        String updateStatement = """
+            UPDATE IGNORE product_availability
+            SET product_code = '${primaryProduct.productCode}', 
+                product_id = '${primaryProduct.id}' 
+            WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
+        """
+        dataService.executeStatement(updateStatement)
+        log.info "Updated product availabilities for product: ${primaryProduct?.productCode} and " +
+            "inventory item: ${obsoleteInventoryItem?.id}"
+
+        // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, null)
+    }
+
+    /**
+     * Used for product merge feature (when primary product *had* the same lot as obsolete)
+     * Change product and inventory to primary for rows with given obsolete inventory item
+     * */
+    void updateProductAvailabilityOnMergeProduct(InventoryItem primaryInventoryItem, InventoryItem obsoleteInventoryItem, Product primaryProduct, Product obsoleteProduct) {
+        if (!primaryProduct?.id || !primaryInventoryItem?.id || !obsoleteInventoryItem?.id) {
+            return
+        }
+
+        // First update records that won't violate product_availability_uniq_idx (location_id, product_code, lot_number, bin_location_name)
+        String updateStatement = """
+            UPDATE IGNORE product_availability
+            SET product_code = '${primaryProduct.productCode}', 
+                product_id = '${primaryProduct.id}', 
+                inventory_item_id = '${primaryInventoryItem.id}', 
+                lot_number = '${primaryInventoryItem.lotNumber ?: 'DEFAULT'}' 
+            WHERE inventory_item_id = '${obsoleteInventoryItem.id}';
+        """
+        dataService.executeStatement(updateStatement)
+        log.info "Updated product availabilities for product: ${primaryProduct?.productCode} and " +
+            "inventory item: ${primaryInventoryItem?.id} with obsolete inventory item: ${obsoleteInventoryItem.id}"
+
+        // Cupy/sum all the remaining availabilities that violated product_availability_uniq_idx
+        processIgnoredProductAvailabilitiesOnProductMerge(primaryProduct, obsoleteInventoryItem, primaryInventoryItem)
+    }
+
+    /**
+     * Used for product merge feature when initial update of product and inventory item was ignored due to the
+     * unique product_availability_uniq_idx violation.
+     * */
+    void processIgnoredProductAvailabilitiesOnProductMerge(Product primaryProduct, InventoryItem obsoleteInventoryItem, InventoryItem primaryInventoryItem) {
+        // Get all remaining obsolete product availabilities with obsolete inventory item
+        List<ProductAvailability> remainingProductAvailabilities = ProductAvailability.findAllByInventoryItem(obsoleteInventoryItem)
+        remainingProductAvailabilities?.each { ProductAvailability remainingProductAvailability ->
+            // Check if product availabilities are already existing for a product_availability_uniq_idx
+            ProductAvailability existingProductAvailability = ProductAvailability.createCriteria().get {
+                eq("location", remainingProductAvailability.location)
+                eq("productCode", primaryProduct.productCode)
+                eq("lotNumber", remainingProductAvailability.lotNumber?.trim() ?: 'DEFAULT')
+                eq("binLocationName", remainingProductAvailability.binLocationName)
+            }
+
+            // If exists, then add quantities from obsolete PA to the new main one
+            if (existingProductAvailability) {
+                existingProductAvailability.quantityOnHand += remainingProductAvailability.quantityOnHand
+                existingProductAvailability.quantityAllocated += remainingProductAvailability.quantityAllocated
+                existingProductAvailability.quantityNotPicked += remainingProductAvailability.quantityNotPicked
+                existingProductAvailability.quantityOnHold += remainingProductAvailability.quantityOnHold
+                existingProductAvailability.quantityAvailableToPromise += remainingProductAvailability.quantityAvailableToPromise
+                existingProductAvailability.save(flush: true)
+
+                remainingProductAvailability.quantityOnHand = 0
+                remainingProductAvailability.quantityAllocated = 0
+                remainingProductAvailability.quantityNotPicked = 0
+                remainingProductAvailability.quantityOnHold = 0
+                remainingProductAvailability.quantityAvailableToPromise = 0
+                remainingProductAvailability.save(flush: true)
+
+                return
+            }
+
+            // Otherwise swap product (and inventory item) on the remaining obsolete PA with primary ones
+            remainingProductAvailability.product = primaryProduct
+            remainingProductAvailability.productCode = primaryProduct.productCode
+            if (primaryInventoryItem) {
+                remainingProductAvailability.inventoryItem = primaryInventoryItem
+                remainingProductAvailability.lotNumber = primaryInventoryItem.lotNumber ?: 'DEFAULT'
+            }
+            remainingProductAvailability.save(flush: true)
+        }
     }
 }

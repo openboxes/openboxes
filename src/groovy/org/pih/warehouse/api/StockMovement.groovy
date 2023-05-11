@@ -159,6 +159,7 @@ class StockMovement {
             dateCreated         : dateCreated?.format("MM/dd/yyyy"),
             dateShipped         : dateShipped?.format("MM/dd/yyyy HH:mm XXX"),
             expectedDeliveryDate: expectedDeliveryDate?.format("MM/dd/yyyy HH:mm XXX"),
+            lastUpdated         : lastUpdated,
             shipmentType        : shipmentType,
             currentStatus       : currentStatus,
             shipmentStatus      : shipment?.status?.name,

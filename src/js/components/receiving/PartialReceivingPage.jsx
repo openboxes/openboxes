@@ -19,7 +19,7 @@ import EditLineModal from 'components/receiving/modals/EditLineModal';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { renderFormField } from 'utils/form-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
+import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -157,24 +157,8 @@ const TABLE_FIELDS = {
           className: 'text-left ml-1',
         },
       },
-      'product.name': {
-        type: (params) => {
-          if (params.subfield) {
-            const { parentIndex, rowIndex } = params;
-            const fieldPath = `containers[${parentIndex}].shipmentItems[${rowIndex}].product.handlingIcons`;
-            const handlingIcons = _.get(params.values, fieldPath);
-
-            const productNameWithIcons = (
-              <div className="d-flex">
-                <span className="text-truncate">
-                  <Translate id={params.fieldValue} defaultMessage={params.fieldValue} />
-                </span>
-                {renderHandlingIcons(handlingIcons)}
-              </div>);
-            return <LabelField {...params} fieldValue={productNameWithIcons} />;
-          }
-          return null;
-        },
+      product: {
+        type: params => (params.subfield ? <LabelField {...params} /> : null),
         label: 'react.partialReceiving.product.label',
         defaultMessage: 'Product',
         headerAlign: 'left',
@@ -182,7 +166,11 @@ const TABLE_FIELDS = {
         attributes: {
           className: 'text-left ml-1',
           showValueTooltip: true,
+          formatValue: formatProductDisplayName,
         },
+        getDynamicAttr: ({ fieldValue }) => ({
+          tooltipValue: fieldValue?.name,
+        }),
       },
       lotNumber: {
         type: params => (params.subfield ? <LabelField {...params} /> : null),
@@ -298,9 +286,9 @@ const TABLE_FIELDS = {
         }),
       },
       edit: {
-        type: params => (params.subfield ? <EditLineModal {...params} /> : null),
+        type: params => (params.subfield ? <EditLineModal {...params} wrapperClassName="edit-button-cell" /> : null),
         fieldKey: '',
-        flexWidth: '0.5',
+        flexWidth: '0.9',
         label: '',
         attributes: {
           btnOpenText: 'react.default.button.edit.label',
@@ -504,18 +492,7 @@ class PartialReceivingPage extends Component {
 
     const payload = {
       ...formValues,
-      containers: _.map(formValues.containers, container => ({
-        ...container,
-        shipmentItems: _.map(container.shipmentItems, (item) => {
-          if (!_.get(item, 'recipient.id')) {
-            return {
-              ...item, recipient: '',
-            };
-          }
-
-          return item;
-        }),
-      })),
+      containers: getReceivingPayloadContainers(formValues),
     };
     return apiClient.post(url, flattenRequest(payload));
   }
@@ -613,11 +590,26 @@ class PartialReceivingPage extends Component {
 
   exportTemplate() {
     this.props.showSpinner();
-
-    const { shipmentId } = this.state.values;
+    const { values } = this.state;
+    const { shipmentId } = values;
     const url = `/openboxes/api/partialReceiving/exportCsv/${shipmentId}`;
-
-    apiClient.post(url, flattenRequest(this.state.values))
+    /** We have to omit product.displayNames, due to an error
+     *  while binding bindData(partialReceiptItem, shipmentItemMap)
+     *  it expects product.displayNames to have a setter, as we pass
+     *  product.displayNames.default: XYZ, to the update method, but it's not a
+     *  writable property.
+     *  With deprecated product.translatedName it was not the case, because
+     *  it was recognizing the transient and we didn't access product.translatedName.something
+     *  but product.translatedName directly
+     * */
+    const valuesWithoutDisplayNames = {
+      ...values,
+      containers: values?.containers?.map?.(container => ({
+        ...container,
+        shipmentItems: container?.shipmentItems?.map?.(item => _.omit(item, 'product.displayNames')),
+      })),
+    };
+    apiClient.post(url, flattenRequest(valuesWithoutDisplayNames))
       .then((response) => {
         fileDownload(response.data, `PartialReceiving${shipmentId ? `-${shipmentId}` : ''}.csv`, 'text/csv');
         this.props.hideSpinner();
@@ -654,18 +646,7 @@ class PartialReceivingPage extends Component {
     const payload = {
       receiptStatus: 'CHECKING',
       ...formValues,
-      containers: _.map(formValues.containers, container => ({
-        ...container,
-        shipmentItems: _.map(container.shipmentItems, (item) => {
-          if (!_.get(item, 'recipient.id')) {
-            return {
-              ...item, recipient: '',
-            };
-          }
-
-          return item;
-        }),
-      })),
+      containers: getReceivingPayloadContainers(formValues),
     };
 
     return apiClient.post(url, flattenRequest(payload));

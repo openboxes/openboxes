@@ -19,10 +19,13 @@
         <thead>
             <td class="noBorder">
                 <div id="product-header" class="divHeader">
+                    <g:if test="${commandInstance?.product?.productFamily}">
+                        <span class="fade">${commandInstance?.product?.productFamily}</span>
+                    </g:if>
                     <div id="product-title" class="title">
                         <small class="font-weight-bold">${commandInstance?.product?.productCode }</small>
                         <g:link controller="inventoryItem" action="showStockCard" params="['product.id': commandInstance?.product?.id]">
-                            ${commandInstance?.product?.name }
+                            ${commandInstance?.product?.displayNameOrDefaultName}
                         </g:link>
                     </div>
                     <div id="product-catalogs">

@@ -22,6 +22,7 @@ import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import { formatProductDisplayName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -97,12 +98,19 @@ const AD_HOCK_FIELDS = {
         defaultMessage: 'Product name',
         attributes: {
           formatValue: value => (
-            <span className="d-flex align-items-center">
-              <span className="text-truncate">
-                {value.name || ''}
+            <Tooltip
+              html={<div className="text-truncate">{value.name}</div>}
+              theme="dark"
+              disabled={!value.displayNames?.default}
+              position="top-start"
+            >
+              <span className="d-flex align-items-center">
+                <span className="text-truncate">
+                  {value.displayNames?.default ?? value.name}
+                </span>
+                {renderHandlingIcons(value ? value.handlingIcons : null)}
               </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
+            </Tooltip>
           ),
         },
         getDynamicAttr: ({ subfield }) => ({
@@ -231,6 +239,7 @@ const AD_HOCK_FIELDS = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          displayName: fieldValue?.product?.displayNames?.default,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -398,17 +407,12 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name || ''}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          showValueTooltip: !!fieldValue?.displayNames?.default,
+          tooltipValue: fieldValue?.name,
         }),
       },
       quantityOnStocklist: {
@@ -533,6 +537,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          displayName: fieldValue?.product?.displayNames?.default,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -700,17 +705,12 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
         label: 'react.stockMovement.productName.label',
         defaultMessage: 'Product name',
         attributes: {
-          formatValue: value => (
-            <span className="d-flex">
-              <span className="text-truncate">
-                {value.name || ''}
-              </span>
-              {renderHandlingIcons(value ? value.handlingIcons : null)}
-            </span>
-          ),
+          formatValue: formatProductDisplayName,
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ subfield, fieldValue }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          showValueTooltip: !!fieldValue?.displayNames?.default,
+          tooltipValue: fieldValue?.name,
         }),
       },
       demandPerReplenishmentPeriod: {
@@ -835,6 +835,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           productId: fieldValue && fieldValue.product && fieldValue.product.id,
           productCode: fieldValue && fieldValue.product && fieldValue.product.productCode,
           productName: fieldValue && fieldValue.product && fieldValue.product.name,
+          displayName: fieldValue?.product?.displayNames?.default,
           originId: values && values.origin && values.origin.id,
           stockMovementId,
           quantityRequested: fieldValue && fieldValue.quantityRequested,
@@ -1283,16 +1284,7 @@ class EditItemsPage extends Component {
     const errors = validateForSave(formValues).editPageItems;
 
     if (errors.length) {
-      let errorMessage = `${this.props.translate('react.stockMovement.errors.errorInLine.label', 'Error occurred in line')}:</br>`;
-      errorMessage += _.reduce(
-        errors,
-        (message, value, key) => (
-          `${message}${value ? `${key + 1} - ${_.map(value, val => this.props.translate(`${val}`))}</br>` : ''}`
-        ),
-        '',
-      );
-
-      Alert.error(errorMessage);
+      showOutboundEditValidationErrors({ translate: this.props.translate, errors });
 
       this.props.hideSpinner();
       return null;

@@ -441,7 +441,7 @@ class ShipmentController {
             barcode4jService.render(generator, shipmentItem?.inventoryItem?.product?.productCode.toString(), baos2, "image/png")
             shipmentItems << [
                     productCode     : shipmentItem?.inventoryItem?.product?.productCode,
-                    productName     : shipmentItem?.inventoryItem?.product?.name,
+                    productName     : shipmentItem?.inventoryItem?.product?.displayName ?: shipmentItem?.inventoryItem?.product?.name,
                     lotNumber       : shipmentItem?.inventoryItem?.lotNumber,
                     lotNumberBytes  : baos1.toByteArray(),
                     productCodeBytes: baos2.toByteArray()]

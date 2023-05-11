@@ -17,12 +17,15 @@ import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Synonym
+import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.util.LocalizationUtil
 import util.ReportUtil
-
 import java.text.SimpleDateFormat
+import org.pih.warehouse.product.ProductGroup
 /**
  * @author jmiranda*
  */
@@ -33,6 +36,7 @@ class ProductService {
     def identifierService
     def userService
     def dataService
+    ProductGroupService productGroupService
 
     def getNdcResults(operation, q) {
         def hipaaspaceApiKey = grailsApplication.config.hipaaspace.api.key
@@ -271,7 +275,7 @@ class ProductService {
      * @return
      */
     List<Product> getProducts(Category category, List<Tag> tags, boolean includeInactive, Map params) {
-        return getProducts([category], [], tags, includeInactive, params)
+        return getProducts([category], [], tags, [], [], includeInactive, params)
     }
 
     /**
@@ -280,26 +284,48 @@ class ProductService {
      * @param category
      * @param catalogs
      * @param tags
+     * @param glAccounts
+     * @param productGroups
+     * @param includeInactive
      * @param params
      * @return
      */
-    List<Product> getProducts(List<Category> categories, List<ProductCatalog> catalogsInput, List<Tag> tagsInput, boolean includeInactive, Map params) {
+    List<Product> getProducts(
+            List<Category> categories,
+            List<ProductCatalog> catalogsInput,
+            List<Tag> tagsInput,
+            List<GlAccount> glAccounts,
+            List<ProductGroup> productFamilies,
+            boolean includeInactive,
+            Map params
+    ) {
         int max = params.max ? params.int("max") : 10
         int offset = params.offset ? params.int("offset") : 0
         String sortColumn = params.sort ?: "name"
         String sortOrder = params.order ?: "asc"
+        Date dateCreatedAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
+        Date dateCreatedBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
 
-        def results = Product.createCriteria().list(max: max, offset: offset) {
+        def query = { isCountQuery ->
 
-            def fields = params.fields ? params.fields.split(",") : null
-            log.info "Fields: " + fields
-            if (fields) {
+            if (isCountQuery) {
                 projections {
-                    fields.each { field ->
-                        property(field)
+                    countDistinct "id"
+                }
+            }
+            else {
+                setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+                def fields = params.fields ? params.fields.split(",") : null
+                log.info "Fields: " + fields
+                if (fields) {
+                    projections {
+                        fields.each { field ->
+                            property(field)
+                        }
                     }
                 }
             }
+
             if (!includeInactive) {
                 eq("active", true)
             }
@@ -312,6 +338,17 @@ class ProductService {
                 }
             }
 
+            if (glAccounts) {
+                glAccount {
+                    'in'("id", glAccounts.collect { it.id })
+                }
+            }
+
+            if (productFamilies) {
+                productFamily {
+                    'in'("id", productFamilies.collect { it.id })
+                }
+            }
 
             if (tagsInput) {
                 tags {
@@ -325,7 +362,15 @@ class ProductService {
                 }
             }
             or {
-                if (params.name) ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                if (params.name) {
+                    ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                    synonyms {
+                        and {
+                            ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
+                            eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                        }
+                    }
+                }
                 if (params.description) ilike("description", params.description + "%")
                 if (params.brandName) ilike("brandName", "%" + params?.brandName?.trim() + "%")
                 if (params.manufacturer) ilike("manufacturer", "%" + params?.manufacturer?.trim() + "%")
@@ -336,6 +381,12 @@ class ProductService {
                 if (params.unitOfMeasure) ilike("unitOfMeasure", "%" + params.unitOfMeasure + "%")
                 if (params.createdById) eq("createdBy.id", params.createdById)
                 if (params.updatedById) eq("updatedBy.id", params.updatedById)
+                if (params.createdAfter || params.createdBefore) {
+                    and {
+                        if (params.createdAfter) ge("dateCreated", dateCreatedAfter)
+                        if (params.createdBefore) le("dateCreated", dateCreatedBefore)
+                    }
+                }
 
                 if (params.unitOfMeasureIsNull) isNull("unitOfMeasure")
                 if (params.productCodeIsNull) isNull("productCode")
@@ -346,6 +397,7 @@ class ProductService {
                 if (params.vendorCodeIsNull) isNull("vendorCode")
             }
 
+            // Sort order
             if (sortColumn) {
                 if (sortColumn == "category") {
                     category {
@@ -362,7 +414,20 @@ class ProductService {
             }
         }
 
-        return results
+        // Get products
+        def products = Product.createCriteria().list(params) {
+            query.delegate = delegate
+            query(false)
+        }
+
+        // Get result count
+        def productCount = Product.createCriteria().get() {
+            query.delegate = delegate
+            query(true)
+        }
+        products.totalCount = productCount
+
+        return products
     }
 
     /**
@@ -602,31 +667,32 @@ class ProductService {
             def productCode = tokens[1]
             def productTypeName = tokens[2]
             def productName = tokens[3]
-            def categoryName = tokens[4]
-            def glAccountCode = tokens[5]
-            def description = tokens[6]
-            def unitOfMeasure = tokens[7]
-            def productTags = tokens[8]?.split(",")
+            def productFamilyName = tokens[4]
+            def categoryName = tokens[5]
+            def glAccountCode = tokens[6]
+            def description = tokens[7]
+            def unitOfMeasure = tokens[8]
+            def productTags = tokens[9]?.split(",")
             def pricePerUnit
             try {
-                pricePerUnit = tokens[9] ? Float.valueOf(tokens[9]) : null
+                pricePerUnit = tokens[10] ? Float.valueOf(tokens[10]) : null
             } catch (NumberFormatException e) {
                 throw new RuntimeException("Unit price for product '${productCode}' at row ${rowCount} must be a valid decimal (value = '${tokens[9]}')", e)
             }
-            def lotAndExpiryControl = Boolean.valueOf(tokens[10])
-            def coldChain = Boolean.valueOf(tokens[11])
-            def controlledSubstance = Boolean.valueOf(tokens[12])
-            def hazardousMaterial = Boolean.valueOf(tokens[13])
-            def reconditioned = Boolean.valueOf(tokens[14])
-            def manufacturer = tokens[15]
-            def brandName = tokens[16]
-            def manufacturerCode = tokens[17]
-            def manufacturerName = tokens[18]
-            def vendor = tokens[19]
-            def vendorCode = tokens[20]
-            def vendorName = tokens[21]
-            def upc = tokens[22]
-            def ndc = tokens[23]
+            def lotAndExpiryControl = Boolean.valueOf(tokens[11])
+            def coldChain = Boolean.valueOf(tokens[12])
+            def controlledSubstance = Boolean.valueOf(tokens[13])
+            def hazardousMaterial = Boolean.valueOf(tokens[14])
+            def reconditioned = Boolean.valueOf(tokens[15])
+            def manufacturer = tokens[16]
+            def brandName = tokens[17]
+            def manufacturerCode = tokens[18]
+            def manufacturerName = tokens[19]
+            def vendor = tokens[20]
+            def vendorCode = tokens[21]
+            def vendorName = tokens[22]
+            def upc = tokens[23]
+            def ndc = tokens[24]
 
             if (!productName) {
                 throw new RuntimeException("Product name cannot be empty at row " + rowCount)
@@ -654,6 +720,8 @@ class ProductService {
                 throw new RuntimeException("GL Account with code ${glAccountCode} does not exist at row " + rowCount)
             }
 
+            ProductGroup productFamily = productFamilyName ? productGroupService.findOrCreateProductGroup(productFamilyName) : null
+
             def category = findOrCreateCategory(categoryName)
             def product = Product.findByIdOrProductCode(productId, productCode)
 
@@ -662,6 +730,7 @@ class ProductService {
                 id                  : product?.id ?: productId,
                 name                : productName,
                 productType         : productType,
+                productFamily       : productFamily,
                 category            : category,
                 glAccount           : glAccount,
                 description         : description,
@@ -785,6 +854,7 @@ class ProductService {
                 ProductCode         : product.productCode ?: '',
                 ProductType         : product.productType?.name ?: '',
                 Name                : product.name,
+                ProductFamily       : product?.productFamily ?: '',
                 Category            : product?.category?.name,
                 GLAccount           : product?.glAccount?.code ?: '',
                 Description         : product?.description ?: '',
@@ -1196,6 +1266,12 @@ class ProductService {
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
+                        synonyms {
+                           and {
+                               ilike("name", "%" + term)
+                               eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                           }
+                        }
                         ilike("description", "%" + term)
                         ilike("upc", term)
                         ilike("ndc", term)
@@ -1228,6 +1304,8 @@ class ProductService {
     }
 
     def searchProductDtos(String[] terms) {
+        String locale = LocalizationUtil.localizationService.getCurrentLocale().toLanguageTag()
+
         def query = """
             select distinct
             product.id, 
@@ -1252,13 +1330,22 @@ class ProductService {
                 left outer join product_catalog pc on pci.product_catalog_id = pc.id 
                 where pci.product_id = product.id 
                 group by pci.product_id
-            ) as productColor
+            ) as productColor,
+            (
+                select s.name from synonym s
+                where s.product_id = product.id
+                and s.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}'
+                and s.locale = '${locale}'
+                limit 1
+            ) as displayName
             from product """
 
         if (terms && terms.size() > 0) {
             query += """
             left outer join product_supplier 
                 on product.id = product_supplier.product_id
+            left outer join synonym 
+                on product.id = synonym.product_id
             left outer join party manufacturer 
                 on product_supplier.manufacturer_id = manufacturer.id 
                 and (${terms.collect { "lower(manufacturer.name) like '${it}%'" }.join(" or ")}) # adding the conditions to join will allow MySQL to optimize the query
@@ -1271,6 +1358,7 @@ class ProductService {
             where product.active = 1 and (${terms.collect {"""
                 lower(product.name) like '%${it}%' 
                 or lower(product.product_code) like '${it}%' 
+                or (synonym.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' and synonym.name like '%${it}%')
                 or lower(product.description) like '%${it}%'
                 or lower(product.upc) like '${it}%' 
                 or lower(product.ndc) like '${it}%'
@@ -1370,5 +1458,36 @@ class ProductService {
 
             importProducts(products)
         }
+    }
+
+    Product addSynonymToProduct(String productId, String synonymTypeCodeName, String synonymValue, String localeName) {
+        Product product = Product.get(productId)
+        Locale locale = localeName ? new Locale(localeName) : null
+        SynonymTypeCode synonymTypeCode = synonymTypeCodeName ? SynonymTypeCode.valueOf(synonymTypeCodeName) : SynonymTypeCode.ALTERNATE_NAME
+        Synonym synonym = new Synonym(name: synonymValue, locale: locale, synonymTypeCode: synonymTypeCode)
+        product.addToSynonyms(synonym)
+        if (!synonym.validate() || !product.save(flush: true, failOnError: true)) {
+            throw new ValidationException("Invalid synonym", synonym.errors)
+        }
+        return product
+    }
+
+    Synonym editProductSynonym(String synonymId, String synonymTypeCodeName, String synonymValue, String localeName) {
+        Synonym synonym = Synonym.get(synonymId)
+        Locale locale = localeName ? new Locale(localeName) : null
+        SynonymTypeCode synonymTypeCode = null
+        try {
+            if (synonymTypeCodeName) {
+                synonymTypeCode = SynonymTypeCode.valueOf(synonymTypeCodeName)
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("classification of type '${synonymTypeCodeName}' does not exist")
+        }
+
+        synonym.properties = [ locale: locale, synonymTypeCode: synonymTypeCode, name: synonymValue ]
+        if (!synonym.validate() || !synonym.save(flush: true)) {
+            throw new ValidationException("Invalid synonym", synonym.errors)
+        }
+        return synonym
     }
 }

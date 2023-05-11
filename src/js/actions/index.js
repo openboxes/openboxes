@@ -3,8 +3,11 @@ import _ from 'lodash';
 import { addTranslationForLanguage } from 'react-localize-redux';
 
 import {
+  ADD_INFO_BAR,
+  ADD_STOCK_MOVEMENT_DRAFT,
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
+  CLOSE_INFO_BAR,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -12,28 +15,43 @@ import {
   FETCH_GRAPHS,
   FETCH_INVOICE_STATUSES,
   FETCH_INVOICE_TYPE_CODES,
+  FETCH_LOCATION_TYPES,
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
+  FETCH_PAYMENT_TERMS,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
   FETCH_SESSION_INFO,
   FETCH_SHIPMENT_STATUS_CODES,
+  FETCH_SHIPMENT_TYPES,
   FETCH_STOCK_TRANSFER_STATUSES,
   FETCH_SUPPLIERS,
   FETCH_USERS,
   FILTER_FORM_PARAMS_BUILT,
+  HIDE_INFO_BAR,
+  HIDE_INFO_BAR_MODAL,
   HIDE_SPINNER,
   REBUILD_FILTER_FORM_PARAMS,
   REMOVE_FROM_INDICATORS,
+  REMOVE_STOCK_MOVEMENT_DRAFT,
   REORDER_INDICATORS,
   RESET_INDICATORS,
   SET_ACTIVE_CONFIG,
+  SET_OFFLINE,
+  SET_ONLINE,
+  SHOW_INFO_BAR,
+  SHOW_INFO_BAR_MODAL,
   SHOW_SPINNER,
   TOGGLE_USER_ACTION_MENU,
   TRANSLATIONS_FETCHED,
 } from 'actions/types';
+import genericApi from 'api/services/GenericApi';
+import locationApi from 'api/services/LocationApi';
+import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import apiClient, { parseResponse } from 'utils/apiClient';
+import { mapShipmentTypes } from 'utils/option-utils';
+
 
 export function showSpinner() {
   return {
@@ -47,6 +65,13 @@ export function hideSpinner() {
     type: HIDE_SPINNER,
     payload: false,
   };
+}
+
+export function setOnline() {
+  return { type: SET_ONLINE };
+}
+export function setOffline() {
+  return { type: SET_OFFLINE };
 }
 
 export function showUserActions() {
@@ -409,6 +434,14 @@ export function fetchPurchaseOrderStatuses() {
   };
 }
 
+export const fetchPaymentTerms = () => async (dispatch) => {
+  const response = await purchaseOrderApi.getPaymentTerms();
+  return dispatch({
+    type: FETCH_PAYMENT_TERMS,
+    payload: response?.data?.data,
+  });
+};
+
 export function fetchSuppliers(active = false) {
   return (dispatch) => {
     apiClient.get(`/openboxes/api/organizations?roleType=ROLE_SUPPLIER&active=${active}`)
@@ -533,3 +566,91 @@ export const setShouldRebuildFilterParams = (flag = true) => (dispatch) => {
     type: FILTER_FORM_PARAMS_BUILT,
   });
 };
+
+export const addStockMovementDraft = ({
+  workflow,
+  lineItems,
+  id,
+  statusCode,
+}) => dispatch => dispatch({
+  type: ADD_STOCK_MOVEMENT_DRAFT,
+  payload: {
+    workflow,
+    lineItems,
+    statusCode,
+    id,
+  },
+});
+
+export const removeStockMovementDraft = id => dispatch => dispatch({
+  type: REMOVE_STOCK_MOVEMENT_DRAFT,
+  payload: {
+    id,
+  },
+});
+
+export const fetchShipmentTypes = () => async (dispatch) => {
+  const response = await genericApi.getShipmentTypes();
+  const shipmentTypes = mapShipmentTypes(response?.data?.data);
+  return dispatch({
+    type: FETCH_SHIPMENT_TYPES,
+    payload: shipmentTypes,
+  });
+};
+
+export const fetchLocationTypes = config => async (dispatch) => {
+  const response = await locationApi.getLocationTypes(config);
+  const data = response?.data?.data;
+  return dispatch({
+    type: FETCH_LOCATION_TYPES,
+    payload: data,
+  });
+};
+
+export const createInfoBar = ({
+  name, versionLabel, title,
+}) => ({
+  type: ADD_INFO_BAR,
+  payload: {
+    name,
+    versionLabel,
+    title,
+    show: true,
+  },
+});
+
+export const hideInfoBar = name => ({
+  type: HIDE_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const closeInfoBar = name => ({
+  type: CLOSE_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const showInfoBar = name => ({
+  type: SHOW_INFO_BAR,
+  payload: {
+    name,
+  },
+});
+
+export const showInfoBarModal = name => ({
+  type: SHOW_INFO_BAR_MODAL,
+  payload: {
+    name,
+  },
+});
+
+export const hideInfoBarModal = name => ({
+  type: HIDE_INFO_BAR_MODAL,
+  payload: {
+    name,
+  },
+});
+
