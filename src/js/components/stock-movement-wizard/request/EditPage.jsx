@@ -22,7 +22,7 @@ import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import { formatProductDisplayName } from 'utils/form-values-utils';
+import { formatProductDisplayName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -1284,16 +1284,7 @@ class EditItemsPage extends Component {
     const errors = validateForSave(formValues).editPageItems;
 
     if (errors.length) {
-      let errorMessage = `${this.props.translate('react.stockMovement.errors.errorInLine.label', 'Error occurred in line')}:</br>`;
-      errorMessage += _.reduce(
-        errors,
-        (message, value, key) => (
-          `${message}${value ? `${key + 1} - ${_.map(value, val => this.props.translate(`${val}`))}</br>` : ''}`
-        ),
-        '',
-      );
-
-      Alert.error(errorMessage);
+      showOutboundEditValidationErrors({ translate: this.props.translate, errors });
 
       this.props.hideSpinner();
       return null;

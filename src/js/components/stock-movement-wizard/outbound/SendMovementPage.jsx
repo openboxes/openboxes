@@ -848,7 +848,6 @@ class SendMovementPage extends Component {
                             {...document}
                             key={idx}
                             onClick={() => this.saveValues(values)}
-                            disabled={showOnly}
                           />);
                         },
                       )}
@@ -875,7 +874,6 @@ class SendMovementPage extends Component {
                   :
                     <button
                       type="button"
-                      disabled={invalid}
                       onClick={() => {
                         window.location = '/openboxes/stockMovement/list?direction=OUTBOUND';
                       }}

@@ -410,7 +410,7 @@ class InventorySnapshotService {
     }
 
     void updateInventorySnapshots(Product product) {
-        if (!product?.id) {
+        if (!product?.id || !product?.productCode) {
             return
         }
         def results = InventorySnapshot.executeUpdate(

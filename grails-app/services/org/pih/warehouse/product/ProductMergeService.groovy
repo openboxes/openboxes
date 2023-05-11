@@ -377,15 +377,13 @@ class ProductMergeService {
     }
 
     /**
-     * Finds inventory item from primary product, that has the same lot and expiry date as obsoleteInventoryItem
+     * Finds inventory item from primary product, that has the same lot as obsoleteInventoryItem
      * (null lotNumber and empty string lotNumber are treated equally)
      * */
     def getPrimaryInventoryItem(Set<InventoryItem> primaryInventoryItems, InventoryItem obsoleteInventoryItem) {
         def obsoleteLotNumber = obsoleteInventoryItem?.lotNumber?.trim()
-        def obsoleteExpirationDate = obsoleteInventoryItem?.expirationDate
         return primaryInventoryItems?.find {
-            def exactLotNumber = obsoleteLotNumber ? (it.lotNumber == obsoleteLotNumber) : (it.lotNumber == null || it.lotNumber?.trim() == "")
-            return exactLotNumber && it.expirationDate == obsoleteExpirationDate
+            obsoleteLotNumber ? (it.lotNumber == obsoleteLotNumber) : (it.lotNumber == null || it.lotNumber?.trim() == "")
         } ?: null
     }
 

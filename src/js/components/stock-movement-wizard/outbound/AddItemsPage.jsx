@@ -148,7 +148,9 @@ const NO_STOCKLIST_FIELDS = {
         getDynamicAttr: ({
           fieldValue, updateRow, values, rowIndex, saveProgress,
         }) => ({
-          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
+          disabled: fieldValue?.rowSaveStatus === RowSaveStatus.SAVING ||
+               (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') ||
+                _.isNil(fieldValue && fieldValue.product),
           onBlur: () => {
             updateRow(values, rowIndex);
             saveProgress({ values });
@@ -173,7 +175,9 @@ const NO_STOCKLIST_FIELDS = {
           updateTotalCount, updateRow, values, saveProgress,
         }) => ({
           options: recipients,
-          disabled: (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') || _.isNil(fieldValue && fieldValue.product),
+          disabled: fieldValue?.rowSaveStatus === RowSaveStatus.SAVING ||
+               (fieldValue && fieldValue.statusCode === 'SUBSTITUTED') ||
+                _.isNil(fieldValue && fieldValue.product),
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
@@ -291,6 +295,7 @@ const STOCKLIST_FIELDS = {
           addRow, rowCount, rowIndex, getSortOrder, updateTotalCount,
           updateRow, values, saveProgress,
         }) => ({
+          disabled: values.lineItems[rowIndex]?.rowSaveStatus === RowSaveStatus.SAVING,
           onTabPress: rowCount === rowIndex + 1 ? () => {
             updateTotalCount(1);
             addRow({ sortOrder: getSortOrder(), rowSaveStatus: RowSaveStatus.PENDING });
@@ -437,7 +442,7 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested <= 0
-      if (parseInt(item.quantityRequested, 10) <= 0) {
+      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) <= 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -878,6 +883,7 @@ class AddItemsPage extends Component {
           statusCode: this.state.values.statusCode,
         });
       }
+
       return apiClient.post(updateItemsUrl, payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
