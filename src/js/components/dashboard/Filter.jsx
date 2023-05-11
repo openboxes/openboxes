@@ -242,7 +242,7 @@ class Filter extends Component {
                    Object.entries(this.props.configs).map(([key, value]) => (
                      // We select the filters availables for this page
                      key === this.props.activeConfig ?
-                       Object.entries(value.filters).map(([nameCategory, categoryData]) => (
+                       value.filters && Object.entries(value.filters).map(([nameCategory, categoryData]) => (
                          <li
                            key={categoryData.endpoint}
                          >
