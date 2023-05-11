@@ -512,8 +512,6 @@ dependencies {
     // enable grails console web ui
     console 'org.grails:grails-console'
 
-    implementation 'org.grails.plugins:grails-console:2.1.1'
-
     /*
      * Enable unit tests of domain activity; see
      * https://testing.grails.org/1.1.5/guide/index.html
