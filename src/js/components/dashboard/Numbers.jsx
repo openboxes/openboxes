@@ -2,31 +2,30 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import { stringUrlInterceptor } from '../../utils/apiClient';
+import { stringUrlInterceptor } from 'utils/apiClient';
 
-
-const Numbers = props => (
-  <div className="gyr-indicator">
-    <a className="number-indicator" href={stringUrlInterceptor(props.data.first.link)}>
-      <div className="value">
-        <div className="circle" style={{ backgroundColor: props.options.colors.first }} /> {props.data.first.value}
-      </div>
-      <div className="subtitle">{props.data.first.subtitle}</div>
-    </a>
-    <a className="number-indicator" href={stringUrlInterceptor(props.data.second.link)}>
-      <div className="value">
-        <div className="circle" style={{ backgroundColor: props.options.colors.second }} /> {props.data.second.value}
-      </div>
-      <div className="subtitle">{props.data.second.subtitle}</div>
-    </a>
-    <a className="number-indicator" href={stringUrlInterceptor(props.data.third.link)}>
-      <div className="value">
-        <div className="circle" style={{ backgroundColor: props.options.colors.third }} /> {props.data.third.value}
-      </div>
-      <div className="subtitle">{props.data.third.subtitle}</div>
-    </a>
-  </div>
-);
+const Numbers = (props) => {
+  const [data, options] = Object.values(props);
+  return (
+    <div className="gyr-indicator">
+      {
+      Object.keys(data).map((number) => {
+        const { link, value, subtitle } = data[number];
+        const redirect = link ? { href: stringUrlInterceptor(link) } : {};
+        return (
+          <a key={number} className="number-indicator" {...redirect}>
+            <div className="value">
+              <div className="circle" style={{ backgroundColor: options.colors[number] }} />
+              {value}
+            </div>
+            <div className="subtitle">{subtitle}</div>
+          </a>
+        );
+      })
+    }
+    </div>
+  );
+};
 
 Numbers.propTypes = {
   data: PropTypes.shape({
