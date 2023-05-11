@@ -119,12 +119,8 @@ class StockTransferApiController {
         render([data: stockTransfer?.toJson()] as JSON)
     }
 
-    Boolean isNull(Object objectValue) {
-        return objectValue == JSONObject.NULL || objectValue == null || objectValue?.equals("")
-    }
-
     StockTransfer bindStockTransferData(StockTransfer stockTransfer, User currentUser, Location currentLocation, JSONObject jsonObject) {
-        bindData(stockTransfer, jsonObject)
+        bindData(stockTransfer, jsonObject, [exclude: ['stockTransferItems']])
 
         if (!stockTransfer.origin) {
             stockTransfer.origin = currentLocation
@@ -187,8 +183,8 @@ class StockTransferApiController {
             }
 
             // For inbound returns
-            Date expirationDate = stockTransferItemMap.expirationDate && stockTransferItemMap.expirationDate != JSONObject.NULL ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
-            String lotNumber = stockTransferItemMap.lotNumber && stockTransferItemMap.lotNumber != JSONObject.NULL ? stockTransferItemMap.lotNumber : null
+            Date expirationDate = stockTransferItemMap.expirationDate ? Constants.EXPIRATION_DATE_FORMATTER.parse(stockTransferItemMap.expirationDate) : null
+            String lotNumber = stockTransferItemMap.lotNumber ? stockTransferItemMap.lotNumber : null
             stockTransferItem.inventoryItem = inventoryService.findAndUpdateOrCreateInventoryItem(
                     stockTransferItem.product,
                     lotNumber,
