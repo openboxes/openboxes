@@ -31,6 +31,7 @@ site/
 build/
 node_modules
 npm-debug.log
+/src/main/webapp/webpack
 /web-app/js/*bundle*
 /web-app/css/*bundle*
 /web-app/fonts/*
