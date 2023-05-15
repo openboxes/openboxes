@@ -357,8 +357,6 @@ processResources {
 repositories {
     mavenCentral()
     maven { url 'https://repo.grails.org/grails/core' }
-    // deprecated: only needed for one dependency (google-analytics)
-    maven { url 'https://repo.grails.org/grails/plugins' }
 }
 
 /*
@@ -611,9 +609,6 @@ dependencies {
     // enable `import geb.*`
     testCompile 'org.grails.plugins:geb'
 
-    // enable <ga:*> tags, which we use only once
-    implementation 'org.grails.plugins:google-analytics:2.3.3'
-
     // enable prettytime.display(), which we use only three times
     implementation 'org.grails.plugins:grails-pretty-time:4.0.0'
 
@@ -734,6 +729,8 @@ dependencies {
 
     implementation "org.xhtmlrenderer:flying-saucer-core:${flyingSaucerVersion}"
     implementation "org.xhtmlrenderer:flying-saucer-pdf-openpdf:${flyingSaucerVersion}"
+
+    implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
     // security patch
     compile 'org.yaml:snakeyaml:1.33'
