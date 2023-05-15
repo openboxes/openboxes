@@ -52,11 +52,11 @@
 
 		<div class="buttonBar">
 			<g:link class="button" action="list">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'application_view_list.png')}"/>&nbsp;
+				<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}"/>&nbsp;
 				<warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroups.label')]"/>
 			</g:link>
 			<g:link class="button" action="create">
-				<img src="${createLinkTo(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
+				<img src="${resource(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
 				<warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label')]"/>
 			</g:link>
 		</div>

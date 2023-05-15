@@ -43,7 +43,7 @@ class ShipmentType implements java.io.Serializable {
     String toString() { name }
 
     String getDisplayName() {
-        def g = Holders.grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         String defaultName = LocalizationUtil.getDefaultString(name)
         return g.message(code: "enum.ShipmentTypeCode.${defaultName.toUpperCase()}.label", default: name)
     }

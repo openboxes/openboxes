@@ -64,7 +64,7 @@
         </button>
     </div>
 </g:form>
-<script src="${createLinkTo(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
 <script type="text/javascript">
   function isValid() {
     const localeFieldValue = $("#locale-dlg").val()
