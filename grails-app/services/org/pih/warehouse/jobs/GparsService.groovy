@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
  */
 class GparsService {
 
-    private static final Logger log = LoggerFactory.getLogger(GparsService)
+    private static final Logger logger = LoggerFactory.getLogger(GparsService)
 
     /**
      * Factory that creates named threads for use by GPars.
@@ -73,7 +73,7 @@ class GparsService {
 
         @Override
         void uncaughtException(Thread failedThread, Throwable throwable) {
-            log.error("GPars thread ${failedThread.name} threw ${throwable.message}", throwable)
+            logger.error("GPars thread ${failedThread.name} threw ${throwable.message}", throwable)
         }
     }
 
@@ -84,7 +84,7 @@ class GparsService {
      * core count, which is high for a host that also runs a database.
      */
     private static ForkJoinPool createPool(String poolName, int poolSize) {
-        log.info("creating new pool '${poolName}' of size ${poolSize}")
+        logger.info("creating new pool '${poolName}' of size ${poolSize}")
         return new ForkJoinPool(
             poolSize,
             createForkJoinWorkerThreadFactoryForPool(poolName),
@@ -103,10 +103,10 @@ class GparsService {
         try {
             return GParsPool.withExistingPool(pool, cl)
         } finally {
-            log.info("draining pool '${poolName}' of size ${poolSize}")
+            logger.info("draining pool '${poolName}' of size ${poolSize}")
             pool.shutdown()
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS)
-            log.debug("finished draining pool '${poolName}'")
+            logger.debug("finished draining pool '${poolName}'")
         }
     }
 
