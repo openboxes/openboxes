@@ -1,6 +1,7 @@
 package org.pih.warehouse
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
+
 
 class GoogleAnalyticsTagLib {
 
@@ -34,7 +35,7 @@ class GoogleAnalyticsTagLib {
      * (https://developers.google.com/analytics/devguides/collection/gtagjs#configure_additional_google_analytics_properties)
      * */
     private getTrackingIds() {
-        return ConfigurationHolder.config.google.analytics.webPropertyID
+        return Holders.config.google.analytics.webPropertyID
     }
 
     /**

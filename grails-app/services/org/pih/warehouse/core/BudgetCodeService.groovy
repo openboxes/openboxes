@@ -9,7 +9,7 @@
 **/
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import grails.web.servlet.mvc.GrailsParameterMap
 
 class BudgetCodeService {
     
