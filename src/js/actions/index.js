@@ -52,7 +52,6 @@ import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
-
 export function showSpinner() {
   return {
     type: SHOW_SPINNER,
@@ -653,4 +652,3 @@ export const hideInfoBarModal = name => ({
     name,
   },
 });
-

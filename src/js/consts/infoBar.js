@@ -20,4 +20,3 @@ export const InfoBarVersionBoxVariant = {
   FILLED: 'filled',
   OUTLINED: 'outlined',
 };
-
