@@ -65,7 +65,23 @@ class Location implements Comparable<Location>, java.io.Serializable {
     static mappedBy = [locations: "parentLocation"]
 
     static constraints = {
-        name(nullable: false, blank: false, maxSize: 255, validator: uniqueNameValidator)
+        name(nullable: false, blank: false, maxSize: 255, validator: { String name, Location obj ->
+            Location.withNewSession {
+                List<Location> otherLocations
+                if (obj.parentLocation) {
+                    otherLocations = Location.findAllByNameAndParentLocation(name, obj.parentLocation)
+                } else {
+                    otherLocations = Location.findAllByNameAndParentLocationIsNull(name)
+                }
+
+                // Exclude edited location from otherLocations (since it is validated withNewSession)
+                if (obj.id) {
+                    otherLocations = otherLocations?.findAll { it.id != obj.id}
+                }
+
+                return otherLocations?.size() > 0 ? ['validator.unique'] : true
+            }
+        })
         description(nullable: true)
         address(nullable: true)
         organization(nullable: true, validator: { organization, Location obj ->
@@ -99,24 +115,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
             }
             return true
         })
-    }
-
-    static uniqueNameValidator = { String name, Location obj ->
-        Location.withNewSession {
-            List<Location> otherLocations
-            if (obj.parentLocation) {
-                otherLocations = Location.findAllByNameAndParentLocation(name, obj.parentLocation)
-            } else {
-                otherLocations = Location.findAllByNameAndParentLocationIsNull(name)
-            }
-
-            // Exclude edited location from otherLocations (since it is validated withNewSession)
-            if (obj.id) {
-                otherLocations = otherLocations?.findAll { it.id != obj.id}
-            }
-
-            return otherLocations?.size() > 0 ? ['validator.unique'] : true
-        }
     }
 
     static mapping = {

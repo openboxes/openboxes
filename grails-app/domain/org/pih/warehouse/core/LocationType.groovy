@@ -43,15 +43,13 @@ class LocationType implements Comparable, Serializable {
         sortOrder(nullable: true)
         dateCreated(display: false)
         lastUpdated(display: false)
-        supportedActivities(validator: supportedActivitiesValidator)
-    }
-
-    static supportedActivitiesValidator = { Set<String> activities, LocationType locationType ->
-        // Don't allow having NONE supported activity in combination with any other supported activity
-        if (activities?.contains(ActivityCode.NONE.id) && activities?.size() > 1) {
-            return ['invalid.supportedActivities']
-        }
-        return true
+        supportedActivities(validator: { Set<String> activities, LocationType locationType ->
+            // Don't allow having NONE supported activity in combination with any other supported activity
+            if (activities?.contains(ActivityCode.NONE.id) && activities?.size() > 1) {
+                return ['invalid.supportedActivities']
+            }
+            return true
+        })
     }
 
     /**
