@@ -619,115 +619,6 @@ class InventoryController {
          categorySelected: category, expirationStatus: expirationStatus]
     }
 
-    def getCsvForInventoryMap(map, statusMap) {
-        def csv = ""
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryItem.lotNumber.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryItem.expirationDate.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.forecastQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.totalValue.label')}" + '"'
-        csv += "\n"
-
-        def hasRoleFinance = userService.hasRoleFinance(session.user)
-
-        map.each { inventoryItem, quantity ->
-
-            def product = inventoryItem?.product
-            def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
-            def statusMessage = inventoryLevel?.statusMessage(quantity ?: 0)
-
-            if (!statusMessage) {
-                def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
-                statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
-            }
-
-            csv += '"' + (statusMessage ?: "") + '"' + ","
-            csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode ?: "") + ","
-            csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
-            csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
-            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
-            csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
-            csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
-            csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
-            csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
-            csv += (inventoryLevel?.minQuantity ?: "") + ","
-            csv += (inventoryLevel?.reorderQuantity ?: "") + ","
-            csv += (inventoryLevel?.maxQuantity ?: "") + ","
-            csv += (inventoryLevel?.forecastQuantity ?: "") + ","
-            csv += '' + (quantity ?: "0") + '' + ","
-            csv += (hasRoleFinance ? (product?.pricePerUnit ?: "") : "") + ","
-            csv += (hasRoleFinance ? (totalValue ?: "") : "")
-            csv += "\n"
-        }
-        return CSVUtils.prependBomToCsvString(csv)
-    }
-
-    def getCsvForProductMap(inventoryItems) {
-        def hasRoleFinance = userService.hasRoleFinance(session.user)
-
-        def csv = ""
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.maxQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.forecastQuantity.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.currentQuantity.label', default: 'Current quantity')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'default.quantityAvailableToPromise.label', default: 'Quantity ATP')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.pricePerUnit.label')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'product.totalValue.label')}" + '"'
-        csv += "\n"
-
-        inventoryItems.each { inventoryItem ->
-            Product product = inventoryItem.product
-            def quantity = inventoryItem.quantity
-            InventoryLevel inventoryLevel = inventoryItem.inventoryLevel
-            def status = inventoryItem.status
-            def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
-            def statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
-
-            csv += '"' + (statusMessage ?: "") + '"' + ","
-            csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product.displayNameWithLocaleCode) + ","
-            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ","
-            csv += '"' + (product?.category?.getHierarchyAsString(" > ") ?: "") + '"' + ","
-            csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
-            csv += '"' + (inventoryLevel?.abcClass ?: "") + '"' + ","
-            csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
-            csv += (inventoryLevel?.minQuantity ?: "") + ","
-            csv += (inventoryLevel?.reorderQuantity ?: "") + ","
-            csv += (inventoryLevel?.maxQuantity ?: "") + ","
-            csv += (inventoryLevel?.forecastQuantity ?: "") + ","
-            csv += (quantity ?: "0") + ","
-            csv += (inventoryItem.quantityAvailableToPromise ?: "0") + ","
-            csv += (hasRoleFinance ? (product?.pricePerUnit ?: "") : "") + ","
-            csv += (hasRoleFinance ? (totalValue ?: "") : "")
-            csv += "\n"
-        }
-        return CSVUtils.prependBomToCsvString(csv)
-    }
-
-
     def exportLatestInventoryDate() {
         println params
         def location = Location.get(session.warehouse.id)
@@ -1458,6 +1349,7 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.lotNumber.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryItem.expirationDate.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
@@ -1479,15 +1371,18 @@ class InventoryController {
             def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
             def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
             def statusMessage = inventoryLevel?.statusMessage(quantity ?: 0)
+
             if (!statusMessage) {
                 def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
                 statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
             }
+
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name ?: "") + ","
+            csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode ?: "") + ","
             csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
             csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
+            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
@@ -1501,7 +1396,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return csv
+        return CSVUtils.prependBomToCsvString(csv)
     }
 
     private def getCsvForProductMap(inventoryItems) {
@@ -1511,9 +1406,9 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.label')}" + '"' + ","
+        csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.abcClass.label', default: 'ABC Class')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
@@ -1536,10 +1431,10 @@ class InventoryController {
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
-            csv += StringEscapeUtils.escapeCsv(product?.name) + ","
-            csv += '"' + (product?.category?.name ?: "") + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(product.displayNameWithLocaleCode) + ","
+            csv += '"' + (product?.productFamily?.name ?: "") + '"' + ","
+            csv += '"' + (product?.category?.getHierarchyAsString(" > ") ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
-            csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
             csv += (inventoryLevel?.minQuantity ?: "") + ","
@@ -1552,7 +1447,7 @@ class InventoryController {
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
         }
-        return csv
+        return CSVUtils.prependBomToCsvString(csv)
     }
 
 }
