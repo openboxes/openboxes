@@ -509,7 +509,7 @@
                * TODO here, we may need to elsewhere -- should we escape all
                * TODO localized strings? Further discussion at OBGM-343.
                */
-              if ($("#validationCode").val() == 'WARN' && !confirm(_.escape(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label').replaceAll( /(')/, '\\\\$1' )}")))) {
+              if ($("#validationCode").val() == 'WARN' && !confirm(_.escape(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label')}")))) {
                 return false
               } else {
                 $.ajax({
