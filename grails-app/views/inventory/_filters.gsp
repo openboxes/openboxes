@@ -48,7 +48,7 @@
 				</button>
 				&nbsp;
 				<g:link controller="inventory" action="browse" params="[resetSearch:true]" class="button">
-					<img src="${createLinkTo(dir:'images/icons/silk',file:'reload.png')}" />
+					<img src="${resource(dir:'images/icons/silk',file:'reload.png')}" />
 					<warehouse:message code="default.button.reset.label" default="Reset"/>
 				</g:link>
 			</div>

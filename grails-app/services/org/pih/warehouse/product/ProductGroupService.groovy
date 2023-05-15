@@ -14,7 +14,7 @@ class ProductGroupService {
     def grailsApplication
 
     def addProductToProductGroup(String productGroupId, String productId, boolean isProductFamily) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         ProductGroup productGroup = ProductGroup.get(productGroupId)
         Product product = Product.get(productId)
         if (productGroup && product) {

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="custom" />
 <title><warehouse:message code="order.addOrderItems.label"/></title>
-<script src="${createLinkTo(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
+<script src="${resource(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
 <style>
     .dlg { display: none; }
     .non-editable { background-color: #e6e6e6; cursor: not-allowed }
