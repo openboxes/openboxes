@@ -65,7 +65,13 @@
                         <g:set var="sortByCode" value='${requisition?.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX}'/>
                         <g:set var="requisitionItems" value='${requisition?."$sortByCode.methodName"}'/>
                         <g:each var="requisitionItem" in="${requisitionItems}" status="i">
-                            <tr class="prop ${i%2?'even':'odd'}" id="requisitionItem_${requisitionItem?.id }" requisitionItem="${requisitionItem?.id}">
+                            <tr
+                                class="prop ${i%2?'even':'odd'} ${!requisitionItem?.product?.active ? 'grayed' : ''}"
+                                id="requisitionItem_${requisitionItem?.id }"
+                                title="${!requisitionItem?.product?.active ?
+                                        g.message(code: 'requisitionTemplate.product.inactive.tooltip.label', default: 'This product has been discontinued. Please remove it from the stock list') :
+                                        null}"
+                            >
                                 <td style="color: ${requisitionItem?.product?.color}">
                                     ${requisitionItem?.product?.productCode}
                                 </td>

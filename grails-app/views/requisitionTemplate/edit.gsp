@@ -258,6 +258,13 @@
             "aoColumns": columns,
             "bUseRendered": false,
             "fnRowCallback": function( nRow, aData) {
+                // If product is inactive, the row should be gray and have a tooltip with an information
+                if (!aData.product?.active) {
+                  $(nRow)
+                    .addClass('grayed')
+                    .attr('title', `${g.message(code: 'requisitionTemplate.product.inactive.tooltip.label', default: 'This product has been discontinued. Please remove it from the stock list')}`)
+                }
+
                 var selectPackage = $('<select/>', {
                     id: 'productPackage-' + aData["id"]
                 });

@@ -19,6 +19,8 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import isRequestFromWard from 'utils/supportedActivitiesUtils';
@@ -622,6 +624,23 @@ function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
   return valuesWithUpdatedQtyRequested;
 }
 
+const inactiveProductValidation = ({
+  lineItems, callback, valuesForCallback, translate,
+}) => {
+  const printError = (lineItem, idx) => `${idx + 1}: ${translate('react.stockMovement.product.label', 'Product')} ${lineItem?.productCode} 
+      ${translate('react.stockMovement.product.inactive.validation.label', 'has been discontinued. Please remove it from the requisition')}`;
+  const inactiveProducts = lineItems
+    .filter(lineItem => !lineItem.product?.active)
+    .map(printError);
+  if (inactiveProducts.length) {
+    return notification(NotificationType.ERROR_FILLED)({
+      message: translate('react.default.error.validationError.label', 'Validation error'),
+      detailsArray: inactiveProducts,
+    });
+  }
+  return callback(valuesForCallback);
+};
+
 
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -658,6 +677,8 @@ class AddItemsPage extends Component {
     this.calculateQuantityRequested =
       calculateQuantityRequested.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
+    this.save = this.save.bind(this);
+    this.saveAndExit = this.saveAndExit.bind(this);
   }
 
   componentDidMount() {
@@ -866,7 +887,6 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
-
     _.forEach(values.lineItems, (item, key) => {
       const rowErrors = {};
       if (!_.isNil(item.product)) {
@@ -1634,7 +1654,12 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => this.save(values)}
+                onClick={() => inactiveProductValidation({
+                    lineItems: values.lineItems,
+                    valuesForCallback: values,
+                    callback: this.save,
+                    translate: this.props.translate,
+                  })}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span>
@@ -1645,7 +1670,12 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => this.saveAndExit(values)}
+                onClick={() => inactiveProductValidation({
+                    lineItems: values.lineItems,
+                    valuesForCallback: values,
+                    callback: this.saveAndExit,
+                    translate: this.props.translate,
+                  })}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span>
@@ -1709,7 +1739,12 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => this.submitRequest(values.lineItems)}
+                  onClick={() => inactiveProductValidation({
+                      lineItems: values.lineItems,
+                      callback: this.submitRequest,
+                      valuesForCallback: values.lineItems,
+                      translate: this.props.translate,
+                    })}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
                     invalid || !_.some(values.lineItems, item =>
