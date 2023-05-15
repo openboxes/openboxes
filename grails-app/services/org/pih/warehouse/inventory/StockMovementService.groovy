@@ -2120,7 +2120,7 @@ class StockMovementService {
             picklistItem.disableRefresh = Boolean.TRUE
             picklistItem.picklist?.removeFromPicklistItems(picklistItem)
             picklistItem.requisitionItem?.removeFromPicklistItems(picklistItem)
-            binLocations.add(picklistItems?.binLocation?.id)
+            binLocations.add(picklistItem?.binLocation?.id)
             picklistItem.delete()
         }
 
