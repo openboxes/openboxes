@@ -29,6 +29,24 @@ openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
 openboxes.purchasing.updateUnitPrice.enabled = false
 openboxes.purchasing.updateUnitPrice.method = UpdateUnitPriceMethodCode.USER_DEFINED_PRICE
 
+// connection timeout milliseconds (OBPIH-5320)
+openboxes.browser.connection.status.timeout = 8000
+
+// Date configuration (OBPIH-5397)
+openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
+openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
+
+// Notifications configuration (OBPIH-5355)
+
+// delay is in ms
+openboxes.client.notification.autohide.delay = 8000
+
+// Autosave configuration (OBPIH-5493)
+openboxes.client.autosave.enabled = false
+
+// Merge Products (OBPIH-5453)
+openboxes.products.merge.enabled = false
+
 openboxes.security.rbac.rules = [
     [controller: '*', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
     [controller: '*', actions: ['remove'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER ]],
@@ -53,6 +71,7 @@ openboxes.security.rbac.rules = [
     [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_APPROVER]]],
     [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
     [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
+    [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
     // Other controller actions that might need explicit rules
     //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]
