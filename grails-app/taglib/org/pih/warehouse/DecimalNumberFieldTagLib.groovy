@@ -1,7 +1,6 @@
 package org.pih.warehouse
 
-import org.codehaus.groovy.grails.plugins.web.taglib.FormatTagLib
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 import java.text.DecimalFormat
 

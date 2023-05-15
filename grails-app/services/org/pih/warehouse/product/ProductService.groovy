@@ -24,7 +24,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import util.ReportUtil
 import java.text.SimpleDateFormat
 import org.pih.warehouse.product.ProductGroup

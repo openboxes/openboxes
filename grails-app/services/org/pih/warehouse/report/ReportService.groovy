@@ -29,7 +29,7 @@ import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.reporting.DateDimension
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.xhtmlrenderer.pdf.ITextRenderer

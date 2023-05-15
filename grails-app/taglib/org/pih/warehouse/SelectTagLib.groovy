@@ -152,7 +152,7 @@ class SelectTagLib {
         out << g.select(attrs)
     }
 
-    @Cacheable("selectProductFamilyCache")
+    //@Cacheable("selectProductFamilyCache")
     def selectProductFamily = { attrs, body ->
         def productGroups = ProductGroup.list(sort: "name").collect {
             [id: it.id, name: it.name]

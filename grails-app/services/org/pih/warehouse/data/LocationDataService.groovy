@@ -19,7 +19,7 @@ import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 
 import javax.annotation.Nullable
 
