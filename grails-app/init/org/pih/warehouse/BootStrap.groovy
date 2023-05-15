@@ -10,7 +10,6 @@ package org.pih.warehouse
  **/
 
 import grails.converters.JSON
-import grails.core.GrailsApplication
 import grails.util.Holders
 import liquibase.Contexts
 import liquibase.LabelExpression
@@ -35,6 +34,8 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Address
+import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
@@ -42,6 +43,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PartyType
+import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
@@ -61,6 +63,9 @@ import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAssociation
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductGroup
+import org.pih.warehouse.product.ProductListItem
 import org.pih.warehouse.product.ProductSearchDto
 import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
@@ -78,7 +83,6 @@ import java.math.RoundingMode
 
 class BootStrap {
 
-    GrailsApplication grailsApplication
     def uploadService
     DataSource dataSource
 
@@ -106,7 +110,8 @@ class BootStrap {
             [
                 id         : shipmentType.id,
                 name       : shipmentType.name,
-                description: shipmentType.description
+                description: shipmentType.description,
+                displayName: shipmentType.displayName,
             ]
         }
 
@@ -174,7 +179,7 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(OrderSummary) { OrderSummary orderSummary ->
-            def defaultCurrencyCode = Holders.config.openboxes.locale.defaultCurrencyCode
+            def defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
             def origOrgCode = orderSummary?.order?.origin?.organization?.code
             def destOrgCode = orderSummary?.order?.destination?.organization?.code
             return [
@@ -182,9 +187,10 @@ class BootStrap {
                 id: orderSummary?.order?.id,
                 orderNumber: orderSummary?.order?.orderNumber,
                 name: orderSummary?.order?.name,
+                paymentTerm: orderSummary?.order?.paymentTerm,
                 origin: orderSummary?.order?.origin?.name + (origOrgCode ? " (${origOrgCode})" : ""),
                 destination: orderSummary?.order?.destination?.name + (destOrgCode ? " (${destOrgCode})" : ""),
-                dateOrdered: orderSummary?.order?.dateOrdered?.format("MMM dd, yyyy"),
+                dateOrdered: orderSummary?.order?.dateOrdered,
                 orderedBy: orderSummary?.order?.orderedBy?.name,
                 createdBy: orderSummary?.order?.createdBy?.name,
                 orderItemsCount: orderSummary?.order?.activeOrderItems?.size()?:0,
@@ -196,6 +202,10 @@ class BootStrap {
                 totalNormalized: "${orderSummary?.order?.totalNormalized?.setScale(2, RoundingMode.HALF_UP)} ${defaultCurrencyCode}",
                 shipmentsCount: orderSummary?.order?.shipments?.size(),
             ]
+        }
+
+        JSON.registerObjectMarshaller(PaymentTerm) { PaymentTerm paymentTerm ->
+            return paymentTerm.toJson()
         }
 
         JSON.registerObjectMarshaller(OrderItem) { OrderItem orderItem ->
@@ -236,44 +246,88 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(PicklistItem) { PicklistItem picklistItem ->
             [
-                id                    : picklistItem.id,
-                status                : picklistItem.status,
-                "picklist.id"         : picklistItem?.picklist?.id,
-                "requisitionItem.id"  : picklistItem?.requisitionItem?.id,
-                "inventoryItem.id"    : picklistItem.inventoryItem?.id,
-                "product.name"        : picklistItem?.inventoryItem?.product?.name,
-                "productCode"         : picklistItem?.inventoryItem?.product?.productCode,
-                lotNumber             : picklistItem?.inventoryItem?.lotNumber,
-                expirationDate        : picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
-                "binLocation.id"      : picklistItem?.binLocation?.id,
-                "binLocation.name"    : picklistItem?.binLocation?.name,
-                "binLocation.zoneId"  : picklistItem?.binLocation?.zone?.id,
-                "binLocation.zoneName": picklistItem?.binLocation?.zone?.name,
-                quantityPicked        : picklistItem.quantity,
-                reasonCode            : picklistItem.reasonCode,
-                comment               : picklistItem.comment
+                id                      : picklistItem.id,
+                status                  : picklistItem.status,
+                "picklist.id"           : picklistItem?.picklist?.id,
+                "requisitionItem.id"    : picklistItem?.requisitionItem?.id,
+                "inventoryItem.id"      : picklistItem.inventoryItem?.id,
+                "product.name"          : picklistItem?.inventoryItem?.product?.name,
+                "product.displayName"   : picklistItem?.inventoryItem?.product?.displayName,
+                "productCode"           : picklistItem?.inventoryItem?.product?.productCode,
+                lotNumber               : picklistItem?.inventoryItem?.lotNumber,
+                expirationDate          : picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
+                "binLocation.id"        : picklistItem?.binLocation?.id,
+                "binLocation.name"      : picklistItem?.binLocation?.name,
+                "binLocation.zoneId"    : picklistItem?.binLocation?.zone?.id,
+                "binLocation.zoneName"  : picklistItem?.binLocation?.zone?.name,
+                quantityPicked          : picklistItem.quantity,
+                reasonCode              : picklistItem.reasonCode,
+                comment                 : picklistItem.comment
             ]
         }
 
-
         JSON.registerObjectMarshaller(Product) { Product product ->
             [
-                id                  : product.id,
-                productCode         : product.productCode,
-                name                : product.name,
-                description         : product.description,
-                category            : product.category?.name,
-                unitOfMeasure       : product.unitOfMeasure,
-                pricePerUnit        : product.pricePerUnit,
-                dateCreated         : product.dateCreated,
-                lastUpdated         : product.lastUpdated.format("MMM dd, yyyy"),
-                updatedBy           : product.updatedBy?.name,
-                color               : product.color,
-                handlingIcons       : product.handlingIcons,
-                lotAndExpiryControl : product.lotAndExpiryControl,
-                active              : product.active,
-                translatedName      : product.translatedName,
+                id                 : product.id,
+                productCode        : product.productCode,
+                name               : product.name,
+                description        : product.description,
+                category           : product.category?.name,
+                unitOfMeasure      : product.unitOfMeasure,
+                pricePerUnit       : product.pricePerUnit,
+                dateCreated        : product.dateCreated,
+                lastUpdated        : product.lastUpdated,
+                updatedBy          : product.updatedBy?.name,
+                color              : product.color,
+                handlingIcons      : product.handlingIcons,
+                lotAndExpiryControl: product.lotAndExpiryControl,
+                active             : product.active,
+                // Introduced new object (decided not to use productNames or synonyms).
+                // that includes the display name for all locales. This gives us a little more
+                // flexibility in case we don't like it or it performs poorly. We can also
+                // convert it into a DTO class if we end up liking it.
+                displayNames        : product.displayNames,
             ]
+        }
+
+        JSON.registerObjectMarshaller(ProductCatalog) { ProductCatalog productCatalog ->
+            [
+                id          : productCatalog.id,
+                code        : productCatalog.code,
+                name        : productCatalog.name,
+                description : productCatalog.description,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(ProductGroup) { ProductGroup productGroup ->
+            [
+                id          : productGroup.id,
+                name        : productGroup.name,
+                description : productGroup.description,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(GlAccount) { GlAccount glAccount ->
+            [
+                id              : glAccount.id,
+                name            : glAccount.name,
+                code            : glAccount.code,
+                description     : glAccount.description,
+                glAccountType   : glAccount.glAccountType,
+            ]
+        }
+
+        JSON.registerObjectMarshaller(GlAccountType) { GlAccountType glAccountType ->
+            return [
+                id : glAccountType.id,
+                name : glAccountType.name,
+                code : glAccountType.code,
+                accountTypeCode : glAccountType.glAccountTypeCode.name(),
+            ]
+        }
+
+        JSON.registerObjectMarshaller(ProductListItem) { ProductListItem productListItem ->
+            return productListItem.toJson()
         }
 
         JSON.registerObjectMarshaller(ProductSearchDto) { ProductSearchDto productSearchDto ->
@@ -592,7 +646,7 @@ class BootStrap {
         // Create uploads directory if it doesn't already exist
         uploadService.findOrCreateUploadsDirectory()
 
-        Boolean refreshAnalyticsDataOnStartup = grailsApplication.config.openboxes.refreshAnalyticsDataOnStartup.enabled
+        Boolean refreshAnalyticsDataOnStartup = Holders.config.openboxes.refreshAnalyticsDataOnStartup.enabled
         if (refreshAnalyticsDataOnStartup) {
             // Refresh stock out data on startup to make sure the fact table is created
             RefreshStockoutDataJob.triggerNow()
