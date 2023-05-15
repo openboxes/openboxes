@@ -52,7 +52,7 @@ const LocationChooser = (props) => {
   };
 
   const fetchLocations = () => {
-    const url = '/openboxes/api/locations';
+    const url = '/api/locations';
     const params = {
       locationChooser: true,
       applyUserFilter: true,

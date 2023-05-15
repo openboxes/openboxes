@@ -18,7 +18,7 @@ const useStockListFilters = () => {
   const history = useHistory();
 
   useEffect(() => {
-    apiClient.get('/openboxes/api/locations')
+    apiClient.get('/api/locations')
       .then((response) => {
         const { data } = response.data;
         setLocations(data);

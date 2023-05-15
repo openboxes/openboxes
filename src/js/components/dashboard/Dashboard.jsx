@@ -200,7 +200,7 @@ class Dashboard extends Component {
 
   getSubdashboardKeys() {
     const dashboardId = this.getDashboardIdFromParams();
-    const url = `/openboxes/api/dashboard/${dashboardId}/subdashboardKeys`;
+    const url = `/api/dashboard/${dashboardId}/subdashboardKeys`;
     return apiClient.get(url)
       .then((res) => {
         const subdashboardKeys = res.data;

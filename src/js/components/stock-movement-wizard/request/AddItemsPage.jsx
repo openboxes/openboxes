@@ -1281,7 +1281,7 @@ class AddItemsPage extends Component {
           label: this.props.translate('react.default.yes.label', 'Yes'),
           onClick: () => {
             this.props.showSpinner();
-            apiClient.delete(`/openboxes/api/stockMovements/${this.state.values.stockMovementId}`)
+            apiClient.delete(`/api/stockMovements/${this.state.values.stockMovementId}`)
               .then((response) => {
                 if (response.status === 204) {
                   this.props.hideSpinner();

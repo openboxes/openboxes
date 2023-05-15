@@ -24,7 +24,7 @@ class PurchaseOrderApiController {
 
     def orderService
 
-    def list = {
+    def list() {
         def purchaseOrders = orderService.getPurchaseOrders(params)
 
         if (params.format == 'csv') {
@@ -42,7 +42,7 @@ class PurchaseOrderApiController {
         ] as JSON)
      }
 
-    def read = {
+    def read() {
         Order order = Order.get(params.id)
         if (!order) {
             def message = "${warehouse.message(code: 'default.not.found.message',args:[warehouse.message(code: 'order.label', default: 'order'), params.id])}"
@@ -52,7 +52,7 @@ class PurchaseOrderApiController {
         render([data: order] as JSON)
     }
 
-    def delete = {
+    def delete() {
         def orderInstance = Order.get(params.id)
         if (orderInstance) {
             if (orderInstance.hasPrepaymentInvoice) {
@@ -93,14 +93,14 @@ class PurchaseOrderApiController {
         render status: 204
     }
 
-    def statusOptions = {
+    def statusOptions() {
         def options = OrderSummaryStatus.derivedStatuses()?.collect {
             [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderSummaryStatus.' + it.name())}", variant: it.variant?.name()  ]
         }
         render([data: options] as JSON)
     }
 
-    def rollback = {
+    def rollback() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
             def message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"

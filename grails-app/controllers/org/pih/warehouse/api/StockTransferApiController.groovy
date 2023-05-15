@@ -250,7 +250,7 @@ class StockTransferApiController {
         render status: 200
     }
 
-    def delete = {
+    def delete() {
         def order = Order.get(params.id)
         if (!order) {
             def message = "Order does not exist"
@@ -270,7 +270,7 @@ class StockTransferApiController {
         render status: 204
     }
 
-    def statusOptions = {
+    def statusOptions() {
         def statusOptions = OrderStatus.listStockTransfer().collect{
             [ id: it.name(), value: it.name(), label: "${g.message(code: 'enum.OrderStatus.' + it.name())}", variant: it.variant?.name()]
         }

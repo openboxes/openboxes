@@ -114,7 +114,7 @@ class StocklistApiController {
         render status: 200
     }
 
-    def clear = {
+    def clear() {
         Requisition requisition = Requisition.get(params.id)
         if (!requisition) {
             return 404
@@ -124,7 +124,7 @@ class StocklistApiController {
         render status: 200
     }
 
-    def clone = {
+    def clone() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             return 404
@@ -134,7 +134,7 @@ class StocklistApiController {
         render status: 200
     }
 
-    def publish = {
+    def publish() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             return 404
@@ -144,7 +144,7 @@ class StocklistApiController {
         render status: 200
     }
 
-    def unpublish = {
+    def unpublish() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             return 404
@@ -154,7 +154,7 @@ class StocklistApiController {
         render status: 200
     }
 
-    def export = {
+    def export() {
         def requisition = Requisition.get(params.id)
         if (!requisition) {
             return 404

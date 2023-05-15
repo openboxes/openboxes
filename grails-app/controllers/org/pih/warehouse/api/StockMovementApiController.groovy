@@ -599,7 +599,7 @@ class StockMovementApiController {
     /**
      * Action to get shipped and not yet received items as csv
      * */
-    def shippedItems = {
+    def shippedItems() {
         if (!params.destination) {
             def message = "Destination parameter cannot be the empty"
             response.status = 400
@@ -657,7 +657,7 @@ class StockMovementApiController {
     /**
      * Action to get pending requisition items as csv
      * */
-    def pendingRequisitionItems = {
+    def pendingRequisitionItems() {
         if (!params.origin) {
             def message = "Origin parameter cannot be the empty"
             response.status = 400
@@ -787,7 +787,7 @@ class StockMovementApiController {
         return csv
     }
 
-    def shipmentStatusCodes = {
+    def shipmentStatusCodes() {
         def options = ShipmentStatusCode.list()?.collect {
             [
                     id: it.name,
@@ -799,7 +799,7 @@ class StockMovementApiController {
         render([data: options] as JSON)
     }
 
-    def requisitionStatusCodes = {
+    def requisitionStatusCodes() {
         def options = RequisitionStatus.listOutboundOptions()?.collect {
             [
                     id: it.name(),
