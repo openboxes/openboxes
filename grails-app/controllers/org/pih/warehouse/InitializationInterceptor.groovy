@@ -9,6 +9,7 @@ package org.pih.warehouse
  * You must not remove this notice, or any other, from this software.
  **/
 import org.pih.warehouse.core.User
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
 
 class InitializationInterceptor {
@@ -32,6 +33,8 @@ class InitializationInterceptor {
                 // We want to set the locale for grails (equivalent to passing ?lang as param)
                 // so grails' g:message "understands" current language so that is translatable with the crowdin
                 RequestContextUtils.getLocaleResolver(request).setLocale(request, response, locale)
+                // TODO (OBPIH-5452): If we get rid of our own logic to handle locale, this line or the RCU one might be removed
+                LocaleContextHolder.setLocale(locale)
 
                 if (session.impersonateUserId && session.user.id != session.impersonateUserId) {
                     session.user = User.get(session.impersonateUserId)
