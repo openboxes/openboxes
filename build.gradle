@@ -74,7 +74,7 @@ plugins {
     id 'com.virgo47.ClasspathJar' version '1.0.0'
 
     // enable `grails gradle autoLintGradle`
-    id 'nebula.lint' version '17.7.1'
+    id 'nebula.lint' version '17.8.0'
 }
 
 // prevent warfile issues by applying this before `asset-pipeline`. OBGM-353
@@ -229,6 +229,11 @@ configurations {
                     }
                 }
 
+                if (details.requested.group.startsWith('org.apache.tomcat')) {
+                    details.because 'enforce consistent Tomcat versioning'
+                    details.useVersion(tomcatVersion)
+                }
+
                 if (details.requested.group == 'org.apache.xmlgraphics') {
                     details.because 'apply batik security patches'
                     if (details.requested.name.startsWith('batik')) {
@@ -357,6 +362,8 @@ processResources {
 repositories {
     mavenCentral()
     maven { url 'https://repo.grails.org/grails/core' }
+    // deprecated; only used to fetch code-coverage plugin
+    maven { url 'https://repo.grails.org/grails/plugins' }
 }
 
 /*
@@ -402,16 +409,16 @@ dependencies {
      */
     if (targetWebServer() == 'tomcat') {
         logger.quiet 'configuring for a Tomcat-hosted environment...'
-        provided "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        provided "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
         provided 'org.springframework.boot:spring-boot-starter-tomcat'
     } else if (targetWebServer() == 'jetty') {
         logger.quiet 'configuring for a Jetty-hosted environment...'
         provided "javax.servlet:javax.servlet-api:${servletVersion}"
-        compile "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        compile "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
         provided 'org.springframework.boot:spring-boot-starter-jetty'
     } else {
         logger.quiet 'configuring for a standalone environment...'
-        compile "org.apache.tomcat:tomcat-jdbc:${minimumTomcatVersion}"
+        compile "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
         compile 'org.springframework.boot:spring-boot-starter-tomcat'
     }
 
@@ -428,16 +435,16 @@ dependencies {
     implementation "com.github.librepdf:openpdf:${openPdfVersion}"
 
     // security patch
-    compile 'com.google.code.gson:gson:2.10'
+    compile 'com.google.code.gson:gson:2.10.1'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:31.1-jre'
 
     compile 'com.google.zxing:javase:3.5.1'  // barcode support
 
-    testImplementation 'com.icegreen:greenmail:1.6.11'
+    testImplementation 'com.icegreen:greenmail:1.6.14'
 
-    compile 'com.newrelic.agent.java:newrelic-api:7.11.1'
+    compile 'com.newrelic.agent.java:newrelic-api:8.2.0'
 
     implementation 'com.sun.mail:jakarta.mail:1.6.7'
 
@@ -449,7 +456,7 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'commons-collections:commons-collections:3.2.2'
 
-    implementation 'commons-fileupload:commons-fileupload:1.4'
+    compile 'commons-fileupload:commons-fileupload:1.5'
 
     compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
@@ -466,7 +473,7 @@ dependencies {
     // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}"
     // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xDocReportVersion}"
 
-    implementation 'fr.w3blog:zebra-zpl:0.0.3'  // ZebraUtils.printZpl(), Labelary API, etc.
+    implementation 'fr.w3blog:zebra-zpl:0.0.4'  // ZebraUtils.printZpl(), Labelary API, etc.
 
     /*
      * FIXME Used in only one place: ApiControllerFunctionalSpec.groovy.
@@ -479,7 +486,7 @@ dependencies {
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
 
     // incorporate latest timezone changes
-    implementation 'joda-time:joda-time:2.12.2'
+    implementation 'joda-time:joda-time:2.12.5'
 
     testCompile 'junit:junit:4.13.2'
 
@@ -487,7 +494,7 @@ dependencies {
 
     testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
-    implementation 'org.apache.commons:commons-csv:1.9.0'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
     compile 'org.apache.commons:commons-email:1.5'
 
     implementation 'org.apache.httpcomponents:fluent-hc'
