@@ -1,6 +1,6 @@
 package org.pih.warehouse.product
 
-import org.codehaus.groovy.grails.validation.Validateable
+import grails.validation.Validateable
 import org.pih.warehouse.api.PutawayItem
 import org.pih.warehouse.api.PutawayStatus
 import org.pih.warehouse.core.Location
