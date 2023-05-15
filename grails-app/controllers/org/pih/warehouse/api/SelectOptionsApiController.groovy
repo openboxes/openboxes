@@ -26,49 +26,49 @@ class SelectOptionsApiController {
     GlAccountService glAccountService;
     UserService userService
 
-    def glAccountOptions = {
+    def glAccountOptions() {
         List<GlAccount> glAccounts = glAccountService.getGlAccounts(params).collect {
             [id: it.id, label: "${it.code} - ${it.name}"]
         }
         render([data: glAccounts] as JSON)
     }
 
-    def productGroupOptions = {
+    def productGroupOptions() {
         List<ProductGroup> productGroups = genericApiService.getList(ProductGroup.class.simpleName, [:]).collect {
             [id: it.id, label: "${it.name}"]
         }
         render([data: productGroups] as JSON)
     }
 
-    def catalogOptions = {
+    def catalogOptions() {
         List<ProductCatalog> catalogs = genericApiService.getList(ProductCatalog.class.simpleName, [sort: "name"]).collect {
             [id: it.id, label: "${it.name} (${it?.productCatalogItems?.size()})"]
         }
         render([data: catalogs] as JSON)
     }
 
-    def categoryOptions = {
+    def categoryOptions() {
         List<Category> categories = genericApiService.getList(Category.class.simpleName, [:]).collect {
             [id: it.id, label: it.getHierarchyAsString(" > ")]
         }
         render([data: categories] as JSON)
     }
 
-    def tagOptions = {
+    def tagOptions() {
         List<Tag> tags = genericApiService.getList(Tag.class.simpleName, [sort: "tag"]).collect {
             [id: it.id, label: "${it.tag} (${it?.products?.size()})"]
         }
         render([data: tags] as JSON)
     }
 
-    def paymentTermOptions = {
+    def paymentTermOptions() {
         List<PaymentTerm> paymentTerms = genericApiService.getList(PaymentTerm.class.simpleName, [sort: "name"]).collect {
             [id: it.id, label: it.name, value: it.id ]
         }
         render([data: paymentTerms] as JSON)
     }
 
-    def usersOptions = {
+    def usersOptions() {
         List<User> users = userService.findUsers(params)
         render([data: users] as JSON)
     }

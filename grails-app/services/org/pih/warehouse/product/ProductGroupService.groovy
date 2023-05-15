@@ -9,9 +9,11 @@
 **/
 package org.pih.warehouse.product
 
+import grails.core.GrailsApplication
+
 class ProductGroupService {
 
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     def addProductToProductGroup(String productGroupId, String productId, boolean isProductFamily) {
         def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')

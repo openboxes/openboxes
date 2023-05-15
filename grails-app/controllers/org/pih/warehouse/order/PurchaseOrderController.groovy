@@ -26,7 +26,7 @@ class PurchaseOrderController {
         redirect(action: "create")
     }
 
-    def list = {
+    def list() {
         render(template: "/common/react")
     }
 

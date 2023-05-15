@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.core.GrailsApplication
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.importer.ImportDataCommand
@@ -17,7 +18,7 @@ import org.pih.warehouse.product.Product
 class ProductSynonymDataService {
 
     def productService
-    def grailsApplication
+    GrailsApplication grailsApplication
 
     Boolean validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename

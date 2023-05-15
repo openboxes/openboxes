@@ -685,7 +685,7 @@ class ProductController {
     /**
      * Export Synonym Template Excel
      */
-    def exportSynonymTemplate = {
+    def exportSynonymTemplate() {
         List<Map> objects = [[]]
         // return a template with filled in product code
         if (params.productCode) {
@@ -904,7 +904,7 @@ class ProductController {
     /**
      * Edit existing product synonym
      */
-    def editProductSynonym = {
+    def editProductSynonym() {
         println "editProductSynonym() " + params
         try {
             productService.editProductSynonym(params['synonym.id'], params.synonymTypeCode, params.synonym, params.locale)
@@ -918,7 +918,7 @@ class ProductController {
         }
     }
 
-    def editProductSynonymDialog = {
+    def editProductSynonymDialog() {
         Synonym synonym = Synonym.read(params.id)
         if (!synonym) {
             throw new RuntimeException("Synonym does not exist")
@@ -1125,7 +1125,7 @@ class ProductController {
         render(view: "addDocument", model: [productInstance: productInstance, documentInstance: documentInstance])
     }
 
-    def importProductSynonyms = { ImportDataCommand command ->
+    def importProductSynonyms(ImportDataCommand command) {
 
         log.info params
         log.info command?.location
@@ -1167,13 +1167,13 @@ class ProductController {
         redirect(controller: 'product', action: 'edit', id: params['product.id'])
     }
 
-    def showMergeProductDialog = {
+    def showMergeProductDialog() {
         // TODO: ADD WARNING IF PRODUCT HAS PENDING ORDER/SHIPMENT/RECEIPT/whatever
         Product primaryProduct = Product.get(params.primaryProduct)
         render(template: params.template, model: [ primaryProduct: primaryProduct ])
     }
 
-    def merge = {
+    def merge() {
         Boolean enabled = Holders.config.openboxes.products.merge.enabled
         if (!enabled) {
             throw new IllegalArgumentException("Merge products feature is not enabled")
@@ -1188,7 +1188,7 @@ class ProductController {
     /**
      * Temporary helper for testing and looking at Product Merge logs for QA
      * */
-    def productMergeLogs = {
+    def productMergeLogs() {
         params.max = params.max?:10
         params.offset = params.offset?:0
         def productMergeLogs = productMergeService.getProductMergeLogs(params)

@@ -29,7 +29,7 @@ class MobileController {
     def megamenuService
     def stockMovementService
 
-    def index = {
+    def index() {
 
         Location location = Location.get(session.warehouse.id)
         def productCount = ProductSummary.countByLocation(location)
@@ -55,11 +55,11 @@ class MobileController {
         ]
     }
 
-    def login = {
+    def login() {
 
     }
 
-    def menu = {
+    def menu() {
         Map menuConfig = grailsApplication.config.openboxes.megamenu
         //User user = User.get(session?.user?.id)
         //Location location = Location.get(session.warehouse?.id)
@@ -67,14 +67,14 @@ class MobileController {
         [menuConfig:menuConfig]
     }
 
-    def chooseLocation = {
+    def chooseLocation() {
         User user = User.get(session.user.id)
         Location warehouse = Location.get(session.warehouse.id)
         render (view: "/mobile/chooseLocation",
             model: [savedLocations: user.warehouse ? [user.warehouse] : null, loginLocationsMap: locationService.getLoginLocationsMap(user, warehouse, true)])
     }
 
-    def productList = {
+    def productList() {
         Location location = Location.get(session.warehouse.id)
         def terms = params?.q ? params?.q?.split(" ") : "".split(" ")
         def productSummaries = ProductSummary.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
@@ -84,7 +84,7 @@ class MobileController {
         [productSummaries:productSummaries]
     }
 
-    def productDetails = {
+    def productDetails() {
         Product product = Product.findByIdOrProductCode(params.id, params.id)
         Location location = Location.get(session.warehouse.id)
         def productSummary = ProductSummary.findByProductAndLocation(product, location)
@@ -97,7 +97,7 @@ class MobileController {
         }
     }
 
-    def outboundList = {
+    def outboundList() {
         Location origin = Location.get(params.origin?params.origin.id:session.warehouse.id)
         StockMovement stockMovement = new StockMovement(origin: origin, stockMovementDirection: StockMovementDirection.OUTBOUND, stockMovementStatusCode: StockMovementStatusCode.PENDING)
         params.max = params.max ?: 10

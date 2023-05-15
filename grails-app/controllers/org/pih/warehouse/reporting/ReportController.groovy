@@ -748,7 +748,7 @@ class ReportController {
         render(view: 'showForecastReport', params: params)
     }
 
-    def amountOutstandingOnOrdersReport = {
+    def amountOutstandingOnOrdersReport() {
         def hasRoleFinance = userService.hasRoleFinance(session?.user)
         if (!hasRoleFinance) {
             flash.message = "You do not have permission to view financial data"
