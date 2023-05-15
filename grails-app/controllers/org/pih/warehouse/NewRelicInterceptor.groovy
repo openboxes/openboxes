@@ -27,7 +27,7 @@ class NewRelicInterceptor {
      */
     @Override
     boolean before() {
-        NewRelic.setTransactionName(request.servletContext.servletContextName, request.servletPath)
+        NewRelic.setTransactionName(request.servletContext.contextPath, request.servletPath)
         return true
     }
 
