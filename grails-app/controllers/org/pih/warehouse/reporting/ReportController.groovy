@@ -20,6 +20,7 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
@@ -544,7 +545,10 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations)
+        String[] categories = params.get('category') instanceof String ? [params.get('category')] :  params.get('category') ?: []
+        // if params don't contain _includeCategoryChildrenKey, then we should set checkbox to true as a default
+        Boolean includeCategoryChildren = !params.containsKey('_includeCategoryChildren') ? true : !!params.includeCategoryChildren
+        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, categories, includeCategoryChildren)
 
         if (params.button == "download") {
             def sw = new StringWriter()
@@ -603,7 +607,7 @@ class ReportController {
             render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
         }
 
-        render(view: 'showInventoryByLocationReport', model: [command: command])
+        render(view: 'showInventoryByLocationReport', model: [command: command, includeCategoryChildren: includeCategoryChildren])
     }
 
     def showRequestDetailReport = {

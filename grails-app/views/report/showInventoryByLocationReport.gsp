@@ -35,8 +35,27 @@
                                                   data-placeholder=" "
                                                   activityCode="${org.pih.warehouse.core.ActivityCode.MANAGE_INVENTORY}"/>
                             </div>
+                            <label><warehouse:message code="category.label"/></label>
+                            <p>
+                                <g:selectCategory
+                                        id="category" multiple="true"
+                                        class="chzn-select-deselect filter"
+                                        data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
+                                        name="category"
+                                        noSelection="['':'']"
+                                        value="${params?.category}"
+                                />
+                            </p>
+                            <p>
+                                <label>
+                                    <g:checkBox name="includeCategoryChildren" value="${params?.includeCategoryChildren}" checked="${includeCategoryChildren}"/>
+                                    ${warehouse.message(
+                                            code:'report.search.includeCategoryChildren.label',
+                                            default: 'Include all products in all subcategories',
+                                    )}
+                                </label>
+                            </p>
                         </div>
-
                         <div class="prop">
                             <div class="center">
                                 <button name="button" value="run" class="button"><g:message code="default.button.run.label"/></button>
