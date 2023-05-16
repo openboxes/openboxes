@@ -624,24 +624,6 @@ function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
   return valuesWithUpdatedQtyRequested;
 }
 
-const inactiveProductValidation = ({
-  lineItems, callback, valuesForCallback, translate,
-}) => {
-  const printError = (lineItem, idx) => `${idx + 1}: ${translate('react.stockMovement.product.label', 'Product')} ${lineItem?.productCode} 
-      ${translate('react.stockMovement.product.inactive.validation.label', 'has been discontinued. Please remove it from the requisition')}`;
-  const inactiveProducts = lineItems
-    .filter(lineItem => !lineItem.product?.active)
-    .map(printError);
-  if (inactiveProducts.length) {
-    return notification(NotificationType.ERROR_FILLED)({
-      message: translate('react.default.error.validationError.label', 'Validation error'),
-      detailsArray: inactiveProducts,
-    });
-  }
-  return callback(valuesForCallback);
-};
-
-
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -863,6 +845,21 @@ class AddItemsPage extends Component {
       }
       this.props.hideSpinner();
     });
+  }
+
+  inactiveProductValidation({ lineItems, callback }) {
+    const printError = (lineItem, idx) => `${idx + 1}: ${this.props.translate('react.stockMovement.product.label', 'Product')} ${lineItem?.productCode} 
+      ${this.props.translate('react.stockMovement.product.inactive.validation.label', 'has been discontinued. Please remove it from the requisition')}`;
+    const inactiveProducts = lineItems
+      .filter(lineItem => !lineItem.product?.active)
+      .map(printError);
+    if (inactiveProducts.length) {
+      return notification(NotificationType.ERROR_FILLED)({
+        message: this.props.translate('react.default.error.validationError.label', 'Validation error'),
+        detailsArray: inactiveProducts,
+      });
+    }
+    return callback();
   }
 
   updateTotalCount(value) {
@@ -1729,11 +1726,9 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => inactiveProductValidation({
+                  onClick={() => this.inactiveProductValidation({
                       lineItems: values.lineItems,
-                      callback: this.submitRequest,
-                      valuesForCallback: values.lineItems,
-                      translate: this.props.translate,
+                      callback: () => this.submitRequest(values.lineItems),
                     })}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
