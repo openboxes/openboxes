@@ -43,7 +43,7 @@
                                         data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
                                         name="category"
                                         noSelection="['':'']"
-                                        value="${params?.category instanceof String ? params?.category : params?.category?.collect { it }}"
+                                        value="${params?.list('category')}"
                                 />
                             </p>
                             <p>

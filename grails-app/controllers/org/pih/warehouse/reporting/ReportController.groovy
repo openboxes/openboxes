@@ -545,7 +545,7 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        String[] categories = params.get('category') instanceof String ? [params.get('category')] :  params.get('category') ?: []
+        String[] categories = params.list('category').findAll { it } ?: [null]
         // if params don't contain _includeCategoryChildrenKey, then we should set checkbox to true as a default
         Boolean includeCategoryChildren = !params.containsKey('_includeCategoryChildren') ? true : !!params.includeCategoryChildren
         command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, categories, includeCategoryChildren)
