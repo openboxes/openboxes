@@ -391,8 +391,7 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    Map<Product, Integer> getQuantityOnHandByProduct(Location location, def params = null) {
-        println "siemka123"
+    Map<Product, Integer> getQuantityOnHandByProduct(Location location) {
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
