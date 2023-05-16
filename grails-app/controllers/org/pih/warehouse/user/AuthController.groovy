@@ -200,7 +200,7 @@ class AuthController {
                 userService.assignDefaultRoles(userInstance)
 
                 // Publish event to trigger email notifications
-                publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
+                grailsApplication.mainContext.publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
 
             } else {
                 // If there's an error, reset the password to what the user entered and redirect to signup

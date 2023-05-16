@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.receiving
 
+import grails.util.Holders
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
@@ -18,7 +19,7 @@ import org.pih.warehouse.shipping.Shipment
 class Receipt implements Serializable, Comparable<Receipt> {
 
     def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
     def afterInsert = publishRefreshEvent

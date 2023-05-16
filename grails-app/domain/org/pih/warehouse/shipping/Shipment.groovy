@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.shipping
 
+import grails.util.Holders
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import org.pih.warehouse.core.*
@@ -30,7 +31,7 @@ import org.pih.warehouse.requisition.Requisition
 class Shipment implements Comparable, Serializable {
 
     def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
     def beforeInsert = {

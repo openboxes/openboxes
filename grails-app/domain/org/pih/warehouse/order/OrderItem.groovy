@@ -36,7 +36,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     def publishRefreshEvent = {
         if (order?.isPurchaseOrder && !disableRefresh) {
-            publishEvent(new RefreshOrderSummaryEvent(order))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(order))
         }
     }
 

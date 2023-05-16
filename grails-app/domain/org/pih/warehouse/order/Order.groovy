@@ -18,13 +18,8 @@ import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationEventPublisher
 
 class Order implements Serializable {
-
-    @Autowired
-    ApplicationEventPublisher applicationEventPublisher
 
     def beforeInsert = {
         createdBy = AuthService.currentUser
@@ -36,13 +31,13 @@ class Order implements Serializable {
 
     def publishRefreshEvent = {
         if (isPurchaseOrder) {
-            applicationEventPublisher?.publishEvent(new RefreshOrderSummaryEvent(this))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
         }
     }
 
     def publishRefreshEvenBeforeDelete = {
         if (isPurchaseOrder) {
-            applicationEventPublisher?.publishEvent(new RefreshOrderSummaryEvent(this, true))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this, true))
         }
     }
 
@@ -127,8 +122,7 @@ class Order implements Serializable {
             "canceled",
             "completed",
             'activeOrderAdjustments',
-            'activeOrderItems',
-            'applicationEventPublisher'
+            'activeOrderItems'
     ]
 
     static hasMany = [
