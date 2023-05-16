@@ -26,7 +26,7 @@ import org.pih.warehouse.shipping.Shipment
 class Invoice implements Serializable {
 
     def publishRefreshEvent = {
-        publishEvent(new RefreshOrderSummaryEvent(this))
+        Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
     def afterInsert = publishRefreshEvent

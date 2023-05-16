@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.order
 
+import grails.util.Holders
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.invoice.InvoiceItem
@@ -19,7 +20,7 @@ class OrderAdjustment implements Serializable {
 
     def publishRefreshEvent = {
         if (order?.isPurchaseOrder && !disableRefresh) {
-            publishEvent(new RefreshOrderSummaryEvent(order))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(order))
         }
     }
 

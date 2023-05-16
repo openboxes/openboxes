@@ -219,7 +219,7 @@ class ProductAvailabilityService {
 
         } catch (Exception e) {
             log.error("Error executing batch update for ${location.name}: " + e.message, e)
-            publishEvent(new ApplicationExceptionEvent(e, location))
+            grailsApplication.mainContext.publishEvent(new ApplicationExceptionEvent(e, location))
             return false
         }
 
