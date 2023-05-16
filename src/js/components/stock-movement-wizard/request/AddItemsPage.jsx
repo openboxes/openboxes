@@ -1654,12 +1654,7 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => inactiveProductValidation({
-                    lineItems: values.lineItems,
-                    valuesForCallback: values,
-                    callback: this.save,
-                    translate: this.props.translate,
-                  })}
+                onClick={() => this.save(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span>
@@ -1670,12 +1665,7 @@ class AddItemsPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => inactiveProductValidation({
-                    lineItems: values.lineItems,
-                    valuesForCallback: values,
-                    callback: this.saveAndExit,
-                    translate: this.props.translate,
-                  })}
+                onClick={() => this.saveAndExit(values)}
                 className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
               >
                 <span>
