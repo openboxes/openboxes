@@ -179,7 +179,7 @@ class BootStrap {
         }
 
         JSON.registerObjectMarshaller(OrderSummary) { OrderSummary orderSummary ->
-            def defaultCurrencyCode = ConfigurationHolder.config.openboxes.locale.defaultCurrencyCode
+            def defaultCurrencyCode = Holders.config.openboxes.locale.defaultCurrencyCode
             def origOrgCode = orderSummary?.order?.origin?.organization?.code
             def destOrgCode = orderSummary?.order?.destination?.organization?.code
             return [
