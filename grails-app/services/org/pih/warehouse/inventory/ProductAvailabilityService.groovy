@@ -456,12 +456,21 @@ class ProductAvailabilityService {
     }
 
     Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, String[] categories, Boolean includeCategoryChildren) {
+        // Mysql throws an error when query with "category.id in (empty set)" is executed, but it works when NULL is included in this set
         String queryWithCategories = categories ? "and category.id in (:categories)" : 'and category.id in (NULL)'
-        def argumentsWithCategory = categories ? [categories: categories] : []
 
-        String filterByCategories = !includeCategoryChildren ? queryWithCategories : ''
-        def categoryArgument = !includeCategoryChildren ? argumentsWithCategory : []
-        def namedArguments = [locations: locations] + categoryArgument
+        // Getting all subcategories of picked categories
+        def categoriesWithChildren = categories.collect { String categoryId ->
+            Category category = Category.load(categoryId)
+            category.getChildren() + category
+        }.flatten().collect { it.id }
+
+        // I am checking if "include all products in all subcategories" checkbox is checked to add children categories
+        def availableCategories = includeCategoryChildren ? categoriesWithChildren : categories
+
+        // Checking if categories will be used in query, because it throws an error when categories argument is not used
+        def categoryArgument = categories ? [categories: availableCategories] : []
+        def queryArguments = [locations: locations] + categoryArgument
         def quantityMap = [:]
         if (locations) {
             def results = ProductAvailability.executeQuery("""
@@ -469,11 +478,11 @@ class ProductAvailabilityService {
 						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa, Product product, Category category
 						where pa.location in (:locations)
-						${filterByCategories}
+						${queryWithCategories}
 						and pa.product = product
 						and pa.product.category = category
 						group by product, pa.location, category.name
-						""", namedArguments)
+						""", queryArguments)
 
             results.each {
                 if (!quantityMap[it[0]]) {

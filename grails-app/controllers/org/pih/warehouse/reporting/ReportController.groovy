@@ -583,7 +583,7 @@ class ReportController {
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.displayNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.category?.getHierarchyAsString(" > ") ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
 
