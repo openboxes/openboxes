@@ -10,13 +10,14 @@ const GRAILS_VIEWS = path.resolve(__dirname, 'grails-app/views');
 const COMMON_VIEW = path.resolve(GRAILS_VIEWS, 'common');
 const RECEIVING_VIEW = path.resolve(GRAILS_VIEWS, 'partialReceiving');
 
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 
 module.exports = {
+    cache: true,
     entry: {
       app: `${SRC}/index.jsx`,
     },
@@ -48,7 +49,6 @@ module.exports = {
         filename: 'bundle.[hash].css',
         chunkFilename: 'bundle.[hash].[name].css',
       }),
-      new OptimizeCSSAssetsPlugin({}),
       /*
        * We use the HtmlWebpackPlugin to render templates to .gsp pages. In
        * the templateParameters field, ${x} is a JavaScript variable expansion,
@@ -93,7 +93,15 @@ module.exports = {
     rules: [
       {
         test: /\.jsx?$/,
-        use: ['cache-loader', 'babel-loader?presets[]=@babel/react&presets[]=@babel/env'],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/react',
+            ]
+          },
+        },
         include: SRC,
         exclude: /node_modules/,
       },
@@ -103,29 +111,39 @@ module.exports = {
       },
       {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'file-loader?name=./[hash].[ext]',
+        loader: 'file-loader',
         options: {
+          name: './[hash].[ext]',
           postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
         },
       },
       {
         test: /\.(woff|woff2)$/,
-        loader: 'url-loader?prefix=font/&limit=5000&name=./[hash].[ext]',
+        loader: 'url-loader',
         options: {
+          limit: 5000,
+          name: './[hash].[ext]',
           postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
+          prefix: 'font/'
         },
       },
       {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=./[hash].[ext]',
+        loader: 'url-loader',
         options: {
+          limit: 10000,
+          mimetype: 'application/octet-stream',
+          name: './[hash].[ext]',
           postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
         },
       },
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=./[hash].[ext]',
+        loader: 'url-loader',
         options: {
+          limit: 10000,
+          mimetype: 'image/svg+xml',
+          name: './[hash].[ext]',
           postTransformPublicPath: (p) => `__webpack_public_path__ + ${p}`,
         },
       },
@@ -140,6 +158,12 @@ module.exports = {
           },
         ],
       },
+    ],
+  },
+  optimization: {
+    minimizer: [
+      `...`,
+      new CssMinimizerPlugin(),
     ],
   },
   resolve: {
