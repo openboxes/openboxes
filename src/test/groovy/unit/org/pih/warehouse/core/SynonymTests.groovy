@@ -17,7 +17,7 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.User
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.util.LocalizationUtil
+import org.pih.warehouse.LocalizationUtil
 import org.springframework.context.ApplicationEvent
 
 @Ignore
