@@ -719,6 +719,8 @@ class AddItemsPage extends Component {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem.quantityRequested, 10);
       const newQty = parseInt(item.quantityRequested, 10);
+      const oldQtyOnHand = parseInt(oldItem.quantityOnHand, 10);
+      const newQtyOnHand = parseInt(newQty.quantityOnHand, 10);
       // Intersection of keys common to both objects (excluding product key)
       const keyIntersection = _.remove(
         _.intersection(
@@ -737,7 +739,8 @@ class AddItemsPage extends Component {
       ) {
         lineItemsToBeUpdated.push(item);
       } else if (newQty !== oldQty || !item.quantityRequested ||
-        (oldItem.comments !== item.comments && !_.isNil(item.comments))) {
+        (oldItem.comments !== item.comments && !_.isNil(item.comments))
+        || oldQtyOnHand !== newQtyOnHand) {
         lineItemsToBeUpdated.push(item);
       }
     });
@@ -749,6 +752,7 @@ class AddItemsPage extends Component {
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
         comments: !_.isNil(item.comments) ? item.comments : '',
+        quantityOnHand: item.quantityOnHand,
       })),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
@@ -756,6 +760,7 @@ class AddItemsPage extends Component {
         quantityRequested: item.quantityRequested,
         sortOrder: item.sortOrder,
         comments: !_.isNil(item.comments) ? item.comments : '',
+        quantityOnHand: item.quantityOnHand,
       })),
     );
   }
