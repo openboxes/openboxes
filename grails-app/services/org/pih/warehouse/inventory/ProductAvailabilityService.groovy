@@ -455,12 +455,23 @@ class ProductAvailabilityService {
     }
 
     Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, String[] categories, Boolean includeCategoryChildren) {
-        def availableCategories = includeCategoryChildren ? categories.collect { String categoryId ->
+        if (!categories && !includeCategoryChildren) {
+            return [:]
+        }
+
+        def categoriesQuery = "";
+        def queryArguments = [locations: locations]
+        // if we don't have categories and checkbox is checked, then we should get all of the products
+        if (categories) {
+            categoriesQuery = "and category.id in (:categories)"
+            def availableCategories = includeCategoryChildren ? categories.collect { String categoryId ->
                 if (categoryId) {
                     Category category = Category.load(categoryId)
                     category?.children + category
                 }
             }.flatten().collect { it?.id } : categories
+            queryArguments += [categories: availableCategories]
+        }
         def quantityMap = [:]
         if (locations) {
             def results = ProductAvailability.executeQuery("""
@@ -468,11 +479,11 @@ class ProductAvailabilityService {
 						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa, Product product, Category category
 						where pa.location in (:locations)
-						and category.id in (:categories)
+						${categoriesQuery}
 						and pa.product = product
 						and pa.product.category = category
 						group by product, pa.location, category.name
-						""", [locations: locations, categories: availableCategories])
+						""", queryArguments)
 
             results.each {
                 if (!quantityMap[it[0]]) {

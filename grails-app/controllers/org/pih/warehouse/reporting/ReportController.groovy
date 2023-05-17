@@ -545,9 +545,13 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        String[] categories = params.list('category').findAll { it } ?: [null]
-        // if params don't contain _includeCategoryChildrenKey, then we should set checkbox to true as a default
-        Boolean includeCategoryChildren = !params.containsKey('_includeCategoryChildren') ? true : !!params.includeCategoryChildren
+        String[] categories = params.list('category').findAll { it } ?: null
+        // When accessing the page for the first time, the flag should be set to true
+        Boolean includeCategoryChildren = true
+        // If we run the report manually and the checkbox is not checked
+        if (params.button == "run" && !params.includeCategoryChildren) {
+            includeCategoryChildren = false
+        }
         command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, categories, includeCategoryChildren)
 
         if (params.button == "download") {
