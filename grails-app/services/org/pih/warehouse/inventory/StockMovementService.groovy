@@ -790,6 +790,7 @@ class StockMovementService {
                         quantityOnHand                  : quantityOnHand ?: 0,
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
                         quantityRequested               : stockMovementItem.quantityRequested,
+                        quantityCounted                 : stockMovementItem.quantityCounted,
                         comments                        : stockMovementItem.comments,
                         statusCode                      : stockMovementItem.statusCode,
                         sortOrder                       : stockMovementItem.sortOrder,
@@ -810,6 +811,7 @@ class StockMovementService {
                         product                         : stockMovementItem.product,
                         productCode                     : stockMovementItem.productCode,
                         quantityOnHand                  : quantityOnHand ?: 0,
+                        quantityCounted                 : stockMovementItem.quantityCounted,
                         quantityAvailable               : quantityAvailable ?: 0,
                         quantityAllowed                 : stockMovementItem.quantityAllowed,
                         comments                        : stockMovementItem.comments,
@@ -827,6 +829,7 @@ class StockMovementService {
                         quantityOnHand      : quantityOnHand ?: 0,
                         quantityAvailable   : quantityAvailable ?: 0,
                         quantityAllowed     : stockMovementItem.quantityAllowed,
+                        quantityCounted     : stockMovementItem.quantityCounted,
                         comments            : stockMovementItem.comments,
                         quantityRequested   : stockMovementItem.quantityRequested,
                         statusCode          : stockMovementItem.statusCode,
@@ -1852,7 +1855,7 @@ class StockMovementService {
                 // If requisition item is found, we update it
                 if (requisitionItem) {
                     log.info "Item updated " + requisitionItem.id
-
+                    requisitionItem.quantityCounted = stockMovementItem.quantityCounted
                     removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
 
                     if (!stockMovementItem.quantityRequested) {
@@ -1898,6 +1901,7 @@ class StockMovementService {
                     requisitionItem.expirationDate = stockMovementItem.expirationDate
                     requisitionItem.orderIndex = stockMovementItem.sortOrder
                     requisitionItem.comment = stockMovementItem.comments
+                    requisitionItem.quantityCounted = stockMovementItem.quantityCounted
                     requisition.addToRequisitionItems(requisitionItem)
                 }
             }

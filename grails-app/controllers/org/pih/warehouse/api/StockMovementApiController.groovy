@@ -570,6 +570,8 @@ class StockMovementApiController {
             stockMovementItem.shipmentItemId = lineItem.shipmentItemId
             stockMovementItem.orderItemId = lineItem.orderItemId
 
+            stockMovementItem.quantityCounted = lineItem.quantityCounted
+
             List splitLineItems = lineItem.splitLineItems
             if (splitLineItems) {
                 stockMovementItem.splitLineItems = createLineItemsFromJson(stockMovement, splitLineItems)

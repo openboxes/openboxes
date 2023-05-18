@@ -745,22 +745,24 @@ class AddItemsPage extends Component {
       }
     });
 
+    const mapPropertiesOfItemsToBeAdded = (item) => {
+      const itemQuantityCounted = item.quantityOnHand ?
+        { quantityCounted: parseInt(item.quantityOnHand, 10) } : {};
+      return {
+        'product.id': item.product.id,
+        quantityRequested: item.quantityRequested,
+        sortOrder: item.sortOrder,
+        comments: !_.isNil(item.comments) ? item.comments : '',
+        ...itemQuantityCounted,
+      };
+    };
+
     // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
-      _.map(lineItemsToBeAdded, item => ({
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-        sortOrder: item.sortOrder,
-        comments: !_.isNil(item.comments) ? item.comments : '',
-        quantityOnHand: item.quantityOnHand,
-      })),
+      _.map(lineItemsToBeAdded, mapPropertiesOfItemsToBeAdded),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-        sortOrder: item.sortOrder,
-        comments: !_.isNil(item.comments) ? item.comments : '',
-        quantityOnHand: item.quantityOnHand,
+        ...mapPropertiesOfItemsToBeAdded(item),
       })),
     );
   }
@@ -799,7 +801,7 @@ class AddItemsPage extends Component {
 
           return {
             ...val,
-            quantityOnHand: '',
+            quantityOnHand: val.quantityCounted,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
           };
@@ -816,7 +818,7 @@ class AddItemsPage extends Component {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
+            quantityOnHand: val.quantityCounted,
           };
         },
       );
@@ -826,7 +828,7 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
+          quantityOnHand: val.quantityCounted,
         }),
       );
     }

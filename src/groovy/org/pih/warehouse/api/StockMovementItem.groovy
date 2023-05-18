@@ -32,6 +32,9 @@ class StockMovementItem {
     BigDecimal quantityPicked
     BigDecimal quantityShipped
 
+    // saved QOH in ward request
+    Integer quantityCounted
+
     String shipmentItemId
     String orderItemId
     String orderNumber
@@ -88,6 +91,7 @@ class StockMovementItem {
         quantityRevised(nullable: true)
         quantityCanceled(nullable: true)
         quantityPicked(nullable: true)
+        quantityCounted(nullable: true)
         statusCode(nullable: true)
         reasonCode(nullable: true)
         comments(nullable: true)
@@ -120,6 +124,7 @@ class StockMovementItem {
                 quantityRequested         : quantityRequested,
                 quantityAllowed           : quantityAllowed,
                 quantityOnHand            : quantityOnHand,
+                quantityCounted           : quantityCounted,
                 quantityAvailable         : quantityAvailable,
                 quantityCanceled          : quantityCanceled,
                 quantityRevised           : quantityRevised,
@@ -197,6 +202,7 @@ class StockMovementItem {
                 product: requisitionItem?.product,
                 inventoryItem: requisitionItem?.inventoryItem,
                 quantityRequested: requisitionItem.quantity,
+                quantityCounted: requisitionItem.quantityCounted,
                 quantityOnHand: null,
                 quantityAvailable: null,
                 quantityCanceled: requisitionItem?.quantityCanceled,
