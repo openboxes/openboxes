@@ -23,7 +23,7 @@
 			</g:hasErrors>
 
             <g:if test="${commandInstance?.data}">
-                <g:if test="${commandInstance.type == 'inventory' && commandInstance?.data?.any { it.quantity == null }}">
+                <g:if test="${commandInstance?.importType == 'inventory' && commandInstance?.data?.any { it.quantity == null }}">
                     <div class="message">
                         <warehouse:message code="import.blankQuantities.label" />
                     </div>
