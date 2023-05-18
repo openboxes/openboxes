@@ -15,6 +15,8 @@ import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.hibernate.Criteria
+import org.hibernate.Hibernate
+import org.hibernate.SQLQuery
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
@@ -47,6 +49,7 @@ class ProductAvailabilityService {
     def locationService
     def inventoryService
     def dataService
+    def sessionFactory
 
     def triggerRefreshProductAvailability(String locationId, List<String> productIds, Boolean forceRefresh) {
         Boolean delayStart = grailsApplication.config.openboxes.jobs.refreshProductAvailabilityJob.delayStart
@@ -82,6 +85,33 @@ class ProductAvailabilityService {
         // Calculate product availability for all products within all locations
         else {
             refreshProductAvailability(forceRefresh)
+        }
+    }
+
+    def refreshProductsAvailability(String locationId, List<String> productIds, List<String> binLocationIds, Boolean forceRefresh) {
+        if (locationId && productIds && !binLocationIds) {
+            refreshProductsAvailability(locationId, productIds, forceRefresh)
+            return
+        }
+
+        if (!locationId || !productIds) {
+            log.info "Stopping refreshing product availability because of lack of location id or product id"
+            return
+        }
+
+        Location location = Location.load(locationId)
+        List<Location> binLocations = []
+        binLocationIds.unique().each {
+            if (it) {
+                binLocations << Location.load(it)
+            } else {
+                binLocations << null
+            }
+        }
+
+        productIds.each { String productId ->
+            Product product = Product.load(productId)
+            refreshProductAvailability(location, product, binLocations, forceRefresh)
         }
     }
 
@@ -134,6 +164,19 @@ class ProductAvailabilityService {
         }
     }
 
+    def refreshProductAvailability(Location location, Product product, List<Location> binLocations, Boolean forceRefresh) {
+        log.info "Refreshing product availability location ${location}, product ${product}, binLocations ${binLocations}, forceRefresh ${forceRefresh}..."
+        def startTime = System.currentTimeMillis()
+        List calculatedBinLocations = calculateBinLocations(location, product, binLocations)
+        // FIXME: if this deadlocks, it safe to auto-retry here?
+        boolean success = saveProductAvailability(location, product, calculatedBinLocations, forceRefresh)
+        if (success) {
+            log.info "Refreshed ${calculatedBinLocations?.size()} product availability records for product (${product?.productCode}), binLocations ${binLocations} and location (${location}) in ${System.currentTimeMillis() - startTime}ms"
+        } else {
+            log.error "Could not refresh ${calculatedBinLocations?.size()} product availability records for product (${product?.productCode}) and location (${location}) after ${System.currentTimeMillis() - startTime}ms"
+        }
+    }
+
     def calculateBinLocations(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
         binLocations = transformBinLocations(binLocations, [])
@@ -155,33 +198,94 @@ class ProductAvailabilityService {
         return transformBinLocations(binLocations, picked)
     }
 
-    def getQuantityPickedByProductAndLocation(Location location, Product product) {
-        def results = Picklist.executeQuery("""
-            SELECT
-                pli.binLocation,
-                pli.inventoryItem,
-                sum(pli.quantity)*((count(distinct pli.requisitionItem) + count(distinct pli.orderItem) )/ count(*))
-            FROM PicklistItem pli
-            INNER JOIN pli.picklist pl
-            LEFT JOIN pli.requisitionItem ri
-            LEFT JOIN pl.requisition r
-            LEFT JOIN pli.orderItem oi
-            LEFT JOIN pl.order o
-            LEFT JOIN pli.inventoryItem ii
-            LEFT JOIN pli.binLocation l
-            LEFT JOIN l.supportedActivities s
-            WHERE ((r.origin = :location AND r.status IN (:pendingRequisitionStatus)) OR (o.origin = :location AND o.status IN (:pendingOrderStatus)))
-              AND (oi IS NOT NULL OR (ri IS NOT NULL AND (ii.lotStatus IS NULL OR ii.lotStatus != 'RECALLED') AND NOT ('HOLD_STOCK' IN ELEMENTS(l.supportedActivities))))
-              AND (:product = '' OR ri.product.id = :product OR oi.product.id = :product)
-            GROUP BY pli.binLocation, pli.inventoryItem
-        """, [
-                location                    : location,
-                pendingRequisitionStatus    : RequisitionStatus.listPending(),
-                pendingOrderStatus          : OrderStatus.listPending(),
-                product                     : product?.id ?: ''
-        ], [readOnly: true])
+    def calculateBinLocations(Location location, Product product, List<Location> binLocations) {
+        def binLocationsWithQuantity = inventoryService.getProductQuantityByBinLocation(location, product, binLocations, Boolean.TRUE)
+        // cleanse bin locations, to ensure that we accidentally don't overwrite
+        // (in case INVENTORY or PRODUCT_INVENTORY transaction had entries with other bins)
+        if (binLocations) {
+            binLocationsWithQuantity = binLocationsWithQuantity.findAll { binLocations*.id?.contains(it.id) }
+        }
+        def picked = getQuantityPickedByProductAndLocation(location, product)
+        return transformBinLocations(binLocationsWithQuantity, picked)
+    }
 
-        return results.collect { [binLocation: it[0]?.id, inventoryItem: it[1]?.id, quantityAllocated: it[2]] }
+    /**
+     * Get quantity allocated for bin locations and inventory items for a specific location (origin) and product.
+     * Data is pulled from:
+     *  1. Picklist items from pending requisitions (outbound stock movements) with origin being provided location
+     *     that are *NOT* having RECALLED inventory item (inventoryItem.lotStatus) or bin location *WITHOUT*
+     *     HOLD_STOCK in the supported activity (location.supportedActivities).
+     *  2. Picklist items from pending orders (outbound returns) with origin being provided location.
+     *     (IMPORTANT: Outbound returns can have picked items with RECALLED lots and bins with HOLD_STOCK activity)
+     * */
+    def getQuantityPickedByProductAndLocation(Location location, Product product) {
+        def query = """
+            SELECT 
+                bin_location_id as bin_location_id, 
+                inventory_item_id as inventory_item_id, 
+                SUM(quantity_picked) as quantity_allocated
+            FROM (
+                SELECT
+                    pli.bin_location_id as bin_location_id,
+                    pli.inventory_item_id as inventory_item_id,
+                    sum(pli.quantity) as quantity_picked
+                FROM picklist_item pli
+                    INNER JOIN picklist p ON pli.picklist_id = p.id
+                    LEFT JOIN requisition_item ri ON pli.requisition_item_id = ri.id
+                    LEFT JOIN requisition r ON p.requisition_id = r.id
+                    LEFT JOIN inventory_item ii ON pli.inventory_item_id = ii.id
+                    LEFT JOIN location l ON pli.bin_location_id = l.id
+                    LEFT JOIN (
+                        SELECT
+                            GROUP_CONCAT(lsa_select.supported_activities_string) as activities,
+                            lsa_select.location_id as location_id
+                        FROM location_supported_activities lsa_select
+                        GROUP BY lsa_select.location_id
+                    ) lsa ON lsa.location_id = l.id
+                WHERE (r.origin_id = :locationId 
+                    AND r.status IN (:pendingRequisitionStatuses))
+                  AND (ri.id IS NOT NULL AND (ii.lot_status IS NULL OR ii.lot_status != 'RECALLED') 
+                  AND (lsa.activities IS NULL OR lsa.activities NOT LIKE '%HOLD_STOCK%'))
+                  AND (:productId = '' OR ri.product_id = :productId)
+                GROUP BY pli.bin_location_id, pli.inventory_item_id
+                UNION
+                SELECT
+                    pli.bin_location_id as bin_location_id,
+                    pli.inventory_item_id as inventory_item_id,
+                    sum(pli.quantity) as quantity_picked
+                FROM picklist_item pli
+                    INNER JOIN picklist p ON pli.picklist_id = p.id
+                    LEFT JOIN order_item oi ON pli.order_item_id = oi.id
+                    LEFT JOIN `order` o ON p.order_id = o.id
+                    LEFT JOIN inventory_item ii ON pli.inventory_item_id = ii.id
+                WHERE (o.origin_id = :locationId 
+                    AND o.status IN (:pendingOrderStatuses))
+                  AND (oi.id IS NOT NULL)
+                  AND (:productId = '' OR oi.product_id = :productId)
+                GROUP BY pli.bin_location_id, pli.inventory_item_id
+            ) as requisition_order_union
+            GROUP BY bin_location_id, inventory_item_id;
+        """
+
+        SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
+        List results = sqlQuery.addScalar("bin_location_id", Hibernate.STRING)
+                .addScalar("inventory_item_id", Hibernate.STRING)
+                .addScalar("quantity_allocated", Hibernate.BIG_DECIMAL)
+                .setString("locationId", location?.id)
+                .setString("productId", product?.id ?: '')
+                .setParameterList("pendingRequisitionStatuses", RequisitionStatus.listPending().collect { it.name() })
+                .setParameterList("pendingOrderStatuses", OrderStatus.listPending().collect { it.name() })
+                .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+                .list()
+
+        results = results.collect { result ->
+            [
+                    binLocation      : Location.load(result["bin_location_id"]),
+                    inventoryItem    : InventoryItem.load(result["inventory_item_id"]),
+                    quantityAllocated: result["quantity_allocated"]
+            ]
+        }
+        return results
     }
 
     boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
@@ -253,14 +357,14 @@ class ProductAvailabilityService {
         return insertStatement
     }
 
-    def transformBinLocations(List binLocations, List picked) {
+    def transformBinLocations(List binLocations, List pickedItems) {
         def binLocationsTransformed = binLocations.collect {
             [
                 product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
                 inventoryItem    : [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
                 binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
                 quantity         : it.quantity,
-                quantityAllocated: picked ? (picked.findAll { row -> row.binLocation == it?.binLocation?.id && row.inventoryItem == it?.inventoryItem?.id }?.sum { it.quantityAllocated } ?: 0) : 0,
+                quantityAllocated: pickedItems ? (pickedItems.findAll { row -> row.binLocation == it?.binLocation && row.inventoryItem == it?.inventoryItem }?.sum { it.quantityAllocated } ?: 0) : 0,
                 quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
             ]
         }

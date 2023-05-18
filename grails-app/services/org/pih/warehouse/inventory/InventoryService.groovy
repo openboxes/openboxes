@@ -810,6 +810,12 @@ class InventoryService implements ApplicationContextAware {
         return binLocations
     }
 
+    List getProductQuantityByBinLocation(Location location, Product product, List<Location> binLocations, Boolean includeOutOfStock) {
+        List transactionEntries = getTransactionEntriesByInventoryAndProductAndBinLocations(location?.inventory, product, binLocations)
+        List calculatedBinLocations = getQuantityByBinLocation(transactionEntries, includeOutOfStock)
+        return calculatedBinLocations
+    }
+
     List getProductQuantityByBinLocation(Location location, List<Product> products) {
         List transactionEntries = getTransactionEntriesByInventoryAndProduct(location?.inventory, products)
         List binLocations = getQuantityByBinLocation(transactionEntries)
@@ -1730,6 +1736,44 @@ class InventoryService implements ApplicationContextAware {
                 inventoryItem { inList("product", products) }
             }
         }
+        return transactionEntries
+    }
+
+    List getTransactionEntriesByInventoryAndProductAndBinLocations(Inventory inventory, Product product, List<Location> binLocations) {
+        def includeDefaultBinLocation = binLocations.contains(null)
+        List<Location> bins = binLocations
+        if (includeDefaultBinLocation) {
+            // not null bins, that can be used in inList() filter and to not overwrite binLocations
+            bins = binLocations.findAll {it != null }
+        }
+
+        def criteria = TransactionEntry.createCriteria()
+        def transactionEntries = criteria.list {
+            transaction {
+                eq("inventory", inventory)
+                order("transactionDate", "asc")
+                order("dateCreated", "asc")
+            }
+            inventoryItem { eq("product", product) }
+            or {
+                // Get all transaction entries from transactions with code as INVENTORY or PRODUCT_INVENTORY (with given product)
+                transaction {
+                    transactionType {
+                        inList("transactionCode", [TransactionCode.INVENTORY, TransactionCode.PRODUCT_INVENTORY])
+                    }
+                }
+                // Or get all transactions for that bin location (with given product)
+                or {
+                    if (bins) {
+                        inList("binLocation", bins)
+                    }
+                    if (includeDefaultBinLocation) {
+                        isNull("binLocation")
+                    }
+                }
+            }
+        }
+
         return transactionEntries
     }
 
