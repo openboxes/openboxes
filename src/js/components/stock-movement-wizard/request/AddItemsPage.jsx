@@ -19,6 +19,8 @@ import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import isRequestFromWard from 'utils/supportedActivitiesUtils';
@@ -622,7 +624,6 @@ function calculateQuantityRequested(values, rowIndex, fieldValue, requestType) {
   return valuesWithUpdatedQtyRequested;
 }
 
-
 /**
  * The second step of stock movement where user can add items to stock list.
  * This component supports three different cases: with or without stocklist
@@ -658,6 +659,8 @@ class AddItemsPage extends Component {
     this.calculateQuantityRequested =
       calculateQuantityRequested.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
+    this.save = this.save.bind(this);
+    this.saveAndExit = this.saveAndExit.bind(this);
   }
 
   componentDidMount() {
@@ -844,6 +847,21 @@ class AddItemsPage extends Component {
     });
   }
 
+  inactiveProductValidation({ lineItems, callback }) {
+    const printError = (lineItem, idx) => `${idx + 1}: ${this.props.translate('react.stockMovement.product.label', 'Product')} ${lineItem?.productCode} 
+      ${this.props.translate('react.stockMovement.product.inactive.validation.label', 'has been discontinued. Please remove it from the requisition')}`;
+    const inactiveProducts = lineItems
+      .filter(lineItem => !lineItem.product?.active)
+      .map(printError);
+    if (inactiveProducts.length) {
+      return notification(NotificationType.ERROR_FILLED)({
+        message: this.props.translate('react.default.error.validationError.label', 'Validation error'),
+        detailsArray: inactiveProducts,
+      });
+    }
+    return callback();
+  }
+
   updateTotalCount(value) {
     this.setState({
       totalCount: this.state.totalCount + value === 0 ? 1 : this.state.totalCount + value,
@@ -866,7 +884,6 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.lineItems = [];
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
-
     _.forEach(values.lineItems, (item, key) => {
       const rowErrors = {};
       if (!_.isNil(item.product)) {
@@ -1709,7 +1726,10 @@ class AddItemsPage extends Component {
                 </button>
                 <button
                   type="submit"
-                  onClick={() => this.submitRequest(values.lineItems)}
+                  onClick={() => this.inactiveProductValidation({
+                      lineItems: values.lineItems,
+                      callback: () => this.submitRequest(values.lineItems),
+                    })}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                   disabled={
                     invalid || !_.some(values.lineItems, item =>

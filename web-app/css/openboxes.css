@@ -4158,3 +4158,7 @@ table.pvtTable tr th { background-color: #ddd; }
 .primary-button:disabled {
     background-color: var(--blue-400) !important;
 }
+
+.grayed {
+    background-color: var(--gray-200) !important;
+}
