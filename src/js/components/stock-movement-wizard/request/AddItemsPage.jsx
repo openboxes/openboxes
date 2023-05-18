@@ -1450,28 +1450,25 @@ class AddItemsPage extends Component {
    * @param {string} status
    * @public
    */
-  transitionToNextStep(status) {
+  async transitionToNextStep(status) {
     const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status };
     const { movementNumber } = this.state.values;
-
     if (this.state.values.statusCode === 'CREATED') {
-      return apiClient.post(url, payload)
-        .then(() => {
-          const translatedSubmitMessage = this.props.translate(
-            'react.stockMovement.request.submitMessage.label',
-            'Thank you for submitting your request. You can check the status of your request using stock movement number',
-          );
-          let redirectToURL = '';
-          if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            redirectToURL = '/openboxes/';
-          } else {
-            redirectToURL = '/openboxes/stockMovement/list?direction=INBOUND';
-          }
-          Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
-          this.props.history.push(redirectToURL);
-        });
+      await apiClient.post(url, payload);
     }
+    const translatedSubmitMessage = this.props.translate(
+      'react.stockMovement.request.submitMessage.label',
+      'Thank you for submitting your request. You can check the status of your request using stock movement number',
+    );
+    let redirectToURL = '';
+    if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+      redirectToURL = '/openboxes/';
+    } else {
+      redirectToURL = '/openboxes/stockMovement/list?direction=INBOUND';
+    }
+    Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
+    this.props.history.push(redirectToURL);
     return Promise.resolve();
   }
 

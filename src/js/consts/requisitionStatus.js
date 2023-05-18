@@ -1,0 +1,14 @@
+const RequisitionStatus = {
+  CREATED: 'CREATED',
+  EDITING: 'EDITING',
+  VERIFYING: 'VERIFYING',
+  PICKING: 'PICKING',
+  PICKED: 'PICKED',
+  CHECKING: 'CHECKING',
+  ISSUED: 'ISSUED',
+  CANCELED: 'CANCELED',
+  PENDING: 'PENDING',
+  REQUESTED: 'REQUESTED',
+};
+
+export default RequisitionStatus;
