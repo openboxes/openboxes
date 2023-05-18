@@ -21,10 +21,10 @@ class OrderItemSummary implements Serializable {
     Integer quantityCanceled
     Integer quantityInvoiced
 
-    Boolean itemOrdered = Boolean.FALSE
-    Boolean itemShipped = Boolean.FALSE
-    Boolean itemReceived = Boolean.FALSE
-    Boolean itemInvoiced = Boolean.FALSE
+    Boolean isItemFullyOrdered = Boolean.FALSE
+    Boolean isItemFullyShipped = Boolean.FALSE
+    Boolean isItemFullyReceived = Boolean.FALSE
+    Boolean isItemFullyInvoiced = Boolean.FALSE
 
     String derivedStatus
 
@@ -49,10 +49,10 @@ class OrderItemSummary implements Serializable {
         quantityReceived(nullable: true)
         quantityCanceled(nullable: true)
         quantityInvoiced(nullable: true)
-        itemOrdered(nullable: true)
-        itemShipped(nullable: true)
-        itemReceived(nullable: true)
-        itemInvoiced(nullable: true)
+        isItemFullyOrdered(nullable: true)
+        isItemFullyShipped(nullable: true)
+        isItemFullyReceived(nullable: true)
+        isItemFullyInvoiced(nullable: true)
         derivedStatus(nullable: true)
     }
 

@@ -142,10 +142,10 @@ CREATE OR REPLACE VIEW order_item_summary AS (
         quantity_received    AS quantity_received,
         quantity_canceled    AS quantity_canceled,
         quantity_invoiced    AS quantity_invoiced,
-        IF(quantity_ordered > 0, 1, 0) AS item_ordered,
-        IF(quantity_shipped > 0 AND quantity_shipped = quantity_ordered, 1, 0) AS item_shipped,
-        IF(quantity_received + quantity_canceled > 0 AND quantity_received + quantity_canceled = quantity_ordered, 1, 0)    AS item_received,
-        IF(quantity_invoiced > 0 AND quantity_invoiced = quantity_ordered, 1, 0)    AS item_invoiced,
+        IF(quantity_ordered > 0, 1, 0) AS is_item_fully_ordered,
+        IF(quantity_shipped > 0 AND quantity_shipped = quantity_ordered, 1, 0) AS is_item_fully_shipped,
+        IF(quantity_received + quantity_canceled > 0 AND quantity_received + quantity_canceled = quantity_ordered, 1, 0)  AS is_item_fully_received,
+        IF(quantity_invoiced > 0 AND quantity_invoiced = quantity_ordered, 1, 0) AS is_item_fully_invoiced,
         COALESCE(payment_status, receipt_status, shipment_status, order_item_status, order_status) AS derived_status
     FROM (
         SELECT
@@ -251,19 +251,19 @@ CREATE OR REPLACE VIEW order_summary AS (
             -- There is need to make an union of order item summary and order adjustments payment status
             -- to not get duplicated quantities and to get proper payment status for order summary
             SELECT
-                `order`.id                                  AS id,
-                `order`.status                              AS order_status,
-                IFNULL(SUM(order_item_summary.quantity_ordered), 0)    AS quantity_ordered,
-                SUM(order_item_summary.item_ordered) AS items_ordered,
-                0									 		AS adjustments_count,
-                IFNULL(SUM(order_item_summary.quantity_shipped), 0)    AS quantity_shipped,
-                SUM(order_item_summary.item_shipped) AS items_shipped,
-                IFNULL(SUM(order_item_summary.quantity_received), 0)   AS quantity_received,
-                SUM(order_item_summary.item_received) AS items_received,
-                IFNULL(SUM(order_item_summary.quantity_canceled), 0)   AS quantity_canceled,
-                IFNULL(SUM(order_item_summary.quantity_invoiced), 0)   AS quantity_invoiced,
-                SUM(order_item_summary.item_invoiced) AS items_invoiced,
-                0   										AS adjustments_invoiced
+                `order`.id                                              AS id,
+                `order`.status                                          AS order_status,
+                IFNULL(SUM(order_item_summary.quantity_ordered), 0)     AS quantity_ordered,
+                SUM(order_item_summary.is_item_fully_ordered)           AS items_ordered,
+                0									 		            AS adjustments_count,
+                IFNULL(SUM(order_item_summary.quantity_shipped), 0)     AS quantity_shipped,
+                SUM(order_item_summary.is_item_fully_shipped)           AS items_shipped,
+                IFNULL(SUM(order_item_summary.quantity_received), 0)    AS quantity_received,
+                SUM(order_item_summary.is_item_fully_received)          AS items_received,
+                IFNULL(SUM(order_item_summary.quantity_canceled), 0)    AS quantity_canceled,
+                IFNULL(SUM(order_item_summary.quantity_invoiced), 0)    AS quantity_invoiced,
+                SUM(order_item_summary.is_item_fully_invoiced)          AS items_invoiced,
+                0   										            AS adjustments_invoiced
             FROM `order`
                 LEFT OUTER JOIN order_item ON order_item.order_id = `order`.id
                 LEFT OUTER JOIN order_item_summary ON order_item_summary.id = order_item.id
@@ -274,15 +274,15 @@ CREATE OR REPLACE VIEW order_summary AS (
                 `order`.id                                  			            AS id,
                 `order`.status                              			            AS order_status,
                 0    													            AS quantity_ordered,
-                0 AS items_ordered,
+                0                                                                   AS items_ordered,
                 IFNULL(SUM(order_adjustment_payment_status.quantity_ordered), 0)	AS adjustments_count,
                 0    													            AS quantity_shipped,
-                0 AS items_shipped,
+                0                                                                   AS items_shipped,
                 0   													            AS quantity_received,
-                0 AS items_received,
+                0                                                                   AS items_received,
                 0   													            AS quantity_canceled,
                 0   													            AS quantity_invoiced,
-                0 AS items_invoiced,
+                0                                                                   AS items_invoiced,
                 SUM(order_adjustment_payment_status.quantity_invoiced)	            AS adjustments_invoiced
             FROM `order`
                 LEFT OUTER JOIN order_adjustment ON order_adjustment.order_id = `order`.id

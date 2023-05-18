@@ -13,6 +13,7 @@ import grails.converters.JSON
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderSummary
@@ -25,7 +26,7 @@ class PurchaseOrderApiController {
     def orderService
 
     def list = {
-        def purchaseOrders = orderService.getPurchaseOrders(params)
+        List<OrderSummary> purchaseOrders = orderService.getPurchaseOrders(params)
 
         if (params.format == 'csv') {
             def csv = params.boolean("orderItems") ? getOrderItemsCsv(purchaseOrders) : getOrdersCsv(purchaseOrders)
@@ -114,7 +115,7 @@ class PurchaseOrderApiController {
         render status: 200
     }
 
-    def getOrdersCsv(List purchaseOrders) {
+    def getOrdersCsv(List<OrderSummary> purchaseOrders) {
         def csv = CSVUtils.getCSVPrinter()
         csv.printRecord(
             "Status",
@@ -136,13 +137,13 @@ class PurchaseOrderApiController {
             "Total Amount (Default Currency)"
         )
 
-        purchaseOrders?.each {
-            def order = it.order
-            Integer lineItemsSize = order?.orderItems?.findAll {item -> item.orderItemStatusCode != OrderItemStatusCode.CANCELED }.size() ?: 0
+        purchaseOrders?.each {OrderSummary orderSummary ->
+            Order order = orderSummary.order
+            Integer lineItemsSize = order?.orderItems?.findAll { OrderItem item -> item.orderItemStatusCode != OrderItemStatusCode.CANCELED }.size() ?: 0
             BigDecimal totalPrice = new BigDecimal(order?.total).setScale(2, RoundingMode.HALF_UP)
             BigDecimal totalPriceNormalized = order?.totalNormalized.setScale(2, RoundingMode.HALF_UP)
             csv.printRecord(
-                it.derivedStatus ?: order.status,
+                orderSummary.derivedStatus ?: order.status,
                 order?.orderNumber,
                 order?.name,
                 "${order?.origin?.name} (${order?.origin?.organization?.code})",
@@ -152,10 +153,10 @@ class PurchaseOrderApiController {
                 order?.paymentMethodType?.name,
                 order?.paymentTerm?.name,
                 lineItemsSize,
-                it?.itemsOrdered ?: 0,
-                it?.itemsShipped ?: 0,
-                it?.itemsReceived ?: 0,
-                it?.itemsInvoiced ?: 0,
+                orderSummary.itemsOrdered ?: 0,
+                orderSummary.itemsShipped ?: 0,
+                orderSummary.itemsReceived ?: 0,
+                orderSummary.itemsInvoiced ?: 0,
                 order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
                 "${totalPrice} ${order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
                 "${totalPriceNormalized} ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
