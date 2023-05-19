@@ -20,6 +20,12 @@ class OrderItemSummary implements Serializable {
     Integer quantityReceived
     Integer quantityCanceled
     Integer quantityInvoiced
+
+    Boolean isItemFullyOrdered = Boolean.FALSE
+    Boolean isItemFullyShipped = Boolean.FALSE
+    Boolean isItemFullyReceived = Boolean.FALSE
+    Boolean isItemFullyInvoiced = Boolean.FALSE
+
     String derivedStatus
 
     static mapping = {
@@ -43,6 +49,10 @@ class OrderItemSummary implements Serializable {
         quantityReceived(nullable: true)
         quantityCanceled(nullable: true)
         quantityInvoiced(nullable: true)
+        isItemFullyOrdered(nullable: true)
+        isItemFullyShipped(nullable: true)
+        isItemFullyReceived(nullable: true)
+        isItemFullyInvoiced(nullable: true)
         derivedStatus(nullable: true)
     }
 

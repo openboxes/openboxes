@@ -21,16 +21,19 @@
 						<table>
 							<thead>
 								<tr>
-									<th>${warehouse.message(code: 'default.orderItemId.label', default: "Order Item ID")}</th>
-									<th>${warehouse.message(code: 'default.orderNumber.label', default: "Order Number")}</th>
-									<th>${warehouse.message(code: 'default.productCode.label', default: "Product Code")}</th>
-									<th>${warehouse.message(code: 'default.orderStatus.label', default: "Order Item Status")}</th>
-									<th>${warehouse.message(code: 'default.quantityOrdered.label', default: "Quantity Ordered")}</th>
-									<th>${warehouse.message(code: 'default.quantityShipped.label', default: "Quantity Shipped")}</th>
-									<th>${warehouse.message(code: 'default.quantityReceived.label', default: "Quantity Received")}</th>
-									<th>${warehouse.message(code: 'default.quantityCanceled.label', default: "Quantity Canceled")}</th>
-									<th>${warehouse.message(code: 'default.quantityInvoiced.label', default: "Quantity Invoiced")}</th>
-									<th>${warehouse.message(code: 'default.derivedStatus.label', default: "Derived Status")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.orderItemId.label', default: "Order Item ID")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.orderNumber.label', default: "Order Number")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.productCode.label', default: "Product Code")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.orderStatus.label', default: "Order Item Status")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.quantityOrdered.label', default: "Quantity Ordered")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.quantityShipped.label', default: "Quantity Shipped")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.quantityReceived.label', default: "Quantity Received")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.quantityCanceled.label', default: "Quantity Canceled")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.quantityInvoiced.label', default: "Quantity Invoiced")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.isItemFullyShipped.label', default: "Is fully shipped")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.isItemFullyReceived.label', default: "Is fully Received")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.isItemFullyInvoiced.label', default: "Is fully Invoiced")}</th>
+									<th>${warehouse.message(code: 'orderItemSummary.derivedStatus.label', default: "Derived Status")}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -75,6 +78,15 @@
 										</td>
 										<td class="middle">
 											${orderItemSummary.quantityInvoiced}
+										</td>
+										<td class="middle">
+											${orderItemSummary.isItemFullyShipped}
+										</td>
+										<td class="middle">
+											${orderItemSummary.isItemFullyReceived}
+										</td>
+										<td class="middle">
+											${orderItemSummary.isItemFullyInvoiced}
 										</td>
 										<td class="middle">
 											${orderItemSummary.derivedStatus}

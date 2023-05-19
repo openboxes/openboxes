@@ -21,12 +21,16 @@
 						<table>
 							<thead>
 								<tr>
-									<th>${warehouse.message(code: 'default.orderNumber.label', default: "Order Number")}</th>
-									<th>${warehouse.message(code: 'default.orderStatus.label', default: "Order Status")}</th>
-									<th>${warehouse.message(code: 'default.shipmentStatus.label', default: "Shipment Status")}</th>
-									<th>${warehouse.message(code: 'default.receiptStatus.label', default: "Receipt Status")}</th>
-									<th>${warehouse.message(code: 'default.paymentStatus.label', default: "Payment Status")}</th>
-									<th>${warehouse.message(code: 'default.derivedStatus.label', default: "Derived Status")}</th>
+									<th>${warehouse.message(code: 'orderSummary.orderNumber.label', default: "Order Number")}</th>
+									<th>${warehouse.message(code: 'orderSummary.itemsOrdered.label', default: "Items Ordered")}</th>
+									<th>${warehouse.message(code: 'orderSummary.itemsShipped.label', default: "Items Shipped")}</th>
+									<th>${warehouse.message(code: 'orderSummary.itemsReceived.label', default: "Items Received")}</th>
+									<th>${warehouse.message(code: 'orderSummary.itemsInvoiced.label', default: "Items Invoiced")}</th>
+									<th>${warehouse.message(code: 'orderSummary.orderStatus.label', default: "Order Status")}</th>
+									<th>${warehouse.message(code: 'orderSummary.shipmentStatus.label', default: "Shipment Status")}</th>
+									<th>${warehouse.message(code: 'orderSummary.receiptStatus.label', default: "Receipt Status")}</th>
+									<th>${warehouse.message(code: 'orderSummary.paymentStatus.label', default: "Payment Status")}</th>
+									<th>${warehouse.message(code: 'orderSummary.derivedStatus.label', default: "Derived Status")}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -47,6 +51,18 @@
 											<g:link action="show" id="${orderSummary?.id}">
 												${fieldValue(bean: orderSummary?.order, field: "orderNumber")}
 											</g:link>
+										</td>
+										<td class="middle">
+											${fieldValue(bean: orderSummary, field: "itemsOrdered")}
+										</td>
+										<td class="middle">
+											${fieldValue(bean: orderSummary, field: "itemsShipped")}
+										</td>
+										<td class="middle">
+											${fieldValue(bean: orderSummary, field: "itemsReceived")}
+										</td>
+										<td class="middle">
+											${fieldValue(bean: orderSummary, field: "itemsInvoiced")}
 										</td>
 										<td class="middle">
 											${fieldValue(bean: orderSummary, field: "orderStatus")}
