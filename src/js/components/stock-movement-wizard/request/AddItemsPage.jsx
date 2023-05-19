@@ -818,7 +818,7 @@ class AddItemsPage extends Component {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            quantityOnHand: val.quantityCounted,
+            quantityOnHand: this.state.isRequestFromWard ? val.quantityCounted : val.quantityOnHand,
           };
         },
       );
@@ -828,7 +828,7 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          quantityOnHand: val.quantityCounted,
+          quantityOnHand: this.state.isRequestFromWard ? val.quantityCounted : val.quantityOnHand,
         }),
       );
     }
