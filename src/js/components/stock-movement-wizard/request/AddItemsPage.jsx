@@ -985,7 +985,7 @@ class AddItemsPage extends Component {
       message: this.state.isRequestFromWard ?
         this.props.translate(
           'react.stockMovement.QOHWillNotBeSaved.message',
-          'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Also if there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+          'If there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
         )
         :
         this.props.translate(
