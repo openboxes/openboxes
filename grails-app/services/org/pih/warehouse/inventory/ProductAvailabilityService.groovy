@@ -454,10 +454,10 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, String[] categories, Boolean includeCategoryChildren) {
+    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, Category[] categories) {
         // If category is not provided and the includeCategoryChildren checkbox is not checked,
         // return nothing, because a product must have a category, so there is no need to execute a query
-        if (!categories && !includeCategoryChildren) {
+        if (categories?.empty) {
             return [:]
         }
 

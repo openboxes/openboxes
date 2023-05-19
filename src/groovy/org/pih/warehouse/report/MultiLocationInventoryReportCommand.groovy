@@ -10,16 +10,30 @@
 package org.pih.warehouse.report
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class MultiLocationInventoryReportCommand {
 
     Location[] locations
+    Category[] categories
+    Boolean includeSubcategories = Boolean.TRUE
+    String buttonAction
 
     Map<Product, Map<Location, Integer>> entries = [:]
 
+    static transients = ["isIncludeSubcategoriesEnabled"]
+
     static constraints = {
         locations(nullable: true)
+        categories(nullable: true)
+        includeSubcategories(nullable: true)
+        buttonAction(nullable: true)
     }
+
+    Boolean getIsIncludeSubcategoriesEnabled() {
+        return buttonAction.equalsIgnoreCase("run") && includeSubcategories
+    }
+
 
 }

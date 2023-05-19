@@ -545,16 +545,15 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        String[] categories = params.list('category').findAll { it } ?: null
-        // When accessing the page for the first time, the flag should be set to true
-        Boolean includeCategoryChildren = true
-        // If we run the report manually and the checkbox is not checked
-        if (params.button == "run" && !params.includeCategoryChildren) {
-            includeCategoryChildren = false
-        }
-        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, categories, includeCategoryChildren)
 
-        if (params.button == "download") {
+        // Include subcategories by default. If user execute report and explicitly chooses
+        // to exclude subcategories, then only use the given categories.
+        if (command.isIncludeSubcategoriesEnabled) {
+            command.categories = inventoryService.getExplodedCategories(categories)
+        }
+        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, command.categories)
+
+        if (command.buttonAction.equalsIgnoreCase("download")) {
             def sw = new StringWriter()
 
             try {
