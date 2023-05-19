@@ -11,6 +11,7 @@ CREATE OR REPLACE VIEW stock_movement_item AS
         product.name,
         requisition_item.quantity,
         requisition_item.quantity_canceled,
+        requisition_item.quantity_counted,
         requisition_item.order_index,
         requisition_item.cancel_reason_code,
         requisition_item.comment as comments,
