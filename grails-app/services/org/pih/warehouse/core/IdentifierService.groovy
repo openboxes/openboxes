@@ -238,6 +238,15 @@ class IdentifierService {
     }
 
     def generateSequentialProductIdentifier(ProductType productType) {
+        // If the product type does not have a custom identifier, then generate sequential product code from product type code
+        if (!productType.productIdentifierFormat) {
+            return generateSequentialProductIdentifierFromCode(productType)
+        }
+
+        if (!productType.productIdentifierFormat.contains("0")) {
+            throw new IllegalArgumentException("Product identifier format on product type does not contain sequential part")
+        }
+
         def sequenceFormat = extractSequenceFormat(productType.productIdentifierFormat, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR, 1)
         def sequenceNumber = productTypeService.getAndSetNextSequenceNumber(productType)
 
@@ -251,7 +260,7 @@ class IdentifierService {
 
         def defaultProductTypeId = ConfigurationHolder.config.openboxes.identifier.defaultProductType.id
         if (!productType.code && productType.id != defaultProductTypeId) {
-            throw new IllegalArgumentException("Can only generate sequential product code without specifed product type code " +
+            throw new IllegalArgumentException("Can only generate sequential product code without specified product type code " +
                 "for default product type with id: ${defaultProductTypeId}")
         }
 
@@ -272,28 +281,70 @@ class IdentifierService {
         return renderTemplate(template, model)
     }
 
+    /**
+     * Generate random product identifier for specific productIdentifierFormat if it is set on the given product type,
+     * or for configured config.openboxes.identifier.product.format
+     * */
+    String generateRandomProductIdentifier(ProductType productType) {
+        // If the product type is null or the product type does not have a custom identifier,
+        // then generate product code from DEFAULT_PRODUCT_NUMBER_FORMAT
+        if (!productType || !productType.productIdentifierFormat) {
+            return generateProductIdentifier()
+        }
+
+        // if the product type does not contain sequential part, then generate identifier basing on custom format
+        return generateIdentifier(productType.productIdentifierFormat)
+    }
+
+    /**
+     * Generates product identifier for product with given product type.
+     *
+     * Options of generated product identifiers (and what needs to be configured to achieve it):
+     *  1. If product type is the systems' default (id == openboxes.identifier.defaultProductType.id):
+     *      a) SEQUENTIAL - requires:
+     *          - setting openboxes.identifier.productCode.generatorType as IdentifierGeneratorTypeCode.SEQUENCE,
+     *          - one of:
+     *              - productIdentifierFormat (needs sequential part to be present in this field),
+     *              - code in combination with with openboxes.identifier.productCode.format template,
+     *              - non of both above will result 'number' only sequence, the identifier will be based on
+     *                the openboxes.identifier.productCode.delimiter, openboxes.identifier.productCode.format,
+     *                openboxes.identifier.productCode.properties and identifier.sequenceNumber.format config
+     *                (available only for the systems' default product type)
+     *      b) RANDOM - requires:
+     *          - setting openboxes.identifier.productCode.generatorType as IdentifierGeneratorTypeCode.RANDOM,
+     *          - one of:
+     *              - filled productIdentifierFormat
+     *              - empty productIdentifierFormat (will be generated basing on the openboxes.identifier.product.format)
+     *  2. If product type is NOT the systems' default:
+     *      a) SEQUENTIAL - requires one of:+
+     *          - product identifier format containng sequential part
+     *          - code
+     *      b) RANDOM - requires one of:
+     *          - filled productIdentifierFormat
+     *          - empty productIdentifierFormat (will be generated basing on the openboxes.identifier.product.format)
+     * */
     String generateProductIdentifier(ProductType productType) {
-        // If the product type is null, then generate product code from DEFAULT_PRODUCT_NUMBER_FORMAT
-        if (!productType) {
-            return generateProductIdentifier()
+        if (productType?.id == ConfigurationHolder.config.openboxes.identifier.defaultProductType.id) {
+            // If product type is systems default then generate basing on the generator type
+            def generatorTypeConfig = ConfigurationHolder.config.openboxes.identifier.productCode.generatorType
+            IdentifierGeneratorTypeCode generatorTypeCode = generatorTypeConfig as IdentifierGeneratorTypeCode
+            switch (generatorTypeCode) {
+                case IdentifierGeneratorTypeCode.SEQUENCE:
+                    return generateSequentialProductIdentifier(productType)
+                case IdentifierGeneratorTypeCode.RANDOM:
+                    return generateRandomProductIdentifier(productType)
+                default:
+                    return generateRandomProductIdentifier(productType)
+            }
         }
 
-        // If the product type does not have a custom identifier but has sequence number, then generate sequential product code
-        if (!productType.productIdentifierFormat && productType.sequenceNumber != null) {
-            return generateSequentialProductIdentifierFromCode(productType)
+        // If product type is not deafult and has sequential identifier format or code,
+        // then generate sequentional, otherwise random
+        if (productType?.productIdentifierFormat?.contains("0") || productType?.code) {
+            return generateSequentialProductIdentifier(productType)
         }
 
-        // If the product type does not have a custom identifier, then generate product code from DEFAULT_PRODUCT_NUMBER_FORMAT
-        if (!productType.productIdentifierFormat) {
-            return generateProductIdentifier()
-        }
-
-        // if does not contain sequential part, then generate identifier basing on custom format
-        if (!productType.productIdentifierFormat.contains("0")) {
-            return generateIdentifier(productType.productIdentifierFormat)
-        }
-
-        return generateSequentialProductIdentifier(productType)
+        return generateRandomProductIdentifier(productType)
     }
 
     def generateSequenceNumber(String sequenceNumber, String sequenceNumberFormat) {
@@ -335,7 +386,7 @@ class IdentifierService {
         def products = Product.findAll("from Product as p where p.active = true and (p.productCode is null or p.productCode = '')")
         products.each { product ->
             try {
-                def productCode = generateProductIdentifier()
+                def productCode = product.productType ? generateProductIdentifier(product.productType) : generateProductIdentifier()
                 println "Assigning identifier ${productCode} to product " + product.id + " " + product.name
 
                 // Check to see if there's already a product with that product code
