@@ -1501,6 +1501,23 @@ class EditItemsPage extends Component {
       });
   }
 
+  /**
+   * If we are in requesting location (destination), allow to add items only for a person
+   * who created a stock request
+   *
+   * If we are in verifying/fulfilling location (origin), allow to add items for any person
+   * verifying the request
+   * @returns {boolean}
+   */
+  isUserAllowedToAddItems() {
+    const { requestedBy, origin, destination } = this.state.values;
+    const { currentUserId, currentLocationId } = this.props;
+    if (currentLocationId === origin?.id) {
+      return true;
+    }
+    return currentLocationId === destination?.id && requestedBy?.id === currentUserId;
+  }
+
   isAddingItemsAllowed() {
     const allowedStatuses = [
       RequisitionStatus.CREATED,
@@ -1509,7 +1526,7 @@ class EditItemsPage extends Component {
     ];
     // The "go back to add items" button should be only visible for requestors of the stock request
     // and if requsition status is < PICKED, so CREATED, EDITING, VERIFYING
-    return this.state.values?.requestedBy?.id === this.props.currentUserId &&
+    return this.isUserAllowedToAddItems() &&
       allowedStatuses.includes(this.state.values?.associations?.requisition?.status);
   }
 
@@ -1625,8 +1642,8 @@ class EditItemsPage extends Component {
               <div className={`submit-buttons ${isAddingItemsAllowed ? 'd-flex justify-content-between' : ''}`}>
                 {isAddingItemsAllowed &&
                   <Button
-                    label="react.stockMovement.goBackToAddItems.label"
-                    defaultLabel="Go back to add items"
+                    label="react.stockMovement.editRequestItems.label"
+                    defaultLabel="Edit request items"
                     variant="primary-outline"
                     onClick={() => this.props.history.push(EDIT_REQUEST(this.state.values?.id))}
                   />
@@ -1661,6 +1678,7 @@ const mapStateToProps = state => ({
   supportedActivities: state.session.supportedActivities,
   currentLocale: state.session.activeLanguage,
   currentUserId: state.session.user?.id,
+  currentLocationId: state.session.currentLocation?.id,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -1696,4 +1714,5 @@ EditItemsPage.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  currentLocationId: PropTypes.string.isRequired,
 };
