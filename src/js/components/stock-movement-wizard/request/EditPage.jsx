@@ -1524,8 +1524,6 @@ class EditItemsPage extends Component {
       RequisitionStatus.EDITING,
       RequisitionStatus.VERIFYING,
     ];
-    // The "go back to add items" button should be only visible for requestors of the stock request
-    // and if requsition status is < PICKED, so CREATED, EDITING, VERIFYING
     return this.isUserAllowedToAddItems() &&
       allowedStatuses.includes(this.state.values?.associations?.requisition?.status);
   }
