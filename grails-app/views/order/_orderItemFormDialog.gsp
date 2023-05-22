@@ -362,6 +362,12 @@
     var budgetCode = $("#dlgBudgetCode").val();
     var quantity = parseInt($("#dlgQuantity").val());
     var quantityInShipments = parseInt($("#dlgQuantityInShipments").val())
+    var quantityPerUom = $("#dlgQuantityPerUom").val();
+
+    if (quantityPerUom < 1) {
+      $("#dlgQuantityPerUom").notify(htmlDecode("${g.message(code: 'orderItem.quantityPerUom.validation.label', default: 'quantity per Uom cannot be less than 1')}"))
+      return false
+    }
     if (quantity < quantityInShipments) {
         $("#dlgQuantity").notify("Must enter a quantity greater than or equal to the quantity in shipments(" + quantityInShipments + ")")
         return false

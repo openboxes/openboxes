@@ -448,6 +448,10 @@
           if (!unitPrice) $("#unitPrice").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
           if (!quantityUom) $("#quantityUom_chosen").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
           if (!quantityPerUom) $("#quantityPerUom").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
+          if (quantityPerUom < 1) {
+            $("#quantityPerUom").notify(htmlDecode("${g.message(code: 'orderItem.quantityPerUom.validation.label', default: 'quantity per Uom cannot be less than 1')}"))
+            return false
+          }
           if (!budgetCode && isAccountingRequired) {
             $("#budgetCode").notify(htmlDecode("${g.message(code: 'default.required.label', default: 'Required')}"))
             return false
