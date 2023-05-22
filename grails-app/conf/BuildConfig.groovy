@@ -133,7 +133,6 @@ grails.project.dependency.resolution = {
 
         build 'org.codehaus.gpars:gpars:0.12'  // otherwise early build chain uses 0.9
         compile "org.codehaus.gpars:gpars:0.12"
-        // Required for GPars
         compile "org.codehaus.jsr166-mirror:jsr166y:1.7.0"
         compile "org.codehaus.jsr166-mirror:extra166y:1.7.0"
 
@@ -178,7 +177,9 @@ grails.project.dependency.resolution = {
         compile 'org.xhtmlrenderer:flying-saucer-core:9.1.15'
         compile 'org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.15'
         compile 'com.github.librepdf:openpdf:1.2.0'
+
         compile 'com.github.albfernandez:juniversalchardet:2.4.0'
+        compile 'com.newrelic.agent.java:newrelic-api:6.5.4'
     }
     plugins {
 
