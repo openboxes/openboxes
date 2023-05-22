@@ -454,25 +454,13 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, String[] categories, Boolean includeCategoryChildren) {
-        // If category is not provided and the includeCategoryChildren checkbox is not checked,
-        // return nothing, because a product must have a category, so there is no need to execute a query
-        if (!categories && !includeCategoryChildren) {
-            return [:]
-        }
-
+    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, Category[] categories) {
         def categoriesQuery = "";
         def queryArguments = [locations: locations]
         // if we don't have categories and checkbox is checked, then we should get all of the products
         if (categories) {
             categoriesQuery = "and category.id in (:categories)"
-            def availableCategories = includeCategoryChildren ? categories.collect { String categoryId ->
-                if (categoryId) {
-                    Category category = Category.load(categoryId)
-                    category?.children + category
-                }
-            }.flatten().collect { it?.id } : categories
-            queryArguments += [categories: availableCategories]
+            queryArguments += [categories: categories.collect { it.id }]
         }
         def quantityMap = [:]
         if (locations) {

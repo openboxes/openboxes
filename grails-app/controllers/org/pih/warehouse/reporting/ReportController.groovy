@@ -545,16 +545,18 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        String[] categories = params.list('category').findAll { it } ?: null
-        // When accessing the page for the first time, the flag should be set to true
-        Boolean includeCategoryChildren = true
-        // If we run the report manually and the checkbox is not checked
-        if (params.button == "run" && !params.includeCategoryChildren) {
-            includeCategoryChildren = false
+        String[] categoriesId = params.list('category')
+        command.buttonAction = params.button
+        command.categories = productService.getCategories(categoriesId)
+        command.setIncludeSubcategories(params.includeCategoryChildren)
+        // Include subcategories by default. If user execute report and explicitly chooses
+        // to exclude subcategories, then only use the given categories.
+        if (command.includeSubcategories) {
+            command.categories = inventoryService.getExplodedCategories(command.categories as List)
         }
-        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, categories, includeCategoryChildren)
 
-        if (params.button == "download") {
+        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, command.categories)
+        if (command.buttonAction?.equalsIgnoreCase("download")) {
             def sw = new StringWriter()
 
             try {
@@ -611,7 +613,7 @@ class ReportController {
             render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
         }
 
-        render(view: 'showInventoryByLocationReport', model: [command: command, includeCategoryChildren: includeCategoryChildren])
+        render(view: 'showInventoryByLocationReport', model: [command: command])
     }
 
     def showRequestDetailReport = {

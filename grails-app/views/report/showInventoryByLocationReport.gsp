@@ -48,7 +48,7 @@
                             </p>
                             <p>
                                 <label>
-                                    <g:checkBox name="includeCategoryChildren" value="${includeCategoryChildren}"/>
+                                    <g:checkBox name="includeCategoryChildren" value="${command.includeSubcategories}"/>
                                     ${warehouse.message(
                                             code:'report.search.includeCategoryChildren.label',
                                             default: 'Include all products in all subcategories',
