@@ -8,11 +8,14 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { Tooltip } from 'react-tippy';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
+import { EDIT_REQUEST } from 'api/redirectUrls';
 import ArrayField from 'components/form-elements/ArrayField';
+import Button from 'components/form-elements/Button';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
@@ -20,6 +23,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
+import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
@@ -1128,12 +1132,16 @@ class EditItemsPage extends Component {
     this.props.fetchReasonCodes();
 
     this.fetchEditPageData().then((resp) => {
-      const { statusCode } = resp.data.data;
+      const { statusCode, associations } = resp.data.data;
       const { totalCount } = resp.data;
 
       this.setState({
         statusCode,
         totalCount,
+        values: {
+          ...this.state.values,
+          associations,
+        },
       }, () => {
         if (!this.props.isPaginated || forceFetch) {
           this.fetchItems();
@@ -1164,6 +1172,7 @@ class EditItemsPage extends Component {
           hasItemsLoaded: true,
           values: {
             ...this.state.values,
+            associations: data?.associations,
             editPageItems: _.map(data, item => ({
               ...item,
               quantityOnHand: item.quantityOnHand || 0,
@@ -1492,9 +1501,37 @@ class EditItemsPage extends Component {
       });
   }
 
+  /**
+   * If we are in requesting location (destination), allow to add items only for a person
+   * who created a stock request
+   *
+   * If we are in verifying/fulfilling location (origin), allow to add items for any person
+   * verifying the request
+   * @returns {boolean}
+   */
+  isUserAllowedToAddItems() {
+    const { requestedBy, origin, destination } = this.state.values;
+    const { currentUserId, currentLocationId } = this.props;
+    if (currentLocationId === origin?.id) {
+      return true;
+    }
+    return currentLocationId === destination?.id && requestedBy?.id === currentUserId;
+  }
+
+  isAddingItemsAllowed() {
+    const allowedStatuses = [
+      RequisitionStatus.CREATED,
+      RequisitionStatus.EDITING,
+      RequisitionStatus.VERIFYING,
+    ];
+    return this.isUserAllowedToAddItems() &&
+      allowedStatuses.includes(this.state.values?.associations?.requisition?.status);
+  }
+
   render() {
     const { showOnlyErroredItems, itemFilter } = this.state;
     const { showOnly } = this.props;
+    const isAddingItemsAllowed = this.isAddingItemsAllowed();
     const erroredItemsCount = this.state.values && this.state.values.editPageItems.length > 0 ? _.filter(this.state.values.editPageItems, item => item.hasError).length : '0';
     return (
       <Form
@@ -1600,7 +1637,15 @@ class EditItemsPage extends Component {
                     itemFilter,
                 }))}
               </div>
-              <div className="submit-buttons">
+              <div className={`submit-buttons ${isAddingItemsAllowed ? 'd-flex justify-content-between' : ''}`}>
+                {isAddingItemsAllowed &&
+                  <Button
+                    label="react.stockMovement.editRequestItems.label"
+                    defaultLabel="Edit request items"
+                    variant="primary-outline"
+                    onClick={() => this.props.history.push(EDIT_REQUEST(this.state.values?.id))}
+                  />
+                }
                 <button
                   type="submit"
                   disabled={!this.state.hasItemsLoaded || showOnly || invalid}
@@ -1630,11 +1675,13 @@ const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
   supportedActivities: state.session.supportedActivities,
   currentLocale: state.session.activeLanguage,
+  currentUserId: state.session.user?.id,
+  currentLocationId: state.session.currentLocation?.id,
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   fetchReasonCodes, showSpinner, hideSpinner,
-})(EditItemsPage);
+})(EditItemsPage));
 
 EditItemsPage.propTypes = {
   /** Initial component's data */
@@ -1661,4 +1708,9 @@ EditItemsPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
   currentLocale: PropTypes.string.isRequired,
+  currentUserId: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+  currentLocationId: PropTypes.string.isRequired,
 };
