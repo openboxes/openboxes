@@ -513,7 +513,7 @@ class LocationService {
         }
 
         // Of those locations remaining, we need to return only locations that can receive stock
-        locations = locations.findAll { Location it -> it.supports(ActivityCode.RECEIVE_STOCK) && !it.supports(ActivityCode.MANAGE_INVENTORY) && !it.isSupplier() }
+        locations = locations.findAll { !it.supports(ActivityCode.MANAGE_INVENTORY) && !it.isSupplier() }
 
         // Remove current location from list
         locations = locations?.unique() - currentLocation
