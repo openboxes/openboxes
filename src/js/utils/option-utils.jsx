@@ -112,6 +112,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             displayName: obj.displayName,
             color: obj.color,
             exactMatch: obj.exactMatch,
+            active: obj.active,
           }
         ))))
         .catch(() => callback([]));

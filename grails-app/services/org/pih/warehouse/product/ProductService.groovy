@@ -1309,7 +1309,8 @@ class ProductService {
         def query = """
             select distinct
             product.id, 
-            product.name, 
+            product.name,
+            product.active,
             product.product_code as productCode, 
             product.cold_chain as coldChain, 
             product.controlled_substance as controlledSubstance, 
