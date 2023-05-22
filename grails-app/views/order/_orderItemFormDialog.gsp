@@ -105,13 +105,12 @@
                     <label for="dlgQuantityPerUom"><warehouse:message code="orderItem.quantityPerUom.label"/></label>
                 </td>
                 <td valign="top" class="value">
-                    <input type="text"
-                           id="dlgQuantityPerUom"
-                           name="quantityPerUom"
-                           value="${g.formatNumber(number: orderItem?.quantityPerUom, maxFractionDigits: 0)?:1}"
-                           min="0"
-                           size="10"
-                           class="text" />
+                    <g:decimalNumberField decimal="0"
+                                          id="dlgQuantityPerUom"
+                                          name="quantityPerUom"
+                                          value="${g.formatNumber(number: orderItem?.quantityPerUom, maxFractionDigits: 0)?:1}"
+                                          size="10"
+                                          class="text" />
                 </td>
             </tr>
             <tr class="prop">
@@ -362,7 +361,7 @@
     var budgetCode = $("#dlgBudgetCode").val();
     var quantity = parseInt($("#dlgQuantity").val());
     var quantityInShipments = parseInt($("#dlgQuantityInShipments").val())
-    var quantityPerUom = $("#dlgQuantityPerUom").val();
+    const quantityPerUom = $("#dlgQuantityPerUom").val();
 
     if (quantityPerUom < 1) {
       $("#dlgQuantityPerUom").notify(htmlDecode("${g.message(code: 'orderItem.quantityPerUom.validation.label', default: 'quantity per Uom cannot be less than 1')}"))
