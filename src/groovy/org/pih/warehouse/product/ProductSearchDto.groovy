@@ -6,6 +6,8 @@ class ProductSearchDto {
 
     String id
 
+    Boolean active
+
     String name
 
     String displayName
@@ -44,6 +46,7 @@ class ProductSearchDto {
         [
                 id                 : id,
                 productCode        : productCode,
+                active             : active,
                 name               : name,
                 displayName        : displayName,
                 color              : productColor,
