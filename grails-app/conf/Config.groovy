@@ -974,11 +974,13 @@ openboxes.identifier.purchaseOrder.sequenceNumber.format = Constants.DEFAULT_PO_
 openboxes.identifier.purchaseOrder.format = "PO-\${destinationPartyCode}-\${sequenceNumber}"
 openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destinationParty.code"]
 
+// Product identifier generator configuration for the systems default product
+openboxes.identifier.defaultProductType.id = "DEFAULT"
 openboxes.identifier.productCode.generatorType = IdentifierGeneratorTypeCode.SEQUENCE
+// Product identifier configuration for all sequential product codes
 openboxes.identifier.productCode.delimiter = Constants.DEFAULT_IDENTIFIER_SEPARATOR
 openboxes.identifier.productCode.format = "\${productTypeCode}\${delimiter}\${sequenceNumber}"
 openboxes.identifier.productCode.properties = ["productTypeCode": "code"]
-openboxes.identifier.defaultProductType.id = "DEFAULT"
 
 // OpenBoxes default line printer port
 openboxes.linePrinterTerminal.port = "LPT1"
