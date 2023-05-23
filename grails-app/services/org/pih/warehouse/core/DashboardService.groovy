@@ -561,27 +561,16 @@ class DashboardService {
         ArrayList<Map> reorderStock = inventoryItems.findAll { Map inventoryItem ->
             def inventoryLevel = inventoryItem?.inventoryLevel as InventoryLevel
 
-            if (inventoryLevel?.binLocation != null) {
-                return false;
-            }
+            Integer minQuantity = inventoryLevel?.minQuantity
+            Integer reorderQuantity = inventoryLevel?.reorderQuantity
 
-            def minQuantity = inventoryLevel?.minQuantity
-
-            if(minQuantity == null) {
-                return false
-            }
-
-            def reorderQuantity = inventoryLevel?.reorderQuantity
-
-            if(reorderQuantity == null) {
+            // If an inventoryLevel does have a bin location,
+            // or minQuantity and reorderQuantity not set, the item should not appear in the report
+            if (inventoryLevel?.binLocation || (!minQuantity && !reorderQuantity)) {
                 return false
             }
 
             def quantityATP = inventoryItem.quantityAvailableToPromise as Number
-
-            if (quantityATP >= minQuantity || quantityATP >= reorderQuantity) {
-                return false
-            }
 
             def quantityToOrder = null
             def expectedReorderCost = null
@@ -598,7 +587,11 @@ class DashboardService {
             inventoryItem.put("unitCost", unitCost);
             inventoryItem.put("expectedReorderCost", expectedReorderCost);
 
-            true
+            // If minQuantity not null and qatp < minQty OR reorderQty not null and qatp < reorderAtp, the item SHOULD appear in the report
+            if ((minQuantity && quantityATP < minQuantity) || (reorderQuantity && quantityATP < reorderQuantity)) {
+                return true
+            }
+            return false
         }
         log.info "Get simple reorder stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return reorderStock
