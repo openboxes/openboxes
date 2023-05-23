@@ -1273,6 +1273,9 @@ class ProductService {
                            }
                         }
                         ilike("description", "%" + term)
+                        ilike("brandName", term)
+                        ilike("manufacturerCode", term)
+                        ilike("vendorCode", term)
                         ilike("upc", term)
                         ilike("ndc", term)
                         ilike("unitOfMeasure", term)
@@ -1361,12 +1364,16 @@ class ProductService {
                 or lower(product.product_code) like '${it}%' 
                 or (synonym.synonym_type_code = '${SynonymTypeCode.DISPLAY_NAME}' and synonym.name like '%${it}%')
                 or lower(product.description) like '%${it}%'
+                or lower(product.brand_name) like '${it}%' 
+                or lower(product.manufacturer_code) like '${it}%' 
+                or lower(product.vendor_code) like '${it}%'
                 or lower(product.upc) like '${it}%' 
                 or lower(product.ndc) like '${it}%'
                 or lower(product.unit_of_measure) like '${it}%' 
                 or lower(product_supplier.name) like '%${it}%' 
                 or lower(product_supplier.code) like '${it}%'
                 or lower(product_supplier.product_code) like '${it}%' 
+                or lower(product_supplier.brand_name) like '${it}%'
                 or lower(product_supplier.manufacturer_code) like '${it}%'
                 or lower(product_supplier.manufacturer_name) like '${it}%' 
                 or lower(product_supplier.supplier_code) like '${it}%'
