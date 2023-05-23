@@ -21,9 +21,7 @@ class MultiLocationInventoryReportCommand {
     String buttonAction
 
     Map<Product, Map<Location, Integer>> entries = [:]
-
-    static transients = ["isIncludeSubcategoriesEnabled"]
-
+    
     static constraints = {
         locations(nullable: true)
         categories(nullable: true)
