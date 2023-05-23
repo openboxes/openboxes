@@ -69,12 +69,11 @@
                     ${location.name}
                 </td>
                 <td>
-                    <g:selectLocation id="transferTo-${inventoryItem?.id}" name="otherLocation.id" class="chzn-select-deselect trigger-change"
-                                      noSelection="['null':'']"
-                                      data-placeholder="${g.message(code: 'inventoryItem.chooseStockTransfer.label', default: 'Choose where stock is being transferred to ...')}"
-                                      data-url="${request.contextPath}/inventoryItem/refreshBinLocation"
-                                      data-target="#transferTo-binLocation"
-                                      value=""/>
+                    <g:selectTransactionDestination name="otherLocation.id" class="chzn-select-deselect trigger-change"
+                                                    data-placeholder="${g.message(code: 'inventoryItem.chooseStockTransfer.label', default: 'Choose where stock is being transferred to ...')}"
+                                                    data-url="${request.contextPath}/inventoryItem/refreshBinLocation"
+                                                    data-target="#transferTo-binLocation"
+                                                    value="${command?.transactionInstance?.destination?.id}" noSelection="['null': '']"/>
                 </td>
             </tr>
             <tr class="prop">
