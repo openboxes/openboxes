@@ -545,18 +545,21 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        String[] categoriesId = params.list('category')
-        command.buttonAction = params.button
-        command.categories = productService.getCategories(categoriesId)
-        command.setIncludeSubcategories(params.includeCategoryChildren)
+
+        if (!command.validate()) {
+            render(view: 'showInventoryByLocationReport', model: [command: command])
+            return
+        }
+
         // Include subcategories by default. If user execute report and explicitly chooses
         // to exclude subcategories, then only use the given categories.
         if (command.includeSubcategories) {
-            command.categories = inventoryService.getExplodedCategories(command.categories as List)
+            command.categories = inventoryService.getExplodedCategories(command.categories)
         }
 
         command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, command.categories)
-        if (command.buttonAction?.equalsIgnoreCase("download")) {
+
+        if (command.isActionDownload) {
             def sw = new StringWriter()
 
             try {
@@ -605,10 +608,9 @@ class ReportController {
                 }
 
             } catch (RuntimeException e) {
-                log.error(e.message)
+                log.error("Unexpected error occurred while generating report ", e.message)
                 sw.append(e.message)
             }
-
             response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
         }

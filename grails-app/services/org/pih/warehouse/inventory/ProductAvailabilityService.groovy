@@ -454,7 +454,7 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations, Category[] categories) {
+    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(List<Location> locations, List<Category> categories) {
         def categoriesQuery = "";
         def queryArguments = [locations: locations]
         // if we don't have categories and checkbox is checked, then we should get all of the products

@@ -9,29 +9,36 @@
  **/
 package org.pih.warehouse.report
 
+import org.apache.commons.collections.FactoryUtils
+import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 class MultiLocationInventoryReportCommand {
 
-    Location[] locations
-    Category[] categories
+    String actionButton
     Boolean includeSubcategories = Boolean.TRUE
-    String buttonAction
+    List<Location> locations = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Location.class))
+    List<Category> categories = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(Category.class))
 
     Map<Product, Map<Location, Integer>> entries = [:]
-    
+
+    static transients = ["isActionRun", "isActionDownload"]
+
     static constraints = {
         locations(nullable: true)
         categories(nullable: true)
         includeSubcategories(nullable: true)
-        buttonAction(nullable: true)
+        actionButton(nullable: true, inList: ["run", "download"])
     }
 
-    void setIncludeSubcategories(String includeCategoryChildren) {
-        if ((buttonAction?.equalsIgnoreCase("run") || (buttonAction?.equalsIgnoreCase("download"))) && !includeCategoryChildren) {
-            includeSubcategories = Boolean.FALSE
-        }
+    Boolean getIsActionRun() {
+        return actionButton?.equalsIgnoreCase("run")
     }
+
+    Boolean getIsActionDownload() {
+        return actionButton?.equalsIgnoreCase("download")
+    }
+
 }

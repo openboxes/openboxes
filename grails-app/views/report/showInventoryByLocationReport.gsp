@@ -12,6 +12,11 @@
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
+    <g:hasErrors bean="${command}">
+        <div class="errors">
+            <g:renderErrors bean="${command}" as="list" />
+        </div>
+    </g:hasErrors>
 
     <div class="button-bar">
         <g:link controller="dashboard" action="index" class="button"><g:message code="default.button.backTo.label" args="['Dashboard']"/></g:link>
@@ -41,14 +46,14 @@
                                         id="category" multiple="true"
                                         class="chzn-select-deselect filter"
                                         data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
-                                        name="category"
+                                        name="categories"
                                         noSelection="['':'']"
-                                        value="${params?.list('category')}"
+                                        value="${params?.list('categories')}"
                                 />
                             </p>
                             <p>
                                 <label>
-                                    <g:checkBox name="includeCategoryChildren" value="${command.includeSubcategories}"/>
+                                    <g:checkBox name="includeSubcategories" value="${command.includeSubcategories}"/>
                                     ${warehouse.message(
                                             code:'report.search.includeCategoryChildren.label',
                                             default: 'Include all products in all subcategories',
@@ -58,17 +63,15 @@
                         </div>
                         <div class="prop">
                             <div class="center">
-                                <button name="button" value="run" class="button"><g:message code="default.button.run.label"/></button>
-                                <button name="button" value="download" class="button"><g:message code="default.button.download.label"/></button>
+                                <button name="actionButton" value="run" class="button"><g:message code="default.button.run.label"/></button>
+                                <button name="actionButton" value="download" class="button"><g:message code="default.button.download.label"/></button>
                             </div>
                         </div>
                     </div>
                 </g:form>
             </div>
-
         </div>
         <div class="yui-u">
-
             <div class="box">
                 <h2>
                     ${warehouse.message(code:'report.inventoryByLocationReport.label')} <small>(${command.entries?.keySet()?.size()} results)</small>
