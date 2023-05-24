@@ -798,8 +798,8 @@ class OrderService {
                         UnitOfMeasure uom = uomParts.length > 1 ? UnitOfMeasure.findByCodeOrName(uomParts[0], uomParts[0]) : null
                         orderItem.quantityUom = uom
                         BigDecimal qtyPerUom = uomParts.length > 1 ? CSVUtils.parseNumber(uomParts[1], "unitOfMeasure"): null
-                        if (!qtyPerUom) {
-                            throw new IllegalArgumentException("Quantity per UoM cannot be 0 or empty")
+                        if (!qtyPerUom || qtyPerUom < 1) {
+                            throw new IllegalArgumentException("Quantity per UoM cannot be empty or less than 1")
                         }
                         orderItem.quantityPerUom = qtyPerUom
                     } else {
