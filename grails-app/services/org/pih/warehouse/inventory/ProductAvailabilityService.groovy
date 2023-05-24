@@ -29,6 +29,7 @@ import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.picklist.Picklist
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAvailability
@@ -557,7 +558,14 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(Location[] locations) {
+    Map<Product, Map<Location, Integer>> getQuantityOnHandByProduct(List<Location> locations, List<Category> categories) {
+        def categoriesQuery = "";
+        def queryArguments = [locations: locations]
+        // if we don't have categories and checkbox is checked, then we should get all of the products
+        if (categories) {
+            categoriesQuery = "and category.id in (:categories)"
+            queryArguments += [categories: categories.collect { it.id }]
+        }
         def quantityMap = [:]
         if (locations) {
             def results = ProductAvailability.executeQuery("""
@@ -565,10 +573,11 @@ class ProductAvailabilityService {
 						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa, Product product, Category category
 						where pa.location in (:locations)
+						${categoriesQuery}
 						and pa.product = product
 						and pa.product.category = category
 						group by product, pa.location, category.name
-						""", [locations: locations])
+						""", queryArguments)
 
             results.each {
                 if (!quantityMap[it[0]]) {

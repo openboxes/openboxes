@@ -20,6 +20,7 @@ import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.report.ChecklistReportCommand
 import org.pih.warehouse.report.InventoryReportCommand
@@ -544,9 +545,21 @@ class ReportController {
     }
 
     def showInventoryByLocationReport = { MultiLocationInventoryReportCommand command ->
-        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations)
 
-        if (params.button == "download") {
+        if (!command.validate()) {
+            render(view: 'showInventoryByLocationReport', model: [command: command])
+            return
+        }
+
+        // Include subcategories by default. If user execute report and explicitly chooses
+        // to exclude subcategories, then only use the given categories.
+        if (command.includeSubcategories) {
+            command.categories = inventoryService.getExplodedCategories(command.categories)
+        }
+
+        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, command.categories)
+
+        if (command.isActionDownload) {
             def sw = new StringWriter()
 
             try {
@@ -579,7 +592,7 @@ class ReportController {
                             sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.displayNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.category?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
+                            sw.append('"' + (entry.key?.category?.getHierarchyAsString(" > ") ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
                             sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
 
@@ -595,10 +608,9 @@ class ReportController {
                 }
 
             } catch (RuntimeException e) {
-                log.error(e.message)
+                log.error("Unexpected error occurred while generating report ", e.message)
                 sw.append(e.message)
             }
-
             response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
         }
