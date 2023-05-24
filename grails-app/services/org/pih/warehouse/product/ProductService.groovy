@@ -1490,8 +1490,4 @@ class ProductService {
         }
         return synonym
     }
-
-    Category[] getCategories(String[] categoriesId) {
-        categoriesId.collect { Category.load(it) }
-    }
 }
