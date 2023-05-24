@@ -442,7 +442,7 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested <= 0
-      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) <= 0) {
+      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -608,7 +608,7 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
+      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -905,6 +905,9 @@ class AddItemsPage extends Component {
             // newly saved item to replace its equivalent in state
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
+              if (parseInt(item.quantityRequested, 10) === 0) {
+                return { ..._.omit(item, 'id'), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
+              }
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
               // line is disabled by default
@@ -975,6 +978,17 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
+    this.setState({
+      values: {
+        ...this.state.values,
+        lineItems: this.state.values.lineItems.map((item) => {
+          if (parseInt(item.quantityRequested, 10) === 0) {
+            return { ...item, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
+          }
+          return item;
+        }),
+      },
+    });
 
     return Promise.resolve();
   }
@@ -998,7 +1012,7 @@ class AddItemsPage extends Component {
         return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
 
-      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) <= 0)) {
+      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0)) {
         return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
       }
 
@@ -1419,7 +1433,7 @@ class AddItemsPage extends Component {
                     disabled={
                     invalid ||
                     showOnly ||
-                    _.some(values.lineItems, item => item.quantityRequested <= 0)
+                    _.some(values.lineItems, item => item.quantityRequested < 0)
                   }
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                     onMouseDown={() => {
@@ -1462,7 +1476,7 @@ class AddItemsPage extends Component {
                     (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
                     invalid ||
                     showOnly ||
-                    _.some(values.lineItems, item => item.quantityRequested <= 0)
+                    _.some(values.lineItems, item => item.quantityRequested < 0)
                   }
                   ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                   </button>
