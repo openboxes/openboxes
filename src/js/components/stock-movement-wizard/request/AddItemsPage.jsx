@@ -1044,7 +1044,7 @@ class AddItemsPage extends Component {
       title: this.props.translate('react.stockMovement.message.confirmSubmit.label', 'Confirm submit'),
       message: this.props.translate(
         'react.stockMovement.confirmSubmit.message',
-        'Please confirm you are ready to submit your request. Once submitted, you cannot edit the request.',
+        'Please confirm you are ready to submit your request.',
       ),
       buttons: [
         {

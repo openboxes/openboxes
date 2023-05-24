@@ -686,24 +686,6 @@ class AddItemsPage extends Component {
     });
   }
 
-  confirmSubmit(onConfirm) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSubmit.label', 'Confirm submit'),
-      message: this.props.translate(
-        'react.stockMovement.confirmSubmit.message',
-        'Please confirm you are ready to submit your request. Once submitted, you cannot edit the request.',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.goBack.label', 'Go back'),
-        },
-        {
-          label: this.props.translate('react.default.submit.label', 'Submit'),
-          onClick: onConfirm,
-        },
-      ],
-    });
-  }
 
   /**
    * Fetches all required data.
