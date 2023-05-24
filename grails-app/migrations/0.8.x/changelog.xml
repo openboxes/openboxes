@@ -157,4 +157,5 @@
     <include file="0.8.x/changelog-2023-02-01-0900-add-active-column-to-gl-accounts.xml" />
     <include file="0.8.x/changelog-2023-02-28-0900-add-product-family-column-to-product.xml" />
     <include file="0.8.x/changelog-2023-04-14-1200-create-table-product-merge-logger.xml" />
+    <include file="0.8.x/changelog-2023-05-17-1453-add-quantity-counted-column.xml" />
 </databaseChangeLog>

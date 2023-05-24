@@ -54,6 +54,9 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     ProductPackage productPackage
     Integer quantity
 
+    // saved QOH in ward request
+    Integer quantityCounted
+
     // Status is handled dynamically at the moment, but we might want to save it at some point
     //RequisitionItemStatus requisitionItemStatus
 
@@ -142,6 +145,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
                         return true
                     }
                 })
+        quantityCounted(nullable: true)
         cancelReasonCode(nullable: true)
         cancelComments(nullable: true)
         unitPrice(nullable: true)

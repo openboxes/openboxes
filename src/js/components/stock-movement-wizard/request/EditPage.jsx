@@ -1037,6 +1037,7 @@ class EditItemsPage extends Component {
         quantityOnHand: val.quantityOnHand > 0 ? val.quantityOnHand : 0,
         quantityAvailable:
             val.quantityAvailable > 0 ? val.quantityAvailable : 0,
+        quantityOnHandRequesting: val.quantityCounted,
         product: {
           ...val.product,
           label: `${val.productCode} ${val.productName}`,

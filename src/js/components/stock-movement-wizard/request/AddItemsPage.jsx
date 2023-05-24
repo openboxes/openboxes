@@ -722,6 +722,8 @@ class AddItemsPage extends Component {
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
       const oldQty = parseInt(oldItem.quantityRequested, 10);
       const newQty = parseInt(item.quantityRequested, 10);
+      const oldQtyOnHand = parseInt(oldItem.quantityOnHand, 10);
+      const newQtyOnHand = parseInt(newQty.quantityOnHand, 10);
       // Intersection of keys common to both objects (excluding product key)
       const keyIntersection = _.remove(
         _.intersection(
@@ -740,25 +742,30 @@ class AddItemsPage extends Component {
       ) {
         lineItemsToBeUpdated.push(item);
       } else if (newQty !== oldQty || !item.quantityRequested ||
-        (oldItem.comments !== item.comments && !_.isNil(item.comments))) {
+        (oldItem.comments !== item.comments && !_.isNil(item.comments))
+        || oldQtyOnHand !== newQtyOnHand) {
         lineItemsToBeUpdated.push(item);
       }
     });
 
+    const mapPropertiesOfItemsToBeAdded = (item) => {
+      const itemQuantityCounted = item.quantityOnHand ?
+        { quantityCounted: parseInt(item.quantityOnHand, 10) } : {};
+      return {
+        'product.id': item.product.id,
+        quantityRequested: item.quantityRequested,
+        sortOrder: item.sortOrder,
+        comments: !_.isNil(item.comments) ? item.comments : '',
+        ...itemQuantityCounted,
+      };
+    };
+
     // Combine items to be added and items to be updated into one list to be saved
     return [].concat(
-      _.map(lineItemsToBeAdded, item => ({
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-        sortOrder: item.sortOrder,
-        comments: !_.isNil(item.comments) ? item.comments : '',
-      })),
+      _.map(lineItemsToBeAdded, mapPropertiesOfItemsToBeAdded),
       _.map(lineItemsToBeUpdated, item => ({
         id: item.id,
-        'product.id': item.product.id,
-        quantityRequested: item.quantityRequested,
-        sortOrder: item.sortOrder,
-        comments: !_.isNil(item.comments) ? item.comments : '',
+        ...mapPropertiesOfItemsToBeAdded(item),
       })),
     );
   }
@@ -797,7 +804,7 @@ class AddItemsPage extends Component {
 
           return {
             ...val,
-            quantityOnHand: '',
+            quantityOnHand: val.quantityCounted,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
           };
@@ -814,7 +821,7 @@ class AddItemsPage extends Component {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
+            quantityOnHand: this.state.isRequestFromWard ? val.quantityCounted : val.quantityOnHand,
           };
         },
       );
@@ -824,7 +831,7 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          quantityOnHand: this.state.isRequestFromWard ? '' : val.quantityOnHand,
+          quantityOnHand: this.state.isRequestFromWard ? val.quantityCounted : val.quantityOnHand,
         }),
       );
     }
@@ -995,7 +1002,7 @@ class AddItemsPage extends Component {
       message: this.state.isRequestFromWard ?
         this.props.translate(
           'react.stockMovement.QOHWillNotBeSaved.message',
-          'This save action won’t save the quantity on hand you have entered. You will have to reenter these when you came back to this request later. Also if there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
+          'If there are any empty or zero quantity lines, those lines will be deleted. Are you sure you want to proceed?',
         )
         :
         this.props.translate(
