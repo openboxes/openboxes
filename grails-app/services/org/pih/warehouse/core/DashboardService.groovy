@@ -370,15 +370,14 @@ class DashboardService {
 
         def lowStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity > 0 && quantity <= minQuantity
+            def minQuantity = inventoryLevel?.minQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && minQuantity && quantity <= minQuantity
         }
 
         def reorderStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            def reorderQuantity = inventoryLevelMap[product]?.first()?.reorderQuantity
-            def minQuantity = inventoryLevelMap[product]?.first()?.minQuantity
-            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && minQuantity > 0 && quantity <= reorderQuantity
+            def reorderQuantity = inventoryLevel?.reorderQuantity
+            inventoryLevel?.status >= InventoryStatus.SUPPORTED && reorderQuantity && quantity <= reorderQuantity
         }
 
         def healthyStock = quantityMap.findAll { product, quantity ->
@@ -391,7 +390,7 @@ class DashboardService {
 
         def overStock = quantityMap.findAll { product, quantity ->
             def inventoryLevel = inventoryLevelMap[product]?.first()
-            def maxQuantity = inventoryLevelMap[product]?.first()?.maxQuantity
+            def maxQuantity = inventoryLevel?.maxQuantity
             inventoryLevel?.status >= InventoryStatus.SUPPORTED && maxQuantity && quantity > maxQuantity
         }
 
