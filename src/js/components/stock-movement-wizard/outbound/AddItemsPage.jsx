@@ -540,20 +540,16 @@ class AddItemsPage extends Component {
 
   setLineItems(response, startIndex, setAllFetchedItems) {
     const { data } = response.data;
-    let lineItemsData;
-    if (!this.state.values.lineItems.length || !data.length) {
-      lineItemsData = new Array(1)
-        .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
-    } else {
-      lineItemsData = _.map(data, val => ({ ...val, disabled: true }));
-    }
+    const lineItemsData = data.length ? _.map(data, val => ({ ...val, disabled: true })) :
+      new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
+
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     this.setState({
-      currentLineItems: data.length && !setAllFetchedItems && this.props.isPaginated ?
+      currentLineItems: !setAllFetchedItems && this.props.isPaginated ?
         _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
       values: {
         ...this.state.values,
-        lineItems: data.length && !setAllFetchedItems && this.props.isPaginated ?
+        lineItems: !setAllFetchedItems && this.props.isPaginated ?
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
