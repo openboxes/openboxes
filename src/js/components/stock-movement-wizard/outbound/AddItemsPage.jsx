@@ -538,24 +538,22 @@ class AddItemsPage extends Component {
     return this.state.sortOrder;
   }
 
-  setLineItems(response, startIndex) {
+  setLineItems(response, startIndex, setAllFetchedItems) {
     const { data } = response.data;
     let lineItemsData;
-
-    if (this.state.values.lineItems.length === 0 && !data.length) {
+    if (!this.state.values.lineItems.length || !data.length) {
       lineItemsData = new Array(1)
         .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     } else {
       lineItemsData = _.map(data, val => ({ ...val, disabled: true }));
     }
-
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     this.setState({
-      currentLineItems: this.props.isPaginated ?
+      currentLineItems: data.length && !setAllFetchedItems && this.props.isPaginated ?
         _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
       values: {
         ...this.state.values,
-        lineItems: this.props.isPaginated ?
+        lineItems: data.length && !setAllFetchedItems && this.props.isPaginated ?
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
@@ -727,8 +725,8 @@ class AddItemsPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.setState({
-          totalCount: response.data.data.length,
-        }, () => this.setLineItems(response, null));
+          totalCount: response.data.data.length || 1,
+        }, () => this.setLineItems(response, null, true));
       })
       .catch(err => err);
   }
