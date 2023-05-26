@@ -117,7 +117,7 @@ class LocationType implements Comparable, Serializable {
     }
 
     int compareTo(obj) {
-        return description <=> obj?.description
+        return name <=> obj?.name
     }
 
     Boolean isDepot() {
