@@ -437,11 +437,10 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
-
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
-      // We wouldn't update items with quantity requested <= 0
+      // We wouldn't update items with quantity requested < 0
       if (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0) {
         return; // lodash continue
       }
@@ -485,10 +484,10 @@ class AddItemsPage extends Component {
         (
           !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
           (item.product.id !== oldItem.product.id)
-        )
+        ) && item.id
       ) {
         lineItemsToBeUpdated.push(item);
-      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
+      } else if ((newQty !== oldQty || newRecipient !== oldRecipient) && item.id) {
         lineItemsToBeUpdated.push(item);
       }
     });
@@ -901,8 +900,12 @@ class AddItemsPage extends Component {
             // newly saved item to replace its equivalent in state
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
-              if (parseInt(item.quantityRequested, 10) === 0) {
-                return { ..._.omit(item, 'id'), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
+              if (
+                parseInt(item.quantityRequested, 10) === 0 &&
+                item.rowSaveStatus === RowSaveStatus.SAVING &&
+                !_.includes(savedItemsIds, item.id)
+              ) {
+                return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
@@ -925,7 +928,7 @@ class AddItemsPage extends Component {
 
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
-              currentLineItems: lineItemsAfterSave,
+              currentLineItems: lineItemsBackendData,
             });
             return;
           }
