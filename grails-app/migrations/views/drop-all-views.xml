@@ -13,15 +13,17 @@
       DROP VIEW IF EXISTS on_order_order_item_summary;
       DROP VIEW IF EXISTS on_order_shipment_item_summary;
       DROP VIEW IF EXISTS on_order_summary;
-      DROP VIEW IF EXISTS order_item_status;
       DROP VIEW IF EXISTS order_receipt_status;
       DROP VIEW IF EXISTS order_payment_status_from_shipments;
       DROP VIEW IF EXISTS order_item_payment_status;
       DROP VIEW IF EXISTS order_payment_status_from_adjustments;
       DROP VIEW IF EXISTS order_adjustment_payment_status;
       DROP VIEW IF EXISTS order_summary;
+      DROP VIEW IF EXISTS order_item_details;
+      DROP VIEW IF EXISTS order_item_status;
       DROP VIEW IF EXISTS order_item_summary;
       DROP VIEW IF EXISTS product_demand;
+      DROP VIEW IF EXISTS product_expiry_summary;
       DROP VIEW IF EXISTS product_inventory_compare_view;
       DROP VIEW IF EXISTS product_inventory_expiry_view;
       DROP VIEW IF EXISTS product_inventory_extended_view;
@@ -37,6 +39,7 @@
       DROP VIEW IF EXISTS product_supplier_clean;
       DROP VIEW IF EXISTS requirement;
       DROP VIEW IF EXISTS stock_movement_item;
+      DROP VIEW IF EXISTS stock_movement_list_item;
       DROP VIEW IF EXISTS stocklist_item_list;
       DROP VIEW IF EXISTS substitution_item;
       DROP VIEW IF EXISTS supplier;
