@@ -797,6 +797,9 @@ class AddItemsPage extends Component {
       this.transitionToNextStep : this.saveAndTransitionToNextStep;
     const itemsMap = {};
     _.forEach(lineItems, (item) => {
+      if (parseInt(item.quantityRequested, 10) === 0) {
+        return;
+      }
       if (itemsMap[item.product.productCode]) {
         itemsMap[item.product.productCode].push(item);
       } else {
@@ -804,7 +807,6 @@ class AddItemsPage extends Component {
       }
     });
     const itemsWithSameCode = _.filter(itemsMap, item => item.length > 1);
-
     if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
       this.confirmTransition(
         () => transitionFunction(formValues, lineItems),
@@ -1470,7 +1472,8 @@ class AddItemsPage extends Component {
                     (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
                     invalid ||
                     showOnly ||
-                    _.some(values.lineItems, item => item.quantityRequested < 0)
+                    _.some(values.lineItems, item => item.quantityRequested < 0) ||
+                      _.every(values.lineItems, item => parseInt(item.quantityRequested, 10) === 0)
                   }
                   ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                   </button>
