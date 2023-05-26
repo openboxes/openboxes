@@ -17,7 +17,6 @@ class RoleFilters {
     def static changeControllers = ['createProductFromTemplate']
 
     def static managerActions = [
-            'inventoryItem'       : ['transferStock'],
             'inventory'           : ['createOutboundTransfer'],
             'stockMovementItemApi': ['eraseItem']
     ]
@@ -37,7 +36,7 @@ class RoleFilters {
     def static superuserActions = [
             'console'                   : ['index', 'execute'],
             'inventory'                 : ['createInboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
-            'inventoryItem'             : ['adjustStock'],
+            'inventoryItem'             : ['adjustStock', 'transferStock'],
             'productCatalog'            : ['create', 'importProductCatalog'],
             'productType'               : ['edit', 'delete', 'save', 'update'],
             'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
