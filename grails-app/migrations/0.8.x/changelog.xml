@@ -158,4 +158,5 @@
     <include file="0.8.x/changelog-2023-02-28-0900-add-product-family-column-to-product.xml" />
     <include file="0.8.x/changelog-2023-04-14-1200-create-table-product-merge-logger.xml" />
     <include file="0.8.x/changelog-2023-05-17-1453-add-quantity-counted-column.xml" />
+    <include file="0.8.x/changelog-2023-05-22-1800-add-requisition-template-document-type.xml" />
 </databaseChangeLog>

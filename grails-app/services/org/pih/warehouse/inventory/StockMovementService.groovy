@@ -2632,6 +2632,20 @@ class StockMovementService {
                     ]
             ])
 
+            List<Document> requisitionTemplates = Document.findAllByDocumentCode(DocumentCode.REQUISITION_TEMPLATE)
+            requisitionTemplates?.each { Document documentTemplate ->
+                documentList << [
+                    name        : documentTemplate?.name,
+                    documentType: documentTemplate?.documentType?.name,
+                    contentType : "application/pdf",
+                    stepNumber  : null,
+                    uri         : documentTemplate?.fileUri ?: g.createLink(controller: "document", action: "renderRequisitionTemplate",
+                        id: stockMovement?.requisition?.id, params: ["documentTemplate.id":  documentTemplate.id, format: "PDF"],
+                        absolute: true, title: documentTemplate?.filename),
+                    fileUri     : documentTemplate?.fileUri
+                ]
+            }
+
             if (!stockMovement?.origin?.isSupplier() && stockMovement?.origin?.supports(ActivityCode.MANAGE_INVENTORY)) {
                 documentList.add([
                         name        : g.message(code: "deliveryNote.label", default: "Delivery Note"),

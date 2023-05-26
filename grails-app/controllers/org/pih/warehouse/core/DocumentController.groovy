@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import fr.w3blog.zpl.utils.ZebraUtils
 import groovyx.net.http.HTTPBuilder
 import org.pih.warehouse.inventory.InventoryItem
@@ -421,6 +422,51 @@ class DocumentController {
             log.error("Unable to render document template ${documentInstance.name} for shipment ${shipmentInstance?.id}", e)
             throw e
         }
+    }
+
+    def renderRequisitionTemplate = {
+        def requisitionInstance = Requisition.get(params.id)
+        if (!requisitionInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
+            redirect(action: "list")
+        } else {
+            if (!params?.documentTemplate?.id) {
+                throw new IllegalArgumentException("documentTemplate.id is required")
+            }
+            Document documentTemplate = Document.get(params?.documentTemplate?.id)
+            if (documentTemplate) {
+                try {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+                    ConverterTypeTo targetDocumentType = params.format ? params.format as ConverterTypeTo : null
+                    documentTemplateService.renderRequisitionDocumentTemplate(documentTemplate,
+                        requisitionInstance, targetDocumentType, outputStream)
+
+                    // Set response headers appropriately
+                    if (targetDocumentType) {
+                        // Use the appropriate content type and extension of the conversion type
+                        // (except XHTML, just render as HTML response)
+                        if (targetDocumentType != ConverterTypeTo.XHTML) {
+                            response.setHeader("Content-disposition",
+                                "attachment; filename=\"${documentTemplate.name}\"-${requisitionInstance.requestNumber}.${targetDocumentType.extension}");
+                            response.setContentType(targetDocumentType.mimeType)
+                        }
+                    }
+                    else {
+                        // Otherwise write processed document to response using the original
+                        // document template's extension and content type
+                        response.setHeader("Content-disposition",
+                            "attachment; filename=\"${documentTemplate.name}\"-${requisitionInstance.requestNumber}.${documentTemplate.extension}");
+                        response.setContentType(documentTemplate.contentType)
+                    }
+                    outputStream.writeTo(response.outputStream)
+                    return
+                } catch (Exception e) {
+                    log.error("Unable to render document template ${documentTemplate.name} for requisition ${requisitionInstance?.id}", e)
+                    throw e;
+                }
+            }
+        }
+        [requisitionInstance:requisitionInstance]
     }
 
     /**
