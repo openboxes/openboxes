@@ -476,7 +476,7 @@
             }
           });
         } else {
-          $.notify("Please enter a proper value for all required fields")
+          $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a proper value for all required fields')}"));
         }
         return false
     }
