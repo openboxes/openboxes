@@ -1284,6 +1284,7 @@ class ProductService {
                                 ilike("name", "%" + term)
                                 ilike("code", term)
                                 ilike("productCode", term)
+                                ilike("brandName", term)
                                 ilike("manufacturerCode", term)
                                 ilike("manufacturerName", term)
                                 ilike("supplierCode", term)
