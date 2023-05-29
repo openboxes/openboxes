@@ -166,9 +166,11 @@ class ApiController {
         def locales = grailsApplication.config.openboxes.locale.supportedLocales
         def browserConnectionTimeout = grailsApplication.config.openboxes.browser.connection.status.timeout
         def isAutosaveEnabled = grailsApplication.config.openboxes.client.autosave.enabled &&
-                supportedActivities.contains(ActivityCode.AUTOSAVE.name());
+                supportedActivities.contains(ActivityCode.AUTOSAVE.name())
+        def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale ?: "en")
         def supportedLocales = locales.collect {
-            def name = new Locale(it).getDisplayName()
+            def defaultName = new Locale(it)?.getDisplayName(locale ?: defaultLocale)
+            def name =  messageSource.getMessage("locale.${it}.label", null,  defaultName, (locale ?: defaultLocale))
             [code: it, name: name]
         }
         String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
