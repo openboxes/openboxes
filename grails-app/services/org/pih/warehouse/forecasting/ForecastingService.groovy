@@ -47,11 +47,12 @@ class ForecastingService {
             def quantityOnHand = productAvailabilityService.getQuantityOnHand(product, origin)
             def onHandMonths = monthlyDemand ? quantityOnHand / monthlyDemand : 0
             return [
-                totalDemand  : totalDemand,
-                totalDays    : demandPeriod,
-                dailyDemand  : dailyDemand,
-                monthlyDemand: new BigDecimal(monthlyDemand).setScale(0, RoundingMode.HALF_UP),
-                onHandMonths : onHandMonths
+                totalDemand     : totalDemand,
+                totalDays       : demandPeriod,
+                dailyDemand     : dailyDemand,
+                monthlyDemand   : new BigDecimal(monthlyDemand).setScale(0, RoundingMode.HALF_UP),
+                onHandMonths    : onHandMonths,
+                quantityOnHand  : quantityOnHand
             ]
         }
         return [:]

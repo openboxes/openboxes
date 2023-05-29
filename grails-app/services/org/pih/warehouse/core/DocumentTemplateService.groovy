@@ -25,6 +25,8 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderItemStatusCode
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.util.PdfUtil
@@ -33,6 +35,7 @@ class DocumentTemplateService {
 
     boolean transactional = true
     GroovyPagesTemplateEngine groovyPagesTemplateEngine
+    def forecastingService
     def requisitionService
 
     def renderGroovyServerPageDocumentTemplate(Document documentTemplate, Map model) {
@@ -190,6 +193,78 @@ class DocumentTemplateService {
         context.put("order", order)
         context.put("orderItems", orderItems);
         context.put("orderAdjustments", orderAdjustments);
+        return context
+    }
+
+    // TODO: make it generic for requistions and orders
+    def renderRequisitionDocumentTemplate(Document documentTemplate, Requisition requisitionInstance, ConverterTypeTo targetDocumentType, OutputStream outputStream) {
+        try {
+            InputStream inputStream = new ByteArrayInputStream(documentTemplate.fileContents)
+            IXDocReport report = XDocReportRegistry.getRegistry().loadReport(inputStream, TemplateEngineKind.Freemarker)
+
+            IContext context = createRequisitionContext(report, requisitionInstance)
+
+            ConverterTypeVia sourceDocumentType = (report.kind == "DOCX") ? ConverterTypeVia.DOCX4J :
+                (report.kind == "ODT") ? ConverterTypeVia.ODFDOM : ConverterTypeVia.XWPF
+
+            // Convert to the target type
+            if (targetDocumentType && sourceDocumentType) {
+                Options options = Options.getTo(targetDocumentType).via(sourceDocumentType)
+                report.convert(context, options, outputStream)
+            }
+            // Process document in place
+            else {
+                report.process(context, outputStream)
+            }
+            log.info "Report dump: " + report.dump()
+        } finally {
+            PdfUtil.restoreBaseFonts()
+        }
+    }
+
+    private createRequisitionContext(IXDocReport report, Requisition requisitionInstance) {
+        def requisitionItems = requisitionInstance?.requisitionItems?.collect { RequisitionItem requisitionItem ->
+            def demand
+            def quantityOnHand
+            if (requisitionInstance?.destination?.isWard()) {
+                // if request FROM Ward then pull demand from origin to ward and use quantity counted as quantity on hand
+                demand = forecastingService.getDemand(requisitionInstance.origin, requisitionInstance.destination, requisitionItem.product)
+                quantityOnHand = requisitionItem?.quantityCounted ?: 0
+            } else {
+                // if request is NOT FROM Ward, then pull demand outgoing FROM destination to all other locations
+                demand = forecastingService.getDemand(requisitionInstance.destination, null, requisitionItem.product)
+                quantityOnHand = demand?.quantityOnHand ?: 0
+            }
+            return [
+                code                    : requisitionItem?.product?.productCode,
+                name                    : requisitionItem?.product?.name,
+                status                  : requisitionItem?.status,
+                unitOfMeasure           : requisitionItem?.product?.unitOfMeasure ?: "EA",
+                requestorMonthlyDemand  : demand?.monthlyDemand ?: 0,
+                requestorQuantityOnHand : quantityOnHand,
+                quantityRequested       : requisitionItem?.quantity,
+                quantityIssued          : requisitionInstance?.isPending() ? "" : requisitionItem?.quantityIssued
+            ]
+        }
+
+        def requisition = requisitionInstance.toJson()
+        requisition.remove('requisitionTemplate')
+        requisition.remove('requisitionItems')
+        requisition.requestNumber = requisitionInstance.requestNumber
+
+        FieldsMetadata metadata = report.createFieldsMetadata()
+        metadata.addFieldAsList("requisitionItems.code")
+        metadata.addFieldAsList("requisitionItems.name")
+        metadata.addFieldAsList("requisitionItems.status")
+        metadata.addFieldAsList("requisitionItems.unitOfMeasure")
+        metadata.addFieldAsList("requisitionItems.requestorMonthlyDemand")
+        metadata.addFieldAsList("requisitionItems.requestorQuantityOnHand")
+        metadata.addFieldAsList("requisitionItems.quantityRequested")
+        metadata.addFieldAsList("requisitionItems.quantityIssued")
+
+        IContext context = report.createContext()
+        context.put("requisition", requisition)
+        context.put("requisitionItems", requisitionItems)
         return context
     }
 }
