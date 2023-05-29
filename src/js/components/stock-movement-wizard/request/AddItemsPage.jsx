@@ -783,6 +783,7 @@ class AddItemsPage extends Component {
     let lineItemsData;
 
     const isPullType = _.get(this.state.values.replenishmentType, 'name') === REPLENISHMENT_TYPE_PULL;
+    const isRequestOrigin = this.props.currentLocationId === this.state.values.origin.id;
 
     if (this.state.values.lineItems.length === 0 && !data.length) {
       lineItemsData = new Array(1).fill({ sortOrder: 100 });
@@ -821,7 +822,8 @@ class AddItemsPage extends Component {
             ...val,
             disabled: true,
             quantityRequested: qtyRequested >= 0 ? qtyRequested : 0,
-            quantityOnHand: this.state.isRequestFromWard ? val.quantityCounted : val.quantityOnHand,
+            quantityOnHand: this.state.isRequestFromWard || isRequestOrigin ?
+              val.quantityCounted : val.quantityOnHand,
           };
         },
       );
@@ -831,7 +833,8 @@ class AddItemsPage extends Component {
         val => ({
           ...val,
           disabled: true,
-          quantityOnHand: this.state.isRequestFromWard ? val.quantityCounted : val.quantityOnHand,
+          quantityOnHand: this.state.isRequestFromWard || isRequestOrigin ?
+            val.quantityCounted : val.quantityOnHand,
         }),
       );
     }
