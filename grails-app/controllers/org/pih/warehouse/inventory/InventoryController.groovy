@@ -483,13 +483,13 @@ class InventoryController {
         [transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected]
     }
 
-    private def listStock(Map params, String methodName, String filePrependString) {
+    private def listStock(Map params, String methodName, String fileNamePrefix) {
         def location = Location.get(session.warehouse.id)
         List<Category> categories = Category.findAllByIdInList(params.list("categories"))
 
         // When accessing the page for the first time, the flag should be set to true
-        // Initially there not parameter button, only after running the report manually it is set
-        params.includeSubcategories = params.button ? params.includeSubcategories : true
+        // Initially there no parameter _includeSubcategories, only after running the report manually it is set
+        params.includeSubcategories = params.containsKey("_includeSubcategories") ? params.includeSubcategories : true
         if (params.includeSubcategories) {
             categories = inventoryService.getExplodedCategories(categories)
         }
@@ -497,7 +497,7 @@ class InventoryController {
         def inventoryItems = dashboardService."$methodName"(location, categories)
 
         if (params.button == "download") {
-            def filename = filePrependString + location.name + ".csv"
+            def filename = fileNamePrefix + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
             return
