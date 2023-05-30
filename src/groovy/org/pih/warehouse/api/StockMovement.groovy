@@ -436,4 +436,18 @@ class StockMovement {
         return stockMovement
     }
 
+    static def buildCsvRow(StockMovementItem lineItem = null) {
+        return [
+                "Requisition item id"            : lineItem?.id ?: "",
+                "Product code (required)"     : lineItem?.product?.productCode ?: "",
+                "Product name"                  : lineItem?.product?.displayNameWithLocaleCode ?: "",
+                "Pack level 1"                   : lineItem?.palletName ?: "",
+                "Pack level 2"                      : lineItem?.boxName ?: "",
+                "Lot number"                    : lineItem?.lotNumber ?: "",
+                "Expiration date (MM/dd/yyyy)": lineItem?.expirationDate ? lineItem?.expirationDate?.format("MM/dd/yyyy") : "",
+                "Quantity (required)"        : lineItem?.quantityRequested ?: "",
+                "Recipient id"                  : lineItem?.recipient?.id ?: ""
+        ]
+    }
+
 }

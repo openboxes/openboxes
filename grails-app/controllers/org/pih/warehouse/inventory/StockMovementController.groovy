@@ -361,20 +361,9 @@ class StockMovementController {
                 throw new IllegalArgumentException("File must be in CSV format")
             }
 
-            String[] columnKeys = [
-                    'requisitionItemId',
-                    'productCode',
-                    'productName',
-                    'packLevel1',
-                    'packLevel2',
-                    'lotNumber',
-                    'expirationDate',
-                    'quantityRequested',
-                    'receipientId'
-            ]
 
             String csv = new String(importFile.bytes)
-            char separatorChar = CSVUtils.getSeparator(csv, columnKeys.length)
+            char separatorChar = CSVUtils.getSeparator(csv, StockMovement.buildCsvRow()?.keySet()?.size())
             def settings = [separatorChar: separatorChar, skipLines: 1]
             Integer sortOrder = 0
             csv.toCsvReader(settings).eachLine { tokens ->
