@@ -22,27 +22,92 @@
             <g:hasRoleFinance>
                 <g:set var="hasRoleFinance" value="${true}"/>
             </g:hasRoleFinance>
+            <div class="button-container button-bar">
 
-            <div class="yui-ga">
+                <div class="right">
+                    <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" style="vertical-align: middle"/>
+                        <g:message code="default.button.downloadAsCSV.label" default="Download as CSVs"/>
+                    </g:link>
+
+
+                </div>
+
+                <div class="button-group">
+                    <g:link class="button" controller="dashboard">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'application.png')}" style="vertical-align: middle"/>
+                        <warehouse:message code="inventory.backToDashboard.label"/>
+                    </g:link>
+                </div>
+            </div>
+
+            <div class="yui-gf">
                 <div class="yui-u first">
-                    <div class="button-container button-bar">
 
-                        <div class="right">
-                            <g:link params="[format:'csv']" controller="${controllerName}" action="${actionName}" class="button">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'page_excel.png')}" style="vertical-align: middle"/>
-                                <g:message code="default.button.downloadAsCSV.label" default="Download as CSVs"/>
-                            </g:link>
-
-
-                        </div>
-
-                        <div class="button-group">
-                            <g:link class="button" controller="dashboard">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'application.png')}" style="vertical-align: middle"/>
-                                <warehouse:message code="inventory.backToDashboard.label"/>
-                            </g:link>
-                        </div>
+                    <div class="box">
+                        <h2 class="middle"><g:message code="default.filters.label"/></h2>
+                        <g:form controller="inventory" action="${actionName}" method="GET">
+                            <div class="filters">
+                                <div class="prop">
+                                    <div class="filter-list-item">
+                                        <label><warehouse:message code="category.label"/></label>
+                                        <p>
+                                            <g:selectCategory
+                                                    id="category" multiple="true"
+                                                    class="chzn-select-deselect filter"
+                                                    data-placeholder="${g.message(code: 'category.selectCategory.label', default: 'Select a category')}"
+                                                    name="categories"
+                                                    noSelection="['':'']"
+                                                    value="${params?.list('categories')}"
+                                            />
+                                        </p>
+                                        <p>
+                                            <label>
+                                                <g:checkBox
+                                                        name="includeSubcategories"
+                                                        value="${command?.includeSubcategories || []}"
+                                                />
+                                                ${warehouse.message(
+                                                        code:'report.search.includeCategoryChildren.label',
+                                                        default: 'Include all products in all subcategories',
+                                                )}
+                                            </label>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="buttons">
+                                    <button name="button" value="run" class="button">
+                                        <img src="${createLinkTo(dir:'images/icons/silk',file:'play_green.png')}" />&nbsp;
+                                    <g:message code="report.runReport.label"/>
+                                    </button>
+                                    <span class="action-menu" style="margin-left: 15px">
+                                        <button class="action-btn button">
+                                            <img src="${createLinkTo(dir:'images/icons/silk',file:'page_white_excel.png')}" />&nbsp;
+                                        ${warehouse.message(code: 'default.button.download.label')}
+                                            <img src="${resource(dir: 'images/icons/silk', file: 'bullet_arrow_down.png')}" />
+                                        </button>
+                                        <div class="actions">
+                                            <div class="action-menu-item">
+                                                <a href="#" class="download-btn" data-download-action="downloadStockReport">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                                    <g:message code="default.download.label" args="[g.message(code: 'default.report.label', default: 'Report')]"/>
+                                                </a>
+                                            </div>
+                                            <div class="action-menu-item">
+                                                <a href="#" class="download-btn" data-download-action="downloadStockMovement">
+                                                    <img src="${resource(dir: 'images/icons/silk', file: 'page_white_excel.png')}" />
+                                                    <g:message code="default.download.label" args="[g.message(code: 'stockMovement.label')]"/>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </g:form>
                     </div>
+
+                </div>
+                <div class="yui-u">
 
                     <g:set var="totalStockValue" value="${0.00}"/>
                     <div class="box">
