@@ -537,18 +537,17 @@ class AddItemsPage extends Component {
     return this.state.sortOrder;
   }
 
-  setLineItems(response, startIndex, setAllFetchedItems) {
+  setLineItems(response, startIndex) {
     const { data } = response.data;
     const lineItemsData = data.length ? _.map(data, val => ({ ...val, disabled: true })) :
       new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
-
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     this.setState({
-      currentLineItems: !setAllFetchedItems && this.props.isPaginated ?
+      currentLineItems: startIndex !== null && this.props.isPaginated ?
         _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
       values: {
         ...this.state.values,
-        lineItems: !setAllFetchedItems && this.props.isPaginated ?
+        lineItems: startIndex !== null && this.props.isPaginated ?
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
@@ -721,7 +720,7 @@ class AddItemsPage extends Component {
       .then((response) => {
         this.setState({
           totalCount: response.data.data.length || 1,
-        }, () => this.setLineItems(response, null, true));
+        }, () => this.setLineItems(response, null));
       })
       .catch(err => err);
   }
