@@ -875,7 +875,7 @@ class InventoryController {
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product.displayNameWithLocaleCode) + ","
             csv += '"' + (product?.productFamily?.name ?: "") + '"' + ","
-            csv += '"' + (product?.category?.name ?: "") + '"' + ","
+            csv += '"' + (product?.category?.getHierarchyAsString(" > ") ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
