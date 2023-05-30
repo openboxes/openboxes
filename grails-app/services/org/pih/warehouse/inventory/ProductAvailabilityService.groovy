@@ -483,7 +483,7 @@ class ProductAvailabilityService {
         def queryArguments = [location: location]
 
         if (categories) {
-            categoriesQuery = "and category.id in (:categories) and pa.product.category = category"
+            categoriesQuery = "and pa.product.category.id in (:categories)"
             queryArguments += [categories: categories.collect { it.id }]
         }
         def quantityMap = [:]
@@ -491,7 +491,7 @@ class ProductAvailabilityService {
             def results = ProductAvailability.executeQuery("""
 						select pa.product, sum(pa.quantityOnHand),
 						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
-						from ProductAvailability pa, Category category
+						from ProductAvailability pa
 						where pa.location = :location
 						${categoriesQuery}
 						group by pa.product

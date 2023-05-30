@@ -496,9 +496,9 @@ class DashboardService {
         return inventoryStatusMap
     }
 
-    def getQuantityOnHandZero(Location location) {
+    def getQuantityOnHandZero(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
 
         def stockOut = inventoryItems.findAll { it.quantity <= 0 }
 
@@ -525,9 +525,9 @@ class DashboardService {
         return stockOut
     }
 
-    def getLowStock(Location location) {
+    def getLowStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
         log.info("getInventoryItems: " + (System.currentTimeMillis() - startTime) + " ms")
 
         def lowStock = inventoryItems.findAll { inventoryItem ->
@@ -541,9 +541,9 @@ class DashboardService {
         return lowStock
     }
 
-    def getReorderStock(Location location) {
+    def getReorderStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
 
         def reorderStock = inventoryItems.findAll { inventoryItem ->
             def quantity = inventoryItem.quantity
@@ -599,9 +599,9 @@ class DashboardService {
         return reorderStock
     }
 
-    def getOverStock(Location location) {
+    def getOverStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
 
         def overStock = inventoryItems.findAll { inventoryItem ->
             def quantity = inventoryItem.quantity
