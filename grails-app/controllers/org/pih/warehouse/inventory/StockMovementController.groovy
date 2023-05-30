@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.picklist.PicklistItem
@@ -360,8 +361,10 @@ class StockMovementController {
                 throw new IllegalArgumentException("File must be in CSV format")
             }
 
+
             String csv = new String(importFile.bytes)
-            def settings = [separatorChar: ',', skipLines: 1]
+            char separatorChar = CSVUtils.getSeparator(csv, StockMovement.buildCsvRow()?.keySet()?.size())
+            def settings = [separatorChar: separatorChar, skipLines: 1]
             Integer sortOrder = 0
             csv.toCsvReader(settings).eachLine { tokens ->
                 Boolean validateLotAndExpiry = stockMovement.getStockMovementDirection(currentLocation) != StockMovementDirection.OUTBOUND && !stockMovement.electronicType

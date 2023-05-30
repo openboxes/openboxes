@@ -153,6 +153,7 @@ class CSVUtils {
         return new CSVPrinter(new StringBuilder(), CSVFormat.DEFAULT)
     }
 
+
     /**
     * Return a CSV separator character based on provided data and expected number of columns.
     *
@@ -168,15 +169,19 @@ class CSVUtils {
     * */
     static char getSeparator(String text, Integer columnCount) {
         String firstLine = text.split("\\r?\\n").first()
+        List<String> customSeparators = [Constants.SEMICOLON_COLUMN_SEPARATOR, Constants.TAB_COLUMN_SEPARATOR]
+        // Loop through custom separators and return separator that columns size after splitting == provided columnCount
+        String separatorChar = customSeparators
+                .find{ String separator ->
+                    if (firstLine.contains(separator)) {
+                        CSVMapReader csvMapReader = new CSVMapReader(new StringReader(firstLine), [separatorChar: separator])
+                        if (csvMapReader.initFieldKeys().size() == columnCount) {
+                            return true
+                        }
+                    }
+                }
 
-        if (firstLine.contains(Constants.CUSTOM_COLUMN_SEPARATOR)) {
-            def csvMapReader = new CSVMapReader(new StringReader(firstLine), [separatorChar: Constants.CUSTOM_COLUMN_SEPARATOR])
-
-            if (csvMapReader.initFieldKeys().size() == columnCount) {
-                return Constants.CUSTOM_COLUMN_SEPARATOR
-            }
-        }
-        return Constants.DEFAULT_COLUMN_SEPARATOR;
+        return separatorChar ?: Constants.DEFAULT_COLUMN_SEPARATOR;
     }
 
     static String prependBomToCsvString(String csvString) {
