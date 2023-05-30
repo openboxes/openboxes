@@ -211,9 +211,12 @@ class DashboardService {
         log.debug "Get expiring stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return expiringStock
     }
-
     def getInventoryItems(Location location) {
-        def inventoryByProduct = productAvailabilityService.getInventoryByProduct(location)
+        return getInventoryItems(location, [])
+    }
+
+    def getInventoryItems(Location location, List<Category> categories) {
+        def inventoryByProduct = productAvailabilityService.getInventoryByProduct(location, categories)
         def inventoryLevelMap = InventoryLevel.findAllByInventory(location.inventory).groupBy {
             it.product
         }
@@ -257,9 +260,9 @@ class DashboardService {
         return inventoryItems
     }
 
-    def getInStock(Location location) {
+    def getInStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
         def inStock = inventoryItems.findAll { it.quantity > 0 }
         log.debug "Get in stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return inStock

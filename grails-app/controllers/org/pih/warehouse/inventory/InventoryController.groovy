@@ -531,9 +531,18 @@ class InventoryController {
 
     def listInStock = {
         def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getInStock(location)
+        List<Category> categories = Category.findAllByIdInList(params.list("categories"))
 
-        if (params.format == "csv") {
+        // When accessing the page for the first time, the flag should be set to true
+        // Initially there not parameter button, only after running the report manually it is set
+        params.includeSubcategories = params.button ? params.includeSubcategories : true
+        if (params.includeSubcategories) {
+            categories = inventoryService.getExplodedCategories(categories)
+        }
+
+        def inventoryItems = dashboardService.getInStock(location, categories)
+
+        if (params.button == "download") {
             def filename = "In stock - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
