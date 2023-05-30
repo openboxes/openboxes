@@ -565,7 +565,7 @@ class DashboardService {
 
             // If an inventoryLevel does have a bin location,
             // or minQuantity and reorderQuantity not set, the item should not appear in the report
-            if (inventoryLevel?.binLocation || (!minQuantity && !reorderQuantity)) {
+            if (inventoryLevel?.internalLocation || (!minQuantity && !reorderQuantity)) {
                 return false
             }
 
