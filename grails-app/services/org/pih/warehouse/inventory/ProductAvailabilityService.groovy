@@ -484,7 +484,7 @@ class ProductAvailabilityService {
 
         if (categories) {
             categoriesQuery = "and pa.product.category.id in (:categories)"
-            queryArguments += [categories: categories.collect { it.id }]
+            queryArguments += [categories: categories.id]
         }
         def quantityMap = [:]
         if (location) {

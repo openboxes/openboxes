@@ -244,18 +244,18 @@ class DashboardService {
         return inventoryItems
     }
 
-    def getReconditionedStock(Location location) {
+    def getReconditionedStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
         def reconditionedStock = inventoryItems.findAll { it.product.reconditioned }
         log.debug "Get reconditioned stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return reconditionedStock
     }
 
 
-    def getTotalStock(Location location) {
+    def getTotalStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
         log.debug "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return inventoryItems
     }
@@ -507,9 +507,9 @@ class DashboardService {
 
     }
 
-    def getOutOfStock(Location location, String abcClass) {
+    def getOutOfStock(Location location, String abcClass, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
 
         def stockOut = inventoryItems.findAll { inventoryItem ->
             def inventoryLevel = inventoryItem.inventoryLevel
@@ -614,9 +614,9 @@ class DashboardService {
         return overStock
     }
 
-    def getHealthyStock(Location location) {
+    def getHealthyStock(Location location, List<Category> categories) {
         long startTime = System.currentTimeMillis()
-        def inventoryItems = getInventoryItems(location)
+        def inventoryItems = getInventoryItems(location, categories)
 
         def healthyStock = inventoryItems.findAll { inventoryItem ->
             def quantity = inventoryItem.quantity
