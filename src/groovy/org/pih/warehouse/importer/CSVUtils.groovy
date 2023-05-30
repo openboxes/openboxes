@@ -169,7 +169,7 @@ class CSVUtils {
     * */
     static char getSeparator(String text, Integer columnCount) {
         String firstLine = text.split("\\r?\\n").first()
-        List<String> customSeparators = [Constants.CUSTOM_COLUMN_SEPARATOR, Constants.SEMICOLON_COLUMN_SEPARATOR]
+        List<String> customSeparators = [Constants.SEMICOLON_COLUMN_SEPARATOR, Constants.TAB_COLUMN_SEPARATOR]
         // Loop through custom separators and return separator that columns size after splitting == provided columnCount
         String separatorChar = customSeparators
                 .find{ String separator ->
