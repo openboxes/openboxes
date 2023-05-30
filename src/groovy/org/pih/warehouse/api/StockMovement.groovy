@@ -436,7 +436,7 @@ class StockMovement {
         return stockMovement
     }
 
-    static def buildCsvRow(StockMovementItem lineItem = null) {
+    static Map buildCsvRow(StockMovementItem lineItem = null) {
         return [
                 "Requisition item id"            : lineItem?.id ?: "",
                 "Product code (required)"     : lineItem?.product?.productCode ?: "",
