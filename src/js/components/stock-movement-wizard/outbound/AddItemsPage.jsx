@@ -437,12 +437,11 @@ class AddItemsPage extends Component {
       !item.statusCode &&
       parseInt(item.quantityRequested, 10) > 0 &&
       item.product);
-
     const lineItemsWithStatus = _.filter(lineItems, item => item.statusCode);
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
-      // We wouldn't update items with quantity requested <= 0
-      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) <= 0) {
+      // We wouldn't update items with quantity requested < 0
+      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -485,10 +484,10 @@ class AddItemsPage extends Component {
         (
           !_.isEqual(_.pick(item, keyIntersection), _.pick(oldItem, keyIntersection)) ||
           (item.product.id !== oldItem.product.id)
-        )
+        ) && item.id
       ) {
         lineItemsToBeUpdated.push(item);
-      } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
+      } else if ((newQty !== oldQty || newRecipient !== oldRecipient) && item.id) {
         lineItemsToBeUpdated.push(item);
       }
     });
@@ -540,22 +539,15 @@ class AddItemsPage extends Component {
 
   setLineItems(response, startIndex) {
     const { data } = response.data;
-    let lineItemsData;
-
-    if (this.state.values.lineItems.length === 0 && !data.length) {
-      lineItemsData = new Array(1)
-        .fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
-    } else {
-      lineItemsData = _.map(data, val => ({ ...val, disabled: true }));
-    }
-
+    const lineItemsData = data.length ? _.map(data, val => ({ ...val, disabled: true })) :
+      new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
     this.setState({
-      currentLineItems: this.props.isPaginated ?
+      currentLineItems: startIndex !== null && this.props.isPaginated ?
         _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
       values: {
         ...this.state.values,
-        lineItems: this.props.isPaginated ?
+        lineItems: startIndex !== null && this.props.isPaginated ?
           _.uniqBy(_.concat(this.state.values.lineItems, lineItemsData), 'id') : lineItemsData,
       },
       sortOrder,
@@ -608,7 +600,7 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested <= 0)) {
+      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -709,7 +701,7 @@ class AddItemsPage extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.setState({
-          totalCount: response.data.data.length,
+          totalCount: response.data.data.length || 1,
         }, () => this.setLineItems(response, null));
       })
       .catch(err => err);
@@ -785,6 +777,9 @@ class AddItemsPage extends Component {
       this.transitionToNextStep : this.saveAndTransitionToNextStep;
     const itemsMap = {};
     _.forEach(lineItems, (item) => {
+      if (parseInt(item.quantityRequested, 10) === 0) {
+        return;
+      }
       if (itemsMap[item.product.productCode]) {
         itemsMap[item.product.productCode].push(item);
       } else {
@@ -792,7 +787,6 @@ class AddItemsPage extends Component {
       }
     });
     const itemsWithSameCode = _.filter(itemsMap, item => item.length > 1);
-
     if (_.some(itemsMap, item => item.length > 1) && !(this.state.values.origin.type === 'SUPPLIER' || !this.state.values.hasManageInventory)) {
       this.confirmTransition(
         () => transitionFunction(formValues, lineItems),
@@ -887,6 +881,13 @@ class AddItemsPage extends Component {
             // newly saved item to replace its equivalent in state
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
+              if (
+                parseInt(item.quantityRequested, 10) === 0 &&
+                item.rowSaveStatus === RowSaveStatus.SAVING &&
+                !_.includes(savedItemsIds, item.id)
+              ) {
+                return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
+              }
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
               // line is disabled by default
@@ -908,7 +909,7 @@ class AddItemsPage extends Component {
 
             this.setState({
               values: { ...this.state.values, lineItems: lineItemsAfterSave },
-              currentLineItems: lineItemsAfterSave,
+              currentLineItems: lineItemsBackendData,
             });
             return;
           }
@@ -957,6 +958,17 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
+    this.setState({
+      values: {
+        ...this.state.values,
+        lineItems: this.state.values.lineItems.map((item) => {
+          if (parseInt(item.quantityRequested, 10) === 0) {
+            return { ...item, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
+          }
+          return item;
+        }),
+      },
+    });
 
     return Promise.resolve();
   }
@@ -980,7 +992,7 @@ class AddItemsPage extends Component {
         return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
 
-      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) <= 0)) {
+      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0)) {
         return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
       }
 
@@ -1401,7 +1413,7 @@ class AddItemsPage extends Component {
                     disabled={
                     invalid ||
                     showOnly ||
-                    _.some(values.lineItems, item => item.quantityRequested <= 0)
+                    _.some(values.lineItems, item => item.quantityRequested < 0)
                   }
                   // onClick -> onMouseDown (see comment for DELETE_BUTTON_FIELD)
                     onMouseDown={() => {
@@ -1444,7 +1456,8 @@ class AddItemsPage extends Component {
                     (values.lineItems.length === 1 && !('product' in values.lineItems[0])) ||
                     invalid ||
                     showOnly ||
-                    _.some(values.lineItems, item => item.quantityRequested <= 0)
+                    _.some(values.lineItems, item => item.quantityRequested < 0) ||
+                      _.every(values.lineItems, item => parseInt(item.quantityRequested, 10) === 0)
                   }
                   ><Translate id="react.default.button.next.label" defaultMessage="Next" />
                   </button>
