@@ -441,7 +441,7 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested < 0
-      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0) {
+      if (!item.quantityRequested === undefined || parseInt(item.quantityRequested, 10) < 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -477,6 +477,12 @@ class AddItemsPage extends Component {
             }),
           },
         }));
+      }
+
+      // We want to delete items with 0 qty after first save using stock list
+      if (item.id && newQty === oldQty && oldQty === 0) {
+        lineItemsToBeUpdated.push(item);
+        return;
       }
 
       if (
@@ -600,7 +606,10 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
+      if (
+        !_.isNil(item.product)
+        && (item.quantityRequested === undefined || item?.quantityRequested < 0)
+      ) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -883,7 +892,8 @@ class AddItemsPage extends Component {
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               if (
                 parseInt(item.quantityRequested, 10) === 0 &&
-                item.rowSaveStatus === RowSaveStatus.SAVING &&
+                (item.rowSaveStatus === RowSaveStatus.SAVING ||
+                  item.rowSaveStatus === RowSaveStatus.SAVED) &&
                 !_.includes(savedItemsIds, item.id)
               ) {
                 return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
@@ -992,7 +1002,10 @@ class AddItemsPage extends Component {
         return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
 
-      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0)) {
+      if (
+        item.product && (item.quantityRequested === undefined ||
+          parseInt(item.quantityRequested, 10) < 0)
+      ) {
         return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
       }
 
