@@ -475,6 +475,17 @@ class ProductAvailabilityService {
     }
 
     def getInventoryByProduct(Location location) {
+        return getInventoryByProduct(location, [])
+    }
+
+    def getInventoryByProduct(Location location, List<Category> categories) {
+        def categoriesQuery = "";
+        def queryArguments = [location: location]
+
+        if (categories) {
+            categoriesQuery = "and pa.product.category.id in (:categories)"
+            queryArguments += [categories: categories.id]
+        }
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
@@ -482,8 +493,9 @@ class ProductAvailabilityService {
 						 sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
 						from ProductAvailability pa
 						where pa.location = :location
+						${categoriesQuery}
 						group by pa.product
-						""", [location: location])
+						""", queryArguments)
             results.each {
                 quantityMap[it[0]] = [
                         quantityOnHand              : it[1],

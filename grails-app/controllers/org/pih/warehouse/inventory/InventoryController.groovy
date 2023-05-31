@@ -483,91 +483,56 @@ class InventoryController {
         [transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected]
     }
 
+    private def determineCategories(params) {
+        List<Category> categories = Category.findAllByIdInList(params.list("categories"))
+
+        // When accessing the page for the first time, the flag should be set to true
+        // Initially there no parameter _includeSubcategories, only after running the report manually it is set
+        params.includeSubcategories = params.containsKey("_includeSubcategories") ? params.includeSubcategories : true
+        if (params.includeSubcategories) {
+            categories = inventoryService.getExplodedCategories(categories)
+        }
+        return categories;
+    }
+
+    private def listStock(Map params, String methodName, String fileNamePrefix) {
+        def location = Location.get(session.warehouse.id)
+        List<Category> categories = this.determineCategories(params)
+
+        def inventoryItems = dashboardService."$methodName"(location, categories)
+
+        if (params.button == "download") {
+            def filename = fileNamePrefix + location.name + ".csv"
+            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
+            return
+        }
+
+        render(view: "list", model: [availableItems: inventoryItems])
+    }
 
     def list = {
-        println "List " + params
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getInventoryItems(location)
-
-        if (params.format == "csv") {
-            def filename = "${location.name} - ${status}.csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        [availableItems: inventoryItems]
+        this.listStock(params, "getInventoryItems", "")
     }
-
 
     def listReconditionedStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getReconditionedStock(location)
-
-        if (params.format == "csv") {
-            def filename = "Reconditioned stock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getReconditionedStock", "Reconditioned stock - ")
     }
 
-
     def listTotalStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getTotalStock(location)
-
-        if (params.format == "csv") {
-            def filename = "Total stock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        render(view: "list", model: [availableItems: inventoryItems])
-
+        this.listStock(params, "getTotalStock", "Total stock - ")
     }
 
     def listInStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getInStock(location)
-
-        if (params.format == "csv") {
-            def filename = "In stock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getInStock", "In stock - ")
     }
 
     def listLowStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getLowStock(location)
-
-        if (params.format == "csv") {
-            def filename = "Low stock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getLowStock", "Low stock - ")
     }
 
     def listReorderStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getReorderStock(location)
-
-        if (params.format == "csv") {
-            def filename = "Reorder stock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getReorderStock", "Reorder stock - ")
     }
 
     def reorderReport = {
@@ -638,52 +603,24 @@ class InventoryController {
     }
 
     def listQuantityOnHandZero = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getQuantityOnHandZero(location)
-
-        if (params.format == "csv") {
-            def filename = "Out of stock  - all - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getQuantityOnHandZero", "Out of stock  - all - ")
     }
 
     def listHealthyStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getHealthyStock(location)
-
-        if (params.format == "csv") {
-            def filename = "Overstock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getHealthyStock", "Overstock - ")
     }
 
     def listOverStock = {
-        def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getOverStock(location)
-
-        if (params.format == "csv") {
-            def filename = "Overstock - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-
-        render(view: "list", model: [availableItems: inventoryItems])
+        this.listStock(params, "getOverStock", "Overstock - ")
     }
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        def inventoryItems = dashboardService.getOutOfStock(location, params.abcClass)
+        List<Category> categories = this.determineCategories(params)
 
-        if (params.format == "csv") {
+        def inventoryItems = dashboardService.getOutOfStock(location, params.abcClass, categories)
+
+        if (params.button == "download") {
             def filename = "Out of stock - supported - " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
@@ -835,7 +772,7 @@ class InventoryController {
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product.displayNameWithLocaleCode) + ","
             csv += '"' + (product?.productFamily?.name ?: "") + '"' + ","
-            csv += '"' + (product?.category?.name ?: "") + '"' + ","
+            csv += '"' + (product?.category?.getHierarchyAsString(" > ") ?: "") + '"' + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
             csv += '"' + (inventoryLevel?.abcClass ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
