@@ -483,8 +483,7 @@ class InventoryController {
         [transactions: transactions, transactionsByDate: transactionsByDate, dateSelected: dateSelected]
     }
 
-    private def listStock(Map params, String methodName, String fileNamePrefix) {
-        def location = Location.get(session.warehouse.id)
+    private def determineCategories(params) {
         List<Category> categories = Category.findAllByIdInList(params.list("categories"))
 
         // When accessing the page for the first time, the flag should be set to true
@@ -493,6 +492,12 @@ class InventoryController {
         if (params.includeSubcategories) {
             categories = inventoryService.getExplodedCategories(categories)
         }
+        return categories;
+    }
+
+    private def listStock(Map params, String methodName, String fileNamePrefix) {
+        def location = Location.get(session.warehouse.id)
+        List<Category> categories = this.determineCategories(params)
 
         def inventoryItems = dashboardService."$methodName"(location, categories)
 
@@ -611,14 +616,8 @@ class InventoryController {
 
     def listOutOfStock = {
         def location = Location.get(session.warehouse.id)
-        List<Category> categories = Category.findAllByIdInList(params.list("categories"))
+        List<Category> categories = this.determineCategories(params)
 
-        // When accessing the page for the first time, the flag should be set to true
-        // Initially there not parameter button, only after running the report manually it is set
-        params.includeSubcategories = params.button ? params.includeSubcategories : true
-        if (params.includeSubcategories) {
-            categories = inventoryService.getExplodedCategories(categories)
-        }
         def inventoryItems = dashboardService.getOutOfStock(location, params.abcClass, categories)
 
         if (params.button == "download") {
