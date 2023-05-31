@@ -226,12 +226,13 @@ class DocumentTemplateService {
         def requisitionItems = requisitionInstance?.requisitionItems?.collect { RequisitionItem requisitionItem ->
             def demand
             def quantityOnHand
-            if (requisitionInstance?.destination?.isWard()) {
-                // if request FROM Ward then pull demand from origin to ward and use quantity counted as quantity on hand
+            if (requisitionInstance?.destination?.hasNoManagedInventoryAndSupportsSubmittingRequests()) {
+                // if request FROM "Ward" (location without managed inventory but supporting submitting requests),
+                // then pull demand from origin to that location
                 demand = forecastingService.getDemand(requisitionInstance.origin, requisitionInstance.destination, requisitionItem.product)
                 quantityOnHand = requisitionItem?.quantityCounted ?: 0
             } else {
-                // if request is NOT FROM Ward, then pull demand outgoing FROM destination to all other locations
+                // if request is NOT FROM "Ward", then pull demand outgoing FROM destination to all other locations
                 demand = forecastingService.getDemand(requisitionInstance.destination, null, requisitionItem.product)
                 quantityOnHand = demand?.quantityOnHand ?: 0
             }
@@ -243,7 +244,7 @@ class DocumentTemplateService {
                 requestorMonthlyDemand  : demand?.monthlyDemand ?: 0,
                 requestorQuantityOnHand : quantityOnHand,
                 quantityRequested       : requisitionItem?.quantity,
-                quantityIssued          : requisitionInstance?.isPending() ? "" : requisitionItem?.quantityIssued
+                quantityIssued          : requisitionItem.isApproved() && !requisitionInstance?.isPending() ? requisitionItem?.quantityIssued : ""
             ]
         }
 

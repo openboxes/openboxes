@@ -328,6 +328,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return !onHold
     }
 
+    Boolean hasNoManagedInventoryAndSupportsSubmittingRequests() {
+        return !supports(ActivityCode.MANAGE_INVENTORY) && supports(ActivityCode.SUBMIT_REQUEST)
+    }
+
     LocationStatus getStatus() {
         if (organization) {
             return (active && organization.active) ? LocationStatus.ENABLED : LocationStatus.DISABLED
