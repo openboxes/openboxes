@@ -367,6 +367,7 @@ class AddItemsPage extends Component {
     this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
     this.shouldShowAutosaveFeatureBar = this.shouldShowAutosaveFeatureBar.bind(this);
     this.shouldCreateAutosaveFeatureBar = this.shouldCreateAutosaveFeatureBar.bind(this);
+    this.didUserConfirmAlert = false;
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -441,7 +442,8 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested < 0
-      if (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0) {
+      if ((item.quantityRequested !== 0 && !item.quantityRequested) ||
+        parseInt(item.quantityRequested, 10) < 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -477,6 +479,12 @@ class AddItemsPage extends Component {
             }),
           },
         }));
+      }
+
+      // We want to delete items with 0 qty after first save using stock list
+      if (item.id && newQty === oldQty && oldQty === 0) {
+        lineItemsToBeUpdated.push(item);
+        return;
       }
 
       if (
@@ -600,7 +608,11 @@ class AddItemsPage extends Component {
     const date = moment(this.props.minimumExpirationDate, 'MM/DD/YYYY');
 
     _.forEach(values.lineItems, (item, key) => {
-      if (!_.isNil(item.product) && (!item.quantityRequested || item.quantityRequested < 0)) {
+      if (
+        !_.isNil(item.product)
+        && ((item.quantityRequested !== 0 && !item.quantityRequested)
+          || item?.quantityRequested < 0)
+      ) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
       if (!_.isEmpty(item.boxName) && _.isEmpty(item.palletName)) {
@@ -644,12 +656,20 @@ class AddItemsPage extends Component {
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
+          onClick: () => {
+            this.didUserConfirmAlert = true;
+          },
         },
         {
           label: this.props.translate('react.default.no.label', 'No'),
         },
       ],
+      afterClose: () => {
+        if (this.didUserConfirmAlert) {
+          onConfirm();
+          this.didUserConfirmAlert = false;
+        }
+      },
     });
   }
 
@@ -883,7 +903,8 @@ class AddItemsPage extends Component {
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               if (
                 parseInt(item.quantityRequested, 10) === 0 &&
-                item.rowSaveStatus === RowSaveStatus.SAVING &&
+                (item.rowSaveStatus === RowSaveStatus.SAVING ||
+                  item.rowSaveStatus === RowSaveStatus.SAVED) &&
                 !_.includes(savedItemsIds, item.id)
               ) {
                 return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
@@ -958,17 +979,17 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
-    this.setState({
+    this.setState(previousState => ({
       values: {
-        ...this.state.values,
-        lineItems: this.state.values.lineItems.map((item) => {
+        ...previousState.values,
+        lineItems: previousState.values.lineItems.map((item) => {
           if (parseInt(item.quantityRequested, 10) === 0) {
             return { ...item, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
           }
           return item;
         }),
       },
-    });
+    }));
 
     return Promise.resolve();
   }
@@ -992,7 +1013,10 @@ class AddItemsPage extends Component {
         return { ...fieldValue, rowSaveStatus: RowSaveStatus.PENDING };
       }
 
-      if (item.product && (!item.quantityRequested || parseInt(item.quantityRequested, 10) < 0)) {
+      if (
+        item.product && ((item.quantityRequested !== 0 && !item.quantityRequested) ||
+          parseInt(item.quantityRequested, 10) < 0)
+      ) {
         return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
       }
 
