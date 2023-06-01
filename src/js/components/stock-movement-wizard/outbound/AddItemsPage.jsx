@@ -367,6 +367,7 @@ class AddItemsPage extends Component {
     this.saveAndTransitionToNextStep = this.saveAndTransitionToNextStep.bind(this);
     this.shouldShowAutosaveFeatureBar = this.shouldShowAutosaveFeatureBar.bind(this);
     this.shouldCreateAutosaveFeatureBar = this.shouldCreateAutosaveFeatureBar.bind(this);
+    this.didUserConfirmAlert = false;
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
@@ -653,12 +654,19 @@ class AddItemsPage extends Component {
       buttons: [
         {
           label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
+          onClick: () => {
+            this.didUserConfirmAlert = true;
+          },
         },
         {
           label: this.props.translate('react.default.no.label', 'No'),
         },
       ],
+      afterClose: () => {
+        if (this.didUserConfirmAlert) {
+          onConfirm();
+        }
+      },
     });
   }
 
@@ -968,17 +976,17 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
     }
-    this.setState({
+    this.setState(previousState => ({
       values: {
-        ...this.state.values,
-        lineItems: this.state.values.lineItems.map((item) => {
+        ...previousState.values,
+        lineItems: previousState.values.lineItems.map((item) => {
           if (parseInt(item.quantityRequested, 10) === 0) {
             return { ...item, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
           }
           return item;
         }),
       },
-    });
+    }));
 
     return Promise.resolve();
   }
