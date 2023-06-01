@@ -512,6 +512,10 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
         return calculatePercentageCompleted() >= 100
     }
 
+    def isQuantityIssued() {
+        return isApproved() && !requisition?.isPending()
+    }
+
     /**
      * @return true if the item has been completed cancelled and has some child items that are substitutes
      */

@@ -328,7 +328,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         return !onHold
     }
 
-    Boolean hasNoManagedInventoryAndSupportsSubmittingRequests() {
+    Boolean isDownstreamConsumer() {
         return !supports(ActivityCode.MANAGE_INVENTORY) && supports(ActivityCode.SUBMIT_REQUEST)
     }
 

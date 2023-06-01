@@ -799,12 +799,12 @@ class StockMovementService {
                 ]
             } else if (!template || (template && template.replenishmentTypeCode == ReplenishmentTypeCode.PULL)) {
                 def demand
-                // if request FROM "Ward" (location without managed inventory but supporting submitting requests),
+                // if request FROM downstream consumer (location without managed inventory but supporting submitting requests),
                 // then pull demand from origin to that location
-                if (requisition?.destination?.hasNoManagedInventoryAndSupportsSubmittingRequests()) {
+                if (requisition?.destination?.isDownstreamConsumer()) {
                     demand = forecastingService.getDemand(requisition.origin, requisition.destination, stockMovementItem.product)
                 } else {
-                    // if request is NOT FROM "Ward", then pull demand outgoing FROM destination to all other locations
+                    // if request is NOT FROM downstream consumer, then pull demand outgoing FROM destination to all other locations
                     demand = forecastingService.getDemand(requisition.destination, null, stockMovementItem.product)
                 }
                 return [
