@@ -550,6 +550,13 @@ class AddItemsPage extends Component {
     const lineItemsData = data.length ? _.map(data, val => ({ ...val, disabled: true })) :
       new Array(1).fill({ sortOrder: 100, rowSaveStatus: RowSaveStatus.PENDING });
     const sortOrder = _.toInteger(_.last(lineItemsData).sortOrder) + 100;
+    // check if stock list has items with qty 0
+    if (
+      this.props.isAutosaveEnabled &&
+      _.get(this.state.values.stocklist, 'id')
+    ) {
+      this.saveRequisitionItemsInCurrentStep(data, false);
+    }
     this.setState({
       currentLineItems: startIndex !== null && this.props.isPaginated ?
         _.uniqBy(_.concat(this.state.currentLineItems, data), 'id') : data,
@@ -904,7 +911,8 @@ class AddItemsPage extends Component {
               if (
                 parseInt(item.quantityRequested, 10) === 0 &&
                 (item.rowSaveStatus === RowSaveStatus.SAVING ||
-                  item.rowSaveStatus === RowSaveStatus.SAVED) &&
+                  item.rowSaveStatus === RowSaveStatus.SAVED ||
+                  !item.rowSaveStatus) &&
                 !_.includes(savedItemsIds, item.id)
               ) {
                 return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
