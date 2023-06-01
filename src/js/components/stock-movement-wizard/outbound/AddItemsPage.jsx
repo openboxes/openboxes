@@ -442,7 +442,8 @@ class AddItemsPage extends Component {
     const lineItemsToBeUpdated = [];
     _.forEach(lineItemsWithStatus, (item) => {
       // We wouldn't update items with quantity requested < 0
-      if (!item.quantityRequested === undefined || parseInt(item.quantityRequested, 10) < 0) {
+      if ((item.quantityRequested !== 0 && !item.quantityRequested) ||
+        parseInt(item.quantityRequested, 10) < 0) {
         return; // lodash continue
       }
       const oldItem = _.find(this.state.currentLineItems, old => old.id === item.id);
@@ -609,7 +610,8 @@ class AddItemsPage extends Component {
     _.forEach(values.lineItems, (item, key) => {
       if (
         !_.isNil(item.product)
-        && (item.quantityRequested === undefined || item?.quantityRequested < 0)
+        && ((item.quantityRequested !== 0 && !item.quantityRequested)
+          || item?.quantityRequested < 0)
       ) {
         errors.lineItems[key] = { quantityRequested: 'react.stockMovement.error.enterQuantity.label' };
       }
@@ -665,6 +667,7 @@ class AddItemsPage extends Component {
       afterClose: () => {
         if (this.didUserConfirmAlert) {
           onConfirm();
+          this.didUserConfirmAlert = false;
         }
       },
     });
@@ -1011,7 +1014,7 @@ class AddItemsPage extends Component {
       }
 
       if (
-        item.product && (item.quantityRequested === undefined ||
+        item.product && ((item.quantityRequested !== 0 && !item.quantityRequested) ||
           parseInt(item.quantityRequested, 10) < 0)
       ) {
         return { ...item, rowSaveStatus: RowSaveStatus.ERROR };
