@@ -351,8 +351,16 @@ manifest {
 node {
     distBaseUrl = 'https://nodejs.org/dist'
     download = true
-    npmVersion = '6.14.18'
-    version = '14.21.3'
+    npmInstall.args = ['--loglevel', 'http']
+    npmInstallCommand = 'ci'
+    npmVersion = '9.6.6'
+    version = '16.20.0'
+}
+
+tasks.npmSetup {
+    doFirst {
+        args = args + ['--loglevel', 'http']
+    }
 }
 
 processResources {

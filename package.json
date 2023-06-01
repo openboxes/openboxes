@@ -4,8 +4,8 @@
   "description": "OpenBoxes Web App",
   "main": "index.js",
   "engines": {
-    "node": "^14",
-    "npm": "^6 || ^7"
+    "node": "^16 || ^18 || ^20",
+    "npm": "^8 || ^9"
   },
   "directories": {
     "doc": "docs",
