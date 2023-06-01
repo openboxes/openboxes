@@ -375,7 +375,7 @@ openboxes {
                         [label: "partyRoles.label", defaultLabel: "Party roles", href: "/partyRole/list"],
                         [label: "partyTypes.label", defaultLabel: "Party types", href: "/partyType/list"],
                         [label: "person.list.label", defaultLabel: "People", href: "/person/list"],
-                        [label: "roles.label", defaultLabel: "Roles", href: "/role/list"],
+                        [label: "roles.label", defaultLabel: "Roles", href: "/role/index"],
                         [label: "users.label", defaultLabel: "Users", href: "/user/list"],
                     ]
                 ],
