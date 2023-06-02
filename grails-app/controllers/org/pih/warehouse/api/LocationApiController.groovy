@@ -87,6 +87,11 @@ class LocationApiController extends BaseDomainApiController {
                 locations += locationService.getLocations(fields, params, isSuperuser, direction, currentLocation, currentUser, params.locationChooser ? true : false)
             }
         }
+
+        if (params.presentation == "toBaseJson") {
+            locations = locations?.collect { Location location -> location.toBaseJson()}
+        }
+
         render ([data:locations] as JSON)
     }
 
