@@ -573,30 +573,6 @@ class RequisitionController {
         redirect(action: "pick", id: command?.requisition?.id)
     }
 
-
-    private List<Location> getDepots() {
-        Location.list().findAll { location -> location.id != session.warehouse.id && location.isWarehouse() }.sort {
-            it.name
-        }
-    }
-
-    private List<Location> getWardsPharmacies() {
-        def current = Location.get(session.warehouse.id)
-        def locations = []
-        if (current) {
-            if (current?.locationGroup == null) {
-                locations = Location.list().findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            } else {
-                locations = Location.list().findAll { location -> location.locationGroup?.id == current.locationGroup?.id }.findAll { location -> location.isWardOrPharmacy() }.sort {
-                    it.name
-                }
-            }
-        }
-        return locations
-    }
-
     /**
      * Generate the name of the requisition.
      *
