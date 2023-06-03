@@ -354,7 +354,7 @@ node {
     npmInstall.args = ['--loglevel', 'http']
     npmInstallCommand = 'ci'
     npmVersion = '9.6.7'
-    version = '14.21.3'
+    version = '16.20.0'
 }
 
 tasks.npmSetup {
