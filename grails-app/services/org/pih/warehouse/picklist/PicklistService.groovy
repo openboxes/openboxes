@@ -145,6 +145,7 @@ class PicklistService {
         if (!picklist) {
             picklist = new Picklist()
             picklist.order = order
+            picklist.save(flush: true)
         }
 
         // If one does not exist create it and add it to the list

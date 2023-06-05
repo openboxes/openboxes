@@ -15,11 +15,16 @@ import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.RefreshProductAvailabilityEvent
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.requisition.RequisitionItem
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationEventPublisher
 
 class PicklistItem implements Serializable {
 
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher
+
     def publishRefreshEvent = {
-        Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this))
+        applicationEventPublisher?.publishEvent(new RefreshProductAvailabilityEvent(this))
     }
 
     def afterInsert = publishRefreshEvent
@@ -66,7 +71,7 @@ class PicklistItem implements Serializable {
         sortOrder(nullable: true)
     }
 
-    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable']
+    static transients = ['associatedLocation', 'associatedProducts', 'disableRefresh', 'pickable', 'applicationEventPublisher']
 
     String getAssociatedLocation() {
         return binLocation?.parentLocation?.id ?:
