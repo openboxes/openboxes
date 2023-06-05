@@ -40,7 +40,7 @@ class InventoryExcelImporter extends AbstractExcelImporter {
             productCode     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             product         : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             lotNumber       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            expirationDate  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            expirationDate  : ([expectedType: ExpectedPropertyType.DateType, defaultValue: null]),
             binLocation    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             quantityOnHand: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             quantity        : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
