@@ -28,7 +28,7 @@ class Organization extends Party {
 
     static hasMany = [locations : Location]
 
-    Map<IdentifierTypeCode, Integer> sequences
+    Map<IdentifierTypeCode, String> sequences
 
     static mapping = {
         id generator: 'uuid'

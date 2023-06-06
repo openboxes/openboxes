@@ -19,7 +19,7 @@ class DecimalNumberFieldTagLib extends FormatTagLib {
             attrs.value = (attrs.value as String).replace('.', decimalSeparator)
         }
         out << render(
-                template: "../taglib/decimalFormatField",
+                template: "/taglib/decimalFormatField",
                 model: [attrs: attrs, decimalSeparator: decimalSeparator]
         )
 
