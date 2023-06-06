@@ -461,7 +461,7 @@ class UserService {
         return user.deserializeDashboardConfig()
     }
 
-    User save(User userInstance, Map params) {
+    User addUser(User userInstance, Map params) {
         // Default value for active field on Person is set to True
         // which is inherited by User
         // but when creating a new user default value should be set to False
