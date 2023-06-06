@@ -324,7 +324,7 @@ class CreateStockMovement extends Component {
         origin: values.origin.id,
         destination: values.destination.id,
         requestedBy: values.requestedBy.id,
-        stocklist: _.get(values.stocklist, 'id') || '',
+        stocklist: { id: _.get(values.stocklist, 'id', '') },
         requestType: values.requestType.id,
         sourceType: ELECTRONIC,
       };
