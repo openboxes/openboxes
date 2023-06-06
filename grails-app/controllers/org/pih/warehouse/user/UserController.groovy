@@ -119,7 +119,7 @@ class UserController {
     def save() {
         log.info "attempt to save the user; show form with validation errors on failure"
         User userInstance = new User(params)
-        User persistedUser = userService.save(userInstance, params)
+        User persistedUser = userService.addUser(userInstance, params)
         if (persistedUser) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), persistedUser.id])}"
             redirect(action: "edit", id: persistedUser.id)
