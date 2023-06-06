@@ -327,10 +327,10 @@ openboxes {
                     defaultLabel: "", // No label
                     menuItems: [
                         [label: "productSuppliers.label", defaultLabel: "Products Sources", href: "/productSupplier/list"],
-                        [label: "product.components.label", defaultLabel: "Components", href: "/productComponent/list"],
+                        [label: "product.components.label", defaultLabel: "Components", href: "/productComponent"],
                         [label: "productGroups.label", defaultLabel: "Generic Products", href: "/productGroup/list"],
-                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/unitOfMeasure/list"],
-                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/unitOfMeasureClass/list"],
+                        [label: "unitOfMeasure.label", defaultLabel: "Unit of Measure", href: "/unitOfMeasure"],
+                        [label: "unitOfMeasureClass.label", defaultLabel: "Uom Class", href: "/unitOfMeasureClass"],
                         [label: "unitOfMeasureConversion.label", defaultLabel: "Uom Conversion", href: "/unitOfMeasureConversion/list"]
                     ]
                 ]
@@ -375,7 +375,7 @@ openboxes {
                         [label: "partyRoles.label", defaultLabel: "Party roles", href: "/partyRole/list"],
                         [label: "partyTypes.label", defaultLabel: "Party types", href: "/partyType/list"],
                         [label: "person.list.label", defaultLabel: "People", href: "/person/list"],
-                        [label: "roles.label", defaultLabel: "Roles", href: "/role/list"],
+                        [label: "roles.label", defaultLabel: "Roles", href: "/role"],
                         [label: "users.label", defaultLabel: "Users", href: "/user/list"],
                     ]
                 ],
@@ -395,17 +395,17 @@ openboxes {
                     defaultLabel: "Other",
                     menuItems: [
                         [label: "budgetCode.label", defaultLabel: "Budget Code", href: "/budgetCode/list"],
-                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/containerType/list"],
+                        [label: "containerTypes.label", defaultLabel: "Container Types", href: "/containerType"],
                         [label: "documents.label", defaultLabel: "Documents", href: "/document/list"],
-                        [label: "documentTypes.label", defaultLabel: "Document Types", href: "/documentType/list"],
+                        [label: "documentTypes.label", defaultLabel: "Document Types", href: "/documentType"],
                         [label: "eventTypes.label", defaultLabel: "Event Types", href: "/eventType/list"],
                         [label: "glAccountType.label", defaultLabel: "GL Account Type", href: "/glAccountType/list"],
                         [label: "glAccount.label", defaultLabel: "GL Account", href: "/glAccount/list"],
                         [label: "orderAdjustmentType.label", defaultLabel: "Order Adjustment Type", href: "/orderAdjustmentType/list"],
-                        [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/paymentMethodType/list"],
+                        [label: "paymentMethodTypes.label", defaultLabel: "Payment Method Types", href: "/paymentMethodType"],
                         [label: "paymentTerms.label", defaultLabel: "Payment Terms", href: "/paymentTerm/list"],
                         [label: "preferenceType.label", defaultLabel: "Preference Type", href: "/preferenceType/list"],
-                        [label: "shippers.label", defaultLabel: "Shippers", href: "/shipper/list"],
+                        [label: "shippers.label", defaultLabel: "Shippers", href: "/shipper"],
                         [label: "shipmentWorkflows.label", defaultLabel: "Shipment Workflows", href: "/shipmentWorkflow/list"],
                         [label: "productsConfiguration.label", defaultLabel: "Categories and Products Configuration", href: "/productsConfiguration/index"],
                         [label: "locationsConfiguration.label", defaultLabel: "Locations Configuration", href: "/locationsConfiguration/index"],
