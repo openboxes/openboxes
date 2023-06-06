@@ -460,4 +460,18 @@ class UserService {
         user.dashboardConfig = stringConfig
         return user.deserializeDashboardConfig()
     }
+
+    User save(User userInstance, Map params) {
+        // Default value for active field on Person is set to True
+        // which is inherited by User
+        // but when creating a new user default value should be set to False
+        if (!params.hasProperty("active")) {
+            userInstance.active = false
+        }
+
+        userInstance.password = params?.password?.encodeAsPassword()
+        userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
+
+        return userInstance.save(flush: true)
+    }
 }
