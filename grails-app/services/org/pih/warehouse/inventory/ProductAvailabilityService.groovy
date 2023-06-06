@@ -11,18 +11,17 @@ package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.PagedResultList
+import grails.util.Holders
 import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
-import grails.util.Holders
 import org.hibernate.Criteria
-import org.hibernate.Hibernate
-import org.hibernate.SQLQuery
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
+import org.hibernate.SQLQuery
+import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
@@ -30,6 +29,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
@@ -270,9 +270,9 @@ class ProductAvailabilityService {
         """
 
         SQLQuery sqlQuery = sessionFactory.currentSession.createSQLQuery(query)
-        List results = sqlQuery.addScalar("bin_location_id", Hibernate.STRING)
-                .addScalar("inventory_item_id", Hibernate.STRING)
-                .addScalar("quantity_allocated", Hibernate.BIG_DECIMAL)
+        List results = sqlQuery.addScalar("bin_location_id", StandardBasicTypes.STRING)
+                .addScalar("inventory_item_id", StandardBasicTypes.STRING)
+                .addScalar("quantity_allocated", StandardBasicTypes.BIG_DECIMAL)
                 .setString("locationId", location?.id)
                 .setString("productId", product?.id ?: '')
                 .setParameterList("pendingRequisitionStatuses", RequisitionStatus.listPending().collect { it.name() })
