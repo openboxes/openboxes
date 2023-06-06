@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.core.UnitOfMeasure
@@ -16,8 +17,11 @@ import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
 import org.springframework.validation.BeanPropertyBindingResult
+import org.grails.plugins.excelimport.ExcelImportService
 
 class ProductAttributeExcelImporter extends AbstractExcelImporter {
+
+    ExcelImportService excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -40,11 +44,13 @@ class ProductAttributeExcelImporter extends AbstractExcelImporter {
 
     ProductAttributeExcelImporter(String fileName) {
         super(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+
     }
 
 
     List<Map> getData() {
-        return ExcelImportUtils.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
