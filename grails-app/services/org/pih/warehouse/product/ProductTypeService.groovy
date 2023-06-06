@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class ProductTypeService {
 
     synchronized getAndSetNextSequenceNumber(ProductType productType) {
@@ -17,4 +20,19 @@ class ProductTypeService {
 
         return productType.sequenceNumber
     }
+
+    ProductType addProductType(ProductType productTypeInstance, Map params) {
+        productTypeInstance.productTypeCode = ProductTypeCode.GOOD
+        productTypeInstance.requiredFields = [ProductField.PRODUCT_CODE, ProductField.NAME, ProductField.CATEGORY, ProductField.GL_ACCOUNT]
+        if (!params.code && !params.productIdentifierFormat) {
+            productTypeInstance.errors.rejectValue("productIdentifierFormat","productType.codeOrIdentifierRequired.message")
+            productTypeInstance.errors.rejectValue("code", "")
+        }
+        ProductType persistedProductType = null
+        if (!productTypeInstance.hasErrors()) {
+            persistedProductType = productTypeInstance.save(flush: true)
+        }
+        return persistedProductType
+    }
+
 }
