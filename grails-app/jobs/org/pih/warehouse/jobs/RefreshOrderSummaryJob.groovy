@@ -17,8 +17,7 @@ class RefreshOrderSummaryJob {
     }
 
     def execute(JobExecutionContext context) {
-        Boolean enabled = Holders.config.openboxes.jobs.refreshOrderSummaryJob.enabled
-        if (enabled) {
+        if (JobUtils.shouldExecute(RefreshOrderSummaryJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing order summary: " + context.mergedJobDataMap)
             orderService.refreshOrderSummary()

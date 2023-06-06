@@ -21,6 +21,7 @@ class RoleInterceptor {
     def static changeControllers = ['createProductFromTemplate']
 
     def static managerActions = [
+        'inventory'           : ['createOutboundTransfer'],
         'stockMovementItemApi': ['eraseItem']
     ]
 
@@ -38,7 +39,7 @@ class RoleInterceptor {
     def static superuserControllers = []
     def static superuserActions = [
         'console'                   : ['index', 'execute'],
-        'inventory'                 : ['createInboundTransfer', 'createOutboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
+        'inventory'                 : ['createInboundTransfer', 'createConsumed', 'editTransaction', 'deleteTransaction', 'saveTransaction'],
         'inventoryItem'             : ['adjustStock', 'transferStock'],
         'productCatalog'            : ['create', 'importProductCatalog'],
         'productType'               : ['edit', 'delete', 'save', 'update'],
