@@ -14,6 +14,8 @@ import org.springframework.dao.DataIntegrityViolationException
 
 class ProductTypeController {
 
+    ProductTypeService productTypeService
+
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -43,16 +45,12 @@ class ProductTypeController {
             params.displayedFields = params.list("displayedFields") as ProductField[]
         }
 
-        def productTypeInstance = new ProductType(params)
-        productTypeInstance.productTypeCode = ProductTypeCode.GOOD
-        productTypeInstance.requiredFields = [ProductField.PRODUCT_CODE, ProductField.NAME, ProductField.CATEGORY, ProductField.GL_ACCOUNT]
-        if (!params.code && !params.productIdentifierFormat) {
-            productTypeInstance.errors.rejectValue("productIdentifierFormat","productType.codeOrIdentifierRequired.message")
-            productTypeInstance.errors.rejectValue("code", "")
-        }
-        if (!productTypeInstance.hasErrors() && productTypeInstance.save(flush: true)) {
+        ProductType productTypeInstance = new ProductType(params)
+        ProductType persistedProductType = productTypeService.addProductType(productTypeInstance, params)
+
+        if (persistedProductType) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), productTypeInstance.id])}"
-            redirect(action: "list", id: productTypeInstance.id)
+            redirect(action: "list", id: persistedProductType.id)
         } else {
             render(view: "create", model: [productTypeInstance: productTypeInstance])
         }
