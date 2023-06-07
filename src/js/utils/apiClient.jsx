@@ -104,22 +104,6 @@ export const handleError = (error) => {
   return Promise.reject(error);
 };
 
-export const unflatten = (flattened) => {
-  const object = {};
-
-  _.forOwn(flattened, (value, key) => {
-    const path = key.split('.');
-    if (Array.isArray(value)) {
-      const unflattenedArray = value.map((val) => unflatten(val));
-      _.set(object, path, unflattenedArray);
-      return;
-    }
-    _.set(object, path, value);
-  });
-
-  return object;
-};
-
 // TODO: This is temporary cleaner. Once migration is complete it should be removed
 const cleanUrlFromContextPath = (url) => url.replace('/openboxes', '');
 

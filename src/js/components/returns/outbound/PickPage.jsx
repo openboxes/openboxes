@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { hideSpinner, showSpinner } from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
-import apiClient, { parseResponse, unflatten } from 'utils/apiClient';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -151,7 +151,7 @@ class PickPage extends Component {
   nextPage() {
     this.props.showSpinner();
     const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
-    const payload = unflatten({
+    const payload = parseResponse({
       ...this.state.values.outboundReturn,
       status: 'PLACED',
     });
