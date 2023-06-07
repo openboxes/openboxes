@@ -1015,8 +1015,8 @@ class OrderService {
 
     def getProductsInOrders(String[] terms, Location destination, Location vendor) {
         return OrderItem.createCriteria().list {
-            createAlias('product', 'prod', JoinType.LEFT_OUTER_JOIN)
-            createAlias('prod.synonyms', 'syn', JoinType.LEFT_OUTER_JOIN)
+            createAlias('product', 'product', JoinType.LEFT_OUTER_JOIN)
+            createAlias('product.synonyms', 'synonym', JoinType.LEFT_OUTER_JOIN)
 
             not {
                 'in'("orderItemStatusCode", OrderItemStatusCode.CANCELED)
@@ -1029,13 +1029,13 @@ class OrderService {
                 terms.each { term ->
                     term = term + "%"
                     or {
-                        ilike("prod.name", "%" + term)
+                        ilike("product.name", "%" + term)
                         and {
-                            ilike("syn.name", "%" + term)
-                            eq("syn.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
+                            ilike("synonym.name", "%" + term)
+                            eq("synonym.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
                         }
-                        ilike("prod.productCode", term)
-                        ilike("prod.description", "%" + term)
+                        ilike("product.productCode", term)
+                        ilike("product.description", "%" + term)
                     }
                 }
             }
