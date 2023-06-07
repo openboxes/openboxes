@@ -225,7 +225,7 @@ class OrderController {
     }
 
     def create() {
-        redirect(controller: 'purchaseOrderWorkflow', action: 'index')
+        redirect(controller: 'purchaseOrder', action: 'index')
     }
 
     def save() {
