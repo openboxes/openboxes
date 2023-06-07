@@ -9,13 +9,13 @@ import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
 import NotificationType from 'consts/notificationTypes';
 
-const justRejectRequestError = error => Promise.reject(error);
+const justRejectRequestError = (error) => Promise.reject(error);
 
 const apiClient = axios.create({});
 
 export function parseResponse(data) {
   if (_.isArray(data)) {
-    return _.map(data, value => (parseResponse(value)));
+    return _.map(data, (value) => (parseResponse(value)));
   }
 
   if (_.isPlainObject(data)) {
@@ -58,7 +58,7 @@ export function flattenRequest(data) {
   // return data === null || data === undefined ? '' : data;
 }
 
-export const handleSuccess = response => response;
+export const handleSuccess = (response) => response;
 
 export const handleError = (error) => {
   const errorMessage = _.get(error, 'response.data.errorMessage', '');
@@ -74,7 +74,7 @@ export const handleError = (error) => {
 
     case 401:
       confirmAlert({
-        customUI: props => (<LoginModal {...props} />),
+        customUI: (props) => (<LoginModal {...props} />),
       });
       break;
     case 403:
@@ -105,7 +105,7 @@ export const handleError = (error) => {
 };
 
 // TODO: This is temporary cleaner. Once migration is complete it should be removed
-const cleanUrlFromContextPath = url => url.replace('/openboxes', '');
+const cleanUrlFromContextPath = (url) => url.replace('/openboxes', '');
 
 const urlInterceptor = (config) => {
   const contextPath = window.CONTEXT_PATH;

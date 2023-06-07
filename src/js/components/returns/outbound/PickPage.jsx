@@ -151,10 +151,10 @@ class PickPage extends Component {
   nextPage() {
     this.props.showSpinner();
     const url = `/api/stockTransfers/${this.props.match.params.outboundReturnId}`;
-    const payload = {
+    const payload = parseResponse({
       ...this.state.values.outboundReturn,
       status: 'PLACED',
-    };
+    });
 
     apiClient.put(url, payload)
       .then((resp) => {

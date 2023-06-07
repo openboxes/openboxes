@@ -1265,6 +1265,7 @@ class ProductService {
             createAlias('productSuppliers.manufacturer', 'psm', JoinType.LEFT_OUTER_JOIN)
             createAlias('productSuppliers.supplier', 'pss', JoinType.LEFT_OUTER_JOIN)
             createAlias('inventoryItems', 'ii', JoinType.LEFT_OUTER_JOIN)
+            createAlias('synonyms', 'synonym', JoinType.LEFT_OUTER_JOIN)
 
             eq("active", true)
             if (categories) {
@@ -1276,11 +1277,9 @@ class ProductService {
                     or {
                         ilike("name", "%" + term)
                         ilike("productCode", term)
-                        synonyms {
-                           and {
-                               ilike("name", "%" + term)
-                               eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
-                           }
+                        and {
+                            ilike("synonym.name", "%" + term)
+                            eq("synonym.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
                         }
                         ilike("description", "%" + term)
                         ilike("brandName", term)
