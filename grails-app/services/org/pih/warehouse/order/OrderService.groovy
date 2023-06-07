@@ -13,6 +13,8 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import grails.util.Holders
+import org.hibernate.sql.JoinType
+
 import java.math.RoundingMode
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
@@ -1013,6 +1015,9 @@ class OrderService {
 
     def getProductsInOrders(String[] terms, Location destination, Location vendor) {
         return OrderItem.createCriteria().list {
+            createAlias('product', 'prod', JoinType.LEFT_OUTER_JOIN)
+            createAlias('product.synonyms', 'syn', JoinType.LEFT_OUTER_JOIN)
+
             not {
                 'in'("orderItemStatusCode", OrderItemStatusCode.CANCELED)
             }
@@ -1020,21 +1025,17 @@ class OrderService {
                 eq("destination", destination)
                 eq("origin", vendor)
             }
-            product {
-                if (terms) {
-                    terms.each { term ->
-                        term = term + "%"
-                        or {
-                            ilike("name", "%" + term)
-                            synonyms {
-                                and {
-                                    ilike("name", "%" + term)
-                                    eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
-                                }
-                            }
-                            ilike("productCode", term)
-                            ilike("description", "%" + term)
+            if (terms) {
+                terms.each { term ->
+                    term = term + "%"
+                    or {
+                        ilike("prod.name", "%" + term)
+                        and {
+                            ilike("syn.name", "%" + term)
+                                eq("syn.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
                         }
+                        ilike("prod.productCode", term)
+                        ilike("prod.description", "%" + term)
                     }
                 }
             }
