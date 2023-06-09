@@ -1155,7 +1155,7 @@ class ShipmentService {
         }
 
         Holders.grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipmentInstance, ShipmentStatusCode.SHIPPED))
-
+        shipmentInstance.save(flush: true)
     }
 
 
