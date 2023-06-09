@@ -206,6 +206,7 @@ slf4j.detectLoggerNameMismatch: true
 
 ---
 hibernate:
+    allow_update_outside_transaction: true
     cache:
         queries: false
         provider_class: org.hibernate.cache.EhCacheProvider

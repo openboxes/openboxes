@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.product
 
-import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.FetchMode
 import org.hibernate.criterion.CriteriaSpecification
@@ -20,7 +19,6 @@ import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import org.pih.warehouse.core.ProductPrice
 
-@Transactional
 class ProductSupplierController {
 
     def dataService
@@ -265,22 +263,19 @@ class ProductSupplierController {
     def delete() {
         def productSupplierInstance = ProductSupplier.get(params.id)
         if (productSupplierInstance) {
+            def productInstance = productSupplierInstance.product
             try {
                 productSupplierInstance.delete(flush: true)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
+            catch (Exception e) {
                 log.error("Unable to delete product supplier: " + e.message, e)
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
-
-            if (params.dialog) {
-                redirect(controller: "product", action: "edit", id: productSupplierInstance?.product?.id)
-            } else {
-                redirect(action: "list", id: productSupplierInstance.id)
-            }
-
-        } else {
+            redirect(controller: "product", action: "edit", id: productInstance.id)
+            return
+        }
+        else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             redirect(action: "list")
         }
