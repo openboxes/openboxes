@@ -1,23 +1,22 @@
 package org.pih.warehouse.jobs
 
 import grails.util.Holders
-import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
 class CalculateHistoricalQuantityJob {
 
-    def concurrent = false  // make `static` in Grails 3
     static dates = []
     static enabled = true
     def inventorySnapshotService
+
+    static concurrent = false
 
     static triggers = {
         cron name: JobUtils.getCronName(CalculateHistoricalQuantityJob),
             cronExpression: JobUtils.getCronExpression(CalculateHistoricalQuantityJob)
     }
 
-    def execute(JobExecutionContext context) {
+    void execute(JobExecutionContext context) {
 
         if (JobUtils.shouldExecute(CalculateHistoricalQuantityJob)) {
 

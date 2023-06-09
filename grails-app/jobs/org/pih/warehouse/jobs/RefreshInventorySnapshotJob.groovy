@@ -11,19 +11,18 @@ package org.pih.warehouse.jobs
 
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
-import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
 class RefreshInventorySnapshotJob {
 
-    def concurrent = false  // make `static` in Grails 3
     def inventorySnapshotService
+
+    static concurrent = false
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
 
-    def execute(JobExecutionContext context) {
+    void execute(JobExecutionContext context) {
 
         if (JobUtils.shouldExecute(RefreshInventorySnapshotJob)) {
             log.info("Refreshing inventory snapshots with data: ${context.mergedJobDataMap}")

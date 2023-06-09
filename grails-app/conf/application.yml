@@ -56,7 +56,7 @@ spring:
 quartz:
     pluginEnabled: true
     jdbcStore: false
-    autoStartup: false
+    autoStartup: true
     monitor:
         layout: custom
         showTriggerNames: true

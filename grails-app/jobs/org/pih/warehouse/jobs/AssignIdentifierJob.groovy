@@ -1,19 +1,17 @@
 package org.pih.warehouse.jobs
 
-import org.quartz.DisallowConcurrentExecution
-
-@DisallowConcurrentExecution
 class AssignIdentifierJob {
 
     def identifierService
 
-    def concurrent = false  // make `static` in Grails 3
+    static concurrent = false
+
     static triggers = {
         cron name: JobUtils.getCronName(AssignIdentifierJob),
             cronExpression: JobUtils.getCronExpression(AssignIdentifierJob)
     }
 
-    def execute() {
+    void execute() {
         if (!JobUtils.shouldExecute(AssignIdentifierJob)) {
             return
         }

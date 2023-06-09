@@ -1,20 +1,19 @@
 package org.pih.warehouse.jobs
 
-import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
 class RefreshDemandDataJob {
 
-    def concurrent = false  // make `static` in Grails 3
     def reportService
+
+    static concurrent = false
 
     static triggers = {
         cron name: JobUtils.getCronName(RefreshDemandDataJob),
             cronExpression: JobUtils.getCronExpression(RefreshDemandDataJob)
     }
 
-    def execute(JobExecutionContext context) {
+    void execute(JobExecutionContext context) {
         if (JobUtils.shouldExecute(RefreshDemandDataJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing demand data: " + context.mergedJobDataMap)
