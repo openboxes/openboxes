@@ -9,17 +9,20 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductCatalogItem
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
 
-    def excelImportService
+    ExcelImportService excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -57,7 +60,6 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
                 }
             }
         }
-
     }
 
     void importData(ImportDataCommand command) {
@@ -68,7 +70,6 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
             }
         }
     }
-
 
     /**
      * @deprecated Use org.pih.warehouse.product.ProductService#createOrUpdateProductCatalogItem(java.util.Map)
