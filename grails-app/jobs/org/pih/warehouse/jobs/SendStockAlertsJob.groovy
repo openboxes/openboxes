@@ -8,28 +8,26 @@
  * You must not remove this notice, or any other, from this software.
  **/
 package org.pih.warehouse.jobs
-import groovyx.gpars.GParsPool
 import grails.util.Holders
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
-import org.quartz.DisallowConcurrentExecution
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
 class SendStockAlertsJob {
 
-    def concurrent = false  // make `static` in Grails 3
     def gparsService
     def locationService
     def notificationService
+
+    static concurrent = false
 
     static triggers = {
         cron name: JobUtils.getCronName(SendStockAlertsJob),
             cronExpression: JobUtils.getCronExpression(SendStockAlertsJob)
     }
 
-    def execute(JobExecutionContext context) {
+    void execute(JobExecutionContext context) {
 
         Boolean skipOnEmpty = Boolean.valueOf(Holders.config.openboxes.jobs.sendStockAlertsJob.skipOnEmpty)
         Integer daysUntilExpiry = Integer.valueOf(Holders.config.openboxes.jobs.sendStockAlertsJob.daysUntilExpiry ?: 60)

@@ -13,13 +13,14 @@ import org.quartz.JobExecutionContext
 
 class RefreshProductAvailabilityJob {
 
-    def concurrent = true  // make `static` in Grails 3
     def productAvailabilityService
+
+    static concurrent = true
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
 
-    def execute(JobExecutionContext context) {
+    void execute(JobExecutionContext context) {
         if (JobUtils.shouldExecute(RefreshProductAvailabilityJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing product availability data: " + context.mergedJobDataMap)

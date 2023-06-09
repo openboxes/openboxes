@@ -1,22 +1,21 @@
 package org.pih.warehouse.jobs
 
 import grails.util.Holders
-import org.quartz.DisallowConcurrentExecution
+import org.pih.warehouse.order.OrderService
 import org.quartz.JobExecutionContext
 
-@DisallowConcurrentExecution
 class RefreshOrderSummaryJob {
 
-    def concurrent = false  // make `static` in Grails 3
+    OrderService orderService
 
-    def orderService
+    static concurrent = false
 
     static triggers = {
         cron name: 'refreshOrderSummaryJobCronTrigger',
                 cronExpression: Holders.config.openboxes.jobs.refreshOrderSummaryJob.cronExpression
     }
 
-    def execute(JobExecutionContext context) {
+    void execute(JobExecutionContext context) {
         if (JobUtils.shouldExecute(RefreshOrderSummaryJob)) {
             def startTime = System.currentTimeMillis()
             log.info("Refreshing order summary: " + context.mergedJobDataMap)
