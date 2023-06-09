@@ -63,7 +63,6 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter {
     }
 
     void importData(ImportDataCommand command) {
-        println "Import data " + command
         command.data.eachWithIndex { params, index ->
             ProductCatalogItem productCatalog = createOrUpdateProductCatalogItem(params)
             if (productCatalog.validate()) {
