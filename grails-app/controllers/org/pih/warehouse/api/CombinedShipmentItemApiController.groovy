@@ -97,29 +97,13 @@ class CombinedShipmentItemApiController {
     }
 
     def addItemsToShipment() {
-        JSONObject jsonObject = request.JSON
         Shipment shipment = Shipment.get(params.id)
+        List itemsToAdd = request.JSON.itemsToAdd
         if (!shipment) {
             render(status: 400, text: "Shipment not found")
             return
         }
-        List itemsToAdd = jsonObject.itemsToAdd
-        if (itemsToAdd) {
-            itemsToAdd.sort { it.sortOrder }.each {
-                OrderItem orderItem = OrderItem.get(it.orderItemId)
-                ShipmentItem shipmentItem = new ShipmentItem()
-                shipmentItem.product = orderItem.product
-                shipmentItem.inventoryItem = orderItem.inventoryItem
-                shipmentItem.product = orderItem.product
-                shipmentItem.quantity = orderItem.quantity
-                shipmentItem.recipient = orderItem.recipient
-                shipmentItem.quantity = it.quantityToShip * orderItem.quantityPerUom
-                shipmentItem.sortOrder = shipment.shipmentItems ? shipment.shipmentItems.size() * 100 : 0
-                orderItem.addToShipmentItems(shipmentItem)
-                shipment.addToShipmentItems(shipmentItem)
-            }
-            shipment.save()
-        }
+        combinedShipmentService.saveItemsToShipment(shipment, itemsToAdd)
         render([data: shipment] as JSON)
     }
 

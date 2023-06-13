@@ -10,6 +10,7 @@
 package org.pih.warehouse.shipping
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
@@ -22,6 +23,7 @@ import org.pih.warehouse.product.Product
 import javax.xml.bind.ValidationException
 import java.text.SimpleDateFormat
 
+@Transactional
 class CombinedShipmentService {
 
     def stockMovementService
@@ -277,6 +279,25 @@ class CombinedShipmentService {
                 }
             }
             throw new ValidationException(message)
+        }
+    }
+
+    void saveItemsToShipment(Shipment shipment, List itemsToAdd) {
+        if (itemsToAdd) {
+            itemsToAdd.sort { it.sortOrder }.each {
+                OrderItem orderItem = OrderItem.get(it.orderItemId)
+                ShipmentItem shipmentItem = new ShipmentItem()
+                shipmentItem.product = orderItem.product
+                shipmentItem.inventoryItem = orderItem.inventoryItem
+                shipmentItem.product = orderItem.product
+                shipmentItem.quantity = orderItem.quantity
+                shipmentItem.recipient = orderItem.recipient
+                shipmentItem.quantity = it.quantityToShip * orderItem.quantityPerUom
+                shipmentItem.sortOrder = shipment.shipmentItems ? shipment.shipmentItems.size() * 100 : 0
+                orderItem.addToShipmentItems(shipmentItem)
+                shipment.addToShipmentItems(shipmentItem)
+            }
+            shipment.save()
         }
     }
 }
