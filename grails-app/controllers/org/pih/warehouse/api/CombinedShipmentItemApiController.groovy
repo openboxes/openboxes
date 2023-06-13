@@ -27,7 +27,6 @@ class CombinedShipmentItemApiController {
 
     def orderService
     def combinedShipmentService
-    def combinedShipmentItemService
 
     def getProductsInOrders() {
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
@@ -104,7 +103,7 @@ class CombinedShipmentItemApiController {
             render(status: 400, text: "Shipment not found")
             return
         }
-        combinedShipmentItemService.addItemsToShipment(shipment, itemsToAdd)
+        combinedShipmentService.saveItemsToShipment(shipment, itemsToAdd)
         render([data: shipment] as JSON)
     }
 
