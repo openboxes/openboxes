@@ -330,6 +330,8 @@ class ProductService {
                 }
             }
 
+            createAlias("synonyms", "synonym", JoinType.LEFT_OUTER_JOIN)
+
             if (!includeInactive) {
                 eq("active", true)
             }
@@ -368,11 +370,9 @@ class ProductService {
             or {
                 if (params.name) {
                     ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
-                    synonyms {
-                        and {
-                            ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
-                            eq("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
-                        }
+                    and {
+                        ilike("synonym.name", "%" + params.name.replaceAll(" ", "%") + "%")
+                        eq("synonym.synonymTypeCode", SynonymTypeCode.DISPLAY_NAME)
                     }
                 }
                 if (params.description) ilike("description", params.description + "%")
