@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { STOCKLIST_API } from 'api/urls';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
@@ -278,9 +279,12 @@ class CreateStockMovement extends Component {
    */
   fetchStockLists(origin, destination, clearStocklist) {
     this.props.showSpinner();
-    const url = `/api/stocklists?origin=${origin.id}&destination=${destination.id}`;
-
-    return apiClient.get(url)
+    return apiClient.get(STOCKLIST_API, {
+      params: {
+        origin: origin.id,
+        destination: destination.id,
+      },
+    })
       .then((response) => {
         const stocklists = _.map(response.data.data, stocklist => (
           {
