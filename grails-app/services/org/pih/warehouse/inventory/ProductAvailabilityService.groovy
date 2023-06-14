@@ -179,7 +179,7 @@ class ProductAvailabilityService {
         }
     }
 
-    def calculateBinLocations(Location location, Date date) {
+    def calculateBinLocationsAsOfDate(Location location, Date date) {
         def binLocations = inventoryService.getBinLocationDetails(location, date)
         binLocations = transformBinLocations(binLocations, [])
         return binLocations
