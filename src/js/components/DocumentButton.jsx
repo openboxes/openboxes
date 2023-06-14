@@ -2,16 +2,14 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import { stringUrlInterceptor } from '../utils/apiClient';
-
 function handleClick(onClick, event, link) {
   event.preventDefault();
   const newWindow = window.open('', '_blank');
   if (onClick) {
     onClick()
-      .then(() => { newWindow.location.href = stringUrlInterceptor(link); });
+      .then(() => { newWindow.location.href = link; });
   } else {
-    newWindow.location.href = stringUrlInterceptor(link);
+    newWindow.location.href = link;
   }
 }
 
@@ -19,7 +17,7 @@ const DocumentButton = ({
   buttonIcon, buttonTitle, link, target, disabled, onClick,
 }) => (
   <a
-    href={stringUrlInterceptor(link)}
+    href={link}
     className={`py-1 mb-1 btn btn-outline-secondary ${disabled ? 'disabled' : ''}`}
     target={target}
     rel="noopener noreferrer"
