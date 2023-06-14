@@ -9,15 +9,18 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 import org.pih.warehouse.product.ProductCatalog
 import org.springframework.validation.BeanPropertyBindingResult
 
+@Transactional
 class ProductCatalogExcelImporter extends AbstractExcelImporter {
 
-    def excelImportService
+    ExcelImportService excelImportService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
