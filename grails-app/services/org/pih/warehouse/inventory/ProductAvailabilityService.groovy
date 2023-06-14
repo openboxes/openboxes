@@ -487,6 +487,7 @@ class ProductAvailabilityService {
             categoriesQuery = "and pa.product.category.id in (:categories)"
             queryArguments += [categories: categories.id]
         }
+
         def quantityMap = [:]
         if (location) {
             def results = ProductAvailability.executeQuery("""
@@ -496,7 +497,7 @@ class ProductAvailabilityService {
 						where pa.location = :location
 						${categoriesQuery}
 						group by pa.product
-						""", queryArguments)
+						""".toString(), queryArguments)
             results.each {
                 quantityMap[it[0]] = [
                         quantityOnHand              : it[1],
