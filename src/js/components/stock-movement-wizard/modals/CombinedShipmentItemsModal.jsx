@@ -7,6 +7,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { ORDER_SHOW } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -63,7 +64,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue,
         }) => ({
-          url: fieldValue && fieldValue.orderId ? `/order/show/${fieldValue.orderId}` : '',
+          url: fieldValue?.orderId ? ORDER_SHOW(fieldValue.orderId) : '',
         }),
         attributes: {
           formatValue: fieldValue => fieldValue && fieldValue.orderNumber,

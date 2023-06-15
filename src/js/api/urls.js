@@ -1,5 +1,6 @@
 const API = '/api';
 const GENERIC_API = `${API}/generic`;
+const { CONTEXT_PATH } = window;
 
 // PURCHASE ORDER
 export const PURCHASE_ORDER_API = `${API}/purchaseOrders`;
@@ -49,3 +50,7 @@ export const USERS_OPTIONS = `${API}/users`;
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
+
+// ORDER
+export const ORDER = `${CONTEXT_PATH}/order`;
+export const ORDER_SHOW = id => `${ORDER}/show/${id}`;
