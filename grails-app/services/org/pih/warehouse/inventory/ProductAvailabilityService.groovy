@@ -889,7 +889,7 @@ class ProductAvailabilityService {
                 if (!command.showOutOfStockProducts) {
 
                     // SUM(product availability.quantity_on_hand) > 0
-                    def quantityGreaterThanZero = Subqueries.lt(0, aggregatedQuantityQuery)
+                    def quantityGreaterThanZero = Subqueries.lt(0L, aggregatedQuantityQuery)
                     // productType in (:searchableProductTypes)
                     def inSearchableProductTypes = Restrictions.in("productType", searchableProductTypes)
                     // productType in (:searchableNoStockProductTypes)
