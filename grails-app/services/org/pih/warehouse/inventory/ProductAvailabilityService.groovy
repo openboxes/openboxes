@@ -591,7 +591,7 @@ class ProductAvailabilityService {
 						and pa.product = product
 						and pa.product.category = category
 						group by product, pa.location, category.name
-						""", queryArguments)
+						""".toString(), queryArguments)
 
             results.each {
                 if (!quantityMap[it[0]]) {

@@ -552,7 +552,7 @@ class ReportController {
             command.categories = inventoryService.getExplodedCategories(command.categories)
         }
 
-        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations as Location[], command.categories as Category[])
+        command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, command.categories)
 
         if (command.isActionDownload) {
             def sw = new StringWriter()
