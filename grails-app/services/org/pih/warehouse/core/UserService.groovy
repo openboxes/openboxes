@@ -460,4 +460,26 @@ class UserService {
         user.dashboardConfig = stringConfig
         return user.deserializeDashboardConfig()
     }
+
+    def saveLocationRole(Location location, LocationRole locationRole, List<Role> roles, User user) {
+        // Update existing role
+        if (locationRole && roles.size() == 1) {
+            locationRole.role = roles.first()
+            locationRole.location = location
+            user.addToLocationRoles(locationRole)
+        } else {
+            // Create new roles
+            List<LocationRole> locationRoles = LocationRole.findAllByUserAndLocation(user, location)
+            roles.each { role ->
+                LocationRole foundLocationRole = locationRoles.find { it.role == role }
+                if (!foundLocationRole) {
+                    foundLocationRole = new LocationRole()
+                    foundLocationRole.role = role
+                    foundLocationRole.location = location
+                    user.addToLocationRoles(foundLocationRole)
+                }
+            }
+        }
+        user.save(failOnError: true)
+    }
 }

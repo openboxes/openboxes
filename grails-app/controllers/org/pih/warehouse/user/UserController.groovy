@@ -20,6 +20,7 @@ import org.pih.warehouse.core.User
 import javax.imageio.ImageIO as IIO
 import javax.swing.*
 import grails.gorm.transactions.Transactional
+import java.util.List
 import java.awt.*
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
@@ -445,29 +446,8 @@ class UserController {
         User user = params.user.id ? User.get(params.user.id) : null
         Location location = params.location?.id ? Location.get(params.location.id) : null
         List<Role> roles = params.list("role.id").collect { roleId -> Role.get(roleId) }
-
-        // Update existing role
         LocationRole locationRole = LocationRole.get(params.id)
-        if (locationRole && roles.size() == 1) {
-            locationRole.role = roles.first()
-            locationRole.location = location
-            user.addToLocationRoles(locationRole)
-        }
-        // Create new roles
-        else {
-            List<LocationRole> locationRoles = LocationRole.findAllByUserAndLocation(user, location)
-            roles.each { role ->
-                LocationRole foundLocationRole = locationRoles.find { it.role == role }
-                if (!foundLocationRole) {
-                    foundLocationRole = new LocationRole()
-                    foundLocationRole.role = role
-                    foundLocationRole.location = location
-                    user.addToLocationRoles(foundLocationRole)
-                }
-            }
-        }
-        user.save(failOnError: true)
-
+        userService.saveLocationRole(location, locationRole, roles, user)
         redirect(action: "edit", id: params.user.id)
     }
 
