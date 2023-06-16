@@ -427,7 +427,8 @@ class InventoryController {
     }
 
     private def determineCategories(params) {
-        List<Category> categories = Category.findAllByIdInList(params.list("categories"))
+        List<Category> categories = params.list('categories') ?
+                Category.findAllByIdInList(params.list('categories')) : []
 
         // When accessing the page for the first time, the flag should be set to true
         // Initially there no parameter _includeSubcategories, only after running the report manually it is set
