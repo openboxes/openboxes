@@ -325,7 +325,7 @@ class UserController {
      */
     def delete() {
 
-        log.info(params)
+        log.info("params " + params)
 
         def userInstance = User.get(params.id)
         if (userInstance) {

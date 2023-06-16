@@ -233,7 +233,7 @@ class RequisitionController {
             } else {
                 jsonResponse = [success: false, errors: requisition.errors]
             }
-            log.info(jsonResponse as JSON)
+            log.info("${jsonResponse as JSON}")
 
         } catch (HibernateException e) {
             println "hibernate exception " + e.message

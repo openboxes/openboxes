@@ -1127,8 +1127,8 @@ class ProductController {
 
     def importProductSynonyms(ImportDataCommand command) {
 
-        log.info params
-        log.info command?.location
+        log.info "params " + params
+        log.info "location " + command?.location
 
         if (request.method == "POST") {
             File localFile = null

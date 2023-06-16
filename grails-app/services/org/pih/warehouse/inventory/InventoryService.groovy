@@ -2380,7 +2380,7 @@ class InventoryService implements ApplicationContextAware {
             // Iterate over each row
             command?.data?.each { Map params ->
 
-                log.debug params
+                log.debug "params " + params
 
                 def lotNumber = (params.lotNumber) ? String.valueOf(params.lotNumber) : null
                 def quantity = (params.quantity) ?: 0
@@ -2457,7 +2457,7 @@ class InventoryService implements ApplicationContextAware {
             }
         } catch (Exception e) {
             // Bad practice but need this for testing
-            log.error("Error importing inventory", e)
+            log.error("Error importing inventory" + e)
             throw e
         }
 

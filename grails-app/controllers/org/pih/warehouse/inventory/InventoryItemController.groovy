@@ -1041,8 +1041,8 @@ class InventoryItemController {
                         transactionInstance.addToTransactionEntries(transactionEntry).save(flush: true)) {
                     flash.message = "${warehouse.message(code: 'inventoryItem.savedTransactionEntry.label')}"
                 } else {
-                    transactionInstance.errors.each { log.info it }
-                    transactionEntry.errors.each { log.info it }
+                    transactionInstance.errors.each { log.info "${it}" }
+                    transactionEntry.errors.each { log.info "${it}" }
                     flash.message = "${warehouse.message(code: 'inventoryItem.inventoryItem.unableToSaveTransactionEntry.message.label')}"
                 }
             }

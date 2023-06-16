@@ -841,7 +841,7 @@ class ShipmentController {
 
 
     def addComment() {
-        log.debug params
+        log.debug "params " + params
         def shipmentInstance = Shipment.get(params.id)
         render(view: "addComment", model: [shipmentInstance: shipmentInstance, comment: new Comment()])
     }
@@ -1021,7 +1021,7 @@ class ShipmentController {
         if (eventInstance.hasErrors()) {
             flash.message = "${warehouse.message(code: 'shipping.unableToEditEvent.message', args: [format.metadata(obj: eventInstance?.eventType)])}"
             eventInstance?.errors.allErrors.each {
-                log.error it
+                log.error "${it}"
             }
             render(view: "editEvent", model: [shipmentInstance: shipmentInstance, eventInstance: eventInstance])
         }

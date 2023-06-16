@@ -48,7 +48,7 @@ class DashboardController {
 
     def showCacheStatistics() {
         def statistics = sessionFactory.statistics
-        log.info(statistics)
+        log.info("${statistics}")
         render statistics
     }
 

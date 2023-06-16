@@ -193,7 +193,7 @@ class JsonController {
             requisitionItem.delete()
             json = [success: true]
         }
-        log.info(json as JSON)
+        log.info("${json as JSON}")
         render json as JSON
     }
 
@@ -263,7 +263,7 @@ class JsonController {
         } else {
             jsonResponse = [success: false, errors: localization.errors]
         }
-        log.info(jsonResponse as JSON)
+        log.info("${jsonResponse as JSON}")
         render jsonResponse as JSON
         return true
     }
@@ -555,7 +555,7 @@ class JsonController {
     }
 
     def getQuantity() {
-        log.info params
+        log.info "params " + params
         def quantity = 0
         def location = Location.get(session.warehouse.id)
         def lotNumber = (params.lotNumber) ? (params.lotNumber) : ""
@@ -600,7 +600,7 @@ class JsonController {
      * Ajax method for the Record Inventory page.
      */
     def getInventoryItems() {
-        log.info params
+        log.info "params " + params
         def productInstance = Product.get(params?.product?.id)
         def inventoryItemList = inventoryService.getInventoryItemsByProduct(productInstance)
         render inventoryItemList as JSON
@@ -611,7 +611,7 @@ class JsonController {
      * Returns inventory items for the given location, lot number, and product.
      */
     def findInventoryItems() {
-        log.info params
+        log.info "params " + params
         long startTime = System.currentTimeMillis()
         def inventoryItems = []
         def location = Location.get(session.warehouse.id)
@@ -684,7 +684,7 @@ class JsonController {
     }
 
     def findLotsByName() {
-        log.info params
+        log.info "params " + params
         // Constrain by product id if the productId param is passed in
         def items = new TreeSet()
         if (params.term) {
@@ -978,7 +978,7 @@ class JsonController {
             // Add the EACH level items
             result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
         }
-        log.info result
+        log.info "${result}"
         render result.sort { "${it.group}${it.value}" } as JSON
     }
 
@@ -1004,7 +1004,7 @@ class JsonController {
             // Add the EACH level items
             result.add([id: product.id, value: value, type: "Product", quantity: null, group: null])
         }
-        log.info result
+        log.info "${result}"
         render result.sort { "${it.group}${it.value}" } as JSON
     }
 

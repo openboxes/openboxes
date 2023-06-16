@@ -323,7 +323,7 @@ class StockMovementController {
     }
 
     def addDocument() {
-        log.info params
+        log.info "params " + params
         def stockMovement = outboundStockMovementService.getStockMovement(params.id)
         if (!stockMovement) {
             stockMovement =  stockMovementService.getStockMovement(params.id)

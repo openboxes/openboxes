@@ -474,7 +474,7 @@ class OrderController {
     }
 
     def saveComment() {
-        log.info(params)
+        log.info("params " + params)
 
         def orderInstance = Order.get(params?.order?.id)
         if (orderInstance) {
