@@ -291,9 +291,9 @@ class StockMovementController {
         Shipment shipment = stockMovement.shipment
         Document document = new Document()
         document.fileContents = command.fileContents.bytes
-        document.contentType = command.fileContents.fileItem.contentType
-        document.name = command.fileContents.fileItem.name
-        document.filename = command.fileContents.fileItem.name
+        document.contentType = command.fileContents.contentType
+        document.name = command.fileContents.originalFilename
+        document.filename = command.fileContents.originalFilename
         document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
 
         shipment.addToDocuments(document)
@@ -310,9 +310,9 @@ class StockMovementController {
         command.filesContents.each { fileContent ->
             Document document = new Document()
             document.fileContents = fileContent.bytes
-            document.contentType = fileContent.fileItem.contentType
-            document.name = fileContent.fileItem.name
-            document.filename = fileContent.fileItem.name
+            document.contentType = fileContent.contentType
+            document.name = fileContent.originalFilename
+            document.filename = fileContent.originalFilename
             document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
 
             shipment.addToDocuments(document)
