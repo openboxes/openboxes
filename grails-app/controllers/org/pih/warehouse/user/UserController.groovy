@@ -20,8 +20,8 @@ import org.pih.warehouse.core.User
 import javax.imageio.ImageIO as IIO
 import javax.swing.*
 import grails.gorm.transactions.Transactional
-import java.util.List
-import java.awt.*
+
+import java.awt.Graphics2D
 import java.awt.Image as AWTImage
 import java.awt.image.BufferedImage
 
