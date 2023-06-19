@@ -10,7 +10,6 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import grails.plugins.csv.CSVWriter
@@ -32,7 +31,6 @@ import grails.core.GrailsApplication
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-@Transactional
 class InventoryItemController {
 
     def dataService
@@ -967,7 +965,7 @@ class InventoryItemController {
 
     def create() {
         def inventoryItem = new InventoryItem(params)
-        if (InventoryItem && inventoryItem.save()) {
+        if (InventoryItem && inventoryItem.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label'), params.id])}"
         } else {
             flash.message = "${warehouse.message(code: 'default.not.created.message', args: [warehouse.message(code: 'inventoryItem.label')])}"
@@ -1054,15 +1052,8 @@ class InventoryItemController {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
             if (inventoryItem.lotNumber) {
-                inventoryItem.lotStatus = LotStatusCode.RECALLED
-
-                // Disable the refresh event, the quantity available calculation will be done manually
-                // to display the latest value on the Stock Card
-                inventoryItem.disableRefresh = Boolean.TRUE
-                inventoryItem.save(flush: true)
-
+                inventoryService.recallInventoryItem(inventoryItem)
                 productAvailabilityService.refreshProductsAvailability(null, [inventoryItem?.product?.id], false)
-
                 flash.message = "${warehouse.message(code: 'inventoryItem.recall.message')}"
             } else {
                 flash.message = "${warehouse.message(code: 'inventoryItem.recallError.message')}"
@@ -1076,15 +1067,8 @@ class InventoryItemController {
     def revertRecall() {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
-            inventoryItem.lotStatus = null
-
-            // Disable the refresh event, the quantity available calculation will be done manually
-            // to display the latest value on the Stock Card
-            inventoryItem.disableRefresh = Boolean.TRUE
-            inventoryItem.save(flush: true)
-
+            inventoryService.revertRecallInventoryItem(inventoryItem)
             productAvailabilityService.refreshProductsAvailability(null, [inventoryItem?.product?.id], false)
-
             flash.message = "${warehouse.message(code: 'inventoryItem.revertRecall.message')}"
         } else {
             flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"
