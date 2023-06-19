@@ -34,12 +34,12 @@ class MultiLocationInventoryReportCommand implements Validateable {
         actionButton(nullable: true, inList: ["run", "download"])
     }
 
-    Boolean getIsActionRun() {
-        return actionButton?.equalsIgnoreCase("run") ?: false
+    boolean getIsActionRun() {
+        return actionButton?.equalsIgnoreCase("run")
     }
 
-    Boolean getIsActionDownload() {
-        return actionButton?.equalsIgnoreCase("download") ?: false
+    boolean getIsActionDownload() {
+        return actionButton?.equalsIgnoreCase("download")
     }
 
 }
