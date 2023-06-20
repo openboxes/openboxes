@@ -687,7 +687,7 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     }
 
     Set<RequisitionItem> getSubstitutionItems() {
-        return requisitionItems.findAll {
+        return requisitionItems?.findAll { RequisitionItem it ->
             it.requisitionItemType == RequisitionItemType.SUBSTITUTION
         }
     }
