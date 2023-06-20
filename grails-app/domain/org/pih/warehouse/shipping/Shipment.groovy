@@ -30,23 +30,25 @@ import org.pih.warehouse.requisition.Requisition
 
 class Shipment implements Comparable, Serializable {
 
-    def publishRefreshEvent = {
+    def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
         currentEvent = mostRecentEvent
         currentStatus = status.code
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 
-    def afterInsert = publishRefreshEvent
+    def afterInsert() {
+        publishRefreshEvent()
+    }
 
-    def afterUpdate = {
+    def afterUpdate() {
         currentEvent = mostRecentEvent
         currentStatus = status.code
         publishRefreshEvent()

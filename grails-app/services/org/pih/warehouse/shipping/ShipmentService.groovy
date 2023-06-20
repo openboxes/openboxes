@@ -1188,6 +1188,7 @@ class ShipmentService {
         def eventInstance = new Event(eventDate: eventDate, eventType: eventType, eventLocation: location)
         if (!eventInstance.hasErrors()) {
             shipmentInstance.addToEvents(eventInstance)
+            shipmentInstance.save()
         } else {
             throw new ValidationException("Unable to create shipment event", eventInstance.errors)
         }
