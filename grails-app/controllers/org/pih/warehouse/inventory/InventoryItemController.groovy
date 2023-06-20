@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.time.TimeCategory
 import grails.plugins.csv.CSVWriter
@@ -631,6 +632,7 @@ class InventoryItemController {
         [itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]
     }
 
+    @Transactional
     def saveInventoryItem() {
         log.info "save inventory item " + params
         def productInstance = Product.get(params.product.id)
@@ -707,6 +709,7 @@ class InventoryItemController {
         [productInstance: productInstance, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance]
     }
 
+    @Transactional
     def updateInventoryLevel() {
 
         log.info("update inventory level " + params)
@@ -811,7 +814,7 @@ class InventoryItemController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id': inventoryItem?.id])
     }
 
-
+    @Transactional
     def update() {
 
         log.info "Params " + params
@@ -864,6 +867,7 @@ class InventoryItemController {
     }
 
 
+    @Transactional
     def deleteTransactionEntry() {
         def transactionEntry = TransactionEntry.get(params.id)
         def productInstance
@@ -882,6 +886,7 @@ class InventoryItemController {
     /**
      * Add a shipment item to a shipment
      */
+    @Transactional
     def addToShipment() {
         log.info "params" + params
         def shipmentInstance = null
@@ -940,7 +945,7 @@ class InventoryItemController {
         redirect(action: "showStockCard", params: ['product.id': productInstance?.id])
     }
 
-
+    @Transactional
     def saveInventoryLevel() {
         // Get existing inventory level
         def inventoryLevelInstance = InventoryLevel.get(params.id)
@@ -963,9 +968,10 @@ class InventoryItemController {
         redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
     }
 
+    @Transactional
     def create() {
         def inventoryItem = new InventoryItem(params)
-        if (InventoryItem && inventoryItem.save(flush: true)) {
+        if (InventoryItem && inventoryItem.save()) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventoryItem.label'), params.id])}"
         } else {
             flash.message = "${warehouse.message(code: 'default.not.created.message', args: [warehouse.message(code: 'inventoryItem.label')])}"
@@ -991,6 +997,7 @@ class InventoryItemController {
         redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
     }
 
+    @Transactional
     def deleteInventoryItem() {
         def inventoryItem = InventoryItem.get(params.id)
         def productInstance = inventoryItem?.product
@@ -1011,7 +1018,7 @@ class InventoryItemController {
 
     }
 
-
+    @Transactional
     def saveTransactionEntry() {
         def productInstance = Product.get(params?.product?.id)
         if (!productInstance) {
