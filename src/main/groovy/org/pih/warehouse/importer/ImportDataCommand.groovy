@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile
 class ImportDataCommand implements Validateable {
     def filename
     MultipartFile importFile
-    String importType
+    String type
     Boolean importNow = Boolean.FALSE
     Location location
     Date date
@@ -48,7 +48,7 @@ class ImportDataCommand implements Validateable {
                 val.part.fileItem.contentType == fileType
             }
         })
-        importType(nullable: false)
+        type(nullable: false)
         location(nullable: false)
         columnMap(nullable: true)
         data(nullable: true)

@@ -131,7 +131,7 @@ class BatchController {
                 command.location = Location.get(session.warehouse.id)
                 try {
                     // Need to choose the right importer
-                    switch (command.importType) {
+                    switch (command.type) {
                         case "category":
                             dataImporter = new CategoryExcelImporter(command?.filename)
                             break
@@ -213,7 +213,7 @@ class BatchController {
                     command.errors.reject("importFile", "${warehouse.message(code: 'inventoryItem.pleaseEnsureDate.message', args: [dataImporter.columnMap?.sheet?:'Sheet1', localFile.getAbsolutePath()])}")
                 }
 
-                if (command.importType == 'inventory' && !command.date) {
+                if (command.type == 'inventory' && !command.date) {
                     command.errors.reject("date", "${warehouse.message(code: 'import.inventoryImportMustHaveDate.message', default: "Inventory import must specify the date of the stock count")}")
                 }
 
