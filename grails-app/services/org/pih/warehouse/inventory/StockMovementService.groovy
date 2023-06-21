@@ -1952,7 +1952,9 @@ class StockMovementService {
 
                 log.info 'Removing previous changes, picklists and shipments, if present'
                 removeShipmentAndPicklistItemsForModifiedRequisitionItem(requisitionItem)
-                requisitionItem.undoChanges()
+                if (requisitionItem.isChanged() || requisitionItem.isCanceled()) {
+                    requisitionItem.undoChanges()
+                }
 
                 log.info "Revising quantity for ${requisitionItem.id}"
                 requisitionItem.changeQuantity(
@@ -2364,7 +2366,7 @@ class StockMovementService {
     }
 
     void createMissingShipmentItems(StockMovement stockMovement) {
-        Requisition requisition = stockMovement.requisition.refresh()
+        Requisition requisition = Requisition.get(stockMovement.id)
 
         if (requisition) {
             Shipment shipment = Shipment.findByRequisition(requisition)
