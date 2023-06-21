@@ -2,10 +2,10 @@
 <%@ page import="org.pih.warehouse.order.OrderType" %>
 <%@ page import="org.pih.warehouse.order.OrderTypeCode" %>
 
+<g:applyLayout name="custom">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="custom" />
 <title><warehouse:message code="order.enterOrderDetails.label"/></title>
 </head>
 <body>
@@ -199,3 +199,4 @@
 </script>
 </body>
 </html>
+</g:applyLayout>

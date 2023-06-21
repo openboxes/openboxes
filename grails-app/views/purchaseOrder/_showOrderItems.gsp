@@ -1,38 +1,37 @@
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatus; org.pih.warehouse.order.OrderStatus" %>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="custom" />
-<title><warehouse:message code="order.addOrderItems.label"/></title>
-<script src="${resource(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
-<style>
-    .dlg { display: none; }
-    .non-editable { background-color: #e6e6e6; cursor: not-allowed }
-    .non-editable.odd { background-color: #e1e1e1; }
-    .canceled-item { background-color: #ffcccb; }
-    .items-table { table-layout: fixed; }
-    .import-template {
-        width: 0.1px;
-        height: 0.1px;
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: -1;
-    }
-    .import-template + label {
-        display: inline-block;
-    }
-    .filters-container {
-        justify-self: flex-end;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        align-items: center;
-        margin: 10px 5px;
-    }
-</style>
-
-</head>
+<g:applyLayout name="custom">
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title><warehouse:message code="order.addOrderItems.label"/></title>
+        <script src="${resource(dir:'js/', file:'decode.js')}" type="text/javascript" ></script>
+        <style>
+            .dlg { display: none; }
+            .non-editable { background-color: #e6e6e6; cursor: not-allowed }
+            .non-editable.odd { background-color: #e1e1e1; }
+            .canceled-item { background-color: #ffcccb; }
+            .items-table { table-layout: fixed; }
+            .import-template {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+            .import-template + label {
+                display: inline-block;
+            }
+            .filters-container {
+                justify-self: flex-end;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                align-items: center;
+                margin: 10px 5px;
+            }
+        </style>
+    </head>
 <body>
 	<div class="body">
         <g:hasRoleApprover>
@@ -496,7 +495,6 @@
         }
 
         function saveOrderItem() {
-            const _ = require('lodash');
             var data = $("#orderItemForm").serialize();
             data += '&orderIndex=' + $("#orderItemsTable tbody tr").length;
             if (validateItemsForm()) {
@@ -509,7 +507,7 @@
                * TODO here, we may need to elsewhere -- should we escape all
                * TODO localized strings? Further discussion at OBGM-343.
                */
-              if ($("#validationCode").val() == 'WARN' && !confirm(_.escape(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label')}")))) {
+              if ($("#validationCode").val() == 'WARN' && !confirm(htmlDecode("${g.message(code: 'orderItem.warningSupplier.label')}"))) {
                 return false
               } else {
                 $.ajax({
@@ -1198,3 +1196,4 @@
 </script>
 </body>
 </html>
+</g:applyLayout>
