@@ -37,29 +37,35 @@ import grails.util.Holders
  */
 class Transaction implements Comparable, Serializable {
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 
-    def publishSaveEvent = {
+    def publishSaveEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, forceRefresh))
     }
 
-    def publishDeleteEvent = {
+    def publishDeleteEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this, true))
     }
 
     // ID won't be available until after the record is inserted
-    def afterInsert = publishSaveEvent
+    def afterInsert() {
+        publishSaveEvent()
+    }
 
-    def afterUpdate = publishSaveEvent
+    def afterUpdate() {
+        publishSaveEvent()
+    }
 
     // This probably needs to be "before" since the transaction will not be around after
-    def afterDelete = publishDeleteEvent
+    def afterDelete() {
+        publishDeleteEvent()
+    }
 
     String id
     TransactionType transactionType
