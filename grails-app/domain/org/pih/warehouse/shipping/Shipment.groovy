@@ -36,12 +36,15 @@ class Shipment implements Comparable, Serializable {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
         currentEvent = mostRecentEvent
         currentStatus = status.code
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
+        currentEvent = mostRecentEvent
+        currentStatus = status.code
     }
 
     def afterInsert() {
@@ -49,8 +52,6 @@ class Shipment implements Comparable, Serializable {
     }
 
     def afterUpdate() {
-        currentEvent = mostRecentEvent
-        currentStatus = status.code
         publishRefreshEvent()
     }
 
