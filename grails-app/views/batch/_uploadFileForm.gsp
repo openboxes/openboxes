@@ -232,7 +232,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productAssociation" checked="${params.type=='productAssociation'}"/>
+                                    <g:radio name="importType" value="productAssociation" checked="${params.importType=='productAssociation'}"/>
                                     <warehouse:message code="productAssociations.label" default="Product Associations"/>
                                 </label>
                             </td>
@@ -250,7 +250,7 @@
                         <tr>
                             <td>
                                 <label>
-                                    <g:radio name="type" value="productSynonym" checked="${params.type=='productSynonym'}"/>
+                                    <g:radio name="importType" value="productSynonym" checked="${params.importType=='productSynonym'}"/>
                                     <warehouse:message code="synonym.productSynonyms.label" default="Product Synonyms"/>
                                 </label>
                             </td>

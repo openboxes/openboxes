@@ -46,12 +46,16 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
 
     ProductAssociationExcelImporter(String fileName) {
         super(fileName)
-        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-        dataService = Holders.grailsApplication.mainContext.getBean("productAssociationDataService")
     }
 
+    def getDataService() {
+        return Holders.grailsApplication.mainContext.getBean("productAssociationDataService")
+    }
+
+
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return Holders.grailsApplication.mainContext.getBean("excelImportService")
+                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
