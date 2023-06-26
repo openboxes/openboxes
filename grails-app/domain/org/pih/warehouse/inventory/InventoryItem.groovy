@@ -27,13 +27,17 @@ import grails.util.Holders
  */
 class InventoryItem implements Serializable {
 
-    def publishPersistenceEvent = {
+    def publishPersistenceEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this))
     }
 
-    def afterUpdate = publishPersistenceEvent
-    def afterDelete = publishPersistenceEvent
+    def afterUpdate() {
+        publishPersistenceEvent()
+    }
+    def afterDelete() {
+        publishPersistenceEvent()
+    }
 
 
     String id

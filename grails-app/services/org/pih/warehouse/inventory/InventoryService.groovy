@@ -3425,4 +3425,20 @@ class InventoryService implements ApplicationContextAware {
             }
         }
     }
+
+    void recallInventoryItem(InventoryItem inventoryItem) {
+        inventoryItem.lotStatus = LotStatusCode.RECALLED
+        // Disable the refresh event, the quantity available calculation will be done manually
+        // to display the latest value on the Stock Card
+        inventoryItem.disableRefresh = Boolean.TRUE
+        inventoryItem.save(flush: true)
+    }
+
+    void revertRecallInventoryItem(InventoryItem inventoryItem) {
+        inventoryItem.lotStatus = null
+        // Disable the refresh event, the quantity available calculation will be done manually
+        // to display the latest value on the Stock Card
+        inventoryItem.disableRefresh = Boolean.TRUE
+        inventoryItem.save(flush: true)
+    }
 }

@@ -32,7 +32,6 @@ import grails.core.GrailsApplication
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-@Transactional
 class InventoryItemController {
 
     def dataService
@@ -633,6 +632,7 @@ class InventoryItemController {
         [itemInstance: itemInstance, inventoryInstance: inventoryInstance, inventoryItems: inventoryItems, inventoryLevelInstance: inventoryLevelInstance, totalQuantity: totalQuantity]
     }
 
+    @Transactional
     def saveInventoryItem() {
         log.info "save inventory item " + params
         def productInstance = Product.get(params.product.id)
@@ -709,6 +709,7 @@ class InventoryItemController {
         [productInstance: productInstance, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance]
     }
 
+    @Transactional
     def updateInventoryLevel() {
 
         log.info("update inventory level " + params)
@@ -813,7 +814,7 @@ class InventoryItemController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id': inventoryItem?.id])
     }
 
-
+    @Transactional
     def update() {
 
         log.info "Params " + params
@@ -866,6 +867,7 @@ class InventoryItemController {
     }
 
 
+    @Transactional
     def deleteTransactionEntry() {
         def transactionEntry = TransactionEntry.get(params.id)
         def productInstance
@@ -884,6 +886,7 @@ class InventoryItemController {
     /**
      * Add a shipment item to a shipment
      */
+    @Transactional
     def addToShipment() {
         log.info "params" + params
         def shipmentInstance = null
@@ -942,7 +945,7 @@ class InventoryItemController {
         redirect(action: "showStockCard", params: ['product.id': productInstance?.id])
     }
 
-
+    @Transactional
     def saveInventoryLevel() {
         // Get existing inventory level
         def inventoryLevelInstance = InventoryLevel.get(params.id)
@@ -965,6 +968,7 @@ class InventoryItemController {
         redirect(action: 'showStockCard', params: ['product.id': productInstance?.id])
     }
 
+    @Transactional
     def create() {
         def inventoryItem = new InventoryItem(params)
         if (InventoryItem && inventoryItem.save()) {
@@ -993,6 +997,7 @@ class InventoryItemController {
         redirect(action: 'showLotNumbers', params: ['product.id': inventoryItem?.product?.id])
     }
 
+    @Transactional
     def deleteInventoryItem() {
         def inventoryItem = InventoryItem.get(params.id)
         def productInstance = inventoryItem?.product
@@ -1013,7 +1018,7 @@ class InventoryItemController {
 
     }
 
-
+    @Transactional
     def saveTransactionEntry() {
         def productInstance = Product.get(params?.product?.id)
         if (!productInstance) {
@@ -1054,15 +1059,8 @@ class InventoryItemController {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
             if (inventoryItem.lotNumber) {
-                inventoryItem.lotStatus = LotStatusCode.RECALLED
-
-                // Disable the refresh event, the quantity available calculation will be done manually
-                // to display the latest value on the Stock Card
-                inventoryItem.disableRefresh = Boolean.TRUE
-                inventoryItem.save(flush: true)
-
+                inventoryService.recallInventoryItem(inventoryItem)
                 productAvailabilityService.refreshProductsAvailability(null, [inventoryItem?.product?.id], false)
-
                 flash.message = "${warehouse.message(code: 'inventoryItem.recall.message')}"
             } else {
                 flash.message = "${warehouse.message(code: 'inventoryItem.recallError.message')}"
@@ -1076,15 +1074,8 @@ class InventoryItemController {
     def revertRecall() {
         InventoryItem inventoryItem = InventoryItem.get(params.id)
         if (userService.isUserAdmin(session.user)) {
-            inventoryItem.lotStatus = null
-
-            // Disable the refresh event, the quantity available calculation will be done manually
-            // to display the latest value on the Stock Card
-            inventoryItem.disableRefresh = Boolean.TRUE
-            inventoryItem.save(flush: true)
-
+            inventoryService.revertRecallInventoryItem(inventoryItem)
             productAvailabilityService.refreshProductsAvailability(null, [inventoryItem?.product?.id], false)
-
             flash.message = "${warehouse.message(code: 'inventoryItem.revertRecall.message')}"
         } else {
             flash.message = "${warehouse.message(code: 'errors.noPermissions.label')}"

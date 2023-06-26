@@ -2366,7 +2366,7 @@ class StockMovementService {
     }
 
     void createMissingShipmentItems(StockMovement stockMovement) {
-        Requisition requisition = Requisition.get(stockMovement.id)
+        Requisition requisition = stockMovement.requisition
 
         if (requisition) {
             Shipment shipment = Shipment.findByRequisition(requisition)
