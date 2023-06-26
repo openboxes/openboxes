@@ -326,9 +326,9 @@ class IdentifierService {
      *          - empty productIdentifierFormat (will be generated basing on the openboxes.identifier.product.format)
      * */
     String generateProductIdentifier(ProductType productType) {
-        if (productType?.id == ConfigurationHolder.config.openboxes.identifier.defaultProductType.id) {
+        if (productType?.id == Holders.config.openboxes.identifier.defaultProductType.id) {
             // If product type is systems default then generate basing on the generator type
-            def generatorTypeConfig = ConfigurationHolder.config.openboxes.identifier.productCode.generatorType
+            def generatorTypeConfig = Holders.config.openboxes.identifier.productCode.generatorType
             IdentifierGeneratorTypeCode generatorTypeCode = generatorTypeConfig as IdentifierGeneratorTypeCode
             switch (generatorTypeCode) {
                 case IdentifierGeneratorTypeCode.SEQUENCE:

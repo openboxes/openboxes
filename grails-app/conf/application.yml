@@ -338,7 +338,7 @@ openboxes:
         productCode:
             generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
             delimiter: "-"
-            format: '$\{productTypeCode}$\{delimiter}$\{sequenceNumber}' # single quote for curly braces escape character
+            format: "${productTypeCode}${delimiter}${sequenceNumber}"
             properties:
                 productTypeCode: "code"
         defaultProductType:

@@ -37,7 +37,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
 
-@Transactional
 class ProductController {
 
     def dataService
@@ -96,7 +95,7 @@ class ProductController {
         [products: product]
     }
 
-
+    @Transactional
     def batchSave(BatchEditCommand cmd) {
 
         println "Batch save " + cmd
@@ -185,13 +184,13 @@ class ProductController {
 
         productInstance.validateRequiredFields()
 
-        if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+        if (!productInstance.hasErrors() && productService.saveProduct(productInstance)) {
             log.info("saved product " + productInstance.errors)
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
             sendProductCreatedNotification(productInstance)
         }
 
-        render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory(), locationInstance: location])
+        redirect(action: "edit", params: [id: productInstance.id])
     }
 
 
@@ -229,6 +228,7 @@ class ProductController {
         }
     }
 
+    @Transactional
     def update() {
         log.info "Update called with params " + params
         def productInstance = Product.get(params.id)
@@ -298,6 +298,7 @@ class ProductController {
         }
     }
 
+    @Transactional
     def delete() {
         def productInstance = Product.get(params.id)
         if (productInstance && !productInstance.hasAssociatedTransactionEntriesOrShipmentItems()) {
@@ -324,7 +325,7 @@ class ProductController {
         }
     }
 
-
+    @Transactional
     def deleteProducts() {
         println "Delete products: " + params
         def productIds = request.getParameterValues("product.id")
@@ -338,7 +339,7 @@ class ProductController {
         redirect(controller: "inventory", action: "browse")
     }
 
-
+    @Transactional
     def removePackage() {
         def packageInstance = ProductPackage.get(params.id)
         def productInstance = packageInstance.product
@@ -350,6 +351,7 @@ class ProductController {
         redirect(action: "edit", id: productInstance.id)
     }
 
+    @Transactional
     def savePackage() {
 
         println "savePackage: " + params
@@ -430,6 +432,7 @@ class ProductController {
     /**
      * Upload a document to a product.
      */
+    @Transactional
     def upload(DocumentCommand command) {
         log.info "Uploading document: " + params
 
@@ -528,7 +531,7 @@ class ProductController {
         redirect(controller: 'product', action: 'edit', id: command?.product?.id)
     }
 
-
+    @Transactional
     def deleteDocument() {
         def productInstance = Product.get(params.product.id)
         if (!productInstance) {
@@ -843,6 +846,7 @@ class ProductController {
     /**
      * Delete product group from database
      */
+    @Transactional
     def removeFromProductGroups() {
         println "removeFromProductGroup() " + params
 
@@ -860,6 +864,7 @@ class ProductController {
     /**
      * Delete product group from database
      */
+    @Transactional
     def deleteProductGroup() {
         println "deleteProductGroup() " + params
 
@@ -932,6 +937,7 @@ class ProductController {
     /**
      * Delete synonym from database
      */
+    @Transactional
     def deleteSynonym() {
         println "deleteSynonym() " + params
 
@@ -954,6 +960,7 @@ class ProductController {
         render(template: "/email/productCreated", model: [productInstance: productInstance, userInstance: userInstance])
     }
 
+    @Transactional
     def addToProductCatalog(ProductCatalogCommand command) {
         log.info("Add product ${command.product} to ${command.productCatalog}" + params)
         def product = command.product
@@ -973,6 +980,7 @@ class ProductController {
         render([products: ProductCatalog.includesProduct(product).listDistinct()] as JSON)
     }
 
+    @Transactional
     def removeFromProductCatalog() {
         log.info("params: " + params)
         def product = Product.get(params.id)
