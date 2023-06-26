@@ -15,8 +15,6 @@ import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
 
-    def excelImportService
-
     static Map columnMap = [
         sheet   : 'Sheet1',
             startRow : 1,
@@ -46,7 +44,7 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
     }
 
     def getDataService() {
-        return Holders.getApplication.getMainContext.getBean("outboundStockMovementDataService")
+        return Holders.grailsApplication.mainContext.getBean("outboundStockMovementDataService")
     }
 
     /**
@@ -58,7 +56,8 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        Holders.grailsApplication.mainContext.getBean("excelImportService")
+                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     /**

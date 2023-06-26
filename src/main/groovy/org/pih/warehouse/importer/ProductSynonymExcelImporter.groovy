@@ -36,12 +36,15 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter {
 
     ProductSynonymExcelImporter(String fileName) {
         super(fileName)
-        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-        dataService = Holders.grailsApplication.mainContext.getBean("productSynonymDataService")
+    }
+
+    def getDataService() {
+        return Holders.grailsApplication.mainContext.getBean("productSynonymDataService")
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, propertyMap)
+        return Holders.grailsApplication.mainContext.getBean("excelImportService")
+                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
     }
 
     void validateData(ImportDataCommand command) {
