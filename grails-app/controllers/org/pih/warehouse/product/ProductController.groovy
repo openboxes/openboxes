@@ -190,7 +190,7 @@ class ProductController {
             sendProductCreatedNotification(productInstance)
         }
 
-        redirect(action: "edit", params: [id: productInstance.id])
+        render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory(), locationInstance: location])
     }
 
 
