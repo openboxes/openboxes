@@ -4,7 +4,7 @@ import org.pih.warehouse.LocalizationUtil
 
 import java.text.DecimalFormat
 
-class DecimalNumberFieldTagLib extends FormatTagLib {
+class DecimalNumberFieldTagLib {
 
     static namespace = "g"
 
