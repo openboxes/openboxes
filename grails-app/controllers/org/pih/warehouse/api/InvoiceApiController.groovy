@@ -42,7 +42,7 @@ class InvoiceApiController {
         render([data: invoice?.toJson()] as JSON)
     }
 
-    def create(Invoice invoice) {
+    def create() {
         JSONObject jsonObject = request.JSON
 
         Location currentLocation = Location.get(session.warehouse.id)
@@ -50,9 +50,10 @@ class InvoiceApiController {
             throw new IllegalArgumentException("User must be logged into a location to create invoice")
         }
 
+        Invoice invoice = new Invoice()
         bindInvoiceData(invoice, currentLocation, jsonObject)
 
-        if (invoice.hasErrors() || !invoice.save(flush: true)) {
+        if (invoice.hasErrors() || !invoiceService.saveInvoice(invoice)) {
             throw new ValidationException("Invalid invoice", invoice.errors)
         }
 
