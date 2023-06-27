@@ -156,7 +156,9 @@ class CreateInvoicePage extends Component {
         vendor: values.vendor.id,
         vendorInvoiceNumber: values.vendorInvoiceNumber,
         dateInvoiced: values.dateInvoiced,
-        'currencyUom.id': values.currencyUom.id,
+        currencyUom: {
+          id: values.currencyUom.id
+        },
       };
 
       apiClient.post(invoiceUrl, payload)
