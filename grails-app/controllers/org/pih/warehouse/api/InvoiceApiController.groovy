@@ -29,7 +29,7 @@ class InvoiceApiController {
     def list() {
         def location = Location.get(session.warehouse.id)
         params.partyFromId = location?.organization?.id
-        List invoices = invoiceService.getInvoices(params)
+        def invoices = invoiceService.getInvoices(params)
         render([data: invoices, totalCount: invoices?.totalCount] as JSON)
     }
 

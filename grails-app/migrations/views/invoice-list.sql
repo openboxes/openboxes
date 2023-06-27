@@ -2,7 +2,7 @@ CREATE OR REPLACE VIEW invoice_list AS (
    	SELECT
          invoice.id as invoice_id,
          invoice.invoice_number,
-         reference_number.identifier as vendor_invoice_number,
+         IFNULL(reference_number.identifier, '') as vendor_invoice_number,
          invoice.party_from_id,
          invoice.party_id,
          party.code as party_code,
