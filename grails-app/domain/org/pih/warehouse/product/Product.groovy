@@ -48,21 +48,29 @@ import org.pih.warehouse.LocalizationUtil
  */
 class Product implements Comparable, Serializable {
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 
-    def publishPersistenceEvent = {
+    def publishPersistenceEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new InventorySnapshotEvent(this))
     }
 
-    def afterInsert = publishPersistenceEvent
-    def afterUpdate = publishPersistenceEvent
-    def afterDelete = publishPersistenceEvent
+    def afterInsert() {
+        publishPersistenceEvent()
+    }
+
+    def afterUpdate() {
+        publishPersistenceEvent()
+    }
+
+    def afterDelete() {
+        publishPersistenceEvent()
+    }
 
 
     // Base product information
