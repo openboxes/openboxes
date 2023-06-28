@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.validation.ValidationException
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.Product
@@ -29,9 +30,9 @@ class ProductAssociationDataService {
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             productAssociationInstance.product = Product.findByProductCode(params['product.productCode'])
             productAssociationInstance.associatedProduct = Product.findByProductCode(params['associatedProduct.productCode'])
-            params['product.id'] =  productAssociationInstance.product?.id
+            params['product'] =  productAssociationInstance.product?.id
             params['product.name'] =  productAssociationInstance.product?.name
-            params['associatedProduct.id'] =  productAssociationInstance.associatedProduct?.id
+            params['associatedProduct'] =  productAssociationInstance.associatedProduct?.id
             params['associatedProduct.name'] =  productAssociationInstance.associatedProduct?.name
 
             params.hasMutualAssociation = Boolean.valueOf(params.hasMutualAssociation as String) || (params.hasMutualAssociation as String)?.equalsIgnoreCase("yes")
@@ -144,20 +145,20 @@ class ProductAssociationDataService {
 
         command.data.each{ params ->
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
-            if (productAssociationInstance.validate()) {
-                if (params.hasMutualAssociation) {
-                    Map otherAssociationParams = params.clone() as Map
-                    otherAssociationParams['product.id'] = params['associatedProduct.id']
-                    otherAssociationParams['associatedProduct.id'] = params['product.id']
-                    ProductAssociation mutualAssociationInstance = new ProductAssociation(otherAssociationParams)
 
-                    productAssociationInstance.mutualAssociation = mutualAssociationInstance
-                    mutualAssociationInstance.mutualAssociation = productAssociationInstance
-                    mutualAssociationInstance.save(failOnError: true)
-                }
-                productAssociationInstance.save(failOnError: true)
+            if (params.hasMutualAssociation) {
+                Map otherAssociationParams = params.clone() as Map
+                otherAssociationParams['product'] = params['associatedProduct']
+                otherAssociationParams['associatedProduct'] = params['product']
+                ProductAssociation mutualAssociationInstance = new ProductAssociation(otherAssociationParams)
+
+                productAssociationInstance.mutualAssociation = mutualAssociationInstance
+                mutualAssociationInstance.mutualAssociation = productAssociationInstance
+            }
+
+            if (!productAssociationInstance.validate() || !productAssociationInstance.save(failOnError: true, flush: true)) {
+                throw new ValidationException("Invalid product association", productAssociationInstance.errors)
             }
         }
     }
-
 }
