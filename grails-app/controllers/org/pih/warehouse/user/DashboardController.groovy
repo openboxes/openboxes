@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.StringEscapeUtils
+import org.hibernate.internal.SessionFactoryImpl
 import org.pih.warehouse.core.ActivityCode
 import grails.util.Holders
 import org.pih.warehouse.core.Comment
@@ -32,6 +33,7 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.boot.info.GitProperties
 
+import java.lang.reflect.Field
 import java.text.SimpleDateFormat
 
 class DashboardController {
@@ -45,6 +47,7 @@ class DashboardController {
     GitProperties gitProperties
     def userAgentIdentService
     def megamenuService
+    def dataSource
 
     def showCacheStatistics() {
         def statistics = sessionFactory.statistics
@@ -108,6 +111,9 @@ class DashboardController {
     }
 
     def index() {
+        Field f = SessionFactoryImpl.class.getDeclaredField("properties");
+        f.setAccessible(true);
+        Properties p = (Properties)f.get(sessionFactory);
         if (userAgentIdentService.isMobile()) {
             redirect(controller: "mobile")
             return

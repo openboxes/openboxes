@@ -19,6 +19,7 @@ import org.hibernate.ObjectNotFoundException
 import org.hibernate.SessionFactory
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.Restrictions
+import org.pih.warehouse.core.Comment
 
 @Transactional
 class GenericApiService {
@@ -135,5 +136,15 @@ class GenericApiService {
             default:
                 throw new UnsupportedOperationException("Operator ${operator} is not supported at this time")
         }
+    }
+
+    def testServiceAction() {
+        Comment comment = new Comment(comment: "helloService")
+        comment.save()
+
+        Comment comment2 = new Comment(comment: "helloService2")
+        comment2.save()
+
+        throw new Exception("exceptionService")
     }
 }

@@ -11,6 +11,9 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.grails.web.json.JSONArray
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationType
 
 class GenericApiController {
 
@@ -54,4 +57,20 @@ class GenericApiController {
         render status: 204
     }
 
+    def testControllerAction() {
+        Comment comment = new Comment(comment: "helloController")
+        comment.save()
+
+        Comment comment2 = new Comment(comment: "helloController")
+        comment2.save()
+
+        throw new Exception("exceptionController")
+
+        render status: 200
+    }
+
+    def testServiceAction() {
+        genericApiService.testServiceAction()
+        render status: 200
+    }
 }

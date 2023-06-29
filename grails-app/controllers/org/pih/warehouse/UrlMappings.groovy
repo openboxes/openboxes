@@ -824,6 +824,16 @@ class UrlMappings {
             action = [GET: "read", POST: "update", PUT: "update", DELETE: "delete"]
         }
 
+        "/api/testController" {
+            controller = "genericApi"
+            action = [GET: "testControllerAction"]
+        }
+
+        "/api/testService" {
+            controller = "genericApi"
+            action = [GET: "testServiceAction"]
+        }
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")
