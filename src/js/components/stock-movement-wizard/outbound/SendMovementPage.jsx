@@ -582,7 +582,9 @@ class SendMovementPage extends Component {
   prepareRequestAndSubmitStockMovement(values) {
     const payload = {
       dateShipped: values.dateShipped,
-      'shipmentType.id': values.shipmentType.id,
+      shipmentType: {
+        id: values.shipmentType.id,
+      },
       trackingNumber: values.trackingNumber || '',
       driverName: values.driverName || '',
       comments: values.comments || '',
