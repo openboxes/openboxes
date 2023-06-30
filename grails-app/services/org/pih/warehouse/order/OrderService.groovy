@@ -458,7 +458,7 @@ class OrderService {
     boolean canApproveOrder(Order order, User userInstance) {
         if (isApprovalRequired(order)) {
             List<RoleType> defaultRoleTypes = grailsApplication.config.openboxes.purchasing.approval.defaultRoleTypes
-                    .collect { RoleType."$it" }
+                    .collect { RoleType.valueOf(it) }
             return userService.hasAnyRoles(userInstance, defaultRoleTypes)
         }
         return Boolean.TRUE
