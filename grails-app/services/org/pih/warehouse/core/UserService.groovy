@@ -339,7 +339,7 @@ class UserService {
             if (person) {
                 def encodedPassword = "password"?.encodeAsPassword()
                 Sql sql = new Sql(dataSource)
-                sql.execute('insert into user (id, username, password) values (?, ?, ?)', [person?.id, person?.email, encodedPassword])
+                sql.execute('insert into user (id, username, password) values (:id, :username, :password)', [id: person?.id, username: person?.email, password: encodedPassword])
             }
         }
     }
@@ -348,7 +348,7 @@ class UserService {
         def person = Person.get(personId)
         if (person) {
             Sql sql = new Sql(dataSource)
-            sql.execute('delete from user where id = ?', [personId])
+            sql.execute('delete from user where id = :id', [id: personId])
         }
     }
 
