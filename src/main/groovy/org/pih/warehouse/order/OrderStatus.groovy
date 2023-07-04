@@ -31,7 +31,7 @@ enum OrderStatus {
     }
 
     static int compare(OrderStatus a, OrderStatus b) {
-        return a.sortOrder <=> b.sortOrder
+        return a?.sortOrder <=> b?.sortOrder
     }
 
     static list() {

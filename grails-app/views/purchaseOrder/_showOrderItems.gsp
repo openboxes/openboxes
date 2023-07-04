@@ -134,7 +134,7 @@
                 <div id="add-adjustment" class="box">
                     <g:set
                             var="canManageAdjustments"
-                            value="${(order?.status >= OrderStatus.PLACED && isApprover) || (order?.status == OrderStatus.PENDING)}"
+                            value="${(OrderStatus.compare(order?.status, OrderStatus.PLACED) >= 0 && isApprover) || (order?.status == OrderStatus.PENDING)}"
                     />
                     <h2 style="display: flex; align-items: center; justify-content: space-between;">
                         <warehouse:message code="default.add.label" args="[g.message(code: 'orderAdjustment.label')]"/>
