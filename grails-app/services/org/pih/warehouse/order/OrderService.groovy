@@ -945,10 +945,10 @@ class OrderService {
      */
     boolean validateOrderItems(List orderItems, Order order) {
         def propertiesMap = grailsApplication.config.openboxes.purchaseOrder.editableProperties
-
+        def excludedProperties = propertiesMap?.deny
         orderItems.each { orderItem ->
             OrderItem existingOrderItem = order.orderItems.find { it.id == orderItem.id }
-            propertiesMap.deny.each { property ->
+            excludedProperties?.each { property ->
                 if (order.status == propertiesMap.status) {
                     def existingValue = existingOrderItem.toImport()."${property}"
                     def importedValue = orderItem."${property}"
