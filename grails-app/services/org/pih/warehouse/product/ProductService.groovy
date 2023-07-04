@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.ApiException
 import org.pih.warehouse.core.Constants
@@ -330,7 +331,6 @@ class ProductService {
                 }
             }
 
-            createAlias("synonyms", "synonym", JoinType.LEFT_OUTER_JOIN)
 
             if (!includeInactive) {
                 eq("active", true)
@@ -369,6 +369,7 @@ class ProductService {
             }
             or {
                 if (params.name) {
+                    createAlias("synonyms", "synonym", JoinType.LEFT_OUTER_JOIN, Restrictions.like("synonymTypeCode", SynonymTypeCode.DISPLAY_NAME) )
                     ilike("name", "%" + params.name.replaceAll(" ", "%") + "%")
                     and {
                         ilike("synonym.name", "%" + params.name.replaceAll(" ", "%") + "%")
