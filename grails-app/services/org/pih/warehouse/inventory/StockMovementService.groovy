@@ -2361,6 +2361,9 @@ class StockMovementService {
         }
 
         Container pallet = (palletName) ? shipment.findOrCreatePallet(palletName) : null
+        if (pallet) {
+            pallet.save(flush: true)
+        }
         Container box = (boxName) ? pallet.findOrCreateBox(boxName) : null
         return box ?: pallet ?: null
     }

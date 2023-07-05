@@ -194,7 +194,7 @@ class PartialReceivingApiController {
                 if (!partialReceiptItem || newLine) {
                     partialReceiptItem = new PartialReceiptItem()
                     partialReceiptItem.shipmentItem = ShipmentItem.get(shipmentItemId)
-                    partialReceiptItem.product = shipmentItemMap.get("product.id") ? Product.load(shipmentItemMap.get("product.id")) : null
+                    partialReceiptItem.product = Product.get(shipmentItemMap?.product?.id)
                     partialReceiptItem.isSplitItem = newLine
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }
