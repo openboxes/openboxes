@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 class PaymentTermController {
+    def paymentTermService
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
@@ -31,7 +32,7 @@ class PaymentTermController {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {
             paymentTerm.properties = params
-            if (!paymentTerm.hasErrors() && paymentTerm.save(flush: true)) {
+            if (!paymentTerm.hasErrors() && paymentTermService.savePaymentTerm(paymentTerm)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'paymentTerm.label', default: 'Payment Term'), paymentTerm.id])}"
                 redirect(action: "list")
             } else {
@@ -39,7 +40,7 @@ class PaymentTermController {
             }
         } else {
             paymentTerm = new PaymentTerm(params)
-            if (paymentTerm.save(flush: true)) {
+            if (paymentTerm.validate() && paymentTermService.savePaymentTerm(paymentTerm)) {
                 flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'paymentTerm.label', default: 'Payment Term'), paymentTerm.id])}"
                 redirect(controller: "paymentTerm", action: "edit", id: paymentTerm?.id)
             } else {
@@ -52,7 +53,7 @@ class PaymentTermController {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {
             try {
-                paymentTerm.delete(flush: true)
+                paymentTermService.deletePaymentTerm(paymentTerm)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'paymentTerm.label', default: 'Payment Term'), params.id])}"
                 redirect(action: "list")
             }
