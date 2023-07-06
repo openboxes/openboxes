@@ -463,15 +463,15 @@ dependencies {
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document:${xDocReportVersion}"
     implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template:${xDocReportVersion}"
-
-    // FIXME assess which, if any, of these sub-dependencies are still needed
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:${xDocReportVersion}"
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:${xDocReportVersion}"
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}"
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xDocReportVersion}"
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}"
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}"
-    // implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xDocReportVersion}"
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter:${xDocReportVersion}"
+    implementation("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.xwpf:${xDocReportVersion}") {
+        exclude group: "org.apache.poi", module: "poi-ooxml"
+    }
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xDocReportVersion}"
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xDocReportVersion}"
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xDocReportVersion}"
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xDocReportVersion}"
+    implementation "fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xDocReportVersion}"
 
     implementation 'fr.w3blog:zebra-zpl:0.0.4'  // ZebraUtils.printZpl(), Labelary API, etc.
 
