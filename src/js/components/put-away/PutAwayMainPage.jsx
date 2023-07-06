@@ -79,7 +79,7 @@ class PutAwayMainPage extends Component {
         },
       ];
     }
-    return '';
+    return [];
   }
 
   updateWizardValues(page, putAway) {

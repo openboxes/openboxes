@@ -79,7 +79,7 @@ class ReplenishmentWizard extends Component {
         },
       ];
     }
-    return '';
+    return [];
   }
 
   updateWizardValues(page, replenishment) {

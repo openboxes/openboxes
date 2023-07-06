@@ -63,7 +63,7 @@ class OutboundReturns extends Component {
   get wizardTitle() {
     const { values } = this.state;
     if (!values.stockTransferNumber || !values.origin || !values.destination) {
-      return '';
+      return [];
     }
 
     return [

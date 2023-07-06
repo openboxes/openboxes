@@ -83,7 +83,7 @@ class StockTransferWizard extends Component {
         },
       ];
     }
-    return '';
+    return [];
   }
 
   updateWizardValues(page, stockTransfer) {
