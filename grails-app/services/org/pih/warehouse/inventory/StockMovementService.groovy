@@ -2369,7 +2369,7 @@ class StockMovementService {
     }
 
     void createMissingShipmentItems(StockMovement stockMovement) {
-        Requisition requisition = stockMovement.requisition
+        Requisition requisition = stockMovement.requisition.refresh()
 
         if (requisition) {
             Shipment shipment = Shipment.findByRequisition(requisition)
