@@ -9,10 +9,20 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 
+@Transactional
 class BudgetCodeService {
-    
+
+    BudgetCode saveBudgetCode(BudgetCode budgetCode) {
+        budgetCode.save(failOnError: true)
+    }
+
+    void deleteBudgetCode(BudgetCode budgetCode) {
+        budgetCode.delete()
+    }
+
     def getBudgetCodes(GrailsParameterMap params) {
         return BudgetCode.createCriteria().list(max: params.max, offset: params.offset) {
             if (params.q) {

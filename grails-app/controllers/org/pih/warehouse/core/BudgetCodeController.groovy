@@ -37,7 +37,7 @@ class BudgetCodeController {
 
     def save() {
         def budgetCode = new BudgetCode(params)
-        if (budgetCode.save(flush: true)) {
+        if (budgetCode.validate() && budgetCodeService.saveBudgetCode(budgetCode)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), budgetCode.id])}"
             redirect(controller: "budgetCode", action: "edit", id: budgetCode?.id)
         } else {
@@ -49,7 +49,7 @@ class BudgetCodeController {
         def budgetCode = BudgetCode.get(params.id)
         if (budgetCode) {
             budgetCode.properties = params
-            if (!budgetCode.hasErrors() && budgetCode.save(flush: true)) {
+            if (!budgetCode.hasErrors() && budgetCodeService.saveBudgetCode(budgetCode)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), budgetCode.id])}"
                 redirect(action: "list")
             } else {
@@ -66,7 +66,7 @@ class BudgetCodeController {
         def budgetCode = BudgetCode.get(params.id)
         if (budgetCode) {
             try {
-                budgetCode.delete(flush: true)
+                budgetCodeService.deleteBudgetCode(budgetCode)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'budgetCode.label', default: 'Budget Code'), params.id])}"
                 redirect(action: "list")
             }
