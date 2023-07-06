@@ -12,6 +12,8 @@ package org.pih.warehouse.core
 import org.pih.warehouse.product.Product
 
 class GlAccountController {
+    def glAccountService
+
     def index() {
         redirect(action: "list", params: params)
     }
@@ -35,7 +37,7 @@ class GlAccountController {
 
     def save() {
         def glAccount = new GlAccount(params)
-        if (glAccount.save(flush: true)) {
+        if (glAccount.validate() && glAccountService.saveGlAccount(glAccount)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), glAccount.id])}"
             redirect(controller: "glAccount", action: "edit", id: glAccount?.id)
         } else {
@@ -54,7 +56,7 @@ class GlAccountController {
                 return
             }
             glAccount.properties = params
-            if (!glAccount.hasErrors() && glAccount.save(flush: true)) {
+            if (!glAccount.hasErrors() && glAccountService.saveGlAccount(glAccount)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), glAccount.id])}"
                 redirect(action: "list")
             } else {
@@ -71,7 +73,7 @@ class GlAccountController {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {
             try {
-                glAccount.delete(flush: true)
+                glAccountService.deleteGlAccount(glAccount)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), params.id])}"
                 redirect(action: "list")
             }

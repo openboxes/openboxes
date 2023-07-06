@@ -9,10 +9,19 @@
  **/
 package org.pih.warehouse.glAccount
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.GlAccount
 
-
+@Transactional
 class GlAccountService {
+
+    GlAccount saveGlAccount(GlAccount glAccount) {
+        glAccount.save(failOnError: true)
+    }
+
+    void deleteGlAccount(GlAccount glAccount) {
+        glAccount.delete()
+    }
 
     List<GlAccount> getGlAccounts (Map params) {
         def max = params.max ? params.int("max") : null
