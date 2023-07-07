@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.product.Product
 
 class GlAccountController {
@@ -33,6 +34,7 @@ class GlAccountController {
         return [glAccount: glAccount, glAccountTypeId: glAccountType?.id]
     }
 
+    @Transactional
     def save() {
         def glAccount = new GlAccount(params)
         if (glAccount.save(flush: true)) {
@@ -43,6 +45,7 @@ class GlAccountController {
         }
     }
 
+    @Transactional
     def update() {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {
@@ -67,6 +70,7 @@ class GlAccountController {
         }
     }
 
+    @Transactional
     def delete() {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {
