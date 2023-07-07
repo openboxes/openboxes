@@ -9,6 +9,8 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
+
 class BudgetCodeController {
     def budgetCodeService
 
@@ -35,6 +37,7 @@ class BudgetCodeController {
         return [budgetCode: budgetCode, organizationId: organization?.id]
     }
 
+    @Transactional
     def save() {
         def budgetCode = new BudgetCode(params)
         if (budgetCode.save(flush: true)) {
@@ -45,6 +48,7 @@ class BudgetCodeController {
         }
     }
 
+    @Transactional
     def update() {
         def budgetCode = BudgetCode.get(params.id)
         if (budgetCode) {
@@ -62,6 +66,7 @@ class BudgetCodeController {
         }
     }
 
+    @Transactional
     def delete() {
         def budgetCode = BudgetCode.get(params.id)
         if (budgetCode) {

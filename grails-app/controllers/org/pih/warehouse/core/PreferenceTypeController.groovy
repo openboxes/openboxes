@@ -9,6 +9,8 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
+
 class PreferenceTypeController {
 
     def index() {
@@ -31,6 +33,7 @@ class PreferenceTypeController {
         return [preferenceType: preferenceType]
     }
 
+    @Transactional
     def save() {
         def preferenceType = new PreferenceType(params)
         if (preferenceType.save(flush: true)) {
@@ -41,6 +44,7 @@ class PreferenceTypeController {
         }
     }
 
+    @Transactional
     def update() {
         def preferenceType = PreferenceType.get(params.id)
         if (preferenceType) {
@@ -57,6 +61,7 @@ class PreferenceTypeController {
         }
     }
 
+    @Transactional
     def delete() {
         def preferenceType = PreferenceType.get(params.id)
         if (preferenceType) {
