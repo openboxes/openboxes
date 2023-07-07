@@ -9,6 +9,8 @@
 **/
 package org.pih.warehouse.core
 
+import grails.gorm.transactions.Transactional
+
 class PaymentTermController {
 
     def list() {
@@ -27,6 +29,7 @@ class PaymentTermController {
         return [paymentTerm: paymentTerm]
     }
 
+    @Transactional
     def save() {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {
@@ -48,6 +51,7 @@ class PaymentTermController {
         }
     }
 
+    @Transactional
     def delete() {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {
