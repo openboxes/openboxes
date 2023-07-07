@@ -956,7 +956,7 @@ class ShipmentService {
             if (saveParent) {
                 shipment.save(flush: true)
             }
-            shipmentItem.delete(flush: true)
+            shipmentItem.delete()
         }
     }
 
