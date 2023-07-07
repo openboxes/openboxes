@@ -18,15 +18,21 @@ import org.pih.warehouse.requisition.RequisitionItem
 
 class PicklistItem implements Serializable {
 
-    def publishRefreshEvent = {
+    def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshProductAvailabilityEvent(this))
     }
 
-    def afterInsert = publishRefreshEvent
+    def afterInsert() {
+        publishRefreshEvent()
+    }
 
-    def afterUpdate = publishRefreshEvent
+    def afterUpdate() {
+        publishRefreshEvent()
+    }
 
-    def afterDelete = publishRefreshEvent
+    def afterDelete() {
+        publishRefreshEvent()
+    }
 
     String id
     RequisitionItem requisitionItem

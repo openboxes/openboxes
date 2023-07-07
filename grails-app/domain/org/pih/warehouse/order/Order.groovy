@@ -21,31 +21,37 @@ import org.pih.warehouse.shipping.ShipmentStatusCode
 
 class Order implements Serializable {
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 
-    def publishRefreshEvent = {
+    def publishRefreshEvent() {
         if (isPurchaseOrder) {
             Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
         }
     }
 
-    def publishRefreshEvenBeforeDelete = {
+    def publishRefreshEvenBeforeDelete() {
         if (isPurchaseOrder) {
             Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this, true))
         }
     }
 
-    def afterInsert = publishRefreshEvent
+    def afterInsert() {
+        publishRefreshEvent()
+    }
 
-    def afterUpdate = publishRefreshEvent
+    def afterUpdate() {
+        publishRefreshEvent()
+    }
 
-    def beforeDelete = publishRefreshEvenBeforeDelete
+    def beforeDelete() {
+        publishRefreshEvenBeforeDelete()
+    }
 
     String id
     OrderStatus status = OrderStatus.PENDING
