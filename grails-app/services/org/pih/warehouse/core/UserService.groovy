@@ -27,6 +27,10 @@ class UserService {
         return User.get(id)
     }
 
+    User saveUser(User user) {
+        return user.save()
+    }
+
 
     def updateUser(String userId, String currentUserId, Map params) {
 

@@ -119,7 +119,7 @@ class UserController {
      */
     def save() {
         log.info "attempt to save the user; show form with validation errors on failure"
-        def userInstance = new User(params)
+        User userInstance = new User(params)
 
         // Default value for active field on Person is set to True
         // which is inherited by User
@@ -131,7 +131,9 @@ class UserController {
         userInstance.password = params?.password?.encodeAsPassword()
         userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
 
-        if (userInstance.save(flush: true)) {
+        User persistedUser = userService.saveUser(userInstance)
+
+        if (persistedUser) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
             redirect(action: "edit", id: userInstance.id)
         } else {
