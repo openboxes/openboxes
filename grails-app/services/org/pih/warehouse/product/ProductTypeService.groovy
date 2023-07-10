@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
+
+@Transactional
 class ProductTypeService {
 
     synchronized getAndSetNextSequenceNumber(ProductType productType) {
@@ -16,5 +19,13 @@ class ProductTypeService {
         productType.save()
 
         return productType.sequenceNumber
+    }
+
+    ProductType saveProductType(ProductType productType) {
+        ProductType persistedProductType = null
+        if (!productType.hasErrors()) {
+            persistedProductType = productType.save()
+        }
+        return persistedProductType
     }
 }
