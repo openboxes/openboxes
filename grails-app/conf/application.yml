@@ -482,6 +482,8 @@ openboxes:
         refreshProductAvailabilityJob:
             enabled: true
             cronExpression: "0 0 0/2 * * ?" # every two hours
+            delayStart: true
+            delayInMilliseconds: 5000
 
         # Refresh transaction fact table
         refreshTransactionFactJob:
