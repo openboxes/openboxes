@@ -506,8 +506,7 @@ class RequisitionService {
         return requisition
     }
 
-    void deleteRequisition(StockMovement stockMovement, Requisition requisition) {
-        OutboundStockMovement associatedStockMovement = OutboundStockMovement.get(stockMovement.id)
+    void deleteRequisition(StockMovement stockMovement, OutboundStockMovement associatedStockMovement, Requisition requisition) {
         stockMovement.requisition = null
         associatedStockMovement.requisition = null
         deleteRequisition(requisition)
