@@ -76,7 +76,7 @@ class ReceivingPage extends Component {
   get wizardTitle() {
     const { formData } = this.state;
     if (!formData.shipment) {
-      return '';
+      return [];
     }
     const dateShipped = moment(formData.dateShipped).format('MM/DD/YYYY');
     return [

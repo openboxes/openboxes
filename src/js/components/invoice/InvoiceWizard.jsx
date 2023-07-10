@@ -50,7 +50,7 @@ class InvoiceWizard extends Component {
   get wizardTitle() {
     const { values } = this.state;
     if (!values.invoiceNumber) {
-      return '';
+      return [];
     }
     return [
       {

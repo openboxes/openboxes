@@ -216,7 +216,7 @@ export default withRouter(connect(mapStateToProps, {
 AddDestinationModal.propTypes = {
   locale: PropTypes.string.isRequired,
   hideSpinner: PropTypes.func.isRequired,
-  isOpen: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onResponse: PropTypes.func.isRequired,
   showSpinner: PropTypes.func.isRequired,
