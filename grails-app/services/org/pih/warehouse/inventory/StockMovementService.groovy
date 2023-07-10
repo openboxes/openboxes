@@ -2369,6 +2369,8 @@ class StockMovementService {
     }
 
     void createMissingShipmentItems(StockMovement stockMovement) {
+        // since there is possibility that requisition will be updated before the end of the transaction
+        // where changes will not yet be persisted, we want to refresh the requisition to get the latest version
         Requisition requisition = stockMovement.requisition.refresh()
 
         if (requisition) {
