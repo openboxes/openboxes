@@ -352,7 +352,10 @@ class StockMovementService {
                 }
                 shipmentService.deleteShipment(shipment)
             }
-            requisitionService.deleteRequisition(stockMovement?.requisition)
+            OutboundStockMovement associatedStockMovement = OutboundStockMovement.get(stockMovement?.id)
+            stockMovement?.shipment = null
+            associatedStockMovement.shipment = null
+            requisitionService.deleteRequisition(stockMovement, stockMovement.requisition)
         }
         else {
             shipmentService.deleteShipment(stockMovement?.shipment)
