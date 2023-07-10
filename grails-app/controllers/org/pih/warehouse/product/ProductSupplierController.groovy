@@ -24,6 +24,7 @@ class ProductSupplierController {
     def dataService
     def documentService
     def identifierService
+    ProductSupplierService productSupplierService
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
@@ -120,7 +121,7 @@ class ProductSupplierController {
             }
         }
 
-        if (productSupplierInstance.save(flush: true)) {
+        if (productSupplierService.saveProductSupplier(productSupplierInstance)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
             if (params.dialog) {
