@@ -342,7 +342,8 @@ class StockMovementService {
         deleteStockMovement(stockMovement)
     }
 
-    void deleteStockMovement(StockMovement stockMovement) {
+    // stockMovement could be an instance of StockMovement or OutboundStockMovement
+    void deleteStockMovement(def stockMovement) {
         if (stockMovement?.requisition) {
             def shipments = stockMovement?.requisition?.shipments
             shipments.toArray().each { Shipment shipment ->
@@ -352,10 +353,7 @@ class StockMovementService {
                 }
                 shipmentService.deleteShipment(shipment)
             }
-            OutboundStockMovement associatedStockMovement = OutboundStockMovement.get(stockMovement?.id)
-            stockMovement?.shipment = null
-            associatedStockMovement.shipment = null
-            requisitionService.deleteRequisition(stockMovement, associatedStockMovement, stockMovement.requisition)
+            requisitionService.deleteRequisition(stockMovement?.requisition)
         }
         else {
             shipmentService.deleteShipment(stockMovement?.shipment)

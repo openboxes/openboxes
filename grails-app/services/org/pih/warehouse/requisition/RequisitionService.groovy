@@ -13,13 +13,11 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
-import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
 import org.pih.warehouse.core.User
-import org.pih.warehouse.inventory.OutboundStockMovement
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -504,12 +502,6 @@ class RequisitionService {
 
         }
         return requisition
-    }
-
-    void deleteRequisition(StockMovement stockMovement, OutboundStockMovement associatedStockMovement, Requisition requisition) {
-        stockMovement.requisition = null
-        associatedStockMovement.requisition = null
-        deleteRequisition(requisition)
     }
 
     void deleteRequisition(Requisition requisition) {
