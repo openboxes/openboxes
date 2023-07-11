@@ -21,10 +21,6 @@ class ProductTypeService {
         return productType.sequenceNumber
     }
 
-    ProductType getOne(String id) {
-        return ProductType.get(id)
-    }
-
     ProductType saveProductType(ProductType productType) {
         ProductType persistedProductType = null
         if (!productType.hasErrors()) {
