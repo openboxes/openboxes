@@ -10,6 +10,7 @@
 package org.pih.warehouse.report
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.apache.http.client.HttpClient
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpGet
@@ -379,7 +380,7 @@ class ReportService implements ApplicationContextAware {
             SELECT 0, transaction_type.transaction_code, substring_index(transaction_type.name, '|', 1), transaction_type.id
             FROM transaction_type
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildLotDimension() {
@@ -389,7 +390,7 @@ class ReportService implements ApplicationContextAware {
             FROM inventory_item
             JOIN product ON product.id = inventory_item.product_id;
         """
-        executeStatements([insertStatement])
+        dataService.executeStatements([insertStatement])
     }
 
     void buildProductDimension() {
@@ -427,6 +428,7 @@ class ReportService implements ApplicationContextAware {
         }
     }
 
+    @Transactional
     def saveDateDimension(Date date) {
         date.clearTime()
 

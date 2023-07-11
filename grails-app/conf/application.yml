@@ -505,17 +505,11 @@ openboxes:
             enabled: true
             cronExpression: "0 * * * * ?" # every minute
 
-        # Calculate current quantity on hand
-        calculateQuantityJob:
-            enabled: true
-            cronExpression: "0 0 0/12 * * ?" # every twelve hours starting at midnight
-            enableOptimization: false
-
         # Calculate historical quantity on hand
         calculateHistoricalQuantityJob:
             enabled: false
             cronExpression: "0 0 0 * * ?" # every day at midnight
-            daysToProcess: 540   // 18 months
+            daysToProcess: 540 # 18 months
 
         # Data Cleaning Job
         dataCleaningJob:

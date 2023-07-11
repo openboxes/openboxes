@@ -19,6 +19,11 @@ class RefreshInventorySnapshotJob {
 
     static concurrent = false
 
+    // By default this is true on QuartzDisplayJob, which invokes execute()
+    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
+    // even if there is no session
+    static sessionRequired = false
+
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
 

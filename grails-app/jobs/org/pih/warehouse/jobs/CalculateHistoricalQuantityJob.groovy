@@ -11,6 +11,11 @@ class CalculateHistoricalQuantityJob {
 
     static concurrent = false
 
+    // By default this is true on QuartzDisplayJob, which invokes execute()
+    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
+    // even if there is no session
+    static sessionRequired = false
+
     static triggers = {
         cron name: JobUtils.getCronName(CalculateHistoricalQuantityJob),
             cronExpression: JobUtils.getCronExpression(CalculateHistoricalQuantityJob)
@@ -24,7 +29,7 @@ class CalculateHistoricalQuantityJob {
             if (!dates) {
                 // Filter down to the transaction dates within the last 18 months
                 def daysToProcess = Holders.getConfig().getProperty("openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess")
-                def startDate = new Date() - daysToProcess
+                def startDate = new Date() - (daysToProcess ? Integer.parseInt(daysToProcess) : 0)
                 def transactionDates = inventorySnapshotService.getTransactionDates()
                 transactionDates = transactionDates.findAll { it >= startDate }
                 dates = transactionDates.reverse()

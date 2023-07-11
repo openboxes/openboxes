@@ -22,6 +22,11 @@ class SendStockAlertsJob {
 
     static concurrent = false
 
+    // By default this is true on QuartzDisplayJob, which invokes execute()
+    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
+    // even if there is no session
+    static sessionRequired = false
+
     static triggers = {
         cron name: JobUtils.getCronName(SendStockAlertsJob),
             cronExpression: JobUtils.getCronExpression(SendStockAlertsJob)
