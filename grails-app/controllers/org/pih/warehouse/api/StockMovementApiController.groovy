@@ -194,8 +194,6 @@ class StockMovementApiController {
                 if (stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) {
                     try {
                         stockMovementService.deleteStockMovement(stockMovement)
-                        stockMovement?.shipment = null
-                        stockMovement?.requisition = null
                     } catch (Exception e) {
                         def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                         response.status = 400
