@@ -85,7 +85,7 @@ class ProductTypeController {
     }
 
     def update() {
-        ProductType productTypeInstance = productTypeService.getOne(params.id)
+        ProductType productTypeInstance = genericApiService.getObject("productType", params.id) as ProductType
         if (productTypeInstance) {
             if (params.version) {
                 def version = params.version.toLong()
