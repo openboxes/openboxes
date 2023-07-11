@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -17,6 +18,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
 import org.pih.warehouse.product.ProductSupplier
 
+@Transactional
 class ProductSupplierAttributeDataService {
 
     Boolean validate(ImportDataCommand command) {
