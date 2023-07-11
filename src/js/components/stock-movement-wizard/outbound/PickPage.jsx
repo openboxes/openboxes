@@ -654,7 +654,7 @@ class PickPage extends Component {
                   <span><i className="fa fa-upload pr-2" /><Translate id="react.default.button.exportTemplate.label" defaultMessage="Export template" /></span>
                 </button>
                 <a
-                  href={stringUrlInterceptor(`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`)}
+                  href={`${this.state.printPicksUrl}${this.state.sorted ? '?sorted=true' : ''}`}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end ml-1 btn-xs"
                   target="_blank"
                   rel="noopener noreferrer"

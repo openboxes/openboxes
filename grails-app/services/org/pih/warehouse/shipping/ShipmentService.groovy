@@ -1499,6 +1499,7 @@ class ShipmentService {
             debitTransaction.transactionDate = shipmentInstance.getActualShippingDate()
             debitTransaction.requisition = shipmentInstance.requisition
             debitTransaction.transactionNumber = identifierService.generateTransactionIdentifier()
+            debitTransaction.outgoingShipment = shipmentInstance
 
             addTransactionEntries(debitTransaction, shipmentInstance)
 

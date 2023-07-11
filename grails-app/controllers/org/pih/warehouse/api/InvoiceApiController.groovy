@@ -125,8 +125,9 @@ class InvoiceApiController {
     }
 
     def getInvoiceItemCandidates() {
+        JSONObject jsonObject = request.JSON
         List<InvoiceItemCandidate> invoiceItemCandidates = invoiceService.getInvoiceItemCandidates(
-            params.id, params.orderNumbers, params.shipmentNumbers
+            params.id, jsonObject.orderNumbers, jsonObject.shipmentNumbers
         )
         render([data: invoiceItemCandidates] as JSON)
     }

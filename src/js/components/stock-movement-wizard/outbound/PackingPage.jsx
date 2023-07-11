@@ -29,7 +29,6 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const FIELDS = {
   packPageItems: {
     type: ArrayField,

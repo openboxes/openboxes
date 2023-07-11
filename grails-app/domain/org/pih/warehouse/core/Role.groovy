@@ -27,7 +27,7 @@ class Role implements Serializable, Comparable<Role> {
         id generator: 'uuid'
     }
 
-    String toString() { return "${roleType.name}" }
+    String toString() { return "${roleType?.name}" }
 
     static Role superuser() {
         Role.findByRoleType(RoleType.ROLE_SUPERUSER)

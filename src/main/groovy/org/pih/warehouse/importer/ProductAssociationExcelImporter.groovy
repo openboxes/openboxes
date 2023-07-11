@@ -9,10 +9,12 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
+@Transactional
 class ProductAssociationExcelImporter extends AbstractExcelImporter {
 
     static Map columnMap = [

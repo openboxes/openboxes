@@ -112,7 +112,7 @@ class StockMovements extends Component {
   get wizardTitle() {
     const { values } = this.state;
     if (!values.movementNumber && !values.trackingNumber) {
-      return '';
+      return [];
     }
     return [
       {

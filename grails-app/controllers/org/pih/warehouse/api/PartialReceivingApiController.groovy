@@ -171,7 +171,7 @@ class PartialReceivingApiController {
 
             // Bind the container
             PartialReceiptContainer partialReceiptContainer =
-                    partialReceipt.findPartialReceiptContainer(containerMap["container.id"])
+                    partialReceipt.findPartialReceiptContainer(containerMap.container?.id)
 
             if (!partialReceiptContainer) {
                 partialReceiptContainer = new PartialReceiptContainer()
@@ -194,7 +194,7 @@ class PartialReceivingApiController {
                 if (!partialReceiptItem || newLine) {
                     partialReceiptItem = new PartialReceiptItem()
                     partialReceiptItem.shipmentItem = ShipmentItem.get(shipmentItemId)
-                    partialReceiptItem.product = shipmentItemMap.get("product.id") ? Product.load(shipmentItemMap.get("product.id")) : null
+                    partialReceiptItem.product = shipmentItemMap?.product?.id ? Product.load(shipmentItemMap?.product?.id) : null
                     partialReceiptItem.isSplitItem = newLine
                     partialReceiptContainer.partialReceiptItems.add(partialReceiptItem)
                 }

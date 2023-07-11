@@ -2364,12 +2364,17 @@ class StockMovementService {
         }
 
         Container pallet = (palletName) ? shipment.findOrCreatePallet(palletName) : null
+        if (pallet) {
+            pallet.save(flush: true)
+        }
         Container box = (boxName) ? pallet.findOrCreateBox(boxName) : null
         return box ?: pallet ?: null
     }
 
     void createMissingShipmentItems(StockMovement stockMovement) {
-        Requisition requisition = stockMovement.requisition
+        // since there is possibility that requisition will be updated before the end of the transaction
+        // where changes will not yet be persisted, we want to refresh the requisition to get the latest version
+        Requisition requisition = stockMovement.requisition.refresh()
 
         if (requisition) {
             Shipment shipment = Shipment.findByRequisition(requisition)

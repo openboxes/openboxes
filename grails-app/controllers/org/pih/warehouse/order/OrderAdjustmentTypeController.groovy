@@ -9,6 +9,7 @@
 **/
 package org.pih.warehouse.order
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
 
 class OrderAdjustmentTypeController {
@@ -35,6 +36,7 @@ class OrderAdjustmentTypeController {
         return [orderAdjustmentType: orderAdjustmentType, locationInstance: location]
     }
 
+    @Transactional
     def save() {
         def orderAdjustmentType = new OrderAdjustmentType(params)
         if (orderAdjustmentType.save(flush: true)) {
@@ -46,6 +48,7 @@ class OrderAdjustmentTypeController {
         }
     }
 
+    @Transactional
     def update() {
         def orderAdjustmentType = OrderAdjustmentType.get(params.id)
         if (orderAdjustmentType) {
@@ -63,6 +66,7 @@ class OrderAdjustmentTypeController {
         }
     }
 
+    @Transactional
     def delete() {
         def orderAdjustmentType = OrderAdjustmentType.get(params.id)
         if (orderAdjustmentType) {

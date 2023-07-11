@@ -39,7 +39,8 @@ import org.docx4j.wml.Tc
 import org.docx4j.wml.Text
 import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
-import org.grails.core.DefaultGrailsDomainClass
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.pih.warehouse.FormatTagLib
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
@@ -55,6 +56,7 @@ class FileService {
 
     def userService
     GrailsApplication grailsApplication
+    def grailsDomainClassMappingContext
 
     File createDirectory(String directoryPath) {
         File folder = new File(directoryPath)
@@ -90,12 +92,12 @@ class FileService {
         Document wmlDocumentEl = (Document) documentPart.getJaxbElement()
 
         // Get document as XML string
-        def xml = XmlUtils.marshaltoString(wmlDocumentEl, true)
+        def xml = XmlUtils.marshaltoString(wmlDocumentEl, true, false)
 
         def dataMappings = getDataMappings(shipmentInstance)
 
         StrSubstitutor strSubstitutor = new StrSubstitutor(dataMappings)
-        Object obj = XmlUtils.unmarshalString(strSubstitutor.replace(xml));
+        Object obj = XmlUtils.unmarshalString(strSubstitutor.replace(xml))
 
         documentPart.setJaxbElement((Document) obj)
 
@@ -132,7 +134,7 @@ class FileService {
 
     Map getPackingList(Shipment shipment) {
 
-        def shipmentItems = shipment?.shipmentItems?.sort()
+        def shipmentItems = shipment?.sortShipmentItems()
         def data = shipmentItems.collect { ShipmentItem shipmentItem ->
             def parentContainer = shipmentItem?.container?.parentContainer
             def childContainer = shipmentItem?.container
@@ -145,12 +147,6 @@ class FileService {
                     quantity       : "${shipmentItem?.quantity} ${shipmentItem?.inventoryItem?.product?.unitOfMeasure ?: ''}",
             ]
         }
-
-        // FIXME Need to remove this once the container sort order bug is fixed
-        data = data.sort(new OrderBy([{NumberUtils.toInt(it.parentContainer, 0)},
-                                      {it?.parentContainer},
-                                      {it?.childContainer},
-                                      {it?.productName}]))
 
         def columns = [
                 parentContainer: [label: "Pack level 1", ratio: 0.75],
@@ -412,14 +408,15 @@ class FileService {
 
     def addObjectProperties(Map dataMappings, String prefix, Object object, Class domainClass) {
         if (object) {
-            new DefaultGrailsDomainClass(domainClass).persistentProperties.each { property ->
-                if (!property.isAssociation()) {
-                    log.info " [included] property " + property.name + " = " + property.naturalName + " " + property.fieldName
-                    String propertyName = prefix ? prefix + "." + property?.fieldName : property?.fieldName
-                    dataMappings.put(propertyName, object.properties[property.name])
+            PersistentEntity entityClass = grailsDomainClassMappingContext.getPersistentEntity(domainClass.name)
+            def entityAssociations = entityClass.getAssociations()
+            entityClass.persistentProperties.each { PersistentProperty property ->
+                if (entityAssociations.contains(property)) {
+                    log.info " [excluded] association " + property.name + " = " + property.capitilizedName + " " + property.name
                 } else {
-                    log.info " [excluded] association " + property.name + " = " + property.naturalName + " " + property.fieldName
-
+                    log.info " [included] property " + property.name + " = " + property.capitilizedName + " " + property.name
+                    String propertyName = prefix ? prefix + "." + property.name : property.name
+                    dataMappings.put(propertyName.toUpperCase(), object.properties[property.name] ?: "")
                 }
             }
         }
