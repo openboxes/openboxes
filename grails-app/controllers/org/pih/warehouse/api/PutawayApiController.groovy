@@ -92,7 +92,7 @@ class PutawayApiController {
 
     private Putaway bindPutawayData(Putaway putaway, User currentUser, Location currentLocation, JSONObject jsonObject) {
         // Bind the putaway
-        bindData(putaway, jsonObject)
+        bindData(putaway, jsonObject, [exclude: ['putawayItems']])
 
         if (!putaway.origin) {
             putaway.origin = currentLocation
