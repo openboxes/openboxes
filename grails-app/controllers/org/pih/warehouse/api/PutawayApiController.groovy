@@ -21,7 +21,6 @@ import org.pih.warehouse.order.Order
 /**
  * Should not extend BaseDomainApiController since stocklist is not a valid domain.
  */
-@Transactional
 class PutawayApiController {
 
     def identifierService

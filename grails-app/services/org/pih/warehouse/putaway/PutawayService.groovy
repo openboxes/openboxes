@@ -220,7 +220,7 @@ class PutawayService {
             }
         }
 
-        order.save(failOnError: true, flush: true)
+        order.save(failOnError: true)
         return order
     }
 
