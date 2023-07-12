@@ -226,7 +226,7 @@ class StockMovementApiController {
 
     def deleteStatus() {
         stockMovementService.rollbackStockMovement(params.id)
-        forward(action: "read")
+        redirect(action: "read", params: params)
     }
 
     /**
