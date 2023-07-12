@@ -463,9 +463,7 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
-        console.log("siemaa")
         $("#print-page").click(function(event){
-          console.log("siema")
           window.print();
           return false;
         });
