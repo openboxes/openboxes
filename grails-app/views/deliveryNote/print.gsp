@@ -9,7 +9,7 @@
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}"/>
     <title><warehouse:message code="default.show.label" args="[entityName]"/></title>
     <link rel="stylesheet" href="${resource(dir:'css',file:'buttons.css')}" type="text/css" media="all" />
-    <g:javascript library="jquery" plugin="jquery" />
+    <g:jquery />
 
     <style>
         @page { margin: .25in; }
@@ -463,7 +463,9 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
+        console.log("siemaa")
         $("#print-page").click(function(event){
+          console.log("siema")
           window.print();
           return false;
         });
