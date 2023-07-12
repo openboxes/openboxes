@@ -580,9 +580,9 @@ class StockMovementApiController {
         List<PackPageItem> packPageItems = new ArrayList<PackPageItem>()
         lineItems.each { lineItem ->
             PackPageItem packPageItem = new PackPageItem()
-            packPageItem.recipient = lineItem["recipient.id"] ? Person.load(lineItem["recipient.id"]) : null
-            packPageItem.palletName = lineItem["palletName"]
-            packPageItem.boxName = lineItem["boxName"]
+            packPageItem.recipient = lineItem.recipient?.id ? Person.load(lineItem.recipient?.id) : null
+            packPageItem.palletName = lineItem.palletName
+            packPageItem.boxName = lineItem.boxName
             packPageItem.quantityShipped = lineItem.quantityShipped ? new BigDecimal(lineItem.quantityShipped) : null
             packPageItem.shipmentItemId = lineItem.shipmentItemId
 
