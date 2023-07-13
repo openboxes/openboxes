@@ -28,4 +28,8 @@ class ProductTypeService {
         }
         return persistedProductType
     }
+
+    void delete(ProductType productType) {
+        productType.delete()
+    }
 }

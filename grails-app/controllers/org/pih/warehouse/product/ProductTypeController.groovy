@@ -83,7 +83,7 @@ class ProductTypeController {
     }
 
     def update() {
-        def productTypeInstance = ProductType.get(params.id)
+        ProductType productTypeInstance = ProductType.get(params.id)
         if (productTypeInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -104,7 +104,7 @@ class ProductTypeController {
                 params.displayedFields = params.list("displayedFields") as ProductField[]
             }
             productTypeInstance.properties = params
-            if (!productTypeInstance.hasErrors() && productTypeInstance.save(flush: true)) {
+            if (productTypeService.saveProductType(productTypeInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), productTypeInstance.id])}"
                 redirect(action: "list", id: productTypeInstance.id)
             }
@@ -125,7 +125,7 @@ class ProductTypeController {
             return
         }
 
-        def productTypeInstance = ProductType.get(params.id)
+        ProductType productTypeInstance = ProductType.get(params.id)
         if (productTypeInstance) {
             def existingProducts = Product.countByProductType(productTypeInstance)
             if (existingProducts) {
@@ -134,7 +134,7 @@ class ProductTypeController {
             }
 
             try {
-                productTypeInstance.delete(flush: true)
+                productTypeService.delete(productTypeInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
                 redirect(action: "list")
             }
