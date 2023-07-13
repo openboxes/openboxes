@@ -106,7 +106,7 @@ class ReplenishmentService {
             validateReplenishment(order)
         }
         if (order.hasErrors() || !order.save(failOnError: true)) {
-            throw new grails.validation.ValidationException("Invalid order", order.errors)
+            throw new ValidationException("Invalid order", order.errors)
         }
         return order
     }
