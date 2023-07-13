@@ -243,7 +243,7 @@ class ProductSupplierController {
                 productSupplierInstance.contractPrice = null
             }
 
-            if (!productSupplierInstance.hasErrors() && productSupplierInstance.save(flush: true)) {
+            if (productSupplierService.saveProductSupplier(productSupplierInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
                 if (params.dialog) {
@@ -266,7 +266,7 @@ class ProductSupplierController {
         if (productSupplierInstance) {
             def productInstance = productSupplierInstance.product
             try {
-                productSupplierInstance.delete(flush: true)
+                productSupplierService.deleteProductSupplier(productSupplierInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
             catch (Exception e) {
@@ -276,10 +276,8 @@ class ProductSupplierController {
             redirect(controller: "product", action: "edit", id: productInstance.id)
             return
         }
-        else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
-            redirect(action: "list")
-        }
+        flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
+        redirect(action: "list")
     }
 
     def dialog() {

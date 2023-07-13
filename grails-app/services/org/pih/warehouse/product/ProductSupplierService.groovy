@@ -6,6 +6,13 @@ import grails.gorm.transactions.Transactional
 class ProductSupplierService {
 
     ProductSupplier saveProductSupplier(ProductSupplier productSupplier) {
-        return productSupplier.save()
+        if (!productSupplier.hasErrors()) {
+            return productSupplier.save()
+        }
+        return null
+    }
+
+    void deleteProductSupplier(ProductSupplier productSupplier) {
+        productSupplier.delete()
     }
 }
