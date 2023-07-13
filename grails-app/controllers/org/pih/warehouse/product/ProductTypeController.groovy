@@ -10,13 +10,11 @@
 package org.pih.warehouse.product
 
 import grails.util.Holders
-import org.pih.warehouse.api.GenericApiService
 import org.springframework.dao.DataIntegrityViolationException
 
 class ProductTypeController {
 
     ProductTypeService productTypeService
-    GenericApiService genericApiService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -85,7 +83,7 @@ class ProductTypeController {
     }
 
     def update() {
-        ProductType productTypeInstance = genericApiService.getObject("productType", params.id) as ProductType
+        ProductType productTypeInstance = ProductType.get(params.id)
         if (productTypeInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -127,7 +125,7 @@ class ProductTypeController {
             return
         }
 
-        ProductType productTypeInstance = genericApiService.getObject("productType", params.id) as ProductType
+        ProductType productTypeInstance = ProductType.get(params.id)
         if (productTypeInstance) {
             def existingProducts = Product.countByProductType(productTypeInstance)
             if (existingProducts) {
