@@ -193,7 +193,7 @@ class StockMovementApiController {
             if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
                 if (stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) {
                     try {
-                        stockMovementService.deleteStockMovement(params.id)
+                        stockMovementService.deleteStockMovement(stockMovement)
                     } catch (Exception e) {
                         def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                         response.status = 400
