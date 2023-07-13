@@ -262,7 +262,7 @@ class StockMovement implements Validateable{
 
         // stock request /stockRequest/remove/:id
         if (electronicType) {
-            User user = AuthService.currentUser.get()
+            User user = AuthService.currentUser
             def accessRule = ConfigHelper.findAccessRule("stockRequest", "remove")
             def userService = Holders.grailsApplication.mainContext.getBean("userService")
             if (!userService.isUserInRole(user, accessRule?.accessRules?.minimumRequiredRole)) {
