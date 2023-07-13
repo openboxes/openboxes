@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.data
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.importer.ImportDataCommand
@@ -16,6 +17,7 @@ import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
 import java.text.SimpleDateFormat
 
+@Transactional
 class ProductSupplierPreferenceDataService {
 
     String DEFAULT = "DEFAULT"
