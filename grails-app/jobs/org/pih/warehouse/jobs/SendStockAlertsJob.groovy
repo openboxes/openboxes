@@ -14,18 +14,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.quartz.JobExecutionContext
 
-class SendStockAlertsJob {
+class SendStockAlertsJob extends SessionlessJob {
 
     def gparsService
     def locationService
     def notificationService
 
     static concurrent = false
-
-    // By default this is true on QuartzDisplayJob, which invokes execute()
-    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
-    // even if there is no session
-    static sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(SendStockAlertsJob),

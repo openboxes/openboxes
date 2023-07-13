@@ -2,16 +2,11 @@ package org.pih.warehouse.jobs
 
 import org.quartz.JobExecutionContext
 
-class RefreshTransactionFactJob {
+class RefreshTransactionFactJob extends SessionlessJob {
 
     def reportService
 
     static concurrent = false
-
-    // By default this is true on QuartzDisplayJob, which invokes execute()
-    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
-    // even if there is no session
-    static sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(RefreshTransactionFactJob),

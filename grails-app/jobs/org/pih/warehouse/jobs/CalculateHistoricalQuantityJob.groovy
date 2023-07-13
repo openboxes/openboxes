@@ -3,18 +3,13 @@ package org.pih.warehouse.jobs
 import grails.util.Holders
 import org.quartz.JobExecutionContext
 
-class CalculateHistoricalQuantityJob {
+class CalculateHistoricalQuantityJob extends SessionlessJob {
 
     static dates = []
     static enabled = true
     def inventorySnapshotService
 
     static concurrent = false
-
-    // By default this is true on QuartzDisplayJob, which invokes execute()
-    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
-    // even if there is no session
-    static sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(CalculateHistoricalQuantityJob),

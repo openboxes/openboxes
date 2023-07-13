@@ -4,16 +4,11 @@ import grails.util.Holders
 import org.pih.warehouse.order.OrderService
 import org.quartz.JobExecutionContext
 
-class RefreshOrderSummaryJob {
+class RefreshOrderSummaryJob extends SessionlessJob {
 
     OrderService orderService
 
     static concurrent = false
-
-    // By default this is true on QuartzDisplayJob, which invokes execute()
-    // and if sessionRequired is true, then QuartzDisplayJob tries to do session flush
-    // even if there is no session
-    static sessionRequired = false
 
     static triggers = {
         cron name: 'refreshOrderSummaryJobCronTrigger',
