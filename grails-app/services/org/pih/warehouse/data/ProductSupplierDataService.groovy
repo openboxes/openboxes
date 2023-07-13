@@ -143,10 +143,8 @@ class ProductSupplierDataService {
         log.info "Process data " + command.filename
 
         command.data.each { params ->
-            ProductSupplier.withNewSession {
-                ProductSupplier productSupplier = createOrUpdate(params)
-                productSupplier.save(failOnError: true)
-            }
+            ProductSupplier productSupplier = createOrUpdate(params)
+            productSupplier.save(failOnError: true)
         }
     }
 
