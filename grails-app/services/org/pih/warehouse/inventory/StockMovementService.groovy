@@ -1350,14 +1350,14 @@ class StockMovementService {
 
         picklistItems.each { picklistItemMap ->
 
-            PicklistItem picklistItem = picklistItemMap["id"] ?
-                    PicklistItem.get(picklistItemMap["id"]) : null
+            PicklistItem picklistItem = picklistItemMap.id ?
+                    PicklistItem.get(picklistItemMap.id) : null
 
-            InventoryItem inventoryItem = picklistItemMap["inventoryItem.id"] ?
-                    InventoryItem.get(picklistItemMap["inventoryItem.id"]) : null
+            InventoryItem inventoryItem = picklistItemMap.inventoryItem?.id ?
+                    InventoryItem.get(picklistItemMap.inventoryItem?.id) : null
 
-            Location binLocation = picklistItemMap["binLocation.id"] ?
-                    Location.get(picklistItemMap["binLocation.id"]) : null
+            Location binLocation = picklistItemMap.binLocation?.id ?
+                    Location.get(picklistItemMap.binLocation?.id) : null
 
             BigDecimal quantityPicked = (picklistItemMap.quantityPicked != null && picklistItemMap.quantityPicked != "") ?
                     new BigDecimal(picklistItemMap.quantityPicked) : null

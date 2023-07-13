@@ -57,7 +57,7 @@ class ReplenishmentApiController {
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
-        if (order.hasErrors() || !order.save(flush: true)) {
+        if (order.hasErrors()) {
             throw new ValidationException("Invalid order", order.errors)
         }
 
@@ -99,7 +99,7 @@ class ReplenishmentApiController {
     }
 
     Replenishment bindReplenishmentData(Replenishment replenishment, User currentUser, Location currentLocation, JSONObject jsonObject) {
-        bindData(replenishment, jsonObject)
+        bindData(replenishment, jsonObject, [exclude: ['replenishmentItems']])
 
         if (!replenishment.origin) {
             replenishment.origin = currentLocation
@@ -123,7 +123,7 @@ class ReplenishmentApiController {
 
         jsonObject.replenishmentItems.each { replenishmentItemMap ->
             ReplenishmentItem replenishmentItem = new ReplenishmentItem()
-            bindData(replenishmentItem, replenishmentItemMap)
+            bindData(replenishmentItem, replenishmentItemMap, [exclude: ['picklistItems']])
             if (!replenishmentItem.location) {
                 replenishmentItem.location = replenishment.destination
             }
