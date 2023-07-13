@@ -22,6 +22,7 @@ import AlertMessage from 'utils/AlertMessage';
 import apiClient, {
   parseResponse,
   stringUrlInterceptor,
+  handleError, handleSuccess,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
@@ -221,6 +222,10 @@ class PickPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.recreatePicklist = this.recreatePicklist.bind(this);
+    this.handleValidationErrors = this.handleValidationErrors.bind(this);
+
+    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
+
   }
 
   componentDidMount() {
@@ -427,6 +432,18 @@ class PickPage extends Component {
   validatePicklist() {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
     return apiClient.get(url);
+  }
+
+  // eslint-disable-next-line react/sort-comp
+  handleValidationErrors(error) {
+    if (error.response.status === 400) {
+      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      this.setState({ alertMessage, showAlert: true });
+
+      return Promise.reject(error);
+    }
+
+    return handleError(error);
   }
 
   validateReasonCodes(lineItems) {
