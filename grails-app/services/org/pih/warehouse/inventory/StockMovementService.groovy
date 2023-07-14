@@ -1234,9 +1234,7 @@ class StockMovementService {
                         requisitionItem?.product?.productCode,
                 ].toArray(), errorMessage)
 
-                // FIXME: Refactor this part to get rid of need to throw wrapped exception plus consider not allowing zeroing out picked stock
-                // Throw checked exception with ValidationException cause to not rollback deleted picklist while throwing unchecked exception
-                // See: https://pihemr.atlassian.net/browse/OBPIH-5318
+                // FIXME: consider not allowing zeroing out picked stock
                 throw new ValidationException(errorMessage, requisitionItem.errors)
             }
         }
