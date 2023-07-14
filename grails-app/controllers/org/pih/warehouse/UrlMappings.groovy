@@ -528,7 +528,7 @@ class UrlMappings {
 
         "/api/replenishments/$id/"(parseRequest: true) {
             controller = { "replenishmentApi" }
-            action = [GET: "read", PUT: "update"]
+            action = [GET: "read", POST: "update", PUT: "update"]
         }
 
         "/api/replenishments/$id/removeItem"(parseRequest: true) {

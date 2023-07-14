@@ -246,7 +246,7 @@ class ReplenishmentSecondPage extends Component {
       this.props.showSpinner();
       const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'APPROVED' };
-      apiClient.put(url, flattenRequest(payload))
+      apiClient.post(url, flattenRequest(payload))
         .then(() => {
           this.props.hideSpinner();
           this.props.nextPage(this.state.values.replenishment);

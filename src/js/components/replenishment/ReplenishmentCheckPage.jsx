@@ -210,7 +210,7 @@ class ReplenishmentSecondPage extends Component {
       this.props.showSpinner();
       const url = `/api/replenishments/${this.props.match.params.replenishmentId}`;
       const payload = { status: 'COMPLETED' };
-      apiClient.put(url, flattenRequest(payload))
+      apiClient.post(url, flattenRequest(payload))
         .then(() => {
           window.location = stringUrlInterceptor(`/stockTransfer/show/${this.props.match.params.replenishmentId}`);
           this.props.hideSpinner();
