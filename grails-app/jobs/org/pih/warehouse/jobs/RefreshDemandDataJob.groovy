@@ -2,11 +2,13 @@ package org.pih.warehouse.jobs
 
 import org.quartz.JobExecutionContext
 
-class RefreshDemandDataJob extends SessionlessJob {
+class RefreshDemandDataJob {
 
     def reportService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(RefreshDemandDataJob),

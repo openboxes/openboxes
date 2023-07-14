@@ -1,10 +1,12 @@
 package org.pih.warehouse.jobs
 
-class DataMigrationJob extends SessionlessJob {
+class DataMigrationJob {
 
     def migrationService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     static triggers = {}
 

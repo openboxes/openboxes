@@ -13,11 +13,13 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import org.quartz.JobExecutionContext
 
-class RefreshInventorySnapshotJob extends SessionlessJob {
+class RefreshInventorySnapshotJob {
 
     def inventorySnapshotService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}

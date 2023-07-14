@@ -11,11 +11,13 @@ package org.pih.warehouse.jobs
 
 import org.quartz.JobExecutionContext
 
-class RefreshProductAvailabilityJob extends SessionlessJob {
+class RefreshProductAvailabilityJob {
 
     def productAvailabilityService
 
     static concurrent = true
+
+    def sessionRequired = false
 
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}

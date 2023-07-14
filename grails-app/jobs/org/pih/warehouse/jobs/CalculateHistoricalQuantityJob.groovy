@@ -3,13 +3,15 @@ package org.pih.warehouse.jobs
 import grails.util.Holders
 import org.quartz.JobExecutionContext
 
-class CalculateHistoricalQuantityJob extends SessionlessJob {
+class CalculateHistoricalQuantityJob {
 
     static dates = []
     static enabled = true
     def inventorySnapshotService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(CalculateHistoricalQuantityJob),

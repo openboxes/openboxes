@@ -1,12 +1,15 @@
 package org.pih.warehouse.jobs
 
+import org.pih.warehouse.reporting.DateDimension
 import org.quartz.JobExecutionContext
 
-class RefreshStockoutDataJob extends SessionlessJob {
+class RefreshStockoutDataJob {
 
     def reportService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(RefreshStockoutDataJob),
@@ -15,11 +18,13 @@ class RefreshStockoutDataJob extends SessionlessJob {
 
     void execute(JobExecutionContext context) {
         if (JobUtils.shouldExecute(RefreshStockoutDataJob)) {
-            def startTime = System.currentTimeMillis()
-            log.info("Refreshing stockout data: " + context.mergedJobDataMap)
-            Date yesterday = new Date() - 1
-            reportService.buildStockoutFact(yesterday)
-            log.info "Refreshed stockout data in " + (System.currentTimeMillis() - startTime) + " ms"
+            DateDimension.withNewSession {
+                def startTime = System.currentTimeMillis()
+                log.info("Refreshing stockout data: " + context.mergedJobDataMap)
+                Date yesterday = new Date() - 1
+                reportService.buildStockoutFact(yesterday)
+                log.info "Refreshed stockout data in " + (System.currentTimeMillis() - startTime) + " ms"
+            }
         }
     }
 }

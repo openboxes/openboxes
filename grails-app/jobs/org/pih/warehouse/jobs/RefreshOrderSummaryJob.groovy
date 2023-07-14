@@ -4,11 +4,13 @@ import grails.util.Holders
 import org.pih.warehouse.order.OrderService
 import org.quartz.JobExecutionContext
 
-class RefreshOrderSummaryJob extends SessionlessJob {
+class RefreshOrderSummaryJob {
 
     OrderService orderService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     static triggers = {
         cron name: 'refreshOrderSummaryJobCronTrigger',

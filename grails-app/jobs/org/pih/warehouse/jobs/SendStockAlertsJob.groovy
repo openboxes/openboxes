@@ -14,13 +14,15 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
 import org.quartz.JobExecutionContext
 
-class SendStockAlertsJob extends SessionlessJob {
+class SendStockAlertsJob {
 
     def gparsService
     def locationService
     def notificationService
 
     static concurrent = false
+
+    def sessionRequired = false
 
     static triggers = {
         cron name: JobUtils.getCronName(SendStockAlertsJob),
