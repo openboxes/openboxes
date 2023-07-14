@@ -67,6 +67,13 @@ class OrganizationService {
         return organization
     }
 
+    Organization saveOrganization(Organization organization) {
+        if (!organization.hasErrors()) {
+            return organization.save()
+        }
+        return null
+    }
+
     Organization findOrCreateBuyerOrganization(String name, String code) {
         return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
     }
