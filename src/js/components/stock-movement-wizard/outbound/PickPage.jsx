@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import axios from 'axios';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
@@ -19,10 +20,13 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import AlertMessage from 'utils/AlertMessage';
-import apiClient, {
+import {
+  handleError,
+  handleSuccess,
   parseResponse,
   stringUrlInterceptor,
-  handleError, handleSuccess,
+  urlInterceptor,
+  justRejectRequestError
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
@@ -194,6 +198,8 @@ const FIELDS = {
   },
 };
 
+const apiClient = axios.create({});
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
  * The forth step of stock movement(for movements from a depot) where user
@@ -225,7 +231,7 @@ class PickPage extends Component {
     this.handleValidationErrors = this.handleValidationErrors.bind(this);
 
     apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
-
+    apiClient.interceptors.request.use(urlInterceptor, justRejectRequestError);
   }
 
   componentDidMount() {
@@ -247,6 +253,17 @@ class PickPage extends Component {
     if (nextProps.currentLocale !== this.props.currentLocale) {
       this.props.fetchReasonCodes();
     }
+  }
+
+  handleValidationErrors(error) {
+    if (error.response.status === 400) {
+      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+      this.setState({ alertMessage, showAlert: true });
+
+      return Promise.reject(error);
+    }
+
+    return handleError(error);
   }
 
   setPickPageItems(response, startIndex) {
@@ -432,18 +449,6 @@ class PickPage extends Component {
   validatePicklist() {
     const url = `/api/stockMovements/${this.state.values.stockMovementId}/validatePicklist`;
     return apiClient.get(url);
-  }
-
-  // eslint-disable-next-line react/sort-comp
-  handleValidationErrors(error) {
-    if (error.response.status === 400) {
-      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
-      this.setState({ alertMessage, showAlert: true });
-
-      return Promise.reject(error);
-    }
-
-    return handleError(error);
   }
 
   validateReasonCodes(lineItems) {

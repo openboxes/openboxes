@@ -9,7 +9,7 @@ import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
 import NotificationType from 'consts/notificationTypes';
 
-const justRejectRequestError = (error) => Promise.reject(error);
+export const justRejectRequestError = (error) => Promise.reject(error);
 
 const apiClient = axios.create({});
 
@@ -107,7 +107,7 @@ export const handleError = (error) => {
 // TODO: This is temporary cleaner. Once migration is complete it should be removed
 const cleanUrlFromContextPath = (url) => url.replace('/openboxes', '');
 
-const urlInterceptor = (config) => {
+export const urlInterceptor = (config) => {
   const contextPath = window.CONTEXT_PATH;
   const cleanedUrl = _.trimStart(config.url ? cleanUrlFromContextPath(config.url) : '', '/');
 

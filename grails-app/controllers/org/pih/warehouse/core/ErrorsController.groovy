@@ -97,12 +97,12 @@ class ErrorsController {
     def handleValidationErrors() {
         if (RequestUtil.isAjax(request)) {
             response.status = 400
-            BeanPropertyBindingResult errors = request?.exception?.cause?.errors
+            BeanPropertyBindingResult errors = request?.exception?.cause?.target?.errors ?: request?.exception?.cause?.errors
             List<String> errorMessages = errors.allErrors.collect {
                 return g.message(error: it, locale: localizationService.currentLocale)
             }
             render([errorCode: 400,
-                    errorMessage: "Validation error. " + request?.exception?.cause?.fullMessage,
+                    errorMessage: "Validation error. " + request?.exception?.cause?.target?.fullMessage ?: request?.exception?.cause?.fullMessage,
                     errorMessages: errorMessages
             ] as JSON)
             return
