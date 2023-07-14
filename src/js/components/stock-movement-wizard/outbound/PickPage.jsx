@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import axios from 'axios';
 import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import fileDownload from 'js-file-download';
@@ -21,19 +20,17 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import AlertMessage from 'utils/AlertMessage';
 import {
-  handleError,
+  apiClientCustomResponseHandler as apiClient,
   handleSuccess,
+  handleValidationErrors,
   parseResponse,
   stringUrlInterceptor,
-  urlInterceptor,
-  justRejectRequestError
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const FIELDS = {
   pickPageItems: {
@@ -198,8 +195,6 @@ const FIELDS = {
   },
 };
 
-const apiClient = axios.create({});
-
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["checkForInitialPicksChanges"] }] */
 /**
  * The forth step of stock movement(for movements from a depot) where user
@@ -228,10 +223,9 @@ class PickPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.recreatePicklist = this.recreatePicklist.bind(this);
-    this.handleValidationErrors = this.handleValidationErrors.bind(this);
+    this.setState = this.setState.bind(this);
 
-    apiClient.interceptors.response.use(handleSuccess, this.handleValidationErrors);
-    apiClient.interceptors.request.use(urlInterceptor, justRejectRequestError);
+    apiClient.interceptors.response.use(handleSuccess, handleValidationErrors(this.setState));
   }
 
   componentDidMount() {
@@ -253,17 +247,6 @@ class PickPage extends Component {
     if (nextProps.currentLocale !== this.props.currentLocale) {
       this.props.fetchReasonCodes();
     }
-  }
-
-  handleValidationErrors(error) {
-    if (error.response.status === 400) {
-      const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
-      this.setState({ alertMessage, showAlert: true });
-
-      return Promise.reject(error);
-    }
-
-    return handleError(error);
   }
 
   setPickPageItems(response, startIndex) {

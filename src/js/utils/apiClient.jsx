@@ -12,6 +12,7 @@ import NotificationType from 'consts/notificationTypes';
 export const justRejectRequestError = (error) => Promise.reject(error);
 
 const apiClient = axios.create({});
+export const apiClientCustomResponseHandler = axios.create({});
 
 export function parseResponse(data) {
   if (_.isArray(data)) {
@@ -125,7 +126,23 @@ export const stringUrlInterceptor = (url) => {
   return config.url;
 };
 
+export const handleValidationErrors = (setState) => (error) => {
+  if (error.response.status === 400) {
+    const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+    setState({ alertMessage, showAlert: true });
+
+    return Promise.reject(error);
+  }
+
+  return handleError(error);
+};
+
 apiClient.interceptors.response.use(handleSuccess, handleError);
 apiClient.interceptors.request.use(urlInterceptor, justRejectRequestError);
+
+apiClientCustomResponseHandler.interceptors.request.use(
+  urlInterceptor,
+  justRejectRequestError,
+);
 
 export default apiClient;
