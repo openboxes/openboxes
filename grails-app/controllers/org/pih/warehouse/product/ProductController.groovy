@@ -31,8 +31,8 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.importer.ProductSynonymExcelImporter
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import javax.activation.MimetypesFileTypeMap
 import java.math.RoundingMode
@@ -1141,7 +1141,7 @@ class ProductController {
         if (request.method == "POST") {
             File localFile = null
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
-            CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file")
+            MultipartFile uploadFile = mpr.getFile("file")
 
             if (uploadFile?.empty) {
                 flash.error = "Please upload a non-empty file"
