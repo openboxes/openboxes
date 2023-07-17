@@ -57,9 +57,6 @@ class ReplenishmentApiController {
 
         bindReplenishmentData(replenishment, currentUser, currentLocation, jsonObject)
         Order order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
-        if (order.hasErrors()) {
-            throw new ValidationException("Invalid order", order.errors)
-        }
 
         picklistService.createPicklist(order)
 
@@ -90,9 +87,6 @@ class ReplenishmentApiController {
             replenishmentService.completeReplenishment(replenishment)
         } else {
             order = replenishmentService.createOrUpdateOrderFromReplenishment(replenishment)
-            if (order.hasErrors() || !order.save(flush: true)) {
-                throw new ValidationException("Invalid order", order.errors)
-            }
         }
 
         render status: 200
@@ -115,10 +109,6 @@ class ReplenishmentApiController {
 
         if (!replenishment.replenishmentNumber) {
             replenishment.replenishmentNumber = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix + identifierService.generateOrderIdentifier()
-        }
-
-        if (jsonObject.status) {
-            replenishment.status = ReplenishmentStatus.valueOf(jsonObject.status)
         }
 
         jsonObject.replenishmentItems.each { replenishmentItemMap ->

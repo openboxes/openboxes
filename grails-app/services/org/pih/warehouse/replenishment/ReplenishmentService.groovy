@@ -105,8 +105,9 @@ class ReplenishmentService {
         } else {
             validateReplenishment(order)
         }
-
-        order.save(failOnError: true)
+        if (order.hasErrors() || !order.save(failOnError: true)) {
+            throw new ValidationException("Invalid order", order.errors)
+        }
         return order
     }
 
