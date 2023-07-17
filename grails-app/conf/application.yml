@@ -315,7 +315,7 @@ openboxes:
         product:
             format: "LLNN"
         productSupplier:
-            format: "LLNN"
+            format: "NNNN"
             prefix:
                 enabled: true
         receipt:
