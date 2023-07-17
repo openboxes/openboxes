@@ -316,6 +316,8 @@ openboxes:
             format: "LLNN"
         productSupplier:
             format: "LLNN"
+            prefix:
+                enabled: true
         receipt:
             format: "NNNLLL"
         requisition:
