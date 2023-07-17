@@ -22,6 +22,8 @@ class SendStockAlertsJob {
 
     static concurrent = false
 
+    def sessionRequired = false
+
     static triggers = {
         cron name: JobUtils.getCronName(SendStockAlertsJob),
             cronExpression: JobUtils.getCronExpression(SendStockAlertsJob)

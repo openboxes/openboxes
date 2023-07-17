@@ -8,6 +8,8 @@ class RefreshDemandDataJob {
 
     static concurrent = false
 
+    def sessionRequired = false
+
     static triggers = {
         cron name: JobUtils.getCronName(RefreshDemandDataJob),
             cronExpression: JobUtils.getCronExpression(RefreshDemandDataJob)

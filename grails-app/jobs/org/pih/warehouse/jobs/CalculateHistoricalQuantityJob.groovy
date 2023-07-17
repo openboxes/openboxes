@@ -11,6 +11,8 @@ class CalculateHistoricalQuantityJob {
 
     static concurrent = false
 
+    def sessionRequired = false
+
     static triggers = {
         cron name: JobUtils.getCronName(CalculateHistoricalQuantityJob),
             cronExpression: JobUtils.getCronExpression(CalculateHistoricalQuantityJob)
@@ -24,7 +26,7 @@ class CalculateHistoricalQuantityJob {
             if (!dates) {
                 // Filter down to the transaction dates within the last 18 months
                 def daysToProcess = Holders.getConfig().getProperty("openboxes.jobs.calculateHistoricalQuantityJob.daysToProcess")
-                def startDate = new Date() - daysToProcess
+                def startDate = new Date() - (daysToProcess ? Integer.parseInt(daysToProcess) : 0)
                 def transactionDates = inventorySnapshotService.getTransactionDates()
                 transactionDates = transactionDates.findAll { it >= startDate }
                 dates = transactionDates.reverse()

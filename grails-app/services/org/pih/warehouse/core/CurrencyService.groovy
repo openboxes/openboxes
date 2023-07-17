@@ -10,6 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
 
 class CurrencyService {
@@ -32,6 +33,7 @@ class CurrencyService {
         return data
     }
 
+    @Transactional
     def updateExchangeRates() {
         def data = getExchangeRates()
         data.rates.each { String toUom, BigDecimal value ->

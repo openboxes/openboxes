@@ -1,5 +1,6 @@
 package org.pih.warehouse.jobs
 
+import org.pih.warehouse.reporting.DateDimension
 import org.quartz.JobExecutionContext
 
 class RefreshTransactionFactJob {
@@ -8,6 +9,8 @@ class RefreshTransactionFactJob {
 
     static concurrent = false
 
+    def sessionRequired = false
+
     static triggers = {
         cron name: JobUtils.getCronName(RefreshTransactionFactJob),
             cronExpression: JobUtils.getCronExpression(RefreshTransactionFactJob)
@@ -15,11 +18,13 @@ class RefreshTransactionFactJob {
 
     void execute(JobExecutionContext context) {
         if (JobUtils.shouldExecute(RefreshTransactionFactJob)) {
-            log.info("Refresh transaction fact and dimensions: " + context.mergedJobDataMap)
-            def startTime = System.currentTimeMillis()
-            reportService.buildDimensions()
-            reportService.buildFacts()
-            log.info "Refreshed transaction fact and dimensions: ${(System.currentTimeMillis() - startTime)} ms"
+            DateDimension.withNewSession {
+                log.info("Refresh transaction fact and dimensions: " + context.mergedJobDataMap)
+                def startTime = System.currentTimeMillis()
+                reportService.buildDimensions()
+                reportService.buildFacts()
+                log.info "Refreshed transaction fact and dimensions: ${(System.currentTimeMillis() - startTime)} ms"
+            }
         }
     }
 }

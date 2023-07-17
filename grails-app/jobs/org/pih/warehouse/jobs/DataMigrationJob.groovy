@@ -6,6 +6,8 @@ class DataMigrationJob {
 
     static concurrent = false
 
+    def sessionRequired = false
+
     static triggers = {}
 
     void execute() {

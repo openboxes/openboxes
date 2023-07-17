@@ -1,8 +1,12 @@
 package org.pih.warehouse.jobs
 
+import org.pih.warehouse.product.Product
+
 class AssignIdentifierJob {
 
     def identifierService
+
+    def sessionRequired = false
 
     static concurrent = false
 
@@ -16,11 +20,13 @@ class AssignIdentifierJob {
             return
         }
 
-        identifierService.assignProductIdentifiers()
-        identifierService.assignShipmentIdentifiers()
-        identifierService.assignReceiptIdentifiers()
-        identifierService.assignOrderIdentifiers()
-        identifierService.assignRequisitionIdentifiers()
-        identifierService.assignTransactionIdentifiers()
+        Product.withNewSession {
+            identifierService.assignProductIdentifiers()
+            identifierService.assignShipmentIdentifiers()
+            identifierService.assignReceiptIdentifiers()
+            identifierService.assignOrderIdentifiers()
+            identifierService.assignRequisitionIdentifiers()
+            identifierService.assignTransactionIdentifiers()
+        }
     }
 }

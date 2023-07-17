@@ -10,6 +10,8 @@ class RefreshOrderSummaryJob {
 
     static concurrent = false
 
+    def sessionRequired = false
+
     static triggers = {
         cron name: 'refreshOrderSummaryJobCronTrigger',
                 cronExpression: Holders.config.openboxes.jobs.refreshOrderSummaryJob.cronExpression

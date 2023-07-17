@@ -17,6 +17,8 @@ class RefreshProductAvailabilityJob {
 
     static concurrent = true
 
+    def sessionRequired = false
+
     // Should never be triggered on a schedule - should only be triggered by persistence event listener
     static triggers = {}
 
