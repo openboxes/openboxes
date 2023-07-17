@@ -504,10 +504,10 @@ class PutAwaySecondPage extends Component {
    */
   generatePutAwayList() {
     this.props.showSpinner();
-    const url = '/putAway/generatePdf';
+    const url = `/putAway/generatePdf/${this.state.putAway.id}`;
     const { putawayNumber } = this.state.putAway;
 
-    return apiClient.post(url, this.state.putAway, { responseType: 'blob' })
+    return apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, `PutawayReport${putawayNumber ? `-${putawayNumber}` : ''}.pdf`, 'application/pdf');
         this.fetchItems(this.state.sortBy);
