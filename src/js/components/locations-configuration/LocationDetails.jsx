@@ -355,7 +355,12 @@ class LocationDetails extends Component {
         locationUrl = `/api/locations?useDefaultActivities=${this.state.useDefaultActivities}`;
       }
 
-      apiClient.post(locationUrl, values)
+      const payload = {
+        ...values,
+        supportedActivities: _.map(values.supportedActivities, val => val.value),
+      };
+
+      apiClient.post(locationUrl, payload)
         .then((response) => {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
