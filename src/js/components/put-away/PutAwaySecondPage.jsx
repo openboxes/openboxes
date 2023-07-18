@@ -12,6 +12,7 @@ import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { PUTAWAY_GENERATE_PDF } from 'api/urls';
 import SplitLineModal from 'components/put-away/SplitLineModal';
 import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
@@ -21,7 +22,6 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
-
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
 
@@ -504,10 +504,9 @@ class PutAwaySecondPage extends Component {
    */
   generatePutAwayList() {
     this.props.showSpinner();
-    const url = `/putAway/generatePdf/${this.state.putAway.id}`;
     const { putawayNumber } = this.state.putAway;
 
-    return apiClient.get(url, { responseType: 'blob' })
+    return apiClient.get(PUTAWAY_GENERATE_PDF(this.state.putAway.id), { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, `PutawayReport${putawayNumber ? `-${putawayNumber}` : ''}.pdf`, 'application/pdf');
         this.fetchItems(this.state.sortBy);
