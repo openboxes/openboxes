@@ -3,6 +3,7 @@
 <html>
 <head>
     <meta name="layout" content="print"/>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'print.css')}" type="text/css"
           media="print, screen, projection"/>
     <g:set var="entityName" value="${warehouse.message(code: 'requisition.label', default: 'Requisition')}"/>
@@ -273,7 +274,7 @@
         </td>
     </tr>
 </table>
-<script>
+<script type="text/javascript">
     $(document).ready(function () {
         $('.nailthumb').nailthumb({ width: 100, height: 60 });
         $('.nailthumb-100').nailthumb({ width: 100, height: 100 });
