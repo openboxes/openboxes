@@ -47,18 +47,18 @@ class ProductAssociationDataService {
                 // So we need to make sure that none of those associations will collide with one another (like 1-st entry)
                 if (params.hasMutualAssociation || it.hasMutualAssociation) {
                     return  (
-                            params['product.id'] == it['product.id'] &&
-                            params['associatedProduct.id'] == it['associatedProduct.id'] &&
+                            params['product'] == it['product'] &&
+                            params['associatedProduct'] == it['associatedProduct'] &&
                             params['code'] == it['code']
                         ) || (
-                            params['product.id'] == it['associatedProduct.id'] &&
-                            params['associatedProduct.id'] == it['product.id'] &&
+                            params['product'] == it['associatedProduct'] &&
+                            params['associatedProduct'] == it['product'] &&
                             params['code'] == it['code']
                         )
                 }
                 // if it is not a mutual association we can check for exact duplicate
-                return params['product.id'] == it['product.id'] &&
-                       params['associatedProduct.id'] == it['associatedProduct.id'] &&
+                return params['product'] == it['product'] &&
+                       params['associatedProduct'] == it['associatedProduct'] &&
                        params['code'] == it['code']
             }
             if (indexOfDuplicate >= 0) {
