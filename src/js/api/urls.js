@@ -58,3 +58,6 @@ export const ORDER_SHOW = id => `${ORDER}/show/${id}`;
 
 // REPLENISHMENT
 export const REPLENISHMENT_PRINT = id => `${CONTEXT_PATH}/replenishment/print/${id}`;
+
+// PUTAWAY
+export const PUTAWAY_GENERATE_PDF = id => `/putAway/generatePdf/${id}`;
