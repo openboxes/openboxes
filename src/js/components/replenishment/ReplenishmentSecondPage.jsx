@@ -9,6 +9,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { REPLENISHMENT_PRINT } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -258,8 +259,7 @@ class ReplenishmentSecondPage extends Component {
   }
 
   printTransferOrder() {
-    const url = `/replenishment/print/${this.props.match.params.replenishmentId}`;
-    window.open(url, '_blank');
+    window.open(REPLENISHMENT_PRINT(this.props.match.params.replenishmentId), '_blank');
   }
 
   revertUserPick(itemId) {
