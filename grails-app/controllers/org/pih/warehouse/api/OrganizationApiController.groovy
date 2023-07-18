@@ -41,9 +41,7 @@ class OrganizationApiController extends BaseDomainApiController {
         Organization organization = new Organization()
         bindOrganizationData(organization, jsonObject)
 
-        if (!organizationService.saveOrganization(organization)) {
-            throw new ValidationException("Invalid organization", organization.errors)
-        }
+        organizationService.saveOrganization(organization)
 
         render([data: [id: organization.id]] as JSON)
     }
