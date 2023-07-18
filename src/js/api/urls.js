@@ -16,6 +16,7 @@ export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
 export const STOCK_TRANSFER_DELETE = id => `${STOCK_TRANSFER_API}/${id}`;
+export const STOCK_TRANSFER_PRINT = id => `${CONTEXT_PATH}/stockTransfer/print/${id}`;
 
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
@@ -54,3 +55,6 @@ export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
 // ORDER
 export const ORDER = `${CONTEXT_PATH}/order`;
 export const ORDER_SHOW = id => `${ORDER}/show/${id}`;
+
+// REPLENISHMENT
+export const REPLENISHMENT_PRINT = id => `${CONTEXT_PATH}/replenishment/print/${id}`;

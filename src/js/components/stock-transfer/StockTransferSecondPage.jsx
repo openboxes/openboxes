@@ -10,6 +10,7 @@ import ReactTable from 'react-table';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { STOCK_TRANSFER_PRINT } from 'api/urls';
 import { extractStockTransferItems, prepareRequest } from 'components/stock-transfer/utils';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
@@ -387,11 +388,9 @@ class StockTransferSecondPage extends Component {
   }
 
   printStockTransfer() {
-    const url = `/stockTransfer/print/${this.props.match.params.stockTransferId}`;
-
     this.saveStockTransfer(
       this.state.stockTransfer,
-      () => window.open(url, '_blank'),
+      () => window.open(STOCK_TRANSFER_PRINT(this.props.match.params.stockTransferId), '_blank'),
     );
   }
 
