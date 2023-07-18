@@ -608,6 +608,7 @@ class ReportController {
             }
             response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
             render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
+            return
         }
 
         render(view: 'showInventoryByLocationReport', model: [command: command])
