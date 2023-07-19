@@ -68,10 +68,7 @@ class OrganizationService {
     }
 
     Organization saveOrganization(Organization organization) {
-        if (organization.validate() && !organization.hasErrors()) {
-            return organization.save()
-        }
-        throw new ValidationException("Invalid organization", organization.errors)
+        return organization.save(failOnError: true)
     }
 
     Organization findOrCreateBuyerOrganization(String name, String code) {
