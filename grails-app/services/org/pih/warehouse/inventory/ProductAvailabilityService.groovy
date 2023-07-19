@@ -881,7 +881,7 @@ class ProductAvailabilityService {
                 'in'("productType", command.productTypes)
                 if (!command.showOutOfStockProducts) {
                     // Read: 0 is less than result from subquery
-                    add Subqueries.lt(0, aggregatedQuantityQuery)
+                    add Subqueries.lt(0L, aggregatedQuantityQuery)
                 }
             }
             // Or apply default product type restrictions:
