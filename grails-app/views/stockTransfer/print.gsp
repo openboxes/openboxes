@@ -27,7 +27,7 @@
     <hr/>
 </div>
 
-<g:set var="enablePageBreak" value="${params.pageBreak != 'Disable page break'}"/>
+<g:set var="enablePageBreak" value="${params.pageBreak == 'Enable page break'}"/>
 
 <table border="0">
     <tr>
@@ -137,8 +137,8 @@
         </td>
     </tr>
 </table>
-<script>
-    $(document).ready(function () {
+<script type="text/javascript">
+  $(document).ready(function () {
         $('.nailthumb').nailthumb({ width: 100, height: 60 });
         $('.nailthumb-100').nailthumb({ width: 100, height: 100 });
 
