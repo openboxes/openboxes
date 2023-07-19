@@ -24,7 +24,7 @@ class ProductSupplierController {
     def dataService
     def documentService
     def identifierService
-    ProductSupplierService productSupplierService
+    ProductSupplierDataService productSupplierGormService
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
@@ -121,7 +121,7 @@ class ProductSupplierController {
             }
         }
 
-        if (productSupplierService.saveProductSupplier(productSupplierInstance)) {
+        if (productSupplierGormService.save(productSupplierInstance)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
             if (params.dialog) {
@@ -243,7 +243,7 @@ class ProductSupplierController {
                 productSupplierInstance.contractPrice = null
             }
 
-            if (productSupplierService.saveProductSupplier(productSupplierInstance)) {
+            if (productSupplierGormService.save(productSupplierInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
                 if (params.dialog) {
@@ -266,7 +266,7 @@ class ProductSupplierController {
         if (productSupplierInstance) {
             def productInstance = productSupplierInstance.product
             try {
-                productSupplierService.deleteProductSupplier(productSupplierInstance)
+                productSupplierGormService.delete(productSupplierInstance.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
             catch (Exception e) {
