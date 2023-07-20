@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { ORDER_SHOW, STOCK_MOVEMENT_SHOW } from 'api/urls';
 import DocumentButton from 'components/DocumentButton';
 import ArrayField from 'components/form-elements/ArrayField';
 import DateField from 'components/form-elements/DateField';
@@ -122,7 +123,7 @@ const INVOICE_ITEMS = {
           const orderId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].orderId;
-          return { url: orderId ? `/order/show/${orderId}` : '' };
+          return { url: orderId ? ORDER_SHOW(orderId) : '' };
         },
       },
       shipmentNumber: {
@@ -134,7 +135,7 @@ const INVOICE_ITEMS = {
           const shipmentId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? `/stockMovement/show/${shipmentId}` : '' };
+          return { url: shipmentId ? STOCK_MOVEMENT_SHOW(shipmentId) : '' };
         },
       },
       budgetCode: {
