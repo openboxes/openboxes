@@ -157,7 +157,7 @@ class ProductSupplierController {
     }
 
     def update() {
-        def productSupplierInstance = ProductSupplier.get(params.id)
+        def productSupplierInstance = productSupplierGormService.get(params.id)
         Location location = Location.get(session.warehouse.id)
         ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
         ProductSupplierPreference productSupplierPreference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
@@ -262,7 +262,7 @@ class ProductSupplierController {
     }
 
     def delete() {
-        def productSupplierInstance = ProductSupplier.get(params.id)
+        def productSupplierInstance = productSupplierGormService.get(params.id)
         if (productSupplierInstance) {
             def productInstance = productSupplierInstance.product
             try {
