@@ -1,8 +1,11 @@
-[![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
+![unit tests](https://github.com/openboxes/openboxes/actions/workflows/unit-tests.yml/badge.svg)
+![integration tests](https://github.com/openboxes/openboxes/actions/workflows/integration-tests.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
+![dbdocs](https://github.com/openboxes/openboxes/actions/workflows/dbdocs.yml/badge.svg)
+![docker image](https://github.com/openboxes/openboxes/actions/workflows/docker-image.yml/badge.svg)
 [![Financial Contributors on Open Collective](https://opencollective.com/openboxes/all/badge.svg?label=financial+contributors)](https://opencollective.com/openboxes) 
-[![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Join the chat at https://gitter.im/openboxes/openboxes](https://badges.gitter.im/openboxes/openboxes.svg)](https://gitter.im/openboxes/openboxes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+[![Join the chat at https://gitter.im/openboxes/openboxes](https://badges.gitter.im/openboxes/openboxes.svg)](https://gitter.im/openboxes/openboxes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OpenBoxes
 =========
@@ -16,7 +19,7 @@ OpenBoxes is an Open Source Inventory and Supply Chain Management System. The in
 ### Code Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="https://github.com/openboxes/openboxes/graphs/contributors"><img src="https://opencollective.com/openboxes/contributors.svg?width=890&button=false" /></a>
+<a href="https://github.com/openboxes/openboxes/graphs/contributors"><img src="https://opencollective.com/openboxes/contributors.svg?width=890&button=true" /></a>
 
 ### Financial Contributors
 
@@ -51,7 +54,23 @@ By using this software in any fashion, you are agreeing to be bound by
 the terms of this license.
 You must not remove this notice, or any other, from this software.
 
-## Deploy to your Azure VPC
+## Deployment Options
+
+We currently support deploying the OpenBoxes application to DigitalOcean and Azure. We would like to support other deployment options like Amazon Web Services, Vultr, Linode, and others but don't have the resources to build and maintain these deployment options at the moment. If interested in other deployment options, please participate in the [discussion here](https://community.openboxes.com/t/adding-openboxes-to-linode/761) to help us better understand your requirements and expectations regarding deployment. For instance, it would be helpful to hear from service providers who would like to manage multiple customers or users who aren't tech savvy but prefer a certain deployment platform because of its ease of use.
+
+### Deploy to DigitalOcean
+
+The *Deploy to DigitalOcean* button will redirect you to DigitalOcean, where you will be able to choose 
+
+For more information and step-by-step instructions go to: 
+https://community.openboxes.com/t/install-openboxes-via-digitalocean-marketplace/311
+
+For our DigitalOcean marketplace app go to:
+https://marketplace.digitalocean.com/apps/openboxes-server?refcode=da4712a483b4
+
+[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://marketplace.digitalocean.com/apps/openboxes-server?refcode=da4712a483b4&action=deploy)
+
+### Deploy to Azure
 
 *Deploy to Azure* button will bring you to Azure portal, where after filling a few of the properties you can get your OpenBoxes environment in a matter of minutes. In the Azure setup screen, look at each property's tooltip description to understand its purpose.
 
