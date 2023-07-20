@@ -294,6 +294,13 @@ class StockTransferService {
         return order.save(flush: true)
     }
 
+    void deleteStockTransfer(def stockMovement) {
+        Order order = stockMovement?.order
+        stockMovement?.order = null
+        stockMovement?.shipment = null
+        orderService.deleteOrder(order)
+    }
+
     void deleteStockTransfer(String id) {
         Order order = Order.get(id)
         if (!order) {

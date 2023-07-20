@@ -174,7 +174,7 @@ class StockMovementApiController {
              * and remove it through stockTransferService
              * */
             try {
-                stockTransferService.deleteStockTransfer(params.id)
+                stockTransferService.deleteStockTransfer(stockMovement)
             } catch (Exception e) {
                 def message = "${g.message(code: 'stockMovement.delete.error.message', default: 'The Stock Movement could not be deleted')}"
                 response.status = 400
