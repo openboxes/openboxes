@@ -1,4 +1,4 @@
-<%@ page import="org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.PagedResultList; org.pih.warehouse.core.Location" %>
 <%@ page import="org.pih.warehouse.product.Product" %>
 <html>
     <head>
@@ -151,7 +151,7 @@
 
 								</form>
 							</div>
-							<g:if test="${commandInstance?.searchResults instanceof grails.orm.PagedResultList}">
+							<g:if test="${commandInstance?.searchResults instanceof PagedResultList}">
 								<div class="paginateButtons">
 
 									<g:paginate total="${commandInstance?.searchResults?.totalCount}"
