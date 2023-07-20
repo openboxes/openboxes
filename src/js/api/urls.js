@@ -8,10 +8,12 @@ export const PURCHASE_ORDER_DELETE = id => `${PURCHASE_ORDER_API}/${id}`;
 export const PURCHASE_ORDER_ROLLBACK_ORDER = id => `${PURCHASE_ORDER_API}/${id}/rollback`;
 
 // STOCK MOVEMENT
+export const STOCK_MOVEMENT = `${CONTEXT_PATH}/stockMovement`;
 export const STOCK_MOVEMENT_API = `${API}/stockMovements`;
 export const STOCK_MOVEMENT_DELETE = id => `${STOCK_MOVEMENT_API}/${id}`;
 export const STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS = `${STOCK_MOVEMENT_API}/pendingRequisitionItems`;
 export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems`;
+export const STOCK_MOVEMENT_SHOW = id => `${STOCK_MOVEMENT}/show/${id}`;
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;

@@ -7,6 +7,7 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { ORDER_SHOW, STOCK_MOVEMENT_SHOW } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
@@ -52,7 +53,7 @@ const FIELDS = {
           const orderId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].orderId;
-          return { url: orderId ? `/order/show/${orderId}` : '' };
+          return { url: orderId ? ORDER_SHOW(orderId) : '' };
         },
       },
       shipmentNumber: {
@@ -64,7 +65,7 @@ const FIELDS = {
           const shipmentId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? `/stockMovement/show/${shipmentId}` : '' };
+          return { url: shipmentId ? STOCK_MOVEMENT_SHOW(shipmentId) : '' };
         },
       },
       budgetCode: {
