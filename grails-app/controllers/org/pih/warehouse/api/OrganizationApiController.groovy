@@ -35,31 +35,8 @@ class OrganizationApiController extends BaseDomainApiController {
         render([data: organization] as JSON)
     }
 
-    def create() {
-        JSONObject jsonObject = request.JSON
-
-        Organization organization = new Organization()
-        bindOrganizationData(organization, jsonObject)
-
-        if (organization.hasErrors() || !organization.save(flush: true)) {
-            throw new ValidationException("Invalid organization", organization.errors)
-        }
-
+    def create(Organization organization) {
+        organizationService.createOrganization(organization)
         render([data: [id: organization.id]] as JSON)
-    }
-
-    Organization bindOrganizationData(Organization organization, JSONObject jsonObject) {
-        bindData(organization, jsonObject)
-
-        if (!organization.code) {
-            organization.code =
-                    identifierService.generateOrganizationIdentifier(organization.name)
-        }
-
-        if (!organization.partyType) {
-            organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
-        }
-
-        return organization
     }
 }

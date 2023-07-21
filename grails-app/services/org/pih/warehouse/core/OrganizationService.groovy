@@ -67,6 +67,23 @@ class OrganizationService {
         return organization
     }
 
+    Organization saveOrganization(Organization organization) {
+        return organization.save(failOnError: true)
+    }
+
+    Organization createOrganization(Organization organization) {
+        if (!organization.code) {
+            organization.code =
+                    identifierService.generateOrganizationIdentifier(organization.name)
+        }
+
+        if (!organization.partyType) {
+            organization.partyType = PartyType.findByCode(Constants.DEFAULT_ORGANIZATION_CODE)
+        }
+
+        return saveOrganization(organization)
+    }
+
     Organization findOrCreateBuyerOrganization(String name, String code) {
         return findOrCreateOrganization(name, code, [RoleType.ROLE_BUYER, RoleType.ROLE_DISTRIBUTOR])
     }

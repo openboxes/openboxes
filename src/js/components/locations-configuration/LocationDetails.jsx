@@ -356,17 +356,8 @@ class LocationDetails extends Component {
       }
 
       const payload = {
-        name: values.name,
-        active: values.active,
-        locationNumber: values.locationNumber,
-        'organization.id': values.organization.id,
-        'locationGroup.id': _.get(values.locationGroup, 'id') || '',
-        'manager.id': _.get(values.manager, 'id') || '',
-        'locationType.id': _.get(values.locationType, 'id') || '',
+        ...values,
         supportedActivities: _.map(values.supportedActivities, val => val.value),
-        logo: values.logo,
-        bgColor: values.bgColor || '',
-        fgColor: values.fgColor || '',
       };
 
       apiClient.post(locationUrl, payload)
