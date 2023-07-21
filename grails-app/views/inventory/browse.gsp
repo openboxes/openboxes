@@ -1,4 +1,5 @@
-<%@ page import="org.pih.warehouse.PagedResultList; org.pih.warehouse.core.Location" %>
+<%@ page import="org.pih.warehouse.PagedResultList" %>
+<%@ page import="org.pih.warehouse.core.Location" %>
 <%@ page import="org.pih.warehouse.product.Product" %>
 <html>
     <head>
