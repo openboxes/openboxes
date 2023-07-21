@@ -1,7 +1,6 @@
 <div class="filters" >
 	<g:form method="GET" controller="inventory" action="browse">
 		<g:hiddenField name="max" value="${params.max?:10 }"/>
-		<g:hiddenField name="location" value="${session.warehouse.id}"/>
 		<div class="box">
 			<h2><warehouse:message code="inventory.filterByProduct.label"/></h2>
 			<div class="filter-list-item">
