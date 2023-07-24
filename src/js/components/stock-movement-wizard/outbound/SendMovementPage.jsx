@@ -20,11 +20,16 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import AlertMessage from 'utils/AlertMessage';
-import apiClient, { handleError, stringUrlInterceptor } from 'utils/apiClient';
+import {
+  apiClientCustomResponseHandler as apiClient,
+  handleError,
+  handleSuccess,
+  handleValidationErrors,
+  stringUrlInterceptor,
+} from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
-import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 import splitTranslation from 'utils/translation-utils';
 
@@ -285,9 +290,12 @@ class SendMovementPage extends Component {
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.validate = this.validate.bind(this);
+    this.setState = this.setState.bind(this);
 
     this.debouncedLocationsFetch =
       debounceLocationsFetch(this.props.debounceTime, this.props.minSearchLength);
+
+    apiClient.interceptors.response.use(handleSuccess, handleValidationErrors(this.setState));
   }
 
   componentDidMount() {

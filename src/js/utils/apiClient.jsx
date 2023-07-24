@@ -9,9 +9,10 @@ import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
 import NotificationType from 'consts/notificationTypes';
 
-const justRejectRequestError = (error) => Promise.reject(error);
+export const justRejectRequestError = (error) => Promise.reject(error);
 
 const apiClient = axios.create({});
+export const apiClientCustomResponseHandler = axios.create({});
 
 export function parseResponse(data) {
   if (_.isArray(data)) {
@@ -107,7 +108,7 @@ export const handleError = (error) => {
 // TODO: This is temporary cleaner. Once migration is complete it should be removed
 const cleanUrlFromContextPath = (url) => url.replace('/openboxes', '');
 
-const urlInterceptor = (config) => {
+export const urlInterceptor = (config) => {
   const contextPath = window.CONTEXT_PATH;
   const cleanedUrl = _.trimStart(config.url ? cleanUrlFromContextPath(config.url) : '', '/');
 
@@ -125,7 +126,23 @@ export const stringUrlInterceptor = (url) => {
   return config.url;
 };
 
+export const handleValidationErrors = (setState) => (error) => {
+  if (error.response.status === 400) {
+    const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');
+    setState({ alertMessage, showAlert: true });
+
+    return Promise.reject(error);
+  }
+
+  return handleError(error);
+};
+
 apiClient.interceptors.response.use(handleSuccess, handleError);
 apiClient.interceptors.request.use(urlInterceptor, justRejectRequestError);
+
+apiClientCustomResponseHandler.interceptors.request.use(
+  urlInterceptor,
+  justRejectRequestError,
+);
 
 export default apiClient;

@@ -19,7 +19,10 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
 import AlertMessage from 'utils/AlertMessage';
-import apiClient, {
+import {
+  apiClientCustomResponseHandler as apiClient,
+  handleSuccess,
+  handleValidationErrors,
   parseResponse,
   stringUrlInterceptor,
 } from 'utils/apiClient';
@@ -28,7 +31,6 @@ import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-v
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const FIELDS = {
   pickPageItems: {
@@ -221,6 +223,9 @@ class PickPage extends Component {
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
     this.recreatePicklist = this.recreatePicklist.bind(this);
+    this.setState = this.setState.bind(this);
+
+    apiClient.interceptors.response.use(handleSuccess, handleValidationErrors(this.setState));
   }
 
   componentDidMount() {

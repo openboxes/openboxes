@@ -18,8 +18,11 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import PackingSplitLineModal from 'components/stock-movement-wizard/modals/PackingSplitLineModal';
 import AlertMessage from 'utils/AlertMessage';
-import apiClient, {
+import {
+  apiClientCustomResponseHandler as apiClient,
   flattenRequest,
+  handleSuccess,
+  handleValidationErrors,
   stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -211,11 +214,14 @@ class PackingPage extends Component {
     this.saveSplitLines = this.saveSplitLines.bind(this);
     this.isRowLoaded = this.isRowLoaded.bind(this);
     this.loadMoreRows = this.loadMoreRows.bind(this);
+    this.setState = this.setState.bind(this);
 
     this.debouncedPeopleFetch =
       debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
 
     this.props.showSpinner();
+
+    apiClient.interceptors.response.use(handleSuccess, handleValidationErrors(this.setState));
   }
 
   componentDidMount() {
