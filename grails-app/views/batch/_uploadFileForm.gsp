@@ -174,7 +174,7 @@
                                 </label>
                             </td>
                             <td>
-                                <g:link controller="batch" action="downloadTemplate" params="[template:'ProductSuppliers.xls']">
+                                <g:link controller="productSupplier" action="export" params="[format:'xls']">
                                     <warehouse:message code="default.download.label" args="[g.message(code:'default.template.label')]"/>
                                 </g:link>
                             </td>

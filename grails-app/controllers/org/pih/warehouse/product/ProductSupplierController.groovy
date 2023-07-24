@@ -306,9 +306,6 @@ class ProductSupplierController {
         }
         else {
             productSuppliers = ProductSupplier.createCriteria().list {
-                createAlias('supplier', 'supplier', JoinType.LEFT_OUTER_JOIN)
-                createAlias('manufacturer', 'manufacturer', JoinType.LEFT_OUTER_JOIN)
-                createAlias('contractPrice', 'contractPrice', JoinType.LEFT_OUTER_JOIN)
                 resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
                 projections {
                     property("active", "active")
@@ -320,13 +317,19 @@ class ProductSupplierController {
                         property("name", "productName")
                     }
                     property("productCode", "legacyProductCode")
-                    property("supplier.name", "supplier.name")
+                    supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("name", "supplier.name")
+                    }
                     property("supplierCode", "supplierCode")
-                    property("manufacturer.name", "manufacturer.name")
+                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("name", "manufacturer.name")
+                    }
                     property("manufacturerCode", "manufacturerCode")
                     property("minOrderQuantity", "minOrderQuantity")
-                    property("contractPrice.price", "contractPrice.price")
-                    property("contractPrice.toDate", "contractPrice.toDate")
+                    contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        property("price", "contractPrice.price")
+                        property("toDate", "contractPrice.toDate")
+                    }
                     property("ratingTypeCode", "ratingTypeCode")
                     property("dateCreated", "dateCreated")
                     property("lastUpdated", "lastUpdated")
