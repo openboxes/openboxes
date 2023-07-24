@@ -157,10 +157,6 @@ class InvoiceService {
         return invoiceItemCandidates
     }
 
-    Invoice saveInvoice(Invoice invoice) {
-        invoice.save(failOnError: true)
-    }
-
     ReferenceNumber createOrUpdateVendorInvoiceNumber(Invoice invoice, String vendorInvoiceNumber) {
         ReferenceNumberType vendorInvoiceNumberType = ReferenceNumberType.findById(Constants.VENDOR_INVOICE_NUMBER_TYPE_ID)
         if (!vendorInvoiceNumberType) {

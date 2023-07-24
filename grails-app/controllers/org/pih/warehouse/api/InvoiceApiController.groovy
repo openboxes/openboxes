@@ -24,6 +24,7 @@ import org.pih.warehouse.invoice.InvoiceStatus
 class InvoiceApiController {
 
     def identifierService
+    def invoiceDataService
     def invoiceService
 
     def list() {
@@ -53,7 +54,7 @@ class InvoiceApiController {
         Invoice invoice = new Invoice()
         bindInvoiceData(invoice, currentLocation, jsonObject)
 
-        if (invoice.hasErrors() || !invoiceService.saveInvoice(invoice)) {
+        if (invoice.hasErrors() || !invoiceDataService.save(invoice)) {
             throw new ValidationException("Invalid invoice", invoice.errors)
         }
 
@@ -75,7 +76,7 @@ class InvoiceApiController {
 
         bindInvoiceData(existingInvoice, currentLocation, jsonObject)
 
-        if (existingInvoice.hasErrors() || !existingInvoice.save(flush: true)) {
+        if (existingInvoice.hasErrors() || !invoiceDataService.save(existingInvoice)) {
             throw new ValidationException("Invalid invoice", existingInvoice.errors)
         }
 
