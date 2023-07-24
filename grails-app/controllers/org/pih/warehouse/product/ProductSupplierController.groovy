@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import grails.validation.ValidationException
 import org.hibernate.FetchMode
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
@@ -305,6 +306,9 @@ class ProductSupplierController {
         }
         else {
             productSuppliers = ProductSupplier.createCriteria().list {
+                createAlias('supplier', 'supplier', JoinType.LEFT_OUTER_JOIN)
+                createAlias('manufacturer', 'manufacturer', JoinType.LEFT_OUTER_JOIN)
+                createAlias('contractPrice', 'contractPrice', JoinType.LEFT_OUTER_JOIN)
                 resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
                 projections {
                     property("active", "active")
@@ -316,19 +320,13 @@ class ProductSupplierController {
                         property("name", "productName")
                     }
                     property("productCode", "legacyProductCode")
-                    supplier {
-                        property("name", "supplier.name")
-                    }
+                    property("supplier.name", "supplier.name")
                     property("supplierCode", "supplierCode")
-                    manufacturer {
-                        property("name", "manufacturer.name")
-                    }
+                    property("manufacturer.name", "manufacturer.name")
                     property("manufacturerCode", "manufacturerCode")
                     property("minOrderQuantity", "minOrderQuantity")
-                    contractPrice {
-                        property("price", "contractPrice.price")
-                        property("toDate", "contractPrice.toDate")
-                    }
+                    property("contractPrice.price", "contractPrice.price")
+                    property("contractPrice.toDate", "contractPrice.toDate")
                     property("ratingTypeCode", "ratingTypeCode")
                     property("dateCreated", "dateCreated")
                     property("lastUpdated", "lastUpdated")
