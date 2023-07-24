@@ -24,7 +24,7 @@ class ProductSupplierController {
     def dataService
     def documentService
     def identifierService
-    ProductSupplierService productSupplierService
+    ProductSupplierDataService productSupplierGormService
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
@@ -121,7 +121,7 @@ class ProductSupplierController {
             }
         }
 
-        if (productSupplierService.saveProductSupplier(productSupplierInstance)) {
+        if (productSupplierGormService.save(productSupplierInstance)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
             if (params.dialog) {
@@ -157,7 +157,7 @@ class ProductSupplierController {
     }
 
     def update() {
-        def productSupplierInstance = ProductSupplier.get(params.id)
+        def productSupplierInstance = productSupplierGormService.get(params.id)
         Location location = Location.get(session.warehouse.id)
         ProductSupplierPreference defaultPreference = productSupplierInstance?.globalProductSupplierPreference
         ProductSupplierPreference productSupplierPreference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
@@ -243,7 +243,7 @@ class ProductSupplierController {
                 productSupplierInstance.contractPrice = null
             }
 
-            if (productSupplierService.saveProductSupplier(productSupplierInstance)) {
+            if (productSupplierGormService.save(productSupplierInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), productSupplierInstance.id])}"
 
                 if (params.dialog) {
@@ -262,11 +262,11 @@ class ProductSupplierController {
     }
 
     def delete() {
-        def productSupplierInstance = ProductSupplier.get(params.id)
+        def productSupplierInstance = productSupplierGormService.get(params.id)
         if (productSupplierInstance) {
             def productInstance = productSupplierInstance.product
             try {
-                productSupplierService.deleteProductSupplier(productSupplierInstance)
+                productSupplierGormService.delete(productSupplierInstance.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
             }
             catch (Exception e) {
