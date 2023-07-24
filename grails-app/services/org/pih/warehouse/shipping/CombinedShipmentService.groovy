@@ -12,6 +12,8 @@ package org.pih.warehouse.shipping
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
+import grails.util.Holders
+import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.ImportDataCommand
@@ -130,7 +132,9 @@ class CombinedShipmentService {
                     line.errors << "Unable to parse expiry date: ${line.expiry}"
                     valid = false
                 }
-                Date date = grailsApplication.config.openboxes.expirationDate.minValue
+                Date date = Constants.EXPIRATION_DATE_FORMATTER.parse(
+                    Holders.grailsApplication.config.openboxes.expirationDate.minValue
+                )
                 def today = new Date()
                 today.clearTime()
                 if (expiry) {

@@ -258,7 +258,9 @@ class StockMovementItem {
                     "Please reformat field with Lot Number: \"${lotNumber}\" to a number format")
         }
 
-        def date = Holders.grailsApplication.config.openboxes.expirationDate.minValue
+        Date date = Constants.EXPIRATION_DATE_FORMATTER.parse(
+                Holders.grailsApplication.config.openboxes.expirationDate.minValue
+        )
         if (expirationDate && date > expirationDate) {
             throw new IllegalArgumentException("Expiration date for item ${productCode} is not valid. Please enter a date after ${date.getYear()+1900}.")
         }
