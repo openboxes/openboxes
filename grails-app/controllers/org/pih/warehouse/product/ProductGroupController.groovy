@@ -9,14 +9,13 @@
  **/
 package org.pih.warehouse.product
 
-import grails.gorm.transactions.Transactional
 // import grails.plugin.springcache.annotations.CacheFlush
 
-@Transactional
 class ProductGroupController {
 
-    def productService
+    ProductService productService
     ProductGroupService productGroupService
+    ProductGroupDataService productGroupDataService
 
     def index() {
         redirect(action: "list", params: params)
@@ -48,16 +47,16 @@ class ProductGroupController {
     // @CacheFlush("selectProductFamilyCache")
     def save() {
         println "Save " + params
-        def productGroupInstance = ProductGroup.get(params.id)
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (!productGroupInstance) {
             productGroupInstance = new ProductGroup(params)
         }
-        def products = productService.getProducts(params['product.id'])
+        List<Product> products = productService.getProducts(params['product.id'])
         products.each { product ->
             productGroupInstance.addToProducts(product)
         }
 
-        if (productGroupInstance.save(flush: true)) {
+        if (productGroupDataService.save(productGroupInstance)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
             redirect(action: "edit", id: productGroupInstance.id)
         } else {
@@ -66,7 +65,7 @@ class ProductGroupController {
     }
 
     def show() {
-        def productGroupInstance = ProductGroup.get(params.id)
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (!productGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
             redirect(action: "list")
@@ -78,7 +77,7 @@ class ProductGroupController {
     def edit() {
         log.info "Edit product group: " + params
 
-        def productGroupInstance = ProductGroup.get(params.id)
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (!productGroupInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
             redirect(action: "list")
@@ -91,7 +90,7 @@ class ProductGroupController {
 
     def addProducts() {
 
-        def productGroupInstance = ProductGroup.get(params.id)
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (productGroupInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -108,7 +107,7 @@ class ProductGroupController {
 
             log.info("Products before " + productGroupInstance.products)
 
-            def products = productService.getProducts(params['product.id'])
+            List<Product> products = productService.getProducts(params['product.id'])
             println "Products: " + products
             products.each { product ->
                 productGroupInstance.addToProducts(product)
@@ -116,7 +115,7 @@ class ProductGroupController {
 
             log.info("Products after " + productGroupInstance.products)
 
-            if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
+            if (!productGroupInstance.hasErrors() && productGroupDataService.save(productGroupInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 redirect(action: "edit", id: productGroupInstance.id)
             } else {
@@ -135,7 +134,7 @@ class ProductGroupController {
         log.info "Update product group " + params
 
 
-        def productGroupInstance = ProductGroup.get(params.id)
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (productGroupInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -148,7 +147,7 @@ class ProductGroupController {
             }
             productGroupInstance.properties = params
 
-            if (!productGroupInstance.hasErrors() && productGroupInstance.save(flush: true)) {
+            if (!productGroupInstance.hasErrors() && productGroupDataService.save(productGroupInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 redirect(controller: "productGroup", action: "list")
             } else {
@@ -166,7 +165,7 @@ class ProductGroupController {
 
     // @CacheFlush("selectProductFamilyCache")
     def delete() {
-        def productGroupInstance = ProductGroup.get(params.id)
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (productGroupInstance) {
             try {
                 // Remove all products from the product group before deleting the product group
@@ -176,7 +175,7 @@ class ProductGroupController {
                     productGroupInstance.removeFromProducts(product)
 
                 }
-                productGroupInstance.delete(flush: true)
+                productGroupDataService.delete(productGroupInstance.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
                 redirect(action: "list")
             }
@@ -194,12 +193,12 @@ class ProductGroupController {
      * From the inventory browser.
      */
     def addToProductGroup() {
-        def productGroupInstance = new ProductGroup()
+        ProductGroup productGroupInstance = new ProductGroup()
         productGroupInstance.properties = params
         productGroupInstance.products = productService.getProducts(params['product.id'])
 
 
-        def categories = productGroupInstance.products.collect {
+        List<Category> categories = productGroupInstance.products.collect {
             it.category
         }
 
@@ -211,7 +210,7 @@ class ProductGroupController {
         }
         productGroupInstance.category = categories.get(0)
 
-        def productGroups = ProductGroup.findAllByCategory(productGroupInstance.category)
+        List<ProductGroup> productGroups = ProductGroup.findAllByCategory(productGroupInstance.category)
 
         render(view: "create", model: [productGroupInstance: productGroupInstance, productGroups: productGroups])
     }
@@ -221,8 +220,8 @@ class ProductGroupController {
      */
 
     def removeProductsFromProductGroup() {
-        def productGroupInstance = ProductGroup.get(params.id)
-        def products = productService.getProducts(params['delete-product.id'])
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
+        List<Product> products = productService.getProducts(params['delete-product.id'])
         products.each { product ->
             productGroupInstance.removeFromProducts(product)
         }
@@ -230,8 +229,8 @@ class ProductGroupController {
     }
 
     def addProductsToProductGroup() {
-        def productGroupInstance = ProductGroup.get(params.id)
-        def products = productService.getProducts(params['add-product.id'])
+        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
+        List<Product> products = productService.getProducts(params['add-product.id'])
         products.each { product ->
             productGroupInstance.addToProducts(product)
         }
@@ -261,8 +260,8 @@ class ProductGroupController {
      */
     def deleteProductFromProductGroup() {
         Boolean isProductFamily = params.boolean("isProductFamily") ?: false
-        def productGroup = ProductGroup.get(params.id)
-        def product = Product.get(params?.product?.id)
+        ProductGroup productGroup = productGroupDataService.get(params.id)
+        Product product = Product.get(params?.product?.id)
         if (product && productGroup) {
             if (isProductFamily) {
                 product.productFamily = null
@@ -271,7 +270,7 @@ class ProductGroupController {
                 product.removeFromProductGroups(productGroup)
                 productGroup.removeFromProducts(product)
             }
-            product.save(flush: true)
+            productService.saveProduct(product)
         } else {
             response.status = 404
         }
