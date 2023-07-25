@@ -698,6 +698,8 @@ class DataService {
                 }
                 properties[fieldName] = value ?: ""
             } else {
+                // to access object value by key we must use the object.get(key) instead of object[key]
+                // because using the object[key] will throw an error when trying to export data using the batch controller
                 value = object.get(element) ?: element.tokenize('.').inject(object) { v, k -> v?."$k" }
                 properties[fieldName] = value ?: ""
             }
