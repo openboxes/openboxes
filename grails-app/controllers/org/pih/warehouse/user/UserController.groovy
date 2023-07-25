@@ -435,12 +435,8 @@ class UserController {
     }
 
     def deleteLocationRole() {
-        LocationRole locationRole = params.id ? LocationRole.get(params.id) : null
-        User user = locationRole.user
-        user.removeFromLocationRoles(locationRole)
-        locationRole.delete()
-        user.save(failOnError: true)
-        redirect(action: "edit", id: user.id)
+        String userId = userService.deleteLocationRole(params.id)
+        redirect(action: "edit", id: userId)
     }
 
     def saveLocationRole() {
