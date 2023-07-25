@@ -12,6 +12,7 @@ package org.pih.warehouse.product
 import grails.validation.ValidationException
 import org.hibernate.FetchMode
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.PreferenceType
@@ -316,16 +317,16 @@ class ProductSupplierController {
                         property("name", "productName")
                     }
                     property("productCode", "legacyProductCode")
-                    supplier {
+                    supplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         property("name", "supplier.name")
                     }
                     property("supplierCode", "supplierCode")
-                    manufacturer {
+                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         property("name", "manufacturer.name")
                     }
                     property("manufacturerCode", "manufacturerCode")
                     property("minOrderQuantity", "minOrderQuantity")
-                    contractPrice {
+                    contractPrice(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         property("price", "contractPrice.price")
                         property("toDate", "contractPrice.toDate")
                     }
