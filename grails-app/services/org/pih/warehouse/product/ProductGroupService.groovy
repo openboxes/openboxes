@@ -10,7 +10,9 @@
 package org.pih.warehouse.product
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 
+@Transactional
 class ProductGroupService {
 
     GrailsApplication grailsApplication
