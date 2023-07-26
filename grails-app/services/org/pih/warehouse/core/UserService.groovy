@@ -22,7 +22,6 @@ class UserService {
     def authService
     def dataSource
     GrailsApplication grailsApplication
-    LocationRoleDataService locationRoleDataService
 
     User getUser(String id) {
         return User.get(id)
@@ -486,18 +485,5 @@ class UserService {
             }
         }
         user.save(failOnError: true)
-    }
-
-    /**
-     *
-     * @param locationRoleId
-     * @return Returns user's id to the controller to display the edit page of the user after successful removal of location role
-     */
-    String deleteLocationRole(String locationRoleId) {
-        LocationRole locationRole = locationRoleDataService.get(locationRoleId)
-        User user = locationRole?.user
-        user?.removeFromLocationRoles(locationRole)
-        locationRoleDataService.delete(locationRole?.id)
-        return user?.id
     }
 }
