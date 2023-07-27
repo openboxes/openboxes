@@ -37,6 +37,11 @@
 	                <g:renderErrors bean="${productInstance}" as="list" />
 	            </div>
             </g:hasErrors>
+            <g:hasErrors bean="${packageInstance}">
+                <div class="errors">
+                    <g:renderErrors bean="${packageInstance}" as="list" />
+                </div>
+            </g:hasErrors>
 
    			<g:if test="${productInstance?.id }">
 				<g:render template="summary" model="[productInstance:productInstance]"/>
