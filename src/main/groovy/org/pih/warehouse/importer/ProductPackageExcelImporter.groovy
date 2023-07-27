@@ -9,11 +9,13 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
+@Transactional
 class ProductPackageExcelImporter extends AbstractExcelImporter {
 
     ExcelImportService excelImportService
