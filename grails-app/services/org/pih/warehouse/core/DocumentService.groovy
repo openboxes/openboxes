@@ -1150,7 +1150,7 @@ class DocumentService {
             row.getCell(CELL_INDEX++).setCellStyle(tableHeaderLeftStyle)
 
             def totalPrice = 0
-            def previousContainer = "", initialRowIndex = 0, finalRowIndex = 0
+            def previousContainer = ""
             shipmentInstance.sortShipmentItemsBySortOrder().each { itemInstance ->
 
                 CELL_INDEX = 0
@@ -1162,12 +1162,6 @@ class DocumentService {
 
                 row.createCell(CELL_INDEX).setCellValue(row.getRowNum() - 6)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataCenterStyle)
-
-                if (row.getRowNum() > 16) {
-                    sheet.addMergedRegion(CellRangeAddress.valueOf("A${initialRowIndex + 1}:A${finalRowIndex + 1}"))
-                }
-                initialRowIndex = row.getRowNum()
-                finalRowIndex = row.getRowNum()
 
                 row.createCell(CELL_INDEX).setCellValue(itemInstance?.inventoryItem?.product?.productCode)
                 row.getCell(CELL_INDEX++).setCellStyle(tableDataLeftStyle)
