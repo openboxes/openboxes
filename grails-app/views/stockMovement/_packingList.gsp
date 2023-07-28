@@ -43,7 +43,7 @@
         </tr>
         <g:if test="${shipmentInstance?.shipmentItems}">
             <g:set var="count" value="${0 }"/>
-            <g:set var="previousContainer"/>
+            <g:set var="previousContainer" value=""/>
             <g:each var="shipmentItem" in="${shipmentInstance.sortShipmentItemsBySortOrder()}" status="i">
                 <g:set var="rowspan" value="${shipmentItemsByContainer[shipmentItem?.container]?.size() }"/>
                 <g:set var="newContainer" value="${previousContainer != shipmentItem?.container }"/>
