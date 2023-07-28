@@ -138,7 +138,6 @@
                                                 id="${locationInstance?.parentLocation?.id}"
                                                 value="${locationInstance?.zone?.id}"
                                                 noSelection="['null': '']"
-                                                from="[]"
                                                 class="chzn-select-deselect"/>
                                     </td>
                                 </tr>

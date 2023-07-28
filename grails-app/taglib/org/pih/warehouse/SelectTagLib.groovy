@@ -445,12 +445,9 @@ class SelectTagLib {
     }
 
     def selectZoneLocationByLocation = { attrs, body ->
-        def location = Location.get(attrs.id)
+        Location location = Location.get(attrs.id)
 
-        if (location) {
-            attrs.from = locationService.getZones(location)
-        }
-
+        attrs.from = location ? locationService.getZones(location) : []
         attrs["class"] = "chzn-select-deselect"
         attrs["noSelection"] = ["null": ""]
         attrs.optionKey = 'id'
