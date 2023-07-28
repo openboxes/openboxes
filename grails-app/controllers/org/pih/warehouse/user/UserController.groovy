@@ -10,9 +10,9 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
-import org.pih.warehouse.core.ILocationRoleDataService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
+import org.pih.warehouse.core.LocationRoleDataService
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
@@ -33,7 +33,7 @@ class UserController {
     def userService
     def locationService
     def localizationService
-    ILocationRoleDataService locationRoleDataService
+    LocationRoleDataService locationRoleDataService
 
     /**
      * Show index page - just a redirect to the list page.
