@@ -12,6 +12,7 @@ package org.pih.warehouse.user
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
+import org.pih.warehouse.core.LocationRoleDataService
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
@@ -32,6 +33,7 @@ class UserController {
     def userService
     def locationService
     def localizationService
+    LocationRoleDataService locationRoleDataService
 
     /**
      * Show index page - just a redirect to the list page.
@@ -435,12 +437,8 @@ class UserController {
     }
 
     def deleteLocationRole() {
-        LocationRole locationRole = params.id ? LocationRole.get(params.id) : null
-        User user = locationRole.user
-        user.removeFromLocationRoles(locationRole)
-        locationRole.delete()
-        user.save(failOnError: true)
-        redirect(action: "edit", id: user.id)
+        String userId = locationRoleDataService.deleteLocationRole(params.id)
+        redirect(action: "edit", id: userId)
     }
 
     def saveLocationRole() {
