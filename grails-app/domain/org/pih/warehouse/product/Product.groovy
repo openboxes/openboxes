@@ -50,6 +50,7 @@ class Product implements Comparable, Serializable {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
     }
 
     def beforeUpdate() {

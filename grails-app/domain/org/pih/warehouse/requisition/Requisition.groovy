@@ -21,11 +21,12 @@ import org.pih.warehouse.product.Product
 
 class Requisition implements Comparable<Requisition>, Serializable {
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 

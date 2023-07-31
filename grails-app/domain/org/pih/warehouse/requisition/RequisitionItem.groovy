@@ -32,11 +32,12 @@ class RequisitionItem implements Comparable<RequisitionItem>, Serializable {
     // Fixme: this line throws: Class annotated with Log annotation cannot have log field declared
     // private static final transient Logger log = LoggerFactory.getLogger(RequisitionItem)
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 

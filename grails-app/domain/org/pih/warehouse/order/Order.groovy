@@ -23,21 +23,16 @@ class Order implements Serializable {
 
     def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
     }
 
     def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 
-    def publishRefreshEvent() {
+    def publishRefreshEvent(Boolean forceRefresh = false) {
         if (isPurchaseOrder) {
-            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
-        }
-    }
-
-    def publishRefreshEvenBeforeDelete() {
-        if (isPurchaseOrder) {
-            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this, true))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this, forceRefresh))
         }
     }
 
@@ -50,7 +45,7 @@ class Order implements Serializable {
     }
 
     def beforeDelete() {
-        publishRefreshEvenBeforeDelete()
+        publishRefreshEvent(true)
     }
 
     String id

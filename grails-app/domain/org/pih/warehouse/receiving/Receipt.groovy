@@ -18,13 +18,17 @@ import org.pih.warehouse.shipping.Shipment
 
 class Receipt implements Serializable, Comparable<Receipt> {
 
-    def publishRefreshEvent = {
+    def publishRefreshEvent() {
         Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this))
     }
 
-    def afterInsert = publishRefreshEvent
+    def afterInsert() {
+        publishRefreshEvent()
+    }
 
-    def afterUpdate = publishRefreshEvent
+    def afterUpdate() {
+        publishRefreshEvent()
+    }
 
     String id
     String receiptNumber
