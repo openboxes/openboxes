@@ -30,9 +30,9 @@ class Order implements Serializable {
         updatedBy = AuthService.currentUser
     }
 
-    def publishRefreshEvent(Boolean forceRefresh = false) {
+    def publishRefreshEvent(Boolean isDelete = false) {
         if (isPurchaseOrder) {
-            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this, forceRefresh))
+            Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(this, isDelete))
         }
     }
 
