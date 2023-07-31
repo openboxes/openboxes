@@ -73,9 +73,9 @@ class OrganizationController {
         }
 
         if (organizationInstance.validate()) {
-            Organization persistedOrganization = organizationDataService.save(organizationInstance)
+            organizationDataService.save(organizationInstance)
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), organizationInstance.id])}"
-            redirect(controller: "organization", action: "edit", id: persistedOrganization?.id)
+            redirect(controller: "organization", action: "edit", id: organizationInstance?.id)
         } else {
             render(view: "create", model: [organizationInstance: organizationInstance])
         }
@@ -102,9 +102,9 @@ class OrganizationController {
             }
 
             if (organizationInstance.validate()) {
-                Organization persistedOrganization = organizationDataService.save(organizationInstance)
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), persistedOrganization.id])}"
-                redirect(action: "edit", id: persistedOrganization.id)
+                organizationDataService.save(organizationInstance)
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), organizationInstance.id])}"
+                redirect(action: "edit", id: organizationInstance.id)
             } else {
                 render(view: "edit", model: [organizationInstance: organizationInstance])
             }
