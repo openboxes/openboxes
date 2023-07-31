@@ -21,7 +21,6 @@ class Party implements Serializable, Comparable<Party> {
 
     static mapping = {
         id generator: 'uuid'
-        roles cascade: "all-delete-orphan"
     }
 
     static constraints = {
