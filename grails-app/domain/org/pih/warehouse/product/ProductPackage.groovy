@@ -54,6 +54,7 @@ class ProductPackage implements Comparable<ProductPackage>, Serializable {
         name(nullable: true)
         description(nullable: true)
         gtin(nullable: true)
+        uom(nullable: true)
         product(nullable: true, unique: ['uom', 'quantity', 'productSupplier'])
         productPrice(nullable: true)
         quantity(nullable: false)
