@@ -10,14 +10,12 @@
 package org.pih.warehouse.core
 
 import grails.plugins.csv.CSVWriter
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.product.Product
-import org.springframework.transaction.TransactionStatus
 
 class OrganizationController {
 
     def identifierService
     def organizationService
+    OrganizationDataService organizationDataService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -67,16 +65,17 @@ class OrganizationController {
     }
 
     def save() {
-        def organizationInstance = new Organization(params)
+        Organization organizationInstance = new Organization(params)
 
-        if (!organizationInstance.code) {
+        if (organizationInstance.name && !organizationInstance.code) {
             organizationInstance.code =
                     identifierService.generateOrganizationIdentifier(organizationInstance.name)
         }
 
-        if (organizationInstance.save(flush: true)) {
+        if (organizationInstance.validate()) {
+            Organization persistedOrganization = organizationDataService.save(organizationInstance)
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), organizationInstance.id])}"
-            redirect(controller: "organization", action: "edit", id: organizationInstance?.id)
+            redirect(controller: "organization", action: "edit", id: persistedOrganization?.id)
         } else {
             render(view: "create", model: [organizationInstance: organizationInstance])
         }
@@ -102,9 +101,10 @@ class OrganizationController {
                         identifierService.generateOrganizationIdentifier(organizationInstance.name)
             }
 
-            if (!organizationInstance.hasErrors() && organizationInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), organizationInstance.id])}"
-                redirect(action: "edit", id: organizationInstance.id)
+            if (organizationInstance.validate()) {
+                Organization persistedOrganization = organizationDataService.save(organizationInstance)
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), persistedOrganization.id])}"
+                redirect(action: "edit", id: persistedOrganization.id)
             } else {
                 render(view: "edit", model: [organizationInstance: organizationInstance])
             }
@@ -141,12 +141,7 @@ class OrganizationController {
     def delete() {
         if (Organization.exists(params.id)) {
             try {
-                Organization.withTransaction { TransactionStatus status ->
-                    Organization organizationInstance = Organization.get(params.id);
-                    if(organizationInstance){
-                        organizationInstance.delete();
-                    }
-                }
+                organizationDataService.delete(params.id)
 
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'organizationInstance.label', default: 'Organization'), params.id])}"
                 redirect(controller: "organization", action: "list")
