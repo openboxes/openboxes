@@ -5,7 +5,7 @@ import grails.gorm.services.Service
 interface OrganizationDataService {
     void delete(String id)
 
-    Organization save(Organization productGroup)
+    Organization save(Organization organization)
 
     Organization get(String id)
 }
