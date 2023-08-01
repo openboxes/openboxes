@@ -43,7 +43,7 @@ class InventoryItemController {
     def userService
     def productAvailabilityService
     GrailsApplication grailsApplication
-
+    InventoryItemDataService inventoryItemDataService
 
     def index() {
         redirect(controller: "inventory", action: "browse")
@@ -981,10 +981,10 @@ class InventoryItemController {
 
 
     def delete() {
-        def inventoryItem = InventoryItem.get(params.id)
+        InventoryItem inventoryItem = inventoryItemDataService.get(params.id)
         if (inventoryItem) {
             try {
-                inventoryItem.delete(flush: true)
+                inventoryItemDataService.delete(inventoryItem.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Attribute'), params.id])}"
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
