@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.auth.AuthService
 
 @Transactional
 class RequisitionTemplateController {
@@ -22,7 +23,6 @@ class RequisitionTemplateController {
     def inventoryService
     def productService
     def userService
-
     static allowedMethods = [save: "POST", update: "POST"]
 
     def index() {
@@ -137,7 +137,7 @@ class RequisitionTemplateController {
             }
             requisition.properties = params
             requisition.lastUpdated = new Date()
-            requisition.updatedBy = session.user
+            requisition.updatedBy = AuthService.currentUser
 
             if (!requisition.hasErrors() && requisition.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisition.label', default: 'Requisition'), params.id])}"
