@@ -393,7 +393,7 @@ class ProductController {
             }
         }
 
-        if (!productInstance.hasErrors() && productInstance.save(flush: true)) {
+        if (!productInstance.hasErrors() && packageInstance.validate() && productInstance.save(flush: true)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
             redirect(action: "edit", id: productInstance?.id)
         } else {
