@@ -981,7 +981,7 @@ class InventoryItemController {
 
 
     def delete() {
-        InventoryItem inventoryItem = inventoryItemDataService.get(params.id)
+        InventoryItem inventoryItem = inventoryItemDataService.getWithProduct(params.id)
         if (inventoryItem) {
             try {
                 inventoryItemDataService.delete(inventoryItem.id)
