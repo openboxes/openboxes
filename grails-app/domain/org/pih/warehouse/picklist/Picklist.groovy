@@ -30,11 +30,12 @@ import org.pih.warehouse.requisition.Requisition
  */
 class Picklist implements Serializable {
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 

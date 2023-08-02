@@ -15,11 +15,12 @@ import org.pih.warehouse.product.ProductSupplier
 
 class ProductPrice implements Serializable {
 
-    def beforeInsert = {
+    def beforeInsert() {
         createdBy = AuthService.currentUser
+        updatedBy = AuthService.currentUser
     }
 
-    def beforeUpdate = {
+    def beforeUpdate() {
         updatedBy = AuthService.currentUser
     }
 

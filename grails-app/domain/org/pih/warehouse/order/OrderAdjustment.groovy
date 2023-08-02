@@ -18,13 +18,15 @@ import org.pih.warehouse.invoice.InvoiceTypeCode
 
 class OrderAdjustment implements Serializable {
 
-    def publishRefreshEvent = {
+    def publishRefreshEvent() {
         if (order?.isPurchaseOrder && !disableRefresh) {
             Holders.grailsApplication.mainContext.publishEvent(new RefreshOrderSummaryEvent(order))
         }
     }
 
-    def afterUpdate = publishRefreshEvent
+    def afterUpdate() {
+        publishRefreshEvent()
+    }
 
     String id
     BigDecimal amount
