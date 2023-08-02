@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import org.grails.exceptions.ExceptionUtils
 import org.pih.warehouse.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
 import util.ConfigHelper
@@ -97,12 +98,14 @@ class ErrorsController {
     def handleValidationErrors() {
         if (RequestUtil.isAjax(request)) {
             response.status = 400
-            BeanPropertyBindingResult errors = request?.exception?.cause?.target?.errors ?: request?.exception?.cause?.errors
+            Throwable exception = request.getAttribute('exception')
+            def root = ExceptionUtils.getRootCause(exception)
+            BeanPropertyBindingResult errors = root.getErrors()
             List<String> errorMessages = errors.allErrors.collect {
                 return g.message(error: it, locale: localizationService.currentLocale)
             }
             render([errorCode: 400,
-                    errorMessage: "Validation error. " + request?.exception?.cause?.target?.fullMessage ?: request?.exception?.cause?.fullMessage,
+                    errorMessage: "Validation error. " + root.fullMessage,
                     errorMessages: errorMessages
             ] as JSON)
             return
