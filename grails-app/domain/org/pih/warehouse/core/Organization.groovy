@@ -33,6 +33,7 @@ class Organization extends Party {
     static mapping = {
         id generator: 'uuid'
         sequences joinTable: [key: 'sequences']
+        roles cascade: "all-delete-orphan"
     }
 
     static constraints = {
