@@ -37,7 +37,7 @@ class InventoryCommand implements Validateable {
     // indicates whether non-inventory products for the warehouse should be included
     def showNonInventoryProducts = Boolean.FALSE
     // indicates whether out of stock products for the warehouse should be included
-    def showOutOfStockProducts = Boolean.FALSE
+    Boolean showOutOfStockProducts = Boolean.FALSE
 
     // all of the resulting ProductCommands above, organized by Category
     Boolean searchPerformed = Boolean.FALSE
