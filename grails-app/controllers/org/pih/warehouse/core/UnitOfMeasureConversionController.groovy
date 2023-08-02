@@ -11,6 +11,8 @@ package org.pih.warehouse.core
 
 class UnitOfMeasureConversionController {
 
+    UnitOfMeasureConversionDataService unitOfMeasureConversionDataService
+
     def index() {
         redirect(action: "list", params: params)
     }
@@ -21,19 +23,19 @@ class UnitOfMeasureConversionController {
     }
 
     def create() {
-        def unitOfMeasureConversion = new UnitOfMeasureConversion()
+        UnitOfMeasureConversion unitOfMeasureConversion = new UnitOfMeasureConversion()
         unitOfMeasureConversion.properties = params
         return [unitOfMeasureConversion: unitOfMeasureConversion]
     }
 
     def edit() {
-        def unitOfMeasureConversion = UnitOfMeasureConversion.get(params.id)
+        UnitOfMeasureConversion unitOfMeasureConversion = unitOfMeasureConversionDataService.get(params.id)
         return [unitOfMeasureConversion: unitOfMeasureConversion]
     }
 
     def save() {
-        def unitOfMeasureConversion = new UnitOfMeasureConversion(params)
-        if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversion.save(flush: true)) {
+        UnitOfMeasureConversion unitOfMeasureConversion = new UnitOfMeasureConversion(params)
+        if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversionDataService.save(unitOfMeasureConversion)) {
             def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), unitOfMeasureConversion.id]
             flash.message = "${warehouse.message(code: 'default.created.message', args: messageArgs)}"
             redirect(controller: "unitOfMeasureConversion", action: "edit", id: unitOfMeasureConversion?.id)
@@ -43,11 +45,11 @@ class UnitOfMeasureConversionController {
     }
 
     def update() {
-        def unitOfMeasureConversion = UnitOfMeasureConversion.get(params.id)
+        UnitOfMeasureConversion unitOfMeasureConversion = unitOfMeasureConversionDataService.get(params.id)
         def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), params.id]
         if (unitOfMeasureConversion) {
             unitOfMeasureConversion.properties = params
-            if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversion.save(flush: true)) {
+            if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversionDataService.save(unitOfMeasureConversion)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: messageArgs)}"
                 redirect(action: "list")
             } else {
@@ -60,11 +62,11 @@ class UnitOfMeasureConversionController {
     }
 
     def delete() {
-        def unitOfMeasureConversion = UnitOfMeasureConversion.get(params.id)
+        UnitOfMeasureConversion unitOfMeasureConversion = unitOfMeasureConversionDataService.get(params.id)
         def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), params.id]
         if (unitOfMeasureConversion) {
             try {
-                unitOfMeasureConversion.delete(flush: true)
+                unitOfMeasureConversionDataService.delete(unitOfMeasureConversion.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: messageArgs)}"
                 redirect(action: "list")
             }
