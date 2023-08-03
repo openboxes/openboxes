@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
@@ -405,7 +406,7 @@ class StockMovementService {
             }
             if (criteria.requestedBy) {
                 or {
-                    requisition {
+                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         eq("requestedBy", criteria?.requestedBy)
                     }
                     and {
