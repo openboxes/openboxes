@@ -31,11 +31,11 @@ class InventoryCommand implements Validateable {
     List searchResults = []
 
     // indicates whether to display hidden products
-    def showHiddenProducts = Boolean.FALSE
+    Boolean showHiddenProducts = Boolean.FALSE
     // indicates whether unsupported products for the warehouse should be included
-    def showUnsupportedProducts = Boolean.FALSE
+    Boolean showUnsupportedProducts = Boolean.FALSE
     // indicates whether non-inventory products for the warehouse should be included
-    def showNonInventoryProducts = Boolean.FALSE
+    Boolean showNonInventoryProducts = Boolean.FALSE
     // indicates whether out of stock products for the warehouse should be included
     Boolean showOutOfStockProducts = Boolean.FALSE
 
