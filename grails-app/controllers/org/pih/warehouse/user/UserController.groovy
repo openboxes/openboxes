@@ -17,6 +17,7 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserDataService
 
 import javax.imageio.ImageIO as IIO
 import javax.swing.*
@@ -34,6 +35,7 @@ class UserController {
     def locationService
     def localizationService
     LocationRoleDataService locationRoleDataService
+    UserDataService userGormService
 
     /**
      * Show index page - just a redirect to the list page.
@@ -332,14 +334,14 @@ class UserController {
 
         log.info("params " + params)
 
-        def userInstance = User.get(params.id)
+        User userInstance = userGormService.get(params.id)
         if (userInstance) {
             if (userInstance?.id == session?.user?.id) {
                 flash.message = "${warehouse.message(code: 'default.cannot.delete.self.message', args: [warehouse.message(code: 'user.label'), params.id])}"
                 redirect(action: "edit", id: params.id)
             } else {
                 try {
-                    userInstance.delete(flush: true)
+                    userGormService.delete(userInstance.id)
                     flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'user.label'), params.id])}"
                     redirect(action: "list")
                 }
