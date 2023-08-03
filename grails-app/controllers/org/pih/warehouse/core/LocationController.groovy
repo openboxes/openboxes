@@ -83,16 +83,12 @@ class LocationController {
                 throw new IllegalArgumentException("The organization ${selectedOrganization?.name} is inactive, you can't assign it to the location")
             }
             // If none supported activities are chosen, assign "None"
-            // [""].empty would evaluate to false, so we want to filter out falsy values with findAll{it}
-            List supportedActivities = params.list("supportedActivities").findAll{ it }
-            if (locationInstance?.id && supportedActivities?.empty) {
-                params.supportedActivities = [ActivityCode.NONE.id]
-            }
-
-            // Map supportedActivities to mark it as dirty for save,
+            // [""].empty would evaluate to false, so we want to filter out falsy values with findAll{ it }
+            // In other case map supportedActivities to mark it as dirty for save,
             // supportedActivities cannot be empty to avoid overriding ActivityCode.NONE
-            if (locationInstance?.id && !supportedActivities?.empty) {
-                params.supportedActivities = params.list("supportedActivities")
+            List supportedActivities = params.list("supportedActivities").findAll{ it }
+            if (locationInstance?.id) {
+                params.supportedActivities = supportedActivities?.empty ? [ActivityCode.NONE.id] : supportedActivities
             }
 
             locationInstance.properties = params
