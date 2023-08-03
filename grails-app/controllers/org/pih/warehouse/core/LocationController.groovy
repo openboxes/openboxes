@@ -88,6 +88,13 @@ class LocationController {
             if (locationInstance?.id && supportedActivities?.empty) {
                 params.supportedActivities = [ActivityCode.NONE.id]
             }
+
+            // Map supportedActivities to mark it as dirty for save,
+            // supportedActivities cannot be empty to avoid overriding ActivityCode.NONE
+            if (locationInstance?.id && !supportedActivities?.empty) {
+                params.supportedActivities = params.list("supportedActivities")
+            }
+
             locationInstance.properties = params
 
             if (!locationInstance.id && !locationInstance.organization) {
