@@ -53,6 +53,7 @@ export const USERS_OPTIONS = `${API}/users`;
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
+export const LOCATION_TEMPLATE = `${CONTEXT_PATH}${LOCATION_API}/template`;
 
 // ORDER
 export const ORDER = `${CONTEXT_PATH}/order`;
@@ -63,3 +64,6 @@ export const REPLENISHMENT_PRINT = id => `${CONTEXT_PATH}/replenishment/print/${
 
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = id => `/putAway/generatePdf/${id}`;
+
+// SUPPORT LINKS
+export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
