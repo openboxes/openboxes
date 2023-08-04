@@ -45,7 +45,7 @@ class ProductsConfigurationApiController {
                 throw new IllegalArgumentException("File cannot be empty")
             }
 
-            if (importFile.fileItem.contentType != "text/csv") {
+            if (importFile.contentType != "text/csv") {
                 throw new IllegalArgumentException("File must be in CSV format")
             }
 
