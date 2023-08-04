@@ -157,7 +157,6 @@ class ImportLocations extends Component {
                   defaultMessage="to download a template with instructions."
                 />&nbsp;
                 <Translate id="react.locationsConfiguration.click.label" defaultMessage="Click" />&nbsp;
-                {console.log(this.state.supportLinks)}
                 <a target="_blank" rel="noopener noreferrer" href={this.state.supportLinks.configureOrganizationsAndLocations || '#'}>
                   <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
                 </a>&nbsp;
