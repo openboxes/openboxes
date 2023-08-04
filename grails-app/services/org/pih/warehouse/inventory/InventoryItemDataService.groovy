@@ -6,10 +6,10 @@ import grails.gorm.services.Service
 @Service(InventoryItem)
 interface InventoryItemDataService {
 
-    InventoryItem save(InventoryItem inventoryItem);
+    InventoryItem save(InventoryItem inventoryItem)
 
     @Join("product")
-    InventoryItem getWithProduct(String id);
+    InventoryItem getWithProduct(String id)
 
-    void delete(String id);
+    void delete(String id)
 }
