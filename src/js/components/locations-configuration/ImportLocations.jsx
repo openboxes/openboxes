@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
 import FileDrop from 'components/form-elements/FileDrop';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess, stringUrlInterceptor } from 'utils/apiClient';
@@ -44,9 +45,7 @@ class ImportLocations extends Component {
   }
 
   getSupportLinks() {
-    const url = '/api/supportLinks';
-
-    apiClient.get(url).then((response) => {
+    apiClient.get(SUPPORT_LINKS).then((response) => {
       const supportLinks = response.data.data;
       this.setState({ supportLinks });
     });
@@ -91,7 +90,7 @@ class ImportLocations extends Component {
 
   downloadLocationsTemplate() {
     this.props.showSpinner();
-    apiClient.get('/api/locations/template')
+    apiClient.get(LOCATION_TEMPLATE)
       .then((response) => {
         fileDownload(response.data, 'Locations_template.csv', 'text/csv');
         this.props.hideSpinner();
@@ -158,6 +157,7 @@ class ImportLocations extends Component {
                   defaultMessage="to download a template with instructions."
                 />&nbsp;
                 <Translate id="react.locationsConfiguration.click.label" defaultMessage="Click" />&nbsp;
+                {console.log(this.state.supportLinks)}
                 <a target="_blank" rel="noopener noreferrer" href={this.state.supportLinks.configureOrganizationsAndLocations || '#'}>
                   <Translate id="react.locationsConfiguration.here.label" defaultMessage="here" />
                 </a>&nbsp;
