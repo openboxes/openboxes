@@ -13,6 +13,7 @@ import grails.validation.Validateable
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
 import org.pih.warehouse.product.Product
+import org.springframework.validation.Errors
 
 class RecordInventoryCommand implements Validateable {
 
@@ -36,7 +37,7 @@ class RecordInventoryCommand implements Validateable {
         transactionDate(nullable: false)
         comment(nullable: true)
         recordInventoryRow(nullable: true)
-        recordInventoryRows(validator: { val, obj, errors ->
+        recordInventoryRows(validator: { List<RecordInventoryRowCommand> val,  RecordInventoryCommand obj,  Errors errors ->
             def errorsFound = false
             val.each { row ->
                 if (row) {
@@ -44,7 +45,7 @@ class RecordInventoryCommand implements Validateable {
                     if (!row?.validate()) {
                         errorsFound = true
                         row.errors.allErrors.each { error ->
-                            obj.errors.rejectValue('recordInventoryRows', "recordInventoryCommand.recordInventoryRows.invalid",
+                            errors.rejectValue('recordInventoryRows', "recordInventoryCommand.recordInventoryRows.invalid",
                                     [row, error.getField(), error.getRejectedValue()] as Object[],
                                     "Property [${error.getField()}] of lot number #${row?.lotNumber} with value [${error.getRejectedValue()}] is invalid.")
                         }
