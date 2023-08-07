@@ -137,6 +137,23 @@ export const handleValidationErrors = (setState) => (error) => {
   return handleError(error);
 };
 
+export const mapToEmptyString = (values, valuesToSkip = []) => Object.keys(values)
+  .reduce((acc, curr) => {
+    if (values[curr] in valuesToSkip) {
+      return acc;
+    }
+    if (values[curr]) {
+      return {
+        ...acc,
+        [curr]: values[curr],
+      };
+    }
+    return {
+      ...acc,
+      [curr]: '',
+    };
+  }, {});
+
 apiClient.interceptors.response.use(handleSuccess, handleError);
 apiClient.interceptors.request.use(urlInterceptor, justRejectRequestError);
 
