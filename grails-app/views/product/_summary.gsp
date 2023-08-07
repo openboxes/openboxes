@@ -57,7 +57,7 @@
 				<td class="right" width="1%">
 					<div id="product-status" class="title">
 						<g:if test="${productInstance?.active}">
-							<g:productStatus product="${productInstance.id}"/>
+							<g:productStatus product="${productInstance}"/>
 						</g:if>
 						<g:else>
 							<span class="tag tag-danger"><g:message code="default.inactive.label"/></span>

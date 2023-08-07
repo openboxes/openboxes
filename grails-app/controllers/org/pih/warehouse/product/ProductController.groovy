@@ -19,6 +19,7 @@ import org.apache.commons.io.FilenameUtils
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationDataService
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RoleType
@@ -43,6 +44,9 @@ class ProductController {
     def userService
     MailService mailService
     def productService
+    ProductDataService productDataService
+    ProductTypeDataService productTypeDataService
+    LocationDataService locationGormService
     def documentService
     def inventoryService
     def barcodeService
@@ -160,9 +164,10 @@ class ProductController {
 
     def save() {
         println "Save product: " + params
-        def productInstance = new Product()
+        Product productInstance = new Product()
         productInstance.properties = params
-        def location = Location.get(session?.warehouse?.id)
+        productInstance.productType = productTypeDataService.getWithRequiredFields(params.productType?.id)
+        Location location = locationGormService.getWithSupportedActivities(session?.warehouse?.id)
 
         updateTags(productInstance, params)
 
@@ -177,8 +182,12 @@ class ProductController {
         // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
-            if (!productInstance.productCode) {
-                productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+            try {
+                if (!productInstance.productCode) {
+                    productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+                }
+            } catch (Exception e) {
+                productInstance.errors.rejectValue("productCode", e.message)
             }
         }
 
@@ -231,7 +240,7 @@ class ProductController {
     @Transactional
     def update() {
         log.info "Update called with params " + params
-        def productInstance = Product.get(params.id)
+        Product productInstance = productDataService.getWithDocumentsAndSynonymsAndProductCatalog(params.id)
 
         if (productInstance) {
             if (params.version) {
@@ -266,8 +275,12 @@ class ProductController {
                 // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
                 // when the session is closed.
                 if (productInstance.validate()) {
-                    if (!productInstance.productCode) {
-                        productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+                    try {
+                        if (!productInstance.productCode) {
+                            productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
+                        }
+                    } catch (Exception e) {
+                        productInstance.errors.rejectValue("productCode", e.message)
                     }
                 }
 

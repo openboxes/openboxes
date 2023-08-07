@@ -814,12 +814,16 @@ class ProductService {
             addTagsToProduct(product, productTags)
 
             if (!product?.id || product.validate()) {
-                if (!product.productCode) {
-                    product.productCode = generateProductIdentifier(product.productType)
+                try {
+                    if (!product.productCode) {
+                        product.productCode = generateProductIdentifier(product.productType)
+                    }
+                } catch (Exception e) {
+                    product.errors.rejectValue("productCode", e.message)
                 }
             }
 
-            if (!product.save(flush: true)) {
+            if (product.hasErrors() || !product.save(flush: true)) {
                 throw new ValidationException("Could not save product '" + product.name + "'", product.errors)
             }
         }
@@ -1137,6 +1141,7 @@ class ProductService {
 
         } catch (Exception e) {
             log.warn("Error generating unique product code " + e.message, e)
+            throw e
         }
         return productCode
     }
