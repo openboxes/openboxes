@@ -814,12 +814,8 @@ class ProductService {
             addTagsToProduct(product, productTags)
 
             if (!product?.id || product.validate()) {
-                try {
-                    if (!product.productCode) {
-                        product.productCode = generateProductIdentifier(product.productType)
-                    }
-                } catch (Exception e) {
-                    product.errors.rejectValue("productCode", e.message)
+                if (!product.productCode) {
+                    product.productCode = generateProductIdentifier(product.productType)
                 }
             }
 
@@ -1131,18 +1127,11 @@ class ProductService {
      * @return
      */
     def generateProductIdentifier(ProductType productType) {
-        def productCode
-
-        try {
-            productCode = identifierService.generateProductIdentifier(productType)
-            if (validateProductIdentifier(productCode)) {
-                return productCode
-            }
-
-        } catch (Exception e) {
-            log.warn("Error generating unique product code " + e.message, e)
-            throw e
+        def productCode = identifierService.generateProductIdentifier(productType)
+        if (!validateProductIdentifier(productCode)) {
+            throw new IllegalArgumentException("Generated product identifier already exists")
         }
+
         return productCode
     }
 

@@ -182,12 +182,8 @@ class ProductController {
         // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
         // when the session is closed.
         if (!productInstance?.id || productInstance.validate()) {
-            try {
-                if (!productInstance.productCode) {
-                    productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
-                }
-            } catch (Exception e) {
-                productInstance.errors.rejectValue("productCode", e.message)
+            if (!productInstance.productCode) {
+                productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
             }
         }
 
@@ -275,12 +271,8 @@ class ProductController {
                 // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
                 // when the session is closed.
                 if (productInstance.validate()) {
-                    try {
-                        if (!productInstance.productCode) {
-                            productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
-                        }
-                    } catch (Exception e) {
-                        productInstance.errors.rejectValue("productCode", e.message)
+                    if (!productInstance.productCode) {
+                        productInstance.productCode = productService.generateProductIdentifier(productInstance.productType)
                     }
                 }
 
