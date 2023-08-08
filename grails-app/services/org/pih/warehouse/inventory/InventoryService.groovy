@@ -1350,7 +1350,7 @@ class InventoryService implements ApplicationContextAware {
 
         try {
             // Create a new transaction
-            def transaction = new Transaction(cmd.properties)
+            Transaction transaction = new Transaction(cmd.properties)
             transaction.inventory = cmd.inventory
             transaction.comment = cmd.comment
             transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
@@ -1373,7 +1373,7 @@ class InventoryService implements ApplicationContextAware {
                     }
 
                     // 1. Find an existing inventory item for the given lot number and product and description
-                    def inventoryItem =
+                    InventoryItem inventoryItem =
                             findInventoryItemByProductAndLotNumber(cmd.product, row.lotNumber)
 
                     // 2. If the inventory item doesn't exist, we create a new one
@@ -1399,7 +1399,7 @@ class InventoryService implements ApplicationContextAware {
                         }
                     }
                     // 3. Create a new transaction entry (even if quantity didn't change)
-                    def transactionEntry = new TransactionEntry()
+                    TransactionEntry transactionEntry = new TransactionEntry()
                     transactionEntry.properties = row.properties
                     transactionEntry.quantity = row.newQuantity
                     transactionEntry.product = inventoryItem?.product
