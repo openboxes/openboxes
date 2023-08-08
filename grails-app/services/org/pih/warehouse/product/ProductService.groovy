@@ -1127,11 +1127,26 @@ class ProductService {
      * @return
      */
     def generateProductIdentifier(ProductType productType) {
-        def productCode = identifierService.generateProductIdentifier(productType)
-        if (!validateProductIdentifier(productCode)) {
-            throw new IllegalArgumentException("Generated product identifier already exists")
-        }
+        def productCode
 
+        try {
+            if (productType.validate()) {
+                productCode = identifierService.generateProductIdentifier(productType)
+            } else {
+                log.error("Invalid ProductType while generating product identifier")
+                // even if the product type is not valid we don't care
+                // since we are not going to use it to generate the identifier
+                productType.clearErrors()
+                productCode = identifierService.generateProductIdentifier()
+            }
+
+            if (validateProductIdentifier(productCode)) {
+                return productCode
+            }
+
+        } catch (Exception e) {
+            log.warn("Error generating unique product code " + e.message, e)
+        }
         return productCode
     }
 

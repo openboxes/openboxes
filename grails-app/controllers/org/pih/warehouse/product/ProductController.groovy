@@ -19,7 +19,6 @@ import org.apache.commons.io.FilenameUtils
 import org.hibernate.Criteria
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.LocationDataService
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RoleType
@@ -44,9 +43,6 @@ class ProductController {
     def userService
     MailService mailService
     def productService
-    ProductDataService productDataService
-    ProductTypeDataService productTypeDataService
-    LocationDataService locationGormService
     def documentService
     def inventoryService
     def barcodeService
@@ -166,8 +162,7 @@ class ProductController {
         println "Save product: " + params
         Product productInstance = new Product()
         productInstance.properties = params
-        productInstance.productType = productTypeDataService.getWithRequiredFields(params.productType?.id)
-        Location location = locationGormService.getWithSupportedActivities(session?.warehouse?.id)
+        Location location = Location.get(session?.warehouse?.id)
 
         updateTags(productInstance, params)
 
@@ -236,7 +231,7 @@ class ProductController {
     @Transactional
     def update() {
         log.info "Update called with params " + params
-        Product productInstance = productDataService.getWithDocumentsAndSynonymsAndProductCatalog(params.id)
+        Product productInstance = Product.get(params.id)
 
         if (productInstance) {
             if (params.version) {
@@ -1051,7 +1046,6 @@ class ProductController {
             tagList.each { tag ->
                 productInstance?.addToTags(tag)
             }
-            productInstance?.save()
             println "product.tags: " + productInstance.tags
 
         } catch (Exception e) {

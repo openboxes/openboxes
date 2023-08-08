@@ -34,7 +34,9 @@ class ProductType {
         name(blank: false, unique: true)
         code(nullable: true, unique: true)
         productTypeCode(nullable: false)
-        productIdentifierFormat(nullable: true)
+        productIdentifierFormat(nullable: true, validator: { val ->
+            return val.contains("0") ? true : ["productType.identifierFormatNotContainSequentialPart.message"]
+        })
         sequenceNumber(nullable: true)
     }
 
