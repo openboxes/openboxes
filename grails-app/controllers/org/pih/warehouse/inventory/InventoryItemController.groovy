@@ -814,7 +814,6 @@ class InventoryItemController {
         redirect(controller: "inventoryItem", action: "showStockCard", id: inventoryItem?.product?.id, params: ['inventoryItem.id': inventoryItem?.id])
     }
 
-    @Transactional
     def update() {
 
         log.info "Params " + params
@@ -849,7 +848,7 @@ class InventoryItemController {
                 return
             }
 
-            if (!itemInstance.hasErrors() && itemInstance.save(flush: true)) {
+            if (!itemInstance.hasErrors() && inventoryItemDataService.save(itemInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
             } else {
                 flash.error = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'inventoryItem.label', default: 'Inventory item'), itemInstance.id])}"
