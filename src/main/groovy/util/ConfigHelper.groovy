@@ -84,4 +84,7 @@ class ConfigHelper {
         return rule?.sort { it?.accessRules?.minimumRequiredRole?.sortOrder }?.first()
     }
 
+    static Date getMinimumExpirationDate() {
+        return Holders.config.getProperty("openboxes.expirationDate.minValue", Date.class)
+    }
 }

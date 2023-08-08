@@ -22,6 +22,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
+import util.ConfigHelper
 
 import java.text.SimpleDateFormat
 
@@ -99,7 +100,7 @@ class ProductSupplierDataService {
                 }
             }
 
-            def minDate = grailsApplication.config.openboxes.expirationDate.minValue
+            Date minDate = ConfigHelper.getMinimumExpirationDate()
             def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             if (validityStartDate) {
                 try {
