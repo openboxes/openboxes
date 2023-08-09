@@ -31,9 +31,9 @@ class ProductSupplierPreferenceDataService {
             def organizationCode = params.organizationCode
             def preferenceTypeName = params.preferenceTypeName
             params.validityStartDate = params.validityStartDate?.isNumber() ?
-                    CSVUtils.getDateFromExcel(params.validityStartDate as Integer) : params.validityStartDate
+                    CSVUtils.parseExcelDate(params.validityStartDate as Integer) : params.validityStartDate
             params.validityEndDate = params.validityEndDate?.isNumber() ?
-                    CSVUtils.getDateFromExcel(params.validityEndDate as Integer) : params.validityEndDate
+                    CSVUtils.parseExcelDate(params.validityEndDate as Integer) : params.validityEndDate
 
             if (!supplierCode) {
                 command.errors.reject("Row ${index + 1}: Product source code is required")
