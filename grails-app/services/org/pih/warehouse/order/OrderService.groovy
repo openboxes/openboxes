@@ -1132,11 +1132,11 @@ class OrderService {
                     property("productCode", "productCode")
                     property("name", "productName")
                 }
-                productSupplier {
+                productSupplier(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                     property("code", "sourceCode")
                     property("supplierCode", "supplierCode")
                     property("manufacturerCode", "manufacturerCode")
-                    manufacturer {
+                    manufacturer(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         property("name", "manufacturerName")
                     }
                 }
