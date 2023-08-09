@@ -30,16 +30,10 @@ class ProductSupplierPreferenceDataService {
             def supplierCode = params.supplierCode
             def organizationCode = params.organizationCode
             def preferenceTypeName = params.preferenceTypeName
-            Date validityStartDate, validityEndDate
-            if (params.validityStartDate.isNumber()) {
-                validityStartDate = CSVUtils.parseDateFromExcel(params.validityStartDate as Integer)
-                validityEndDate = CSVUtils.parseDateFromExcel(params.validityEndDate as Integer)
-                params.validityStartDate = validityStartDate.format("MM/dd/yyyy")
-                params.validityEndDate = validityEndDate.format("MM/dd/yyyy")
-            } else {
-                validityStartDate = Date.from(params.validityStartDate)
-                validityEndDate = Date.from(params.validityEndDate)
-            }
+            params.validityStartDate = params.validityStartDate?.isNumber() ?
+                    CSVUtils.getDateFromExcel(params.validityStartDate as Integer) : params.validityStartDate
+            params.validityEndDate = params.validityEndDate?.isNumber() ?
+                    CSVUtils.getDateFromExcel(params.validityEndDate as Integer) : params.validityEndDate
 
             if (!supplierCode) {
                 command.errors.reject("Row ${index + 1}: Product source code is required")
@@ -59,19 +53,20 @@ class ProductSupplierPreferenceDataService {
                 command.errors.reject("Row ${index + 1}: Preference Type with name: ${preferenceTypeName} does not exist")
             }
 
-            if (validityStartDate) {
+            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+            if (params.validityStartDate) {
                 try {
-                    validityStartDate.format("MM/dd/yyyy")
+                    dateFormat.parse(params.validityStartDate)
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid")
+                    command.errors.reject("Row ${index + 1}: Validity start date ${params.validityStartDate} is invalid")
                 }
             }
 
-            if (validityEndDate) {
+            if (params.validityEndDate) {
                 try {
-                    validityEndDate.format("MM/dd/yyyy")
+                    dateFormat.parse(params.validityEndDate)
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid")
+                    command.errors.reject("Row ${index + 1}: Validity end date ${params.validityEndDate} is invalid")
                 }
             }
         }
