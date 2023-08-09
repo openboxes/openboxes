@@ -12,6 +12,7 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
@@ -29,8 +30,16 @@ class ProductSupplierPreferenceDataService {
             def supplierCode = params.supplierCode
             def organizationCode = params.organizationCode
             def preferenceTypeName = params.preferenceTypeName
-            def validityStartDate = params.validityStartDate
-            def validityEndDate = params.validityEndDate
+            Date validityStartDate, validityEndDate
+            if (params.validityStartDate.isNumber()) {
+                validityStartDate = CSVUtils.parseDateFromExcel(params.validityStartDate as Integer)
+                validityEndDate = CSVUtils.parseDateFromExcel(params.validityEndDate as Integer)
+                params.validityStartDate = validityStartDate.format("MM/dd/yyyy")
+                params.validityEndDate = validityEndDate.format("MM/dd/yyyy")
+            } else {
+                validityStartDate = Date.from(params.validityStartDate)
+                validityEndDate = Date.from(params.validityEndDate)
+            }
 
             if (!supplierCode) {
                 command.errors.reject("Row ${index + 1}: Product source code is required")
@@ -50,10 +59,9 @@ class ProductSupplierPreferenceDataService {
                 command.errors.reject("Row ${index + 1}: Preference Type with name: ${preferenceTypeName} does not exist")
             }
 
-            def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
             if (validityStartDate) {
                 try {
-                    dateFormat.parse(validityStartDate)
+                    validityStartDate.format("MM/dd/yyyy")
                 } catch (Exception e) {
                     command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid")
                 }
@@ -61,7 +69,7 @@ class ProductSupplierPreferenceDataService {
 
             if (validityEndDate) {
                 try {
-                    dateFormat.parse(validityEndDate)
+                    validityEndDate.format("MM/dd/yyyy")
                 } catch (Exception e) {
                     command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid")
                 }
