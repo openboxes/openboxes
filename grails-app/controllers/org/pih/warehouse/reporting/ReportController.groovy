@@ -279,7 +279,7 @@ class ReportController {
         command.location = Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
+        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob", "GRAILS_JOBS"))
         def previousFireTime = triggers*.previousFireTime.max()
         def nextFireTime = triggers*.nextFireTime.max()
         def locationKey = LocationDimension.findByLocationId(command?.location?.id)
