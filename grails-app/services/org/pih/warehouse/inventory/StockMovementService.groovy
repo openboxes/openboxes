@@ -1057,7 +1057,8 @@ class StockMovementService {
         List<ReceiptItem> receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                            a?.sortOrder <=> b?.sortOrder
+                            a?.sortOrder <=> b?.sortOrder ?:
+                                    a?.inventoryItem?.product?.name <=>  b?.inventoryItem?.product?.name
         }
         return receiptItems
     }
@@ -1067,7 +1068,8 @@ class StockMovementService {
         List<ReceiptItem> receiptItems = shipment.receipts*.receiptItems?.flatten()?.sort { a, b ->
             a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
                     a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                            a?.sortOrder <=> b?.sortOrder
+                            a?.sortOrder <=> b?.sortOrder ?:
+                                    a?.inventoryItem?.product?.name <=>  b?.inventoryItem?.product?.name
         }
         return receiptItems
     }
