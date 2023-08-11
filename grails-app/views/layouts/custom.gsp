@@ -48,6 +48,8 @@
     <link rel="stylesheet" href="${resource(dir:'css',file:'loading.css')}" type="text/css" media="all" />
 
     <!-- jquery validation messages -->
+    <jqval:resources />
+    <jqvalui:resources />
     <g:if test="${ session?.user?.locale && session?.user?.locale != 'en'}">
         <script src="${resource(dir:'js/jquery.validation/', file:'messages_'+ session?.user?.locale + '.js')}"  type="text/javascript" ></script>
     </g:if>

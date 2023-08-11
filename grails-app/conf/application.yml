@@ -648,6 +648,65 @@ uiperformance:
     enabled: false
 
 # TODO OBGM 1: Add jqueryValidation plugin config if will be needed
+
+jqueryValidation:
+    packed: true
+    cdn: false  # false or "microsoft"
+    additionalMethods: false
+
+jqueryValidationUi:
+    errorClass: 'error'
+    validClass: 'valid'
+    onsubmit: true
+    renderErrorsOnTop: true
+    qTip:
+        packed: true
+        classes: 'ui-tooltip-red ui-tooltip-shadow ui-tooltip-rounded'
+    StringConstraintsMap:
+        blank: 'required'
+        creditCard: 'creditcard'
+        email: 'email'
+        inList: 'inList'
+        minSize: 'minlength'
+        maxSize: 'maxlength'
+        size: 'rangelength'
+        matches: 'matches'
+        notEqual: 'notEqual'
+        url: 'url'
+        nullable: 'required'
+        unique: 'unique'
+        validator: 'validator'
+    NumberConstraintsMap:
+        min: 'min'
+        max: 'max'
+        range: 'range'
+        notEqual: 'notEqual'
+        nullable: 'required'
+        inList: 'inList'
+        unique: 'unique'
+        validator: 'validator'
+    CollectionConstraintsMap:
+        minSize: 'minlength'
+        maxSize: 'maxlength'
+        size: 'rangelength'
+        nullable: 'required'
+        validator: 'validator'
+    DateConstraintsMap:
+        min: 'minDate'
+        max: 'maxDate'
+        range: 'rangeDate'
+        notEqual: 'notEqual'
+        nullable: 'required'
+        inList: 'inList'
+        unique: 'unique'
+        validator: 'validator'
+    ObjectConstraintsMap:
+        nullable: 'required'
+        validator: 'validator'
+    CustomConstraintsMap:
+        phone: 'true'
+        phoneUS: 'true'
+
 # TODO OBGM 2: Add log4j plugin config if will be needed
 # TODO OBGM 3: Add springcache plugin config if will be needed
 # TODO OBGM 4: Add raven plugin config if will be needed

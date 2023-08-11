@@ -432,6 +432,12 @@ dependencies {
      */
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
 
+    // https://mvnrepository.com/artifact/org.grails.plugins/jquery-validation-ui
+    implementation 'org.grails.plugins:jquery-validation-ui:1.4.7'
+
+    // https://mvnrepository.com/artifact/org.grails.plugins/jquery-validation
+    implementation 'org.grails.plugins:jquery-validation:1.9'
+
     implementation "com.github.librepdf:openpdf:${openPdfVersion}"
 
     // security patch
