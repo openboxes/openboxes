@@ -120,6 +120,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "partiallyFulfilled",
             "completelyFulfilled",
             "completelyReceived",
+            "partiallyReceived",
             "pending",
             "quantityRemainingToShip",
             "invoiceItems",
@@ -271,6 +272,10 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     Boolean isCompletelyReceived() {
         return (quantityReceived + quantityCanceled) >= quantity
+    }
+
+    Boolean isPartiallyReceived() {
+        return quantityReceived > 0 && !isCompletelyReceived()
     }
 
     Boolean isCompletelyInvoiced() {
