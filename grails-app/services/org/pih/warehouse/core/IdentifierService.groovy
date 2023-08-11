@@ -342,7 +342,9 @@ class IdentifierService {
         // and has sequential identifier format containing "0" character which indicates the sequential part
         // or identifier format is not specified when generatorTypeCode is SEQUENCE but has a code
         // then generate sequential, otherwise random
-        if (productType?.productIdentifierFormat?.contains("0") || (!productType?.productIdentifierFormat && productType?.code && generatorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE)) {
+        Boolean shouldGenerateSequential = generatorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE
+
+        if (productType?.hasSequentialFormat() || (productType?.code && shouldGenerateSequential)) {
             return generateSequentialProductIdentifier(productType)
         }
 
