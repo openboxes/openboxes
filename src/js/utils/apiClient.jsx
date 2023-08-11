@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
 import NotificationType from 'consts/notificationTypes';
+import { object } from 'prop-types';
 
 export const justRejectRequestError = (error) => Promise.reject(error);
 
@@ -142,6 +143,15 @@ export const mapToEmptyString = (values, valuesToSkip = []) => Object.keys(value
     if (values[curr] in valuesToSkip) {
       return acc;
     }
+
+    if (_.isPlainObject(values[curr])) {
+      const nestedObject = mapToEmptyString(values[curr], valuesToSkip);
+      return {
+        ...acc,
+        nestedObject,
+      };
+    }
+
     if (values[curr]) {
       return {
         ...acc,
