@@ -200,11 +200,4 @@ class CSVUtils {
         detector.dataEnd();
         return detector.getDetectedCharset() ?: 'MacRoman';
     }
-
-    static String parseExcelDate(Integer daysNumber) {
-        String dateFormat = "MM/dd/yyyy"
-        Date startDate = Date.parse(dateFormat, "01/01/1900")
-        Date convertedDate = startDate + daysNumber - 2
-        return convertedDate.format(dateFormat)
-    }
 }
