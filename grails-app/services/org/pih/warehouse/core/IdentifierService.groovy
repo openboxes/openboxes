@@ -240,13 +240,10 @@ class IdentifierService {
     }
 
     def generateSequentialProductIdentifier(ProductType productType) {
-        // If the product type does not have a custom identifier, then generate sequential product code from product type code
-        if (!productType.productIdentifierFormat) {
+        // If the product type does not have a custom identifier or does not contain character "0" which indicates the sequential part,
+        // then generate sequential product code from product type code
+        if (!productType.productIdentifierFormat || !productType.productIdentifierFormat.contains("0")) {
             return generateSequentialProductIdentifierFromCode(productType)
-        }
-
-        if (!productType.productIdentifierFormat.contains("0")) {
-            throw new IllegalArgumentException("Product identifier format on product type does not contain sequential part")
         }
 
         def sequenceFormat = extractSequenceFormat(productType.productIdentifierFormat, Constants.DEFAULT_SEQUENCE_NUMBER_FORMAT_CHAR, 1)
@@ -326,10 +323,11 @@ class IdentifierService {
      *          - empty productIdentifierFormat (will be generated basing on the openboxes.identifier.product.format)
      * */
     String generateProductIdentifier(ProductType productType) {
-        if (productType?.id == Holders.config.openboxes.identifier.defaultProductType.id) {
+        IdentifierGeneratorTypeCode generatorTypeCode = Holders.config.openboxes.identifier.productCode.generatorType as IdentifierGeneratorTypeCode
+        def defaultProductType = Holders.config.openboxes.identifier.defaultProductType
+
+        if (productType?.id == defaultProductType.id) {
             // If product type is systems default then generate basing on the generator type
-            def generatorTypeConfig = Holders.config.openboxes.identifier.productCode.generatorType
-            IdentifierGeneratorTypeCode generatorTypeCode = generatorTypeConfig as IdentifierGeneratorTypeCode
             switch (generatorTypeCode) {
                 case IdentifierGeneratorTypeCode.SEQUENCE:
                     return generateSequentialProductIdentifier(productType)
@@ -340,9 +338,13 @@ class IdentifierService {
             }
         }
 
-        // If product type is not deafult and has sequential identifier format or code,
-        // then generate sequentional, otherwise random
-        if (productType?.productIdentifierFormat?.contains("0") || productType?.code) {
+        // If product type is not default
+        // and has sequential identifier format containing "0" character which indicates the sequential part
+        // or identifier format is not specified when generatorTypeCode is SEQUENCE but has a code
+        // then generate sequential, otherwise random
+        Boolean shouldGenerateSequential = generatorTypeCode == IdentifierGeneratorTypeCode.SEQUENCE
+
+        if (productType?.hasSequentialFormat() || (productType?.code && shouldGenerateSequential)) {
             return generateSequentialProductIdentifier(productType)
         }
 

@@ -69,6 +69,10 @@ class ProductType {
         )
     }
 
+    Boolean hasSequentialFormat() {
+        return productIdentifierFormat?.contains("0")
+    }
+
     Integer getNextSequenceNumber() {
         if (!sequenceNumber) {
             return 1

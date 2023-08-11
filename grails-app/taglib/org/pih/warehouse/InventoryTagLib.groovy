@@ -20,11 +20,10 @@ class InventoryTagLib {
     def inventoryService
 
     def productStatus = { attrs, body ->
-        def product = Product.get(attrs.product)
         def location = attrs.location ? Location.get(attrs.location) : Location.get(session.warehouse.id)
-        def totalQuantity = inventoryService.getQuantityOnHand(location, product)
-        def inventoryLevel = inventoryService.getInventoryLevelByProductAndInventory(product, location.inventory)
-        out << render(template: "/taglib/productStatus", model: [product: product, inventoryLevel: inventoryLevel, totalQuantity: totalQuantity])
+        def totalQuantity = inventoryService.getQuantityOnHand(location, attrs.product)
+        def inventoryLevel = inventoryService.getInventoryLevelByProductAndInventory(attrs.product, location.inventory)
+        out << render(template: "/taglib/productStatus", model: [product: attrs.product, inventoryLevel: inventoryLevel, totalQuantity: totalQuantity])
     }
 
     def abcClassification = { attrs, body ->

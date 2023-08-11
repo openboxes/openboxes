@@ -160,9 +160,9 @@ class ProductController {
 
     def save() {
         println "Save product: " + params
-        def productInstance = new Product()
+        Product productInstance = new Product()
         productInstance.properties = params
-        def location = Location.get(session?.warehouse?.id)
+        Location location = Location.get(session?.warehouse?.id)
 
         updateTags(productInstance, params)
 
@@ -231,7 +231,7 @@ class ProductController {
     @Transactional
     def update() {
         log.info "Update called with params " + params
-        def productInstance = Product.get(params.id)
+        Product productInstance = Product.get(params.id)
 
         if (productInstance) {
             if (params.version) {
@@ -1046,7 +1046,6 @@ class ProductController {
             tagList.each { tag ->
                 productInstance?.addToTags(tag)
             }
-            productInstance?.save()
             println "product.tags: " + productInstance.tags
 
         } catch (Exception e) {
