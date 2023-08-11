@@ -14,6 +14,7 @@ import grails.util.Holders
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
 import grails.validation.ValidationException
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.plugins.web.taglib.ValidationTagLib
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
