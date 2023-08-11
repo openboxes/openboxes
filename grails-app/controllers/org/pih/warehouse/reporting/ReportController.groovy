@@ -12,6 +12,7 @@ package org.pih.warehouse.reporting
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementItem
@@ -279,7 +280,7 @@ class ReportController {
         command.location = Location.get(session.warehouse.id)
         command.rootCategory = productService.getRootCategory()
 
-        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob"))
+        def triggers = quartzScheduler.getTriggersOfJob(new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob", GrailsJobClassConstants.DEFAULT_GROUP))
         def previousFireTime = triggers*.previousFireTime.max()
         def nextFireTime = triggers*.nextFireTime.max()
         def locationKey = LocationDimension.findByLocationId(command?.location?.id)
