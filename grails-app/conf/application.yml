@@ -198,6 +198,7 @@ grails:
     databinding:
         dateFormats:
             - 'MM/dd/yyyy'
+        convertEmptyStringsToNull: false
 endpoints:
     jmx:
         unique-names: true
