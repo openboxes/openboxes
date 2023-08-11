@@ -232,7 +232,7 @@ class OrderService {
                 eq("origin", origin)
                 eq("destination", destination)
                 eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
-                ge("status", OrderStatus.PLACED)
+                'in'("status", [OrderStatus.PLACED, OrderStatus.PARTIALLY_RECEIVED])
             }
         }
     }

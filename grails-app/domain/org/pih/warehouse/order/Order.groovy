@@ -213,10 +213,10 @@ class Order implements Serializable {
      */
     OrderStatus updateStatus() {
         if (orderItems?.size() > 0 && orderItems?.size() == orderItems?.findAll {
-            it.isCompletelyFulfilled()
+            it.isCompletelyReceived()
         }?.size()) {
             status = OrderStatus.RECEIVED
-        } else if (orderItems?.size() > 0 && orderItems?.find { it.isPartiallyFulfilled() }) {
+        } else if (orderItems?.size() > 0 && orderItems?.find { it.isPartiallyReceived() }) {
             status = OrderStatus.PARTIALLY_RECEIVED
         } else if (!status) {
             status = OrderStatus.PENDING
