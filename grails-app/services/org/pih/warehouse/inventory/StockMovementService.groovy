@@ -1054,21 +1054,13 @@ class StockMovementService {
 
     List<ReceiptItem> getRequisitionBasedStockMovementReceiptItems(def stockMovement) {
         def shipments = Shipment.findAllByRequisition(stockMovement.requisition)
-        List<ReceiptItem> receiptItems = shipments*.receipts*.receiptItems?.flatten()?.sort { a, b ->
-            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
-                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                            a?.sortOrder <=> b?.sortOrder
-        }
+        List<ReceiptItem> receiptItems = shipments*.receipts?.flatten()*.sortReceiptItemsBySortOrder()?.flatten()
         return receiptItems
     }
 
     List<ReceiptItem> getShipmentBasedStockMovementReceiptItems(def stockMovement) {
         Shipment shipment = stockMovement.shipment
-        List<ReceiptItem> receiptItems = shipment.receipts*.receiptItems?.flatten()?.sort { a, b ->
-            a.shipmentItem?.requisitionItem?.orderIndex <=> b.shipmentItem?.requisitionItem?.orderIndex ?:
-                    a.shipmentItem?.sortOrder <=> b.shipmentItem?.sortOrder ?:
-                            a?.sortOrder <=> b?.sortOrder
-        }
+        List<ReceiptItem> receiptItems = shipment.receipts*.sortReceiptItemsBySortOrder()?.flatten()
         return receiptItems
     }
 
