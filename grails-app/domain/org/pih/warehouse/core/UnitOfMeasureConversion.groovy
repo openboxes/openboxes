@@ -36,6 +36,7 @@ class UnitOfMeasureConversion {
                 property "conversionRate"
             }
             eq("active", Boolean.TRUE)
+            order("lastUpdated", "desc")
             fromUnitOfMeasure {
                 eq("code", fromUomCode)
             }

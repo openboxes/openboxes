@@ -149,7 +149,7 @@ class Invoice implements Serializable {
         BigDecimal currentExchangeRate
         String defaultCurrencyCode = Holders.config.openboxes.locale.defaultCurrencyCode
         if (currencyUom?.code != defaultCurrencyCode) {
-            currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyUom?.code).list()
+            currentExchangeRate = UnitOfMeasureConversion.conversionRateLookup(defaultCurrencyCode, currencyUom?.code).get()
         }
         return totalValue * (currentExchangeRate ?: 1.0)
     }
