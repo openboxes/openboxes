@@ -24,13 +24,14 @@ class ProductSupplierPreferenceDataService {
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
+        String dateFormat = "MM/dd/yyyy"
         command.data.eachWithIndex { params, index ->
 
             String supplierCode = params.supplierCode
             String organizationCode = params.organizationCode
             String preferenceTypeName = params.preferenceTypeName
-            Date validityStartDate = params.validityStartDate
-            Date validityEndDate = params.validityEndDate
+            params.validityStartDate = params?.validityStartDate?.format(dateFormat)
+            params.validityEndDate = params?.validityEndDate?.format(dateFormat)
 
             if (!supplierCode) {
                 command.errors.reject("Row ${index + 1}: Product source code is required")
@@ -48,23 +49,6 @@ class ProductSupplierPreferenceDataService {
                 command.errors.reject("Row ${index + 1}: Preference Type is required")
             } else if (!PreferenceType.findByName(preferenceTypeName)) {
                 command.errors.reject("Row ${index + 1}: Preference Type with name: ${preferenceTypeName} does not exist")
-            }
-
-            String dateFormat = "MM/dd/yyyy"
-            if (validityStartDate) {
-                try {
-                    params.validityStartDate = validityStartDate.format(dateFormat)
-                } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity start date ${params.validityStartDate} is invalid")
-                }
-            }
-
-            if (validityEndDate) {
-                try {
-                    params.validityEndDate = validityEndDate.format(dateFormat)
-                } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity end date ${params.validityEndDate} is invalid")
-                }
             }
         }
     }
