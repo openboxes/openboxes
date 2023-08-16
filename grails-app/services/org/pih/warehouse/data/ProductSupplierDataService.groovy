@@ -202,6 +202,7 @@ class ProductSupplierDataService {
                 defaultProductPackage.productPrice = productPrice
             } else if (price && defaultProductPackage.productPrice) {
                 defaultProductPackage.productPrice.price = price
+                defaultProductPackage.lastUpdated = new Date()
             }
         }
 
