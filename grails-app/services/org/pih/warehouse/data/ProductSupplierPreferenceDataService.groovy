@@ -15,7 +15,6 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
-import java.text.SimpleDateFormat
 
 @Transactional
 class ProductSupplierPreferenceDataService {
@@ -24,14 +23,11 @@ class ProductSupplierPreferenceDataService {
 
     Boolean validate(ImportDataCommand command) {
         log.info "Validate data " + command.filename
-        String dateFormat = "MM/dd/yyyy"
         command.data.eachWithIndex { params, index ->
 
             String supplierCode = params.supplierCode
             String organizationCode = params.organizationCode
             String preferenceTypeName = params.preferenceTypeName
-            params.validityStartDate = params?.validityStartDate?.format(dateFormat)
-            params.validityEndDate = params?.validityEndDate?.format(dateFormat)
 
             if (!supplierCode) {
                 command.errors.reject("Row ${index + 1}: Product source code is required")
@@ -66,12 +62,12 @@ class ProductSupplierPreferenceDataService {
 
     def createOrUpdate(Map params) {
 
-        def supplierCode = params.supplierCode
-        def organizationCode = params.organizationCode
-        def preferenceTypeName = params.preferenceTypeName
-        def validityStartDate = params.validityStartDate
-        def validityEndDate = params.validityEndDate
-        def preferenceComments = params.preferenceComments
+        String supplierCode = params.supplierCode
+        String organizationCode = params.organizationCode
+        String preferenceTypeName = params.preferenceTypeName
+        Date validityStartDate = params.validityStartDate
+        Date validityEndDate = params.validityEndDate
+        String preferenceComments = params.preferenceComments
 
         ProductSupplier productSupplier = ProductSupplier.findByCode(supplierCode)
         Organization organization = null
@@ -80,17 +76,13 @@ class ProductSupplierPreferenceDataService {
         }
         PreferenceType preferenceType = PreferenceType.findByName(preferenceTypeName)
 
-        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-        Date parsedValidityStartDate = validityStartDate ? dateFormat.parse(validityStartDate) : null
-        Date parsedValidityEndDate = validityEndDate ? dateFormat.parse(validityEndDate) : null
-
         ProductSupplierPreference existingPreference = ProductSupplierPreference
                 .findByProductSupplierAndDestinationParty(productSupplier, organization)
 
         if (existingPreference) {
             existingPreference.preferenceType = preferenceType
-            existingPreference.validityStartDate = parsedValidityStartDate
-            existingPreference.validityEndDate = parsedValidityEndDate
+            existingPreference.validityStartDate = validityStartDate
+            existingPreference.validityEndDate = validityEndDate
             existingPreference.comments = preferenceComments
             return existingPreference
         } else {
@@ -98,8 +90,8 @@ class ProductSupplierPreferenceDataService {
             newPreference.productSupplier = productSupplier
             newPreference.destinationParty = organization
             newPreference.preferenceType = preferenceType
-            newPreference.validityStartDate = parsedValidityStartDate
-            newPreference.validityEndDate = parsedValidityEndDate
+            newPreference.validityStartDate = validityStartDate
+            newPreference.validityEndDate = validityEndDate
             newPreference.comments = preferenceComments
             return newPreference
         }
