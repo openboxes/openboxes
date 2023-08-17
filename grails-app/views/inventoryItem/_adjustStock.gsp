@@ -1,6 +1,5 @@
 <%@ page import="org.pih.warehouse.core.ReasonCode" %>
 <div class="dialog">
-    <jqvalui:renderValidationScript for="org.pih.warehouse.inventory.AdjustStockCommand" form="adjustStockForm"/>
     <g:form name="adjustStockForm" controller="inventoryItem" action="adjustStock" autocomplete="off">
 
         <g:hiddenField name="product.id" value="${inventoryItem?.product?.id}"/>

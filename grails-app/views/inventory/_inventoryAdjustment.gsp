@@ -2,7 +2,6 @@
 <g:form action="saveAdjustmentTransaction">
     <div class="box">
         <h2><g:message code="inventory.adjustStock.label"/></h2>
-        <g:hiddenField name="transactionInstance.id" value="${command?.transactionInstance?.id}"/>
         <g:hiddenField name="transactionInstance.inventory.id" value="${command?.warehouseInstance?.inventory?.id}"/>
         <g:hiddenField name="transactionInstance.transactionType.id" value="${command?.transactionInstance?.transactionType?.id }"/>
         <table>
