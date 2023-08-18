@@ -18,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
+import org.pih.warehouse.data.LocationDataService
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
 
@@ -25,10 +26,8 @@ import util.ConfigHelper
 class LocationService {
 
     GrailsApplication grailsApplication
-    def dataService
-    def productTypeService
-    def userService
-
+    UserService userService
+    LocationDataService locationDataService
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {

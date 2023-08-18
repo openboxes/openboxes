@@ -54,6 +54,7 @@ export const USERS_OPTIONS = `${API}/users`;
 export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
 export const LOCATION_TEMPLATE = `${CONTEXT_PATH}${LOCATION_API}/template`;
+export const LOCATION_IMPORT = `${CONTEXT_PATH}${LOCATION_API}/importCsv`;
 export const LOCATION = id => `${LOCATION_API}/${id}`;
 
 // ORDER
