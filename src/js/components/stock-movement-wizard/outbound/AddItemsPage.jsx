@@ -961,7 +961,7 @@ class AddItemsPage extends Component {
             // When there is an error during saving we have to find products which
             // caused the error. These items are not saved, so we don't have line ID,
             // and we have to find these items by product ID and SaveStatus
-            const notSavedItemsIds = payload.lineItems.map(item => item['product.id']);
+            const notSavedItemsIds = payload.lineItems.map(item => item.product.id);
             const lineItemsWithErrors = this.state.values.lineItems.map((item) => {
               if (
                 item.product &&
