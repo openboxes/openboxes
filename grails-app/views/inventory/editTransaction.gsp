@@ -35,7 +35,7 @@
 
 				<div class="yui-gf">
 					<div class="yui-u first">
-						<g:render template="../transaction/details" model="[transactionInstance:transactionInstance]"/>
+						<g:render template="/transaction/details" model="[transactionInstance:transactionInstance]"/>
 					</div>
 					<div class="yui-u">
 						<div class="tabs tabs-ui">
