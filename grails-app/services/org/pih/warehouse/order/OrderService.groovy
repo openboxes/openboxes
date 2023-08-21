@@ -64,7 +64,6 @@ class OrderService {
     InventoryService inventoryService
     ProductSupplierDataService productSupplierDataService
     PersonDataService personDataService
-    def stockMovementService
     GrailsApplication grailsApplication
 
     def getPurchaseOrders(Map params) {
@@ -119,7 +118,7 @@ class OrderService {
                             if (params.list("paymentTerm").contains("null")) {
                                 isNull("paymentTerm")
                             }
-                            paymentTerm {
+                            paymentTerm(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                                 'in'("id", params.list("paymentTerm"))
                             }
                         }
