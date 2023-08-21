@@ -182,8 +182,7 @@ class ProductController {
             }
         }
 
-        List<ProductField> ignoreFields = location.isAccountingRequired() ? [] : [ProductField.GL_ACCOUNT]
-        productInstance.validateRequiredFields(ignoreFields)
+        productInstance.validateRequiredFieldsInLocation(location)
 
         if (!productInstance.hasErrors() && productService.saveProduct(productInstance)) {
             log.info("saved product " + productInstance.errors)
@@ -273,8 +272,7 @@ class ProductController {
                     }
                 }
 
-                List<ProductField> ignoreFields = location.isAccountingRequired() ? [] : [ProductField.GL_ACCOUNT]
-                productInstance.validateRequiredFields(ignoreFields)
+                productInstance.validateRequiredFieldsInLocation(location)
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"

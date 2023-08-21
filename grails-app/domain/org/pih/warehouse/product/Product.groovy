@@ -613,6 +613,14 @@ class Product implements Comparable, Serializable {
         return isValid
     }
 
+    boolean validateRequiredFieldsInLocation(Location location) {
+        if (location.isAccountingRequired()) {
+            return validateRequiredFields()
+        }
+
+        return validateRequiredFields([ProductField.GL_ACCOUNT])
+    }
+
     /**
      * Converts product catalog association to string.
      *
