@@ -124,7 +124,7 @@
                                     <td>
 										<g:if test ="${!recordInventoryRow?.oldQuantity}">
 											<g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
-											<g:set var="minimumYear" value="${ConfigHelper.getMinimumExpirationDate()[Calendar.YEAR]}"/>
+											<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
 											<g:datePicker name="recordInventoryRows[${status}].expirationDate" years="${minimumYear..currentYear + 20}"
 														  noSelection="['': '']" precision="day" value="${recordInventoryRow?.expirationDate}"/>
 										</g:if>
@@ -464,7 +464,7 @@
             }
         </style>
         <g:set var="currentYear" value="${new Date()[Calendar.YEAR]}"/>
-		<g:set var="minimumYear" value="${ConfigHelper.getMinimumExpirationDate()[Calendar.YEAR]}"/>
+		<g:set var="minimumYear" value="${ConfigHelper.minimumExpirationDate[Calendar.YEAR]}"/>
         <g:datePicker name="recordInventoryRows[{{= getIndex()}}].expirationDate"
                       default="none"
 					  noSelection="['': '']"
