@@ -34,8 +34,8 @@ class ProductSupplierPreferenceImporter extends AbstractExcelImporter {
             organizationCode     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             organizationName     : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             preferenceTypeName   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            validityStartDate    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            validityEndDate      : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            validityStartDate    : ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
+            validityEndDate      : ([expectedType: ExpectedPropertyType.DateJavaType, defaultValue: null]),
             preferenceComments   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
