@@ -182,7 +182,7 @@ class ProductController {
             }
         }
 
-        productInstance.validateRequiredFields()
+        productInstance.validateRequiredFieldsInLocation(location)
 
         if (!productInstance.hasErrors() && productService.saveProduct(productInstance)) {
             log.info("saved product " + productInstance.errors)
@@ -232,6 +232,7 @@ class ProductController {
     def update() {
         log.info "Update called with params " + params
         Product productInstance = Product.get(params.id)
+        Location location = Location.get(session?.warehouse?.id)
 
         if (productInstance) {
             if (params.version) {
@@ -271,7 +272,7 @@ class ProductController {
                     }
                 }
 
-                productInstance.validateRequiredFields()
+                productInstance.validateRequiredFieldsInLocation(location)
 
                 if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
@@ -293,8 +294,6 @@ class ProductController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
             redirect(controller: "inventoryItem", action: "browse")
-
-
         }
     }
 
