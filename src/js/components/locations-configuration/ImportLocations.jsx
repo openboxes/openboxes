@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
+import { LOCATION_IMPORT, LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
 import FileDrop from 'components/form-elements/FileDrop';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess, stringUrlInterceptor } from 'utils/apiClient';
@@ -75,9 +75,7 @@ class ImportLocations extends Component {
       },
     };
 
-    const url = '/api/locations/importCsv';
-
-    return apiClient.post(url, formData, config)
+    return apiClient.post(LOCATION_IMPORT, formData, config)
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.locationsConfiguration.importSuccess.label', 'Locations Created Successfully'));
