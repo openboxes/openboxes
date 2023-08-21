@@ -11,6 +11,8 @@ package org.pih.warehouse.core
 
 class LocationTypeController {
 
+    LocationTypeDataService locationTypeDataService
+
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -29,8 +31,8 @@ class LocationTypeController {
     }
 
     def save() {
-        def locationTypeInstance = new LocationType(params)
-        if (locationTypeInstance.save(flush: true)) {
+        LocationType locationTypeInstance = new LocationType(params)
+        if (locationTypeDataService.save(locationTypeInstance)) {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), locationTypeInstance.id])}"
             redirect(action: "list", id: locationTypeInstance.id)
         }
@@ -40,7 +42,7 @@ class LocationTypeController {
     }
 
     def show() {
-        def locationTypeInstance = LocationType.get(params.id)
+        LocationType locationTypeInstance = locationTypeDataService.get(params.id)
         if (!locationTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), params.id])}"
             redirect(action: "list")
@@ -51,7 +53,7 @@ class LocationTypeController {
     }
 
     def edit() {
-        def locationTypeInstance = LocationType.get(params.id)
+        LocationType locationTypeInstance = locationTypeDataService.get(params.id)
         if (!locationTypeInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), params.id])}"
             redirect(action: "list")
@@ -62,7 +64,7 @@ class LocationTypeController {
     }
 
     def update() {
-        def locationTypeInstance = LocationType.get(params.id)
+        LocationType locationTypeInstance = locationTypeDataService.get(params.id)
         if (locationTypeInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -74,7 +76,7 @@ class LocationTypeController {
                 }
             }
             locationTypeInstance.properties = params
-            if (!locationTypeInstance.hasErrors() && locationTypeInstance.save(flush: true)) {
+            if (!locationTypeInstance.hasErrors() && locationTypeDataService.save(locationTypeInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), locationTypeInstance.id])}"
                 redirect(action: "list", id: locationTypeInstance.id)
             }
@@ -89,10 +91,10 @@ class LocationTypeController {
     }
 
     def delete() {
-        def locationTypeInstance = LocationType.get(params.id)
+        LocationType locationTypeInstance = locationTypeDataService.get(params.id)
         if (locationTypeInstance) {
             try {
-                locationTypeInstance.delete(flush: true)
+                locationTypeDataService.delete(locationTypeInstance.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), params.id])}"
                 redirect(action: "list")
             }
