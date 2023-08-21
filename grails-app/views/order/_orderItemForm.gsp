@@ -50,11 +50,9 @@
     <td class="center middle">
     </td>
     <td class="center middle">
-        <g:hiddenField id="defaultRecipient" name="defaultRecipient" value="${order?.orderedBy?.id}"/>
         <g:selectPerson
             id="recipient"
             name="recipient"
-            value="${order?.orderedBy?.id}"
             noSelection="['':'']" class="select2"
             data-placeholder="${g.message(code: 'default.selectAnOption.label', default: 'Select an Option')}"
         />

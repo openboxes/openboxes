@@ -594,9 +594,8 @@
           clearSource();
           $("#quantityUom").val(null).trigger('change');
 
-          // Reset recipient to default recipient
-          var defaultRecipient = $("#defaultRecipient").val();
-          $("#recipient").val(defaultRecipient).trigger("change");
+          // Reset recipient
+          $("#recipient").val("").trigger("change");
 
           // Reset estimated ready date
           $("#estimatedReadyDate-datepicker").datepicker('setDate', null);
