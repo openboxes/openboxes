@@ -596,15 +596,15 @@ class Product implements Comparable, Serializable {
         }
     }
 
-    def validateRequiredFields() {
+    boolean validateRequiredFields(List<ProductField> ignoreProductFields = []) {
         if (!productType || !productType?.requiredFields || productType?.requiredFields?.isEmpty()) {
             return true
         }
 
-        def isValid = true
+        boolean isValid = true
 
         productType.requiredFields.each {
-            if (!this."$it.fieldName") {
+            if (!ignoreProductFields.contains(it) && !this."$it.fieldName") {
                 isValid = false
                 errors.rejectValue(it.fieldName, "default.null.message", [it.fieldName, "Product"] as Object[], "")
             }
