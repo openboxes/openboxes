@@ -36,16 +36,20 @@ class UserService {
 
         def userInstance = User.get(userId)
 
+        if (params.roles) {
+            userInstance.roles = Role.findAllByIdInList(params.list("roles"))
+            params.remove("roles")
+        }
+
         // Password in the db is different from the one specified
         // so the user must have changed the password.  We need
         // to compare the password with confirm password before
         // setting the new password in the database
+        userInstance.properties = params
         if (params.changePassword && userInstance.password != params.password) {
-            userInstance.properties = params
             userInstance.password = params?.password?.encodeAsPassword()
             userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
         } else {
-            userInstance.properties = params
             // Needed to bypass the password == passwordConfirm validation
             userInstance.passwordConfirm = userInstance.password
         }
@@ -71,7 +75,7 @@ class UserService {
 
             // Check to make sure the roles are dirty
             def currentRoles = new HashSet(userInstance?.roles)
-            def updatedRoles = Role.findAllByIdInList(params.list("roles"))
+            def updatedRoles = params.roles ? Role.findAllByIdInList(params.list("roles")) : []
             def isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles)
             log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
             if (isRolesDirty && !canEditRoles) {
