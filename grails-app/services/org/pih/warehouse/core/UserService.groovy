@@ -34,10 +34,11 @@ class UserService {
 
     def updateUser(String userId, String currentUserId, Map params) {
 
-        def userInstance = User.get(userId)
+        User userInstance = User.get(userId)
+        List<Role> updatedRoles = params.roles ? Role.findAllByIdInList(params.list("roles")) : []
 
         if (params.roles) {
-            userInstance.roles = Role.findAllByIdInList(params.list("roles"))
+            userInstance.roles = updatedRoles
             params.remove("roles")
         }
 
@@ -70,13 +71,12 @@ class UserService {
         // We need to cache current role and check edit privilege here because the roles association
         // may change once we merge user and request parameters
         if (params.updateRoles) {
-            def currentUser = User.load(currentUserId)
-            def canEditRoles = canEditUserRoles(currentUser, userInstance)
+            User currentUser = User.load(currentUserId)
+            Boolean canEditRoles = canEditUserRoles(currentUser, userInstance)
 
             // Check to make sure the roles are dirty
-            def currentRoles = new HashSet(userInstance?.roles)
-            def updatedRoles = params.roles ? Role.findAllByIdInList(params.list("roles")) : []
-            def isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles)
+            HashSet<Role> currentRoles = new HashSet(userInstance?.roles)
+            boolean isRolesDirty = !ListUtils.isEqualList(updatedRoles, currentRoles)
             log.info "User update: ${updatedRoles} vs ${currentRoles}: isDirty=${isRolesDirty}, canEditRoles=${canEditRoles}"
             if (isRolesDirty && !canEditRoles) {
                 Object[] args = [currentUser.username, userInstance.username]
