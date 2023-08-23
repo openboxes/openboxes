@@ -20,15 +20,15 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<g:hasErrors bean="${productGroupInstance}">
+		<g:hasErrors>
 			<div class="errors">
-				<g:renderErrors bean="${productGroupInstance}" as="list" />
+				<g:renderErrors as="list" />
 			</div>
 		</g:hasErrors>
 
         <div class="summary">
 			<h1 class="title">
-				${productGroupInstance?.name}
+				${productGroup?.name}
 			</h1>
         </div>
 
@@ -51,8 +51,8 @@
                 </ul>
                 <div id="product-group-tab">
 					<g:form method="post" action="update">
-						<g:hiddenField name="id" value="${productGroupInstance?.id}" />
-						<g:hiddenField name="version" value="${productGroupInstance?.version}" />
+						<g:hiddenField name="id" value="${productGroup?.id}" />
+						<g:hiddenField name="version" value="${productGroup?.version}" />
 						<div class="box">
 							<h2><warehouse:message code="productGroup.label" default="Product group"/></h2>
 							<table>
@@ -62,9 +62,9 @@
 													code="productGroup.name.label" default="Name" /></label>
 										</td>
 										<td valign="top"
-											class="value ${hasErrors(bean: productGroupInstance, field: 'name', 'errors')}">
+											class="value ${hasErrors(bean: productGroup, field: 'name', 'errors')}">
 											<g:textField name="name" class="text large" size="100"
-												value="${productGroupInstance?.name}" />
+												value="${productGroup?.name}" />
 										</td>
 									</tr>
 
@@ -74,7 +74,7 @@
 													code="productGroup.category.label" default="Category" /></label></td>
 										<td valign="top" class="value">
 											<g:selectCategory name="category.id" class="chzn-select-deselect" noSelection="['null':'']"
-															  value="${productGroupInstance?.category?.id}" />
+															  value="${productGroup?.category?.id}" />
 
 										</td>
 									</tr>
@@ -83,8 +83,8 @@
 												code="productGroup.description.label" default="Description" /></label>
 										</td>
 										<td valign="top"
-											class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">
-											<g:textArea name="description" class="text" style="width: 100%" rows="5">${productGroupInstance?.description}</g:textArea>
+											class="value ${hasErrors(bean: productGroup, field: 'description', 'errors')}">
+											<g:textArea name="description" class="text" style="width: 100%" rows="5">${productGroup?.description}</g:textArea>
 										</td>
 									</tr>
 
@@ -108,13 +108,13 @@
 				<div id="product-group-products-tab">
 					<div class="box">
 						<h2><warehouse:message code="productGroup.products.label" default="Products"/></h2>
-						<g:render template="products" model="[productGroup: productGroupInstance, products: productGroupInstance?.products, isProductFamily: false]"/>
+						<g:render template="/productGroup/products" model="[productGroup: productGroup, products: productGroup?.products, isProductFamily: false]"/>
 					</div>
 				</div>
 				<div id="product-group-siblings-tab">
 					<div class="box">
 						<h2><warehouse:message code="productGroup.products.label" default="Products"/></h2>
-						<g:render template="products" model="[productGroup: productGroupInstance, products: productGroupInstance?.siblings, isProductFamily: true]"/>
+						<g:render template="/productGroup/products" model="[productGroup: productGroup, products: productGroup?.siblings, isProductFamily: true]"/>
 					</div>
 				</div>
 			</div>

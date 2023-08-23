@@ -40,28 +40,27 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<g:hasErrors bean="${productGroupInstance}">
+		<g:hasErrors>
 			<div class="errors">
-				<g:renderErrors bean="${productGroupInstance}" as="list" />
+				<g:renderErrors as="list" />
 			</div>
 		</g:hasErrors>
-
 		<div class="summary">
 			<h1 class="title"><g:message code="default.create.label" args="[g.message(code: 'productGroup.label')]"/></h1>
 		</div>
 
 		<div class="buttonBar">
-			<g:link class="button" action="list">
+			<g:link class="button" controller="productGroup" action="list">
 				<img src="${resource(dir:'images/icons/silk',file:'application_view_list.png')}"/>&nbsp;
 				<warehouse:message code="default.list.label" args="[warehouse.message(code:'productGroups.label')]"/>
 			</g:link>
-			<g:link class="button" action="create">
+			<g:link class="button" controller="productGroup" action="create">
 				<img src="${resource(dir:'images/icons/silk',file:'add.png')}"/>&nbsp;
 				<warehouse:message code="default.add.label" args="[warehouse.message(code:'productGroup.label')]"/>
 			</g:link>
 		</div>
 
-		<g:form action="save" method="post">
+		<g:form controller="productGroup" action="save" method="post">
 
 				<div class="box">
 
@@ -70,24 +69,23 @@
 					<table>
 						<tbody>
 
-
 							<tr class="prop">
 								<td valign="middle" class="name"><label for="name"><warehouse:message
 											code="productGroup.name.label" default="Generic product" /></label>
 								</td>
 								<td valign="middle"
-									class="value ${hasErrors(bean: productGroupInstance, field: 'name', 'errors')}">
+									class="value ${hasErrors(bean: productGroup, field: 'name', 'errors')}">
 
-									<g:if test="${productGroups }">
+									<g:if test="${productGroups}">
 										<div>
-											<g:select name="id" from="${productGroups }"
-												optionKey="id" optionValue="name" value="${productGroupInstance?.id }" noSelection="['null':'']"/>
+											<g:select name="id" from="${productGroups}"
+												optionKey="id" optionValue="name" value="${productGroup?.id }" noSelection="['null':'']"/>
 										</div>
 									</g:if>
 									<g:else>
 										<div>
 											<g:textField name="name" class="text large"
-												value="${productGroupInstance?.name}" />
+												value="${productGroup?.name}" />
 										</div>
 									</g:else>
 
@@ -97,16 +95,16 @@
                             <tr class="prop">
                                 <td valign="middle" class="name"><label for="category"><warehouse:message
                                         code="productGroup.category.label" default="Category" /></label></td>
-                                <td valign="middle" class="value ${hasErrors(bean: productGroupInstance, field: 'category', 'errors')}">
+                                <td valign="middle" class="value ${hasErrors(bean: productGroup, field: 'category', 'errors')}">
                                     <%-- Show category if coming from Inventory Browser --%>
-                                    <g:if test="${productGroupInstance?.category }">
-                                        <format:category category="${productGroupInstance?.category }"/>
+                                    <g:if test="${productGroup?.category }">
+                                        <format:category category="${productGroup?.category }"/>
                                         <g:hiddenField id="category" name="category.id"
-                                                       value="${productGroupInstance?.category?.id }" />
+                                                       value="${productGroup?.category?.id }" />
                                     </g:if>
                                     <g:else>
                                         <g:selectCategory name="category.id" class="chzn-select" noSelection="['null':'']"
-                                                          value="${productGroupInstance?.category?.id}" />
+                                                          value="${productGroup?.category?.id}" />
                                     </g:else>
 
                                 </td>
@@ -116,21 +114,21 @@
 										code="productGroup.description.label" default="Description" /></label>
 								</td>
 								<td valign="top"
-									class="value ${hasErrors(bean: productGroupInstance, field: 'description', 'errors')}">
-									<g:textArea name="description" class="text" style="width: 100%" rows="5">${productGroupInstance?.description}</g:textArea>
+									class="value ${hasErrors(bean: productGroup, field: 'description', 'errors')}">
+									<g:textArea name="description" class="text" style="width: 100%" rows="5">${productGroup?.description}</g:textArea>
 								</td>
 							</tr>
 
 
-							<g:if test="${productGroupInstance?.products }">
+							<g:if test="${productGroup?.products }">
 								<tr class="prop">
 									<td valign="top" class="name">
 										<label for="products"><warehouse:message
 												code="productGroup.products.label" default="Products" /></label>
 									</td>
-									<td class="value ${hasErrors(bean: productGroupInstance, field: 'products', 'errors')}">
+									<td class="value ${hasErrors(bean: productGroup, field: 'products', 'errors')}">
 										<table>
-											<g:each var="product" in="${productGroupInstance?.products }" status="status">
+											<g:each var="product" in="${productGroup?.products }" status="status">
 												<tr class="${status%2?'even':'odd' }">
 													<td class="middle" width="1%">
 														<g:checkBox id="productId" name="product.id" value="${product?.id }"/>
@@ -174,7 +172,7 @@
 										<g:submitButton name="create" class="button"
 											value="${warehouse.message(code: 'default.button.create.label', default: 'Create')}" />
 
-										<g:link action="list" class="button">
+										<g:link controller="productGroup" action="list" class="button">
 											${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}
 										</g:link>
 

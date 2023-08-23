@@ -1073,6 +1073,12 @@ openboxes.supportLinks = [
     knowledgeBase: 'https://openboxes.helpscoutdocs.com/',
 ]
 
+openboxes.errorHandler.templateMapping = [
+        "/productGroup/save": "/productGroup/create",
+        "/productGroup/addToProductGroup": "/productGroup/create",
+        "/productGroup/update": "/productGroup/edit",
+]
+
 // Reset an instance
 
 openboxes.resettingInstance.command = "wget https://raw.githubusercontent.com/openboxes/openboxes/develop/reset-database.sh | sh"

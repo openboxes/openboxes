@@ -41,7 +41,7 @@ class ProductGroupController {
     def create() {
         def productGroupInstance = new ProductGroup()
         productGroupInstance.properties = params
-        return [productGroupInstance: productGroupInstance]
+        return [productGroup: productGroupInstance]
     }
 
     // @CacheFlush("selectProductFamilyCache")
@@ -56,12 +56,9 @@ class ProductGroupController {
             productGroupInstance.addToProducts(product)
         }
 
-        if (productGroupDataService.save(productGroupInstance)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
-            redirect(action: "edit", id: productGroupInstance.id)
-        } else {
-            render(view: "create", model: [productGroupInstance: productGroupInstance])
-        }
+        productGroupDataService.save(productGroupInstance)
+        flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
+        redirect(action: "edit", id: productGroupInstance.id)
     }
 
     def show() {
@@ -84,7 +81,7 @@ class ProductGroupController {
         } else {
             productGroupInstance.properties = params
             log.info "category: " + productGroupInstance?.category?.name
-            return [productGroupInstance: productGroupInstance]
+            return [productGroup: productGroupInstance]
         }
     }
 
@@ -97,7 +94,7 @@ class ProductGroupController {
                 if (productGroupInstance.version > version) {
 
                     productGroupInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'productGroup.label', default: 'ProductGroup')] as Object[], "Another user has updated this ProductGroup while you were editing")
-                    render(view: "edit", model: [productGroupInstance: productGroupInstance])
+                    render(view: "edit", model: [productGroup: productGroupInstance])
                     return
                 }
             }
@@ -119,7 +116,7 @@ class ProductGroupController {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 redirect(action: "edit", id: productGroupInstance.id)
             } else {
-                render(view: "edit", model: [productGroupInstance: productGroupInstance])
+                render(view: "edit", model: [productGroup: productGroupInstance])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
@@ -130,9 +127,7 @@ class ProductGroupController {
 
     // @CacheFlush("selectProductFamilyCache")
     def update() {
-
         log.info "Update product group " + params
-
 
         ProductGroup productGroupInstance = productGroupDataService.get(params.id)
         if (productGroupInstance) {
@@ -141,21 +136,22 @@ class ProductGroupController {
                 if (productGroupInstance.version > version) {
 
                     productGroupInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'productGroup.label', default: 'ProductGroup')] as Object[], "Another user has updated this ProductGroup while you were editing")
-                    render(view: "edit", model: [productGroupInstance: productGroupInstance])
+                    render(view: "edit", model: [productGroup: productGroupInstance])
                     return
                 }
             }
             productGroupInstance.properties = params
 
-            if (!productGroupInstance.hasErrors() && productGroupDataService.save(productGroupInstance)) {
+            try {
+                productGroupDataService.save(productGroupInstance)
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
                 redirect(controller: "productGroup", action: "list")
-            } else {
+            } catch (Exception e) {
                 println productGroupInstance.errors
                 // Refresh the instance from db, to avoid returning to the view productGroupInstance
                 // that is persisted in Hibernate session with the binded properties that didn't pass the validation
                 productGroupInstance.refresh()
-                render(view: "edit", model: [productGroupInstance: productGroupInstance])
+                render(view: "edit", model: [productGroup: productGroupInstance])
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), params.id])}"
@@ -212,7 +208,7 @@ class ProductGroupController {
 
         List<ProductGroup> productGroups = ProductGroup.findAllByCategory(productGroupInstance.category)
 
-        render(view: "create", model: [productGroupInstance: productGroupInstance, productGroups: productGroups])
+        render(view: "create", model: [productGroup: productGroupInstance, productGroups: productGroups])
     }
 
     /**

@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import org.grails.exceptions.ExceptionUtils
+import org.grails.gsp.GroovyPagesTemplateEngine
 import org.pih.warehouse.RequestUtil
 import org.springframework.validation.BeanPropertyBindingResult
 import util.ConfigHelper
@@ -24,6 +25,7 @@ class ErrorsController {
     GrailsApplication grailsApplication
     def userAgentIdentService
     def localizationService
+    GroovyPagesTemplateEngine groovyPagesTemplateEngine
 
     def handleException() {
         if (RequestUtil.isAjax(request)) {
@@ -96,11 +98,12 @@ class ErrorsController {
     }
 
     def handleValidationErrors() {
+        Throwable exception = request.getAttribute('exception')
+        def root = ExceptionUtils.getRootCause(exception)
+        BeanPropertyBindingResult errors = root.getErrors()
+
         if (RequestUtil.isAjax(request)) {
             response.status = 400
-            Throwable exception = request.getAttribute('exception')
-            def root = ExceptionUtils.getRootCause(exception)
-            BeanPropertyBindingResult errors = root.getErrors()
             List<String> errorMessages = errors.allErrors.collect {
                 return g.message(error: it, locale: localizationService.currentLocale)
             }
@@ -108,6 +111,17 @@ class ErrorsController {
                     errorMessage: "Validation error. " + root.fullMessage,
                     errorMessages: errorMessages
             ] as JSON)
+            return
+        }
+
+        def path = request.forwardURI - request.contextPath
+        def engine = groovyPagesTemplateEngine
+
+        Map templateMapping = grailsApplication.config.openboxes.errorHandler.templateMapping
+        def viewPath = templateMapping[path] ?: path
+
+        if (engine.getResourceForUri("${viewPath}.gsp").exists() || engine.getResourceForUri("/grails-app/views/${viewPath}.gsp").exists()) {
+            respond errors.target, view: viewPath
             return
         }
         render(view: "/error")
