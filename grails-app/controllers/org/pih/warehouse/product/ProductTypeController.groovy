@@ -94,16 +94,10 @@ class ProductTypeController {
                     return
                 }
             }
-            if (params.supportedActivities) {
-                params.supportedActivities = params.list("supportedActivities") as ProductActivityCode[]
-            }
-            if (params.requiredFields) {
-                params.requiredFields = params.list("requiredFields") as ProductField[]
-            }
-            if (params.displayedFields) {
-                params.displayedFields = params.list("displayedFields") as ProductField[]
-            }
-            productTypeInstance.properties = params
+            params.supportedActivities = params.list("supportedActivities")
+            params.displayedFields = params.list("displayedFields")
+            bindData(productTypeInstance, params)
+
             if (productTypeService.saveProductType(productTypeInstance)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), productTypeInstance.id])}"
                 redirect(action: "list", id: productTypeInstance.id)
