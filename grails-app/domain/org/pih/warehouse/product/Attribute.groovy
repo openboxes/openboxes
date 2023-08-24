@@ -53,9 +53,9 @@ class Attribute {
     }
 
     static constraints = {
-        code(nullable: true, validator: { code, attribute ->
+        code(validator: { code, attribute ->
             Attribute existingAttribute = Attribute.findByCode(code)
-            if(existingAttribute && existingAttribute.id != attribute.id) {
+            if (existingAttribute && existingAttribute.id != attribute.id) {
                 ['default.not.unique.message']
             }
         })
