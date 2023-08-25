@@ -9,10 +9,13 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.databinding.BindUsing
+import org.pih.warehouse.NullBinderHelper
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import util.InventoryUtil
 
+@BindUsing(NullBinderHelper)
 class InventoryLevel {
 
     String id
