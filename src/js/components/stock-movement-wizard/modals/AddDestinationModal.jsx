@@ -121,7 +121,7 @@ class AddDestinationModal extends Component {
     const url = '/api/locations?useDefaultActivities=true';
 
     const { name, locationType, ...address } = values;
-    const payload = { name, 'locationType.id': _.get(locationType, 'id') || '' };
+    const payload = { name, locationType: _.get(locationType, 'id') || '' };
 
     apiClient.post(url, payload)
       .then((response) => {
