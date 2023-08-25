@@ -88,6 +88,7 @@
                                         <g:selectLocation class="chzn-select-deselect filter"
                                                           id="destination.id"
                                                           name="destination.id"
+                                                          hasOrganization="${true}"
                                                           activityCode="${ActivityCode.RECEIVE_STOCK}"
                                                           noSelection="['':'']"
                                                           value="${order?.destination?.id}"/>

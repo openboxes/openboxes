@@ -486,6 +486,10 @@ class SelectTagLib {
             ActivityCode activityCode = attrs.activityCode ?: null
             attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() }
 
+            if (attrs.hasOrganization) {
+                attrs.from = attrs.from.findAll { !!it.organization }
+            }
+
             // use sparingly - this is expensive since it requires multiple database queries
             if (activityCode) {
                 attrs.from = attrs.from.findAll { it.supports(activityCode) }
