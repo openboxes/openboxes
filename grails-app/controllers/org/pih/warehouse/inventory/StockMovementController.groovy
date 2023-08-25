@@ -33,7 +33,6 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-@Transactional
 class StockMovementController {
 
     def dataService
@@ -285,6 +284,7 @@ class StockMovementController {
         return stockMovement
     }
 
+    @Transactional
     def uploadDocument(DocumentCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
@@ -302,7 +302,7 @@ class StockMovementController {
         render([data: "Document was uploaded successfully"] as JSON)
     }
 
-
+    @Transactional
     def uploadDocuments(BulkDocumentCommand command ) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         Shipment shipment = stockMovement.shipment
