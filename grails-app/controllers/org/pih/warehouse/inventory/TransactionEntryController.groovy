@@ -25,6 +25,6 @@ class TransactionEntryController {
             transactionEntryInstance.transaction.removeFromTransactionEntries(transactionEntryInstance)
             transactionEntryInstance.delete()
         }
-        redirect(action: "list")
+        redirect(action: "index")
     }
 }
