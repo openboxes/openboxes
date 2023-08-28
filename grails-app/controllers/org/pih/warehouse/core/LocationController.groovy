@@ -18,13 +18,14 @@ import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.multipart.MultipartFile
 
-@Transactional
 class LocationController {
 
     def inventoryService
     def locationService
     def dataService
     def organizationService
+    LocationDataService locationGormService
+    UserDataService userGormService
 
     /**
      * Controllers for managing other locations (besides warehouses)
@@ -62,6 +63,7 @@ class LocationController {
         }
     }
 
+    @Transactional
     def update() {
         def locationInstance = inventoryService.getLocation(params.id)
 
@@ -183,9 +185,10 @@ class LocationController {
     }
 
     def resetSupportedActivities() {
-        def location = Location.get(params.id)
+        def location = locationGormService.get(params.id)
         location.supportedActivities.clear()
-        location.save()
+        locationGormService.save(location)
+
         redirect(action: "edit", id: params.id)
     }
 
@@ -276,18 +279,21 @@ class LocationController {
         def location = Location.get(params.id)
         if (location) {
             location.logo = []
-            location.save(flush: true)
+            locationGormService.save(location)
             flash.message = "Logo has been deleted"
         }
         redirect(action: "uploadLogo", id: params.id)
     }
 
+    @Transactional
     def deleteTransaction() {
         def transaction = Transaction.get(params.id)
         transaction.delete()
         flash.message = "Transaction deleted"
         redirect(action: "show", id: params.location.id)
     }
+
+    @Transactional
     def deleteShipment() {
         def shipment = Shipment.get(params.id)
         shipment.delete()
@@ -300,21 +306,24 @@ class LocationController {
         flash.message = "Order deleted"
         redirect(action: "show", id: params.location.id)
     }
+
+    @Transactional
     def deleteRequest() {
         def requestInstance = Requisition.get(params.id)
         requestInstance.delete()
         flash.message = "Request deleted"
         redirect(action: "show", id: params.location.id)
     }
+    @Transactional
     def deleteEvent() {
         def event = Event.get(params.id)
         event.delete()
         flash.message = "Event deleted"
         redirect(action: "show", id: params.location.id)
     }
+
     def deleteUser() {
-        def user = User.get(params.id)
-        user.delete()
+        userGormService.delete(params.id)
         flash.message = "User deleted"
         redirect(action: "show", id: params.location.id)
     }
