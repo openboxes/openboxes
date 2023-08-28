@@ -45,7 +45,7 @@ class ImportDataCommand implements Validateable {
             }
 
             return ['application/vnd.ms-excel', 'text/plain', 'text/csv', 'text/tsv'].any { fileType ->
-                val.part.fileItem.contentType == fileType
+                val.part.contentType == fileType
             }
         })
         importType(nullable: false)
