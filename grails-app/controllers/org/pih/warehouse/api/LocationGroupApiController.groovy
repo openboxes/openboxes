@@ -27,7 +27,7 @@ class LocationGroupApiController extends BaseDomainApiController {
     }
 
     def read() {
-        LocationGroup locationGroup = LocationGroupDataService.get(params.id)
+        LocationGroup locationGroup = locationGroupDataService.get(params.id)
         if (!locationGroup) {
             throw new IllegalArgumentException("No Location Group found for location group ID ${params.id}")
         }
