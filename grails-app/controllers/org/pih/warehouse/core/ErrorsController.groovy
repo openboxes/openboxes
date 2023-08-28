@@ -27,10 +27,10 @@ class ErrorsController {
 
     def handleException() {
         if (RequestUtil.isAjax(request)) {
-            def cause = request?.exception?.cause ?: request?.exception
-            def message = cause?.message ?: ""
-
-            render([errorCode: 500, cause: cause?.class, errorMessage: message] as JSON)
+            Throwable exception = request.getAttribute('exception')
+            def root = ExceptionUtils.getRootCause(exception)
+            def message = root?.message ?: ""
+            render([errorCode: 500, cause: root?.class, errorMessage: message] as JSON)
         } else {
             if (userAgentIdentService.isMobile()) {
                 render(view: "/mobile/error")
