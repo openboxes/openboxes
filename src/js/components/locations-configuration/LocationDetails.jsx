@@ -9,6 +9,7 @@ import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import { LOCATION_CREATE } from 'api/redirectUrls';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import ColorPickerField from 'components/form-elements/ColorPickerField';
 import FileField from 'components/form-elements/FileField';
@@ -365,7 +366,7 @@ class LocationDetails extends Component {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
-          this.props.history.push(`/locationsConfiguration/create/${resp.id}`);
+          this.props.history.push(LOCATION_CREATE(resp.id));
           this.props.nextPage({
             ...values,
             locationId: resp.id,
