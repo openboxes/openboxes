@@ -12,7 +12,6 @@ package org.pih.warehouse.inventory
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
-import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
@@ -22,7 +21,6 @@ import org.pih.warehouse.core.BulkDocumentCommand
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
-import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
@@ -33,7 +31,6 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-@Transactional
 class StockMovementController {
 
     def dataService
@@ -288,36 +285,15 @@ class StockMovementController {
     def uploadDocument(DocumentCommand command) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-        Shipment shipment = stockMovement.shipment
-        Document document = new Document()
-        document.fileContents = command.fileContents.bytes
-        document.contentType = command.fileContents.contentType
-        document.name = command.fileContents.originalFilename
-        document.filename = command.fileContents.originalFilename
-        document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
-
-        shipment.addToDocuments(document)
-        shipment.save()
+        stockMovementService.saveDocument(command.fileContents, stockMovement)
 
         render([data: "Document was uploaded successfully"] as JSON)
     }
 
-
     def uploadDocuments(BulkDocumentCommand command ) {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        Shipment shipment = stockMovement.shipment
 
-        command.filesContents.each { fileContent ->
-            Document document = new Document()
-            document.fileContents = fileContent.bytes
-            document.contentType = fileContent.contentType
-            document.name = fileContent.originalFilename
-            document.filename = fileContent.originalFilename
-            document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
-
-            shipment.addToDocuments(document)
-        }
-        shipment.save()
+        stockMovementService.saveDocuments(command.filesContents, stockMovement)
 
         render([data: "Documents were uploaded successfully"] as JSON)
     }

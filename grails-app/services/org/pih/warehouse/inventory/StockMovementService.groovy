@@ -31,6 +31,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
@@ -60,6 +61,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
+import org.springframework.web.multipart.MultipartFile
 
 @Transactional
 class StockMovementService {
@@ -2781,6 +2783,30 @@ class StockMovementService {
             StockMovement.buildCsvRow(it)
         }
         return lineItems
+    }
+
+    void addDocument(MultipartFile fileContents, StockMovement stockMovement) {
+        Shipment shipment = stockMovement.shipment
+        Document document = new Document()
+        document.fileContents = fileContents.bytes
+        document.contentType = fileContents.contentType
+        document.name = fileContents.originalFilename
+        document.filename = fileContents.originalFilename
+        document.documentType = DocumentType.get(Constants.DEFAULT_DOCUMENT_TYPE_ID)
+
+        shipment.addToDocuments(document)
+    }
+
+    void saveDocument(MultipartFile fileContent, StockMovement stockMovement) {
+        addDocument(fileContent, stockMovement)
+        stockMovement.shipment.save()
+    }
+
+    void saveDocuments(List<MultipartFile> filesContents, StockMovement stockMovement) {
+        filesContents.each { fileContent ->
+            addDocument(fileContent, stockMovement)
+        }
+        stockMovement.shipment.save()
     }
 
     def getDisabledMessage(StockMovement stockMovement, Location currentLocation, Boolean isEditing = false) {
