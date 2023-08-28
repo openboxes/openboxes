@@ -15,7 +15,7 @@ import org.pih.warehouse.core.User
 class ProductMergeLogger implements Serializable {
 
     def beforeInsert() {
-        def currentUser = AuthService.currentUser.get()
+        def currentUser = AuthService.currentUser
         if (currentUser) {
             createdBy = currentUser
             updatedBy = currentUser
@@ -23,7 +23,7 @@ class ProductMergeLogger implements Serializable {
     }
 
     def beforeUpdate() {
-        def currentUser = AuthService.currentUser.get()
+        def currentUser = AuthService.currentUser
         if (currentUser) {
             updatedBy = currentUser
         }

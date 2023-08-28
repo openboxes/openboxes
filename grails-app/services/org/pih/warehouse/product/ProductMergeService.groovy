@@ -9,6 +9,7 @@
 **/ 
 package org.pih.warehouse.product
 
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.Inventory
@@ -34,6 +35,7 @@ class ProductMergeService {
      * Preforms product swapping for a product pairs passed as params
      * TODO: OBPIH-5484 Refactor this part and move each relation swapping to the separate function
      * */
+    @Transactional
     def mergeProduct(String primaryId, String obsoleteId) {
         /**
          * ================================
