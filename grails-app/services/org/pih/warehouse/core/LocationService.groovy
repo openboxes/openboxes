@@ -106,6 +106,10 @@ class LocationService {
                 }
             }
 
+            if(params?.withOrganization) {
+                isNotNull("organization")
+            }
+
             eq("active", Boolean.TRUE)
             isNull("parentLocation")
         }

@@ -484,7 +484,8 @@ class SelectTagLib {
         // If attrs.from is populated use that by default even if it's empty
         if (!attrs.containsKey("from")) {
             ActivityCode activityCode = attrs.activityCode ?: null
-            attrs.from = locationService.getAllLocations().sort { it?.name?.toLowerCase() }
+            Map locationListAttributes = [withOrganization: attrs.withOrganization]
+            attrs.from = locationService.getLocations(null, locationListAttributes).sort { it?.name?.toLowerCase() }
 
             // use sparingly - this is expensive since it requires multiple database queries
             if (activityCode) {
