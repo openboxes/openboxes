@@ -15,8 +15,8 @@
             	<div class="message">${flash.message}</div>
             </g:if>
             <div class="list">
-            
-				<div>            	
+
+				<div>
 	            	<span class="linkButton">
 	            		<g:link class="new" action="create"><warehouse:message code="default.add.label" args="['transactionEntry']"/></g:link>
 	            	</span>
@@ -24,40 +24,40 @@
                 <table>
                     <thead>
                         <tr>
-                        
+
                             <g:sortableColumn property="id" title="${warehouse.message(code: 'transactionEntry.id.label', default: 'Id')}" />
-                        
+
                             <th><warehouse:message code="transactionEntry.inventoryItem.label" default="Inventory Item" /></th>
-                   	    
+
                             <g:sortableColumn property="quantity" title="${warehouse.message(code: 'transactionEntry.quantity.label', default: 'Quantity')}" />
-                        
+
                             <g:sortableColumn property="comments" title="${warehouse.message(code: 'transactionEntry.comments.label', default: 'Comments')}" />
-                        
+
                             <th><warehouse:message code="transactionEntry.transaction.label" default="Transaction" /></th>
-                   	    
+
                         </tr>
                     </thead>
                     <tbody>
-                    <g:each in="${transactionEntryInstanceList}" status="i" var="transactionEntryInstance">
+                    <g:each in="${transactionEntryList}" status="i" var="transactionEntry">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        
-                            <td><g:link action="edit" id="${transactionEntryInstance.id}">${fieldValue(bean: transactionEntryInstance, field: "id")}</g:link></td>
-                        
-                            <td>${fieldValue(bean: transactionEntryInstance, field: "inventoryItem")}</td>
-                        
-                            <td>${fieldValue(bean: transactionEntryInstance, field: "quantity")}</td>
-                        
-                            <td>${fieldValue(bean: transactionEntryInstance, field: "comments")}</td>
-                        
-                            <td>${fieldValue(bean: transactionEntryInstance, field: "transaction")}</td>
-                        
+
+                            <td><g:link action="edit" id="${transactionEntry.id}">${fieldValue(bean: transactionEntry, field: "id")}</g:link></td>
+
+                            <td>${fieldValue(bean: transactionEntry, field: "inventoryItem")}</td>
+
+                            <td>${fieldValue(bean: transactionEntry, field: "quantity")}</td>
+
+                            <td>${fieldValue(bean: transactionEntry, field: "comments")}</td>
+
+                            <td>${fieldValue(bean: transactionEntry, field: "transaction")}</td>
+
                         </tr>
                     </g:each>
                     </tbody>
                 </table>
             </div>
             <div class="paginateButtons">
-                <g:paginate total="${transactionEntryInstanceTotal}" />
+                <g:paginate total="${transactionEntryTotal}" />
             </div>
         </div>
     </body>

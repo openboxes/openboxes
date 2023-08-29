@@ -17,55 +17,55 @@
             <div class="dialog">
                 <table>
                     <tbody>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="transactionEntry.id.label" default="Id" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: transactionEntryInstance, field: "id")}</td>
-                            
+
+                            <td valign="top" class="value">${fieldValue(bean: transactionEntry, field: "id")}</td>
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="transactionEntry.inventoryItem.label" default="Inventory Item" /></td>
 
-                            <td valign="top" class="value"><g:link controller="inventoryItem" action="show" id="${transactionEntryInstance?.inventoryItem?.id}">${transactionEntryInstance?.inventoryItem}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="inventoryItem" action="show" id="${transactionEntry?.inventoryItem?.id}">${transactionEntry?.inventoryItem}</g:link></td>
 
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="transactionEntry.quantity.label" default="Quantity" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: transactionEntryInstance, field: "quantity")}</td>
-                            
+
+                            <td valign="top" class="value">${fieldValue(bean: transactionEntry, field: "quantity")}</td>
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="transactionEntry.comments.label" default="Comments" /></td>
-                            
-                            <td valign="top" class="value">${fieldValue(bean: transactionEntryInstance, field: "comments")}</td>
-                            
+
+                            <td valign="top" class="value">${fieldValue(bean: transactionEntry, field: "comments")}</td>
+
                         </tr>
-                    
+
                         <tr class="prop">
                             <td valign="top" class="name"><warehouse:message code="transactionEntry.transaction.label" default="Transaction" /></td>
 
-                            <td valign="top" class="value"><g:link controller="transaction" action="show" id="${transactionEntryInstance?.transaction?.id}">${transactionEntryInstance?.transaction}</g:link></td>
+                            <td valign="top" class="value"><g:link controller="transaction" action="show" id="${transactionEntry?.transaction?.id}">${transactionEntry?.transaction}</g:link></td>
 
                         </tr>
-                    
-                    
+
+
 						<tr class="prop">
                         	<td valign="top"></td>
-                        	<td valign="top">                         
+                        	<td valign="top">
 					            <div class="buttons">
 					                <g:form>
-					                    <g:hiddenField name="id" value="${transactionEntryInstance?.id}" />
+					                    <g:hiddenField name="id" value="${transactionEntry?.id}" />
 					                    <g:actionSubmit class="edit" action="edit" value="${warehouse.message(code: 'default.button.edit.label', default: 'Edit')}" />
 					                    <g:actionSubmit class="delete" action="delete" value="${warehouse.message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 					                </g:form>
 					            </div>
 							</td>
-						</tr>                    
+						</tr>
                     </tbody>
                 </table>
             </div>
