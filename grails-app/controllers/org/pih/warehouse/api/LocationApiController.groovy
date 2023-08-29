@@ -16,6 +16,7 @@ import org.hibernate.Criteria
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.LocationDataService
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.RoleType
@@ -28,7 +29,6 @@ import grails.core.GrailsApplication
 import org.springframework.web.multipart.MultipartFile
 import org.pih.warehouse.core.LocationStatus
 
-@Transactional
 class LocationApiController extends BaseDomainApiController {
 
     def locationService
@@ -37,6 +37,7 @@ class LocationApiController extends BaseDomainApiController {
     def identifierService
     def inventoryService
     def documentService
+    LocationDataService locationGormService
 
     def read() {
         Location location = Location.get(params.id)
@@ -145,7 +146,8 @@ class LocationApiController extends BaseDomainApiController {
         render ([data: data] as JSON)
     }
 
-    def create(Location location) {
+    def create() {
+        Location location = new Location()
         JSONObject jsonObject = request.JSON
 
         bindLocationData(location, jsonObject)
@@ -160,9 +162,7 @@ class LocationApiController extends BaseDomainApiController {
             throw new IllegalArgumentException("The organization ${location.organization.name} is inactive, you can't assign it to the location")
         }
 
-        if (!location.validate() || !location.save(failOnError: true)) {
-            throw new ValidationException("Invalid location ${location.name}", location.errors)
-        }
+        locationGormService.save(location)
 
         render ([data: location] as JSON)
     }
@@ -183,18 +183,8 @@ class LocationApiController extends BaseDomainApiController {
             existingLocation.supportedActivities.clear()
         }
 
-        if (existingLocation.validate() && !existingLocation.hasErrors()) {
-            if (existingLocation.address) {
-                if (existingLocation?.address?.validate() && !existingLocation?.address?.hasErrors()) {
-                    existingLocation.address.save()
-                } else {
-                    throw new ValidationException("Address validation failed", existingLocation.errors)
-                }
-            }
-            existingLocation.save()
-        } else {
-            throw new ValidationException("Invalid location ${existingLocation.name}", existingLocation.errors)
-        }
+        existingLocation.address?.validate()
+        locationGormService.save(existingLocation)
 
         render([data: existingLocation] as JSON)
     }
@@ -204,8 +194,7 @@ class LocationApiController extends BaseDomainApiController {
         if (jsonObject.containsKey("supportedActivities")) {
             jsonObject.supportedActivities = jsonObject.supportedActivities ?: [ActivityCode.NONE.id]
         }
-
-        bindData(location, jsonObject)
+        bindData(location, jsonObject, [exclude: ['logo', 'zoneId']])
 
         String logo = jsonObject.logo
 
@@ -224,6 +213,7 @@ class LocationApiController extends BaseDomainApiController {
         return location
     }
 
+    @Transactional
     def updateForecastingConfiguration() {
         JSONObject jsonObject = request.JSON
         Location existingLocation = Location.get(params.id)
