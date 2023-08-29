@@ -10,7 +10,6 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
-import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.math.NumberUtils
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.ActivityCode
@@ -33,7 +32,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-@Transactional
+
 class StockMovementApiController {
 
     def dataService
