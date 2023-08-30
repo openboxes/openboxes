@@ -17,12 +17,14 @@ class JobUtils {
     /** Return true if the given job class can run safely at the present time. */
     static boolean shouldExecute(Class clazz) {
         if (!Holders.flatConfig["openboxes.jobs.${getKey(clazz)}.enabled"]) {
+            log.info "Job ${getKey(clazz)} is disabled"
             return false
         }
         if (LiquibaseUtil.isRunningMigrations()) {
             log.info "Postponing job execution for ${getKey(clazz)} until liquibase migrations are complete"
             return false
         }
+        log.info "Job ${getKey(clazz)} is enabled"
         return true
     }
 
@@ -31,6 +33,8 @@ class JobUtils {
     }
 
     static String getCronExpression(Class clazz) {
-        return Holders.flatConfig["openboxes.jobs.${getKey(clazz)}.cronExpression"]
+        def cronExpression = Holders.flatConfig["openboxes.jobs.${getKey(clazz)}.cronExpression"]
+        log.info "Setting cron expression: ${cronExpression} for job ${getKey(clazz)}"
+        return cronExpression
     }
 }
