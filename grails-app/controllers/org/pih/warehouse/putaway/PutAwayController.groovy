@@ -37,6 +37,7 @@ class PutAwayController {
         } else if (params.id) {
             Order order = Order.get(params.id)
             putaway = Putaway.createFromOrder(order)
+            putaway.sortBy = params.sortBy
             putaway.putawayItems.each { PutawayItem putawayItem ->
                 putawayItem.availableItems =
                         productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
