@@ -194,6 +194,7 @@ class CreateStockMovement extends Component {
             this.props.history.push(stringUrlInterceptor(`/stockMovement/createCombinedShipments/${resp.id}`));
             this.props.nextPage({
               ...values,
+              dateRequested: resp.dateRequested,
               stockMovementId: resp.id,
               lineItems: resp.lineItems,
               movementNumber: resp.identifier,
