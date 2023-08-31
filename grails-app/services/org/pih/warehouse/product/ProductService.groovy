@@ -925,14 +925,14 @@ class ProductService {
      * @return
      */
     Category findOrCreateRootCategory(String rootCategoryName) {
-        def rootCategory = Category.findByName(rootCategoryName)
+        def rootCategory = Category.findByNameAndIsRoot(rootCategoryName, true)
 
-        if (rootCategory && rootCategory.isRoot) {
+        if (rootCategory) {
             return rootCategory
         }
 
         rootCategory = new Category(parentCategory: null, name: rootCategoryName, isRoot: true)
-        rootCategory.save(failOnError: true)
+        rootCategory.save(failOnError: true, flush: true)
 
         return rootCategory
     }
