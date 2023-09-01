@@ -868,7 +868,9 @@ class DocumentService {
                     row.getCell(CELL_INDEX++).setCellStyle(tableDataPalletStyle)
                     // If we're at a place in the XLS file where we want to merge cells (e.g. the packing list)
                     // Then we merge rows when the container name is different from the previous container name
-                    //sheet.addMergedRegion(CellRangeAddress.valueOf("A${packLevelOneInitialRowIndex + 1}:A${packLevelOneFinalRowIndex + 1}"))
+                    if (packLevelOneInitialRowIndex != packLevelOneFinalRowIndex) {
+                        sheet.addMergedRegion(CellRangeAddress.valueOf("A${packLevelOneInitialRowIndex + 1}:A${packLevelOneFinalRowIndex + 1}"))
+                    }
 
                     packLevelOneInitialRowIndex = row.getRowNum()
                     packLevelOneFinalRowIndex = row.getRowNum()
