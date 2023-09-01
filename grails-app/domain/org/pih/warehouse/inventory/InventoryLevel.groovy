@@ -9,6 +9,8 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.databinding.BindUsing
+import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 import util.InventoryUtil
@@ -45,12 +47,15 @@ class InventoryLevel {
     BigDecimal forecastPeriodDays = 30
 
     // Lead time in days (safety stock is lead time days x daily forecast quantity)
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "expectedLeadTimeDays")})
     BigDecimal expectedLeadTimeDays
 
     // Replenishment period in days
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "replenishmentPeriodDays")})
     BigDecimal replenishmentPeriodDays
 
     // Demand time period in days
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "demandTimePeriodDays")})
     BigDecimal demandTimePeriodDays
 
     // Preferred bin location
