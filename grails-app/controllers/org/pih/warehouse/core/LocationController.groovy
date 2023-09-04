@@ -12,6 +12,7 @@ package org.pih.warehouse.core
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryLevelDataService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.requisition.Requisition
@@ -24,6 +25,7 @@ class LocationController {
     def locationService
     def dataService
     def organizationService
+    InventoryLevelDataService inventoryLevelDataService
     LocationDataService locationGormService
     UserDataService userGormService
 
@@ -383,7 +385,7 @@ class LocationController {
 
         inventoryLevelInstance.properties = params
 
-        inventoryLevelInstance.save()
+        inventoryLevelDataService.save(inventoryLevelInstance)
 
         redirect(action: "edit", id: locationInstance.id)
     }
