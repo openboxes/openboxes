@@ -18,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.data.LocationDataService
 import org.pih.warehouse.importer.ImportDataCommand
 import util.ConfigHelper
@@ -228,7 +229,7 @@ class LocationService {
             if (query) {
                 or {
                     ilike("name", terms)
-                    organization {
+                    organization(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         ilike("name", terms)
                     }
                 }

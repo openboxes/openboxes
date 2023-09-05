@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
@@ -78,7 +79,7 @@ class MigrationService {
     def getReceiptsWithoutTransaction() {
         return Receipt.createCriteria().list() {
             eq("receiptStatusCode", ReceiptStatusCode.RECEIVED)
-            transaction {
+            transaction(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                 isNull("id")
             }
         }
@@ -89,7 +90,7 @@ class MigrationService {
             not {
                 'in'("currentStatus", [ShipmentStatusCode.PENDING])
             }
-            outgoingTransactions {
+            outgoingTransactions(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                 isNull("id")
             }
             origin {

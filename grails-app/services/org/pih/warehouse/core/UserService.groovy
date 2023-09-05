@@ -14,6 +14,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
 
 @Transactional
@@ -367,7 +368,7 @@ class UserService {
             def criteria = User.createCriteria()
             users = criteria.list {
                 eq("active", true)
-                roles {
+                roles(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                     eq("id", role.id)
                 }
             }
@@ -383,11 +384,11 @@ class UserService {
             users = User.createCriteria().listDistinct {
                 eq("active", true)
                 or {
-                    roles {
+                    roles(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         'in'("id", roleIds)
                     }
                     if (location) {
-                        locationRoles {
+                        locationRoles(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                             'in'("role.id", roleIds)
                             eq("location.id", location.id)
                         }

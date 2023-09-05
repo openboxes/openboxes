@@ -48,6 +48,7 @@ import org.docx4j.wml.Tr
 import org.docx4j.wml.TrPr
 //import org.groovydev.SimpleImageBuilder
 import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.Stocklist
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
@@ -1603,7 +1604,7 @@ class DocumentService {
                     documents {
                         property("id", "documentId")
                         property("documentNumber", "documentNumber")
-                        documentType {
+                        documentType(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                             property("name", "documentType")
                         }
                         property("name", "documentName")
@@ -1613,9 +1614,6 @@ class DocumentService {
                 }
                 eq("originParty", supplierOrganization)
                 eq("orderType", OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name()))
-                documents {
-                    isNotNull("id")
-                }
             }
 
         return documents
