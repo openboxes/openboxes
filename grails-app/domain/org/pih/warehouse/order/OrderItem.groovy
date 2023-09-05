@@ -88,6 +88,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         id generator: 'uuid'
         shipmentItems joinTable: [name: 'order_shipment', key: 'order_item_id']
         picklistItems cascade: "all-delete-orphan", sort: "id"
+        invoiceItems joinTable: [name: 'order_invoice', key: 'order_item_id']
     }
 
     static transients = [
@@ -120,7 +121,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
             "partiallyReceived",
             "pending",
             "quantityRemainingToShip",
-            "invoiceItems",
+            "allInvoiceItems",
             "quantityInvoiced",
             "quantityInvoicedInStandardUom",
             "orderItemStatus",
@@ -129,7 +130,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
 
     static belongsTo = [order: Order, parentOrderItem: OrderItem]
 
-    static hasMany = [orderItems: OrderItem, shipmentItems: ShipmentItem, orderAdjustments: OrderAdjustment, picklistItems: PicklistItem]
+    static hasMany = [orderItems: OrderItem, shipmentItems: ShipmentItem, orderAdjustments: OrderAdjustment, picklistItems: PicklistItem, invoiceItems: InvoiceItem]
 
     static constraints = {
         description(nullable: true)
@@ -334,27 +335,16 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
         return sortOrder
     }
 
-    List<InvoiceItem> getInvoiceItems() {
-        return InvoiceItem.executeQuery("""
-          SELECT ii
-            FROM InvoiceItem ii
-            LEFT JOIN ii.orderItems oi
-            LEFT JOIN ii.shipmentItems si
-            LEFT JOIN si.orderItems soi
-            WHERE oi.id = :id OR soi.id = :id
-          """, [id: id])
+    /**
+     * Returns all invoice items related to this order item.
+     * Either directly related to that order item or from related shipment items.
+     **/
+    List<InvoiceItem> getAllInvoiceItems() {
+        (shipmentItems*.invoiceItems + invoiceItems)?.flatten()?.unique() ?: []
     }
 
     Integer getQuantityInvoicedInStandardUom() {
-        return InvoiceItem.executeQuery("""
-          SELECT SUM(ii.quantity)
-            FROM InvoiceItem ii
-            JOIN ii.invoice i
-            JOIN ii.shipmentItems si
-            JOIN si.orderItems oi
-            WHERE oi.id = :id 
-            AND i.datePosted IS NOT NULL
-          """, [id: id])?.first() ?: 0
+        allInvoiceItems?.findAll { it?.invoice?.datePosted != null }?.collect {  it.quantity }?.sum() ?: 0
     }
 
     def getInvoices() {

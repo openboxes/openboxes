@@ -401,7 +401,7 @@ class Order implements Serializable {
             invoiceItems += it.invoiceItems
         }
         orderItems?.each {
-            invoiceItems += it.invoiceItems
+            invoiceItems += it.allInvoiceItems
         }
         return invoiceItems
     }

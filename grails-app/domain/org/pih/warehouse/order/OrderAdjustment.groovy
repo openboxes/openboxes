@@ -48,7 +48,6 @@ class OrderAdjustment implements Serializable {
     static transients = [
         'totalAdjustments',
         'postedPurchaseInvoiceItems',
-        'invoiceItems',
         'isInvoiced',
         "invoices",
         "hasInvoices",
@@ -59,9 +58,13 @@ class OrderAdjustment implements Serializable {
 
     static belongsTo = [order: Order, orderItem: OrderItem]
 
+    static hasMany = [invoiceItems: InvoiceItem]
+
     static mapping = {
         id generator: 'uuid'
+        invoiceItems joinTable: [name: 'order_adjustment_invoice', key: 'order_adjustment_id']
     }
+
     static constraints = {
         order(nullable:false)
         orderItem(nullable:true)
@@ -80,27 +83,10 @@ class OrderAdjustment implements Serializable {
         return amount ?: percentage ? orderItem ? orderItem?.subtotal * (percentage/100) : order.subtotal * (percentage/100) : 0
     }
 
-    def getInvoiceItems() {
-        return InvoiceItem.executeQuery("""
-          SELECT ii
-            FROM InvoiceItem ii
-            JOIN ii.invoice i
-            JOIN ii.orderAdjustments oa
-            WHERE oa.id = :id 
-          """, [id: id])
-    }
-
     def getPostedPurchaseInvoiceItems() {
-        return InvoiceItem.executeQuery("""
-          SELECT ii
-            FROM InvoiceItem ii
-            JOIN ii.invoice i
-            JOIN i.invoiceType it
-            JOIN ii.orderAdjustments oa
-            WHERE oa.id = :id 
-            AND i.datePosted IS NOT NULL
-            AND it.code = :purchaseInvoiceCode
-          """, [id: id, purchaseInvoiceCode: InvoiceTypeCode.INVOICE])
+        invoiceItems?.findAll {
+            it.invoice.datePosted != null && it.invoice.isRegularInvoice
+        }
     }
 
     Boolean getIsInvoiced() {
