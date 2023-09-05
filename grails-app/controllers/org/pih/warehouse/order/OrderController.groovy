@@ -1096,6 +1096,47 @@ class OrderController {
     }
 
     def orderSummary = {
+        Order order = Order.get(params.id)
+        render(template: "orderSummary", model: [orderInstance: order])
+    }
+
+    def itemStatus = {
+        Order order = Order.get(params.id)
+        render(template: "itemStatus", model: [orderInstance: order])
+    }
+
+    def itemDetails = {
+        Order order = Order.get(params.id)
+        render(template: "itemDetails", model: [orderInstance: order])
+    }
+
+    def orderAdjustments = {
+        Order order = Order.get(params.id)
+        render(template: "orderAdjustments", model: [orderInstance: order])
+    }
+
+    def orderShipments = {
+        Order order = Order.get(params.id)
+        render(template: "orderShipments", model: [orderInstance: order])
+    }
+
+    def orderInvoices = {
+        Order order = Order.get(params.id)
+        render(template: "orderInvoices", model: [orderInstance: order])
+    }
+
+    def orderDocuments = {
+        Order order = Order.get(params.id)
+        render(template: "orderDocuments", model: [orderInstance: order])
+    }
+
+    def orderComments = {
+        Order order = Order.get(params.id)
+        render(template: "orderComments", model: [orderInstance: order])
+    }
+
+    // For testing order derived status feature. orderSummaryList action gets the data from extended SQL view
+    def orderSummaryList = {
         params.max = params.max?:10
         params.offset = params.offset?:0
         def orderSummaryList = orderService.getOrderSummaryList(params)

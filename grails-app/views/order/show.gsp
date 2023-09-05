@@ -223,48 +223,53 @@
                     <div class="yui-u">
                         <div class="tabs tabs-ui">
                             <ul>
-                                <li><a href="#tabs-summary"><warehouse:message code="default.summary.label" default="Summary"/></a></li>
-                                <li><a href="#tabs-items"><g:message code="order.itemStatus.message" default="Item Status"/></a></li>
-                                <li><a href="#tabs-itemDetails"><g:message code="order.itemDetails.message" default="Item Details"/></a></li>
+                                <li>
+                                    <a href="${request.contextPath}/order/orderSummary/${orderInstance.id}">
+                                        <warehouse:message code="default.summary.label" default="Summary"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="${request.contextPath}/order/itemStatus/${orderInstance.id}">
+                                        <g:message code="order.itemStatus.message" default="Item Status"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="${request.contextPath}/order/itemDetails/${orderInstance.id}">
+                                        <g:message code="order.itemDetails.message" default="Item Details"/>
+                                    </a>
+                                </li>
                                 <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
-                                    <li><a href="#tabs-adjustments"><warehouse:message code="orderAdjustments.label"/></a></li>
-                                    <li><a href="#tabs-shipments"><warehouse:message code="shipments.label"/></a></li>
-                                    <li><a href="#tabs-invoices"><warehouse:message code="invoices.label"/></a></li>
+                                    <li>
+                                    <a href="${request.contextPath}/order/orderAdjustments/${orderInstance.id}">
+                                            <warehouse:message code="orderAdjustments.label"/>
+                                        </a>
+                                    </li>
+                                    <li>
+                                    <a href="${request.contextPath}/order/orderShipments/${orderInstance.id}">
+                                            <warehouse:message code="shipments.label"/>
+                                        </a>
+                                    </li>
+                                    <li>
+                                    <a href="${request.contextPath}/order/orderInvoices/${orderInstance.id}">
+                                            <warehouse:message code="invoices.label"/>
+                                        </a>
+                                    </li>
                                 </g:if>
-                                <li><a href="#tabs-documents"><warehouse:message code="documents.label"/></a></li>
+                                <li>
+                                    <a href="${request.contextPath}/order/orderDocuments/${orderInstance.id}">
+                                        <warehouse:message code="documents.label"/>
+                                    </a>
+                                </li>
                                 <li
                                     data-count="${orderInstance.comments.size() < 1000 ? orderInstance.comments.size() : '999+' }"
                                     class="${orderInstance.comments.size() > 0 ? 'tab-badge' : ''}"
                                 >
-                                    <a href="#tabs-comments"><warehouse:message code="comments.label" default="Comments"/></a>
+                                    <a href="${request.contextPath}/order/orderComments/${orderInstance.id}">
+                                        <warehouse:message code="comments.label" default="Comments"/>
+                                    </a>
                                 </li>
                             </ul>
-                            <div id="tabs-summary" class="ui-tabs-hide">
-                                <g:render template="/order/orderSummary"/>
-                            </div>
-                            <div id="tabs-items" class="ui-tabs-hide">
-                                <g:render template="/order/itemStatus"/>
-                            </div>
-                            <div id="tabs-itemDetails" class="ui-tabs-hide">
-                                <g:render template="/order/itemDetails"/>
-                            </div>
-                            <g:if test="${orderInstance.orderType?.code == OrderTypeCode.PURCHASE_ORDER.name()}">
-                                <div id="tabs-adjustments" class="ui-tabs-hide">
-                                    <g:render template="/order/orderAdjustments"/>
-                                </div>
-                                <div id="tabs-shipments" class="ui-tabs-hide">
-                                    <g:render template="/order/orderShipments"/>
-                                </div>
-                                <div id="tabs-invoices" class="ui-tabs-hide">
-                                    <g:render template="/order/orderInvoices"/>
-                                </div>
-                            </g:if>
-                            <div id="tabs-documents" class="ui-tabs-hide">
-                                <g:render template="/order/orderDocuments"/>
-                            </div>
-                            <div id="tabs-comments" class="ui-tabs-hide">
-                                <g:render template="/order/orderComments"/>
-                            </div>
+                            <div class="loading">Loading...</div>
                         </div>
                     </div>
                 </div>
@@ -280,6 +285,20 @@
                 $(".tabs").tabs({
                     cookie: {
                         expires: 1
+                    },
+                    ajaxOptions: {
+                      error: function(xhr, status, index, anchor) {
+                        // Reload the page if session has timed out
+                        if (xhr.statusCode == 401) {
+                          window.location.reload();
+                        }
+                      },
+                      beforeSend: function() {
+                        $('.loading').show();
+                      },
+                      complete: function() {
+                        $(".loading").hide();
+                      }
                     },
                     selected: ${params.tab ? params.tab : 0}
                 });
