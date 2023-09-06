@@ -265,6 +265,7 @@ class MigrationController {
         }
         else {
             data = data.collect {
+                def href = g.createLink(controller: "stockMovement", action: "show", id: it?.id)
                 [
                         shipmentNumber: "<a target='_blank' href='${href}'>${it?.shipmentNumber}</a>",
                         shipmentStatus: it.currentStatus.name(),

@@ -113,12 +113,12 @@ class OrderService {
                     if (params.createdBy) {
                         eq("createdBy.id", params.createdBy)
                     }
-                    if (params.paymentTerm) {
-                        or {
-                            if (params.list("paymentTerm").contains("null")) {
-                                isNull("paymentTerm")
-                            }
-                            paymentTerm(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                    paymentTerm(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        if (params.paymentTerm) {
+                            or {
+                                if (params.list("paymentTerm").contains("null")) {
+                                    isNull("id")
+                                }
                                 'in'("id", params.list("paymentTerm"))
                             }
                         }

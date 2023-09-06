@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -129,8 +130,8 @@ class OutboundStockMovementService {
                 } else if (params.sort == "dateRequested") {
                     order("dateRequested", params.order ?: "desc")
                 } else if (params.sort == "stocklist.name") {
-                    requisition {
-                        requisitionTemplate {
+                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
+                        requisitionTemplate(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                             order("name", params.order ?: "desc")
                         }
                     }

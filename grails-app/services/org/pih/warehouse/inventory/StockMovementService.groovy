@@ -444,8 +444,8 @@ class StockMovementService {
                         order("dateRequested", params.order ?: "desc")
                     }
                 } else if (params.sort == "stocklist.name") {
-                    requisition {
-                        requisitionTemplate {
+                    requisition(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
+                        requisitionTemplate(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
                             order("name", params.order ?: "desc")
                         }
                     }
