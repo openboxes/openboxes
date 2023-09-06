@@ -409,7 +409,7 @@ class ProductService {
                         order("name", sortOrder)
                     }
                 } else if (sortColumn == "updatedBy") {
-                    updatedBy {
+                    updatedBy(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         order("firstName", sortOrder)
                         order("lastName", sortOrder)
                     }
