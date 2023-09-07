@@ -9,36 +9,39 @@
  **/
 package org.pih.warehouse.product
 
-import grails.gorm.transactions.Transactional
 // TODO: Fix CacheFlush
 // import grails.plugin.springcache.annotations.CacheFlush
 
-@Transactional
 class CategoryController {
 
     def productService
+    CategoryDataService categoryGormService
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
     }
 
-
     def tree() {
         long startTime = System.currentTimeMillis()
-        def categoryInstance = Category.get(params.id)
+        def selectedCategory = Category.get(params.id) ?: productService.getRootCategory()
 
         println "Category tree: " + (System.currentTimeMillis() - startTime) + " ms"
+        List<Category> categoriesWithoutParent = productService.getCategoriesWithoutParent()
 
-        [rootCategory: productService.getRootCategory(), categoryInstance: categoryInstance]
+        [
+            selectedCategory:           selectedCategory,
+            categoriesWithoutParent:    categoriesWithoutParent,
+        ]
     }
-
 
     def move() {
         def parent = Category.get(params.newParent)
         def child = Category.get(params.child)
         child.parentCategory = parent
-        if (!child.hasErrors() && child.save(flush: true)) {
+
+        if (!child.hasErrors()) {
+            categoryGormService.save(child)
             flash.message = "${warehouse.message(code: 'default.success.message')}"
         }
         redirect(action: "tree")
@@ -53,24 +56,29 @@ class CategoryController {
             categoryInstance.properties = params
         }
 
-        if (!categoryInstance.hasErrors() && categoryInstance.save()) {
+        try {
+            categoryGormService.save(categoryInstance)
             flash.message = "${warehouse.message(code: 'category.saved.message', arg: [format.category(category: categoryInstance).decodeHTML()])}"
             redirect(action: "tree", model: [rootCategory: productService.getRootCategory()])
-        } else {
+        } catch (Exception e) {
             render(view: "edit", model: [categoryInstance: categoryInstance])
         }
     }
 
     def deleteCategory() {
-
-        def categoryInstance = Category.get(params.id)
+        Category categoryInstance = categoryGormService.get(params.id)
 
         if (categoryInstance) {
             try {
-                categoryInstance.delete(flush: true)
-            } catch (Exception e) {
-                //categoryInstance.errors.reject(e.getMessage())
-                throw e
+                categoryGormService.delete(params.id)
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                flash.error = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
+                List<Category> categoriesWithoutParent = productService.getCategoriesWithoutParent()
+
+                return render(view: "tree", model: [
+                        selectedCategory:           categoryInstance,
+                        categoriesWithoutParent:    categoriesWithoutParent,
+                ])
             }
         }
 
@@ -93,11 +101,11 @@ class CategoryController {
     //  @CacheFlush("selectCategoryCache")
     def save() {
         def categoryInstance = new Category(params)
-
-        if (categoryInstance.save(flush: true)) {
+        try {
+            categoryGormService.save(categoryInstance)
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
             redirect(action: "tree", id: categoryInstance.id)
-        } else {
+        } catch(Exception e) {
             render(view: "create", model: [categoryInstance: categoryInstance])
         }
     }
@@ -125,7 +133,7 @@ class CategoryController {
 
     //  @CacheFlush("selectCategoryCache")
     def update() {
-        def categoryInstance = Category.get(params.id)
+        Category categoryInstance = categoryGormService.get(params.id)
         if (categoryInstance) {
             if (params.version) {
                 def version = params.version.toLong()
@@ -137,7 +145,8 @@ class CategoryController {
                 }
             }
             categoryInstance.properties = params
-            if (!categoryInstance.hasErrors() && categoryInstance.save(flush: true)) {
+            if (!categoryInstance.hasErrors()) {
+                categoryGormService.save(categoryInstance)
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
                 redirect(action: "tree", id: categoryInstance.id)
             } else {
@@ -151,10 +160,10 @@ class CategoryController {
 
     //  @CacheFlush("selectCategoryCache")
     def delete() {
-        def categoryInstance = Category.get(params.id)
+        Category categoryInstance = categoryGormService.get(params.id)
         if (categoryInstance) {
             try {
-                categoryInstance.delete(flush: true)
+                categoryGormService.delete(params.id)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
                 redirect(action: "tree")
             }

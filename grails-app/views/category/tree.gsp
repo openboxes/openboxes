@@ -11,16 +11,33 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-			<g:hasErrors bean="${categoryInstance}">
-				<div class="errors"><g:renderErrors bean="${categoryInstance}" as="list" /></div>
+            <g:if test="${flash.error}">
+                <div class="errors">${flash.error}</div>
+            </g:if>
+			<g:hasErrors>
+				<div class="errors"><g:renderErrors as="list" /></div>
 			</g:hasErrors>
 
 
-            <div class="buttonBar">
+            <div class="buttonBar d-flex">
                 <g:link class="button" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
                 <g:isUserAdmin>
                     <g:link class="button" controller="category" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
                 </g:isUserAdmin>
+            <g:form class="select-category d-flex ml-auto mr-0" action="tree">
+                <div style="width: 15rem">
+                   <g:select
+                           name="id"
+                           class="select2"
+                           from="${categoriesWithoutParent}"
+                           optionValue="name"
+                           optionKey="id"
+                           value="${selectedCategory?.id}"
+
+                   />
+                </div>
+                <button class="button ml-2" type="submit">search</button>
+            </g:form>
             </div>
 
             <div class="yui-ga">
@@ -37,7 +54,7 @@
                                         </style>
 
                                         <%-- Display the category tree from the ROOT node --%>
-                                        <g:render template="tree" model="[category:rootCategory, level: 0]"/>
+                                        <g:render template="tree" model="[category:selectedCategory, level: 0]"/>
 
 
                                         <script>
