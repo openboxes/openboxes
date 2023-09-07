@@ -4,4 +4,5 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
     <include file="0.9.x/changelog-2023-02-21-1340-alter-table-order-change-date-ordered-column-type.xml" />
+    <include file="0.9.x/changelog-2023-09-07-1140-add-missing-is_root-value-to-root-catalog.xml" />
 </databaseChangeLog>
