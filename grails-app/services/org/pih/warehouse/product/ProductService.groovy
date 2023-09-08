@@ -28,7 +28,6 @@ import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.LocalizationUtil
 import util.ReportUtil
 import java.text.SimpleDateFormat
-import org.pih.warehouse.product.ProductGroup
 /**
  * @author jmiranda*
  */
@@ -1260,8 +1259,13 @@ class ProductService {
      * @param categories
      * @return
      */
-    List<Product> searchProducts(String[] terms, List<Category> categories) {
+    def searchProducts(String[] terms, List<Category> categories, boolean returnIds = false) {
         def results = Product.createCriteria().list {
+            if (returnIds) {
+                projections {
+                    property("id")
+                }
+            }
             createAlias('productSuppliers', 'ps', JoinType.LEFT_OUTER_JOIN)
             createAlias('productSuppliers.manufacturer', 'psm', JoinType.LEFT_OUTER_JOIN)
             createAlias('productSuppliers.supplier', 'pss', JoinType.LEFT_OUTER_JOIN)
@@ -1304,6 +1308,7 @@ class ProductService {
                 }
             }
         }
+
         return results
     }
 
