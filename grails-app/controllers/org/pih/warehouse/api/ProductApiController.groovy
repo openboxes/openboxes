@@ -126,9 +126,9 @@ class ProductApiController extends BaseDomainApiController {
             if (products) {
                 availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
             }
-            List results = []
+            products = []
             availableItems.each { k, v ->
-                results.add([
+                products.add([
                     productCode: k,
                     name: v[0].inventoryItem.product.name,
                     id: v[0].inventoryItem.product.id,
@@ -142,7 +142,7 @@ class ProductApiController extends BaseDomainApiController {
                 ])
             }
 
-            results = results.unique()
+            products = products.unique()
         } else {
             products = productService.searchProductDtos(terms)
         }

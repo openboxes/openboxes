@@ -650,42 +650,6 @@ class ProductAvailabilityService {
         return data
     }
 
-//    def getAvailableItems(Location location, List<String> productsIds) {
-//        log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
-//        def data = []
-//        if (location) {
-//            List<AvailableItemDto> results = ProductAvailability.executeQuery("""
-//						select
-//						    pa.product,
-//						    ii,
-//						    pa.binLocation,
-//						    pa.quantityOnHand,
-//						    pa.quantityAvailableToPromise
-//						from ProductAvailability pa
-//						left outer join pa.inventoryItem ii
-//						left outer join pa.binLocation bl
-//						where pa.location = :location
-//						and ${true ? "pa.product.id" : "pa.product"} in (:products)
-//						""", [location: location, products: productsIds])
-//            def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
-//            data = results.collect {
-//                def inventoryItem = it[1]
-//                def binLocation = it[2]
-//                def quantity = it[3]
-//
-//                return new AvailableItemDto(
-//                        it[0],
-//                        inventoryItem,
-//                        binLocation,
-//                        quantity,
-//                        it[4]
-//                )
-//
-//            }
-//        }
-//        return data
-//    }
-
     List getAvailableItems(Location location, List products, boolean excludeNegativeQuantity = false) {
         // Flag to check if products is a list of products objects or list of products ids
         boolean containsProductsIds = ListUtil.isTypeOfString(products)
