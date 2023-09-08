@@ -68,7 +68,7 @@ class ApiClientService {
         // Process response
         InputStream is = response.entity.content
         String data = IOUtils.toString(is, "UTF-8")
-        return new JSONObject(data)
+        return !data.isEmpty() ? new JSONObject(data) : null
     }
 
     static private getRequestConfig() {

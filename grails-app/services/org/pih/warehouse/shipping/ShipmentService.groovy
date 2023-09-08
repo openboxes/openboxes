@@ -63,6 +63,7 @@ class ShipmentService {
     def documentService
     def personDataService
     def productAvailabilityService
+    def webhookPublisherService
     GrailsApplication grailsApplication
 
     /**
@@ -1155,6 +1156,7 @@ class ShipmentService {
         else {
             throw new ValidationException("Failed to send shipment", shipmentInstance?.errors)
         }
+        webhookPublisherService.publishEvent(shipmentInstance)
 
         grailsApplication.mainContext.publishEvent(new ShipmentStatusTransitionEvent(shipmentInstance, ShipmentStatusCode.SHIPPED))
 

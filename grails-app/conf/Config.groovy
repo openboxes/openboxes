@@ -1091,6 +1091,9 @@ openboxes.browser.connection.status.timeout = 8000
 //google.analytics.enabled = false
 //google.analytics.webPropertyID = "UA-xxxxxx-x"
 
+// Default webhook URL
+openboxes.webhook.endpoint.url = 'https://webhook.site/9969a2d6-9780-483d-beb4-50667d66497d'
+
 // Fullstory integration
 openboxes.fullstory.enabled = false
 openboxes.fullstory.debug = false
