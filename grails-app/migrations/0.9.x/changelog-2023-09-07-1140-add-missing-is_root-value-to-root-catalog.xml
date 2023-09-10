@@ -8,12 +8,12 @@
         <sqlCheck expectedResult="1">
           SELECT count(*)
           FROM category
-          WHERE id = "ROOT"
+          WHERE id = "ROOT" AND is_root is NULL
         </sqlCheck>
     </preConditions>
     <update tableName="category">
       <column name="is_root" valueBoolean="true" />
-      <where>id='ROOT'</where>
+      <where>id='ROOT' and is_root is NULL</where>
     </update>
   </changeSet>
 </databaseChangeLog>
