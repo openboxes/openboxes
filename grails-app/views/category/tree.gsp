@@ -11,33 +11,28 @@
             <g:if test="${flash.message}">
             	<div class="message">${flash.message}</div>
             </g:if>
-            <g:if test="${flash.error}">
-                <div class="errors">${flash.error}</div>
-            </g:if>
 			<g:hasErrors>
 				<div class="errors"><g:renderErrors as="list" /></div>
 			</g:hasErrors>
-
+            <g:if test="${flash.error}">
+                <div class="errors">${flash.error}</div>
+            </g:if>
 
             <div class="buttonBar d-flex">
                 <g:link class="button" controller="category" action="tree"><warehouse:message code="default.list.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
                 <g:isUserAdmin>
                     <g:link class="button" controller="category" action="create"><warehouse:message code="default.add.label" args="[warehouse.message(code: 'category.label')]"/></g:link>
                 </g:isUserAdmin>
-            <g:form class="select-category d-flex ml-auto mr-0" action="tree">
-                <div style="width: 15rem">
-                   <g:select
-                           name="id"
-                           class="select2"
-                           from="${categoriesWithoutParent}"
-                           optionValue="name"
-                           optionKey="id"
-                           value="${selectedCategory?.id}"
-
-                   />
-                </div>
-                <button class="button ml-2" type="submit">search</button>
-            </g:form>
+                    <div style="width: 15rem" class="ml-auto mr-0">
+                       <g:select
+                               name="id"
+                               class="select2 root-category-select"
+                               from="${categoriesWithoutParent}"
+                               optionValue="name"
+                               optionKey="id"
+                               value="${selectedCategory?.id}"
+                       />
+                    </div>
             </div>
 
             <div class="yui-ga">
@@ -97,6 +92,10 @@
                                                             }
                                                         }
                                                 );
+
+                                                $('.root-category-select').on( "select2:select", function(e) {
+                                                    window.location.href = "${g.createLink( controller:'category', action:'tree' )}?id=" + e.params.data.id;
+                                                });
                                             });
                                         </script>
                                     </div>
