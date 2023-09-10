@@ -5,4 +5,5 @@
 
     <include file="0.9.x/changelog-2023-02-21-1340-alter-table-order-change-date-ordered-column-type.xml" />
     <include file="0.9.x/changelog-2023-09-07-1140-add-missing-is_root-value-to-root-catalog.xml" />
+    <include file="0.9.x/changelog-2023-09-08-1340-remove-missing-price-fk-on-product-packages.xml" />
 </databaseChangeLog>

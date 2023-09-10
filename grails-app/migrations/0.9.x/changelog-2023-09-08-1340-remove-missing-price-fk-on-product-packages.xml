@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="drodzewicz" id="080920231340-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM product_package ppkg
+          LEFT JOIN product_price pp
+          ON ppkg.product_price_id=pp.id
+          WHERE ppkg.product_price_id IS NOT NULL AND pp.id IS NULL;
+        </sqlCheck>
+      </not>
+    </preConditions>
+    <sql>
+      UPDATE product_package pkg
+      SET pkg.product_price_id = NULL
+      WHERE pkg.id IN (SELECT * FROM (
+      SELECT ppkg.id FROM product_package ppkg
+      LEFT JOIN product_price pp
+      ON ppkg.product_price_id=pp.id
+      WHERE ppkg.product_price_id IS NOT NULL AND pp.id IS NULL
+      ) as ppkg_ids);
+    </sql>
+  </changeSet>
+</databaseChangeLog>

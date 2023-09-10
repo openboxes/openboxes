@@ -163,7 +163,7 @@ class ProductSupplierDataService {
         UnitOfMeasure unitOfMeasure = params.defaultProductPackageUomCode ?
                 UnitOfMeasure.findByCode(params.defaultProductPackageUomCode) : null
         BigDecimal price = params.defaultProductPackagePrice ?
-                new BigDecimal(params.defaultProductPackagePrice) : null
+                new BigDecimal(params.defaultProductPackagePrice) : 0
         Integer quantity = params.defaultProductPackageQuantity as Integer
 
         ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(params["id"], params["code"])
