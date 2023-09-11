@@ -245,7 +245,7 @@ class LocationApiController extends BaseDomainApiController {
 
         try {
             locationService.deleteLocation(existingLocation)
-        } catch (Exception e) {
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
             throw new Exception("${warehouse.message(code: 'default.not.deleted.with.reason.message', args: [warehouse.message(code: 'location.label', default: 'Location'), existingLocation.id, e.message])}")
         }
 
