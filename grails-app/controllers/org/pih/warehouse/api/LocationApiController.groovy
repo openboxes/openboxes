@@ -242,7 +242,12 @@ class LocationApiController extends BaseDomainApiController {
         if (existingLocation.isZoneLocation() && Location.findAllByZone(existingLocation)) {
             throw new IllegalArgumentException("You cannot delete zone that is assigned to a bin location ${params.id}")
         }
-        locationService.deleteLocation(existingLocation)
+
+        try {
+            locationService.deleteLocation(existingLocation)
+        } catch (Exception e) {
+            throw new Exception("${warehouse.message(code: 'default.not.deleted.with.reason.message', args: [warehouse.message(code: 'location.label', default: 'Location'), existingLocation.id, e.message])}")
+        }
 
         render(status: 204)
     }
