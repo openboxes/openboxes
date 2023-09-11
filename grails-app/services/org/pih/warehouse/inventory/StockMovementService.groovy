@@ -63,7 +63,7 @@ import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.springframework.web.multipart.MultipartFile
 
-import java.util.stream.Collectors
+
 
 @Transactional
 class StockMovementService {
@@ -941,14 +941,15 @@ class StockMovementService {
                     where parent_requisition_item_id in (${editItemsIds})
                     """).groupBy { it.parent_requisition_item_id }
 
-        List<Product> products = Product.findAllByIdInList(data.collect { it.product_id })
+        List<String> productsIds = data.collect { it.product_id }
+        List<Product> products = Product.findAllByIdInList(productsIds)
         Map productsMap = products.inject([:]) { map, item -> map << [(item.id): item] }
 
         Requisition requisition = Requisition.get(data.first()?.requisition_id)
         def picklistItemsMap = requisition?.picklist?.pickablePicklistItemsByProductId
 
         Map<String, List<AvailableItem>> availableItemsMap = productAvailabilityService
-                .getAllAvailableBinLocations(requisition.origin, productsMap.keySet().stream().collect(Collectors.toList()))
+                .getAllAvailableBinLocations(requisition.origin, productsIds)
                 .groupBy { it?.inventoryItem?.product?.id }
 
         def editPageItems = data.collect {
@@ -1494,8 +1495,7 @@ class StockMovementService {
                     def picklistItems = requisitionItem.substitutionItems.findAll { it.product == associatedProduct }
                             .collect { it.picklistItems }?.flatten()
 
-                    availableItems = productAvailabilityService.getAllAvailableBinLocations(location, associatedProduct?.id)
-                    availableItems = availableItems.findAll { it.quantityOnHand > 0 }
+                    availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct?.id)
                     availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
                     availableItems = productAvailabilityService.sortAvailableItems(availableItems)
                 } else {
