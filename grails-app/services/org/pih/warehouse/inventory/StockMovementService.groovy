@@ -63,6 +63,8 @@ import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
 import org.springframework.web.multipart.MultipartFile
 
+import java.util.stream.Collectors
+
 @Transactional
 class StockMovementService {
 
@@ -939,13 +941,15 @@ class StockMovementService {
                     where parent_requisition_item_id in (${editItemsIds})
                     """).groupBy { it.parent_requisition_item_id }
 
-        def products = Product.findAllByIdInList(data.collect { it.product_id })
-        def productsMap = products.inject([:]) { map, item -> map << [(item.id): item] }
+        List<Product> products = Product.findAllByIdInList(data.collect { it.product_id })
+        Map productsMap = products.inject([:]) { map, item -> map << [(item.id): item] }
 
         Requisition requisition = Requisition.get(data.first()?.requisition_id)
         def picklistItemsMap = requisition?.picklist?.pickablePicklistItemsByProductId
 
-        def availableItemsMap = productAvailabilityService.getAllAvailableBinLocations(requisition.origin, products).groupBy { it?.inventoryItem?.product?.id }
+        Map<String, List<AvailableItem>> availableItemsMap = productAvailabilityService
+                .getAllAvailableBinLocations(requisition.origin, productsMap.keySet().stream().collect(Collectors.toList()))
+                .groupBy { it?.inventoryItem?.product?.id }
 
         def editPageItems = data.collect {
             def substitutionItems = substitutionItemsMap[it.id]
@@ -987,7 +991,7 @@ class StockMovementService {
                 statusCode                  : statusCode.name(),
                 substitutionItems           : substitutionItems.collect {
                     Product product = Product.get(it.product_id)
-                    List<AvailableItem> availableItemsForSubstitution = productAvailabilityService.getAllAvailableBinLocations(requisition.origin, product)
+                    List<AvailableItem> availableItemsForSubstitution = productAvailabilityService.getAllAvailableBinLocations(requisition.origin, product?.id)
                     def picklistForSubstitution = (picklistItemsMap && picklistItemsMap[it.product_id]) ? picklistItemsMap[it.product_id] : []
                     availableItemsForSubstitution = calculateQuantityAvailableToPromise(availableItemsForSubstitution, picklistForSubstitution)
 
@@ -1371,7 +1375,7 @@ class StockMovementService {
     }
 
     List<AvailableItem> getAvailableItems(Location location, RequisitionItem requisitionItem, Boolean calculateStatus) {
-        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product)
+        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, requisitionItem.product?.id)
         def picklistItems = getPicklistItems(requisitionItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 }
@@ -1490,12 +1494,12 @@ class StockMovementService {
                     def picklistItems = requisitionItem.substitutionItems.findAll { it.product == associatedProduct }
                             .collect { it.picklistItems }?.flatten()
 
-                    availableItems = productAvailabilityService.getAllAvailableBinLocations(location, associatedProduct)
+                    availableItems = productAvailabilityService.getAllAvailableBinLocations(location, associatedProduct?.id)
                     availableItems = availableItems.findAll { it.quantityOnHand > 0 }
                     availableItems = calculateQuantityAvailableToPromise(availableItems, picklistItems)
                     availableItems = productAvailabilityService.sortAvailableItems(availableItems)
                 } else {
-                    availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct)
+                    availableItems = productAvailabilityService.getAvailableBinLocations(location, associatedProduct?.id)
                 }
 
                 log.info "Available items for substitution ${associatedProduct}: ${availableItems}"

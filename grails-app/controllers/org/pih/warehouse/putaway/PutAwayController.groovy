@@ -39,7 +39,7 @@ class PutAwayController {
             putaway = Putaway.createFromOrder(order)
             putaway.putawayItems.each { PutawayItem putawayItem ->
                 putawayItem.availableItems =
-                        productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product)
+                        productAvailabilityService.getAllAvailableBinLocations(putawayItem.currentFacility, putawayItem.product?.id)
                 putawayItem.inventoryLevel = InventoryLevel.findByProductAndInventory(putawayItem.product, putaway.origin.inventory)
             }
             jsonObject = new JSONObject(putaway.toJson())

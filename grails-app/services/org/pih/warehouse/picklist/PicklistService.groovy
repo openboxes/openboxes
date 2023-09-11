@@ -215,7 +215,7 @@ class PicklistService {
     }
 
     List<AvailableItem> getAvailableItems(Location location, OrderItem orderItem) {
-        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, orderItem.product)
+        List<AvailableItem> availableItems = productAvailabilityService.getAllAvailableBinLocations(location, orderItem.product?.id)
         def picklistItems = getPicklistItems(orderItem)
 
         availableItems = availableItems.findAll { it.quantityOnHand > 0 && it.inventoryItem != orderItem.inventoryItem && it.binLocation != orderItem.destinationBinLocation }

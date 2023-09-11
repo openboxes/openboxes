@@ -22,7 +22,6 @@ import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
 import org.hibernate.type.StandardBasicTypes
-import org.pih.warehouse.ListUtil
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
@@ -30,7 +29,6 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.PagedResultList
-import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -650,10 +648,8 @@ class ProductAvailabilityService {
         return data
     }
 
-    List getAvailableItems(Location location, List products, boolean excludeNegativeQuantity = false) {
-        // Flag to check if products is a list of products objects or list of products ids
-        boolean containsProductsIds = ListUtil.isTypeOfString(products)
-        log.info("getQuantityOnHandByBinLocation: location=${location} product=${products}")
+    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false) {
+        log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
         List<AvailableItem> data = []
         if (location) {
             def results = ProductAvailability.executeQuery("""
@@ -668,7 +664,7 @@ class ProductAvailabilityService {
 						where pa.location = :location
 						""" +
                         "${excludeNegativeQuantity ? "and pa.quantityOnHand > 0" : ""}" +
-                        "and ${containsProductsIds ? "pa.product.id" : "pa.product"} in (:products)", [location: location, products: products])
+                        "and pa.product.id in (:products)", [location: location, products: productsIds])
 
             data = results.collect {
                 InventoryItem inventoryItem = it[0]
@@ -705,16 +701,16 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        return getAvailableBinLocations(location, [product])
+    List<AvailableItem> getAvailableBinLocations(Location location, String productId) {
+        return getAvailableBinLocations(location, [productId])
     }
 
-    List<AvailableItem> getAllAvailableBinLocations(Location location, Product product) {
-        return getAllAvailableBinLocations(location, [product])
+    List<AvailableItem> getAllAvailableBinLocations(Location location, String productId) {
+        return getAllAvailableBinLocations(location, [productId])
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, List products) {
-        List<AvailableItem> availableItems = getAvailableItems(location, products, true)
+    List<AvailableItem> getAvailableBinLocations(Location location, List<String> productsIds) {
+        List<AvailableItem> availableItems = getAvailableItems(location, productsIds, true)
 
         availableItems = sortAvailableItems(availableItems)
 
@@ -723,18 +719,9 @@ class ProductAvailabilityService {
 
     // Include also bin locations with negative qty (needed for edit page items)
     List<AvailableItem> getAllAvailableBinLocations(Location location, List products) {
-        def availableBinLocations = getAvailableItems(location, products)
+        List<AvailableItem> availableBinLocations = getAvailableItems(location, products)
 
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantityAvailableToPromise,
-                    quantityOnHand: it.quantityOnHand
-            )
-        }
-
-        return availableItems
+        return availableBinLocations
     }
 
     /**
