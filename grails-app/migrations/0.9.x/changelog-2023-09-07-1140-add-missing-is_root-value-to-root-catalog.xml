@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="drodzewicz" id="070920231140-0">
+    <preConditions onFail="MARK_RAN">
+        <sqlCheck expectedResult="1">
+          SELECT count(*)
+          FROM category
+          WHERE id = "ROOT" AND is_root is NULL
+        </sqlCheck>
+    </preConditions>
+    <update tableName="category">
+      <column name="is_root" valueBoolean="true" />
+      <where>id='ROOT' and is_root is NULL</where>
+    </update>
+  </changeSet>
+</databaseChangeLog>

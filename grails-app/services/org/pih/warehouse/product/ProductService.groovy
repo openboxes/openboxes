@@ -457,6 +457,14 @@ class ProductService {
         return category;
     }
 
+    List<Category> getCategoriesWithoutParent() {
+        return Category.findAllByParentCategoryIsNull().sort { a, b ->
+            b?.isRoot <=> a?.isRoot ?:
+                a?.sortOrder <=> b?.sortOrder ?:
+                    a?.name <=> b?.name
+        }
+    }
+
     List getCategoryTree() {
         return Category.list()
     }
