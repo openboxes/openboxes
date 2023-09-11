@@ -26,11 +26,9 @@ import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.PagedResultList
-import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -650,13 +648,12 @@ class ProductAvailabilityService {
         return data
     }
 
-    List getAvailableItems(Location location, List<Product> products) {
-        log.info("getQuantityOnHandByBinLocation: location=${location} product=${products}")
-        def data = []
+    List getAvailableItems(Location location, List<String> productsIds, boolean excludeNegativeQuantity = false) {
+        log.info("getQuantityOnHandByBinLocation: location=${location} product=${productsIds}")
+        List<AvailableItem> data = []
         if (location) {
             def results = ProductAvailability.executeQuery("""
 						select 
-						    pa.product, 
 						    ii,
 						    pa.binLocation,
 						    pa.quantityOnHand,
@@ -665,22 +662,22 @@ class ProductAvailabilityService {
 						left outer join pa.inventoryItem ii
 						left outer join pa.binLocation bl
 						where pa.location = :location
-						and pa.product in (:products)
-						""", [location: location, products: products])
-            def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
-            data = results.collect {
-                def inventoryItem = it[1]
-                def binLocation = it[2]
-                def quantity = it[3]
+						""" +
+                        "${excludeNegativeQuantity ? "and pa.quantityOnHand > 0" : ""}" +
+                        "and pa.product.id in (:products)", [location: location, products: productsIds])
 
-                [
-                        status                      : status(quantity),
-                        product                     : it[0],
+            data = results.collect {
+                InventoryItem inventoryItem = it[0]
+                Location binLocation = it[1]
+                Integer quantityOnHand = it[2]
+                Integer quantityAvailableToPromise = it[3]
+
+                return new AvailableItem(
                         inventoryItem               : inventoryItem,
                         binLocation                 : binLocation,
-                        quantityOnHand              : quantity,
-                        quantityAvailableToPromise  : it[4]
-                ]
+                        quantityOnHand              : quantityOnHand,
+                        quantityAvailable           : quantityAvailableToPromise
+                )
             }
         }
         return data
@@ -704,46 +701,27 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
-        return getAvailableBinLocations(location, [product])
+    List<AvailableItem> getAvailableBinLocations(Location location, String productId) {
+        return getAvailableBinLocations(location, [productId])
     }
 
-    List<AvailableItem> getAllAvailableBinLocations(Location location, Product product) {
-        return getAllAvailableBinLocations(location, [product])
+    List<AvailableItem> getAllAvailableBinLocations(Location location, String productId) {
+        return getAllAvailableBinLocations(location, [productId])
     }
 
-    List<AvailableItem> getAvailableBinLocations(Location location, List products) {
-        def availableBinLocations = getAvailableItems(location, products)
-
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantityAvailableToPromise,
-                    quantityOnHand: it.quantityOnHand
-            )
-        }
-
-        availableItems = availableItems.findAll { it.quantityOnHand > 0 }
+    List<AvailableItem> getAvailableBinLocations(Location location, List<String> productsIds) {
+        List<AvailableItem> availableItems = getAvailableItems(location, productsIds, true)
 
         availableItems = sortAvailableItems(availableItems)
+
         return availableItems
     }
 
     // Include also bin locations with negative qty (needed for edit page items)
     List<AvailableItem> getAllAvailableBinLocations(Location location, List products) {
-        def availableBinLocations = getAvailableItems(location, products)
+        List<AvailableItem> availableBinLocations = getAvailableItems(location, products)
 
-        List<AvailableItem> availableItems = availableBinLocations.collect {
-            return new AvailableItem(
-                    inventoryItem: it?.inventoryItem,
-                    binLocation: it?.binLocation,
-                    quantityAvailable: it.quantityAvailableToPromise,
-                    quantityOnHand: it.quantityOnHand
-            )
-        }
-
-        return availableItems
+        return availableBinLocations
     }
 
     /**

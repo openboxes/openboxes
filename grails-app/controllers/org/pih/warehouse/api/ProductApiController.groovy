@@ -121,14 +121,14 @@ class ProductApiController extends BaseDomainApiController {
         String[] terms = params?.name?.split(",| ")?.findAll { it }
         def products, availableItems = []
         if(params.availableItems) {
-            def location = Location.get(session.warehouse.id)
-            products = productService.searchProducts(terms, [])
+            Location location = Location.get(session.warehouse.id)
+            products = productService.searchProducts(terms, [], true)
             if (products) {
                 availableItems = productAvailabilityService.getAvailableBinLocations(location, products).groupBy { it.inventoryItem?.product?.productCode }
             }
             products = []
             availableItems.each { k, v ->
-                products += [
+                products.add([
                     productCode: k,
                     name: v[0].inventoryItem.product.name,
                     id: v[0].inventoryItem.product.id,
@@ -139,7 +139,7 @@ class ProductApiController extends BaseDomainApiController {
                     }.min()?.format("MM/dd/yyyy"),
                     color: v[0].inventoryItem.product.color,
                     active: v[0].inventoryItem.product?.active
-                ]
+                ])
             }
 
             products = products.unique()
