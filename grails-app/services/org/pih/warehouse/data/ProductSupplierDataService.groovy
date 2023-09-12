@@ -192,15 +192,17 @@ class ProductSupplierDataService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = price
-                defaultProductPackage.productPrice = productPrice
+                if (price != null) {
+                    ProductPrice productPrice = new ProductPrice()
+                    productPrice.price = price
+                    defaultProductPackage.productPrice = productPrice
+                }
                 productSupplier.addToProductPackages(defaultProductPackage)
-            } else if (price && !defaultProductPackage.productPrice) {
+            } else if (price != null && !defaultProductPackage.productPrice) {
                 ProductPrice productPrice = new ProductPrice()
                 productPrice.price = price
                 defaultProductPackage.productPrice = productPrice
-            } else if (price && defaultProductPackage.productPrice) {
+            } else if (price != null && defaultProductPackage.productPrice) {
                 defaultProductPackage.productPrice.price = price
                 defaultProductPackage.lastUpdated = new Date()
             }

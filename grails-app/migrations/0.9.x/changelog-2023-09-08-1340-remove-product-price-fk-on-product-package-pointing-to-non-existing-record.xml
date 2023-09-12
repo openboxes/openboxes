@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="drodzewicz" id="080920231340-0">
+    <preConditions onFail="MARK_RAN">
+      <not>
+        <sqlCheck expectedResult="0">
+          SELECT COUNT(*) FROM product_package ppkg
+          LEFT JOIN product_price pp
+          ON ppkg.product_price_id=pp.id
+          WHERE ppkg.product_price_id IS NOT NULL AND pp.id IS NULL;
+        </sqlCheck>
+      </not>
+    </preConditions>
+    <comment>
+      This migration is meant to fix a bug found on OBGM-687
+      which caused an issue when importing product sources.
+      An invalid product price was not persisted in the database,
+      but an id (FK) was added to the product_package table on product_price_id column
+      which pointed to non-existing record.
+    </comment>
+    <sql>
+      UPDATE product_package pkg
+      SET pkg.product_price_id = NULL
+      WHERE pkg.id IN (SELECT * FROM (
+      SELECT ppkg.id FROM product_package ppkg
+      LEFT JOIN product_price pp
+      ON ppkg.product_price_id=pp.id
+      WHERE ppkg.product_price_id IS NOT NULL AND pp.id IS NULL
+      ) as ppkg_ids);
+    </sql>
+  </changeSet>
+</databaseChangeLog>
