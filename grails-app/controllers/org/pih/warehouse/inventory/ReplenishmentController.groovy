@@ -19,7 +19,7 @@ class ReplenishmentController {
     }
 
     def create() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def print() {

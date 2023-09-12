@@ -117,12 +117,12 @@ class DashboardController {
             return
         }
         def contextPath = grailsApplication.config.server.contextPath
-        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''])
+        render(view: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''])
     }
 
     def supplier() {
         def contextPath = grailsApplication.config.server.contextPath
-        render(template: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''])
+        render(view: "/common/react", model: [contextPath: contextPath != '/' ? contextPath : ''])
     }
 
     def expirationSummary() {

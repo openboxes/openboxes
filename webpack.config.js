@@ -61,7 +61,7 @@ module.exports = {
        * https://gsp.grails.org/latest/guide/resources.html
        */
       new HtmlWebpackPlugin({
-        filename: `${COMMON_VIEW}/_react.gsp`,
+        filename: `${COMMON_VIEW}/react.gsp`,
         template: `${TEMPLATES}/grails-template.html`,
         inject: false,
         templateParameters: (compilation) => ({
@@ -69,15 +69,7 @@ module.exports = {
           contextPath: '\${util.ConfigHelper.contextPath}',
           jsSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.js')}`,
           cssSource: `\${resource(dir: '${path.basename(WEBPACK_OUTPUT)}', file: 'bundle.${compilation.hash}.css')}`,
-          receivingIfStatement:
-          // eslint-disable-next-line no-template-curly-in-string
-            '<g:if test="${session.useDebugLocale}">\n'
-            + '<script type="text/javascript">\n'
-            + '  var _jipt = [];\n'
-            + '  _jipt.push([\'project\', \'openboxes\']);\n'
-            + '</script>\n'
-            + '<script type="text/javascript" src="//cdn.crowdin.com/jipt/jipt.js"></script>\n'
-            + '</g:if>',
+          receivingIfStatement: '',
         }),
       }),
       new HtmlWebpackPlugin({

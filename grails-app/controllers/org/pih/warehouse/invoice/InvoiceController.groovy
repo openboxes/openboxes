@@ -26,11 +26,11 @@ class InvoiceController {
     }
 
     def create() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def list() {
-        render(template: "/common/react")
+        render(view: "/common/react")
     }
 
     def show() {

@@ -26,7 +26,7 @@ class StockTransferController {
     }
 
     def create() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
@@ -49,15 +49,15 @@ class StockTransferController {
     }
 
     def createOutboundReturn() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def createInboundReturn() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def list() {
-        render(template: "/common/react")
+        render(view: "/common/react")
     }
 
     def show() {
