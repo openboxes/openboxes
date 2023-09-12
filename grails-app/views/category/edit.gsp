@@ -36,7 +36,7 @@
                                         <label><warehouse:message code="category.parent.label"/></label>
                                     </td>
                                     <td class="value">
-                                        <g:selectCategory name="parentCategory.id" class="chzn-select-deselect" value="${categoryInstance?.parentCategory?.id}"/>
+                                        <g:selectCategory name="parentCategory.id" class="chzn-select-deselect" value="${categoryInstance?.parentCategory?.id}" noSelection="['null':'']"/>
                                     </td>
                                 </tr>
                                 <tr class="prop">
