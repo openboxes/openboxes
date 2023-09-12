@@ -6,10 +6,11 @@
 * By using this software in any fashion, you are agreeing to be bound by
 * the terms of this license.
 * You must not remove this notice, or any other, from this software.
-**/ 
+**/
 package org.pih.warehouse.product
 
 import grails.gorm.transactions.Transactional
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.inventory.Inventory
@@ -428,7 +429,7 @@ class ProductMergeService {
             or {
                 eq("product", product)
                 if (hasInventoryItem) {
-                    inventoryItem {
+                    inventoryItem(JoinType.LEFT_OUTER_JOIN.joinTypeValue) {
                         eq("product", product)
                     }
                 }
@@ -501,7 +502,7 @@ class ProductMergeService {
             throw new IllegalArgumentException("Obsolete product has pending stock movements or requisitions (${obsoletePendingRequisitions?.join(', ')}). " +
                 "Please finish or cancel these stock movements or requisitions before merging products.")
         }
-        
+
         def pendingInvoiceItems = invoiceService.getPendingInvoiceItems(obsolete)
         if (pendingInvoiceItems) {
             def pendingInvoiceNumbers = pendingInvoiceItems.invoice?.unique()?.invoiceNumber
