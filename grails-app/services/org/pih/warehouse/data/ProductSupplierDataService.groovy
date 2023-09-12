@@ -163,7 +163,7 @@ class ProductSupplierDataService {
         UnitOfMeasure unitOfMeasure = params.defaultProductPackageUomCode ?
                 UnitOfMeasure.findByCode(params.defaultProductPackageUomCode) : null
         BigDecimal price = params.defaultProductPackagePrice ?
-                new BigDecimal(params.defaultProductPackagePrice) : 0
+                new BigDecimal(params.defaultProductPackagePrice) : null
         Integer quantity = params.defaultProductPackageQuantity as Integer
 
         ProductSupplier productSupplier = ProductSupplier.findByIdOrCode(params["id"], params["code"])
@@ -192,15 +192,17 @@ class ProductSupplierDataService {
                 defaultProductPackage.product = productSupplier.product
                 defaultProductPackage.uom = unitOfMeasure
                 defaultProductPackage.quantity = quantity
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = price
-                defaultProductPackage.productPrice = productPrice
+                if (price != null) {
+                    ProductPrice productPrice = new ProductPrice()
+                    productPrice.price = price
+                    defaultProductPackage.productPrice = productPrice
+                }
                 productSupplier.addToProductPackages(defaultProductPackage)
-            } else if (price && !defaultProductPackage.productPrice) {
+            } else if (price != null && !defaultProductPackage.productPrice) {
                 ProductPrice productPrice = new ProductPrice()
                 productPrice.price = price
                 defaultProductPackage.productPrice = productPrice
-            } else if (price && defaultProductPackage.productPrice) {
+            } else if (price != null && defaultProductPackage.productPrice) {
                 defaultProductPackage.productPrice.price = price
                 defaultProductPackage.lastUpdated = new Date()
             }

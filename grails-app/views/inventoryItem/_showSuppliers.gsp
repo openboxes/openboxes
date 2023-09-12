@@ -105,7 +105,7 @@
                         </td>
 
                         <td>
-                            <g:if test="${defaultProductPackage}">
+                            <g:if test="${defaultProductPackage?.productPrice != null}">
                                 <g:hasRoleFinance onAccessDenied="${g.message(code:'errors.blurred.message', args: [g.message(code:'default.none.label')])}">
                                     <g:formatNumber number="${defaultProductPackage?.productPrice?.price}" />
                                     ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}

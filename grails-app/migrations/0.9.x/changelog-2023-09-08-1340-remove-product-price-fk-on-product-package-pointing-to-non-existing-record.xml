@@ -14,6 +14,13 @@
         </sqlCheck>
       </not>
     </preConditions>
+    <comment>
+      This migration is meant to fix a bug found on OBGM-687
+      which caused an issue when importing product sources.
+      An invalid product price was not persisted in the database,
+      but an id (FK) was added to the product_package table on product_price_id column
+      which pointed to non-existing record.
+    </comment>
     <sql>
       UPDATE product_package pkg
       SET pkg.product_price_id = NULL
