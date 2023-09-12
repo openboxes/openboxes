@@ -12,6 +12,6 @@ package org.pih.warehouse.core
 class ResettingInstanceInfoController {
 
     def index() {
-        render(template: "/common/react")
+        render(view: "/common/react")
     }
 }

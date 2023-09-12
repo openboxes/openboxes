@@ -55,23 +55,23 @@ class StockMovementController {
     }
 
     def createOutbound() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def createInbound() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def createRequest() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def verifyRequest() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def createCombinedShipments() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
@@ -129,7 +129,7 @@ class StockMovementController {
     }
 
     def list() {
-        render(template: "/common/react", params: params)
+        render(view: "/common/react", params: params)
     }
 
     def rollback() {

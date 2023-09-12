@@ -61,7 +61,7 @@ module.exports = {
        * https://gsp.grails.org/latest/guide/resources.html
        */
       new HtmlWebpackPlugin({
-        filename: `${COMMON_VIEW}/_react.gsp`,
+        filename: `${COMMON_VIEW}/react.gsp`,
         template: `${TEMPLATES}/grails-template.html`,
         inject: false,
         templateParameters: (compilation) => ({

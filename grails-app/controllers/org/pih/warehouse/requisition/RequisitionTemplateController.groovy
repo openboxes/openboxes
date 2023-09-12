@@ -30,7 +30,7 @@ class RequisitionTemplateController {
     }
 
     def list() {
-        render(template: "/common/react")
+        render(view: "/common/react")
     }
 
     def create() {
