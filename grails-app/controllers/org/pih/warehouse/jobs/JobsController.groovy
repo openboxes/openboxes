@@ -10,6 +10,7 @@
 package org.pih.warehouse.jobs
 
 import grails.gorm.transactions.Transactional
+import grails.plugins.quartz.GrailsJobClassConstants
 import grails.plugins.quartz.JobDescriptor
 import grails.plugins.quartz.JobManagerService
 import org.quartz.JobDetail
@@ -47,7 +48,8 @@ class JobsController {
     }
 
     def show() {
-        JobKey jobKey = new JobKey(params.id, params.group)
+        String jobGroup = params.group ?: GrailsJobClassConstants.DEFAULT_GROUP
+        JobKey jobKey = new JobKey(params.id, jobGroup)
         JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
         JobDescriptor jobDescriptor = (jobDetail) ? JobDescriptor.build(jobDetail, quartzScheduler) : null
         if (!jobDescriptor) {
