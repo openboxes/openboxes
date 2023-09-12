@@ -11,11 +11,11 @@ package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.orm.PagedResultList
 import grails.validation.ValidationException
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.api.AvailableItemStatus
 import org.pih.warehouse.api.DocumentGroupCode
@@ -61,6 +61,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
+import org.pih.warehouse.PaginatedList
 import org.springframework.web.multipart.MultipartFile
 
 
@@ -387,7 +388,7 @@ class StockMovementService {
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
 
-        def shipments = Shipment.createCriteria().list(max: max, offset: offset) {
+        PagedResultList shipments = Shipment.createCriteria().list(max: max, offset: offset) {
 
             if (criteria?.identifier || criteria.name || criteria?.description) {
                 or {
@@ -460,15 +461,14 @@ class StockMovementService {
                 order("dateCreated", "desc")
             }
         }
-        def stockMovements = shipments.collect { Shipment shipment ->
+        List<StockMovement> stockMovements = shipments.collect { Shipment shipment ->
             if (shipment.requisition) {
                 return StockMovement.createFromRequisition(shipment.requisition, params.includeStockMovementItems)
-            }
-            else {
+            } else {
                 return StockMovement.createFromShipment(shipment, params.includeStockMovementItems)
             }
         }
-        return new PagedResultList(stockMovements, shipments.totalCount)
+        return new PaginatedList(stockMovements, shipments.totalCount)
     }
 
     def getOutboundStockMovements(Integer maxResults, Integer offset) {
@@ -559,7 +559,7 @@ class StockMovementService {
             return StockMovement.createFromRequisition(requisition, params.includeStockMovementItems)
         }
 
-        return new PagedResultList(stockMovements, requisitions.totalCount)
+        return new PaginatedList(stockMovements, requisitions.totalCount)
     }
 
     @Transactional(readOnly=true)

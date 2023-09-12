@@ -9,8 +9,8 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Product
 
