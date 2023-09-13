@@ -385,7 +385,6 @@ openboxes {
                     menuItems: [
                         [label: "transactionsTypes.label", defaultLabel: "Transactions Types", href: "/transactionType"],
                         [label: "transactions.label", defaultLabel: "Transactions", href: "/inventory/listAllTransactions"],
-                        [label: "transaction.add.label", defaultLabel: "Add transaction", href: "/inventory/editTransaction"],
                         [label: "import.inventory.label", defaultLabel: "Import Inventory", href: "/batch/importData?type=inventory"],
                         [label: "import.inventoryLevel.label", defaultLabel: "Import Inventory Level", href: "/batch/importData?type=inventoryLevel"]
                     ]

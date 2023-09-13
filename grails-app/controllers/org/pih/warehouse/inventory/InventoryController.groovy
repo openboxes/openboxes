@@ -1167,6 +1167,12 @@ class InventoryController {
         def startTime = System.currentTimeMillis()
         log.info "edit transaction: " + params
         def transactionInstance = Transaction.get(params?.id)
+        if (!transactionInstance) {
+            flash.message = "${warehouse.message(code: 'inventory.noTransactionWithId.message', args: [params.id])}"
+            redirect(action: "listTransactions")
+            return
+        }
+
         def warehouseInstance = Location.get(session?.warehouse?.id)
         def products = transactionInstance?.transactionEntries.collect { it.inventoryItem.product }
         def inventoryItems = InventoryItem.findAllByProductInList(products)
