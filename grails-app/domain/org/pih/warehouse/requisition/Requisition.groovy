@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -91,6 +92,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
     // Intended recipient
     Person recipient
 
+    Person approvedBy
+
     // Intended recipient program
     String recipientProgram
 
@@ -117,16 +120,26 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Integer statusSortOrder
 
+    Date dateApproved
+
+    Date dateRejected
+
     // Removed comments, documents, events for the time being.
     static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
     static hasOne = [picklist: Picklist]
-    static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
+    static hasMany = [
+            requisitionItems: RequisitionItem,
+            transactions: Transaction,
+            shipments: Shipment,
+            comments: Comment,
+    ]
     static mapping = {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
         statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
         monthRequested formula: "date_format(date_requested, '%M %Y')"
+        comments joinTable: [name: "requisition_comment", key: "requisition_id"]
     }
 
     static constraints = {
@@ -176,6 +189,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
         replenishmentTypeCode(nullable: true)
         sortByCode(nullable: true)
         statusSortOrder(nullable: true)
+        approvedBy(nullable: true)
+        dateApproved(nullable: true)
+        dateRejected(nullable: true)
     }
 
     def getRequisitionItemCount() {
