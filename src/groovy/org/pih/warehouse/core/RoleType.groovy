@@ -54,7 +54,7 @@ enum RoleType {
     ROLE_EMPLOYEE('Employee', 50),
 
     // Purchasing roles
-    ROLE_APPROVER('Approver', 50),
+    ROLE_PURCHASE_APPROVER('Purchase approver', 50),
     ROLE_BUYER('Buyer', 50),
 
     // Warehouse roles
