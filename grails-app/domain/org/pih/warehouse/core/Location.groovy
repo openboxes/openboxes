@@ -98,13 +98,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
             if (activities?.contains(ActivityCode.NONE.id) && activities?.size() > 1) {
                 return ['invalid.supportedActivities']
             }
-            // Don't allow to set REQUEST_APPROVAL activity if there are not any users that
-            // have Request Approver location role for this location
-            // TODO: Replace ROLE_APPROVER with the ROLE_REQUEST_APPROVER when OBPIH-5799 is done
-            if (activities?.contains(ActivityCode.REQUEST_APPROVAL.id)
-                && !location.getUsersWithRole(RoleType.ROLE_APPROVER).size()) {
-                    return ['noRequestApprovers']
-            }
             return true
         })
     }
@@ -344,13 +337,6 @@ class Location implements Comparable<Location>, java.io.Serializable {
             return (active && organization.active) ? LocationStatus.ENABLED : LocationStatus.DISABLED
         }
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
-    }
-
-    List<User> getUsersWithRole(RoleType roleType) {
-        withNewSession {
-            List<Role> roles = Role.findAllByRoleType(roleType)
-            return LocationRole.findAllByLocationAndRoleInList(this, roles).user
-        }
     }
 
     Map toBaseJson() {

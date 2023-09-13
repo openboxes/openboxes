@@ -114,6 +114,10 @@ class LocationController {
                     }
                     flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
 
+                    if (locationInstance.supportedActivities.contains(ActivityCode.REQUEST_APPROVAL.id)) {
+                        flash.message += " ${g.message(code: 'location.supportedActivities.noRequestApprovers', default: 'You must add one or several Approvers to the location to support the requests approval workflow. Go to users list to add an Approver.')}"
+                    }
+
                 } catch (ValidationException e) {
                     flash.message = e.message
                     log.error("error: " + e.message, e)
