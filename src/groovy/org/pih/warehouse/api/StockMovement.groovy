@@ -43,12 +43,15 @@ class StockMovement {
     Person requestedBy
     Person createdBy
     Person updatedBy
+    Person approvedBy
 
     Date dateRequested
     Date dateShipped
     Date expectedDeliveryDate
     Date dateCreated
     Date lastUpdated
+    Date dateApproved
+    Date dateRejected
 
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode

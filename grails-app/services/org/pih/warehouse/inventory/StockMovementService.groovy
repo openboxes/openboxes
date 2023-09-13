@@ -1707,6 +1707,9 @@ class StockMovementService {
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
+        requisition.approvedBy = stockMovement.approvedBy
+        requisition.dateApproved = stockMovement.dateApproved
+        requisition.dateRejected = stockMovement.dateRejected
 
         stockMovement.lineItems.each { stockMovementItem ->
             RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)
