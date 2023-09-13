@@ -21,6 +21,18 @@
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
+    <g:if test="${flash.messages}">
+        <g:each in="${flash.messages}" var="msg">
+            <div class="message">
+                <g:if test="${msg instanceof java.lang.String}">
+                   ${msg}
+                </g:if>
+                <g:else>
+                   <g:message code="${msg?.code}" default="${msg?.default}" args="${msg?.args}" />
+                </g:else>
+            </div>
+        </g:each>
+    </g:if>
     <g:hasErrors bean="${locationInstance}">
         <div class="errors">
             <g:renderErrors bean="${locationInstance}" as="list"/>
