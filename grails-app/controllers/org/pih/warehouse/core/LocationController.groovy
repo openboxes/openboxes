@@ -112,20 +112,21 @@ class LocationController {
                     if (locationInstance?.id == session?.warehouse?.id) {
                         session.warehouse = locationInstance
                     }
-                    flash.messages = []
-                    flash.messages.add([code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id]])
+                    flash.message = [
+                        [code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id]]
+                    ]
                     if (locationInstance.supportedActivities.contains(ActivityCode.REQUEST_APPROVAL.id)) {
-                        flash.messages.add([code: 'location.supportedActivities.noRequestApprovers', args: [g.createLink(controller: "user", action: "list")]])
+                        flash.message.add([code: 'location.supportedActivities.noRequestApprovers', args: [g.createLink(controller: "user", action: "list")]])
                     }
 
                 } catch (ValidationException e) {
-                    flash.messages.add(e.message)
+                    flash.message = e.message
                     log.error("error: " + e.message, e)
                     render(view: "edit", model: [locationInstance: locationInstance])
                     return
 
                 } catch (Exception e) {
-                    flash.messages.add(e.message)
+                    flash.message = e.message
                     log.error("error: " + e.message, e)
                     render(view: "edit", model: [locationInstance: locationInstance])
                     return
@@ -140,7 +141,7 @@ class LocationController {
                 return
             }
         } else {
-            flash.messages.add([code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id]])
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
             redirect(action: "list")
         }
 
