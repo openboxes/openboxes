@@ -34,7 +34,10 @@ enum RequisitionStatus {
     OPEN(0, null, StatusType.SUCCESS),
     FULFILLED(0, null, StatusType.SUCCESS),
     REVIEWING(0, null, StatusType.PRIMARY),
-    CONFIRMING(0, null, StatusType.PRIMARY)
+    CONFIRMING(0, null, StatusType.PRIMARY),
+    WAITING_FOR_APPROVAL(0, null, StatusType.WARNING),
+    APPROVED(0, null, StatusType.SUCCESS),
+    REJECTED(0, null, StatusType.DANGER)
 
     int sortOrder
     RequisitionStatus displayStatusCode
