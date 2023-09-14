@@ -468,7 +468,7 @@ class StockMovementService {
                 return StockMovement.createFromShipment(shipment, params.includeStockMovementItems)
             }
         }
-        return new PaginatedList(stockMovements, shipments.totalCount)
+        return new PaginatedList<StockMovement>(stockMovements, shipments.totalCount)
     }
 
     def getOutboundStockMovements(Integer maxResults, Integer offset) {
@@ -559,7 +559,7 @@ class StockMovementService {
             return StockMovement.createFromRequisition(requisition, params.includeStockMovementItems)
         }
 
-        return new PaginatedList(stockMovements, requisitions.totalCount)
+        return new PaginatedList<StockMovement>(stockMovements, requisitions.totalCount)
     }
 
     @Transactional(readOnly=true)

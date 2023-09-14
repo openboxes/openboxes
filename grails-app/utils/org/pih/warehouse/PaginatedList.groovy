@@ -1,16 +1,16 @@
 package org.pih.warehouse
 
-class PaginatedList {
+class PaginatedList<T> {
     @Delegate
-    List list;
+    List<T> list;
     int totalCount;
 
-    PaginatedList(List list) {
+    PaginatedList(List<T> list) {
         this.list = list
         this.totalCount = list.size()
     }
 
-    PaginatedList(List list, int totalCount) {
+    PaginatedList(List<T> list, int totalCount) {
         this.list = list
         this.totalCount = totalCount
     }

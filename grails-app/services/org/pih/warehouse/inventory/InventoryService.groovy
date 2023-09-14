@@ -386,7 +386,7 @@ class InventoryService implements ApplicationContextAware {
             products = products.reverse()
         }
 
-        return new PaginatedList(products, totalCount)
+        return new PaginatedList<Product>(products, totalCount)
     }
 
 
