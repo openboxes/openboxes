@@ -17,16 +17,19 @@ enum RequisitionStatus {
 
     CREATED(1, null, StatusType.SUCCESS),
     EDITING(2, PENDING, StatusType.PRIMARY),
-    VERIFYING(3, PENDING, StatusType.WARNING),
-    PICKING(4, PENDING, StatusType.WARNING),
-    PICKED(5, PENDING, StatusType.PRIMARY),
-    PENDING(5,null, StatusType.PRIMARY),
-    CHECKING(6, PENDING, StatusType.WARNING),
-    ISSUED(7, null, StatusType.SUCCESS),
-    RECEIVED(8, null, StatusType.SUCCESS),
-    CANCELED(9, null, StatusType.DANGER),
-    DELETED(10, null, StatusType.DANGER),
-    ERROR(11, null, StatusType.DANGER),
+    WAITING_FOR_APPROVAL(3, null, StatusType.WARNING),
+    VERIFYING(4, PENDING, StatusType.WARNING),
+    APPROVED(5, null, StatusType.SUCCESS),
+    REJECTED(6, null, StatusType.DANGER),
+    PICKING(7, PENDING, StatusType.WARNING),
+    PICKED(8, PENDING, StatusType.PRIMARY),
+    PENDING(9,null, StatusType.PRIMARY),
+    CHECKING(10, PENDING, StatusType.WARNING),
+    ISSUED(11, null, StatusType.SUCCESS),
+    RECEIVED(12, null, StatusType.SUCCESS),
+    CANCELED(13, null, StatusType.DANGER),
+    DELETED(14, null, StatusType.DANGER),
+    ERROR(15, null, StatusType.DANGER),
     // for Outbound Stock Movement mapping
     DISPATCHED(0, null, StatusType.SUCCESS),
     REQUESTED(0, null, StatusType.PRIMARY),
@@ -34,10 +37,7 @@ enum RequisitionStatus {
     OPEN(0, null, StatusType.SUCCESS),
     FULFILLED(0, null, StatusType.SUCCESS),
     REVIEWING(0, null, StatusType.PRIMARY),
-    CONFIRMING(0, null, StatusType.PRIMARY),
-    WAITING_FOR_APPROVAL(0, null, StatusType.WARNING),
-    APPROVED(0, null, StatusType.SUCCESS),
-    REJECTED(0, null, StatusType.DANGER)
+    CONFIRMING(0, null, StatusType.PRIMARY)
 
     int sortOrder
     RequisitionStatus displayStatusCode
