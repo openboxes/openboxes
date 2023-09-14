@@ -147,4 +147,47 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <changeSet author="kchelstowski" id="140920231300-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition_designated_approvers"/>
+            </not>
+        </preConditions>
+        <createTable tableName="requisition_designated_approvers">
+            <column name="requisition_id" type="CHAR(38)"/>
+            <column name="person_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920231300-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_designated_approvers_requisition"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id"
+                                 baseTableName="requisition_designated_approvers"
+                                 constraintName="fk_requisition_designated_approvers_requisition"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="requisition"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920231300-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_designated_approvers_person"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="person_id"
+                                 baseTableName="requisition_designated_approvers"
+                                 constraintName="fk_requisition_designated_approvers_person"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="person"
+        />
+    </changeSet>
 </databaseChangeLog>

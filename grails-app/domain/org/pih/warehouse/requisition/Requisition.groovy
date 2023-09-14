@@ -93,8 +93,6 @@ class Requisition implements Comparable<Requisition>, Serializable {
     // Intended recipient
     Person recipient
 
-    Person approvedBy
-
     // Intended recipient program
     String recipientProgram
 
@@ -121,6 +119,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Integer statusSortOrder
 
+    // Request approval fields
+    Person approvedBy
+
     Date dateApproved
 
     Date dateRejected
@@ -143,6 +144,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             shipments: Shipment,
             comments: Comment,
             events: Event,
+            designatedApprovers: Person,
     ]
     static mapping = {
         id generator: 'uuid'
@@ -152,6 +154,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         monthRequested formula: "date_format(date_requested, '%M %Y')"
         comments joinTable: [name: "requisition_comment", key: "requisition_id"]
         events joinTable: [name: "requisition_event", key: "requisition_id"]
+        designatedApprovers joinTable: [name: "requisition_designated_approvers", key: "requisition_id"]
     }
 
     static constraints = {
