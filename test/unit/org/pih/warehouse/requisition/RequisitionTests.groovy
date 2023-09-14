@@ -246,4 +246,57 @@ class RequisitionTests extends GrailsUnitTestCase {
 
     }
 
+    @Test
+    void shouldContainRequestApprovalFields() {
+        mockForConstraintsTests(Requisition)
+        Requisition requisition = new Requisition()
+        Person peter = new Person(id:"person1", firstName:"peter", lastName:"zhao")
+        requisition.dateApproved = new Date()
+        requisition.dateRejected = new Date()
+        requisition.requiresApproval = false
+        requisition.approvedBy = peter
+
+        requisition.validate()
+        assertFalse(requisition.requiresApproval)
+        assertNull(requisition.errors?.dateApproved)
+        assertNull(requisition.errors?.dateRejected)
+        assertEquals(peter, requisition.approvedBy)
+    }
+
+    @Test
+    void shouldContainEvent() {
+        mockForConstraintsTests(Requisition)
+        mockDomain(Event)
+        mockDomain(EventType)
+        Person peter = new Person(id:"person1", firstName:"peter", lastName:"zhao")
+        Location boston = new Location(id: "l1", name:"boston")
+        Location miami = new Location(id: "l2", name:"miami")
+        Date today = new Date()
+        Date tomorrow = new Date().plus(1)
+        RequisitionItem requisitionItem = new RequisitionItem(id:"item1")
+        Requisition requisition = new Requisition(
+                id: "1234",
+                requestedBy: peter,
+                dateRequested: today,
+                requestedDeliveryDate: tomorrow,
+                name: "test",
+                version: 3,
+                lastUpdated: today,
+                status:  RequisitionStatus.CREATED,
+                recipientProgram: "prog",
+                origin: boston,
+                destination: miami,
+                requisitionItems: [requisitionItem]
+        )
+        mockDomain(Requisition, [requisition])
+
+        EventType eventType = new EventType(id: "321", name: "Approve", dateCreated: today, lastUpdated: today, eventCode: EventCode.APPROVED)
+        Event event = new Event(id: "4321", eventType: eventType, dateCreated: today, lastUpdated: today)
+        assertNotNull(requisition)
+        requisition.addToEvents(event)
+
+        assertTrue(requisition.validate())
+        assertEquals(1, requisition.events.size())
+
+    }
 }
