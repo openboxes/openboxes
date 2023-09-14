@@ -29,6 +29,7 @@ import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
@@ -1707,9 +1708,6 @@ class StockMovementService {
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
-        requisition.approvedBy = stockMovement.approvedBy
-        requisition.dateApproved = stockMovement.dateApproved
-        requisition.dateRejected = stockMovement.dateRejected
 
         stockMovement.lineItems.each { stockMovementItem ->
             RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)
