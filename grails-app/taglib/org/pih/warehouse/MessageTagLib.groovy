@@ -36,4 +36,18 @@ class MessageTagLib {
 
         out << defaultTagLib.message.call(attrs)
     }
+
+    def renderMessage = { attrs ->
+        def messages = attrs?.message ?: flash.message
+        if (messages && !(messages instanceof List)) {
+            messages = [messages]
+        }
+        out << render(
+                template: "/taglib/renderMessage",
+                model: [
+                        style: attrs?.style ?: "message",
+                        messages: messages,
+                ]
+        )
+    }
 }

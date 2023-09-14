@@ -17,7 +17,7 @@
 
 <body>
 <div class="body">
-    <g:renderMessage />
+    <warehouse:renderMessage />
     <g:hasErrors bean="${locationInstance}">
         <div class="errors">
             <g:renderErrors bean="${locationInstance}" as="list"/>
