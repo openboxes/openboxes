@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import grails.core.GrailsApplication
+import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import groovy.sql.BatchingStatementWrapper
@@ -22,13 +23,13 @@ import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
 import org.hibernate.type.StandardBasicTypes
+import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.jobs.RefreshProductAvailabilityJob
 import org.pih.warehouse.order.OrderStatus
-import org.pih.warehouse.PagedResultList
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductActivityCode
@@ -851,7 +852,7 @@ class ProductAvailabilityService {
             add(Restrictions.eq('pa.location.id', command.location.id))
         }
 
-        def products = Product.createCriteria().list([max: command.maxResults, offset: command.offset]) {
+        PagedResultList products = Product.createCriteria().list([max: command.maxResults, offset: command.offset]) {
             eq("active", true)
 
             // Restrict products by selected product types
@@ -925,7 +926,7 @@ class ProductAvailabilityService {
             ]
         }
 
-        return new PagedResultList(items, products.totalCount)
+        return new PaginatedList(items, products.totalCount)
     }
 
     List<ProductAvailability> getStockTransferCandidates(Location location) {

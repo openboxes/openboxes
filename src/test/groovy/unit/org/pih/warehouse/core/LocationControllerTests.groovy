@@ -13,7 +13,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
-import org.pih.warehouse.PagedResultList
+
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationController
 import org.pih.warehouse.core.LocationGroup
@@ -21,7 +21,6 @@ import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.inventory.InventoryService
-import org.springframework.mock.web.MockMultipartFile
 import spock.lang.Ignore
 import spock.lang.Specification
 

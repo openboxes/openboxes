@@ -3,7 +3,7 @@ package org.pih.warehouse.product
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.junit.Ignore
-import org.pih.warehouse.PagedResultList
+import org.pih.warehouse.PaginatedList
 import spock.lang.Specification
 
 @Ignore("FIX these tests")
@@ -28,7 +28,7 @@ class ProductControllerTests extends Specification {
 		when:
 		controller.productService = [
 				getProducts: { arg1, arg2, arg3, arg4, arg5 ->
-					return new PagedResultList(Product.list(), 2)
+					return new PaginatedList(Product.list(), 2)
 				}
 		]
 		def model = controller.list()
