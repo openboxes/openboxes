@@ -73,7 +73,7 @@ module.exports = {
         }),
       }),
       new HtmlWebpackPlugin({
-        filename: `${RECEIVING_VIEW}/_create.gsp`,
+        filename: `${RECEIVING_VIEW}/create.gsp`,
         template: `${TEMPLATES}/grails-template.html`,
         inject: false,
         templateParameters: (compilation) => ({
