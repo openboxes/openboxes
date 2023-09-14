@@ -24,11 +24,28 @@ enum EventCode {
     DELIVERED,
     RECEIVED,
     PARTIALLY_RECEIVED,
-    CANCELLED
+    CANCELLED,
+    WAITING_FOR_APPROVAL,
+    APPROVED,
+    REJECTED
 
 
     static list() {
-        [SCHEDULED, SHIPPED, IN_TRANSIT, CUSTOMS_ENTRY, CUSTOMS_HOLD, CUSTOMS_RELEASE, DELIVERED, RECEIVED, PARTIALLY_RECEIVED, CANCELLED]
+        [
+            SCHEDULED,
+            SHIPPED,
+            IN_TRANSIT,
+            CUSTOMS_ENTRY,
+            CUSTOMS_HOLD,
+            CUSTOMS_RELEASE,
+            DELIVERED,
+            RECEIVED,
+            PARTIALLY_RECEIVED,
+            CANCELLED,
+            WAITING_FOR_APPROVAL,
+            APPROVED,
+            REJECTED
+        ]
     }
 
     static listInTransit() {
