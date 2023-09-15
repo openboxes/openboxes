@@ -81,7 +81,7 @@ class AuthTagLib {
         }
     }
     def hasRoleApprover = { attrs, body ->
-        if (userService.hasRoleApprover(session?.user))
+        if (userService.hasRolePurchaseApprover(session?.user))
             out << body()
     }
 

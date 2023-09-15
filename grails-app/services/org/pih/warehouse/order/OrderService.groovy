@@ -1041,7 +1041,7 @@ class OrderService {
 
     def canOrderItemBeEdited(OrderItem orderItem, User user) {
         def isPending = orderItem?.order?.status == OrderStatus.PENDING
-        def isApprover = userService.hasRoleApprover(user)
+        def isApprover = userService.hasRolePurchaseApprover(user)
 
         return isPending?:isApprover
     }
@@ -1067,7 +1067,7 @@ class OrderService {
     }
 
     def canManageAdjustments(Order order, User user) {
-        return order.status == OrderStatus.PENDING || order?.status >= OrderStatus.PLACED && userService.hasRoleApprover(user)
+        return order.status == OrderStatus.PENDING || order?.status >= OrderStatus.PLACED && userService.hasRolePurchaseApprover(user)
     }
 
     def getOrderSummaryList(Map params) {
