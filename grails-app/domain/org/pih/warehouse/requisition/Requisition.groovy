@@ -121,12 +121,9 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Request approval fields
     Person approvedBy
-
     Date dateApproved
-
     Date dateRejected
-
-    Boolean requiresApproval
+    Boolean approvalRequired
 
     // Removed comments, documents, events for the time being.
     static transients = [
@@ -144,7 +141,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             shipments: Shipment,
             comments: Comment,
             events: Event,
-            designatedApprovers: Person,
+            approvers: Person,
     ]
     static mapping = {
         id generator: 'uuid'
@@ -154,7 +151,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         monthRequested formula: "date_format(date_requested, '%M %Y')"
         comments joinTable: [name: "requisition_comment", key: "requisition_id"]
         events joinTable: [name: "requisition_event", key: "requisition_id"]
-        designatedApprovers joinTable: [name: "requisition_designated_approvers", key: "requisition_id"]
+        approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
     }
 
     static constraints = {
@@ -207,7 +204,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         approvedBy(nullable: true)
         dateApproved(nullable: true)
         dateRejected(nullable: true)
-        requiresApproval(nullable: true)
+        approvalRequired(nullable: true)
     }
 
     def getRequisitionItemCount() {

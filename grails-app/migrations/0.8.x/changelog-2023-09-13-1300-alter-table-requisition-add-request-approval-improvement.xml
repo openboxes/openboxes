@@ -57,12 +57,12 @@
     <changeSet author="kchelstowski" id="130920231300-5">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_approved_by_requisition"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_approved_by"/>
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="approved_by_id"
                                  baseTableName="requisition"
-                                 constraintName="fk_approved_by_requisition"
+                                 constraintName="fk_requisition_approved_by"
                                  deferrable="false"
                                  initiallyDeferred="false"
                                  referencedColumnNames="id"
@@ -138,11 +138,11 @@
     <changeSet author="kchelstowski" id="140920230830-4">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="requisition" columnName="requires_approval"/>
+                <columnExists tableName="requisition" columnName="approval_required"/>
             </not>
         </preConditions>
         <addColumn tableName="requisition">
-            <column name="requires_approval" type="BIT">
+            <column name="approval_required" type="BIT">
                 <constraints nullable="true" />
             </column>
         </addColumn>
@@ -152,10 +152,10 @@
     <changeSet author="kchelstowski" id="140920231300-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="requisition_designated_approvers"/>
+                <tableExists tableName="requisition_approvers"/>
             </not>
         </preConditions>
-        <createTable tableName="requisition_designated_approvers">
+        <createTable tableName="requisition_approvers">
             <column name="requisition_id" type="CHAR(38)"/>
             <column name="person_id" type="CHAR(38)"/>
         </createTable>
@@ -163,12 +163,12 @@
     <changeSet author="kchelstowski" id="140920231300-2">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_requisition_designated_approvers_requisition"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_approvers_requisition"/>
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="requisition_id"
-                                 baseTableName="requisition_designated_approvers"
-                                 constraintName="fk_requisition_designated_approvers_requisition"
+                                 baseTableName="requisition_approvers"
+                                 constraintName="fk_requisition_approvers_requisition"
                                  deferrable="false"
                                  initiallyDeferred="false"
                                  referencedColumnNames="id"
@@ -178,12 +178,12 @@
     <changeSet author="kchelstowski" id="140920231300-3">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_requisition_designated_approvers_person"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_approvers_person"/>
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="person_id"
-                                 baseTableName="requisition_designated_approvers"
-                                 constraintName="fk_requisition_designated_approvers_person"
+                                 baseTableName="requisition_approvers"
+                                 constraintName="fk_requisition_approvers_person"
                                  deferrable="false"
                                  initiallyDeferred="false"
                                  referencedColumnNames="id"
