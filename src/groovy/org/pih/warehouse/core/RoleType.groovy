@@ -54,7 +54,7 @@ enum RoleType {
     ROLE_EMPLOYEE('Employee', 50),
 
     // Purchasing roles
-    ROLE_APPROVER('Approver', 50),
+    ROLE_PURCHASE_APPROVER('Purchase approver', 50),
     ROLE_BUYER('Buyer', 50),
 
     // Warehouse roles
@@ -85,7 +85,10 @@ enum RoleType {
     ROLE_CUSTOMER('Customer', 102),
 
     // Requestor role type
-    ROLE_REQUESTOR('Requestor', 100)
+    ROLE_REQUESTOR('Requestor', 100),
+
+    // Requisition approver role type
+    ROLE_REQUISITION_APPROVER('Request approver', 100)
 
     String name
     Integer sortOrder
@@ -128,7 +131,8 @@ enum RoleType {
                 ROLE_ITEM_OVERSTOCK_NOTIFICATION,
                 ROLE_ITEM_REORDER_NOTIFICATION,
                 ROLE_ITEM_LOW_STOCK_NOTIFICATION,
-                ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION
+                ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION,
+                ROLE_REQUISITION_APPROVER
         ]
     }
 

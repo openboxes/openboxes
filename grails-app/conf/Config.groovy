@@ -988,7 +988,7 @@ openboxes.linePrinterTerminal.port = "LPT1"
 // Require approval on purchase orders
 openboxes.purchasing.approval.enabled = false
 openboxes.purchasing.approval.minimumAmount = 0.00
-openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
+openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_PURCHASE_APPROVER]
 
 // Experimental feature that approximates a costing method to provide a crude unit price used
 // for inventory valuation.
@@ -1033,7 +1033,7 @@ openboxes.security.rbac.rules = [
         [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
         [controller: 'purchaseOrderApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
-        [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_APPROVER]]],
+        [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_PURCHASE_APPROVER]]],
         [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
         [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
         [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],

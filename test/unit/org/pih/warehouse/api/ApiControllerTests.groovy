@@ -104,7 +104,7 @@ class ApiControllerTests extends ControllerUnitTestCase {
         controller.userService = [
                 isSuperuser: { User user -> return false },
                 isUserAdmin: { User user -> return true },
-                hasRoleApprover: { User user -> return true },
+                hasRolePurchaseApprover: { User user -> return true },
                 getEffectiveRoles: { User user -> return [] }
         ]
         controller.localizationService = [
