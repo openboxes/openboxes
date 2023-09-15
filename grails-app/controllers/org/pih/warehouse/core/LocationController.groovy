@@ -119,7 +119,12 @@ class LocationController {
                     if (locationInstance?.id == session?.warehouse?.id) {
                         session.warehouse = locationInstance
                     }
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id])}"
+                    flash.message = [
+                        [code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id]]
+                    ]
+                    if (locationInstance.supportedActivities.contains(ActivityCode.APPROVE_REQUEST.id)) {
+                        flash.message.add([code: 'location.supportedActivities.noRequestApprovers', args: [g.createLink(controller: "user", action: "list")]])
+                    }
 
                 } catch (ValidationException e) {
                     flash.message = e.message
