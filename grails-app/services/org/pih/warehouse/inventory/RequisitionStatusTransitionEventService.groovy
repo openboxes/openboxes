@@ -21,9 +21,9 @@ class RequisitionStatusTransitionEventService {
 
 
     void publishDefaultEmailNotifications(Requisition requisition, Collection receivers) {
-        String redirectToRequestsList = "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
-        String subject = "${requisition.requestNumber} ${requisition.name}"
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String redirectToRequestsList = "${g.createLink(uri: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC", absolute: true)}"
         GString body = "${g.render(template: "/email/approvalsAlert", model: [requisition: requisition, redirectUrl: redirectToRequestsList])}"
 
         mailService.sendHtmlMail(subject, body, receivers)
