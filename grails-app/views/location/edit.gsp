@@ -17,10 +17,7 @@
 
 <body>
 <div class="body">
-
-    <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
-    </g:if>
+    <warehouse:renderMessage />
     <g:hasErrors bean="${locationInstance}">
         <div class="errors">
             <g:renderErrors bean="${locationInstance}" as="list"/>
