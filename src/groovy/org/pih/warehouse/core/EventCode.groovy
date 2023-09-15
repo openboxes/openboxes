@@ -25,9 +25,10 @@ enum EventCode {
     RECEIVED,
     PARTIALLY_RECEIVED,
     CANCELLED,
-    WAITING_FOR_APPROVAL,
+    PENDING_APPROVAL,
     APPROVED,
-    REJECTED
+    REJECTED,
+    SUBMITTED
 
 
     static list() {
@@ -42,9 +43,10 @@ enum EventCode {
             RECEIVED,
             PARTIALLY_RECEIVED,
             CANCELLED,
-            WAITING_FOR_APPROVAL,
+            PENDING_APPROVAL,
             APPROVED,
-            REJECTED
+            REJECTED,
+            SUBMITTED
         ]
     }
 
