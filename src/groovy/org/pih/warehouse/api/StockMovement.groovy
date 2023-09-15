@@ -83,6 +83,9 @@ class StockMovement {
     Shipment shipment
     List documents
 
+    // Request approval fields
+    List<Person> approvers
+
     static transients = [
             "electronicType"
     ]
