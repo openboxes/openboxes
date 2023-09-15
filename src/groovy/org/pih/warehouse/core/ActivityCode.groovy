@@ -64,8 +64,6 @@ enum ActivityCode {
 
     AUTOSAVE('AUTOSAVE'),
 
-    REQUEST_APPROVAL('REQUEST_APPROVAL'),
-
     NONE('NONE')
 
     final String id
@@ -98,7 +96,6 @@ enum ActivityCode {
                 SUBMIT_REQUEST,
                 DYNAMIC_CREATION,
                 AUTOSAVE,
-                REQUEST_APPROVAL,
                 NONE,
         ]
     }

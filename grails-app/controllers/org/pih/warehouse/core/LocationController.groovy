@@ -115,7 +115,7 @@ class LocationController {
                     flash.message = [
                         [code: 'default.updated.message', args: [warehouse.message(code: 'location.label', default: 'Location'), locationInstance.id]]
                     ]
-                    if (locationInstance.supportedActivities.contains(ActivityCode.REQUEST_APPROVAL.id)) {
+                    if (locationInstance.supportedActivities.contains(ActivityCode.APPROVE_REQUEST.id)) {
                         flash.message.add([code: 'location.supportedActivities.noRequestApprovers', args: [g.createLink(controller: "user", action: "list")]])
                     }
 
