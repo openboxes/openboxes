@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.pih.warehouse.core.MailService
+import org.pih.warehouse.core.Person
 import org.pih.warehouse.requisition.Requisition
 
 
@@ -20,12 +21,16 @@ class RequisitionStatusTransitionEventService {
     GrailsApplication grailsApplication
 
 
-    void publishDefaultEmailNotifications(Requisition requisition, Collection receivers) {
+    void publishDefaultEmailNotifications(Requisition requisition, List<Person> receivers) {
         def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         String subject = "${requisition.requestNumber} ${requisition.name}"
         String redirectToRequestsList = "${g.createLink(uri: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC", absolute: true)}"
         GString body = "${g.render(template: "/email/approvalsAlert", model: [requisition: requisition, redirectUrl: redirectToRequestsList])}"
 
-        mailService.sendHtmlMail(subject, body, receivers)
+        receivers.each {receiver ->
+            if (receiver.email) {
+                mailService.sendHtmlMail(subject, body, receiver.email)
+            }
+        }
     }
 }

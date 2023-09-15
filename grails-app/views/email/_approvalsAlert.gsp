@@ -1,21 +1,21 @@
 <%@ page contentType="text/html"%>
 <style>
-label {
-    font-weight: bold;
-}
+    label {
+        font-weight: bold;
+    }
 </style>
 <div>
     <div class="header">
         <g:render template="/email/header"/>
     </div>
     <div>
-        <g:message code='email.requestReceived.message' args='[requisition.destination, requisition.requestedBy, redirectUrl]' />
+        <g:message code="email.requestReceived.message" args="[requisition.destination, requisition.requestedBy, redirectUrl]" />
     </div>
     &nbsp;
 </div>
 <div>
     <table>
-        <thead style="text-align: left;">
+        <thead style="text-align: left">
         <tr>
             <th>
                 <g:message code="product.productCode.label" />
