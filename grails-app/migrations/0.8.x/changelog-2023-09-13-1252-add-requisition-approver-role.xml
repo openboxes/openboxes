@@ -6,13 +6,13 @@
     <changeSet author="AlanNadolny" id="130920231252-0">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                select count(*) from role where role_type = "ROLE_REQUEST_APPROVER";
+                select count(*) from role where role_type = "ROLE_REQUISITION_APPROVER";
             </sqlCheck>
         </preConditions>
         <insert tableName="role">
-            <column name="id" value="ROLE_REQUEST_APPROVER"/>
+            <column name="id" value="ROLE_REQUISITION_APPROVER"/>
             <column name="version" valueNumeric="0"/>
-            <column name="role_type" value="ROLE_REQUEST_APPROVER"/>
+            <column name="role_type" value="ROLE_REQUISITION_APPROVER"/>
             <column name="name" value="Request approver"/>
         </insert>
     </changeSet>

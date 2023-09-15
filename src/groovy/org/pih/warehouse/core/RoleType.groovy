@@ -87,8 +87,8 @@ enum RoleType {
     // Requestor role type
     ROLE_REQUESTOR('Requestor', 100),
 
-    // Request approver role type
-    ROLE_REQUEST_APPROVER('Request approver', 100)
+    // Requisition approver role type
+    ROLE_REQUISITION_APPROVER('Request approver', 100)
 
     String name
     Integer sortOrder
@@ -132,7 +132,7 @@ enum RoleType {
                 ROLE_ITEM_REORDER_NOTIFICATION,
                 ROLE_ITEM_LOW_STOCK_NOTIFICATION,
                 ROLE_ITEM_OUT_OF_STOCK_NOTIFICATION,
-                ROLE_REQUEST_APPROVER
+                ROLE_REQUISITION_APPROVER
         ]
     }
 

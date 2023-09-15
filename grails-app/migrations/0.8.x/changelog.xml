@@ -160,5 +160,5 @@
     <include file="0.8.x/changelog-2023-05-17-1453-add-quantity-counted-column.xml" />
     <include file="0.8.x/changelog-2023-05-22-1800-add-requisition-template-document-type.xml" />
     <include file="0.8.x/changelog-2023-09-13-1233-rename-approver-role-to-purchase-approver.xml" />
-    <include file="0.8.x/changelog-2023-09-13-1252-add-request-approver-role.xml" />
+    <include file="0.8.x/changelog-2023-09-13-1252-add-requisition-approver-role.xml" />
 </databaseChangeLog>
