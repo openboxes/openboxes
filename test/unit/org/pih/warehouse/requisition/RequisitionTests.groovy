@@ -253,11 +253,11 @@ class RequisitionTests extends GrailsUnitTestCase {
         Person peter = new Person(id:"person1", firstName:"peter", lastName:"zhao")
         requisition.dateApproved = new Date()
         requisition.dateRejected = new Date()
-        requisition.requiresApproval = false
+        requisition.approvalRequired = false
         requisition.approvedBy = peter
 
         requisition.validate()
-        assertFalse(requisition.requiresApproval)
+        assertFalse(requisition.approvalRequired)
         assertNull(requisition.errors?.dateApproved)
         assertNull(requisition.errors?.dateRejected)
         assertEquals(peter, requisition.approvedBy)
