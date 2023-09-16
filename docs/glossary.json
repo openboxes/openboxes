@@ -1,0 +1,199 @@
+{ "glossary": {
+    "ABC_a_c": {
+        "ABC_a_cTerm": "ABC analysis class",
+        "ABC_a_cDef": "This categorizes products based on their impact on cost. Products in Class A contribute to the majority of costs, so you should prioritize them. Class B products are more infrequently bought. Class C items are not high value and do not need many follow-ups."
+    },
+    "bin_l": {
+        "bin_lTerm": "bin location",
+        "bin_lDef": "A location that designates a particular shelf, pallet position, or bin within a given zone in a given depot. For example, within Zone A, you may have a bin location for pharmacy items."
+    },
+    "bud_c": {
+        "bud_cTerm": "budget code",
+        "bud_cDef": "A sequence of alphanumeric digits assigned by organizations for budgetary reporting. Budget codes identify fund types and track expenditures."
+    },
+    "cen_p": {
+        "cen_pTerm": "central purchasing",
+        "cen_pDef": "When, for example, a headquarters office purchases stock for delivery to all its subsidiaries. Allows the user to see and create purchase orders destined for multiple locations."
+    },
+    "com_i": {
+        "com_iTerm": "committed inventory",
+        "com_iDef": "Inventory becomes committed when the user picks inventory on the Create Outbound Shipment page."
+    },
+    "con": {
+        "conTerm": "consumption",
+        "conDef": "All of the stock sent out from your warehouse over a given time period."
+    },
+    "dis_w_p": {
+        "dis_w_pTerm": "dispensary / ward / pharmacy",
+        "dis_w_pDef": "These locations are essentially interchangeable and exist only to receive stock from depots. Any location to which you will be sending stock, but not actively receiving or managing inventory in Openboxes, is a ward, dispensary, or pharmacy.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/33-location-type-and-supported-activities\">Location Type and Supported Activities<\/a>.<\/p>"
+    },
+    "ele_s_c": {
+        "ele_s_cTerm": "electronic stock card",
+        "ele_s_cDef": "Like a paper stock card, this provides the user with key product details and the history of transactions related to that product.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/39-electronic-stock-card\">Electronic Stock Cards<\/a>.<\/p>"
+    },
+    "for_c": {
+        "for_cTerm": "formulary / catalog",
+        "for_cDef": "An optional system that lets users list and group all products for a certain location or service."
+    },
+    "GL_a": {
+        "GL_aTerm": "GL accounts",
+        "GL_aDef": "Also known as general ledger accounts, these account numbers are used to categorize types of financial transactions. For example, you could create a GL account for medical supplies, food, or IT equipment."
+    },
+    "hol_b": {
+        "hol_bTerm": "hold bin",
+        "hol_bDef": "Holds products that eed to be isolated or prevented from being picked or shipped. For example, if you receive information from a supplier that a product lot number is being investigated and may be recalled, put that lot number in a hold bin.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/67-creating-hold-bins\">Creating Hold Bins<\/a>.<\/p>"
+    },
+    "lea_t": {
+        "lea_tTerm": "lead time",
+        "lea_tDef": "The number of days it takes for a product to reach the site after it is ordered."
+    },
+    "loc": {
+        "locTerm": "location",
+        "locDef": "A physical space that ships stock, receives stock, or manages inventory."
+    },
+    "loc_g": {
+        "loc_gTerm": "location group",
+        "loc_gDef": "A flexible method of grouping often used to represent a particular geographic area.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/35-configure-location-groups\">Configure Location Groups<\/a>.<\/p>"
+    },
+    "loc_n": {
+        "loc_nTerm": "location number",
+        "loc_nDef": "A unique code that identifies your location, such as an acronym. If left blank, OpenBoxes auto-generates this code."
+    },
+    "man_c": {
+        "man_cTerm": "manufacturer code",
+        "mac_cDef": "The code/SKU the manufacturer uses for the product."
+    },
+    "man_n": {
+        "man_nTerm": "manufacturer name",
+        "man_nDef": "The name the manufacturer calls the product (NOT the name of the manufacturer)."
+    },
+    "NDC": {
+        "NDCTerm": "NDC",
+        "NDCDef": "National Drug Code"
+    },
+    "org": {
+        "orgTerm": "organization",
+        "orgDef": "A company, government, or other entity that interacts directly or indirectly with OpenBoxes. The organization represents the financial entity and is associated with one or more locations which represent a physical office or warehouse."
+    },
+    "par_r": {
+        "par_rTerm": "partial receiving",
+        "par_rDef": "A stratagem that allows users to receive part of a shipment at first, then return later to receive the rest of the shipment.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/300-partial-receiving\">Partial Receiving<\/a>.<\/p>"
+    },
+    "par": {
+        "parTerm": "parties",
+        "parDef": "People, users, organizations, or locations that interact with OpenBoxes. This interaction can be active, like a user that logs into the system to do work, or passive, like an organization that is referenced in certain fields but does actively engage with the system.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/31-configure-parties\">Configure Parties<\/a>.<\/p>"
+    },
+    "peo": {
+        "peoTerm": "people",
+        "peoDef": "People (or Persons in singular form) are non-users that need to be referenced in the system or receive emails notifying them of transactions you specify."
+    },
+    "PiH": {
+        "PiHTerm": "PiH",
+        "PiHDef": "Partners In Health, OpenBoxes's parent organization"
+    },
+    "PO": {
+        "POTerm": "PO",
+        "PODef": "purchase order"
+    },
+    "pro": {
+        "proTerm": "product",
+        "proDef": "A specific physical item tracked in various transactions in OpenBoxes, such as a purchase order, shipment, and inventory. Each product has a unique auto-generated code.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/65-intro-to-products\">Intro to Products<\/a>.<\/p>"
+    },
+    "pro_a": {
+        "pro_aTerm": "product attributes",
+        "pro_aDef": "Custom fields that can be added to a product to record information that is not in the standard product card. For example, a custom \"temperature requirements\" free-text field under \"cold chain\" to further specify product needs."
+    },
+    "pro_c": {
+        "pro_cTerm": "product code",
+        "pro_cDef": "Called a SKU in some systems, this code is the main identifier for the product in all areas of the system. For example, TS123."
+    },
+    "pro_f": {
+        "pro_fTerm": "product family",
+        "pro_fDef": "A way of grouping similar products. For example, all nasogastric feeding tubes could belong to the same product family.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/388-product-family-create-and-add\">View and Create Product Family<\/a>.<\/p>"
+    },
+    "pro_r": {
+        "pro_rTerm": "product record",
+        "pro_rDef": "Describes a specific physical item to track in inventory, shipments, and purchase orders. Made up of first a product code, then a product name. For example: \"TS123 - Exam Gloves\"."
+    },
+    "pul_r": {
+        "pul_rTerm": "pull replenishment",
+        "pul_rDef": "A plan that autofills quantities for each item in the stocklist by looking at the quantity on hand at the destination and demand of the products. The max quantity will be demand of the product.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/54-create-a-stocklist\">Create a Stocklist<\/a>.<\/p>"
+    },
+    "pus_r": {
+        "pus_rTerm": "push replenishment",
+        "pus_rDef": "A plan that involves creations or ordering inventory stock based on predictions of customer demand and ordering. Allows users to enter max quantity for each item.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/54-create-a-stocklist\">Create a Stocklist<\/a>.<\/p>"
+    },
+    "qua_a": {
+        "qua_aTerm": "quantity available",
+        "qua_aDef": "The uncommitted portion of the inventory. To determine this number, take the quantity on hand and subtract any product that's on hold, already picked for other stock movements/stock transfers, or otherwise committed and can’t be acted upon.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/73-outbound-shipment-page-by-page-edit\">Outbound Shipment - page by page<\/a>.<\/p>"
+    },
+    "qua_o_h": {
+        "qua_o_hTerm": "quantity on hand (QoH)",
+        "qua_o_hDef": "The total quantity in inventory at a given location. This encompasses all products including lots or quantities that are on hold, allocated to requisitions, or committed in some other fashion.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/73-outbound-shipment-page-by-page-edit\">Outbound Shipment - page by page<\/a>.<\/p>"
+    },
+    "rec": {
+        "recTerm": "recipient",
+        "recDef": "Non-users in OpenBoxes that need to be referenced in the system or receive emails notifying them of certain transactions."
+    },
+    "rep_p": {
+        "rep_pTerm": "replenishment period",
+        "rep_pDef": "This is how many days between when you order the product and it arrives."
+    },
+    "sou_c": {
+        "sou_cTerm": "source code",
+        "sou_cDef": "A unique combination of supplier code, manufacturer, and manufacturer code."
+    },
+    "sto": {
+        "stoTerm": "stocklist",
+        "stoDef": "A list of products that are frequently requested from a requesting facility.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/362-intro-to-stock-list\">Intro to Stocklists (Admin)<\/a> or <a href=\"https://help.openboxes.com/article/52-intro-to-stocklists\">Intro to Stocklists (User)<\/a>.<\/p>"
+    },
+    "sup": {
+        "supTerm": "supplier",
+        "supDef": "A location that exists only to send stock to other locations. Any location that sends stock but does not manage stock in Openboxes can also be a supplier; for example, Amazon."
+    },
+    "syn": {
+        "synTerm": "synonym",
+        "synDef": "Usually a translated product name. For example, if a user in a Spanish locale creates the product \"Bomba de jeringa, eléctrica\", they could add the English synonym \"Syringe Pump, Electric\" so their English-speaking users could read it.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/396-translate-product-names\">Add Product Name Synonyms<\/a>.<\/p>"
+    },
+    "tag": {
+        "tagTerm": "tags",
+        "tagDef": "Free-text sets of descriptors that can be applied to a set of products for easier grouping.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/374-product-tag\">Product Tags<\/a>.<\/p>"
+    },
+    "UNS": {
+        "UNSTerm": "UNSPSC",
+        "UNSDef": "United Nations Standard Products and Services Code"
+    },
+    "UoM": {
+        "UoMTerm": "UoM",
+        "UoMDef": "Unit of Measurement"
+    },
+    "ven_c": {
+        "ven_cTerm": "vendor code",
+        "ven_cDef": "The code/SKU the vendor uses for the product."
+    },
+    "ven_n": {
+        "ven_nTerm": "vendor name",
+        "ven_nDef": "The name the vendor calls the product (NOT the name of the vendor)."
+    },
+    "zon_l": {
+        "zon_lTerm": "zone location",
+        "zon_lDef": "An area or a room within a warehouse that contains multiple bins. For example, in a warehouse with a separate cold room, the zone for cold chain items might be \"Cold Room 1\", and within that room, each bin might represent a shelf.",
+        "html": "<p> See also <a href=\"https://help.openboxes.com/article/289-managing-bin-and-zone-locations\">Managing Bin and Zone Locations<\/a>.<\/p>"
+    }
+}
+}
