@@ -1545,5 +1545,21 @@ div.search-input:focus-within {
       position: relative;
       left: 1px;
     }
+
+    // Popovers
+
+    a[data-toggle=popover] {
+      color: cadetblue;
+      border-bottom: dashed;
+      border-bottom-color: darkgray;
+      border-bottom-width: thin;
+      font-style: italic;
+    }
+
+    a[data-toggle=popover]:hover {
+      border-bottom: solid;
+      border-bottom-color: darkgray;
+      border-bottom-width: thin;
+    }
   }
 }
