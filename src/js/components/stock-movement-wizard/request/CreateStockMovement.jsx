@@ -184,13 +184,14 @@ const DEFAULT_FIELDS = {
 const APPROVER_FIELDS = {
   ...DEFAULT_FIELDS,
   approvers: {
-    label: 'react.stockMovement.request.approvers',
+    label: 'react.stockMovement.request.approvers.label',
     defaultMessage: 'Approvers',
     attributes: {
       multi: true,
       showValueTooltip: true,
       valueKey: 'id',
       labelKey: 'name',
+      subtext: 'react.stockMovement.request.approvers.leaveBlank.label',
     },
     type: SelectField,
     getDynamicAttr: props => ({
