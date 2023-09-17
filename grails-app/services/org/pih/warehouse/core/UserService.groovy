@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Role
 
 class UserService {
 
@@ -309,8 +310,11 @@ class UserService {
 
     def findUsers(String query, Map params) {
         println "findUsers: " + query + " : " + params
-        def criteria = User.createCriteria()
-        def results = criteria.list(params) {
+        List<RoleType> roleTypeList = params.roleTypes.collect { RoleType.valueOf(it) }
+        List<String> roleIds = Role.findAllByRoleTypeInList(roleTypeList).collect{ it.id }
+        Location location = Location.get(params.location)
+
+        return User.createCriteria().list(params) {
             if (query) {
                 or {
                     like("firstName", query)
@@ -322,10 +326,19 @@ class UserService {
             if (params.status) {
                 eq("active", Boolean.valueOf(params.status))
             }
+            if (roleIds) {
+                or {
+                    roles {
+                        'in'("id", roleIds)
+                    }
+                    locationRoles {
+                        'in'("role.id", roleIds)
+                        eq("location.id", location.id)
+                    }
+                }
+            }
             // Disabled to allow the user to choose sorting mechanism (should probably add this as the default)
         }
-
-        return results
     }
 
 
