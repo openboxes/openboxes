@@ -138,6 +138,7 @@ class StockMovement {
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
                 isDepot             : origin?.isDepot(),
+                supportedActivities : origin?.supportedActivities,
             ],
             destination         : [
                 id                  : destination?.id,
@@ -146,6 +147,7 @@ class StockMovement {
                 locationType        : destination?.locationType,
                 locationGroup       : destination?.locationGroup,
                 organizationName    : destination?.organization?.name,
+                supportedActivities : destination?.supportedActivities,
                 organizationCode    : destination?.organization?.code,
             ],
             order                : [

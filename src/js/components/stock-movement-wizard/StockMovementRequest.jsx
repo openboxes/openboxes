@@ -153,12 +153,14 @@ class StockMovementsRequest extends Component {
               type: originType ? originType.locationTypeCode : null,
               name: resp.origin.name,
               label: `${resp.origin.name} [${originType ? originType.description : null}]`,
+              supportedActivities: resp.origin.supportedActivities,
             },
             destination: {
               id: resp.destination.id,
               type: destinationType ? destinationType.locationTypeCode : null,
               name: resp.destination.name,
               label: `${resp.destination.name} [${destinationType ? destinationType.description : null}]`,
+              supportedActivities: resp.destination.supportedActivities,
             },
             requestedBy: {
               id: resp.requestedBy.id,
