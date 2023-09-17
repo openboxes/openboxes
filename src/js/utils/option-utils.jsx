@@ -35,11 +35,7 @@ export const debounceUsersFetch = (waitTime, minSearchLength) =>
         },
       };
       userApi.getUsersOptions(config).then((users) => {
-        callback(users?.data?.data?.map?.(user => ({
-          ...user,
-          value: user.id,
-          label: user.name,
-        })));
+        callback(users?.data?.data);
       });
       return;
     }

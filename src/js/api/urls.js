@@ -44,7 +44,7 @@ export const SHIPMENT_TYPES = `${GENERIC_API}/shipmentType`;
 export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
 
 // USERS
-export const USERS_OPTIONS = `${API}/users`;
+export const USERS_OPTIONS = `${API}/usersOptions`;
 
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;

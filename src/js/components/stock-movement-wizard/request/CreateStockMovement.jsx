@@ -107,10 +107,10 @@ const DEFAULT_FIELDS = {
         if (value && props.destination && props.destination.id) {
           props.fetchStockLists(value, props.destination);
           if (value?.supportedActivities?.includes(ActivityCode.APPROVE_REQUEST)) {
-            props.setSupportApprover(true);
+            props.setSupportsApprover(true);
             props.fetchAvailableApprovers();
           } else {
-            props.setSupportApprover(false);
+            props.setSupportsApprover(false);
           }
         }
       },
@@ -305,17 +305,11 @@ class CreateStockMovement extends Component {
       params: { roleTypes: RoleType.ROLE_REQUISITION_APPROVER },
     })
       .then((response) => {
-        const options = response.data.data?.map(user => ({
-          id: user.id,
-          value: user.id,
-          label: `${user.firstName} ${user.lastName}`,
-        }));
-
         this.setState({
-          availableApprovers: options,
+          availableApprovers: response.data.data,
         }, () => this.props.hideSpinner());
 
-        return options;
+        return response.data.data;
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -488,10 +482,12 @@ class CreateStockMovement extends Component {
                     // then preselect this options by default
                     if (resp?.length === 1) {
                       mutators.setApproversValues(resp);
+                    } else {
+                      mutators.setApproversValues([]);
                     }
                   });
                 },
-                setSupportApprover: this.setSupportApprover,
+                setSupportsApprover: this.setSupportsApprover,
                 origin: values.origin,
                 destination: values.destination,
                 isSuperuser: this.props.isSuperuser,

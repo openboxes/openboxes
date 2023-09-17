@@ -268,6 +268,10 @@ class UserService {
 
     List<User> findUsers(Map params) {
         List<String> terms = params.searchTerm?.split(",| ")
+        List<RoleType> roleTypeList = params.roleTypes.collect { RoleType.valueOf(it) }
+        List<String> roleIds = roleTypeList ? Role.findAllByRoleTypeInList(roleTypeList).collect{ it.id } : null
+        Location location = params.location ? Location.get(params.location) : null
+
         return User.createCriteria().list() {
             if (params.active != null) {
                 eq("active", Boolean.valueOf(params.active))
@@ -278,6 +282,19 @@ class UserService {
                         ilike("firstName", "%" + term + "%")
                         ilike("lastName", "%" + term + "%")
                         ilike("email", "%" + term + "%")
+                    }
+                }
+            }
+            if (roleIds) {
+                or {
+                    roles {
+                        'in'("id", roleIds)
+                    }
+                    if (location) {
+                        locationRoles {
+                            'in'("role.id", roleIds)
+                            eq("location.id", location.id)
+                        }
                     }
                 }
             }
@@ -310,11 +327,8 @@ class UserService {
 
     def findUsers(String query, Map params) {
         println "findUsers: " + query + " : " + params
-        List<RoleType> roleTypeList = params.roleTypes.collect { RoleType.valueOf(it) }
-        List<String> roleIds = Role.findAllByRoleTypeInList(roleTypeList).collect{ it.id }
-        Location location = Location.get(params.location)
-
-        return User.createCriteria().list(params) {
+        def criteria = User.createCriteria()
+        def results = criteria.list(params) {
             if (query) {
                 or {
                     like("firstName", query)
@@ -326,19 +340,10 @@ class UserService {
             if (params.status) {
                 eq("active", Boolean.valueOf(params.status))
             }
-            if (roleIds) {
-                or {
-                    roles {
-                        'in'("id", roleIds)
-                    }
-                    locationRoles {
-                        'in'("role.id", roleIds)
-                        eq("location.id", location.id)
-                    }
-                }
-            }
             // Disabled to allow the user to choose sorting mechanism (should probably add this as the default)
         }
+
+        return results
     }
 
 

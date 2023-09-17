@@ -151,7 +151,7 @@ class StockMovementsRequest extends Component {
             approvers: resp.approvers?.map(user => ({
               id: user.id,
               value: user.id,
-              label: `${user.firstName} ${user.lastName}`,
+              label: user.name,
             })),
             origin: {
               id: resp.origin.id,
