@@ -11,9 +11,12 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
+import userApi from 'api/services/UserApi';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import ActivityCode from 'consts/activityCode';
+import RoleType from 'consts/roleType';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
@@ -50,7 +53,7 @@ function validate(values) {
   return errors;
 }
 
-const FIELDS = {
+const DEFAULT_FIELDS = {
   description: {
     type: TextField,
     label: 'react.stockMovement.description.label',
@@ -103,6 +106,12 @@ const FIELDS = {
       onChange: (value) => {
         if (value && props.destination && props.destination.id) {
           props.fetchStockLists(value, props.destination);
+          if (value?.supportedActivities?.includes(ActivityCode.APPROVE_REQUEST)) {
+            props.setSupportApprover(true);
+            props.fetchAvailableApprovers();
+          } else {
+            props.setSupportApprover(false);
+          }
         }
       },
       disabled: false,
@@ -172,6 +181,25 @@ const FIELDS = {
   },
 };
 
+const APPROVER_FIELDS = {
+  ...DEFAULT_FIELDS,
+  approvers: {
+    label: 'react.stockMovement.request.approvers',
+    defaultMessage: 'Approvers',
+    attributes: {
+      multi: true,
+      showValueTooltip: true,
+      valueKey: 'id',
+      labelKey: 'name',
+    },
+    type: SelectField,
+    getDynamicAttr: props => ({
+      options: props.availableApprovers,
+    }),
+  },
+};
+
+
 const ELECTRONIC = 'ELECTRONIC';
 
 /** The first step of stock movement where user can add all the basic information. */
@@ -180,12 +208,16 @@ class CreateStockMovement extends Component {
     super(props);
     this.state = {
       stocklists: [],
+      availableApprovers: [],
+      supportsApprover: false,
       setInitialValues: true,
       values: this.props.initialValues,
       requestTypes: [],
     };
     this.fetchStockLists = this.fetchStockLists.bind(this);
     this.setRequestType = this.setRequestType.bind(this);
+    this.fetchAvailableApprovers = this.fetchAvailableApprovers.bind(this);
+    this.setSupportsApprover = this.setSupportsApprover.bind(this);
 
     this.debouncedPeopleFetch =
       debouncePeopleFetch(this.props.debounceTime, this.props.minSearchLength);
@@ -197,6 +229,14 @@ class CreateStockMovement extends Component {
   componentDidMount() {
     if (this.state.values.origin && this.state.values.destination) {
       this.fetchStockLists(this.state.values.origin, this.state.values.destination);
+    }
+    if (this.state.values.origin) {
+      if (this.state.values.origin?.supportedActivities?.includes(ActivityCode.APPROVE_REQUEST)) {
+        this.setSupportsApprover(true);
+        this.fetchAvailableApprovers();
+      } else {
+        this.setSupportsApprover(false);
+      }
     }
     this.fetchRequisitionTypes();
   }
@@ -235,8 +275,15 @@ class CreateStockMovement extends Component {
         label: `${user.name}`,
       },
       dateRequested: moment(new Date()).format('MM/DD/YYYY'),
+      approvers: undefined,
     };
     this.setState({ values, setInitialValues: false });
+  }
+
+  setSupportsApprover(value) {
+    this.setState({
+      supportsApprover: value,
+    });
   }
 
   /**
@@ -249,6 +296,26 @@ class CreateStockMovement extends Component {
     return apiClient.get(url)
       .then((response) => {
         this.setState({ requestTypes: response.data.data }, () => this.props.hideSpinner());
+      })
+      .catch(() => this.props.hideSpinner());
+  }
+
+  fetchAvailableApprovers() {
+    return userApi.getUsersOptions({
+      params: { roleTypes: RoleType.ROLE_REQUISITION_APPROVER },
+    })
+      .then((response) => {
+        const options = response.data.data?.map(user => ({
+          id: user.id,
+          value: user.id,
+          label: `${user.firstName} ${user.lastName}`,
+        }));
+
+        this.setState({
+          availableApprovers: options,
+        }, () => this.props.hideSpinner());
+
+        return options;
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -327,6 +394,7 @@ class CreateStockMovement extends Component {
         'stocklist.id': _.get(values.stocklist, 'id') || '',
         requestType: values.requestType.id,
         sourceType: ELECTRONIC,
+        approvers: values.approvers?.map(user => user.id),
       };
 
       apiClient.post(stockMovementUrl, payload)
@@ -389,8 +457,8 @@ class CreateStockMovement extends Component {
       });
     }
   }
-
   render() {
+    const FIELDS = this.state.supportsApprover ? APPROVER_FIELDS : DEFAULT_FIELDS;
     return (
       <Form
         onSubmit={values => this.nextPage(values)}
@@ -399,6 +467,10 @@ class CreateStockMovement extends Component {
         mutators={{
           clearStocklist: (args, state, utils) => {
             utils.changeValue(state, 'stocklist', () => null);
+          },
+          setApproversValues: (args, state, utils) => {
+            const [selectedOptions] = args;
+            utils.changeValue(state, 'approvers', () => selectedOptions);
           },
         }}
         render={({ form: { mutators }, handleSubmit, values }) => (
@@ -410,6 +482,16 @@ class CreateStockMovement extends Component {
                 stocklists: this.state.stocklists,
                 fetchStockLists: (origin, destination) =>
                   this.fetchStockLists(origin, destination, mutators.clearStocklist),
+                fetchAvailableApprovers: () => {
+                  this.fetchAvailableApprovers().then((resp) => {
+                    // if there is only one available approver to choose from
+                    // then preselect this options by default
+                    if (resp?.length === 1) {
+                      mutators.setApproversValues(resp);
+                    }
+                  });
+                },
+                setSupportApprover: this.setSupportApprover,
                 origin: values.origin,
                 destination: values.destination,
                 isSuperuser: this.props.isSuperuser,
@@ -417,6 +499,7 @@ class CreateStockMovement extends Component {
                 debouncedLocationsFetch: this.debouncedLocationsFetch,
                 requestTypes: this.state.requestTypes,
                 setRequestType: this.setRequestType,
+                availableApprovers: this.state.availableApprovers,
                 values,
               }),
             )}
