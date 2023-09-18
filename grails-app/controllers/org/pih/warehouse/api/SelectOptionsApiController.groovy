@@ -73,9 +73,7 @@ class SelectOptionsApiController {
         if (params.roleTypes && !params.location) {
             params.location = session.warehouse?.id
         }
-        List<User> users = userService.findUsers(params).collect {
-            [id: it.id, label: it.name, value: it.id ]
-        }
+        List<User> users = userService.findUsers(params)
         render([data: users] as JSON)
     }
 

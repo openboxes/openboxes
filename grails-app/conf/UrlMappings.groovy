@@ -82,7 +82,7 @@ class UrlMappings {
             action = [GET: "paymentTermOptions"]
         }
 
-        "/api/usersOptions" {
+        "/api/users" {
             controller = { "selectOptionsApi" }
             action = [GET: "usersOptions"]
         }

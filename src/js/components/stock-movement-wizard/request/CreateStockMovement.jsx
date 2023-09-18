@@ -306,13 +306,17 @@ class CreateStockMovement extends Component {
       params: { roleTypes: RoleType.ROLE_REQUISITION_APPROVER },
     })
       .then((response) => {
-        this.setState({
-          availableApprovers: response.data.data,
-        }, () => this.props.hideSpinner());
+        const options = response.data.data?.map(user => ({
+          id: user.id,
+          value: user.id,
+          label: user.name,
+        }));
 
-        return response.data.data;
+        this.setState({ availableApprovers: options });
+
+        return options;
       })
-      .catch(() => this.props.hideSpinner());
+      .finally(() => this.props.hideSpinner());
   }
 
   checkStockMovementChange(newValues) {
