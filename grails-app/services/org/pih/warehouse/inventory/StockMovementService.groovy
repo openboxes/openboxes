@@ -298,6 +298,7 @@ class StockMovementService {
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         if (stockMovement.requestType) requisition.type = stockMovement.requestType
+        if (stockMovement.approvers != null) requisition.approvers = stockMovement.approvers
         requisition.name = stockMovement.generateName()
 
         if (requisition.requisitionTemplate?.id != stockMovement.stocklist?.id) {
@@ -1707,6 +1708,7 @@ class StockMovementService {
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
+        requisition.approvers = stockMovement.approvers
 
         stockMovement.lineItems.each { stockMovementItem ->
             RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)
