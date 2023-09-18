@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="kchelstowski" id="130920231300-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition_comment"/>
+            </not>
+        </preConditions>
+        <createTable tableName="requisition_comment">
+            <column name="requisition_id" type="CHAR(38)"/>
+            <column name="comment_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kchelstowski" id="130920231300-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_comment_requisition"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id"
+                                 baseTableName="requisition_comment"
+                                 constraintName="fk_requisition_comment_requisition"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="requisition"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="130920231300-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_comment_comment"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="comment_id"
+                                 baseTableName="requisition_comment"
+                                 constraintName="fk_requisition_comment_comment"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="comment"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="130920231300-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="approved_by_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="approved_by_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="kchelstowski" id="130920231300-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_approved_by"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="approved_by_id"
+                                 baseTableName="requisition"
+                                 constraintName="fk_requisition_approved_by"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="person"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="130920231300-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="date_approved"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="date_approved" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="kchelstowski" id="130920231300-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="date_rejected"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="date_rejected" type="DATETIME">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="kchelstowski" id="140920230830-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition_event"/>
+            </not>
+        </preConditions>
+        <createTable tableName="requisition_event">
+            <column name="requisition_id" type="CHAR(38)"/>
+            <column name="event_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920230830-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_event_requisition"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id"
+                                 baseTableName="requisition_event"
+                                 constraintName="fk_requisition_event_requisition"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="requisition"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920230830-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_event_event"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="event_id"
+                                 baseTableName="requisition_event"
+                                 constraintName="fk_requisition_event_event"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="event"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920230830-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="requisition" columnName="approval_required"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="requisition">
+            <column name="approval_required" type="BIT">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="kchelstowski" id="140920231300-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="requisition_approvers"/>
+            </not>
+        </preConditions>
+        <createTable tableName="requisition_approvers">
+            <column name="requisition_id" type="CHAR(38)"/>
+            <column name="person_id" type="CHAR(38)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920231300-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_approvers_requisition"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="requisition_id"
+                                 baseTableName="requisition_approvers"
+                                 constraintName="fk_requisition_approvers_requisition"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="requisition"
+        />
+    </changeSet>
+    <changeSet author="kchelstowski" id="140920231300-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_requisition_approvers_person"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="person_id"
+                                 baseTableName="requisition_approvers"
+                                 constraintName="fk_requisition_approvers_person"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="person"
+        />
+    </changeSet>
+</databaseChangeLog>
