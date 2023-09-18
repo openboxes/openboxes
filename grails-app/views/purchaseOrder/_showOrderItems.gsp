@@ -462,29 +462,34 @@
         }
 
         function validateAdjustmentsForm() {
-          var orderAdjustmentType = $("#orderAdjustmentType").val();
-          var amount = $("#amount").val();
-          var percentage = $("#percentage").val();
-          var canManageAdjustments = ($("#canManageAdjustments").val() === "true");
-          var budgetCode = $("#adjustmentBudgetCode").val();
-          var description = $("#description").val();
-          var isAccountingRequired = ($("#isAccountingRequired").val() === "true");
+          // If we don't have permissions we don't want to validate the rest of the values
+          const canManageAdjustments = ($("#canManageAdjustments").val() === "true");
+          if (!canManageAdjustments) {
+            $.notify("${g.message(code: 'errors.noPermissions.label', default: 'You do not have permissions to perform this action xd')}")
+            return false
+          }
+
+          const orderAdjustmentType = $("#orderAdjustmentType").val();
+          const amount = $("#amount").val();
+          const percentage = $("#percentage").val();
+          const budgetCode = $("#adjustmentBudgetCode").val();
+          const description = $("#description").val();
+          const isAccountingRequired = ($("#isAccountingRequired").val() === "true");
 
           if (!orderAdjustmentType) $("#orderAdjustmentType").notify("${g.message(code: 'default.required.label', default: 'Required')}")
           if (!(percentage || amount)) $("#amount").notify("${g.message(code: 'order.errors.amountOrPercentageRequired.label', default: 'Amount or percentage required')}")
           if (!(percentage || amount)) $("#percentage").notify("${g.message(code: 'order.errors.amountOrPercentageRequired.label', default: 'Amount or percentage required')}")
           if (!description) $("#description").notify("${g.message(code: 'order.errors.descriptionRequired.label', default: 'Description required')}")
-          if (!canManageAdjustments) $.notify("${g.message(code: 'errors.noPermissions.label', default: 'You do not have permissions to perform this action')}")
           if (!budgetCode && isAccountingRequired) {
             $("#adjustmentBudgetCode").notify("${g.message(code: 'default.required.label', default: 'Required')}")
             return false
           }
 
-          if (orderAdjustmentType && canManageAdjustments && (amount || percentage) && description) {
-            return true
-          } else {
-            return false
+          const isFormFilled = orderAdjustmentType && canManageAdjustments && (amount || percentage) && description
+          if (!isFormFilled) {
+            $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a proper value for all required fields')}"));
           }
+          return isFormFilled
         }
 
         function isFormDirty() {
@@ -550,28 +555,27 @@
         }
 
         function saveOrderAdjustment() {
-            var data = $("#orderAdjustmentForm").serialize();
-            if (validateAdjustmentsForm()) {
-                $.ajax({
-                    url:'${g.createLink(controller:'order', action:'saveAdjustment')}',
-                    data: data,
-                    success: function() {
-                        clearOrderAdjustments();
-                        loadOrderAdjustments();
-                        clearOrderAdjustmentForm();
-                        $.notify(htmlDecode("${g.message(code: 'order.successAdjustmentSave.label', default: 'Successfully saved new adjustment')}"), "success");
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        if (jqXHR.responseText) {
-                            $.notify(jqXHR.responseText, "error");
-                        } else {
-                            $.notify("Error saving adjustment");
-                        }
-                    }
-                });
-            } else {
-                $.notify(htmlDecode("${g.message(code: 'order.errors.allRequiredFields.label', default: 'Please enter a proper value for all required fields')}"));
+            const data = $("#orderAdjustmentForm").serialize();
+            if (!validateAdjustmentsForm()) {
+              return
             }
+            $.ajax({
+                url:'${g.createLink(controller:'order', action:'saveAdjustment')}',
+                data: data,
+                success: function() {
+                    clearOrderAdjustments();
+                    loadOrderAdjustments();
+                    clearOrderAdjustmentForm();
+                    $.notify(htmlDecode("${g.message(code: 'order.successAdjustmentSave.label', default: 'Successfully saved new adjustment')}"), "success");
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.responseText) {
+                        $.notify(jqXHR.responseText, "error");
+                    } else {
+                        $.notify("Error saving adjustment");
+                    }
+                }
+            });
             return false;
         }
 
