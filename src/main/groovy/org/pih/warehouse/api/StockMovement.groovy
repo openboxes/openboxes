@@ -48,6 +48,7 @@ class StockMovement implements Validateable{
     Date dateCreated
     Date lastUpdated
 
+
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
     List<ShipmentStatusCode> receiptStatusCodes // For filtering
@@ -79,6 +80,9 @@ class StockMovement implements Validateable{
     Order order
     Shipment shipment
     List documents
+
+    // Request approval fields
+    List<Person> approvers
 
     static transients = [
             "electronicType"
