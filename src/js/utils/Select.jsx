@@ -313,8 +313,8 @@ class Select extends Component {
       if (fieldValue?.displayName || showLabelTooltip) {
         return false;
       }
-
-      return !(showValueTooltip && fieldValue);
+      const hasFieldValue = Array.isArray(fieldValue) ? fieldValue.length : fieldValue;
+      return !(showValueTooltip && hasFieldValue);
     };
 
     return (

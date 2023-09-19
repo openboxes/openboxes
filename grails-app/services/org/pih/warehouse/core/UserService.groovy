@@ -284,7 +284,7 @@ class UserService {
         List<String> roleIds = roleTypeList ? Role.findAllByRoleTypeInList(roleTypeList).collect{ it.id } : null
         Location location = params.location ? Location.get(params.location) : null
 
-        return User.createCriteria().list() {
+        return User.createCriteria().listDistinct() {
             if (params.active != null) {
                 eq("active", Boolean.valueOf(params.active))
             }

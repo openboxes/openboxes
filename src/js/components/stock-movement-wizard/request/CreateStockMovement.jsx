@@ -109,7 +109,7 @@ const DEFAULT_FIELDS = {
           props.fetchStockLists(value, props.destination);
           if (value?.supportedActivities?.includes(ActivityCode.APPROVE_REQUEST)) {
             props.setSupportsApprover(true);
-            props.fetchAvailableApprovers();
+            props.fetchAvailableApprovers(value.id);
           } else {
             props.setSupportsApprover(false);
           }
@@ -235,7 +235,7 @@ class CreateStockMovement extends Component {
     if (this.state.values.origin) {
       if (this.state.values.origin?.supportedActivities?.includes(ActivityCode.APPROVE_REQUEST)) {
         this.setSupportsApprover(true);
-        this.fetchAvailableApprovers();
+        this.fetchAvailableApprovers(this.state.values.origin.id);
       } else {
         this.setSupportsApprover(false);
       }
@@ -302,9 +302,9 @@ class CreateStockMovement extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
-  fetchAvailableApprovers() {
+  fetchAvailableApprovers(locationId) {
     return userApi.getUsersOptions({
-      params: { roleTypes: RoleType.ROLE_REQUISITION_APPROVER },
+      params: { roleTypes: RoleType.ROLE_REQUISITION_APPROVER, location: locationId },
     })
       .then((response) => {
         const options = response.data.data?.map(user => ({
@@ -485,8 +485,8 @@ class CreateStockMovement extends Component {
                 stocklists: this.state.stocklists,
                 fetchStockLists: (origin, destination) =>
                   this.fetchStockLists(origin, destination, mutators.clearStocklist),
-                fetchAvailableApprovers: () => {
-                  this.fetchAvailableApprovers().then((resp) => {
+                fetchAvailableApprovers: (locationId) => {
+                  this.fetchAvailableApprovers(locationId).then((resp) => {
                     // if there is only one available approver to choose from
                     // then preselect this options by default
                     if (resp?.length === 1) {
