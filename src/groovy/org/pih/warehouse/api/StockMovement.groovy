@@ -138,6 +138,7 @@ class StockMovement {
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
                 isDepot             : origin?.isDepot(),
+                supportedActivities : origin?.supportedActivities,
             ],
             destination         : [
                 id                  : destination?.id,
@@ -146,6 +147,7 @@ class StockMovement {
                 locationType        : destination?.locationType,
                 locationGroup       : destination?.locationGroup,
                 organizationName    : destination?.organization?.name,
+                supportedActivities : destination?.supportedActivities,
                 organizationCode    : destination?.organization?.code,
             ],
             order                : [
@@ -181,6 +183,7 @@ class StockMovement {
                 },
                 documents  : documents
             ],
+            approvers           : approvers,
             isFromOrder         : isFromOrder,
             isReturn            : isReturn,
             isShipped           : isShipped,
@@ -402,7 +405,8 @@ class StockMovement {
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
-            lineItemCount: requisition.requisitionItemCount
+            lineItemCount: requisition.requisitionItemCount,
+            approvers: requisition.approvers?.toList()
         )
 
         // Include all requisition items except those that are substitutions or modifications because the

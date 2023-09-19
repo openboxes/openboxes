@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.Role
 
 class UserService {
 
@@ -267,6 +268,10 @@ class UserService {
 
     List<User> findUsers(Map params) {
         List<String> terms = params.searchTerm?.split(",| ")
+        List<RoleType> roleTypeList = params.roleTypes.collect { RoleType.valueOf(it) }
+        List<String> roleIds = roleTypeList ? Role.findAllByRoleTypeInList(roleTypeList).collect{ it.id } : null
+        Location location = params.location ? Location.get(params.location) : null
+
         return User.createCriteria().list() {
             if (params.active != null) {
                 eq("active", Boolean.valueOf(params.active))
@@ -277,6 +282,19 @@ class UserService {
                         ilike("firstName", "%" + term + "%")
                         ilike("lastName", "%" + term + "%")
                         ilike("email", "%" + term + "%")
+                    }
+                }
+            }
+            if (roleIds) {
+                or {
+                    roles {
+                        'in'("id", roleIds)
+                    }
+                    if (location) {
+                        locationRoles {
+                            'in'("role.id", roleIds)
+                            eq("location.id", location.id)
+                        }
                     }
                 }
             }
