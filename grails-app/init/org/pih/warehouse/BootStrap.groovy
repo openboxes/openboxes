@@ -85,6 +85,7 @@ class BootStrap {
 
     def uploadService
     DataSource dataSource
+    def eventService
 
     def init = { servletContext ->
 
@@ -646,6 +647,8 @@ class BootStrap {
         // Create uploads directory if it doesn't already exist
         uploadService.findOrCreateUploadsDirectory()
 
+        eventService.autoWireEvents()
+
         Boolean refreshAnalyticsDataOnStartup = Holders.config.openboxes.refreshAnalyticsDataOnStartup.enabled
         if (refreshAnalyticsDataOnStartup) {
             // Refresh stock out data on startup to make sure the fact table is created
@@ -660,6 +663,7 @@ class BootStrap {
             // Refresh order summary materialized view
             RefreshOrderSummaryJob.triggerNow()
         }
+
     }
 
 

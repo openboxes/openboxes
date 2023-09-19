@@ -632,6 +632,32 @@ openboxes:
             enabled: true
             pageSize: 10
 
+#Add classes and event type and event closure for hibernate persistence handler.
+    publishEventForEntitiesAndFields:
+        User:
+            PRE_UPDATE:
+                eventName: onEventUserUpdated
+                fields:
+                    - ALL
+        Product:
+            INSERT:
+                eventName: onEventProductCreated
+                fields:
+                    - ALL
+            PRE_UPDATE:
+                eventName: onEventProductUpdated
+                fields:
+                    - ALL
+        Shipment:
+            INSERT:
+                eventName: onEventShipmentCreated
+                fields:
+                - ALL
+            PRE_UPDATE:
+                eventName: onEventShipmentUpdated
+                fields:
+                - currentStatus
+
 mail:
     error:
         enabled: false

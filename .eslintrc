@@ -35,6 +35,7 @@
       "allowChildren": false
     }],
     "operator-linebreak": "warn",
+    "linebreak-style": ["error", "windows"],
     "simple-import-sort/imports": [
       "error",
       {
