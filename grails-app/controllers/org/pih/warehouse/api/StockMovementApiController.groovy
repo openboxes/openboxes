@@ -807,14 +807,35 @@ class StockMovementApiController {
     }
 
     def requisitionStatusCodes = {
-        def options = RequisitionStatus.listOutboundOptions()?.collect {
-            [
-                    id: it.name(),
-                    value: it.name(),
-                    label: "${g.message(code: 'enum.RequisitionStatus.' + it.name())}",
-                    variant: it.variant.name
-            ]
+        boolean hasRequestApprovalActivity = false
+        boolean isRequestsList = params.getBoolean("isRequestsList")
+        if (params.location) {
+            Location location = Location.get(params.location)
+            hasRequestApprovalActivity = location.supports(ActivityCode.APPROVE_REQUEST)
         }
-        render([data: options] as JSON)
+
+        List<RequisitionStatus> statuses = getRequisitionStatusCodesList(hasRequestApprovalActivity, isRequestsList)
+
+        List options = statuses?.collect(mapStatusCodes)
+        List availableStatuses = RequisitionStatus.listAll().collect(mapStatusCodes)
+
+        render([data: options, availableStatuses: availableStatuses] as JSON)
+    }
+
+    List<RequisitionStatus> getRequisitionStatusCodesList(boolean hasRequestApprovalActivity, boolean isRequestsList) {
+        if (isRequestsList) {
+            return hasRequestApprovalActivity ? RequisitionStatus.listRequisitionOptions() : RequisitionStatus.listOutboundOptions()
+        }
+
+        return hasRequestApprovalActivity ? RequisitionStatus.listOutboundOptionsWhenSupportingRequestApproval() : RequisitionStatus.listOutboundOptions()
+    }
+
+    Closure mapStatusCodes = { RequisitionStatus status ->
+        [
+                id: status.name(),
+                value: status.name(),
+                label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
+                variant: status.variant.name
+        ]
     }
 }

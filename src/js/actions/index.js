@@ -531,13 +531,13 @@ export function fetchShipmentStatusCodes() {
 }
 
 
-export function fetchRequisitionStatusCodes() {
+export function fetchRequisitionStatusCodes(locationId = null, isRequestsList = false) {
   return (dispatch) => {
-    apiClient.get('/openboxes/api/stockMovements/requisitionsStatusCodes')
+    apiClient.get(`/openboxes/api/stockMovements/requisitionsStatusCodes?location=${locationId}&isRequestsList=${isRequestsList}`)
       .then((res) => {
         dispatch({
           type: FETCH_REQUISITION_STATUS_CODES,
-          payload: res.data.data,
+          payload: res.data,
         });
       });
   };
