@@ -13,12 +13,18 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionService
+import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
+import org.springframework.context.ApplicationEvent
+import org.springframework.context.ApplicationListener
 
+class RequisitionStatusTransitionEventService implements ApplicationListener<RequisitionStatusTransitionEvent> {
 
-class RequisitionStatusTransitionEventService {
+    static transactional = true
 
     MailService mailService
     GrailsApplication grailsApplication
+    RequisitionService requisitionService
 
 
     void publishDefaultEmailNotifications(Requisition requisition, List<Person> receivers) {
@@ -32,5 +38,14 @@ class RequisitionStatusTransitionEventService {
                 mailService.sendHtmlMail(subject, body, receiver.email)
             }
         }
+    }
+
+    void onApplicationEvent(RequisitionStatusTransitionEvent event) {
+        requisitionService.triggerRequisitionStatusTransition(event.requisition, event.newStatus)
+
+    }
+
+    void triggerRequisitionStatusTransition(ApplicationEvent event) {
+
     }
 }
