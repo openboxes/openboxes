@@ -9,36 +9,27 @@
 **/
 package org.pih.warehouse.inventory
 
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.report.NotificationService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
 
 class RequisitionStatusTransitionEventService implements ApplicationListener<RequisitionStatusTransitionEvent> {
 
-    MailService mailService
-    GrailsApplication grailsApplication
     RequisitionService requisitionService
+    NotificationService notificationService
 
-
-    void publishDefaultEmailNotifications(Requisition requisition, List<Person> receivers) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        String subject = "${requisition.requestNumber} ${requisition.name}"
-        String redirectToRequestsList = "${g.createLink(uri: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC", absolute: true)}"
-        GString body = "${g.render(template: "/email/approvalsAlert", model: [requisition: requisition, redirectUrl: redirectToRequestsList])}"
-
-        receivers.each {receiver ->
-            if (receiver.email) {
-                mailService.sendHtmlMail(subject, body, receiver.email)
-            }
-        }
-    }
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
+        if (event.newStatus == RequisitionStatus.PENDING_APPROVAL) {
+            Requisition req = event.requisition
+            List<Person> approvers = Person.findAllByIdInList(event.requisition.approvers.collect {it.id})
+            notificationService.sendRequestPendingForApprovalNotification(req, approvers)
+        }
         requisitionService.triggerRequisitionStatusTransition(event.requisition, event.newStatus, event.createdBy)
     }
 }

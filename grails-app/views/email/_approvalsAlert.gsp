@@ -9,7 +9,13 @@
         <g:render template="/email/header"/>
     </div>
     <div>
-        <g:message code="email.requestReceived.message" args="[requisition.destination, requisition.requestedBy, redirectUrl]" />
+        <g:message
+                code="email.requestReceived.message"
+                args="[requisition.destination,
+                       requisition.requestedBy,
+                       g.createLink(uri: redirectUrl, absolute: true),
+                ]"
+        />
     </div>
     &nbsp;
 </div>
