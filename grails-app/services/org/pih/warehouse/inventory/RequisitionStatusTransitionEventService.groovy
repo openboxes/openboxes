@@ -11,10 +11,6 @@ package org.pih.warehouse.inventory
 
 import org.pih.warehouse.report.NotificationService
 import org.pih.warehouse.requisition.Requisition
-import org.pih.warehouse.requisition.RequisitionService
-import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
-import org.springframework.context.ApplicationEvent
-import org.springframework.context.ApplicationListener
 
 class RequisitionStatusTransitionEventService implements ApplicationListener<RequisitionStatusTransitionEvent> {
 
