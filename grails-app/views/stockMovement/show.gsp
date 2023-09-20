@@ -208,6 +208,14 @@
                         </tr>
                         <tr class="prop">
                             <td class="name">
+                                <warehouse:message code="stockMovement.approvers.label"/>
+                            </td>
+                            <td class="value">
+                                ${stockMovement?.hasApprovers()?:warehouse.message(code:"default.none.label")}
+                            </td>
+                        </tr>
+                        <tr class="prop">
+                            <td class="name">
                                 <warehouse:message code="stockMovement.comments.label"/>
                             </td>
                             <td class="value">
