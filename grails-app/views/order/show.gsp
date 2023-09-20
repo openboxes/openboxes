@@ -28,6 +28,7 @@
             </g:if>
             <div class="dialog">
 
+                <g:hiddenField id="orderId" name="orderId" value="${orderInstance?.id}"/>
                 <g:render template="summary" model="[orderInstance:orderInstance,currentState:'showOrder']"/>
 
                 <g:hasErrors bean="${orderInstance}">
@@ -323,6 +324,21 @@
                   return;
                 }
                 $(currentRow).hide();
+              });
+            }
+
+            function fetchOrderItemsDerivedStatus() {
+              const orderId = $('#orderId').val();
+              $.ajax({
+                url: "${request.contextPath}/purchaseOrderApi/orderItemsDerivedStatus",
+                data: "id=" + orderId,
+                success: function(data, textStatus, jqXHR){
+                  if (data && Object.keys(data)) {
+                    Object.keys(data).forEach(
+                      orderItemId => $("." + orderItemId).text(data[orderItemId])
+                    );
+                  }
+                }
               });
             }
         </script>

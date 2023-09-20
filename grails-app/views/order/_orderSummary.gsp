@@ -1,37 +1,17 @@
-<%@ page import="org.pih.warehouse.order.OrderItemStatusCode;" %>
-<%@ page import="org.pih.warehouse.order.OrderType;" %>
-<%@ page import="org.pih.warehouse.order.OrderTypeCode;" %>
-<%@ page import="org.pih.warehouse.core.Constants;" %>
-
-
-<script>
-  $(document).ready(function() {
-    $("#orderItemsFilter").keyup(function(event){
-      const filterCells = [1, 2]; // filter by product code or name
-      const filterValue = $("#orderItemsFilter")
-        .val()
-        .toUpperCase();
-      const tableRows = $("#order-items tr.dataRow");
-      filterTableItems(filterCells, filterValue, tableRows)
-    });
-  });
-</script>
-
-
 <div class="box">
     <h2>
         <warehouse:message code="default.summary.label"/>
     </h2>
-    <g:if test="${orderInstance.orderType != OrderType.findByCode(Constants.PUTAWAY_ORDER)}">
+    <g:if test="${!isPutawayOrder}">
         <input type="text" id="orderItemsFilter" class="text large" placeholder="${g.message(code: 'order.filterByProduct.label', default: 'Filter by product name or code')}"/>
     </g:if>
-    <g:if test="${orderInstance?.orderItems}">
+    <g:if test="${orderItems}">
         <g:set var="status" value="${0}"/>
         <g:set var="columnsNumber" value="5"/>
         <table class="order-items" id="order-items">
             <thead>
             <tr>
-                <g:if test="${orderInstance?.orderType == OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())}">
+                <g:if test="${isPurchaseOrder}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}" />
                     <th class="bottom">
                         <warehouse:message code="default.status.label"/>
@@ -43,19 +23,19 @@
                 <th class="bottom">
                     <warehouse:message code="product.name.label"/>
                 </th>
-                <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                <g:if test="${anySupplierCode}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                     <th class="center">
                         <warehouse:message code="product.supplierCode.label"/>
                     </th>
                 </g:if>
-                <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                <g:if test="${anyManufacturerName}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                     <th class="center">
                         <warehouse:message code="product.manufacturer.label"/>
                     </th>
                 </g:if>
-                <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                <g:if test="${anyManufacturerCode}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                     <th class="center">
                         <warehouse:message code="product.manufacturerCode.label"/>
@@ -80,14 +60,13 @@
 
             <tbody>
 
-            <g:set var="orderItemsDerivedStatus" value="${orderInstance?.getOrderItemsDerivedStatus()}"/>
-            <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
-                <g:if test="${!orderItem?.canceled || orderInstance?.isPurchaseOrder}">
-                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${isItemCanceled ? 'background-color: #ffcccb;' : ''}">
-                        <g:if test="${orderInstance?.isPurchaseOrder}">
+            <g:each var="orderItem" in="${orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
+                <g:if test="${!orderItem?.canceled || isPurchaseOrder}">
+                    <tr class="order-item ${(i % 2) == 0 ? 'even' : 'odd'} dataRow" style="${orderItem?.canceled ? 'background-color: #ffcccb;' : ''}">
+                        <g:if test="${isPurchaseOrder}">
                             <td>
                                 <div class="tag ${orderItem?.canceled ? 'tag-danger' : ''}">
-                                    <format:metadata obj="${!orderItem?.canceled && orderItemsDerivedStatus[orderItem?.id] ? orderItemsDerivedStatus[orderItem?.id] : orderItem?.orderItemStatusCode?.name()}"/>
+                                    <span class="${orderItem?.id}">${g.message(code: 'default.loading.label')}</span>
                                 </div>
                             </td>
                         </g:if>
@@ -102,17 +81,17 @@
                             </g:link>
                         </td>
                         <g:if test="${!orderItem?.canceled}">
-                            <g:if test="${orderInstance.orderItems.any { it.productSupplier?.supplierCode } }">
+                            <g:if test="${anySupplierCode}">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.supplierCode}
                                 </td>
                             </g:if>
-                            <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerName } }">
+                            <g:if test="${anyManufacturerName}">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.manufacturerName}
                                 </td>
                             </g:if>
-                            <g:if test="${orderInstance.orderItems.any { it.productSupplier?.manufacturerCode } }">
+                            <g:if test="${anyManufacturerCode}">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.manufacturerCode}
                                 </td>
@@ -125,11 +104,11 @@
                             </td>
                             <td class="right">
                                 <g:formatNumber number="${orderItem?.unitPrice}" />
-                                ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                ${currencyCode}
                             </td>
                             <td class="right">
                                 <g:formatNumber number="${orderItem?.totalPrice()}"/>
-                                ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                                ${currencyCode}
                             </td>
                         </g:if>
                         <g:else>
@@ -145,8 +124,8 @@
                     <warehouse:message code="default.subtotal.label" default="Subtotal"/>
                 </th>
                 <th class="right">
-                    <g:formatNumber number="${orderInstance?.subtotal}"/>
-                    ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                    <g:formatNumber number="${subtotal}"/>
+                    ${currencyCode}
                 </th>
             </tr>
             <tr>
@@ -154,8 +133,8 @@
                     <warehouse:message code="default.adjustments.label" default="Adjustments"/>
                 </th>
                 <th class="right">
-                    <g:formatNumber number="${orderInstance?.totalAdjustments}"/>
-                    ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                    <g:formatNumber number="${totalAdjustments}"/>
+                    ${currencyCode}
                 </th>
             </tr>
             <tr>
@@ -163,8 +142,8 @@
                     <warehouse:message code="default.total.label"/>
                 </th>
                 <th class="right">
-                    <g:formatNumber number="${orderInstance?.total}"/>
-                    ${orderInstance?.currencyCode?:grailsApplication.config.openboxes.locale.defaultCurrencyCode}
+                    <g:formatNumber number="${total}"/>
+                    ${currencyCode}
                 </th>
             </tr>
             </tfoot>
@@ -175,3 +154,17 @@
     </g:else>
 </div>
 
+<script>
+  $(document).ready(function() {
+    fetchOrderItemsDerivedStatus();
+
+    $("#orderItemsFilter").keyup(function(event){
+      const filterCells = [1, 2]; // filter by product code or name
+      const filterValue = $("#orderItemsFilter")
+        .val()
+        .toUpperCase();
+      const tableRows = $("#order-items tr.dataRow");
+      filterTableItems(filterCells, filterValue, tableRows)
+    });
+  });
+</script>
