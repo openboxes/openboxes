@@ -70,15 +70,18 @@ enum RequisitionStatus {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, PENDING_APPROVAL, APPROVED, REJECTED]
     }
 
+    // Default options for outbound list, without supporting request approval
     static listOutboundOptions() {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED, PENDING_APPROVAL, APPROVED, REJECTED]
     }
 
+    // Options for outbounds when we are supporting request approval (Added approved)
     static listOutboundOptionsWhenSupportingRequestApproval() {
         [CREATED, EDITING, APPROVED, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
-    static listRequisitionOptions() {
+    // Options for request list when we are supporting request approval (Added approved and waiting for approval)
+    static listRequestOptionsWhenSupportingRequestApproval() {
         [CREATED, EDITING, APPROVED, WAITING_FOR_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 

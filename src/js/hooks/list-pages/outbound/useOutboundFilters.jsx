@@ -39,7 +39,7 @@ const useOutboundFilters = (isRequestsList) => {
   }, [currentLocale]);
 
   useEffect(() => {
-    dispatch(fetchRequisitionStatusCodes(currentLocation?.id, isRequestsList));
+    dispatch(fetchRequisitionStatusCodes(isRequestsList));
   }, [currentLocale, currentLocation, isRequestsList]);
 
   const clearFilterValues = () => {

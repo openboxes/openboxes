@@ -807,24 +807,20 @@ class StockMovementApiController {
     }
 
     def requisitionStatusCodes = {
-        boolean hasRequestApprovalActivity = false
-        boolean isRequestsList = params.getBoolean("isRequestsList")
-        if (params.location) {
-            Location location = Location.get(params.location)
-            hasRequestApprovalActivity = location.supports(ActivityCode.APPROVE_REQUEST)
-        }
+        Location currentLocation = Location.get(session.warehouse.id)
+        Boolean isRequestsList = params.getBoolean("isRequestsList")
 
-        List<RequisitionStatus> statuses = getRequisitionStatusCodesList(hasRequestApprovalActivity, isRequestsList)
+        List<RequisitionStatus> statuses = getRequisitionStatusCodesList(currentLocation.isApprovalRequired(), isRequestsList)
 
         List options = statuses?.collect(mapStatusCodes)
-        List availableStatuses = RequisitionStatus.listAll().collect(mapStatusCodes)
+        List allStatuses = RequisitionStatus.listAll().collect(mapStatusCodes)
 
-        render([data: options, availableStatuses: availableStatuses] as JSON)
+        render([data: options, allStatuses: allStatuses] as JSON)
     }
 
-    List<RequisitionStatus> getRequisitionStatusCodesList(boolean hasRequestApprovalActivity, boolean isRequestsList) {
+    List<RequisitionStatus> getRequisitionStatusCodesList(Boolean hasRequestApprovalActivity, Boolean isRequestsList) {
         if (isRequestsList) {
-            return hasRequestApprovalActivity ? RequisitionStatus.listRequisitionOptions() : RequisitionStatus.listOutboundOptions()
+            return hasRequestApprovalActivity ? RequisitionStatus.listRequestOptionsWhenSupportingRequestApproval() : RequisitionStatus.listOutboundOptions()
         }
 
         return hasRequestApprovalActivity ? RequisitionStatus.listOutboundOptionsWhenSupportingRequestApproval() : RequisitionStatus.listOutboundOptions()

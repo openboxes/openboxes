@@ -276,7 +276,7 @@ const StockMovementOutboundTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  requisitionStatuses: state.requisitionStatuses.availableStatuses,
+  requisitionStatuses: state.requisitionStatuses.allStatuses,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
   currentLocale: state.session.activeLanguage,
