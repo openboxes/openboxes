@@ -125,7 +125,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
         cache true
     }
 
-    static transients = ["managedLocally", "status"]
+    static transients = ["managedLocally", "status", "approvalRequired"]
 
     String toString() { return this.name }
 
@@ -337,6 +337,10 @@ class Location implements Comparable<Location>, java.io.Serializable {
             return (active && organization.active) ? LocationStatus.ENABLED : LocationStatus.DISABLED
         }
         return active ? LocationStatus.ENABLED : LocationStatus.DISABLED
+    }
+
+    Boolean isApprovalRequired() {
+        return supportedActivities?.contains(ActivityCode.APPROVE_REQUEST.id)
     }
 
     Map toBaseJson() {
