@@ -150,7 +150,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
         statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
         monthRequested formula: "date_format(date_requested, '%M %Y')"
         comments joinTable: [name: "requisition_comment", key: "requisition_id"]
-        events joinTable: [name: "requisition_event", key: "requisition_id"]
+        // Fetch join in the events should be removed in Grails 3 and replaced with proper join query using data services
+        events joinTable: [name: "requisition_event", key: "requisition_id"], fetch: 'join'
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
     }
 
