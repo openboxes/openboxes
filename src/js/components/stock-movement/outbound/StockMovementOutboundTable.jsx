@@ -129,7 +129,7 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       fixed: 'left',
-      width: 150,
+      width: 170,
       sortable: false,
       Cell: (row) => {
         const status = _.find(requisitionStatuses, _.matchesProperty('id', row.value));
@@ -276,7 +276,7 @@ const StockMovementOutboundTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  requisitionStatuses: state.requisitionStatuses.data,
+  requisitionStatuses: state.requisitionStatuses.availableStatuses,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
   currentLocale: state.session.activeLanguage,

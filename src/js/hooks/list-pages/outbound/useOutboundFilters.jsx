@@ -35,10 +35,12 @@ const useOutboundFilters = (isRequestsList) => {
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
-    dispatch(fetchRequisitionStatusCodes());
     dispatch(fetchShipmentTypes());
   }, [currentLocale]);
 
+  useEffect(() => {
+    dispatch(fetchRequisitionStatusCodes(currentLocation?.id, isRequestsList));
+  }, [currentLocale, currentLocation, isRequestsList]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
