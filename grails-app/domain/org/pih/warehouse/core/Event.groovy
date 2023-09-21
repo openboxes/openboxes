@@ -21,11 +21,6 @@ import org.pih.warehouse.auth.AuthService
  *{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}*/
 class Event implements Comparable, Serializable {
 
-    def beforeInsert = {
-        User currentUser = AuthService.currentUser.get()
-        createdBy = currentUser
-    }
-
     String id
     Date eventDate                // The date and time on which the Event occurred
     EventType eventType            // The type of the Event
