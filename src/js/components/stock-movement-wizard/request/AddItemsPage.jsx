@@ -20,10 +20,11 @@ import LabelField from 'components/form-elements/LabelField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
+import ActivityCode from 'consts/activityCode';
 import NotificationType from 'consts/notificationTypes';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
-import isRequestFromWard from 'utils/supportedActivitiesUtils';
+import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -1049,25 +1050,6 @@ class AddItemsPage extends Component {
     });
   }
 
-  confirmSubmit(onConfirm) {
-    confirmAlert({
-      title: this.props.translate('react.stockMovement.message.confirmSubmit.label', 'Confirm submit'),
-      message: this.props.translate(
-        'react.stockMovement.confirmSubmit.message',
-        'Please confirm you are ready to submit your request.',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.goBack.label', 'Go back'),
-        },
-        {
-          label: this.props.translate('react.default.submit.label', 'Submit'),
-          onClick: onConfirm,
-        },
-      ],
-    });
-  }
-
   /**
    * Fetches all required data.
    * @param {boolean} forceFetch
@@ -1245,11 +1227,9 @@ class AddItemsPage extends Component {
   }
 
   submitRequest(lineItems) {
-    this.confirmSubmit(() => {
-      const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
-      this.saveRequisitionItems(nonEmptyLineItems)
-        .then(() => this.transitionToNextStep('REQUESTED'));
-    });
+    const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
+    this.saveRequisitionItems(nonEmptyLineItems)
+      .then(() => this.transitionToNextStep('REQUESTED'));
   }
 
   /**
@@ -1607,6 +1587,7 @@ class AddItemsPage extends Component {
   }
 
   render() {
+    const { origin } = this.state.values;
     return (
       <Form
         onSubmit={() => {}}
@@ -1742,7 +1723,11 @@ class AddItemsPage extends Component {
                     invalid || !_.some(values.lineItems, item =>
                         item.product && _.parseInt(item.quantityRequested))
                   }
-                ><Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
+                >
+                  {supports(origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)
+                    ? <Translate id="react.default.button.submitForApproval.label" defaultMessage="Submit for approval" />
+                    : <Translate id="react.default.button.submitRequest.label" defaultMessage="Submit request" />
+                  }
                 </button>
               </div>
             </form>
