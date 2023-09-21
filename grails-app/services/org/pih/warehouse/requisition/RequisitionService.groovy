@@ -817,25 +817,26 @@ class RequisitionService {
             """, ['location': location, 'startDate': startDate, 'endDate': endDate])[0] ?: 0
     }
 
-    Event createEvent(EventCode eventCode, Location eventLocation, Date eventDate) {
+    Event createEvent(EventCode eventCode, Location eventLocation, Date eventDate, User currentUser) {
         EventType eventType = EventType.findByEventCode(eventCode)
         if (!eventType) {
             throw new NotFoundException("No event type with code ${eventCode} has been found")
         }
-        return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation)
+        return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
     void triggerRequisitionStatusTransition(Requisition requisition, RequisitionStatus status) {
+        User currentUser = AuthService.currentUser.get()
         if (status == RequisitionStatus.PENDING_APPROVAL) {
             if (requisition.origin.approvalRequired) {
-                Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date())
+                Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
                 requisition.addToEvents(event)
                 requisition.status = RequisitionStatus.PENDING_APPROVAL
                 requisition.approvalRequired = true
                 requisition.save()
                 return
             }
-            Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date())
+            Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date(), currentUser)
             requisition.addToEvents(event)
             requisition.status = RequisitionStatus.VERIFYING
             requisition.approvalRequired = false
