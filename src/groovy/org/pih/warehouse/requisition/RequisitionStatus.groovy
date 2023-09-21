@@ -82,7 +82,7 @@ enum RequisitionStatus {
 
     // Options for request list when current location is supporting request approval (Added approved and waiting for approval)
     static listRequestOptionsWhenSupportingRequestApproval() {
-        [CREATED, EDITING, APPROVED, WAITING_FOR_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
+        [CREATED, EDITING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
     static listPending() {
@@ -98,7 +98,7 @@ enum RequisitionStatus {
     }
 
     static listAll() {
-        [CREATED, EDITING, VERIFYING, APPROVED, WAITING_FOR_APPROVAL, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
+        [CREATED, EDITING, VERIFYING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
     }
 
     static toStockMovementStatus(RequisitionStatus requisitionStatus) {
@@ -139,7 +139,7 @@ enum RequisitionStatus {
         return "(case status " +
             "when '${CREATED}' then ${CREATED.sortOrder} " +
             "when '${EDITING}' then ${EDITING.sortOrder} " +
-            "when '${WAITING_FOR_APPROVAL}' then ${WAITING_FOR_APPROVAL.sortOrder} " +
+            "when '${PENDING_APPROVAL}' then ${PENDING_APPROVAL.sortOrder} " +
             "when '${APPROVED}' then ${APPROVED.sortOrder} " +
             "when '${VERIFYING}' then ${VERIFYING.sortOrder} " +
             "when '${PICKING}' then ${PICKING.sortOrder} " +
