@@ -139,6 +139,12 @@ class StockMovementService {
                     //RequisitionStatus.VERIFYING:
                     case StockMovementStatusCode.VALIDATED:
                         break
+                    //RequisitionStatus.APPROVED:
+                    case StockMovementStatusCode.APPROVED:
+                        break
+                    //RequisitionStatus.REJECTED:
+                    case StockMovementStatusCode.REJECTED:
+                        break
                     // RequisitionStatus.PICKING:
                     case StockMovementStatusCode.PICKING:
                         validateQuantityRequested(stockMovement)

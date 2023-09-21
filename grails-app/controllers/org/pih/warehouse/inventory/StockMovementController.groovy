@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
@@ -243,6 +244,53 @@ class StockMovementController {
 
         redirect(action: "list", params: params << ["flash": flash as JSON])
     }
+
+    def updateStatus = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        try {
+            stockMovementService.transitionStockMovement(stockMovement, params as JSONObject)
+
+            if (stockMovement.status == RequsitionStatus.APPROVED) {
+                // check if status has already changed from waiting for approval
+                    // if has changed then throw an exception and return a message that t has changed
+                    // and return to view page with that message
+                // set change status on requisition to approved
+                stockMovementService.transitionStockMovement(stockMovement, jsonObject)
+                flash.message = g.message(
+                        code: "request.approved.message.label",
+                        default: "You have successfully approved the request {0}",
+                        args: [stockMovement.id]
+                )
+            } else if (stockMovement.status == RequsitionStatus.APPROVED) {
+                // check if status has already changed from waiting for approval
+                    // if has changed then throw an exception and return a message that t has changed
+                    // and return to view page with that message
+                // set change status on requisition to rejected
+                flash.message = g.message(
+                        code: "request.rejected.message.label",
+                        default: "You have successfully rejected the request {0}",
+                        args: [stockMovement.id]
+                )
+            }
+        } catch(Exception e) {
+            Location currentLocation = Location.get(session?.warehouse?.id)
+            render(view: "show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
+
+        }
+
+        redirect(action: "list", params: ["flash": flash as JSON, sourceType: "ELECTRONIC", direction: "OUTBOUND"])
+    }
+
+    def rollbackApproval = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        // no-opt
+        // check if status is either approved or rejecetd
+            // if no then throw error and return a message that it can't be rolledback
+
+        // TODO: to be implemented
+    }
+
 
     def requisition = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
