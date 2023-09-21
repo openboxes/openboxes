@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import org.pih.warehouse.auth.AuthService
 
 /**
  * Represents a particular Event of interest during the course of a Shipment
@@ -19,6 +20,11 @@ package org.pih.warehouse.core
  *  Shipment #2 Arrived at Customs on 5/5/2010:
  *{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}*/
 class Event implements Comparable, Serializable {
+
+    def beforeInsert = {
+        User currentUser = AuthService.currentUser.get()
+        createdBy = currentUser
+    }
 
     String id
     Date eventDate                // The date and time on which the Event occurred
