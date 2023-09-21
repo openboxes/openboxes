@@ -211,7 +211,7 @@
                                 <warehouse:message code="stockMovement.approvers.label"/>
                             </td>
                             <td class="value">
-                                ${stockMovement?.requisition?.approvers?.join(", ") ?: warehouse.message(code:"default.none.label")}
+                                ${stockMovement?.requisition?.approvers?.join(", ") ?: g.message(code:"default.none.label")}
                             </td>
                         </tr>
                         <tr class="prop">
