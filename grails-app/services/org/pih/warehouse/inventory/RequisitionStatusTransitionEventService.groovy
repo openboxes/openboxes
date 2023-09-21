@@ -44,8 +44,4 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
         requisitionService.triggerRequisitionStatusTransition(event.requisition, event.newStatus)
 
     }
-
-    void triggerRequisitionStatusTransition(ApplicationEvent event) {
-
-    }
 }
