@@ -1,6 +1,7 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -147,6 +148,24 @@
                     <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
                 </a>
             </g:isSuperuser>
+
+        %{--            <g:isUserRequestApprover stockMovement="${stockMovement}">--}%
+            <g:set var="isApprovedOrRejected"  value="${stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED}" />
+            <g:link class="button" controller="stockRequest" action="updateStatus" id="${stockMovement.id}" params="[status: StockMovementStatusCode.APPROVED]">
+                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
+                <g:message code="request.approval.approve.label"  default="approve" />
+            </g:link>
+            <g:link class="button" controller="stockRequest" action="updateStatus" id="${stockMovement.id}" params="[status: StockMovementStatusCode.REJECTED]">
+                <img src="${resource(dir: 'images/icons/silk', file: 'cancel.png')}" />&nbsp;
+                <g:message code="request.approval.reject.label"  default="reject" />
+            </g:link>
+            <g:if test="${isApprovedOrRejected}" >
+                <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                    <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
+                </g:link>
+            </g:if>
+        %{--            </g:isUserRequestApprover>--}%
         </div>
     </div>
     <div class="yui-gf">

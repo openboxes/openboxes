@@ -83,6 +83,14 @@ class AuthTagLib {
             out << body()
     }
 
+    def isUserRequestApprover = { attrs, body ->
+        def user = session.user
+
+        if (attrs.stockMovement?.isUserRequestApprover(user)) {
+            out << body()
+        }
+    }
+
     def hasRoleInvoice = { attrs, body ->
         if (userService.hasRoleInvoice(session?.user))
             out << body()

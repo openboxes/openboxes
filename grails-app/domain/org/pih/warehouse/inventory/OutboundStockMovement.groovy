@@ -86,7 +86,8 @@ class OutboundStockMovement implements Serializable {
             "documents",
             "totalValue",
             "pending",
-            "electronicType"
+            "electronicType",
+            "approvers"
     ]
 
     static mapping = {
@@ -191,6 +192,14 @@ class OutboundStockMovement implements Serializable {
     Float getTotalValue() {
         def itemsWithPrice = shipment?.shipmentItems?.findAll { it.product.pricePerUnit }
         return itemsWithPrice.collect { it?.quantity * it?.product?.pricePerUnit }.sum() ?: 0
+    }
+
+    List<Person> getApprovers() {
+        return requisition?.approvers?.toList()
+    }
+
+    Boolean isUserRequestApprover(Person user) {
+        return approvers.contains(user)
     }
 
     Boolean isPending() {
