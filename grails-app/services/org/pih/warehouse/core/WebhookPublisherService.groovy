@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.auth.AuthService
 
 
 class WebhookPublisherService {
@@ -20,15 +21,47 @@ class WebhookPublisherService {
 
     boolean transactional = false
 
-    def publishEvent(Shipment shipment) {
-        Map payloadData = [id: shipment.id, eventType: "shipment.shipped"]
-        publishEvent(payloadData)
+    def publishShippedEvent(Shipment shipment) {
+
+        boolean webhooksEnabled = shipment.origin.supports(ActivityCode.ENABLE_WEBHOOKS)
+        if (!webhooksEnabled) {
+            log.info "Location ${shipment.origin} does not support activity code ${ActivityCode.ENABLE_WEBHOOKS}"
+            return
+        }
+
+        Map payload = [
+                id       : shipment.id,
+                type     : "shipment.shipped",
+                timestamp: new Date().time,
+                user     : AuthService.currentUser.get()?.id,
+                location : AuthService.currentLocation.get()?.id,
+                data     : [
+                        id            : shipment.id,
+                        shipmentNumber: shipment.shipmentNumber,
+                        origin        : shipment.origin.id,
+                        destination   : shipment.destination.id,
+                        shipmentType  : shipment.shipmentType,
+                        shipmentItems : shipment.shipmentItems.collect {
+                            [
+                                    id            : it.id,
+                                    productName   : it.inventoryItem.product?.name,
+                                    productCode   : it.inventoryItem?.product.productCode,
+                                    lotNumber     : it?.inventoryItem?.lotNumber,
+                                    expirationDate: it?.inventoryItem?.expirationDate.format("MM/dd/yyyy"),
+                                    quantity      : it.quantity
+                            ]
+                        }
+                ]
+        ]
+        publishEvent(payload)
     }
 
-    def publishEvent(Map payloadData) {
+    def publishEvent(Map payload) {
         try {
+            boolean webhooksEnabled = ConfigurationHolder.config.openboxes.webhook.enabled
             String webhookUrl = ConfigurationHolder.config.openboxes.webhook.endpoint.url
-            apiClientService.post(webhookUrl, payloadData)
+            Map headers = ConfigurationHolder.config.openboxes.webhook.endpoint.headers
+            apiClientService.post(webhookUrl, payload, headers)
         } catch (Exception e) {
             log.error("Failed to publish webhook event due to error: " + e.message, e)
         }
