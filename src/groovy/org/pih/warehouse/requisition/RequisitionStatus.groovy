@@ -137,6 +137,9 @@ enum RequisitionStatus {
             "when '${RECEIVED}' then ${RECEIVED.sortOrder} " +
             "when '${CANCELED}' then ${CANCELED.sortOrder} " +
             "when '${DELETED}' then ${DELETED.sortOrder} " +
+            "when '${PENDING_APPROVAL}' then ${PENDING_APPROVAL.sortOrder} " +
+            "when '${APPROVED}' then ${APPROVED.sortOrder} " +
+            "when '${REJECTED}' then ${REJECTED.sortOrder} " +
             "else 0 " +
             "end)"
     }
