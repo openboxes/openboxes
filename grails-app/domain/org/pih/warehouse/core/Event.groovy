@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.core
 
+import org.pih.warehouse.auth.AuthService
 
 /**
  * Represents a particular Event of interest during the course of a Shipment
@@ -20,12 +21,18 @@ package org.pih.warehouse.core
  *{eventDate: 5/5/2010, eventLocation: Customs, eventType: ARRIVED}*/
 class Event implements Comparable, Serializable {
 
+    def beforeInsert = {
+        User currentUser = AuthService.currentUser.get()
+        createdBy = currentUser
+    }
+
     String id
     Date eventDate                // The date and time on which the Event occurred
     EventType eventType            // The type of the Event
     Location eventLocation        // The Location at which the Event occurred
     Date dateCreated
     Date lastUpdated
+    User createdBy
 
     static mapping = {
         id generator: 'uuid'
@@ -36,6 +43,7 @@ class Event implements Comparable, Serializable {
         eventDate(nullable: true)
         eventType(nullable: true)
         eventLocation(nullable: true)
+        createdBy(nullable: true)
     }
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
