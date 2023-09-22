@@ -206,14 +206,16 @@
                                 ${stockMovement?.stocklist?.name?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
-                        <tr class="prop">
-                            <td class="name">
-                                <warehouse:message code="stockMovement.approvers.label"/>
-                            </td>
-                            <td class="value">
-                                ${stockMovement?.requisition?.approvers?.join(", ") ?: g.message(code:"default.none.label")}
-                            </td>
-                        </tr>
+                        <g:if test="${!stockMovement?.requisition?.approvers?.isEmpty()}">
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="stockMovement.approvers.label"/>
+                                </td>
+                                <td class="value">
+                                    ${stockMovement?.requisition?.approvers?.join(", ") ?: g.message(code:"default.none.label")}
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.comments.label"/>
