@@ -206,7 +206,7 @@
                                 ${stockMovement?.stocklist?.name?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
-                        <g:if test="${!stockMovement?.requisition?.approvers?.isEmpty()}">
+                        <g:if test="${stockMovement?.requisition?.approvers}">
                             <g:set var="approversList" value="${stockMovement?.requisition?.approvers?.join(', ')}" />
                             <tr class="prop" title="${approversList}">
                                 <td class="name">
