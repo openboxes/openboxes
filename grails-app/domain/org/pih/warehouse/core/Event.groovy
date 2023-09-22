@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.core
 
-import org.pih.warehouse.auth.AuthService
 
 /**
  * Represents a particular Event of interest during the course of a Shipment
