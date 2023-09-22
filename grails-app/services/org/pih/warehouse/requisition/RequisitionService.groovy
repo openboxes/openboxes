@@ -844,19 +844,19 @@ class RequisitionService {
                 requisition.save()
             } else if (status == RequisitionStatus.APPROVED) {
                 requisition.dateApproved = new Date()
-            requisition.approvedBy = currentUser
+                requisition.approvedBy = currentUser
                 requisition.status = RequisitionStatus.APPROVED
 
-                Event event = createEvent(EventCode.APPROVED, requisition.origin, new Date())
+                Event event = createEvent(EventCode.APPROVED, requisition.origin, new Date(), currentUser)
                 requisition.addToEvents(event)
                 requisition.save()
                 return
             } else if (status == RequisitionStatus.REJECTED) {
                 requisition.dateRejected = new Date()
-            requisition.rejectedBy = currentUser
+                requisition.rejectedBy = currentUser
                 requisition.status = RequisitionStatus.REJECTED
 
-                Event event = createEvent(EventCode.REJECTED, requisition.origin, new Date())
+                Event event = createEvent(EventCode.REJECTED, requisition.origin, new Date(), currentUser)
                 requisition.addToEvents(event)
                 requisition.save()
                 return

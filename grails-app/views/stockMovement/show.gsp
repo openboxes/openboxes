@@ -3,6 +3,7 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
 <%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
 <%@page import="org.pih.warehouse.core.ActivityCode"%>
+<html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
