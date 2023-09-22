@@ -829,7 +829,6 @@ class StockMovementApiController {
                 id: status.name(),
                 value: status.name(),
                 label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
-                variant: status.variant.name
         ]
     }
 }
