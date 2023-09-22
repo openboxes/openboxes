@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {
   RiArrowRightSLine,
@@ -17,6 +16,7 @@ import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
+import useTranslation from 'hooks/useTranslation';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
@@ -42,6 +42,8 @@ const StockMovementOutboundTable = ({
     exportPendingShipmentItems,
     deleteConfirmAlert,
   } = useOutboundListTableData(filterParams);
+
+  useTranslation('requisitionStatus');
 
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
@@ -131,17 +133,18 @@ const StockMovementOutboundTable = ({
       fixed: 'left',
       width: 170,
       sortable: false,
-      Cell: (row) => {
-        const status = _.find(requisitionStatuses, _.matchesProperty('id', row.value));
-        return (
-          <TableCell
-            {...row}
-            tooltip
-            tooltipLabel={getStatusTooltip(row.value)}
-          >
-            <StatusIndicator variant={status?.variant} status={status?.label} />
-          </TableCell>);
-      },
+      Cell: row => (
+        <TableCell
+          {...row}
+          tooltip
+          tooltipLabel={getStatusTooltip(row.value)}
+        >
+          <StatusIndicator
+            variant={row?.original?.statusVariant}
+            status={translate(`react.requisitionStatus.enum.${row?.original?.status}`, row?.original?.status)}
+          />
+        </TableCell>
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
@@ -276,7 +279,7 @@ const StockMovementOutboundTable = ({
 
 const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
-  requisitionStatuses: state.requisitionStatuses.allStatuses,
+  requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
   currentLocale: state.session.activeLanguage,

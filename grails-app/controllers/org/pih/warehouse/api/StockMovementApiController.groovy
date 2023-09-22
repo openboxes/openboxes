@@ -810,14 +810,12 @@ class StockMovementApiController {
         Location currentLocation = Location.get(session.warehouse.id)
         Boolean isRequestsList = params.getBoolean("isRequestsList")
 
-        List<RequisitionStatus> statuses = getRequisitionStatusCodesList(currentLocation.isApprovalRequired(), isRequestsList)
+        List<String> statuses = getRequisitionStatusCodesList(currentLocation.isApprovalRequired(), isRequestsList).collect(mapStatusCodes)
 
-        List options = statuses?.collect(mapStatusCodes)
-        List allStatuses = RequisitionStatus.listAll().collect(mapStatusCodes)
-
-        render([data: options, allStatuses: allStatuses] as JSON)
+        render([data: statuses] as JSON)
     }
 
+    // Function for getting appropriate filter options based on current list and supporting requests approval
     List<RequisitionStatus> getRequisitionStatusCodesList(Boolean hasRequestApprovalActivity, Boolean isRequestsList) {
         if (isRequestsList) {
             return hasRequestApprovalActivity ? RequisitionStatus.listRequestOptionsWhenSupportingRequestApproval() : RequisitionStatus.listOutboundOptions()

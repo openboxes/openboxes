@@ -538,7 +538,7 @@ export function fetchRequisitionStatusCodes(isRequestsList = false) {
     }).then((res) => {
       dispatch({
         type: FETCH_REQUISITION_STATUS_CODES,
-        payload: res.data,
+        payload: res.data.data,
       });
     });
   };

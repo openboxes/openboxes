@@ -22,6 +22,7 @@ enum StockMovementStatusCode {
     VALIDATING(2, PENDING),
     VALIDATED(3, PENDING),
     APPROVED(3),
+    REJECTED(3),
     PICKING(3, PENDING),
     PICKED(4, PENDING),
     CHECKING(4, PENDING),

@@ -108,6 +108,7 @@ class OutboundStockMovementListItem implements Serializable {
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
+                statusVariant       : status?.variant?.name,
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,

@@ -2,7 +2,6 @@ import { FETCH_REQUISITION_STATUS_CODES } from 'actions/types';
 
 const initialState = {
   data: [],
-  allStatuses: [],
   fetched: false,
 };
 
@@ -11,8 +10,7 @@ export default function (state = initialState, action) {
     case FETCH_REQUISITION_STATUS_CODES:
       if (action.payload) {
         return {
-          data: action.payload.data,
-          allStatuses: action.payload.allStatuses,
+          data: action.payload,
           fetched: true,
         };
       }
