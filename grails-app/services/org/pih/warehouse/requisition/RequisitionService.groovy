@@ -843,12 +843,8 @@ class RequisitionService {
                 requisition.approvalRequired = false
                 requisition.save()
             } else if (status == RequisitionStatus.APPROVED) {
-                // if is not WAITING FOR APPROVAL then throw exception
-//            if (requisition.canceled) {
-//                throw new IllegalStateException("nah nah")
-//            }
                 requisition.dateApproved = new Date()
-                requisition.approvedBy = person
+            requisition.approvedBy = currentUser
                 requisition.status = RequisitionStatus.APPROVED
 
                 Event event = createEvent(EventCode.APPROVED, requisition.origin, new Date())
@@ -856,13 +852,8 @@ class RequisitionService {
                 requisition.save()
                 return
             } else if (status == RequisitionStatus.REJECTED) {
-                // if is not WAITING FOR APPROVAL then throw exception
-
-                //            if (requisition.canceled) {
-//                throw new IllegalStateException("nah nah")
-//            }
                 requisition.dateRejected = new Date()
-                requisition.rejectedBy = person
+            requisition.rejectedBy = currentUser
                 requisition.status = RequisitionStatus.REJECTED
 
                 Event event = createEvent(EventCode.REJECTED, requisition.origin, new Date())

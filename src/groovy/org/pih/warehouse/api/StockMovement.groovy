@@ -255,6 +255,10 @@ class StockMovement {
         requisition?.sourceType == RequisitionSourceType.ELECTRONIC
     }
 
+    Boolean isPendingApproval() {
+        return requisition?.status == RequisitionStatus.PENDING_APPROVAL
+    }
+
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
         Location origin = requisition?.origin?:shipment?.origin
         Location destination = requisition?.destination?:shipment?.destination

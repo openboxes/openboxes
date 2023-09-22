@@ -251,32 +251,28 @@ class StockMovementController {
         try {
             stockMovementService.transitionStockMovement(stockMovement, params as JSONObject)
 
-            if (stockMovement.status == RequsitionStatus.APPROVED) {
-                // check if status has already changed from waiting for approval
-                    // if has changed then throw an exception and return a message that t has changed
-                    // and return to view page with that message
-                // set change status on requisition to approved
-                stockMovementService.transitionStockMovement(stockMovement, jsonObject)
-                flash.message = g.message(
-                        code: "request.approved.message.label",
-                        default: "You have successfully approved the request {0}",
-                        args: [stockMovement.id]
-                )
-            } else if (stockMovement.status == RequsitionStatus.APPROVED) {
-                // check if status has already changed from waiting for approval
-                    // if has changed then throw an exception and return a message that t has changed
-                    // and return to view page with that message
-                // set change status on requisition to rejected
-                flash.message = g.message(
-                        code: "request.rejected.message.label",
-                        default: "You have successfully rejected the request {0}",
-                        args: [stockMovement.id]
-                )
+            switch(stockMovement.requisition?.status) {
+                case RequisitionStatus.APPROVED:
+                    flash.message = g.message(
+                            code: "request.approved.message.label",
+                            default: "You have successfully approved the request {0}",
+                            args: [stockMovement.id]
+                    )
+                    break
+                case RequisitionStatus.REJECTED:
+                    flash.message = g.message(
+                            code: "request.rejected.message.label",
+                            default: "You have successfully rejected the request {0}",
+                            args: [stockMovement.id]
+                    )
+                    break
+                default:
+                    break
             }
         } catch(Exception e) {
-            Location currentLocation = Location.get(session?.warehouse?.id)
-            render(view: "show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
-
+            flash.message = e.message
+            redirect(action: "show", params: [id: stockMovement.id])
+            return
         }
 
         redirect(action: "list", params: ["flash": flash as JSON, sourceType: "ELECTRONIC", direction: "OUTBOUND"])
