@@ -236,6 +236,13 @@ class UserService {
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
     }
 
+    Boolean userHasRoles(String userId, Collection roleTypes, String locationId) {
+        User user = User.get(userId)
+        Location location = Location.get(locationId)
+
+        return user.hasRoles(location, roleTypes)
+    }
+
     Boolean isUserInRole(User user, RoleType roleType) {
         return isUserInRole(user.id, [roleType])
     }
@@ -407,7 +414,11 @@ class UserService {
 
     public def getEffectiveRoles(User user) {
         def currentLocation = AuthService.currentLocation?.get()
-        return user.getEffectiveRoles(currentLocation)
+        return getEffectiveRoles(user, currentLocation)
+    }
+
+    public def getEffectiveRoles(User user, Location location) {
+        return user.getEffectiveRoles(location)
     }
 
 

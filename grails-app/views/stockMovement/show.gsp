@@ -2,7 +2,7 @@
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
 <%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
-<html>
+<%@page import="org.pih.warehouse.core.ActivityCode"%>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
@@ -76,6 +76,10 @@
             <g:set var="hasBeenPlaced" value="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
             <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
+            <g:set var="userHasRequestApproverRole" value="${false}"/>
+            <g:userHasRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
+                <g:set var="userHasRequestApproverRole" value="${true}"/>
+            </g:userHasRoles>
             <g:if test="${stockMovement?.order}">
                 <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
                     <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
@@ -148,24 +152,41 @@
                     <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
                 </a>
             </g:isSuperuser>
-
-        %{--            <g:isUserRequestApprover stockMovement="${stockMovement}">--}%
-            <g:set var="isApprovedOrRejected"  value="${stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED}" />
-            <g:link class="button" controller="stockRequest" action="updateStatus" id="${stockMovement.id}" params="[status: StockMovementStatusCode.APPROVED]">
-                <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
-                <g:message code="request.approval.approve.label"  default="approve" />
-            </g:link>
-            <g:link class="button" controller="stockRequest" action="updateStatus" id="${stockMovement.id}" params="[status: StockMovementStatusCode.REJECTED]">
-                <img src="${resource(dir: 'images/icons/silk', file: 'cancel.png')}" />&nbsp;
-                <g:message code="request.approval.reject.label"  default="reject" />
-            </g:link>
-            <g:if test="${isApprovedOrRejected}" >
-                <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
-                    <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
-                </g:link>
-            </g:if>
-        %{--            </g:isUserRequestApprover>--}%
+            <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
+                <g:if test="${userHasRequestApproverRole}">
+                    <g:link
+                            class="button"
+                            controller="stockRequest"
+                            action="updateStatus"
+                            id="${stockMovement.id}"
+                            params="[status: StockMovementStatusCode.APPROVED]"
+                            disabled="${!stockMovement.pendingApproval}"
+                            disabledMessage="Request is not pending approval"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
+                        <g:message code="request.approval.approve.label"  default="approve" />
+                    </g:link>
+                    <g:link
+                            class="button"
+                            controller="stockRequest"
+                            action="updateStatus"
+                            id="${stockMovement.id}"
+                            params="[status: StockMovementStatusCode.REJECTED]"
+                            disabled="${!stockMovement.pendingApproval}"
+                            disabledMessage="Request is not pending approval"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'cancel.png')}" />&nbsp;
+                        <g:message code="request.approval.reject.label"  default="reject" />
+                    </g:link>
+                    <g:set var="isApprovedOrRejected" value="${stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED}" />
+                    <g:if test="${isApprovedOrRejected}" >
+                        <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                            <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
+                        </g:link>
+                    </g:if>
+                </g:if>
+            </g:supports>
         </div>
     </div>
     <div class="yui-gf">

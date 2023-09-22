@@ -87,7 +87,8 @@ class OutboundStockMovement implements Serializable {
             "totalValue",
             "pending",
             "electronicType",
-            "approvers"
+            "approvers",
+            "pendingApproval"
     ]
 
     static mapping = {
@@ -198,8 +199,8 @@ class OutboundStockMovement implements Serializable {
         return requisition?.approvers?.toList()
     }
 
-    Boolean isUserRequestApprover(Person user) {
-        return approvers.contains(user)
+    Boolean isPendingApproval() {
+        return requisition?.status == RequisitionStatus.PENDING_APPROVAL
     }
 
     Boolean isPending() {

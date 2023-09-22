@@ -87,7 +87,8 @@ class StockMovement {
     List<Person> approvers
 
     static transients = [
-            "electronicType"
+            "electronicType",
+            "pendingApproval"
     ]
 
     static constraints = {
