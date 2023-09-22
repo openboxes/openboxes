@@ -20,8 +20,6 @@ import org.springframework.context.ApplicationListener
 
 class RequisitionStatusTransitionEventService implements ApplicationListener<RequisitionStatusTransitionEvent> {
 
-    static transactional = true
-
     MailService mailService
     GrailsApplication grailsApplication
     RequisitionService requisitionService
@@ -41,7 +39,6 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
     }
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        requisitionService.triggerRequisitionStatusTransition(event.requisition, event.newStatus)
-
+        requisitionService.triggerRequisitionStatusTransition(event.requisition, event.newStatus, event.createdBy)
     }
 }

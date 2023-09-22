@@ -246,7 +246,7 @@ class StockMovementService {
         } else {
             requisition.status = status
             requisition.save(flush: true)
-            publishEvent(new RequisitionStatusTransitionEvent(requisition, requisition.status))
+            publishEvent(new RequisitionStatusTransitionEvent(requisition, requisition.status, AuthService.currentUser.get()))
         }
     }
 

@@ -340,7 +340,7 @@ class Location implements Comparable<Location>, java.io.Serializable {
     }
 
     Boolean isApprovalRequired() {
-        return supportedActivities?.contains(ActivityCode.APPROVE_REQUEST.id)
+        return supports(ActivityCode.APPROVE_REQUEST)
     }
 
     Map toBaseJson() {

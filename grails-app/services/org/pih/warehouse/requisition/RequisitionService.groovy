@@ -825,22 +825,24 @@ class RequisitionService {
         return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisition, RequisitionStatus status) {
-        User currentUser = AuthService.currentUser.get()
-        if (status == RequisitionStatus.PENDING_APPROVAL) {
-            if (requisition.origin.approvalRequired) {
-                Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
+    void triggerRequisitionStatusTransition(Requisition requisitionInstance, RequisitionStatus status, User currentUser) {
+        Requisition.withSession {
+            Requisition requisition = Requisition.get(requisitionInstance.id)
+            if (status == RequisitionStatus.PENDING_APPROVAL) {
+                if (requisition.origin.approvalRequired) {
+                    Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
+                    requisition.addToEvents(event)
+                    requisition.status = RequisitionStatus.PENDING_APPROVAL
+                    requisition.approvalRequired = true
+                    requisition.save()
+                    return
+                }
+                Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date(), currentUser)
                 requisition.addToEvents(event)
-                requisition.status = RequisitionStatus.PENDING_APPROVAL
-                requisition.approvalRequired = true
+                requisition.status = RequisitionStatus.VERIFYING
+                requisition.approvalRequired = false
                 requisition.save()
-                return
             }
-            Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date(), currentUser)
-            requisition.addToEvents(event)
-            requisition.status = RequisitionStatus.VERIFYING
-            requisition.approvalRequired = false
-            requisition.save()
         }
     }
 }
