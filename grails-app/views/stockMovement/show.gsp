@@ -155,7 +155,7 @@
                 <h2><warehouse:message code="default.details.label" /></h2>
                 <div class="dialog">
 
-                    <table>
+                    <table class="d-inline-block text-truncate">
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.identifier.label"/>
@@ -206,6 +206,17 @@
                                 ${stockMovement?.stocklist?.name?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.requisition?.approvers}">
+                            <g:set var="approversList" value="${stockMovement?.requisition?.approvers?.join(', ')}" />
+                            <tr class="prop" title="${approversList}">
+                                <td class="name">
+                                    <warehouse:message code="stockMovement.approvers.label"/>
+                                </td>
+                                <td class="value text-truncate d-inline-block">
+                                    ${approversList}
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.comments.label"/>
