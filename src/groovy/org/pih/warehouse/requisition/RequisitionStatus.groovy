@@ -17,7 +17,7 @@ enum RequisitionStatus {
 
     CREATED(1, null, StatusType.SUCCESS),
     EDITING(2, PENDING, StatusType.PRIMARY),
-    WAITING_FOR_APPROVAL(3, null, StatusType.WARNING),
+    PENDING_APPROVAL(3, null, StatusType.WARNING),
     APPROVED(4, null, StatusType.SUCCESS),
     REJECTED(5, null, StatusType.DANGER),
     VERIFYING(6, PENDING, StatusType.WARNING),
@@ -67,11 +67,11 @@ enum RequisitionStatus {
     /* remove OPEN, FULFILLED */
 
     static list() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, PENDING_APPROVAL, APPROVED, REJECTED]
     }
 
     static listOutboundOptions() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED, PENDING_APPROVAL, APPROVED, REJECTED]
     }
 
     static listPending() {
@@ -112,7 +112,7 @@ enum RequisitionStatus {
             case StockMovementStatusCode.REQUESTING:
                 return RequisitionStatus.EDITING
             case StockMovementStatusCode.REQUESTED:
-                return RequisitionStatus.VERIFYING
+                return RequisitionStatus.PENDING_APPROVAL
             case StockMovementStatusCode.PACKED:
                 return RequisitionStatus.CHECKING
             case StockMovementStatusCode.VALIDATED:
@@ -137,6 +137,9 @@ enum RequisitionStatus {
             "when '${RECEIVED}' then ${RECEIVED.sortOrder} " +
             "when '${CANCELED}' then ${CANCELED.sortOrder} " +
             "when '${DELETED}' then ${DELETED.sortOrder} " +
+            "when '${PENDING_APPROVAL}' then ${PENDING_APPROVAL.sortOrder} " +
+            "when '${APPROVED}' then ${APPROVED.sortOrder} " +
+            "when '${REJECTED}' then ${REJECTED.sortOrder} " +
             "else 0 " +
             "end)"
     }
