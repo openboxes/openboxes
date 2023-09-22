@@ -13,7 +13,12 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
+import javassist.NotFoundException
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -30,7 +35,7 @@ import org.pih.warehouse.product.Product
 class RequisitionService {
 
     GrailsApplication grailsApplication
-    def authService
+    AuthService authService
     def identifierService
     def inventoryService
 
@@ -808,5 +813,34 @@ class RequisitionService {
             FROM Requisition r 
             WHERE r.origin = :location AND r.dateCreated >= :startDate AND r.dateCreated <= :endDate AND r.isTemplate = false 
             """, ['location': location, 'startDate': startDate, 'endDate': endDate])[0] ?: 0
+    }
+
+    Event createEvent(EventCode eventCode, Location eventLocation, Date eventDate, User currentUser) {
+        EventType eventType = EventType.findByEventCode(eventCode)
+        if (!eventType) {
+            throw new NotFoundException("No event type with code ${eventCode} has been found")
+        }
+        return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
+    }
+
+    void triggerRequisitionStatusTransition(Requisition requisitionInstance, RequisitionStatus status, User currentUser) {
+        Requisition.withSession {
+            Requisition requisition = Requisition.get(requisitionInstance.id)
+            if (status == RequisitionStatus.PENDING_APPROVAL) {
+                if (requisition.origin.approvalRequired) {
+                    Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
+                    requisition.addToEvents(event)
+                    requisition.status = RequisitionStatus.PENDING_APPROVAL
+                    requisition.approvalRequired = true
+                    requisition.save()
+                    return
+                }
+                Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date(), currentUser)
+                requisition.addToEvents(event)
+                requisition.status = RequisitionStatus.VERIFYING
+                requisition.approvalRequired = false
+                requisition.save()
+            }
+        }
     }
 }

@@ -116,6 +116,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     // Request approval fields
     Person approvedBy
+    Person rejectedBy
     Date dateApproved
     Date dateRejected
     Boolean approvalRequired
@@ -197,6 +198,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
         sortByCode(nullable: true)
         statusSortOrder(nullable: true)
         approvedBy(nullable: true)
+        rejectedBy(nullable: true)
         dateApproved(nullable: true)
         dateRejected(nullable: true)
         approvalRequired(nullable: true)

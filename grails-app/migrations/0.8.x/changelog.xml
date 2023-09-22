@@ -162,4 +162,7 @@
     <include file="0.8.x/changelog-2023-09-13-1233-rename-approver-role-to-purchase-approver.xml" />
     <include file="0.8.x/changelog-2023-09-13-1252-add-requisition-approver-role.xml" />
     <include file="0.8.x/changelog-2023-09-13-1300-alter-table-requisition-add-request-approval-improvement.xml" />
+    <include file="0.8.x/changelog-2023-09-21-1330-alter-table-requisition-add-rejectedby-field.xml" />
+    <include file="0.8.x/changelog-2023-09-21-1345-alter-table-event-add-createdby-field.xml" />
+    <include file="0.8.x/changelog-2023-09-21-1400-add-eventtypes-for-request-approval-workflow.xml" />
 </databaseChangeLog>

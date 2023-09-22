@@ -54,6 +54,7 @@ import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -237,6 +238,7 @@ class StockMovementService {
     void updateRequisitionStatus(String id, RequisitionStatus status) {
 
         log.info "Update status ${id} " + status
+        // TODO: In Grails the get below should be replaced by the data service get that joins the Events
         Requisition requisition = Requisition.get(id)
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
@@ -251,6 +253,7 @@ class StockMovementService {
         } else {
             requisition.status = status
             requisition.save(flush: true)
+            publishEvent(new RequisitionStatusTransitionEvent(requisition, requisition.status, AuthService.currentUser.get()))
         }
     }
 
