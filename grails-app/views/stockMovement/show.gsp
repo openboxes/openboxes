@@ -369,6 +369,30 @@
                                 </g:else>
                             </td>
                         </tr>
+
+                        <g:if test="${stockMovement.requisition.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]}">
+                            <g:set var="person" value="${stockMovement.requisition.approvedBy ?: stockMovement.requisition.rejectedBy}" />
+                            <g:set var="date" value="${stockMovement.requisition.dateApproved ?: stockMovement.requisition.dateRejected}" />
+                            <g:set var="label" value="${stockMovement.requisition.status == RequisitionStatus.APPROVED ? 'dateApproved' : 'dateRejected'}" />
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="stockMovement.${label}.label"/>
+                                </td>
+                                <td class="value">
+                                    <g:if test="${date && person}">
+                                        <span title="${g.formatDate(date: date)}">
+                                            <g:formatDate format="MMMM dd, yyyy" date="${date}"/>
+                                        </span>
+                                        <g:message code="default.by.label"/>
+                                        ${person}
+                                    </g:if>
+                                    <g:else>
+                                        <g:message code="default.none.label"/>
+                                    </g:else>
+                                </td>
+                            </tr>
+                        </g:if>
+
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.dateShipped.label"/>
