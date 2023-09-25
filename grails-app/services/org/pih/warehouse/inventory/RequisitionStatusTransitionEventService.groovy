@@ -9,14 +9,10 @@
 **/
 package org.pih.warehouse.inventory
 
-import org.pih.warehouse.core.Person
-import org.pih.warehouse.core.UserService
-import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.report.NotificationService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
-import org.pih.warehouse.requisition.RequisitionStatus
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationListener
 
@@ -24,21 +20,10 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
 
     RequisitionService requisitionService
     NotificationService notificationService
-    UserService userService
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        if (event.newStatus == RequisitionStatus.PENDING_APPROVAL) {
-            Requisition req = event.requisition
-
-            List<Person> approvers
-            if (req.approvers?.size()) {
-                approvers = Person.findAllByIdInList(req.approvers.collect { it.id })
-            } else {
-                // if there are not assigned users as approvers then notify all approvers
-                approvers = userService.findUsersByRoleTypes(req.origin, [RoleType.ROLE_REQUISITION_APPROVER])
-            }
-            notificationService.sendRequestPendingForApprovalNotification(req, approvers)
-        }
-        requisitionService.triggerRequisitionStatusTransition(req, event.newStatus, event.createdBy)
+        Requisition requisition = event.requisition
+        notificationService.publishRequisitionStatusTransitionNotifications(requisition, event.newStatus)
+        requisitionService.triggerRequisitionStatusTransition(requisition, event.newStatus, event.createdBy)
     }
 }

@@ -23,6 +23,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -227,11 +228,35 @@ class NotificationService {
         }
     }
 
-    def sendRequestPendingForApprovalNotification(Requisition requisition, List<Person> receivers) {
+
+    List<Person> resolveNotificationRecipients(Requisition requisition) {
+        List<Person> recipients = []
+        Requisition.withSession {
+            if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
+                if (requisition.approvers?.size()) {
+                    recipients = Person.findAllByIdInList(requisition.approvers.collect { it.id })
+                } else {
+                    // if there are not assigned users as approvers then notify all approvers
+                    recipients = userService.findUsersByRoleTypes(requisition.origin, [RoleType.ROLE_REQUISITION_APPROVER])
+                }
+            }
+        }
+        return recipients
+    }
+
+    void publishRequisitionStatusTransitionNotifications(Requisition requisition, RequisitionStatus newStatus) {
+        List<Person> approvers = resolveNotificationRecipients(requisition)
+
+        if (newStatus == RequisitionStatus.PENDING_APPROVAL) {
+            publishRequisitionPendingApprovalNotifications(requisition, approvers)
+        }
+    }
+
+    void publishRequisitionPendingApprovalNotifications(Requisition requisition, List<Person> receivers) {
         String subject = "${requisition.requestNumber} ${requisition.name}"
         String template = "/email/approvalsAlert"
 
-        receivers.each {receiver ->
+        receivers.each { receiver ->
             if (receiver.email) {
                 String redirectToRequestsList = "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC&approver=${receiver.id}"
                 String body = renderTemplate(template, [requisition: requisition, redirectUrl: redirectToRequestsList])
