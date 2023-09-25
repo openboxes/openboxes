@@ -244,23 +244,23 @@ class NotificationService {
         return recipients
     }
 
-    void publishRequisitionStatusTransitionNotifications(Requisition requisition, RequisitionStatus newStatus) {
-        List<Person> approvers = resolveNotificationRecipients(requisition)
+    void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
+        List<Person> recipients = resolveNotificationRecipients(requisition)
 
-        if (newStatus == RequisitionStatus.PENDING_APPROVAL) {
-            publishRequisitionPendingApprovalNotifications(requisition, approvers)
+        if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
+            publishRequisitionPendingApprovalNotifications(requisition, recipients)
         }
     }
 
-    void publishRequisitionPendingApprovalNotifications(Requisition requisition, List<Person> receivers) {
+    void publishRequisitionPendingApprovalNotifications(Requisition requisition, List<Person> recipients) {
         String subject = "${requisition.requestNumber} ${requisition.name}"
         String template = "/email/approvalsAlert"
 
-        receivers.each { receiver ->
-            if (receiver.email) {
-                String redirectToRequestsList = "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC&approver=${receiver.id}"
+        recipients.each { recipient ->
+            if (recipient.email) {
+                String redirectToRequestsList = "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC&approver=${recipient.id}"
                 String body = renderTemplate(template, [requisition: requisition, redirectUrl: redirectToRequestsList])
-                mailService.sendHtmlMail(subject, body, receiver.email)
+                mailService.sendHtmlMail(subject, body, recipient.email)
             }
         }
     }
