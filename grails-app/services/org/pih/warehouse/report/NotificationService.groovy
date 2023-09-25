@@ -265,4 +265,13 @@ class NotificationService {
         }
     }
 
+    void sendFulfilmentAlert(User requestor, Requisition requisition) {
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/fulfilmentAlert"
+
+        if (requestor.email) {
+            String body = renderTemplate(template, [requisition: requisition])
+            mailService.sendHtmlMail(subject, body, requestor.email)
+        }
+    }
 }
