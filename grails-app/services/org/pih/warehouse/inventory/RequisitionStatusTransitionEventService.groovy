@@ -9,9 +9,7 @@
 **/
 package org.pih.warehouse.inventory
 
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.pih.warehouse.core.MailService
-import org.pih.warehouse.core.Person
+import org.pih.warehouse.report.NotificationService
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionService
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
@@ -20,25 +18,12 @@ import org.springframework.context.ApplicationListener
 
 class RequisitionStatusTransitionEventService implements ApplicationListener<RequisitionStatusTransitionEvent> {
 
-    MailService mailService
-    GrailsApplication grailsApplication
     RequisitionService requisitionService
-
-
-    void publishDefaultEmailNotifications(Requisition requisition, List<Person> receivers) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        String subject = "${requisition.requestNumber} ${requisition.name}"
-        String redirectToRequestsList = "${g.createLink(uri: "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC", absolute: true)}"
-        GString body = "${g.render(template: "/email/approvalsAlert", model: [requisition: requisition, redirectUrl: redirectToRequestsList])}"
-
-        receivers.each {receiver ->
-            if (receiver.email) {
-                mailService.sendHtmlMail(subject, body, receiver.email)
-            }
-        }
-    }
+    NotificationService notificationService
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        requisitionService.triggerRequisitionStatusTransition(event.requisition, event.newStatus, event.createdBy)
+        Requisition requisition = event.requisition
+        requisitionService.triggerRequisitionStatusTransition(requisition, event.createdBy)
+        notificationService.publishRequisitionStatusTransitionNotifications(requisition)
     }
 }
