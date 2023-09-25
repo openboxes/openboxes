@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.inventory.StockMovementStatusCode
 
 import org.pih.warehouse.core.StatusType
@@ -155,6 +156,15 @@ enum RequisitionStatus {
             "when '${REJECTED}' then ${REJECTED.sortOrder} " +
             "else 0 " +
             "end)"
+    }
+
+    static Closure mapStatusCodes = { RequisitionStatus status ->
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        [
+                id: status.name(),
+                value: status.name(),
+                label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
+        ]
     }
 
     String toString() { return name() }

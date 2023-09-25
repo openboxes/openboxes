@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
@@ -103,12 +104,14 @@ class OutboundStockMovementListItem implements Serializable {
     }
 
     Map toJson() {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         return [
                 id                  : id,
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
                 statusVariant       : status?.variant?.name,
+                statusLabel         : "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,

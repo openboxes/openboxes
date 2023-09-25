@@ -807,28 +807,27 @@ class StockMovementApiController {
     }
 
     def requisitionStatusCodes = {
+        // Location for checking if approval is required
         Location currentLocation = Location.get(session.warehouse.id)
-        Boolean isRequestsList = params.getBoolean("isRequestsList")
+        // Indicator deciding if we should get statuses for request or for normal outbound
+        Boolean isElectronicType = params.getBoolean("isElectronicType")
 
-        List<String> statuses = getRequisitionStatusCodesList(currentLocation.isApprovalRequired(), isRequestsList).collect(mapStatusCodes)
+        List<String> statuses = getOutboundRequisitionStatusCodes(currentLocation.isApprovalRequired(), isElectronicType).collect(RequisitionStatus.mapStatusCodes)
 
         render([data: statuses] as JSON)
     }
 
     // Function for getting appropriate filter options based on current list and supporting requests approval
-    List<RequisitionStatus> getRequisitionStatusCodesList(Boolean hasRequestApprovalActivity, Boolean isRequestsList) {
-        if (isRequestsList) {
-            return hasRequestApprovalActivity ? RequisitionStatus.listRequestOptionsWhenSupportingRequestApproval() : RequisitionStatus.listOutboundOptions()
+    List<RequisitionStatus> getOutboundRequisitionStatusCodes(Boolean isApprovalRequired, Boolean isElectronicType) {
+        // If a location doesn't have approval required, return listOutboundOptions no matter what list is displayed
+        if (!isApprovalRequired) {
+            return RequisitionStatus.listOutboundOptions()
+        }
+        // If request approval is required, check what type of list it is and return appropriate statuses
+        if (isElectronicType) {
+            return RequisitionStatus.listRequestOptionsWhenSupportingRequestApproval()
         }
 
-        return hasRequestApprovalActivity ? RequisitionStatus.listOutboundOptionsWhenSupportingRequestApproval() : RequisitionStatus.listOutboundOptions()
-    }
-
-    Closure mapStatusCodes = { RequisitionStatus status ->
-        [
-                id: status.name(),
-                value: status.name(),
-                label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
-        ]
+        return RequisitionStatus.listOutboundOptionsWhenSupportingRequestApproval()
     }
 }

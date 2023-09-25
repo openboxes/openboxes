@@ -16,7 +16,6 @@ import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
-import useTranslation from 'hooks/useTranslation';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
@@ -42,8 +41,6 @@ const StockMovementOutboundTable = ({
     exportPendingShipmentItems,
     deleteConfirmAlert,
   } = useOutboundListTableData(filterParams);
-
-  useTranslation('requisitionStatus');
 
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
@@ -141,7 +138,7 @@ const StockMovementOutboundTable = ({
         >
           <StatusIndicator
             variant={row?.original?.statusVariant}
-            status={translate(`react.requisitionStatus.enum.${row?.original?.status}`, row?.original?.status)}
+            status={row?.original?.statusLabel}
           />
         </TableCell>
       ),
