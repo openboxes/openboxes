@@ -96,6 +96,9 @@ class User extends Person {
         return roles.roleType.find { RoleType.listPrimaryRoleTypes().contains(it) }
     }
 
+    /**
+     * @return does user have exact roles, either specified as global or location based
+     */
     boolean hasRoles(Location location, List<RoleType> roleTypes) {
         List userRoles = getEffectiveRoles(location)?.collect { it.roleType }
         return roleTypes?.every { userRoles.contains(it) }

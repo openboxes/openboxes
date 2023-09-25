@@ -825,40 +825,33 @@ class RequisitionService {
         return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser) {
+        requisition.status = requisitionStatus
+        Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
+        requisition.addToEvents(event)
+        requisition.save()
+    }
+
     void triggerRequisitionStatusTransition(Requisition requisitionInstance, User currentUser) {
         Requisition.withSession {
             Requisition requisition = Requisition.get(requisitionInstance.id)
             if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
                 if (requisition.origin.approvalRequired) {
-                    Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
-                    requisition.addToEvents(event)
-                    requisition.status = RequisitionStatus.PENDING_APPROVAL
+                    transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
                     requisition.approvalRequired = true
-                    requisition.save()
                     return
                 }
-                Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date(), currentUser)
-                requisition.addToEvents(event)
-                requisition.status = RequisitionStatus.VERIFYING
+                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
                 requisition.approvalRequired = false
-                requisition.save()
             } else if (status == RequisitionStatus.APPROVED) {
+                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
                 requisition.dateApproved = new Date()
                 requisition.approvedBy = currentUser
-                requisition.status = RequisitionStatus.APPROVED
-
-                Event event = createEvent(EventCode.APPROVED, requisition.origin, new Date(), currentUser)
-                requisition.addToEvents(event)
-                requisition.save()
                 return
             } else if (status == RequisitionStatus.REJECTED) {
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
-                requisition.status = RequisitionStatus.REJECTED
-
-                Event event = createEvent(EventCode.REJECTED, requisition.origin, new Date(), currentUser)
-                requisition.addToEvents(event)
-                requisition.save()
                 return
             }
         }

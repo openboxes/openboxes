@@ -248,34 +248,22 @@ class StockMovementController {
     def updateStatus = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
 
-        try {
-            stockMovementService.transitionStockMovement(stockMovement, params as JSONObject)
+        stockMovementService.transitionStockMovement(stockMovement, params as JSONObject)
 
-            switch(stockMovement.requisition?.status) {
-                case RequisitionStatus.APPROVED:
-                    flash.message = g.message(
-                            code: "request.approved.message.label",
-                            default: "You have successfully approved the request {0}",
-                            args: [stockMovement.id]
-                    )
-                    break
-                case RequisitionStatus.REJECTED:
-                    flash.message = g.message(
-                            code: "request.rejected.message.label",
-                            default: "You have successfully rejected the request {0}",
-                            args: [stockMovement.id]
-                    )
-                    break
-                default:
-                    break
-            }
-        } catch(Exception e) {
-            flash.message = e.message
-            redirect(action: "show", params: [id: stockMovement.id])
-            return
+        if (stockMovement.requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
+            String status = stockMovement.requisition?.status
+            flash.message = g.message(
+                    code: "request.${status}.message.label",
+                    default: "You have successfully ${status} the request {0}",
+                    args: [stockMovement.id]
+            )
         }
 
-        redirect(action: "list", params: ["flash": flash as JSON, sourceType: "ELECTRONIC", direction: "OUTBOUND"])
+        redirect(action: "list", params: [
+                "flash"     : flash as JSON,
+                sourceType  : RequisitionSourceType.ELECTRONIC,
+                direction   : StockMovementDirection.OUTBOUND.name()?.toUpperCase(),
+        ])
     }
 
     def rollbackApproval = {
