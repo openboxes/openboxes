@@ -158,7 +158,7 @@ enum RequisitionStatus {
             "end)"
     }
 
-    static Closure mapStatusCodes = { RequisitionStatus status ->
+    static Closure mapToOption = { RequisitionStatus status ->
         def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         [
                 id: status.name(),

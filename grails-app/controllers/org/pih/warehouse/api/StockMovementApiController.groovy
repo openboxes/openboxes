@@ -812,7 +812,7 @@ class StockMovementApiController {
         // Indicator deciding if we should get statuses for request or for normal outbound
         Boolean isElectronicType = params.getBoolean("isElectronicType")
 
-        List<String> statuses = getOutboundRequisitionStatusCodes(currentLocation.isApprovalRequired(), isElectronicType).collect(RequisitionStatus.mapStatusCodes)
+        List<String> statuses = getOutboundRequisitionStatusCodes(currentLocation.isApprovalRequired(), isElectronicType).collect(RequisitionStatus.mapToOption)
 
         render([data: statuses] as JSON)
     }
