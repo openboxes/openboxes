@@ -104,14 +104,13 @@ class OutboundStockMovementListItem implements Serializable {
     }
 
     Map toJson() {
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         return [
                 id                  : id,
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
                 statusVariant       : status?.variant?.name,
-                statusLabel         : "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
+                statusLabel         : RequisitionStatus.mapToOption(status)?.label,
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,
