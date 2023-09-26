@@ -832,34 +832,31 @@ class RequisitionService {
         requisition.save()
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisitionInstance, User currentUser) {
-        Requisition.withSession {
-            Requisition requisition = Requisition.get(requisitionInstance.id)
-            // OBPIH-5134 Request approval feature implements additional status transitions for a request
-            // If fulfilling location does not require approval we omit all other status transitions and set it to VERIFYING
-            switch(requisition.status) {
-                case RequisitionStatus.PENDING_APPROVAL:
-                    if (requisition.origin.approvalRequired) {
-                        transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
-                        requisition.approvalRequired = true
-                    } else {
-                        transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
-                        requisition.approvalRequired = false
-                    }
-                    break
-                case RequisitionStatus.APPROVED:
-                    transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
-                    requisition.dateApproved = new Date()
-                    requisition.approvedBy = currentUser
-                    break
-                case RequisitionStatus.REJECTED:
-                    transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
-                    requisition.dateRejected = new Date()
-                    requisition.rejectedBy = currentUser
-                    break
-                default:
-                    break
-            }
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser) {
+        // OBPIH-5134 Request approval feature implements additional status transitions for a request
+        // If fulfilling location does not require approval we omit all other status transitions and set it to VERIFYING
+        switch(requisition.status) {
+            case RequisitionStatus.PENDING_APPROVAL:
+                if (requisition.origin.approvalRequired) {
+                    transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                    requisition.approvalRequired = true
+                } else {
+                    transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                    requisition.approvalRequired = false
+                }
+                break
+            case RequisitionStatus.APPROVED:
+                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
+                requisition.dateApproved = new Date()
+                requisition.approvedBy = currentUser
+                break
+            case RequisitionStatus.REJECTED:
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
+                requisition.dateRejected = new Date()
+                requisition.rejectedBy = currentUser
+                break
+            default:
+                break
         }
     }
 }
