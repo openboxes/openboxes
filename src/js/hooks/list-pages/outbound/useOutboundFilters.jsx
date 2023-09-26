@@ -11,7 +11,7 @@ import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
-const useOutboundFilters = (isRequestsList) => {
+const useOutboundFilters = (sourceType) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -39,8 +39,8 @@ const useOutboundFilters = (isRequestsList) => {
   }, [currentLocale]);
 
   useEffect(() => {
-    dispatch(fetchRequisitionStatusCodes(isRequestsList));
-  }, [currentLocale, currentLocation, isRequestsList]);
+    dispatch(fetchRequisitionStatusCodes(sourceType));
+  }, [currentLocale, currentLocation]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
@@ -68,7 +68,7 @@ const useOutboundFilters = (isRequestsList) => {
 
     defaultValues.direction = 'OUTBOUND';
 
-    if (isRequestsList) {
+    if (sourceType === 'ELECTRONIC') {
       defaultValues.sourceType = 'ELECTRONIC';
     }
 
@@ -179,5 +179,5 @@ const useOutboundFilters = (isRequestsList) => {
 export default useOutboundFilters;
 
 useOutboundFilters.propTypes = {
-  isRequestsList: PropTypes.bool.isRequired,
+  sourceType: PropTypes.string.isRequired,
 };

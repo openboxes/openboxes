@@ -810,7 +810,7 @@ class StockMovementApiController {
         // Location for checking if approval is required
         Location currentLocation = Location.get(session.warehouse.id)
         // Indicator deciding if we should get statuses for request or for normal outbound
-        Boolean isElectronicType = params.getBoolean("isElectronicType")
+        Boolean isElectronicType = params.get("sourceType") == RequisitionSourceType.ELECTRONIC.name()
 
         List<String> statuses = getOutboundRequisitionStatusCodes(currentLocation.isApprovalRequired(), isElectronicType).collect(RequisitionStatus.mapToOption)
 

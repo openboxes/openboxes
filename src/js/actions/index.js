@@ -531,10 +531,10 @@ export function fetchShipmentStatusCodes() {
 }
 
 
-export function fetchRequisitionStatusCodes(isElectronicType = false) {
+export function fetchRequisitionStatusCodes(sourceType = null) {
   return (dispatch) => {
     apiClient.get('/openboxes/api/stockMovements/requisitionsStatusCodes', {
-      params: { isElectronicType },
+      params: { sourceType },
     }).then((res) => {
       dispatch({
         type: FETCH_REQUISITION_STATUS_CODES,
