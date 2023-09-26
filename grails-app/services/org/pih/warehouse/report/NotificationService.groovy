@@ -265,15 +265,15 @@ class NotificationService {
         }
     }
 
-    void publishFulfilmentNotifications(Requisition requisition, RequisitionStatus newStatus) {
-        if (newStatus == RequisitionStatus.ISSUED) {
-            sendFulfilmentNotification(requisition.requestedBy, requisition)
+    void publishFulfillmentNotifications(Requisition requisition) {
+        if (requisition.status == RequisitionStatus.ISSUED) {
+            sendFulfillmentNotification(requisition.requestedBy, requisition)
         }
     }
 
-    void sendFulfilmentNotification(Person requestor, Requisition requisition) {
+    void sendFulfillmentNotification(Person requestor, Requisition requisition) {
         String subject = "${requisition.requestNumber} ${requisition.name}"
-        String template = "/email/fulfilmentAlert"
+        String template = "/email/fulfillmentAlert"
 
         if (requestor.email) {
             String body = renderTemplate(template, [requisition: requisition])

@@ -9,7 +9,7 @@ label {
         <g:render template="/email/header"/>
     </div>
     <div>
-        <g:message code="email.fulfilment.message" args="[ShipmentStatusCode.SHIPPED, g.createLink(uri: '/', absolute: true)]" />
+        <g:message code="email.fulfillment.message" args="[ShipmentStatusCode.SHIPPED, g.createLink(uri: '/', absolute: true)]" />
     </div>
     &nbsp;
 </div>
