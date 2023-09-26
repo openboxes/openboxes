@@ -22,9 +22,11 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
     NotificationService notificationService
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        Requisition requisition = event.requisition
-        requisitionService.triggerRequisitionStatusTransition(requisition, event.createdBy)
-        notificationService.publishRequisitionStatusTransitionNotifications(requisition)
-        notificationService.publishFulfillmentNotifications(requisition)
+        Requisition.withNewSession {
+            Requisition requisition = Requisition.get(event.requisition.id)
+            requisitionService.triggerRequisitionStatusTransition(requisition, event.createdBy)
+            notificationService.publishRequisitionStatusTransitionNotifications(requisition)
+            notificationService.publishFulfillmentNotifications(requisition)
+        }
     }
 }

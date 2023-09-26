@@ -247,7 +247,7 @@ class NotificationService {
     void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
         List<Person> recipients = resolveNotificationRecipients(requisition)
 
-        if (requisition?.origin?.isApprovalRequired() && requisition?.status == RequisitionStatus.PENDING_APPROVAL) {
+        if (requisition?.status == RequisitionStatus.PENDING_APPROVAL) {
             publishRequisitionPendingApprovalNotifications(requisition, recipients)
         }
     }

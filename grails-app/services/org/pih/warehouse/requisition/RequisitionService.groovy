@@ -825,9 +825,7 @@ class RequisitionService {
         return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisitionInstance, User currentUser) {
-        Requisition.withSession {
-            Requisition requisition = Requisition.get(requisitionInstance.id)
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser) {
             if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
                 if (requisition.origin.approvalRequired) {
                     Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
@@ -843,6 +841,5 @@ class RequisitionService {
                 requisition.approvalRequired = false
                 requisition.save()
             }
-        }
     }
 }
