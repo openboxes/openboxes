@@ -22,9 +22,13 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentStatusTransitionEvent
+import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Component
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 
+@Component
 class NotificationService {
 
     def dataService
@@ -118,6 +122,38 @@ class NotificationService {
 
     }
 
+    @EventListener
+    void shipmentNotification(ShipmentStatusTransitionEvent event){
+        log.info "Application event ${event} has been published!"
+        Shipment shipment = Shipment.get(event?.source?.id)
+        log.info "Shipment ${shipment?.shipmentNumber} from ${shipment?.origin} to ${shipment.destination}"
+        def eventConfig = grailsApplication.config.openboxes.application.event;
+        def shipmentEventEmailConfig = grailsApplication.config.openboxes.application.shipmentStatusTransitionEvent[event.shipmentStatusCode.name].email
+        if(eventConfig && eventConfig.email.enabled){
+            if (shipmentEventEmailConfig.enabled){
+                Location location = shipment.origin
+                List<RoleType> outboundRolesTypes = shipmentEventEmailConfig.outboundRoleTypes.collect {
+                    "${it}" as RoleType
+                }
+                def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+                String subject = g.message(code: shipmentEventEmailConfig.subject?.toString(), args: [shipment.shipmentNumber]?.toArray(), locale: Locale.default)
+
+                List<User> users = userService.findUsersByRoleTypes(location, outboundRolesTypes)
+                sendShipmentNotifications(shipment, users, shipmentEventEmailConfig?.template?.toString(), subject)
+
+                location = shipment.destination
+                List<RoleType> inboundRoleTypes = shipmentEventEmailConfig.inboundRoleTypes.collect {
+                    "${it}" as RoleType
+                }
+                users = userService.findUsersByRoleTypes(location, inboundRoleTypes)
+                sendShipmentNotifications(shipment, users, shipmentEventEmailConfig?.template?.toString(), subject)
+            }else{
+                log.info "Email notifications are disabled for ${event?.shipmentStatusCode}"
+            }
+        }else{
+            log.info "Email Notifications are disabled."
+        }
+    }
 
     def sendShipmentCreatedNotification(Shipment shipmentInstance, Location location, List<RoleType> roleTypes) {
         def users = userService.findUsersByRoleTypes(location, roleTypes)

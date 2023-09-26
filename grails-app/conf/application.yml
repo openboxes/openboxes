@@ -657,6 +657,41 @@ openboxes:
                 eventName: onEventShipmentUpdated
                 fields:
                 - currentStatus
+    application:
+        event:
+            webhook:
+                enabled: true
+            email:
+                enabled: true
+        shipmentStatusTransitionEvent:
+            SHIPPED:
+                webhook:
+                    eventType: "shipment.shipped"
+                    enabled: true,
+                    url: "https://webhook.url/id"
+                    headers: []
+                email:
+                    enabled: true
+                    template: "/email/shipmentShipped"
+                    subject: "email.subject.your.shipment.shipped"
+            CREATED:
+                webhook:
+                    eventType: "shipment.created"
+                    enabled: true,
+                    url: "https://webhook.url/id"
+                    headers: []
+                email:
+                    enabled: true
+                    template: "/email/shipmentCreated"
+                    subject: "email.subject.your.shipment.created"
+                    outboundRoleTypes:
+                        - "ROLE_SHIPMENT_NOTIFICATION"
+                        - "ROLE_SHIPMENT_OUTBOUND_CREATED_NOTIFICATION"
+                    inboundRoleTypes:
+                        - "ROLE_SHIPMENT_NOTIFICATION"
+                        - "ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION"
+
+
 
 mail:
     error:
@@ -672,6 +707,9 @@ mail:
 
 uiperformance:
     enabled: false
+
+
+
 
 # TODO OBGM 1: Add jqueryValidation plugin config if will be needed
 # TODO OBGM 2: Add log4j plugin config if will be needed
