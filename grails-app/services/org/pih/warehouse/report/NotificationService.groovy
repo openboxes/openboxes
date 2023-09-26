@@ -245,10 +245,11 @@ class NotificationService {
     }
 
     void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
-        List<Person> recipients = resolveNotificationRecipients(requisition)
-
         if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
+            List<Person> recipients = resolveNotificationRecipients(requisition)
             publishRequisitionPendingApprovalNotifications(requisition, recipients)
+        } else if (requisition.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
+            publishRequisitionStatusUpdateNotifications(requisition, requisition.requestedBy)
         }
     }
 
@@ -263,6 +264,17 @@ class NotificationService {
                 mailService.sendHtmlMail(subject, body, recipient.email)
             }
         }
+    }
+
+    void publishRequisitionStatusUpdateNotifications(Requisition requisition, Person recipient) {
+        if (!recipient.email) {
+            return
+        }
+
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/approvalsStatusChanged"
+        String body = renderTemplate(template, [requisition: requisition])
+        mailService.sendHtmlMail(subject, body, recipient.email)
     }
 
     void publishFulfillmentNotifications(Requisition requisition) {
