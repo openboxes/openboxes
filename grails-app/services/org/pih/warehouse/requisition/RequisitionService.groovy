@@ -843,12 +843,12 @@ class RequisitionService {
                 }
                 transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
                 requisition.approvalRequired = false
-            } else if (status == RequisitionStatus.APPROVED) {
+            } else if (requisition.status == RequisitionStatus.APPROVED) {
                 transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
                 requisition.dateApproved = new Date()
                 requisition.approvedBy = currentUser
                 return
-            } else if (status == RequisitionStatus.REJECTED) {
+            } else if (requisition.status == RequisitionStatus.REJECTED) {
                 transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
