@@ -262,4 +262,19 @@ class NotificationService {
         }
     }
 
+    void publishFulfillmentNotifications(Requisition requisition) {
+        if (requisition.status == RequisitionStatus.ISSUED) {
+            sendFulfillmentNotification(requisition.requestedBy, requisition)
+        }
+    }
+
+    void sendFulfillmentNotification(Person requestor, Requisition requisition) {
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/fulfillmentAlert"
+
+        if (requestor.email) {
+            String body = renderTemplate(template, [requisition: requisition])
+            mailService.sendHtmlMail(subject, body, requestor.email)
+        }
+    }
 }
