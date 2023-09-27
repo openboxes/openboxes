@@ -107,6 +107,8 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
+                statusVariant       : status?.variant?.name,
+                statusLabel         : RequisitionStatus.mapToOption(status)?.label,
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,

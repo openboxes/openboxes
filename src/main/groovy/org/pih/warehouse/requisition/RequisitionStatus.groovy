@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.inventory.StockMovementStatusCode
 
 import org.pih.warehouse.core.StatusType
@@ -70,8 +71,19 @@ enum RequisitionStatus {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, PENDING_APPROVAL, APPROVED, REJECTED]
     }
 
+    // Default options for outbound list, without supporting request approval
     static listOutboundOptions() {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED, PENDING_APPROVAL, APPROVED, REJECTED]
+    }
+
+    // Options for outbounds when current location is supporting request approval (Added approved)
+    static listOutboundOptionsWhenApprovalRequired() {
+        [CREATED, EDITING, APPROVED, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
+    }
+
+    // Options for request list when current location is supporting request approval (Added approved and waiting for approval)
+    static listRequestOptionsWhenApprovalRequired() {
+        [CREATED, EDITING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
     static listPending() {
@@ -87,7 +99,7 @@ enum RequisitionStatus {
     }
 
     static listAll() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
+        [CREATED, EDITING, VERIFYING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
     }
 
     static toStockMovementStatus(RequisitionStatus requisitionStatus) {
@@ -128,6 +140,8 @@ enum RequisitionStatus {
         return "(case status " +
             "when '${CREATED}' then ${CREATED.sortOrder} " +
             "when '${EDITING}' then ${EDITING.sortOrder} " +
+            "when '${PENDING_APPROVAL}' then ${PENDING_APPROVAL.sortOrder} " +
+            "when '${APPROVED}' then ${APPROVED.sortOrder} " +
             "when '${VERIFYING}' then ${VERIFYING.sortOrder} " +
             "when '${PICKING}' then ${PICKING.sortOrder} " +
             "when '${PICKED}' then ${PICKED.sortOrder} " +
@@ -142,6 +156,15 @@ enum RequisitionStatus {
             "when '${REJECTED}' then ${REJECTED.sortOrder} " +
             "else 0 " +
             "end)"
+    }
+
+    static Closure mapToOption = { RequisitionStatus status ->
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        [
+                id: status.name(),
+                value: status.name(),
+                label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
+        ]
     }
 
     String toString() { return name() }

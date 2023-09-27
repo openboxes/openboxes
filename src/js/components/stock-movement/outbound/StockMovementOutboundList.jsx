@@ -13,19 +13,20 @@ import useOutboundFilters from 'hooks/list-pages/outbound/useOutboundFilters';
 import useTranslation from 'hooks/useTranslation';
 
 const StockMovementOutboundList = (props) => {
+  const isRequestsList = props.sourceType === 'ELECTRONIC';
   const {
     selectFiltersForMyStockMovements,
     defaultFilterValues,
     setFilterValues,
     filterParams,
-  } = useOutboundFilters(props.isRequestsList);
+  } = useOutboundFilters(props.sourceType);
 
   useTranslation('stockMovement', 'StockMovementType', 'reactTable');
 
   return (
     <div className="d-flex flex-column list-page-main">
       <StockMovementOutboundHeader
-        isRequestsOpen={props.isRequestsList}
+        isRequestsOpen={isRequestsList}
         showMyStockMovements={selectFiltersForMyStockMovements}
       />
       <StockMovementOutboundFilters
@@ -38,7 +39,7 @@ const StockMovementOutboundList = (props) => {
         }}
       />
       <StockMovementOutboundTable
-        isRequestsOpen={props.isRequestsList}
+        isRequestsOpen={isRequestsList}
         filterParams={filterParams}
       />
     </div>
@@ -58,7 +59,7 @@ export default withRouter(connect(mapStateToProps, {
 })(StockMovementOutboundList));
 
 StockMovementOutboundList.propTypes = {
-  isRequestsList: PropTypes.bool.isRequired,
+  sourceType: PropTypes.string.isRequired,
   requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,

@@ -11,7 +11,7 @@ import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
 
-const useOutboundFilters = (isRequestsList) => {
+const useOutboundFilters = (sourceType) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -35,10 +35,12 @@ const useOutboundFilters = (isRequestsList) => {
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
-    dispatch(fetchRequisitionStatusCodes());
     dispatch(fetchShipmentTypes());
   }, [currentLocale]);
 
+  useEffect(() => {
+    dispatch(fetchRequisitionStatusCodes(sourceType));
+  }, [currentLocale, currentLocation]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
@@ -66,7 +68,7 @@ const useOutboundFilters = (isRequestsList) => {
 
     defaultValues.direction = 'OUTBOUND';
 
-    if (isRequestsList) {
+    if (sourceType === 'ELECTRONIC') {
       defaultValues.sourceType = 'ELECTRONIC';
     }
 
@@ -177,5 +179,5 @@ const useOutboundFilters = (isRequestsList) => {
 export default useOutboundFilters;
 
 useOutboundFilters.propTypes = {
-  isRequestsList: PropTypes.bool.isRequired,
+  sourceType: PropTypes.string.isRequired,
 };

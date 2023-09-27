@@ -530,15 +530,16 @@ export function fetchShipmentStatusCodes() {
   };
 }
 
-export function fetchRequisitionStatusCodes() {
+export function fetchRequisitionStatusCodes(sourceType = null) {
   return (dispatch) => {
-    apiClient.get('/api/stockMovements/requisitionsStatusCodes')
-      .then((res) => {
-        dispatch({
-          type: FETCH_REQUISITION_STATUS_CODES,
-          payload: res.data.data,
-        });
+    apiClient.get('/api/stockMovements/requisitionsStatusCodes', {
+      params: { sourceType },
+    }).then((res) => {
+      dispatch({
+        type: FETCH_REQUISITION_STATUS_CODES,
+        payload: res.data.data,
       });
+    });
   };
 }
 
