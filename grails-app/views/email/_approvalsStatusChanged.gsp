@@ -12,7 +12,7 @@
         <g:message code="email.statusChange.message" args="[format.metadata(obj:requisition.status), g.createLink(uri: '/', absolute: true)]" />
     </div>
     <div>
-        <g:message code="email.withComment.message" />
+        <g:message code="email.withComment.message" />:
         <g:set var="comment" value="${requisition.recentComment}" />
         <g:if test="${comment}">
             "${comment.sender.name}, ${g.formatDate(date:comment.dateCreated)}: “${comment.comment}”"

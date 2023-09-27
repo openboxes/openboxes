@@ -213,7 +213,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
     Comment getRecentComment() {
         return comments?.sort({ a, b ->
             b.dateCreated <=> a.dateCreated
-        }).find()
+        })?.find{true}
     }
 
     def getRequisitionItemCount() {
