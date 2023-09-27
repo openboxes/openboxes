@@ -85,7 +85,8 @@ class StockMovement implements Validateable{
     List<Person> approvers
 
     static transients = [
-            "electronicType"
+            "electronicType",
+            "pendingApproval"
     ]
 
     static constraints = {
@@ -257,6 +258,10 @@ class StockMovement implements Validateable{
 
     Boolean isElectronicType() {
         requisition?.sourceType == RequisitionSourceType.ELECTRONIC
+    }
+
+    Boolean isPendingApproval() {
+        return requisition?.status == RequisitionStatus.PENDING_APPROVAL
     }
 
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {

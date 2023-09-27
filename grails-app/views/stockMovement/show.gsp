@@ -1,6 +1,8 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode"%>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -75,78 +77,119 @@
             <g:set var="hasBeenPlaced" value="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
             <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
-            <g:if test="${stockMovement?.order}">
-                <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                    <warehouse:message code="default.button.edit.label" />
-                </g:link>
-            </g:if>
-            <g:else>
-                <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                    <warehouse:message code="default.button.edit.label" />
-                </g:link>
-            </g:else>
-            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                <warehouse:message code="default.button.receive.label" />
-            </g:link>
-            <g:isUserAdmin>
-                <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
-                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+            <g:set var="userHasRequestApproverRole" value="${false}"/>
+            <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
+                <g:set var="userHasRequestApproverRole" value="${true}"/>
+            </g:isUserInAllRoles>
+            <g:if test="${!userHasRequestApproverRole}">
+                <g:if test="${stockMovement?.order}">
+                    <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
-                        stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
-                    <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                        <warehouse:message code="default.button.rollback.label" />
+                <g:else>
+                    <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
                     </g:link>
-                </g:elseif>
-            </g:isUserAdmin>
-                <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
-                <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
-                <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
-                    <g:if test="${stockMovement?.order}">
-                        <g:isUserAdmin>
-                            <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
-                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
-                                &nbsp;<warehouse:message code="default.button.delete.label" />
-                            </g:link>
-                        </g:isUserAdmin>
+                </g:else>
+                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                    <warehouse:message code="default.button.receive.label" />
+                </g:link>
+                <g:isUserAdmin>
+                    <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                        <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                            <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                        </g:link>
                     </g:if>
-                    <g:else>
-                        <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                    <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
+                            stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
+                        <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                            <warehouse:message code="default.button.rollback.label" />
+                        </g:link>
+                    </g:elseif>
+                </g:isUserAdmin>
+                    <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
+                    <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
+                    <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
+                        <g:if test="${stockMovement?.order}">
+                            <g:isUserAdmin>
+                                <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
+                                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                                    &nbsp;<warehouse:message code="default.button.delete.label" />
+                                </g:link>
+                            </g:isUserAdmin>
+                        </g:if>
+                        <g:else>
+                            <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    disabledMessage="You do not have minimum required role to delete stock movement"
+                            >
+                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                                <warehouse:message code="default.button.delete.label" />
+                            </g:link>
+                        </g:else>
+                    </g:if>
+                    <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
+                        <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                                disabledMessage="You do not have minimum required role to delete stock movement"
+                                disabledMessage="You do not have minimum required role to delete stock request"
                         >
                             <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                             <warehouse:message code="default.button.delete.label" />
                         </g:link>
-                    </g:else>
-                </g:if>
-                <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
-                    <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
-                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                            disabledMessage="You do not have minimum required role to delete stock request"
-                    >
-                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
-                        <warehouse:message code="default.button.delete.label" />
-                    </g:link>
-                </g:if>
+                    </g:if>
 
-            <g:isSuperuser>
-                <a href="javascript:void(0);" class="button btn-show-dialog"
-                    data-height="600" data-width="1000"
-                   data-title="${warehouse.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
-                   data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
-                    <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
-                </a>
-            </g:isSuperuser>
+                <g:isSuperuser>
+                    <a href="javascript:void(0);" class="button btn-show-dialog"
+                        data-height="600" data-width="1000"
+                       data-title="${warehouse.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
+                       data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
+                        <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
+                    </a>
+                </g:isSuperuser>
+            </g:if>
+            <g:if test="${userHasRequestApproverRole}">
+                <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
+                    <g:link
+                            class="button"
+                            controller="stockRequest"
+                            action="updateStatus"
+                            id="${stockMovement.id}"
+                            params="[status: StockMovementStatusCode.APPROVED]"
+                            disabled="${!stockMovement.pendingApproval}"
+                            disabledMessage="Request is not pending approval"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
+                        <g:message code="request.approval.approve.label"  default="Approve" />
+                    </g:link>
+                    <g:link
+                            class="button"
+                            controller="stockRequest"
+                            action="updateStatus"
+                            id="${stockMovement.id}"
+                            params="[status: StockMovementStatusCode.REJECTED]"
+                            disabled="${!stockMovement.pendingApproval}"
+                            disabledMessage="Request is not pending approval"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
+                        <g:message code="request.approval.reject.label"  default="Reject" />
+                    </g:link>
+                    <g:set var="isApprovedOrRejected" value="${stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED}" />
+                    <g:if test="${isApprovedOrRejected}" >
+                        <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                            <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
+                        </g:link>
+                    </g:if>
+                </g:supports>
+            </g:if>
         </div>
     </div>
     <div class="yui-gf">

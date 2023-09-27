@@ -823,23 +823,40 @@ class RequisitionService {
         return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser) {
+        requisition.status = requisitionStatus
+        Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
+        requisition.addToEvents(event)
+        requisition.save()
+    }
+
     void triggerRequisitionStatusTransition(Requisition requisitionInstance, User currentUser) {
         Requisition.withSession {
             Requisition requisition = Requisition.get(requisitionInstance.id)
-            if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
-                if (requisition.origin.approvalRequired) {
-                    Event event = createEvent(EventCode.PENDING_APPROVAL, requisition.origin, new Date(), currentUser)
-                    requisition.addToEvents(event)
-                    requisition.status = RequisitionStatus.PENDING_APPROVAL
-                    requisition.approvalRequired = true
-                    requisition.save()
-                    return
-                }
-                Event event = createEvent(EventCode.SUBMITTED, requisition.origin, new Date(), currentUser)
-                requisition.addToEvents(event)
-                requisition.status = RequisitionStatus.VERIFYING
-                requisition.approvalRequired = false
-                requisition.save()
+            // OBPIH-5134 Request approval feature implements additional status transitions for a request
+            // If fulfilling location does not require approval we omit all other status transitions and set it to VERIFYING
+            switch(requisition.status) {
+                case RequisitionStatus.PENDING_APPROVAL:
+                    if (requisition.origin.approvalRequired) {
+                        transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                        requisition.approvalRequired = true
+                    } else {
+                        transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                        requisition.approvalRequired = false
+                    }
+                    break
+                case RequisitionStatus.APPROVED:
+                    transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
+                    requisition.dateApproved = new Date()
+                    requisition.approvedBy = currentUser
+                    break
+                case RequisitionStatus.REJECTED:
+                    transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
+                    requisition.dateRejected = new Date()
+                    requisition.rejectedBy = currentUser
+                    break
+                default:
+                    break
             }
         }
     }

@@ -13,6 +13,8 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVWriter
+import org.apache.commons.lang.NotImplementedException
+import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
@@ -249,6 +251,30 @@ class StockMovementController {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         render(template: "requisition", model: [stockMovement: stockMovement])
 
+    }
+
+    def updateStatus() {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+
+        stockMovementService.transitionStockMovement(stockMovement, params as JSONObject)
+
+        if (stockMovement.requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
+            flash.message = g.message(
+                    code: "request.statusUpdate.success.message.label",
+                    default: "You have successfully {0} the request {1}",
+                    args: [format.metadata(obj: stockMovement.requisition?.status)?.toLowerCase(), stockMovement.id]
+            )
+        }
+
+        redirect(action: "list", params: [
+                "flash"     : flash as JSON,
+                sourceType  : RequisitionSourceType.ELECTRONIC,
+                direction   : StockMovementDirection.OUTBOUND.name()?.toUpperCase(),
+        ])
+    }
+
+    def rollbackApproval() {
+        throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 
     def documents() {

@@ -146,6 +146,18 @@ class StockMovementService {
                     //RequisitionStatus.VERIFYING:
                     case StockMovementStatusCode.VALIDATED:
                         break
+                    //RequisitionStatus.APPROVED:
+                    case StockMovementStatusCode.APPROVED:
+                        if (!stockMovement.pendingApproval) {
+                            throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
+                        }
+                        break
+                    //RequisitionStatus.REJECTED:
+                    case StockMovementStatusCode.REJECTED:
+                        if (!stockMovement.pendingApproval) {
+                            throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
+                        }
+                        break
                     // RequisitionStatus.PICKING:
                     case StockMovementStatusCode.PICKING:
                         validateQuantityRequested(stockMovement)
