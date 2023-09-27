@@ -835,6 +835,8 @@ class RequisitionService {
     void triggerRequisitionStatusTransition(Requisition requisitionInstance, User currentUser) {
         Requisition.withSession {
             Requisition requisition = Requisition.get(requisitionInstance.id)
+            // OBPIH-5134 Request approval feature implements additional status transitions for a request
+            // If fulfilling location does not require approval we omit all other status transitions and set it to VERIFYING
             switch(requisition.status) {
                 case RequisitionStatus.PENDING_APPROVAL:
                     if (requisition.origin.approvalRequired) {

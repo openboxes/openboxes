@@ -78,9 +78,9 @@
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
             <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
             <g:set var="userHasRequestApproverRole" value="${false}"/>
-            <g:ifUserHasRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
+            <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
-            </g:ifUserHasRoles>
+            </g:isUserInAllRoles>
             <g:if test="${!userHasRequestApproverRole}">
                 <g:if test="${stockMovement?.order}">
                     <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">

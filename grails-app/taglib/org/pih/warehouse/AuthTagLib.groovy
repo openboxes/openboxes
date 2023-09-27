@@ -88,7 +88,7 @@ class AuthTagLib {
             out << body()
     }
 
-    def ifUserHasRoles = {attrs, body ->
+    def isUserInAllRoles = {attrs, body ->
        if (session.user && userService.isUserInAllRoles(session?.user?.id, attrs.roles, attrs.location)) {
            out << body()
        }
