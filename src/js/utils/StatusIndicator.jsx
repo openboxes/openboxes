@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 const StatusIndicator = ({ status, variant }) => {
   // Replace _ with [spaces] and capitalize each word
-  const statusToDisplay = status.split('_')
+  const statusToDisplay = status?.split('_')
     .map(word => word.charAt(0) + word.toLowerCase().substring(1))
     .join(' ');
 

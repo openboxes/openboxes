@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {
   RiArrowRightSLine,
@@ -129,19 +128,20 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       fixed: 'left',
-      width: 150,
+      width: 170,
       sortable: false,
-      Cell: (row) => {
-        const status = _.find(requisitionStatuses, _.matchesProperty('id', row.value));
-        return (
-          <TableCell
-            {...row}
-            tooltip
-            tooltipLabel={getStatusTooltip(row.value)}
-          >
-            <StatusIndicator variant={status?.variant} status={status?.label} />
-          </TableCell>);
-      },
+      Cell: row => (
+        <TableCell
+          {...row}
+          tooltip
+          tooltipLabel={getStatusTooltip(row.value)}
+        >
+          <StatusIndicator
+            variant={row?.original?.statusVariant}
+            status={row?.original?.statusLabel}
+          />
+        </TableCell>
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,

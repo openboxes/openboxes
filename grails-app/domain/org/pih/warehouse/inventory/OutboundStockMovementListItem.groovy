@@ -1,5 +1,6 @@
 package org.pih.warehouse.inventory
 
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.validation.Validateable
 import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
@@ -108,6 +109,8 @@ class OutboundStockMovementListItem implements Serializable {
                 name                : name,
                 description         : description,
                 statusCode          : statusCode?.toString(),
+                statusVariant       : status?.variant?.name,
+                statusLabel         : RequisitionStatus.mapToOption(status)?.label,
                 status              : status.toString(),
                 currentStatus       : shipment?.currentStatus?.toString(),
                 identifier          : identifier,
