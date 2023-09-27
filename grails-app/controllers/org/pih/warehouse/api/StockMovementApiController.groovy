@@ -825,9 +825,9 @@ class StockMovementApiController {
         }
         // If request approval is required, check what type of list it is and return appropriate statuses
         if (isElectronicType) {
-            return RequisitionStatus.listRequestOptionsWhenSupportingRequestApproval()
+            return RequisitionStatus.listRequestOptionsWhenApprovalRequired()
         }
 
-        return RequisitionStatus.listOutboundOptionsWhenSupportingRequestApproval()
+        return RequisitionStatus.listOutboundOptionsWhenApprovalRequired()
     }
 }
