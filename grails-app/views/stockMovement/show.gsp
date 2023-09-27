@@ -78,9 +78,9 @@
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
             <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
             <g:set var="userHasRequestApproverRole" value="${false}"/>
-            <g:userHasRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
+            <g:ifUserHasRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
-            </g:userHasRoles>
+            </g:ifUserHasRoles>
             <g:if test="${!userHasRequestApproverRole}">
                 <g:if test="${stockMovement?.order}">
                     <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
@@ -167,7 +167,7 @@
                             disabledMessage="Request is not pending approval"
                     >
                         <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
-                        <g:message code="request.approval.approve.label"  default="approve" />
+                        <g:message code="request.approval.approve.label"  default="Approve" />
                     </g:link>
                     <g:link
                             class="button"
@@ -178,8 +178,8 @@
                             disabled="${!stockMovement.pendingApproval}"
                             disabledMessage="Request is not pending approval"
                     >
-                        <img src="${resource(dir: 'images/icons/silk', file: 'cancel.png')}" />&nbsp;
-                        <g:message code="request.approval.reject.label"  default="reject" />
+                        <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
+                        <g:message code="request.approval.reject.label"  default="Reject" />
                     </g:link>
                     <g:set var="isApprovedOrRejected" value="${stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED}" />
                     <g:if test="${isApprovedOrRejected}" >

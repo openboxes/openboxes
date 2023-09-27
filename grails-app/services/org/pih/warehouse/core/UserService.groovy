@@ -236,7 +236,7 @@ class UserService {
         return isSuperuser(currentUser) || (currentUser.getHighestRole(location) >= otherUser.getHighestRole(location))
     }
 
-    boolean userHasRoles(String userId, Collection roleTypes, String locationId) {
+    boolean isUserInAllRoles(String userId, Collection roleTypes, String locationId) {
         User user = User.get(userId)
         Location location = Location.get(locationId)
 

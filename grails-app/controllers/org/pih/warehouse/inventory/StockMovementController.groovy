@@ -11,6 +11,7 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
+import org.apache.commons.lang.NotImplementedException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
@@ -251,11 +252,10 @@ class StockMovementController {
         stockMovementService.transitionStockMovement(stockMovement, params as JSONObject)
 
         if (stockMovement.requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
-            String status = stockMovement.requisition?.status
             flash.message = g.message(
-                    code: "request.${status}.message.label",
-                    default: "You have successfully ${status} the request {0}",
-                    args: [stockMovement.id]
+                    code: "request.statusUpdate.success.message.label",
+                    default: "You have successfully {0} the request {1}",
+                    args: [format.metadata(obj: stockMovement.requisition?.status)?.toLowerCase(), stockMovement.id]
             )
         }
 
@@ -267,12 +267,7 @@ class StockMovementController {
     }
 
     def rollbackApproval = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        // no-opt
-        // check if status is either approved or rejecetd
-            // if no then throw error and return a message that it can't be rolledback
-
-        // TODO: to be implemented
+        throw new NotImplementedException("Action ${params.actionName} not implemented")
     }
 
 

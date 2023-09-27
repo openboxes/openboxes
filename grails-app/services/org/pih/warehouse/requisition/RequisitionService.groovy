@@ -835,24 +835,28 @@ class RequisitionService {
     void triggerRequisitionStatusTransition(Requisition requisitionInstance, User currentUser) {
         Requisition.withSession {
             Requisition requisition = Requisition.get(requisitionInstance.id)
-            if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
-                if (requisition.origin.approvalRequired) {
-                    transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
-                    requisition.approvalRequired = true
-                    return
-                }
-                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
-                requisition.approvalRequired = false
-            } else if (requisition.status == RequisitionStatus.APPROVED) {
-                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
-                requisition.dateApproved = new Date()
-                requisition.approvedBy = currentUser
-                return
-            } else if (requisition.status == RequisitionStatus.REJECTED) {
-                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
-                requisition.dateRejected = new Date()
-                requisition.rejectedBy = currentUser
-                return
+            switch(requisition.status) {
+                case RequisitionStatus.PENDING_APPROVAL:
+                    if (requisition.origin.approvalRequired) {
+                        transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                        requisition.approvalRequired = true
+                    } else {
+                        transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                        requisition.approvalRequired = false
+                    }
+                    break
+                case RequisitionStatus.APPROVED:
+                    transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
+                    requisition.dateApproved = new Date()
+                    requisition.approvedBy = currentUser
+                    break
+                case RequisitionStatus.REJECTED:
+                    transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
+                    requisition.dateRejected = new Date()
+                    requisition.rejectedBy = currentUser
+                    break
+                default:
+                    break
             }
         }
     }
