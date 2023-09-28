@@ -155,6 +155,7 @@ class OutboundStockMovementListItem implements Serializable {
                 isReturn            : fromReturnOrder,
                 isElectronicType    : electronicType,
                 shipmentType        : shipment?.shipmentType,
+                approvers           : requisition?.approvers?.toList()
         ]
     }
 

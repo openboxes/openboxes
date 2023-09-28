@@ -208,6 +208,19 @@ const StockMovementOutboundTable = ({
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
+      Header: <Translate id="react.stockMovement.approvers.label" defaultMessage="Approvers" />,
+      accessor: 'approvers',
+      minWidth: 250,
+      sortable: false,
+      Cell: row =>
+        (<TableCell
+          {...row}
+          tooltip
+          defaultValue="None"
+          value={row.value.map(catalog => catalog.name).join(', ')}
+        />),
+    },
+    {
       Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
