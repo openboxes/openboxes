@@ -16,6 +16,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
+import { canEditRequest } from 'components/stock-transfer/utils';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
@@ -30,6 +31,7 @@ const StockMovementOutboundTable = ({
   translate,
   requisitionStatuses,
   currentLocation,
+  currentUser,
   isRequestsOpen,
   isUserAdmin,
 }) => {
@@ -65,7 +67,10 @@ const StockMovementOutboundTable = ({
     actions.push(showAction);
 
     // Edit
-    if (!isReceived && !isPartiallyReceived) {
+    if (
+      !isReceived && !isPartiallyReceived &&
+      canEditRequest(currentUser, row.original, currentLocation)
+    ) {
       const editAction = {
         defaultLabel: 'Edit Stock Movement',
         label: 'react.stockMovement.action.edit.label',
@@ -280,6 +285,7 @@ const mapStateToProps = state => ({
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
   currentLocale: state.session.activeLanguage,
+  currentUser: state.session.user,
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);
@@ -293,6 +299,9 @@ StockMovementOutboundTable.propTypes = {
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+  }).isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
   }).isRequired,
   requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,

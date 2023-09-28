@@ -9,6 +9,7 @@ import PackingPage from 'components/stock-movement-wizard/outbound/PackingPage';
 import PickPage from 'components/stock-movement-wizard/outbound/PickPage';
 import SendMovementPage from 'components/stock-movement-wizard/outbound/SendMovementPage';
 import EditPage from 'components/stock-movement-wizard/request/EditPage';
+import { canEditRequest } from 'components/stock-transfer/utils';
 import Wizard from 'components/wizard/Wizard';
 import apiClient from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -223,8 +224,9 @@ class StockMovementVerifyRequest extends Component {
 
   render() {
     const { values, currentPage } = this.state;
-    const { currentLocation } = this.props;
-    const showOnly = values.origin && values.origin.id !== currentLocation.id;
+    const { currentLocation, currentUser } = this.props;
+    const showOnly = (values.origin && values.origin.id !== currentLocation.id) ||
+      (values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation));
 
     if (values.stockMovementId) {
       return (
@@ -251,6 +253,7 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
   hasPackingSupport: state.session.currentLocation.hasPackingSupport,
   currentLocation: state.session.currentLocation,
+  currentUser: state.session.user,
 });
 
 export default connect(mapStateToProps, {
@@ -279,6 +282,9 @@ StockMovementVerifyRequest.propTypes = {
   initialValues: PropTypes.shape({
     shipmentStatus: PropTypes.string,
   }),
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 StockMovementVerifyRequest.defaultProps = {

@@ -23,6 +23,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
+import { canEditRequest } from 'components/stock-transfer/utils';
 import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -1512,14 +1513,23 @@ class EditItemsPage extends Component {
    */
   isUserAllowedToAddItems() {
     const { requestedBy, origin, destination } = this.state.values;
-    const { currentUserId, currentLocationId } = this.props;
-    if (currentLocationId === origin?.id) {
+    const { currentUser, currentLocation } = this.props;
+    if (currentLocation?.id === origin?.id) {
       return true;
     }
-    return currentLocationId === destination?.id && requestedBy?.id === currentUserId;
+    return currentLocation?.id === destination?.id && requestedBy?.id === currentUser?.id;
   }
 
   isAddingItemsAllowed() {
+    const { currentUser, currentLocation } = this.props;
+
+    if (
+      this.state.values?.isElectronicType &&
+      !canEditRequest(currentUser, this.state.values, currentLocation)
+    ) {
+      return false;
+    }
+
     const allowedStatuses = [
       RequisitionStatus.CREATED,
       RequisitionStatus.EDITING,
@@ -1676,8 +1686,8 @@ const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
   supportedActivities: state.session.supportedActivities,
   currentLocale: state.session.activeLanguage,
-  currentUserId: state.session.user?.id,
-  currentLocationId: state.session.currentLocation?.id,
+  currentUser: state.session.user,
+  currentLocation: state.session.currentLocation,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -1709,9 +1719,14 @@ EditItemsPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
   currentLocale: PropTypes.string.isRequired,
-  currentUserId: PropTypes.string.isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
-  currentLocationId: PropTypes.string.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 };
