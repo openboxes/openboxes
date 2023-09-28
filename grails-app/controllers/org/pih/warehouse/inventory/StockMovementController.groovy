@@ -255,7 +255,7 @@ class StockMovementController {
             flash.message = g.message(
                     code: "request.statusUpdate.success.message.label",
                     default: "You have successfully {0} the request {1}",
-                    args: [format.metadata(obj: stockMovement.requisition?.status)?.toLowerCase(), stockMovement.id]
+                    args: [format.metadata(obj: stockMovement.requisition?.status)?.toLowerCase(), stockMovement.identifier]
             )
         }
 
