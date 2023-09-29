@@ -414,10 +414,10 @@
                             </td>
                         </tr>
 
-                        <g:if test="${stockMovement?.requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]}">
+                        <g:if test="${stockMovement?.requisition?.approvedBy || stockMovement?.requisition?.rejectedBy}">
                             <g:set var="person" value="${stockMovement?.requisition?.approvedBy ?: stockMovement?.requisition?.rejectedBy}" />
                             <g:set var="date" value="${stockMovement?.requisition?.dateApproved ?: stockMovement?.requisition?.dateRejected}" />
-                            <g:set var="label" value="${stockMovement?.requisition?.status == RequisitionStatus.APPROVED ? 'dateApproved' : 'dateRejected'}" />
+                            <g:set var="label" value="${stockMovement?.requisition?.dateApproved ? 'dateApproved' : 'dateRejected'}" />
                             <tr class="prop">
                                 <td class="name">
                                     <g:message code="stockMovement.${label}.label"/>
