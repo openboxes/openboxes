@@ -208,7 +208,7 @@ const StockMovementOutboundTable = ({
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
-      Header: <Translate id="react.stockMovement.approvers.label" defaultMessage="Approvers" />,
+      Header: <Translate id="react.stockMovement.request.approvers.label" defaultMessage="Approvers" />,
       accessor: 'approvers',
       minWidth: 250,
       sortable: false,
