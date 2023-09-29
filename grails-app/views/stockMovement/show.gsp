@@ -81,7 +81,8 @@
             <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
             </g:isUserInAllRoles>
-            <g:if test="${!userHasRequestApproverRole}">
+            <g:set var="isApprovalRequired" value="${userHasRequestApproverRole && stockMovement?.requisition?.approvalRequired}" />
+            <g:if test="${!isApprovalRequired}">
                 <g:if test="${stockMovement?.order}">
                     <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
                         <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
@@ -155,7 +156,7 @@
                     </a>
                 </g:isSuperuser>
             </g:if>
-            <g:if test="${userHasRequestApproverRole}">
+            <g:if test="${isApprovalRequired}">
                 <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
                     <g:link
                             class="button"
