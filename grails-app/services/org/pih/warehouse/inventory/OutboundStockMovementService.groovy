@@ -100,6 +100,13 @@ class OutboundStockMovementService {
                     }
                 }
             }
+            if (stockMovement.approvers) {
+                requisition {
+                    approvers {
+                        'in'("id", stockMovement.approvers.collect { it.id })
+                    }
+                }
+            }
             if(createdAfter) {
                 ge("dateCreated", createdAfter)
             }
@@ -143,6 +150,6 @@ class OutboundStockMovementService {
             }
         }
 
-        return stockMovements
+        return stockMovements.unique()
     }
 }
