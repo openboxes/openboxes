@@ -129,6 +129,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             "requisitionItemsByCategory",
             "shipment",
             "totalCost",
+            "recentComment"
     ]
     static hasOne = [picklist: Picklist]
     static hasMany = [
@@ -202,6 +203,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
         dateApproved(nullable: true)
         dateRejected(nullable: true)
         approvalRequired(nullable: true)
+    }
+
+    Comment getRecentComment() {
+        return comments?.sort({ a, b ->
+            b.dateCreated <=> a.dateCreated
+        })?.find{true}
     }
 
     def getRequisitionItemCount() {
