@@ -245,10 +245,22 @@ class NotificationService {
     }
 
     void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
-        List<Person> recipients = resolveNotificationRecipients(requisition)
-
-        if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
-            publishRequisitionPendingApprovalNotifications(requisition, recipients)
+        switch(requisition.status) {
+            case RequisitionStatus.PENDING_APPROVAL:
+                List<Person> recipients = resolveNotificationRecipients(requisition)
+                publishRequisitionPendingApprovalNotifications(requisition, recipients)
+                break
+            case RequisitionStatus.APPROVED:
+                publishRequisitionStatusUpdateNotification(requisition, requisition.requestedBy)
+                break
+            case RequisitionStatus.REJECTED:
+                publishRequisitionStatusUpdateNotification(requisition, requisition.requestedBy)
+                break
+            case RequisitionStatus.ISSUED:
+                publishFulfillmentNotification(requisition.requestedBy, requisition)
+                break
+            default:
+                break
         }
     }
 
@@ -265,13 +277,18 @@ class NotificationService {
         }
     }
 
-    void publishFulfillmentNotifications(Requisition requisition) {
-        if (requisition.status == RequisitionStatus.ISSUED) {
-            sendFulfillmentNotification(requisition.requestedBy, requisition)
+    void publishRequisitionStatusUpdateNotification(Requisition requisition, Person recipient) {
+        if (!recipient.email) {
+            return
         }
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/approvalsStatusChanged"
+        String body = renderTemplate(template, [requisition: requisition])
+        mailService.sendHtmlMail(subject, body, recipient.email)
     }
 
-    void sendFulfillmentNotification(Person requestor, Requisition requisition) {
+
+    void publishFulfillmentNotification(Person requestor, Requisition requisition) {
         String subject = "${requisition.requestNumber} ${requisition.name}"
         String template = "/email/fulfillmentAlert"
 
