@@ -24,12 +24,14 @@ const useOutboundFilters = (sourceType) => {
     currentUser,
     currentLocale,
     shipmentTypes,
+    availableApprovers,
   } = useSelector(state => ({
     requisitionStatuses: state.requisitionStatuses.data,
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
     currentLocale: state.session.activeLanguage,
     shipmentTypes: state.stockMovementCommon.shipmentTypes,
+    availableApprovers: state.approvers.data,
   }));
 
   useEffect(() => {
@@ -110,6 +112,10 @@ const useOutboundFilters = (sourceType) => {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
+    if (queryProps.approver) {
+      const approvers = getParamList(queryProps.approver);
+      defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
+    }
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
@@ -157,6 +163,7 @@ const useOutboundFilters = (sourceType) => {
       requisitionStatusCode: { name: 'requisitionStatusCode', accessor: 'id' },
       receiptStatusCode: { name: 'receiptStatusCode' },
       shipmentType: { name: 'shipmentType', accessor: 'id' },
+      approver: { name: 'approver', accessor: 'id' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
