@@ -86,6 +86,10 @@ enum RequisitionStatus {
         [CREATED, EDITING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
+    static isApprovalStatus(RequisitionStatus status) {
+        return status in [APPROVED, REJECTED, PENDING_APPROVAL]
+    }
+
     static listPending() {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, PENDING, REQUESTED]
     }

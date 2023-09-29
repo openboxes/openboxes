@@ -25,7 +25,7 @@ const COLUMNS = [
   },
   {
     Header: 'Current Status',
-    accessor: 'shipmentStatus',
+    accessor: 'statusLabel',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
     maxWidth: 180,
@@ -97,6 +97,7 @@ class StockRequestDashboard extends Component {
     apiClient.get(url, { params })
       .then((response) => {
         const { data, totalCount } = response.data;
+        console.log(data)
         this.setState({
           pageCount: Math.ceil(totalCount / pageSize),
           stockRequests: data,

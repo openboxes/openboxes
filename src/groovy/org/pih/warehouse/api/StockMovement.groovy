@@ -129,6 +129,7 @@ class StockMovement {
             name                : name,
             description         : description,
             statusCode          : statusCode,
+            statusLabel         : getRequestStatusLabel(),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -463,4 +464,9 @@ class StockMovement {
         ]
     }
 
+    def getRequestStatusLabel() {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        String status = RequisitionStatus.isApprovalStatus(requisition?.status) ? requisition?.status?.name() : shipment?.status?.name
+        return "${g.message(code: 'enum.RequisitionStatus.' + status)}"
+    }
 }
