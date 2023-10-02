@@ -1503,37 +1503,16 @@ class EditItemsPage extends Component {
       });
   }
 
-  /**
-   * If we are in requesting location (destination), allow to add items only for a person
-   * who created a stock request
-   *
-   * If we are in verifying/fulfilling location (origin), allow to add items for any person
-   * verifying the request
-   * @returns {boolean}
-   */
-  isUserAllowedToAddItems() {
-    const { requestedBy, origin, destination } = this.state.values;
-    const { currentUser, currentLocation } = this.props;
-    if (currentLocation?.id === origin?.id) {
-      return true;
-    }
-    return currentLocation?.id === destination?.id && requestedBy?.id === currentUser?.id;
-  }
-
   isAddingItemsAllowed() {
     const { currentUser, currentLocation } = this.props;
     const { values } = this.state;
-
-    if (values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation)) {
-      return false;
-    }
 
     const allowedStatuses = [
       RequisitionStatus.CREATED,
       RequisitionStatus.EDITING,
       RequisitionStatus.VERIFYING,
     ];
-    return this.isUserAllowedToAddItems() &&
+    return canEditRequest(currentUser, values, currentLocation) &&
       allowedStatuses.includes(this.state.values?.associations?.requisition?.status);
   }
 
