@@ -9,9 +9,9 @@ import PackingPage from 'components/stock-movement-wizard/outbound/PackingPage';
 import PickPage from 'components/stock-movement-wizard/outbound/PickPage';
 import SendMovementPage from 'components/stock-movement-wizard/outbound/SendMovementPage';
 import EditPage from 'components/stock-movement-wizard/request/EditPage';
-import { canEditRequest } from 'components/stock-transfer/utils';
 import Wizard from 'components/wizard/Wizard';
 import apiClient from 'utils/apiClient';
+import canEditRequest from 'utils/permissionUtils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';

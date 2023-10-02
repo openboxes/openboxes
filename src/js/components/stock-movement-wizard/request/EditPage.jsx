@@ -23,11 +23,11 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
-import { canEditRequest } from 'components/stock-transfer/utils';
 import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
+import canEditRequest from 'utils/permissionUtils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -1522,11 +1522,9 @@ class EditItemsPage extends Component {
 
   isAddingItemsAllowed() {
     const { currentUser, currentLocation } = this.props;
+    const { values } = this.state;
 
-    if (
-      this.state.values?.isElectronicType &&
-      !canEditRequest(currentUser, this.state.values, currentLocation)
-    ) {
+    if (values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation)) {
       return false;
     }
 

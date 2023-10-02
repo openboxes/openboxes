@@ -1,9 +1,5 @@
 import _ from 'lodash';
 
-import ActivityCode from 'consts/activityCode';
-import RequisitionStatus from 'consts/requisitionStatus';
-import { supports } from 'utils/supportedActivitiesUtils';
-
 const PENDING = 'PENDING';
 const CANCELED = 'CANCELED';
 
@@ -98,22 +94,3 @@ export function prepareRequest(stockTransfer, status) {
 
   return { ...stockTransfer, stockTransferItems, status };
 }
-
-export const canEditRequest = (currentUser, request, location) => {
-  const isRequestApprovalSupported = supports(
-    location?.supportedActivities,
-    ActivityCode.APPROVE_REQUEST,
-  );
-  const isUserRequestor = currentUser?.id === request?.requestedBy?.id;
-
-  // If request approval is not supported by the location we are able to edit every request
-  if (!isRequestApprovalSupported) {
-    return true;
-  }
-
-  // If the location supports request approval, only the requestor is able to edit
-  // and the request couldn't be approved / rejected when editing
-  return isUserRequestor &&
-    request.statusCode !== RequisitionStatus.APPROVED &&
-    request.statusCode !== RequisitionStatus.REJECTED;
-};
