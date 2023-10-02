@@ -11,7 +11,6 @@ package org.pih.warehouse.inventory
 
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.AvailableItem
@@ -57,7 +56,6 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
@@ -2815,12 +2813,5 @@ class StockMovementService {
             validateQuantityRequested(stockMovement)
         }
         return true
-    }
-
-    static String getRequestStatusLabel(RequisitionStatus requisitionStatus, ShipmentStatus shipmentStatus) {
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        String status = RequisitionStatus.isApprovalStatus(requisitionStatus) ? requisitionStatus.name() : shipmentStatus.name
-        String enumName = RequisitionStatus.isApprovalStatus(requisitionStatus) ? "RequisitionStatus" : "ShipmentStatusCode"
-        return "${g.message(code: "enum.${enumName}." + status)}"
     }
 }

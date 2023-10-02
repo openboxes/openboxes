@@ -23,7 +23,6 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
-import org.pih.warehouse.shipping.ShipmentStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
@@ -130,7 +129,7 @@ class StockMovement {
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            statusLabel         : getRequestStatusLabel(),
+            statusLabel         : RequisitionStatus.getRequestStatusLabel(requisition?.status, shipment?.status),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,

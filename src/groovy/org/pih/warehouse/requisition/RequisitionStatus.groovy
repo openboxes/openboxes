@@ -13,6 +13,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.inventory.StockMovementStatusCode
 
 import org.pih.warehouse.core.StatusType
+import org.pih.warehouse.shipping.ShipmentStatus
 
 enum RequisitionStatus {
 
@@ -169,6 +170,14 @@ enum RequisitionStatus {
                 value: status.name(),
                 label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
         ]
+    }
+
+    static String getRequestStatusLabel(RequisitionStatus requisitionStatus, ShipmentStatus shipmentStatus) {
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        boolean isApprovalStatus = isApprovalStatus(requisitionStatus)
+        String status = isApprovalStatus ? requisitionStatus?.name() : shipmentStatus?.name
+        String enumName = isApprovalStatus ? "enum.RequisitionStatus." : "enum.ShipmentStatusCode."
+        return "${g.message(code: enumName + status)}"
     }
 
     String toString() { return name() }
