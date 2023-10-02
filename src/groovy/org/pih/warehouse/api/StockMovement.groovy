@@ -23,6 +23,7 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.auth.AuthService
@@ -462,11 +463,5 @@ class StockMovement {
                 "Quantity (required)"               : lineItem?.quantityRequested ?: "",
                 "Recipient id"                      : lineItem?.recipient?.id ?: ""
         ]
-    }
-
-    def getRequestStatusLabel() {
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        String status = RequisitionStatus.isApprovalStatus(requisition?.status) ? requisition?.status?.name() : shipment?.status?.name
-        return "${g.message(code: 'enum.RequisitionStatus.' + status)}"
     }
 }
