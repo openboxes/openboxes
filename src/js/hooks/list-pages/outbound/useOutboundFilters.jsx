@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
+import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -41,8 +41,13 @@ const useOutboundFilters = (sourceType) => {
   }, [currentLocale]);
 
   useEffect(() => {
+    dispatch(fetchAvailableApprovers());
     dispatch(fetchRequisitionStatusCodes(sourceType));
-  }, [currentLocale, currentLocation]);
+  }, [currentLocale, currentLocation.id]);
+
+  useEffect(() => {
+    dispatch(fetchAvailableApprovers());
+  }, [currentLocation.id]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)

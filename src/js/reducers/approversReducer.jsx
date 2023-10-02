@@ -9,16 +9,21 @@ const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
-    case FETCH_APPROVERS:
-      if (action.payload !== undefined) {
-        const users = _.map(action.payload, user => (
-          {
-            value: user.id, id: user.id, label: user.name, name: user.name,
-          }
-        ));
-        return { ...state, data: users, fetched: true };
-      }
-      return state;
+    case FETCH_APPROVERS: {
+      const users = _.map(action.payload, user => (
+        {
+          value: user.id,
+          id: user.id,
+          label: user.name,
+          name: user.name,
+        }
+      ));
+      return {
+        ...state,
+        data: users,
+        fetched: true,
+      };
+    }
     default:
       return state;
   }

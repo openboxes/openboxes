@@ -103,7 +103,7 @@ class OutboundStockMovementService {
             if (stockMovement.approvers) {
                 requisition {
                     approvers {
-                        'in'("id", stockMovement.approvers.collect { it.id })
+                        'in'("id", stockMovement.approvers.collect { it?.id })
                     }
                 }
             }

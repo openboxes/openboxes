@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import {
-  fetchAvailableApprovers,
   fetchRequisitionStatusCodes,
   hideSpinner,
   showSpinner,
@@ -82,7 +81,6 @@ const useOutboundListTableData = (filterParams) => {
     if (!isRequisitionStatusesFetched || !requisitionStatuses.length) {
       dispatch(fetchRequisitionStatusCodes());
     }
-    dispatch(fetchAvailableApprovers());
   }, []);
 
   const exportStockMovements = () => {
