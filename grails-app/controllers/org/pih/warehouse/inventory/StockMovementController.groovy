@@ -35,6 +35,8 @@ import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
+import java.nio.file.AccessDeniedException
+
 class StockMovementController {
 
     def dataService
@@ -309,6 +311,11 @@ class StockMovementController {
             redirect(action: "show", id: stockMovement?.id)
             return
         }
+        if (comment.sender.id != session.user.id) {
+            flash.message = "${g.message(code: 'auth.notAuthorized.message')}"
+            redirect(action: "show", id: stockMovement?.id)
+            return
+        }
         render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
@@ -324,6 +331,10 @@ class StockMovementController {
             flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), params.id])}"
             redirect(action: "show", id: stockMovement?.id)
             return
+        }
+
+        if (comment.sender.id != session.user.id) {
+            throw new AccessDeniedException("You are not authorized to perform this action")
         }
 
         stockMovement.requisition?.removeFromComments(comment)
@@ -344,6 +355,9 @@ class StockMovementController {
         }
         Comment comment = Comment.get(params?.id)
         if (comment) {
+            if (comment.sender.id != session.user.id) {
+                throw new AccessDeniedException("You are not authorized to perform this action")
+            }
             comment.properties = params
             if (!stockMovement.requisition.hasErrors() && stockMovement.requisition.save()) {
                 flash.message = "${g.message(code: 'default.comments.updated.label')}"
@@ -359,7 +373,7 @@ class StockMovementController {
                 return
             }
         }
-            render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
     def packingList = {
