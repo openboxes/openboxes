@@ -10,6 +10,7 @@
 package org.pih.warehouse.inventory
 
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
@@ -40,7 +41,15 @@ class OutboundStockMovementService {
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
 
-        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
+        def query = { isCountQuery ->
+            if (isCountQuery) {
+                projections {
+                    countDistinct "id"
+                }
+            } else {
+                setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            }
+
 
             if (stockMovement?.receiptStatusCodes) {
                 'in'("shipmentStatus", stockMovement.receiptStatusCodes)
@@ -100,6 +109,13 @@ class OutboundStockMovementService {
                     }
                 }
             }
+            if (stockMovement.approvers) {
+                requisition {
+                    approvers {
+                        'in'("id", stockMovement.approvers.collect { it?.id })
+                    }
+                }
+            }
             if(createdAfter) {
                 ge("dateCreated", createdAfter)
             }
@@ -142,6 +158,18 @@ class OutboundStockMovementService {
                 order("dateCreated", "desc")
             }
         }
+
+        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
+            query.delegate = delegate
+            query(false)
+        }
+
+        // Get result count
+        def stockMovementsCount = OutboundStockMovementListItem.createCriteria().get() {
+            query.delegate = delegate
+            query(true)
+        }
+        stockMovements.totalCount = stockMovementsCount
 
         return stockMovements
     }

@@ -91,6 +91,28 @@ export default {
       loadOptions: fetchPeople,
     }),
   },
+  approver: {
+    type: FilterSelectField,
+    attributes: {
+      openOnClick: false,
+      autoload: false,
+      cache: false,
+      valueKey: 'id',
+      labelKey: 'name',
+      options: [],
+      filterOptions: options => options,
+      filterElement: true,
+      placeholder: 'react.stockMovement.request.approvers.label',
+      defaultPlaceholder: 'Approvers',
+      showLabelTooltip: true,
+      multi: true,
+    },
+    getDynamicAttr: ({
+      approvers,
+    }) => ({
+      options: approvers,
+    }),
+  },
   createdBy: {
     type: FilterSelectField,
     attributes: {

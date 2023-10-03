@@ -6,7 +6,11 @@ import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
+import {
+  fetchRequisitionStatusCodes,
+  hideSpinner,
+  showSpinner,
+} from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
@@ -31,6 +35,7 @@ const useOutboundListTableData = (filterParams) => {
       createdBy,
       updatedBy,
       shipmentType,
+      approver,
     } = filterParams;
     return _.omitBy({
       ...filterParams,
@@ -44,6 +49,7 @@ const useOutboundListTableData = (filterParams) => {
       createdBy: createdBy?.id,
       updatedBy: updatedBy?.id,
       shipmentType: shipmentType?.map?.(({ id }) => id),
+      approver: approver?.map?.(({ id }) => id),
       ...sortingParams,
     }, (value) => {
       if (typeof value === 'object' && _.isEmpty(value)) return true;
