@@ -24,6 +24,8 @@ import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
@@ -281,6 +283,83 @@ class StockMovementController {
         def stockMovement = getStockMovement(params.id)
         stockMovement.documents = stockMovementService.getDocuments(stockMovement)
         render(template: "documents", model: [stockMovement: stockMovement])
+    }
+
+    def comments = {
+        def stockMovement = getStockMovement(params.id)
+        render(template: "comments", model: [stockMovement: stockMovement])
+    }
+
+    def addComment = {
+        def stockMovement = getStockMovement(params.id)
+        List<User> recipients = User.list()
+        return [stockMovement: stockMovement, comment: new Comment(), recipients: recipients]
+    }
+
+    def editComment = {
+        def stockMovement = getStockMovement(params['stockMovement.id'])
+        if (!stockMovement) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'Stock Movement'), params['stockMovement.id']])}"
+            redirect(action: "list")
+            return
+        }
+        Comment comment = Comment.get(params?.id)
+        if (!comment) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
+            redirect(action: "show", id: stockMovement?.id)
+            return
+        }
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+    }
+
+    def deleteComment = {
+        def stockMovement = getStockMovement(params['stockMovement.id'])
+        if (!stockMovement) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'Stock Movement'), params['stockMovement.id']])}"
+            redirect(action: "list")
+            return
+        }
+        Comment comment = Comment.get(params?.id)
+        if (!comment) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), params.id])}"
+            redirect(action: "show", id: stockMovement?.id)
+            return
+        }
+
+        stockMovement.requisition?.removeFromComments(comment)
+        if (!stockMovement.requisition.hasErrors() && stockMovement.requisition?.save()) {
+            flash.message = "${g.message(code: 'default.comments.deleted.label')}"
+            redirect(action: "show", id: stockMovement.id)
+            return
+        }
+        render(view: "show", model: [stockMovement: stockMovement])
+    }
+
+    def saveComment = {
+        def stockMovement = getStockMovement(params['stockMovement.id'])
+        if (!stockMovement) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
+            redirect(action: "list")
+            return
+        }
+        Comment comment = Comment.get(params?.id)
+        if (comment) {
+            comment.properties = params
+            if (!stockMovement.requisition.hasErrors() && stockMovement.requisition.save()) {
+                flash.message = "${g.message(code: 'default.comments.updated.label')}"
+                redirect(action: "show", id: stockMovement.id)
+                return
+            }
+        } else {
+            comment = new Comment(params)
+            stockMovement.requisition.addToComments(comment)
+            if (!stockMovement.requisition.hasErrors() && stockMovement.requisition.save()) {
+                flash.message = "${g.message(code: 'default.comments.created.label')}"
+                redirect(action: "show", id: stockMovement.id)
+                return
+            }
+        }
+            render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
     def packingList = {
