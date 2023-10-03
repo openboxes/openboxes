@@ -657,30 +657,48 @@ openboxes:
                 eventName: onEventShipmentUpdated
                 fields:
                 - currentStatus
+
     application:
         event:
             webhook:
-                enabled: true
+                - hooks:
+                      enabled: true
+                      eventTypes:
+                          - "shipment.created"
+                          - "shipment.shipped"
+                      url: https://webhook.site/9969a2d6-9780-483d-beb4-50667d66497d
+                      headers:
+                        accept: json
+                        authorization: keys
+                - hooks:
+                      enabled: true
+                      eventTypes:
+                          - "shipment.created"
+                          - "shipment.shipped"
+                      url: https://webhook.url/id
+                      headers:
+                          accept: json
+                          authorization: keys
+                - hooks:
+                      enabled: true
+                      eventTypes:
+                          - "shipment.created"
+                          - "shipment.shipped"
+                      url: https://webhook.url/id
+                      headers:
+                          accept: json
+                          authorization: keys
+                - hooks:
+                      enabled: true
+                      eventTypes:
+                          - "shipment.created"
+                          - "shipment.shipped"
+                      url: https://webhook.url/id
+                      headers:
+                          accept: json
+                          authorization: keys
             email:
-                enabled: true
-        shipmentStatusTransitionEvent:
-            SHIPPED:
-                webhook:
-                    eventType: "shipment.shipped"
-                    enabled: true,
-                    url: "https://webhook.url/id"
-                    headers: []
-                email:
-                    enabled: true
-                    template: "/email/shipmentShipped"
-                    subject: "email.subject.your.shipment.shipped"
-            CREATED:
-                webhook:
-                    eventType: "shipment.created"
-                    enabled: true,
-                    url: "https://webhook.url/id"
-                    headers: []
-                email:
+                "shipment.created":
                     enabled: true
                     template: "/email/shipmentCreated"
                     subject: "email.subject.your.shipment.created"
@@ -690,7 +708,6 @@ openboxes:
                     inboundRoleTypes:
                         - "ROLE_SHIPMENT_NOTIFICATION"
                         - "ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION"
-
 
 
 mail:

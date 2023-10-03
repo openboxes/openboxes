@@ -17,6 +17,19 @@ class ShipmentStatusTransitionEvent extends ApplicationEvent {
     PartialReceipt partialReceipt
     ShipmentStatusCode shipmentStatusCode
 
+    static Map statusToNameMap = [
+            // Ignore stockMovement status for now
+            "CREATED": "shipment.created",
+            "PENDING": "shipment.pending", // or "picklist.started"
+            "SHIPPED": "shipment.shipped", // or "picklist.completed"
+            "PARTIALLY_RECEIVED": "shipment.partially_received",
+            "RECEIVED": "shipment.received"
+    ]
+
+    public String getEventType(){
+        return statusToNameMap[this.shipmentStatusCode?.name]
+    }
+
     ShipmentStatusTransitionEvent(Shipment shipment, ShipmentStatusCode shipmentStatusCode) {
         super(shipment)
         this.shipmentStatusCode = shipmentStatusCode

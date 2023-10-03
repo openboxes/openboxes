@@ -127,10 +127,11 @@ class NotificationService {
         log.info "Application event ${event} has been published!"
         Shipment shipment = Shipment.get(event?.source?.id)
         log.info "Shipment ${shipment?.shipmentNumber} from ${shipment?.origin} to ${shipment.destination}"
-        def eventConfig = grailsApplication.config.openboxes.application.event;
-        def shipmentEventEmailConfig = grailsApplication.config.openboxes.application.shipmentStatusTransitionEvent[event.shipmentStatusCode.name].email
-        if(eventConfig && eventConfig.email.enabled){
-            if (shipmentEventEmailConfig.enabled){
+        def emailConfig = grailsApplication.config.openboxes.application.event.email;
+        if(emailConfig){
+            List eventKeys = event.eventType?.split("\\.")
+            Map shipmentEventEmailConfig = eventKeys?.size() == 1 ? emailConfig[eventKeys[0]][eventKeys[1]] : [:]
+            if (shipmentEventEmailConfig && shipmentEventEmailConfig.enabled){
                 Location location = shipment.origin
                 List<RoleType> outboundRolesTypes = shipmentEventEmailConfig.outboundRoleTypes.collect {
                     "${it}" as RoleType
@@ -148,7 +149,7 @@ class NotificationService {
                 users = userService.findUsersByRoleTypes(location, inboundRoleTypes)
                 sendShipmentNotifications(shipment, users, shipmentEventEmailConfig?.template?.toString(), subject)
             }else{
-                log.info "Email notifications are disabled for ${event?.shipmentStatusCode}"
+                log.info "Email notifications are disabled for ${event?.shipmentStatusCode}, config setting:${shipmentEventEmailConfig}"
             }
         }else{
             log.info "Email Notifications are disabled."
