@@ -12,6 +12,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -129,7 +130,7 @@ class StockMovement {
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            statusLabel         : RequisitionStatus.getRequestStatusLabel(requisition?.status, shipment?.status),
+            displayStatus       : StockMovementService.getRequestStatusLabel(shipment, requisition),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,

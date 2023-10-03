@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.inventory.StockMovementStatusCode
 
 import org.pih.warehouse.core.StatusType
@@ -85,10 +86,6 @@ enum RequisitionStatus {
     // Options for request list when current location is supporting request approval (Added approved and waiting for approval)
     static listRequestOptionsWhenApprovalRequired() {
         [CREATED, EDITING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
-    }
-
-    static isApprovalStatus(RequisitionStatus status) {
-        return status in [APPROVED, REJECTED, PENDING_APPROVAL]
     }
 
     static listPending() {
@@ -170,14 +167,6 @@ enum RequisitionStatus {
                 value: status.name(),
                 label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
         ]
-    }
-
-    static String getRequestStatusLabel(RequisitionStatus requisitionStatus, ShipmentStatus shipmentStatus) {
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-        boolean isApprovalStatus = isApprovalStatus(requisitionStatus)
-        String status = isApprovalStatus ? requisitionStatus?.name() : shipmentStatus?.name
-        String enumName = isApprovalStatus ? "enum.RequisitionStatus." : "enum.ShipmentStatusCode."
-        return "${g.message(code: enumName + status)}"
     }
 
     String toString() { return name() }

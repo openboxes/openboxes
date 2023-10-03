@@ -25,7 +25,7 @@ const COLUMNS = [
   },
   {
     Header: 'Current Status',
-    accessor: 'statusLabel',
+    accessor: 'displayStatus',
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
     maxWidth: 200,

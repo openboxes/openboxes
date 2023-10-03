@@ -9,6 +9,9 @@
  **/
 package org.pih.warehouse.shipping
 import org.pih.warehouse.core.StatusType
+import org.pih.warehouse.inventory.StockMovementStatusCode
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionStatus
 
 enum ShipmentStatusCode {
 
@@ -44,6 +47,19 @@ enum ShipmentStatusCode {
 
     static listShipped() {
         [SHIPPED, PARTIALLY_RECEIVED, RECEIVED]
+    }
+
+    static toShipmentStatus(Shipment shipment, Requisition requisition) {
+        switch(requisition?.status) {
+            case RequisitionStatus.APPROVED:
+                return StockMovementStatusCode.APPROVED
+            case RequisitionStatus.REJECTED:
+                return StockMovementStatusCode.REJECTED
+            case RequisitionStatus.PENDING_APPROVAL:
+                return StockMovementStatusCode.PENDING_APPROVAL
+            default:
+                return shipment?.status?.code
+        }
     }
 
     String getName() { return name() }
