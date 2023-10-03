@@ -2,7 +2,7 @@ import ActivityCode from 'consts/activityCode';
 import RequisitionStatus from 'consts/requisitionStatus';
 import { supports } from 'utils/supportedActivitiesUtils';
 
-const canEditRequestWithoutRequestApproval = (location, origin, destination, isUserRequestor) => {
+const canEditRequestWithoutRequiredApproval = (location, origin, destination, isUserRequestor) => {
   const isLocationOrigin = location.id === origin?.id;
   // If we are in verifying/fulfilling location (origin), allow to add items for any person
   // verifying the request
@@ -16,15 +16,15 @@ const canEditRequestWithoutRequestApproval = (location, origin, destination, isU
 };
 
 const canEditRequest = (currentUser, request, location) => {
-  const isRequestApprovalSupported = supports(
+  const isApprovalRequired = supports(
     location?.supportedActivities,
     ActivityCode.APPROVE_REQUEST,
   );
   const isUserRequestor = currentUser?.id === request?.requestedBy?.id;
   // If request approval is not supported by the location we have to check if the
   // location is destination or origin
-  if (!isRequestApprovalSupported) {
-    return canEditRequestWithoutRequestApproval(
+  if (!isApprovalRequired) {
+    return canEditRequestWithoutRequiredApproval(
       location,
       request?.origin,
       request?.destination,
