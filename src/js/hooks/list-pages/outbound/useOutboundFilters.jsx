@@ -41,7 +41,6 @@ const useOutboundFilters = (sourceType) => {
   }, [currentLocale]);
 
   useEffect(() => {
-    dispatch(fetchAvailableApprovers());
     dispatch(fetchRequisitionStatusCodes(sourceType));
   }, [currentLocale, currentLocation.id]);
 
