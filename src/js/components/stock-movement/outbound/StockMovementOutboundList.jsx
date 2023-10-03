@@ -35,6 +35,7 @@ const StockMovementOutboundList = (props) => {
         filterFields={filterFields}
         formProps={{
           requisitionStatuses: props.requisitionStatuses,
+          approvers: props.approvers,
           shipmentTypes: props.shipmentTypes,
         }}
       />
@@ -52,6 +53,7 @@ const mapStateToProps = state => ({
   requisitionStatuses: state.requisitionStatuses.data,
   isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
   shipmentTypes: state.stockMovementCommon.shipmentTypes,
+  approvers: state.approvers.data,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -71,5 +73,11 @@ StockMovementOutboundList.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     description: PropTypes.string,
+  })).isRequired,
+  approvers: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    label: PropTypes.string,
+    value: PropTypes.string,
   })).isRequired,
 };

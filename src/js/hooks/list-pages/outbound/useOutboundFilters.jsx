@@ -5,7 +5,7 @@ import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
+import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
@@ -24,12 +24,14 @@ const useOutboundFilters = (sourceType) => {
     currentUser,
     currentLocale,
     shipmentTypes,
+    availableApprovers,
   } = useSelector(state => ({
     requisitionStatuses: state.requisitionStatuses.data,
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
     currentLocale: state.session.activeLanguage,
     shipmentTypes: state.stockMovementCommon.shipmentTypes,
+    availableApprovers: state.approvers.data,
   }));
 
   useEffect(() => {
@@ -40,7 +42,11 @@ const useOutboundFilters = (sourceType) => {
 
   useEffect(() => {
     dispatch(fetchRequisitionStatusCodes(sourceType));
-  }, [currentLocale, currentLocation]);
+  }, [currentLocale, currentLocation.id]);
+
+  useEffect(() => {
+    dispatch(fetchAvailableApprovers());
+  }, [currentLocation.id]);
 
   const clearFilterValues = () => {
     const defaultValues = Object.keys(filterFields)
@@ -110,6 +116,10 @@ const useOutboundFilters = (sourceType) => {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
+    if (queryProps.approver) {
+      const approvers = getParamList(queryProps.approver);
+      defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
+    }
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
@@ -157,6 +167,7 @@ const useOutboundFilters = (sourceType) => {
       requisitionStatusCode: { name: 'requisitionStatusCode', accessor: 'id' },
       receiptStatusCode: { name: 'receiptStatusCode' },
       shipmentType: { name: 'shipmentType', accessor: 'id' },
+      approver: { name: 'approver', accessor: 'id' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);

@@ -63,6 +63,7 @@ class StockMovementApiController {
         stockMovement.requisitionStatusCodes = params.requisitionStatusCode ? params?.list("requisitionStatusCode") as RequisitionStatus[] : null
         stockMovement.requestType = params.requestType ? params.requestType as RequisitionType : null
         stockMovement.sourceType = params.sourceType ? params.sourceType as RequisitionSourceType : null
+        stockMovement.approvers = params.approver ? User.getAll(params.list("approver"))?.findAll{ it } : null
 
         if (params.q) {
             stockMovement.identifier = "%" + params.q + "%"

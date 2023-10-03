@@ -153,6 +153,7 @@ class OutboundStockMovementListItem implements Serializable, Validateable {
                 isReturn            : fromReturnOrder,
                 isElectronicType    : electronicType,
                 shipmentType        : shipment?.shipmentType,
+                approvers           : requisition?.approvers?.toList()
         ]
     }
 
