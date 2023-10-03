@@ -39,6 +39,7 @@ class OutboundStockMovementService {
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
+        Boolean isApprovalRequired = stockMovement?.origin?.isApprovalRequired()
 
         def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
 
@@ -97,6 +98,20 @@ class OutboundStockMovementService {
                 if (stockMovement.sourceType == RequisitionSourceType.ELECTRONIC) {
                     not {
                         'in'("status", [RequisitionStatus.CREATED, RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    }
+                    if (!isApprovalRequired) {
+                        not {
+                            'in'("status", RequisitionStatus.listApproval())
+                        }
+                    }
+                }
+            } else {
+                not {
+                    'in'("status", [RequisitionStatus.PENDING_APPROVAL, RequisitionStatus.REJECTED])
+                }
+                if (!isApprovalRequired) {
+                    not {
+                        'in'("status", [RequisitionStatus.APPROVED])
                     }
                 }
             }
