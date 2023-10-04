@@ -229,8 +229,23 @@ class NotificationService {
     }
 
 
-    void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
-        switch(requisition.status) {
+    List<Person> resolveNotificationRecipients(Requisition requisition) {
+        List<Person> recipients = []
+        Requisition.withSession {
+            if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
+                if (requisition.approvers?.size()) {
+                    recipients = Person.findAllByIdInList(requisition.approvers.collect { it.id })
+                } else {
+                    // if there are not assigned users as approvers then notify all approvers
+                    recipients = userService.findUsersByRoleTypes(requisition.origin, [RoleType.ROLE_REQUISITION_APPROVER])
+                }
+            }
+        }
+        return recipients
+    }
+
+    void publishRequisitionStatusTransitionNotifications(Requisition requisition, RequisitionStatus status) {
+        switch(status) {
             case RequisitionStatus.PENDING_APPROVAL:
                 List<Person> recipients = requisition.approvers ? Person.getAll(requisition.approvers.id) : []
                 publishRequisitionPendingApprovalNotifications(requisition, recipients)

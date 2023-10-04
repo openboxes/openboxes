@@ -256,9 +256,8 @@ class StockMovementService {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         } else {
-            requisition.status = status
-            requisition.save(flush: true)
-            publishEvent(new RequisitionStatusTransitionEvent(requisition, AuthService.currentUser.get()))
+            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status)
+            publishEvent(new RequisitionStatusTransitionEvent(requisition, status))
         }
     }
 
