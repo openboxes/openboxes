@@ -41,6 +41,7 @@ class OutboundStockMovementService {
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
+        Boolean isApprovalRequired = stockMovement?.origin?.isApprovalRequired()
 
         def query = { isCountQuery ->
             if (isCountQuery) {
@@ -107,6 +108,26 @@ class OutboundStockMovementService {
                 if (stockMovement.sourceType == RequisitionSourceType.ELECTRONIC) {
                     not {
                         'in'("status", [RequisitionStatus.CREATED, RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
+                    }
+                    // If we want to get stock movements with electronic source type when approval is not required
+                    // we don't want to show the stock movements with approval statuses
+                    if (!isApprovalRequired) {
+                        not {
+                            'in'("status", RequisitionStatus.listApproval())
+                        }
+                    }
+                }
+            } else {
+                // If we are getting stock movements with default source type when approval is required
+                // we want to show stock movements just with APPROVED status
+                not {
+                    'in'("status", [RequisitionStatus.PENDING_APPROVAL, RequisitionStatus.REJECTED])
+                }
+                // When approval is not required, we want to hide stock movements with all of the
+                // approval statuses
+                if (!isApprovalRequired) {
+                    not {
+                        'in'("status", [RequisitionStatus.APPROVED])
                     }
                 }
             }

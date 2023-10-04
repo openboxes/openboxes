@@ -98,6 +98,10 @@ enum RequisitionStatus {
         [CANCELED, DELETED]
     }
 
+    static listApproval() {
+        [APPROVED, REJECTED, PENDING_APPROVAL]
+    }
+
     static listAll() {
         [CREATED, EDITING, VERIFYING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
     }
