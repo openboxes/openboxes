@@ -535,31 +535,31 @@
                 <ul>
                     <g:if test="${!stockMovement?.origin?.isSupplier()}">
                         <li>
-                            <a href="${request.contextPath}/stockMovement/requisition/${stockMovement?.id}">
+                            <g:link controller="stockMovement" action="requisition" params="${[ id: stockMovement?.id ]}">
                                 <warehouse:message code="requestDetails.label"/>
-                            </a>
+                            </g:link>
                         </li>
                     </g:if>
                     <li>
-                        <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
+                        <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="shipping.packingList.label" />
-                        </a>
+                        </g:link>
                     </li>
                     <li>
-                        <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
+                        <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="receipts.label" default="Receipts"/>
-                        </a>
+                        </g:link>
                     </li>
                     <li>
-                        <a href="${request.contextPath}/stockMovement/documents/${stockMovement?.id}">
+                        <g:link controller="stockMovement" action="documents" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="documents.label" default="Documents"/>
-                        </a>
+                        </g:link>
                     </li>
                     <g:if test="${stockMovement?.requisition}">
                         <li>
-                            <a href="${request.contextPath}/stockMovement/comments/${stockMovement?.id}">
+                            <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
                                 <warehouse:message code="comments.label" default="Comments"/>
-                            </a>
+                            </g:link>
                         </li>
                     </g:if>
                 </ul>

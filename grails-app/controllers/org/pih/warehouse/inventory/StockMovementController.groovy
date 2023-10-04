@@ -34,8 +34,7 @@ import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-
-import java.nio.file.AccessDeniedException
+import grails.validation.ValidationException
 
 class StockMovementController {
 
@@ -293,13 +292,13 @@ class StockMovementController {
     }
 
     def addComment = {
-        def stockMovement = getStockMovement(params.id)
+        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
         List<User> recipients = User.list()
-        return [stockMovement: stockMovement, comment: new Comment(), recipients: recipients]
+        [stockMovement: stockMovement, comment: new Comment(), recipients: recipients]
     }
 
     def editComment = {
-        def stockMovement = getStockMovement(params['stockMovement.id'])
+        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
         if (!stockMovement) {
             flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'Stock Movement'), params['stockMovement.id']])}"
             redirect(action: "list")
@@ -316,65 +315,74 @@ class StockMovementController {
             redirect(action: "show", id: stockMovement?.id)
             return
         }
-        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+        List<User> recipients = User.list()
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, recipients: recipients])
     }
 
     def deleteComment = {
-        def stockMovement = getStockMovement(params['stockMovement.id'])
-        if (!stockMovement) {
-            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'Stock Movement'), params['stockMovement.id']])}"
-            redirect(action: "list")
-            return
-        }
-        Comment comment = Comment.get(params?.id)
-        if (!comment) {
-            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), params.id])}"
-            redirect(action: "show", id: stockMovement?.id)
-            return
-        }
-
-        if (comment.sender.id != session.user.id) {
-            throw new AccessDeniedException("You are not authorized to perform this action")
-        }
-
-        stockMovement.requisition?.removeFromComments(comment)
-        if (!stockMovement.requisition.hasErrors() && stockMovement.requisition?.save()) {
-            flash.message = "${g.message(code: 'default.comments.deleted.label')}"
-            redirect(action: "show", id: stockMovement.id)
-            return
-        }
-        render(view: "show", model: [stockMovement: stockMovement])
-    }
-
-    def saveComment = {
-        def stockMovement = getStockMovement(params['stockMovement.id'])
+        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
         if (!stockMovement) {
             flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
             redirect(action: "list")
             return
         }
         Comment comment = Comment.get(params?.id)
-        if (comment) {
-            if (comment.sender.id != session.user.id) {
-                throw new AccessDeniedException("You are not authorized to perform this action")
-            }
-            comment.properties = params
-            if (!stockMovement.requisition.hasErrors() && stockMovement.requisition.save()) {
-                flash.message = "${g.message(code: 'default.comments.updated.label')}"
-                redirect(action: "show", id: stockMovement.id)
-                return
-            }
-        } else {
-            comment = new Comment(params)
-            stockMovement.requisition.addToComments(comment)
-            if (!stockMovement.requisition.hasErrors() && stockMovement.requisition.save()) {
-                flash.message = "${g.message(code: 'default.comments.created.label')}"
-                redirect(action: "show", id: stockMovement.id)
-                return
-            }
+        if (!comment) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), params.id])}"
+            redirect(action: "show", id: stockMovement.id)
+            return
         }
-        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+
+        if (comment.sender.id != session.user.id) {
+            throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
+        }
+        stockMovementService.deleteComment(comment, stockMovement.requisition)
+        flash.message = "${g.message(code: 'default.comments.deleted.label')}"
+        redirect(action: "show", id: stockMovement.id)
     }
+
+    def saveComment = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
+        if (!stockMovement) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
+            redirect(action: "list")
+            return
+        }
+        try {
+            Comment comment = new Comment(params)
+            stockMovementService.addCommentToRequisition(comment, stockMovement.requisition)
+            flash.message = "${g.message(code: 'default.comments.created.label')}"
+            redirect(action: "show", id: stockMovement.id)
+        } catch(ValidationException e) {
+            stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
+            List<User> recipients = User.list()
+            render(view: "addComment", model: [stockMovement: stockMovement, comment: e.errors.target, recipients: recipients])
+        }
+    }
+
+    def updateComment = {
+        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
+        if (!stockMovement) {
+            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
+            redirect(action: "list")
+            return
+        }
+        Comment comment = Comment.get(params?.id)
+        if (comment.sender.id != session.user.id) {
+            throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
+        }
+        try {
+            comment.properties = params
+            stockMovementService.saveComment(comment)
+            flash.message = "${g.message(code: 'default.comments.updated.label')}"
+            redirect(action: "show", id: stockMovement.id)
+        } catch(ValidationException e) {
+            stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
+            List<User> recipients = User.list()
+            render(view: "addComment", model: [stockMovement: stockMovement, comment: e.errors.target, recipients: recipients])
+        }
+    }
+
 
     def packingList = {
         def stockMovement = getStockMovement(params.id)

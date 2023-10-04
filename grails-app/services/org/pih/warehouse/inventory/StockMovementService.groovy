@@ -2813,4 +2813,18 @@ class StockMovementService {
         }
         return true
     }
+
+    void deleteComment(Comment comment, Requisition requisition) {
+        requisition.removeFromComments(comment)
+    }
+
+    void saveComment(Comment comment) {
+        comment.save(failOnError: true)
+    }
+
+    void addCommentToRequisition(Comment comment, Requisition requisition) {
+        comment.save(failOnError: true)
+        requisition.addToComments(comment)
+        requisition.save()
+    }
 }
