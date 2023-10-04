@@ -10,11 +10,8 @@
 package org.pih.warehouse.requisition
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.inventory.StockMovementStatusCode
-
 import org.pih.warehouse.core.StatusType
-import org.pih.warehouse.shipping.ShipmentStatus
 
 enum RequisitionStatus {
 

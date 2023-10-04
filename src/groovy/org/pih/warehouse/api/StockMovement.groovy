@@ -130,7 +130,7 @@ class StockMovement {
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            displayStatus       : StockMovementService.getRequestStatusLabel(shipment, requisition),
+            displayStatus       : StockMovementService.getDisplayStatus(shipment, requisition),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
