@@ -311,7 +311,7 @@ class ConsumptionController {
                         'Category'                                    : row.product?.category?.name,
                         'Formulary'                                   : row.product?.productCatalogsToString(),
                         'Tag'                                         : row.product?.tagsToString(),
-                        'Unit Price'                                  : g.formatNumber(number: row.pricePerUnit, format: '###.#', maxFractionDigits: 2) ?: '',
+                        'Unit Price'                                  : g.formatNumber(number: row.pricePerUnit, format: '###.#', maxFractionDigits: 4) ?: '',
                         'UoM'                                         : row.product.unitOfMeasure ?: '',
                         'Qty Issued'                                  : g.formatNumber(number: row.issuedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Qty Consumed'                                : g.formatNumber(number: row.consumedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
