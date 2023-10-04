@@ -17,6 +17,9 @@ const RequisitionStatus = {
   FULFILLED: 'FULFILLED',
   REVIEWING: 'REVIEWING',
   CONFIRMING: 'CONFIRMING',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
 };
 
 export default RequisitionStatus;

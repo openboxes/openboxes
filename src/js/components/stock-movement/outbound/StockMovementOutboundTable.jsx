@@ -19,6 +19,7 @@ import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListT
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
+import canEditRequest from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -29,6 +30,7 @@ const StockMovementOutboundTable = ({
   translate,
   requisitionStatuses,
   currentLocation,
+  currentUser,
   isRequestsOpen,
   isUserAdmin,
 }) => {
@@ -64,7 +66,10 @@ const StockMovementOutboundTable = ({
     actions.push(showAction);
 
     // Edit
-    if (!isReceived && !isPartiallyReceived) {
+    if (
+      !isReceived && !isPartiallyReceived &&
+      canEditRequest(currentUser, row.original, currentLocation)
+    ) {
       const editAction = {
         defaultLabel: 'Edit Stock Movement',
         label: 'react.stockMovement.action.edit.label',
@@ -293,6 +298,7 @@ const mapStateToProps = state => ({
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
   currentLocale: state.session.activeLanguage,
+  currentUser: state.session.user,
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);
@@ -306,6 +312,9 @@ StockMovementOutboundTable.propTypes = {
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+  }).isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
   }).isRequired,
   requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
