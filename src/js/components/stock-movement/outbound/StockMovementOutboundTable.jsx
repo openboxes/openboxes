@@ -217,7 +217,7 @@ const StockMovementOutboundTable = ({
           {...row}
           tooltip
           defaultValue="None"
-          value={row.value.map(approver => approver.name).join(', ')}
+          value={row.value?.map(approver => approver.name)?.join(', ')}
         />),
     },
     {
