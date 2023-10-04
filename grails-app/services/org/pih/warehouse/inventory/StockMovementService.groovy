@@ -1808,6 +1808,9 @@ class StockMovementService {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ShipmentItem shipmentItem = findOrCreateShipmentItem(shipment, stockMovementItem.id)
                 if (!stockMovementItem.quantityRequested) {
+                    if (shipmentItem.invoiceItems) {
+                        throw new Exception("Shipment item for product ${shipmentItem.product.productCode} has invoice associated")
+                    }
                     shipment.removeFromShipmentItems(shipmentItem)
                     shipmentItem.delete(flush: true)
                 } else {
@@ -2066,6 +2069,9 @@ class StockMovementService {
     }
 
     void removeShipmentItem(ShipmentItem shipmentItem) {
+        if (shipmentItem.invoiceItems) {
+            throw new Exception("Shipment item for product ${shipmentItem.product.productCode} has invoice associated")
+        }
         Shipment shipment = shipmentItem.shipment
         OrderItem orderItem = OrderItem.get(shipmentItem.orderItemId)
         if (orderItem) {

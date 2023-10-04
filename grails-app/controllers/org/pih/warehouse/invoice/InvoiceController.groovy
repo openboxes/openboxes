@@ -13,6 +13,9 @@ package org.pih.warehouse.invoice
 import org.pih.warehouse.core.Document
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.order.Order
+import org.pih.warehouse.order.OrderAdjustment
+import org.pih.warehouse.order.OrderItem
+import org.pih.warehouse.shipping.ShipmentItem
 
 import java.text.SimpleDateFormat
 
@@ -64,7 +67,7 @@ class InvoiceController {
         def invoiceInstance = Invoice.get(params.id)
         if (invoiceInstance) {
             try {
-                invoiceInstance.delete(flush: true)
+                invoiceService.deleteInvoice(invoiceInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
                 redirect(action: "list")
                 return
