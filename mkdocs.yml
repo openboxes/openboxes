@@ -118,4 +118,4 @@ nav:
   - Support:
     - Overview: support/index.md
   - Glossary:
-    - Glossary: docs/glossary.json
+    - Glossary: support/glossary.md
