@@ -12,7 +12,6 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
-import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
@@ -130,7 +129,7 @@ class StockMovement {
             name                : name,
             description         : description,
             statusCode          : statusCode,
-            displayStatus       : StockMovementService.getDisplayStatus(shipment, requisition),
+            displayStatus       : getDisplayStatus(),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -463,5 +462,24 @@ class StockMovement {
                 "Quantity (required)"               : lineItem?.quantityRequested ?: "",
                 "Recipient id"                      : lineItem?.recipient?.id ?: ""
         ]
+    }
+
+    String getDisplayStatus() {
+        def status
+        switch(requisition?.status) {
+            case RequisitionStatus.APPROVED:
+                status =  StockMovementStatusCode.APPROVED
+                break
+            case RequisitionStatus.REJECTED:
+                status = StockMovementStatusCode.REJECTED
+                break
+            case RequisitionStatus.PENDING_APPROVAL:
+                status = StockMovementStatusCode.PENDING_APPROVAL
+                break
+            default:
+                status = shipment?.status?.code
+        }
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
     }
 }
