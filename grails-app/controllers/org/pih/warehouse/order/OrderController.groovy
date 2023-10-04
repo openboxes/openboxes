@@ -1096,32 +1096,11 @@ class OrderController {
     }
 
     def orderSummary = {
-        Order order = Order.get(params.id)
-        def orderItems = order?.orderItems
-        render(template: "orderSummary", model: [
-            isPurchaseOrder: order.isPurchaseOrder,
-            isPutawayOrder: order.isPutawayOrder,
-            orderItems: orderItems,
-            anySupplierCode: orderItems?.any { it.productSupplier?.supplierCode },
-            anyManufacturerName: orderItems?.any { it.productSupplier?.manufacturerName },
-            anyManufacturerCode: orderItems?.any { it.productSupplier?.manufacturerCode },
-            currencyCode: order.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
-            subtotal: order.subtotal,
-            totalAdjustments: order.totalAdjustments,
-            total: order.total,
-        ])
+        render(template: "orderSummary", model: orderService.getOrderSummary(params.id))
     }
 
     def itemStatus = {
-        Order order = Order.get(params.id)
-        def orderItems = order?.listOrderItems()
-        render(template: "itemStatus", model: [
-            isPurchaseOrder: order.isPurchaseOrder,
-            isPutawayOrder: order.isPutawayOrder,
-            orderItems: orderItems,
-            currencyCode: order.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
-            total: order.total,
-        ])
+        render(template: "itemStatus", model: orderService.getOrderItemStatus(params.id))
     }
 
     def itemDetails = {

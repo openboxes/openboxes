@@ -23,19 +23,19 @@
                 <th class="bottom">
                     <warehouse:message code="product.name.label"/>
                 </th>
-                <g:if test="${anySupplierCode}">
+                <g:if test="${hasSupplierCode}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                     <th class="center">
                         <warehouse:message code="product.supplierCode.label"/>
                     </th>
                 </g:if>
-                <g:if test="${anyManufacturerName}">
+                <g:if test="${hasManufacturerName}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                     <th class="center">
                         <warehouse:message code="product.manufacturer.label"/>
                     </th>
                 </g:if>
-                <g:if test="${anyManufacturerCode}">
+                <g:if test="${hasManufacturerCode}">
                     <g:set var="columnsNumber" value="${columnsNumber.toInteger() + 1}"/>
                     <th class="center">
                         <warehouse:message code="product.manufacturerCode.label"/>
@@ -81,17 +81,17 @@
                             </g:link>
                         </td>
                         <g:if test="${!orderItem?.canceled}">
-                            <g:if test="${anySupplierCode}">
+                            <g:if test="${hasSupplierCode}">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.supplierCode}
                                 </td>
                             </g:if>
-                            <g:if test="${anyManufacturerName}">
+                            <g:if test="${hasManufacturerName}">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.manufacturerName}
                                 </td>
                             </g:if>
-                            <g:if test="${anyManufacturerCode}">
+                            <g:if test="${hasManufacturerCode}">
                                 <td class="center">
                                     ${orderItem?.productSupplier?.manufacturerCode}
                                 </td>

@@ -1284,4 +1284,33 @@ class OrderService {
             return false
         }
     }
+
+    Map getOrderSummary(String orderId) {
+        Order order = Order.get(orderId)
+        def orderItems = order?.orderItems
+        return [
+            isPurchaseOrder: order.isPurchaseOrder,
+            isPutawayOrder: order.isPutawayOrder,
+            orderItems: orderItems,
+            hasSupplierCode: orderItems?.any { it.productSupplier?.supplierCode },
+            hasManufacturerName: orderItems?.any { it.productSupplier?.manufacturerName },
+            hasManufacturerCode: orderItems?.any { it.productSupplier?.manufacturerCode },
+            currencyCode: order.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
+            subtotal: order.subtotal,
+            totalAdjustments: order.totalAdjustments,
+            total: order.total,
+        ]
+    }
+
+    Map getOrderItemStatus(String orderId) {
+        Order order = Order.get(orderId)
+        def orderItems = order?.listOrderItems()
+        return [
+            isPurchaseOrder: order.isPurchaseOrder,
+            isPutawayOrder: order.isPutawayOrder,
+            orderItems: orderItems,
+            currencyCode: order.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
+            total: order.total,
+        ]
+    }
 }
