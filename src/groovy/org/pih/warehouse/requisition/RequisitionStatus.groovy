@@ -11,7 +11,6 @@ package org.pih.warehouse.requisition
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.pih.warehouse.inventory.StockMovementStatusCode
-
 import org.pih.warehouse.core.StatusType
 
 enum RequisitionStatus {
