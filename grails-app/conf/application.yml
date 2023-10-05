@@ -657,7 +657,6 @@ openboxes:
                 eventName: onEventShipmentUpdated
                 fields:
                 - currentStatus
-
     application:
         event:
             webhook:
@@ -708,8 +707,6 @@ openboxes:
                     inboundRoleTypes:
                         - "ROLE_SHIPMENT_NOTIFICATION"
                         - "ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION"
-
-
 mail:
     error:
         enabled: false
@@ -724,9 +721,6 @@ mail:
 
 uiperformance:
     enabled: false
-
-
-
 
 # TODO OBGM 1: Add jqueryValidation plugin config if will be needed
 # TODO OBGM 2: Add log4j plugin config if will be needed
