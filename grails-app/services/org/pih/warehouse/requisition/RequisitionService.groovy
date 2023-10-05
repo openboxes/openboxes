@@ -28,6 +28,7 @@ import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.util.DateUtil
 
@@ -867,6 +868,33 @@ class RequisitionService {
                 requisition.status = newStatus
         }
         requisition.save(flush: true)
+    }
+
+    void deleteEvent(Requisition requisition, Event event) {
+        requisition.removeFromEvents(event)
+        event.delete()
+        requisition.save()
+    }
+
+    void rollbackLastEvent(Requisition requisition) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        Event event = requisition.mostRecentEvent
+        if (!event) {
+            throw new RuntimeException(g.message(
+                    code: "requisition.error.rollback.noRecentEvents",
+                    default: "Cannot rollback requisition because there are no recent events"
+            ))
+        }
+        try {
+            deleteEvent(requisition, event)
+        } catch (Exception e) {
+            log.error("Error rolling back most recent event", e)
+            throw new IllegalStateException(g.message(
+                    "code": "default.error.event.rollback.mostRecentEvent",
+                    "default: Error rolling back most recent event: ${e}",
+                    args: [e]
+            ))
+        }
     }
 
     void deleteComment(Comment comment, Requisition requisition) {

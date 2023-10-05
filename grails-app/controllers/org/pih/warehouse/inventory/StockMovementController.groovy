@@ -17,6 +17,7 @@ import org.grails.plugins.csv.CSVWriter
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BulkDocumentCommand
 import org.pih.warehouse.core.Constants
@@ -270,7 +271,30 @@ class StockMovementController {
     }
 
     def rollbackApproval = {
-        throw new NotImplementedException("Action ${params.actionName} not implemented")
+        String stockMovementId = params.get("id")
+        if (!stockMovementService.canRollbackApproval(AuthService.currentUser.get(), stockMovementId)) {
+            flash.message = g.message(
+                    code: "request.errors.approval.rollback.message",
+                    default: "Unable to rollback approval: You do not have permissions to perform this action",
+                    args: [g.message(code: "errors.noPermissions.label")]
+            )
+        }
+
+        try {
+            stockMovementService.rollbackApproval(stockMovementId)
+            flash.message = g.message(
+                    code: "request.successfulApproval.rollback.message",
+                    default: "Successfully rolled back approval",
+            )
+        } catch (Exception e) {
+            log.error("Unable to rollback stock movement with ID ${stockMovementId}: " + e.message)
+            flash.message = g.message(
+                    code: "request.errors.approval.rollback.message",
+                    default: "Unable to rollback approval: ${e.message}",
+                    args: [e.message]
+            )
+        }
+        redirect(action: "show", id: stockMovementId)
     }
 
 

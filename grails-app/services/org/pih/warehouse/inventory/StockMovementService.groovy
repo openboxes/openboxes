@@ -33,6 +33,7 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
@@ -72,6 +73,7 @@ class StockMovementService {
     def dataService
     def forecastingService
     def outboundStockMovementService
+    UserService userService
 
     boolean transactional = true
 
@@ -2821,5 +2823,29 @@ class StockMovementService {
             validateQuantityRequested(stockMovement)
         }
         return true
+    }
+
+    void rollbackApproval(String stockMovementId) {
+        StockMovement stockMovement = getStockMovement(stockMovementId)
+
+        Requisition requisition = stockMovement?.requisition
+        if (requisition.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
+            requisitionService.rollbackLastEvent(requisition)
+            requisition.status = RequisitionStatus.PENDING_APPROVAL
+            requisition.approvedBy = null
+            requisition.rejectedBy = null
+            requisition.dateApproved = null
+            requisition.dateRejected = null
+        }
+    }
+
+    Boolean canRollbackApproval(User user, String stockMovementId) {
+        StockMovement stockMovement = getStockMovement(stockMovementId)
+
+        // When a user is an approver or requestor or is a manager or superuser, then can rollback approval
+        Boolean isApproverOrRequestor = stockMovement?.approvers?.contains(user) || stockMovement?.requestedBy == user
+        Boolean isManagerOrSuperuser = userService.isSuperuser(user) || userService.isUserAdmin(user)
+
+        return isApproverOrRequestor || isManagerOrSuperuser
     }
 }
