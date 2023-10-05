@@ -127,6 +127,8 @@ enum RequisitionStatus {
             case StockMovementStatusCode.REQUESTING:
                 return RequisitionStatus.EDITING
             case StockMovementStatusCode.REQUESTED:
+                return RequisitionStatus.VERIFYING
+            case StockMovementStatusCode.PENDING_APPROVAL:
                 return RequisitionStatus.PENDING_APPROVAL
             case StockMovementStatusCode.PACKED:
                 return RequisitionStatus.CHECKING

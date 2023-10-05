@@ -1229,7 +1229,7 @@ class AddItemsPage extends Component {
   submitRequest(lineItems) {
     const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
     this.saveRequisitionItems(nonEmptyLineItems)
-      .then(() => this.transitionToNextStep('REQUESTED'));
+      .then(() => this.transitionToNextStep('PENDING_APPROVAL'));
   }
 
   /**
