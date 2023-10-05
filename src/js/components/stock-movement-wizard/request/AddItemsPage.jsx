@@ -1229,7 +1229,13 @@ class AddItemsPage extends Component {
   submitRequest(lineItems) {
     const nonEmptyLineItems = _.filter(lineItems, val => !_.isEmpty(val) && val.product);
     this.saveRequisitionItems(nonEmptyLineItems)
-      .then(() => this.transitionToNextStep('PENDING_APPROVAL'));
+      .then(() => {
+        if (supports(this.state.values.origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)) {
+          this.transitionToNextStep('PENDING_APPROVAL');
+        } else {
+          this.transitionToNextStep('REQUESTED');
+        }
+      });
   }
 
   /**
