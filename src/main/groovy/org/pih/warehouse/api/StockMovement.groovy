@@ -133,6 +133,7 @@ class StockMovement implements Validateable{
             name                : name,
             description         : description,
             statusCode          : statusCode,
+            displayStatus       : getDisplayStatus(),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -467,4 +468,22 @@ class StockMovement implements Validateable{
         ]
     }
 
+    String getDisplayStatus() {
+        def status
+        switch(requisition?.status) {
+            case RequisitionStatus.APPROVED:
+                status =  StockMovementStatusCode.APPROVED
+                break
+            case RequisitionStatus.REJECTED:
+                status = StockMovementStatusCode.REJECTED
+                break
+            case RequisitionStatus.PENDING_APPROVAL:
+                status = StockMovementStatusCode.PENDING_APPROVAL
+                break
+            default:
+                status = shipment?.status?.code
+        }
+        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
+    }
 }
