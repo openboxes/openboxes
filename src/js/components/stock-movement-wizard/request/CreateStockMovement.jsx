@@ -192,7 +192,6 @@ const APPROVER_FIELDS = {
       showValueTooltip: true,
       valueKey: 'id',
       labelKey: 'name',
-      subtext: 'react.stockMovement.request.approvers.leaveBlank.label',
     },
     type: SelectField,
     getDynamicAttr: props => ({

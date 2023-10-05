@@ -226,25 +226,10 @@ class NotificationService {
     }
 
 
-    List<Person> resolveNotificationRecipients(Requisition requisition) {
-        List<Person> recipients = []
-        Requisition.withSession {
-            if (requisition.status == RequisitionStatus.PENDING_APPROVAL) {
-                if (requisition.approvers?.size()) {
-                    recipients = Person.findAllByIdInList(requisition.approvers.collect { it.id })
-                } else {
-                    // if there are not assigned users as approvers then notify all approvers
-                    recipients = userService.findUsersByRoleTypes(requisition.origin, [RoleType.ROLE_REQUISITION_APPROVER])
-                }
-            }
-        }
-        return recipients
-    }
-
     void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
         switch(requisition.status) {
             case RequisitionStatus.PENDING_APPROVAL:
-                List<Person> recipients = resolveNotificationRecipients(requisition)
+                List<Person> recipients = requisition.approvers ? Person.getAll(requisition.approvers.id) : []
                 publishRequisitionPendingApprovalNotifications(requisition, recipients)
                 break
             case RequisitionStatus.APPROVED:
@@ -266,7 +251,7 @@ class NotificationService {
         String template = "/email/approvalsAlert"
 
         recipients.each { recipient ->
-            if (recipient.email) {
+            if (recipient?.email) {
                 String redirectToRequestsList = "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC&approver=${recipient.id}"
                 String body = renderTemplate(template, [requisition: requisition, redirectUrl: redirectToRequestsList])
                 mailService.sendHtmlMail(subject, body, recipient.email)
