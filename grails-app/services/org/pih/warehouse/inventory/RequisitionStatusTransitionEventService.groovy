@@ -10,7 +10,6 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.report.NotificationService
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
 import org.springframework.context.ApplicationListener
 
@@ -19,9 +18,6 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
     NotificationService notificationService
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        Requisition.withSession {
-            Requisition requisition = Requisition.get(event.requisition.id)
-            notificationService.publishRequisitionStatusTransitionNotifications(requisition, event.status)
-        }
+        notificationService.publishRequisitionStatusTransitionNotifications(event.requisition)
     }
 }

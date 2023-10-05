@@ -5,11 +5,8 @@ import org.springframework.context.ApplicationEvent
 class RequisitionStatusTransitionEvent extends ApplicationEvent {
     Requisition requisition
 
-    RequisitionStatus status
-
-    RequisitionStatusTransitionEvent(Requisition requisition, RequisitionStatus status) {
+    RequisitionStatusTransitionEvent(Requisition requisition) {
         super(requisition)
         this.requisition = requisition
-        this.status = status
     }
 }
