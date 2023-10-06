@@ -117,5 +117,5 @@ nav:
         - Receiving: api-guide/receiving.md
   - Support:
     - Overview: support/index.md
-
-
+  - Glossary:
+    - Glossary: support/glossary.md
