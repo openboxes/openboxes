@@ -830,10 +830,10 @@ class RequisitionService {
         requisition.save()
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser) {
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
         // If fulfilling location does not require approval we omit all other status transitions and set it to VERIFYING
-        switch(requisition.status) {
+        switch(newStatus) {
             case RequisitionStatus.PENDING_APPROVAL:
                 if (requisition.origin.approvalRequired) {
                     transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
@@ -854,7 +854,8 @@ class RequisitionService {
                 requisition.rejectedBy = currentUser
                 break
             default:
-                break
+                requisition.status = newStatus
         }
+        requisition.save(flush: true)
     }
 }
