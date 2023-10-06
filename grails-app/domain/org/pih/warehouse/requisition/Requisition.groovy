@@ -396,7 +396,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Event getMostRecentEvent() {
         if (events?.size() > 0) {
-            return events.iterator().next()
+            return events.sort().iterator().next()
         }
         return null
     }

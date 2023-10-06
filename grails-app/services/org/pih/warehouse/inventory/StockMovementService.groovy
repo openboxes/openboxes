@@ -2827,6 +2827,13 @@ class StockMovementService {
 
     void rollbackApproval(String stockMovementId) {
         StockMovement stockMovement = getStockMovement(stockMovementId)
+        if (!canRollbackApproval(AuthService.currentUser.get(), stockMovement)) {
+            String errorMessage = applicationTagLib.message(
+                    code: "request.errors.approval.rollback.message",
+                    default: "Unable to rollback approval due to insufficient permissions",
+            )
+            throw new IllegalAccessException(errorMessage)
+        }
 
         Requisition requisition = stockMovement?.requisition
         if (requisition.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
@@ -2839,13 +2846,11 @@ class StockMovementService {
         }
     }
 
-    Boolean canRollbackApproval(User user, String stockMovementId) {
-        StockMovement stockMovement = getStockMovement(stockMovementId)
+    Boolean canRollbackApproval(User user, StockMovement stockMovement) {
+        return (stockMovement.canUserRollbackApproval(user) || userService.isUserAdmin(user)) && stockMovement.isInApprovalState()
+    }
 
-        // When a user is an approver or requestor or is a manager or superuser, then can rollback approval
-        Boolean isApproverOrRequestor = stockMovement?.approvers?.contains(user) || stockMovement?.requestedBy == user
-        Boolean isManagerOrSuperuser = userService.isSuperuser(user) || userService.isUserAdmin(user)
-
-        return isApproverOrRequestor || isManagerOrSuperuser
+    def getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
     }
 }

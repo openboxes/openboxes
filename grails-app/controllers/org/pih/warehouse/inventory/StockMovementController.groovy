@@ -272,14 +272,6 @@ class StockMovementController {
 
     def rollbackApproval = {
         String stockMovementId = params.get("id")
-        if (!stockMovementService.canRollbackApproval(AuthService.currentUser.get(), stockMovementId)) {
-            flash.message = g.message(
-                    code: "request.errors.approval.rollback.message",
-                    default: "Unable to rollback approval: You do not have permissions to perform this action",
-                    args: [g.message(code: "errors.noPermissions.label")]
-            )
-        }
-
         try {
             stockMovementService.rollbackApproval(stockMovementId)
             flash.message = g.message(
