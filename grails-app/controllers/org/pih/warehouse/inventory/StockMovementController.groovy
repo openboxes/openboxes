@@ -293,8 +293,7 @@ class StockMovementController {
 
     def addComment = {
         StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
-        List<User> recipients = User.list()
-        [stockMovement: stockMovement, comment: new Comment(), recipients: recipients]
+        [stockMovement: stockMovement, comment: new Comment()]
     }
 
     def editComment = {
@@ -315,8 +314,7 @@ class StockMovementController {
             redirect(action: "show", id: stockMovement?.id)
             return
         }
-        List<User> recipients = User.list()
-        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, recipients: recipients])
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
     def deleteComment = {
@@ -348,16 +346,16 @@ class StockMovementController {
             redirect(action: "list")
             return
         }
-        try {
-            Comment comment = new Comment(params)
-            stockMovementService.addCommentToRequisition(comment, stockMovement.requisition)
-            flash.message = "${g.message(code: 'default.comments.created.label')}"
-            redirect(action: "show", id: stockMovement.id)
-        } catch(ValidationException e) {
-            stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
-            List<User> recipients = User.list()
-            render(view: "addComment", model: [stockMovement: stockMovement, comment: e.errors.target, recipients: recipients])
-        }
+        Comment comment = new Comment(params)
+        stockMovementService.saveComment(comment)
+        stockMovementService.addCommentToRequisition(comment, stockMovement.requisition)
+         if (comment?.hasErrors()) {
+             stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
+             render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+             return
+         }
+        flash.message = "${g.message(code: 'default.comments.created.label')}"
+        redirect(action: "show", id: stockMovement.id)
     }
 
     def updateComment = {
@@ -371,16 +369,15 @@ class StockMovementController {
         if (comment.sender.id != session.user.id) {
             throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
         }
-        try {
-            comment.properties = params
-            stockMovementService.saveComment(comment)
-            flash.message = "${g.message(code: 'default.comments.updated.label')}"
-            redirect(action: "show", id: stockMovement.id)
-        } catch(ValidationException e) {
+        comment.properties = params
+        stockMovementService.saveComment(comment)
+        if (comment?.hasErrors()) {
             stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
-            List<User> recipients = User.list()
-            render(view: "addComment", model: [stockMovement: stockMovement, comment: e.errors.target, recipients: recipients])
+            render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+            return
         }
+        flash.message = "${g.message(code: 'default.comments.updated.label')}"
+        redirect(action: "show", id: stockMovement.id)
     }
 
 

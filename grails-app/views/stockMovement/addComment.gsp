@@ -38,17 +38,8 @@
 								<td valign="top" class="name"><label><warehouse:message code="comment.recipient.label" /></label></td>
 								<td valign="top" class="value ${hasErrors(bean: comment, field: 'recipient', 'errors')}">
 									<div style="width:300px">
-										<g:select
-											id="recipient.id"
-											class="chzn-select-deselect"
-											name='recipient.id'
-											noSelection="['':'']"
-											from='${recipients}'
-											optionKey="id"
-											optionValue="name"
-											value="${comment?.recipient?.id }"
-											data-placeholder="${g.message(code: 'default.selectOne.label', default: 'Select one...')}"
-										/>
+										<g:selectUser name="recipient.id" value="${comment?.recipient?.id}"
+													  noSelection="['null':'']" class="chzn-select-deselect"/>
 									</div>
 								</td>
 							</tr>

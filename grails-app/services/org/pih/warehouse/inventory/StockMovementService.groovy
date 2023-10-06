@@ -2818,12 +2818,11 @@ class StockMovementService {
         requisition.removeFromComments(comment)
     }
 
-    void saveComment(Comment comment) {
-        comment.save(failOnError: true)
+    Comment saveComment(Comment comment) {
+        return comment.save()
     }
 
     void addCommentToRequisition(Comment comment, Requisition requisition) {
-        comment.save(failOnError: true)
         requisition.addToComments(comment)
         requisition.save()
     }
