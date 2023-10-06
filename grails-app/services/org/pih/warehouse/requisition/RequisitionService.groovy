@@ -13,6 +13,7 @@ import grails.validation.ValidationException
 import javassist.NotFoundException
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
@@ -859,5 +860,18 @@ class RequisitionService {
                 requisition.status = newStatus
         }
         requisition.save(flush: true)
+    }
+
+    void deleteComment(Comment comment, Requisition requisition) {
+        requisition.removeFromComments(comment)
+    }
+
+    Comment saveComment(Comment comment) {
+        return comment.save()
+    }
+
+    void addCommentToRequisition(Comment comment, Requisition requisition) {
+        requisition.addToComments(comment)
+        requisition.save()
     }
 }
