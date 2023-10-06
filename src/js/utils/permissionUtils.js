@@ -22,7 +22,7 @@ const canEditRequest = (currentUser, request, location) => {
     // If the request is approved, approver cannot edit request,
     // but normal warehouse user can edit it
     const isUserApprover = request?.approvers?.find(user => user?.id === currentUser?.id);
-    return request.statusCode === RequisitionStatus.APPROVED && !isUserApprover;
+    return request.statusCode === RequisitionStatus.APPROVED && !isUserApprover && isLocationOrigin;
   }
 
   // If request approval is not supported by the location we have to check if the
