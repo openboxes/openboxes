@@ -11,12 +11,17 @@ const canEditRequest = (currentUser, request, location) => {
     ActivityCode.APPROVE_REQUEST,
   );
 
-  // If the location supports request approval, only the requestor is able to edit
-  // and the request can't be approved / rejected when editing
   if (isApprovalRequired) {
+    // If the request is approved, approver cannot edit request,
+    // but normal warehouse user can edit it
+    const isUserApprover = request?.approvers?.find(user => user?.id === currentUser?.id);
+    if (request.statusCode === RequisitionStatus.APPROVED && isUserApprover) {
+      return false;
+    }
+    // If the location supports request approval, only the requestor is able to edit
+    // If the request is rejected, then it cannot be edited
     return isUserRequestor &&
       (isLocationDestination || isLocationOrigin) &&
-      request.statusCode !== RequisitionStatus.APPROVED &&
       request.statusCode !== RequisitionStatus.REJECTED;
   }
 
