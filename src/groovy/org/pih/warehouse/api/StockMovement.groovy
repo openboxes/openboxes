@@ -485,7 +485,7 @@ class StockMovement {
 
     Boolean canUserRollbackApproval(User user) {
         // Approval can be rolled back by user who is approver or requestor
-        return approvers?.contains(user) || requestedBy == user
+        return approvers?.contains(user) || requestedBy?.id == user?.id
     }
 
     Boolean isInApprovalState() {
