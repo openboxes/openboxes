@@ -136,6 +136,9 @@ class StockMovementService {
                     //RequisitionStatus.EDITING:
                     case StockMovementStatusCode.REQUESTED:
                         break
+                    //RequisitionStatus.PENDING_APPROVAL:
+                    case StockMovementStatusCode.PENDING_APPROVAL:
+                        break
                     //RequisitionStatus.VERIFYING:
                     case StockMovementStatusCode.VALIDATED:
                         break

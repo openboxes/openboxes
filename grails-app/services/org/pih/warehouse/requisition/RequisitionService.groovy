@@ -834,23 +834,30 @@ class RequisitionService {
 
     void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
-        // If fulfilling location does not require approval we omit all other status transitions and set it to VERIFYING
         switch(newStatus) {
+            case RequisitionStatus.VERIFYING:
+                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                requisition.approvalRequired = false
+                break
             case RequisitionStatus.PENDING_APPROVAL:
-                if (requisition.origin.approvalRequired) {
-                    transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
-                    requisition.approvalRequired = true
-                } else {
-                    transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
-                    requisition.approvalRequired = false
+                if (!requisition.origin.approvalRequired) {
+                    throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
+                transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                requisition.approvalRequired = true
                 break
             case RequisitionStatus.APPROVED:
+                if (!requisition.origin.approvalRequired) {
+                    throw new IllegalArgumentException("Fulfilling location must support Request Approval")
+                }
                 transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
                 requisition.dateApproved = new Date()
                 requisition.approvedBy = currentUser
                 break
             case RequisitionStatus.REJECTED:
+                if (!requisition.origin.approvalRequired) {
+                    throw new IllegalArgumentException("Fulfilling location must support Request Approval")
+                }
                 transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
