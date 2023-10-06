@@ -18,6 +18,7 @@ import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
 import ActivityCode from 'consts/activityCode';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
@@ -47,6 +48,9 @@ const StockMovementOutboundTable = ({
     exportStockMovements,
     exportPendingShipmentItems,
     deleteConfirmAlert,
+    approveRequest,
+    rejectRequest,
+    rollbackRequest,
   } = useOutboundListTableData(filterParams);
 
   const getStatusTooltip = status => translate(
@@ -58,34 +62,35 @@ const StockMovementOutboundTable = ({
     (row) => {
       const {
         statusCode,
+        identifier,
       } = row.original;
       const actions = [];
 
-      if (statusCode === 'PENDING_APPROVAL') {
+      if (statusCode === RequisitionStatus.PENDING_APPROVAL) {
         const approveAction = {
           defaultLabel: 'Approve',
           label: 'react.stockMovement.action.approve.label',
           leftIcon: <RiCheckFill />,
-          onClick: () => 1,
+          onClick: id => approveRequest(id, identifier),
         };
         actions.push(approveAction);
       }
-      if (statusCode === 'PENDING_APPROVAL') {
+      if (statusCode === RequisitionStatus.PENDING_APPROVAL) {
         const rejectAction = {
           defaultLabel: 'Reject',
           label: 'react.stockMovement.action.reject.label',
           leftIcon: <RiCloseFill />,
           variant: 'danger',
-          onClick: () => 1,
+          onClick: id => rejectRequest(id, identifier),
         };
         actions.push(rejectAction);
       }
-      if (statusCode === 'APPROVED' || statusCode === 'REJECTED') {
+      if (statusCode === RequisitionStatus.APPROVED || statusCode === RequisitionStatus.REJECTED) {
         const rollbackAction = {
           defaultLabel: 'Rolllback',
           label: 'react.stockMovement.action.rollback.label',
           leftIcon: <RiArrowGoBackLine />,
-          onClick: () => 1,
+          onClick: rollbackRequest,
         };
         actions.push(rollbackAction);
       }
