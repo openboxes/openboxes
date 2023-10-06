@@ -22,6 +22,7 @@ import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
 import NotificationType from 'consts/notificationTypes';
+import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
@@ -1231,9 +1232,9 @@ class AddItemsPage extends Component {
     this.saveRequisitionItems(nonEmptyLineItems)
       .then(() => {
         if (supports(this.state.values.origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)) {
-          this.transitionToNextStep('PENDING_APPROVAL');
+          this.transitionToNextStep(RequisitionStatus.PENDING_APPROVAL);
         } else {
-          this.transitionToNextStep('REQUESTED');
+          this.transitionToNextStep(RequisitionStatus.REQUESTED);
         }
       });
   }
