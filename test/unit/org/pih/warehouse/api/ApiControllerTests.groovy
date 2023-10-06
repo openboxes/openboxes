@@ -104,7 +104,7 @@ class ApiControllerTests extends ControllerUnitTestCase {
         controller.userService = [
                 isSuperuser: { User user -> return false },
                 isUserAdmin: { User user -> return true },
-                isUserRequestApprover: { User user -> return true },
+                isUserInAllRoles: { String userId, Collection roleTypes, String locationId -> true },
                 hasRolePurchaseApprover: { User user -> return true },
                 getEffectiveRoles: { User user -> return [] }
         ]
@@ -137,7 +137,6 @@ class ApiControllerTests extends ControllerUnitTestCase {
         assertEquals("Boston", jsonResponse.data.location.name)
         assertEquals(false, jsonResponse.data.isSuperuser)
         assertEquals(true, jsonResponse.data.isUserAdmin)
-        assertEquals(true, jsonResponse.data.isUserRequestApprover)
         assertEquals("0.8.9", jsonResponse.data.appVersion)
         assertEquals("develop", jsonResponse.data.branchName)
         assertEquals("test", jsonResponse.data.environment)
