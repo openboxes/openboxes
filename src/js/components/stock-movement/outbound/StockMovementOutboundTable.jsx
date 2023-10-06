@@ -74,8 +74,7 @@ const StockMovementOutboundTable = ({
           onClick: id => approveRequest(id, identifier),
         };
         actions.push(approveAction);
-      }
-      if (statusCode === RequisitionStatus.PENDING_APPROVAL) {
+
         const rejectAction = {
           defaultLabel: 'Reject',
           label: 'react.stockMovement.action.reject.label',

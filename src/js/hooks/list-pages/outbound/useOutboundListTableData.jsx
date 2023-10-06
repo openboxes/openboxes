@@ -13,6 +13,8 @@ import {
 } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS } from 'api/urls';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
 import RequisitionStatus from 'consts/requisitionStatus';
 import useTableData from 'hooks/list-pages/useTableData';
 import exportFileFromAPI from 'utils/file-download-util';
@@ -137,8 +139,9 @@ const useOutboundListTableData = (filterParams) => {
     dispatch(showSpinner());
     try {
       await stockMovementApi.updateStatus(id, RequisitionStatus.APPROVED);
-      const successMessage = `You have successfully Approved the request ${identifier}`;
-      Alert.success(successMessage);
+      notification(NotificationType.SUCCESS)({
+        message: `You have successfully Approved the request ${identifier}`,
+      });
       fireFetchData();
     } finally {
       dispatch(hideSpinner());
@@ -149,8 +152,9 @@ const useOutboundListTableData = (filterParams) => {
     dispatch(showSpinner());
     try {
       await stockMovementApi.updateStatus(id, RequisitionStatus.REJECTED);
-      const successMessage = `You have successfully Rejected the request ${identifier}`;
-      Alert.success(successMessage);
+      notification(NotificationType.SUCCESS)({
+        message: `You have successfully Rejected the request ${identifier}`,
+      });
       fireFetchData();
     } finally {
       dispatch(hideSpinner());
@@ -158,7 +162,9 @@ const useOutboundListTableData = (filterParams) => {
   };
 
   const rollbackRequest = () => {
-    Alert.error('Not implemented');
+    notification(NotificationType.WARNING)({
+      message: 'Not implemented',
+    });
   };
 
   return {
