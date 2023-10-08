@@ -25,16 +25,15 @@ import org.pih.warehouse.core.DocumentCommand
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Comment
-import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.picklist.PicklistItem
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
-import grails.validation.ValidationException
 
 class StockMovementController {
 
@@ -288,22 +287,20 @@ class StockMovementController {
     }
 
     def comments = {
-        def stockMovement = getStockMovement(params.id)
-        render(template: "comments", model: [stockMovement: stockMovement])
+        Requisition requisition = Requisition.get(params.id)
+        render(template: "comments", model: [requisition: requisition])
     }
 
     def addComment = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.id)
+        Requisition requisition = Requisition.get(params.id)
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
         [stockMovement: stockMovement, comment: new Comment()]
     }
 
     def editComment = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
-        if (!stockMovement) {
-            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'Stock Movement'), params['stockMovement.id']])}"
-            redirect(action: "list")
-            return
-        }
+        Requisition requisition = Requisition.get(params.requisition)
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+
         Comment comment = Comment.get(params?.id)
         if (!comment) {
             flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
@@ -319,37 +316,30 @@ class StockMovementController {
     }
 
     def deleteComment = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
-        if (!stockMovement) {
-            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
-            redirect(action: "list")
-            return
-        }
+        Requisition requisition = Requisition.get(params.requisition)
+
         Comment comment = Comment.get(params?.id)
         if (!comment) {
             flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'comment.label', default: 'Comment'), params.id])}"
-            redirect(action: "show", id: stockMovement.id)
+            redirect(action: "show", id: requisition.id)
             return
         }
 
         if (comment.sender.id != session.user.id) {
             throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
         }
-        requisitionService.deleteComment(comment, stockMovement.requisition)
+        requisitionService.deleteComment(comment, requisition)
         flash.message = "${g.message(code: 'default.comments.deleted.label')}"
-        redirect(action: "show", id: stockMovement.id)
+        redirect(action: "show", id: requisition.id)
     }
 
     def saveComment = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
-        if (!stockMovement) {
-            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
-            redirect(action: "list")
-            return
-        }
+        Requisition requisition = Requisition.get(params.requisition)
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+
         Comment comment = new Comment(params)
-         if (comment.validate()) {
-             requisitionService.addCommentToRequisition(comment, stockMovement.requisition)
+         if (!comment.validate()) {
+             requisitionService.addCommentToRequisition(comment, requisition)
              render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
              return
          }
@@ -358,18 +348,15 @@ class StockMovementController {
     }
 
     def updateComment = {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params['stockMovement.id'])
-        if (!stockMovement) {
-            flash.message = "${g.message(code: 'default.not.found.message', args: [g.message(code: 'stockMovement.label', default: 'StockMovement'), params['stockMovement.id']])}"
-            redirect(action: "list")
-            return
-        }
+        Requisition requisition = Requisition.get(params.requisition)
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+
         Comment comment = Comment.get(params?.id)
         if (comment.sender.id != session.user.id) {
             throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
         }
         comment.properties = params
-        if (comment.validate()) {
+        if (!comment.validate()) {
             requisitionService.saveComment(comment)
             render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
             return

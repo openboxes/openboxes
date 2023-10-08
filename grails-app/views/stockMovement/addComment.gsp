@@ -31,7 +31,7 @@
 				<h2><warehouse:message code="default.add.label" args="[entityName]" /></h2>
 				<g:form action="${comment?.id ? 'updateComment' : 'saveComment'}">
 					<g:hiddenField name="id" value="${comment?.id}" />
-					<g:hiddenField name="stockMovement.id" value="${stockMovement?.id}" />
+					<g:hiddenField name="requisition" value="${stockMovement?.id}" />
 					<table>
 						<tbody>
 							<tr class="prop">

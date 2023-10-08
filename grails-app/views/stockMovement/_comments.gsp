@@ -1,6 +1,6 @@
 <div class="box">
     <h2><warehouse:message code="comments.label"/></h2>
-    <g:if test="${stockMovement?.requisition?.comments}">
+    <g:if test="${requisition?.comments}">
         <table>
             <thead>
             <tr class="odd">
@@ -12,7 +12,7 @@
             </tr>
             </thead>
             <tbody>
-            <g:each var="comment" in="${stockMovement?.requisition?.comments}">
+            <g:each var="comment" in="${requisition?.comments}">
                 <tr>
                     <td>
                         ${comment?.recipient?.name}
@@ -28,14 +28,14 @@
                     </td>
                     <td align="right">
                         <g:if test="${comment?.sender?.id == session?.user?.id}">
-                            <g:link action="editComment" id="${comment.id}" params="['stockMovement.id':stockMovement?.id]">
+                            <g:link action="editComment" id="${comment.id}" params="['requisition':requisition?.id]">
                                 <img tile="edit" src="${createLinkTo(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit" />
                             </g:link>
 
                             <g:link
                                     action="deleteComment"
                                     id="${comment.id}"
-                                    params="['stockMovement.id':stockMovement?.id]"
+                                    params="['requisition':requisition?.id]"
                                     onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
                             >
                                 <img  title="delete" src="${createLinkTo(dir:'images/icons',file:'trash.png')}" alt="Delete" />
