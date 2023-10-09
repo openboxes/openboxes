@@ -18,6 +18,7 @@ import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BulkDocumentCommand
 import org.pih.warehouse.core.Constants
@@ -277,7 +278,22 @@ class StockMovementController {
     }
 
     def rollbackApproval() {
-        throw new NotImplementedException("Action ${params.actionName} not implemented")
+        String stockMovementId = params.get("id")
+        try {
+            stockMovementService.rollbackApproval(stockMovementId)
+            flash.message = g.message(
+                    code: "request.rollbackApproval.success.message",
+                    default: "Successfully rolled back approval",
+            )
+        } catch (Exception e) {
+            log.error("Unable to rollback stock movement with ID ${stockMovementId}: " + e.message)
+            flash.message = g.message(
+                    code: "request.rollbackApproval.error.message",
+                    default: "Unable to rollback approval: ${e.message}",
+                    args: [e.message]
+            )
+        }
+        redirect(action: "show", id: stockMovementId)
     }
 
     def documents() {

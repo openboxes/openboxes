@@ -129,7 +129,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
             "requisitionItemsByCategory",
             "shipment",
             "totalCost",
-            "recentComment"
+            "recentComment",
+            "mostRecentEvent"
     ]
     static hasOne = [picklist: Picklist]
     static hasMany = [
@@ -388,6 +389,12 @@ class Requisition implements Comparable<Requisition>, Serializable {
         }?.sum() ?: 0
     }
 
+    Event getMostRecentEvent() {
+        if (events?.size() > 0) {
+            return events.sort().iterator().next()
+        }
+        return null
+    }
 
     Map toJson() {
         [

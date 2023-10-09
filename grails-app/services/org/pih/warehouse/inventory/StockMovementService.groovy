@@ -36,6 +36,7 @@ import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
@@ -81,6 +82,7 @@ class StockMovementService {
     def dataService
     def forecastingService
     def outboundStockMovementService
+    UserService userService
 
     GrailsApplication grailsApplication
 
@@ -2873,5 +2875,35 @@ class StockMovementService {
             validateQuantityRequested(stockMovement)
         }
         return true
+    }
+
+    void rollbackApproval(String stockMovementId) {
+        StockMovement stockMovement = getStockMovement(stockMovementId)
+        // TODO: remove .get() from current user in Grails 3 (with .get it will return null)
+        if (!canRollbackApproval(AuthService.currentUser.get(), stockMovement)) {
+            String errorMessage = applicationTagLib.message(
+                    code: "request.rollbackApproval.insufficientPermissions.message",
+                    default: "Unable to rollback approval due to insufficient permissions",
+            )
+            throw new IllegalAccessException(errorMessage)
+        }
+
+        Requisition requisition = stockMovement?.requisition
+        if (requisition.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
+            requisitionService.rollbackLastEvent(requisition)
+            requisition.status = RequisitionStatus.PENDING_APPROVAL
+            requisition.approvedBy = null
+            requisition.rejectedBy = null
+            requisition.dateApproved = null
+            requisition.dateRejected = null
+        }
+    }
+
+    Boolean canRollbackApproval(User user, StockMovement stockMovement) {
+        return (stockMovement.canUserRollbackApproval(user) || userService.isUserAdmin(user)) && stockMovement.isInApprovalState()
+    }
+
+    def getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
     }
 }

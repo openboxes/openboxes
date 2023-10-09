@@ -867,6 +867,25 @@ class RequisitionService {
         requisition.save(flush: true)
     }
 
+    void deleteEvent(Requisition requisition, Event event) {
+        requisition.removeFromEvents(event)
+        event.delete()
+        requisition.save()
+    }
+
+    void rollbackLastEvent(Requisition requisition) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        Event event = requisition.mostRecentEvent
+        if (!event) {
+            String errorMessage = g.message(
+                    code: "requisition.error.rollback.noRecentEvents",
+                    default: "Cannot rollback requisition because there are no recent events"
+            )
+            throw new RuntimeException(errorMessage)
+        }
+        deleteEvent(requisition, event)
+    }
+
     void deleteComment(Comment comment, Requisition requisition) {
         requisition.removeFromComments(comment)
     }
