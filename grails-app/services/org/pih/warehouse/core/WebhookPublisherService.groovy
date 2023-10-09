@@ -47,7 +47,9 @@ class WebhookPublisherService {
                                     productName   : it.inventoryItem.product?.name,
                                     productCode   : it.inventoryItem?.product.productCode,
                                     lotNumber     : it?.inventoryItem?.lotNumber,
-                                    expirationDate: it?.inventoryItem?.expirationDate.format("MM/dd/yyyy"),
+                                    expirationDate: it?.inventoryItem?.expirationDate ?
+                                            it.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) :
+                                            null,
                                     quantity      : it.quantity
                             ]
                         }
