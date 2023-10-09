@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.auth.AuthService" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
 <%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
@@ -163,6 +165,21 @@
                 </g:isSuperuser>
             </g:if>
             <g:if test="${isApprovalRequired}">
+                <g:set var="canUserEdit"
+                       value="${AuthService.currentUser.get()?.id == stockMovement?.requestedBy?.id &&
+                               stockMovement.status == RequisitionStatus.PENDING_APPROVAL}"
+                />
+                <g:if test="${canUserEdit}">
+                    <g:link
+                            class="button"
+                            controller="stockMovement"
+                            action="edit"
+                            id="${stockMovement?.id}"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
+                    </g:link>
+                </g:if>
                 <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
                     <g:link
                             class="button"
