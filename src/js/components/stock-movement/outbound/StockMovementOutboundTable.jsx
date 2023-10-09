@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 
 import PropTypes from 'prop-types';
+import { RiCloseFill } from 'react-icons/all';
 import {
-  RiArrowRightSLine,
+  RiArrowGoBackLine,
+  RiArrowRightSLine, RiCheckFill,
   RiDeleteBinLine,
   RiDownload2Line,
   RiInformationLine,
@@ -15,12 +17,15 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
+import ActivityCode from 'consts/activityCode';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import canEditRequest from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
+import { supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -33,6 +38,7 @@ const StockMovementOutboundTable = ({
   currentUser,
   isRequestsOpen,
   isUserAdmin,
+  isUserRequestApprover,
 }) => {
   const {
     tableData,
@@ -42,6 +48,9 @@ const StockMovementOutboundTable = ({
     exportStockMovements,
     exportPendingShipmentItems,
     deleteConfirmAlert,
+    approveRequest,
+    rejectRequest,
+    rollbackRequest,
   } = useOutboundListTableData(filterParams);
 
   const getStatusTooltip = status => translate(
@@ -49,12 +58,67 @@ const StockMovementOutboundTable = ({
     status.toLowerCase(),
   );
 
+  const approverActions = useCallback(
+    (row) => {
+      const {
+        statusCode,
+        identifier,
+      } = row.original;
+      const actions = [];
+
+      if (statusCode === RequisitionStatus.PENDING_APPROVAL) {
+        const approveAction = {
+          defaultLabel: 'Approve',
+          label: 'react.stockMovement.action.approve.label',
+          leftIcon: <RiCheckFill />,
+          onClick: id => approveRequest(id, identifier),
+        };
+        actions.push(approveAction);
+
+        const rejectAction = {
+          defaultLabel: 'Reject',
+          label: 'react.stockMovement.action.reject.label',
+          leftIcon: <RiCloseFill />,
+          variant: 'danger',
+          onClick: id => rejectRequest(id, identifier),
+        };
+        actions.push(rejectAction);
+      }
+      if (statusCode === RequisitionStatus.APPROVED || statusCode === RequisitionStatus.REJECTED) {
+        const rollbackAction = {
+          defaultLabel: 'Rolllback',
+          label: 'react.stockMovement.action.rollback.label',
+          leftIcon: <RiArrowGoBackLine />,
+          onClick: rollbackRequest,
+        };
+        actions.push(rollbackAction);
+      }
+      return actions;
+    },
+    [],
+  );
+
+
   // List of all actions for outbound Stock Movement rows
   const getActions = useCallback((row) => {
     const {
-      isPending, isReturn, order, origin, isReceived, isPartiallyReceived, currentStatus,
+      isPending,
+      isReturn,
+      order,
+      origin,
+      isReceived,
+      isPartiallyReceived,
+      currentStatus,
+      isApprovalRequired,
     } = row.original;
     const actions = [];
+
+    if (isUserRequestApprover
+        && isApprovalRequired
+        && supports(origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)
+    ) {
+      return approverActions(row);
+    }
 
     // Show
     const showAction = {
@@ -297,6 +361,7 @@ const mapStateToProps = state => ({
   requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
+  isUserRequestApprover: state.session.isUserRequestApprover,
   currentLocale: state.session.activeLanguage,
   currentUser: state.session.user,
 });
@@ -309,6 +374,7 @@ StockMovementOutboundTable.propTypes = {
   translate: PropTypes.func.isRequired,
   isRequestsOpen: PropTypes.bool.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
+  isUserRequestApprover: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
