@@ -151,7 +151,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
         statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
         monthRequested formula: "date_format(date_requested, '%M %Y')"
-        comments joinTable: [name: "requisition_comment", key: "requisition_id"]
+        comments joinTable: [name: "requisition_comment", key: "requisition_id"], cascade: "all-delete-orphan"
         events joinTable: [name: "requisition_event", key: "requisition_id"]
         approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
     }
