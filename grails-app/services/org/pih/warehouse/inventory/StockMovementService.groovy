@@ -2830,7 +2830,7 @@ class StockMovementService {
         // TODO: remove .get() from current user in Grails 3 (with .get it will return null)
         if (!canRollbackApproval(AuthService.currentUser.get(), stockMovement)) {
             String errorMessage = applicationTagLib.message(
-                    code: "request.errors.approval.rollback.message",
+                    code: "request.rollbackApproval.insufficientPermissions.message",
                     default: "Unable to rollback approval due to insufficient permissions",
             )
             throw new IllegalAccessException(errorMessage)

@@ -275,13 +275,13 @@ class StockMovementController {
         try {
             stockMovementService.rollbackApproval(stockMovementId)
             flash.message = g.message(
-                    code: "request.successfulApproval.rollback.message",
+                    code: "request.rollbackApproval.success.message",
                     default: "Successfully rolled back approval",
             )
         } catch (Exception e) {
             log.error("Unable to rollback stock movement with ID ${stockMovementId}: " + e.message)
             flash.message = g.message(
-                    code: "request.errors.approval.rollback.message",
+                    code: "request.rollbackApproval.error.message",
                     default: "Unable to rollback approval: ${e.message}",
                     args: [e.message]
             )
