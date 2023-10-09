@@ -15,6 +15,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.donation.Donor
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.LotStatusCode
+import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Product
@@ -50,7 +51,7 @@ class ShipmentItem implements Comparable, Serializable {
 
     static belongsTo = [Shipment, OrderItem]
 
-    static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem]
+    static hasMany = [orderItems: OrderItem, receiptItems: ReceiptItem, invoiceItems: InvoiceItem]
 
     static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
                          "orderNumber", "orderId", "purchaseOrders", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders",
@@ -60,6 +61,7 @@ class ShipmentItem implements Comparable, Serializable {
         id generator: 'uuid'
         cache true
         orderItems joinTable: [name: 'order_shipment', key: 'shipment_item_id']
+        invoiceItems joinTable: [name: 'shipment_invoice', key: 'shipment_item_id']
     }
 
     static constraints = {

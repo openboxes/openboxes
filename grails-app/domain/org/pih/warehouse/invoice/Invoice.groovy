@@ -98,6 +98,7 @@ class Invoice implements Serializable {
             'hasPrepaymentInvoice',
             'totalPrepaymentValue',
             'isPrepaymentInvoice',
+            'isRegularInvoice',
             'prepaymentInvoices',
             'prepaymentItems',
             'orders',
@@ -187,6 +188,10 @@ class Invoice implements Serializable {
 
     boolean getIsPrepaymentInvoice() {
         return invoiceType?.code == InvoiceTypeCode.PREPAYMENT_INVOICE
+    }
+
+    boolean getIsRegularInvoice() {
+        return invoiceType?.code == InvoiceTypeCode.INVOICE
     }
 
     Float getTotalPrepaymentValue() {
