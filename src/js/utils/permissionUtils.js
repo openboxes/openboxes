@@ -19,10 +19,8 @@ const canEditRequest = (currentUser, request, location) => {
         (isLocationDestination || isLocationOrigin) &&
         request.statusCode !== RequisitionStatus.REJECTED;
     }
-    // If the request is approved, approver cannot edit request,
-    // but fulfilling user can edit it
-    const isUserApprover = request?.approvers?.find(user => user?.id === currentUser?.id);
-    return request.statusCode === RequisitionStatus.APPROVED && !isUserApprover && isLocationOrigin;
+    // If the request is approved, everyone from the fulfilling location can edit
+    return request.statusCode === RequisitionStatus.APPROVED && isLocationOrigin;
   }
 
   // If request approval is not supported by the location we have to check if the
