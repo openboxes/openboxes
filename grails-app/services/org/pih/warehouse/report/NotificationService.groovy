@@ -23,6 +23,7 @@ import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
@@ -242,7 +243,9 @@ class NotificationService {
                 publishRequisitionStatusUpdateNotification(requisition, requisition.requestedBy)
                 break
             case RequisitionStatus.ISSUED:
-                publishFulfillmentNotification(requisition.requestedBy, requisition)
+                if (requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
+                    publishFulfillmentNotification(requisition.requestedBy, requisition)
+                }
                 break
             default:
                 break
