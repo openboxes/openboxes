@@ -482,4 +482,13 @@ class StockMovement {
         def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
         return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
     }
+
+    Boolean canUserRollbackApproval(User user) {
+        // Approval can be rolled back by user who is approver or requestor
+        return approvers?.contains(user) || requestedBy?.id == user?.id
+    }
+
+    Boolean isInApprovalState() {
+        return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
+    }
 }
