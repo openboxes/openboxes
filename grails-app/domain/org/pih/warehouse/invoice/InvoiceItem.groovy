@@ -35,6 +35,7 @@ class InvoiceItem implements Serializable {
     }
 
     String id
+    Invoice invoice
 
     Product product
     GlAccount glAccount
@@ -52,7 +53,7 @@ class InvoiceItem implements Serializable {
     User createdBy
     User updatedBy
 
-    static belongsTo = [invoice: Invoice]
+    static belongsTo = [Invoice, ShipmentItem, OrderAdjustment, OrderItem]
 
     static hasMany = [shipmentItems: ShipmentItem, orderItems: OrderItem, orderAdjustments: OrderAdjustment]
 
