@@ -202,6 +202,8 @@ class StockMovementVerifyRequest extends Component {
           switch (values.statusCode) {
             case 'REQUESTED':
             case 'VALIDATING':
+            case 'PENDING_APPROVAL':
+            case 'APPROVED':
               break;
             case 'VALIDATED':
             case 'PICKING':
