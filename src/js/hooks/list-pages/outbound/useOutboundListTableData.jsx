@@ -13,6 +13,9 @@ import {
 } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS } from 'api/urls';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useTableData from 'hooks/list-pages/useTableData';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -132,6 +135,38 @@ const useOutboundListTableData = (filterParams) => {
     });
   };
 
+  const approveRequest = async (id, identifier) => {
+    dispatch(showSpinner());
+    try {
+      await stockMovementApi.updateStatus(id, RequisitionStatus.APPROVED);
+      notification(NotificationType.SUCCESS)({
+        message: `You have successfully Approved the request ${identifier}`,
+      });
+      fireFetchData();
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  const rejectRequest = async (id, identifier) => {
+    dispatch(showSpinner());
+    try {
+      await stockMovementApi.updateStatus(id, RequisitionStatus.REJECTED);
+      notification(NotificationType.SUCCESS)({
+        message: `You have successfully Rejected the request ${identifier}`,
+      });
+      fireFetchData();
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  const rollbackRequest = () => {
+    notification(NotificationType.WARNING)({
+      message: 'Not implemented',
+    });
+  };
+
   return {
     tableData,
     tableRef,
@@ -140,6 +175,9 @@ const useOutboundListTableData = (filterParams) => {
     exportStockMovements,
     exportPendingShipmentItems,
     deleteConfirmAlert,
+    approveRequest,
+    rejectRequest,
+    rollbackRequest,
   };
 };
 
