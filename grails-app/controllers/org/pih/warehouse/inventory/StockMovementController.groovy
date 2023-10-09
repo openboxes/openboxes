@@ -329,7 +329,7 @@ class StockMovementController {
             throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
         }
         requisitionService.deleteComment(comment, requisition)
-        flash.message = "${g.message(code: 'default.comments.deleted.label')}"
+        flash.message = "${g.message(code: 'default.deleted.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
         redirect(action: "show", id: requisition.id)
     }
 
@@ -338,13 +338,14 @@ class StockMovementController {
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
 
         Comment comment = new Comment(params)
-         if (!comment.validate()) {
+         if (comment.validate()) {
+             requisitionService.saveComment(comment)
              requisitionService.addCommentToRequisition(comment, requisition)
-             render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+             flash.message = "${g.message(code: 'default.created.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
+             redirect(action: "show", id: stockMovement.id)
              return
          }
-        flash.message = "${g.message(code: 'default.comments.created.label')}"
-        redirect(action: "show", id: stockMovement.id)
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
     def updateComment = {
@@ -356,13 +357,13 @@ class StockMovementController {
             throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
         }
         comment.properties = params
-        if (!comment.validate()) {
+        if (comment.validate()) {
             requisitionService.saveComment(comment)
-            render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
+            flash.message = "${g.message(code: 'default.updated.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
+            redirect(action: "show", id: stockMovement.id)
             return
         }
-        flash.message = "${g.message(code: 'default.comments.updated.label')}"
-        redirect(action: "show", id: stockMovement.id)
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
     }
 
 
