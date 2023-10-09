@@ -11,13 +11,16 @@ const canEditRequest = (currentUser, request, location) => {
     ActivityCode.APPROVE_REQUEST,
   );
 
-  // If the location supports request approval, only the requestor is able to edit
-  // and the request can't be approved / rejected when editing
   if (isApprovalRequired) {
-    return isUserRequestor &&
-      (isLocationDestination || isLocationOrigin) &&
-      request.statusCode !== RequisitionStatus.APPROVED &&
-      request.statusCode !== RequisitionStatus.REJECTED;
+    // If the location supports request approval, only the requestor is able to edit
+    // If the request is rejected, then it cannot be edited
+    if (request.statusCode !== RequisitionStatus.APPROVED) {
+      return isUserRequestor &&
+        (isLocationDestination || isLocationOrigin) &&
+        request.statusCode !== RequisitionStatus.REJECTED;
+    }
+    // If the request is approved, everyone from the fulfilling location can edit
+    return request.statusCode === RequisitionStatus.APPROVED && isLocationOrigin;
   }
 
   // If request approval is not supported by the location we have to check if the

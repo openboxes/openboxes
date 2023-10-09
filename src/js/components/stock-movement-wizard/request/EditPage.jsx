@@ -1506,14 +1506,14 @@ class EditItemsPage extends Component {
   isAddingItemsAllowed() {
     const { currentUser, currentLocation } = this.props;
     const { values } = this.state;
+    const status = values?.associations?.requisition?.status;
 
     const allowedStatuses = [
       RequisitionStatus.CREATED,
       RequisitionStatus.EDITING,
       RequisitionStatus.VERIFYING,
     ];
-    return canEditRequest(currentUser, values, currentLocation) &&
-      allowedStatuses.includes(this.state.values?.associations?.requisition?.status);
+    return canEditRequest(currentUser, values, currentLocation) && allowedStatuses.includes(status);
   }
 
   render() {
