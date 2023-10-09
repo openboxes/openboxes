@@ -130,10 +130,17 @@ class OutboundStockMovementService {
                     }
                 }
             }
-            if (stockMovement.approvers) {
+            if (params.list("approver")) {
                 requisition {
-                    approvers {
-                        'in'("id", stockMovement.approvers.collect { it?.id })
+                    or {
+                        if (params.list("approver").contains("null")) {
+                            isEmpty("approvers")
+                        }
+                        if (stockMovement.approvers) {
+                            approvers {
+                                'in'("id", stockMovement.approvers.collect { it?.id })
+                            }
+                        }
                     }
                 }
             }
