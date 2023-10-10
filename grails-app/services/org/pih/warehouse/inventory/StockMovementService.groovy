@@ -268,7 +268,9 @@ class StockMovementService {
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         } else {
             requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status, comment)
-            publishEvent(new RequisitionStatusTransitionEvent(requisition))
+            if (requisition.shouldSendApprovalNotification()) {
+                publishEvent(new RequisitionStatusTransitionEvent(requisition))
+            }
         }
     }
 

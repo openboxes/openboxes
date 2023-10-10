@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
@@ -399,6 +400,44 @@ class Requisition implements Comparable<Requisition>, Serializable {
             return events.sort().iterator().next()
         }
         return null
+    }
+
+    /**
+     * Note: This one probably should be a "shouldSendStatusTransitionNotification()",
+     * and be extended a bit, instead of looking only into approval workflow (but I wanted
+     * to keep it simple for now)
+     * */
+    boolean shouldSendApprovalNotification() {
+        if (destination.isManagedLocally()) {
+            // If requestor has managed inventory, then check for the activity codes on locations
+
+            if (status == RequisitionStatus.PENDING_APPROVAL) {
+                // if submitted for approval, then check if approvers (from fulfilling location) should get notification
+                return !origin.supports(ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS)
+            } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
+                // if approved or rejected, then check if requestors (from requesting location) should get notification
+                return !destination.supports(ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS)
+            }
+        }
+
+        /**
+         * We could also add a case here for destinations that are downstream consumers (non managed locally "wards"),
+         * if we'd like to make a separate case for disabling notification when we have a request from
+         * a location that can submit reuqests, but don't have managed inventory
+
+        if (destination.isDownstreamConsumer()) {
+            if (status == RequisitionStatus.PENDING_APPROVAL) {
+                // if submitted for approval, then check if approvers (from fulfilling location) should get notification
+                return !origin.supports(ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS)
+            } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
+                // if approved or rejected, then check if requestors (from requesting location) should get notification
+                return !destination.supports(ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS)
+            }
+        }
+        */
+
+        // by default always send approval workflow notifications
+        return true
     }
 
     Map toJson() {
