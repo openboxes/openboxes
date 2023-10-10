@@ -12,7 +12,7 @@
             </tr>
             </thead>
             <tbody>
-            <g:each var="comment" in="${requisition?.comments}">
+            <g:each var="comment" in="${requisition?.comments?.sort(){ a,b -> b?.lastUpdated <=> a?.lastUpdated }}">
                 <tr>
                     <td>
                         ${comment?.recipient?.name}

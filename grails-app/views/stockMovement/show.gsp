@@ -7,6 +7,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
+    <link rel="stylesheet" href="${createLinkTo(dir: 'css', file: 'badge.css')}" type="text/css" />
     <g:set var="entityName" value="${warehouse.message(code: 'stockMovement.label', default: 'Stock Movement')}" />
     <title>
         <warehouse:message code="stockMovement.label"/>
@@ -28,7 +29,7 @@
         <g:if test="${stockMovement?.documents}">
             <div class="right">
                 <div class="button-group">
-                    <g:if test="${stockMovement?.requisition}">
+                    <g:if test="${stockMovement.sourceType == RequisitionSourceType.ELECTRONIC}">
                         <g:link controller="stockMovement" action="addComment" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
                             <warehouse:message code="requisition.addComment.label" default="Add comment" />
@@ -555,10 +556,14 @@
                             <warehouse:message code="documents.label" default="Documents"/>
                         </g:link>
                     </li>
-                    <g:if test="${stockMovement?.requisition}">
-                        <li>
+                    <g:if test="${stockMovement.sourceType == RequisitionSourceType.ELECTRONIC}">
+                        <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
+                        <li
+                            data-count="${commentCount < 1000 ? commentCount : '999+' }"
+                            class="${commentCount > 0 ? 'tab-badge' : ''}"
+                        >
                             <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="comments.label" default="Comments"/>
+                                <warehouse:message code="comments.label" default="Comments"/>${fragment}
                             </g:link>
                         </li>
                     </g:if>
