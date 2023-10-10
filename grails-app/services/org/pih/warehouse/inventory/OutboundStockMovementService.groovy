@@ -42,7 +42,10 @@ class OutboundStockMovementService {
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
         Boolean isApprovalRequired = stockMovement?.origin?.isApprovalRequired()
 
-
+        // OBPIH-5814
+        // This query returns a list of OutboundStockMovementListItem ids with applied filters
+        // which later will be hydrated by another OutboundStockMovementListItem.list()
+        // this is a workaround to prevent missing approvers data when filtering by approvers
         def stockMovementsIds = OutboundStockMovementListItem.createCriteria().list() {
             projections {
                 property "id"
@@ -154,7 +157,7 @@ class OutboundStockMovementService {
             }
         }
 
-        // Get result count
+        // Hydrate previously fetched OutboundStockMovementListItem ids, also paginate and sort the data
         def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
             'in'("id", stockMovementsIds)
 
