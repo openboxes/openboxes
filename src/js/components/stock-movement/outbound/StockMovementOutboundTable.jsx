@@ -80,6 +80,7 @@ const StockMovementOutboundTable = ({
           defaultLabel: 'Edit Stock Movement',
           label: 'react.stockMovement.action.edit.label',
           leftIcon: <RiPencilLine />,
+          href: '/openboxes/stockMovement/edit',
         };
 
         actions.push(editAction);

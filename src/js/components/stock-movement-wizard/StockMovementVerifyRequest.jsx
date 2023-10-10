@@ -15,6 +15,7 @@ import canEditRequest from 'utils/permissionUtils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
+import RequisitionStatus from 'consts/requisitionStatus';
 
 /** Main Verify Request Stock movement form's wizard component. */
 class StockMovementVerifyRequest extends Component {
@@ -228,7 +229,8 @@ class StockMovementVerifyRequest extends Component {
     const { values, currentPage } = this.state;
     const { currentLocation, currentUser } = this.props;
     const showOnly = (values.origin && values.origin.id !== currentLocation.id) ||
-      (values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation));
+      ((values?.isElectronicType && !canEditRequest(currentUser, values, currentLocation)) ||
+        values.statusCode === RequisitionStatus.PENDING_APPROVAL);
 
     if (values.stockMovementId) {
       return (
