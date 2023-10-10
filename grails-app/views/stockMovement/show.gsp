@@ -29,7 +29,7 @@
         <g:if test="${stockMovement?.documents}">
             <div class="right">
                 <div class="button-group">
-                    <g:if test="${stockMovement.sourceType == RequisitionSourceType.ELECTRONIC}">
+                    <g:if test="${stockMovement.electronicType}">
                         <g:link controller="stockMovement" action="addComment" id="${stockMovement?.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
                             <warehouse:message code="requisition.addComment.label" default="Add comment" />
@@ -556,14 +556,14 @@
                             <warehouse:message code="documents.label" default="Documents"/>
                         </g:link>
                     </li>
-                    <g:if test="${stockMovement.sourceType == RequisitionSourceType.ELECTRONIC}">
+                    <g:if test="${stockMovement.electronicType}">
                         <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
                         <li
                             data-count="${commentCount < 1000 ? commentCount : '999+' }"
                             class="${commentCount > 0 ? 'tab-badge' : ''}"
                         >
                             <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
-                                <warehouse:message code="comments.label" default="Comments"/>${fragment}
+                                <warehouse:message code="comments.label" default="Comments"/>
                             </g:link>
                         </li>
                     </g:if>
