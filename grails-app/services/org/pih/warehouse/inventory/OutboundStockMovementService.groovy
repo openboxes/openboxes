@@ -42,15 +42,12 @@ class OutboundStockMovementService {
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
         Boolean isApprovalRequired = stockMovement?.origin?.isApprovalRequired()
 
-        def query = { isCountQuery ->
-            if (isCountQuery) {
-                projections {
-                    countDistinct "id"
-                }
-            } else {
-                setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
-            }
 
+        def stockMovementsIds = OutboundStockMovementListItem.createCriteria().list() {
+            projections {
+                property "id"
+            }
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
 
             if (stockMovement?.receiptStatusCodes) {
                 'in'("shipmentStatus", stockMovement.receiptStatusCodes)
@@ -155,6 +152,11 @@ class OutboundStockMovementService {
                     'in'("shipmentType", shipmentTypes)
                 }
             }
+        }
+
+        // Get result count
+        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
+            'in'("id", stockMovementsIds)
 
             if (params.sort) {
                 if (params.sort == "destination.name") {
@@ -186,18 +188,6 @@ class OutboundStockMovementService {
                 order("dateCreated", "desc")
             }
         }
-
-        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
-            query.delegate = delegate
-            query(false)
-        }
-
-        // Get result count
-        def stockMovementsCount = OutboundStockMovementListItem.createCriteria().get() {
-            query.delegate = delegate
-            query(true)
-        }
-        stockMovements.totalCount = stockMovementsCount
 
         return stockMovements
     }
