@@ -12,13 +12,6 @@
         <!-- Specify content to overload like global navigation links, page titles, etc. -->
         <style>
             .canceled-item { background-color: grey; }
-
-            .ui-tabs-nav > .tab-badge::before {
-                background-color: rgb(192, 192, 192);
-            }
-            .ui-tabs-nav > .ui-state-active.tab-badge::before {
-                background-color: green;
-            }
         </style>
     </head>
     <body>
