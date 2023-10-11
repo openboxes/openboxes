@@ -18,3 +18,9 @@
     color: white;
 }
 
+.ui-tabs-nav > .tab-badge::before {
+    background-color: rgb(192, 192, 192);
+}
+.ui-tabs-nav > .ui-state-active.tab-badge::before {
+    background-color: green;
+}
