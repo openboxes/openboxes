@@ -10,12 +10,12 @@ import PickPage from 'components/stock-movement-wizard/outbound/PickPage';
 import SendMovementPage from 'components/stock-movement-wizard/outbound/SendMovementPage';
 import EditPage from 'components/stock-movement-wizard/request/EditPage';
 import Wizard from 'components/wizard/Wizard';
+import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import canEditRequest from 'utils/permissionUtils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/stock-movement-wizard/StockMovement.scss';
-import RequisitionStatus from 'consts/requisitionStatus';
 
 /** Main Verify Request Stock movement form's wizard component. */
 class StockMovementVerifyRequest extends Component {
@@ -205,6 +205,7 @@ class StockMovementVerifyRequest extends Component {
             case 'VALIDATING':
             case 'PENDING_APPROVAL':
             case 'APPROVED':
+            case 'REJECTED':
               break;
             case 'VALIDATED':
             case 'PICKING':
