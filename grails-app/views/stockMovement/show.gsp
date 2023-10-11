@@ -166,7 +166,7 @@
             </g:if>
             <g:if test="${isApprovalRequired}">
                 <g:set var="currentUser" value="${AuthService.currentUser.get()}" />
-                <g:set var="isUserRequestor" value="${stockMovement.requestedBy?.id == currentLocation.id}" />
+                <g:set var="isUserRequestor" value="${stockMovement.requestedBy?.id == currentUser.id}" />
                 <g:set var="isLocationOrigin" value="${stockMovement?.origin?.id == currentLocation?.id}" />
                 <g:set var="isLocationDestination" value="${stockMovement?.destination?.id == currentLocation?.id}" />
                 <g:set var="canUserEdit"

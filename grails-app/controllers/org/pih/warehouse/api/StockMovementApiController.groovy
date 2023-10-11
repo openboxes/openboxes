@@ -831,4 +831,21 @@ class StockMovementApiController {
 
         return RequisitionStatus.listOutboundOptionsWhenApprovalRequired()
     }
+
+    def rollbackApproval = {
+        String stockMovementId = params.get("id")
+        try {
+            stockMovementService.rollbackApproval(stockMovementId)
+        } catch (Exception e) {
+            log.error("Unable to rollback stock movement with ID ${stockMovementId}: " + e.message)
+            String errorMessage = g.message(
+                    code: "request.rollbackApproval.error.message",
+                    default: "Unable to rollback approval: ${e.message}",
+                    args: [e.message]
+            )
+            render([errorMessage: errorMessage], status: 500)
+
+        }
+        render(status: 200)
+    }
 }
