@@ -43,15 +43,15 @@ class OutboundStockMovementService {
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
         Boolean isApprovalRequired = stockMovement?.origin?.isApprovalRequired()
 
-        def query = { isCountQuery ->
-            if (isCountQuery) {
-                projections {
-                    countDistinct "id"
-                }
-            } else {
-                setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+        // OBPIH-5814
+        // This query returns a list of OutboundStockMovementListItem ids with applied filters
+        // which later will be hydrated by another OutboundStockMovementListItem.list()
+        // this is a workaround to prevent missing approvers data when filtering by approvers
+        def stockMovementsIds = OutboundStockMovementListItem.createCriteria().list() {
+            projections {
+                property "id"
             }
-
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
 
             if (stockMovement?.receiptStatusCodes) {
                 'in'("shipmentStatus", stockMovement.receiptStatusCodes)
@@ -131,10 +131,17 @@ class OutboundStockMovementService {
                     }
                 }
             }
-            if (stockMovement.approvers) {
+            if (params.list("approver")) {
                 requisition {
-                    approvers {
-                        'in'("id", stockMovement.approvers.collect { it?.id })
+                    or {
+                        if (params.list("approver").contains("null")) {
+                            isEmpty("approvers")
+                        }
+                        if (stockMovement.approvers) {
+                            approvers {
+                                'in'("id", stockMovement.approvers.collect { it?.id })
+                            }
+                        }
                     }
                 }
             }
@@ -149,6 +156,11 @@ class OutboundStockMovementService {
                     'in'("shipmentType", shipmentTypes)
                 }
             }
+        }
+
+        // Hydrate previously fetched OutboundStockMovementListItem ids, also paginate and sort the data
+        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
+            'in'("id", stockMovementsIds)
 
             if (params.sort) {
                 if (params.sort == "destination.name") {
@@ -180,18 +192,6 @@ class OutboundStockMovementService {
                 order("dateCreated", "desc")
             }
         }
-
-        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
-            query.delegate = delegate
-            query(false)
-        }
-
-        // Get result count
-        def stockMovementsCount = OutboundStockMovementListItem.createCriteria().get() {
-            query.delegate = delegate
-            query(true)
-        }
-        stockMovements.totalCount = stockMovementsCount
 
         return stockMovements
     }

@@ -9,7 +9,7 @@ import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentType
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
-import { fetchLocationById, fetchUserById } from 'utils/option-utils';
+import { fetchLocationById, fetchUserById, selectNullOption } from 'utils/option-utils';
 
 const useOutboundFilters = (sourceType) => {
   const [filterParams, setFilterParams] = useState({});
@@ -119,6 +119,9 @@ const useOutboundFilters = (sourceType) => {
     if (queryProps.approver) {
       const approvers = getParamList(queryProps.approver);
       defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
+      if (approvers.includes(selectNullOption.id)) {
+        defaultValues.approver.push(selectNullOption);
+      }
     }
 
     setDefaultFilterValues(defaultValues);
