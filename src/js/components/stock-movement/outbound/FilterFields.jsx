@@ -106,6 +106,8 @@ export default {
       defaultPlaceholder: 'Approvers',
       showLabelTooltip: true,
       multi: true,
+      nullOption: true,
+      nullOptionDefaultLabel: 'None',
     },
     getDynamicAttr: ({
       approvers,
