@@ -78,7 +78,7 @@
 					<div class="buttons">
 						<button type="submit" class="button icon approve">
 							<g:if test="${isRequestRejected}">
-								Confirm Reject
+								<warehouse:message code="request.confirmReject.label" />
 							</g:if>
 							<g:else>
 								<warehouse:message code="default.button.save.label"/>

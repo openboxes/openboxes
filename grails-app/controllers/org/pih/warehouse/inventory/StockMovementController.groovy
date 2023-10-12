@@ -321,7 +321,7 @@ class StockMovementController {
     def rejectRequestWithComment = {
         Requisition requisition = Requisition.get(params.id)
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-        flash.message = "Please provide a reason for rejecting " + stockMovement.identifier
+        flash.message = g.message(code: "request.rejectReason.message.label") + ": ${stockMovement.identifier}"
         Comment comment = new Comment(recipient: requisition.requestedBy)
         render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, approvalStatus: StockMovementStatusCode.REJECTED])
     }
