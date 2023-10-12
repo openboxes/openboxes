@@ -166,14 +166,7 @@
             </g:if>
             <g:if test="${isApprovalRequired}">
                 <g:set var="currentUser" value="${AuthService.currentUser.get()}" />
-                <g:set var="isUserRequestor" value="${stockMovement.requestedBy?.id == currentUser.id}" />
-                <g:set var="isLocationOrigin" value="${stockMovement?.origin?.id == currentLocation?.id}" />
-                <g:set var="isLocationDestination" value="${stockMovement?.destination?.id == currentLocation?.id}" />
-                <g:set var="canUserEdit"
-                       value="${(isUserRequestor &&
-                               stockMovement?.status == RequisitionStatus.PENDING_APPROVAL && (isLocationDestination || isLocationOrigin)) ||
-                               (stockMovement?.status == RequisitionStatus.APPROVED && isLocationOrigin)}" />
-                <g:if test="${canUserEdit}">
+                <g:if test="${stockMovement?.canUserEdit(currentUser, currentLocation)}">
                     <g:link
                             class="button"
                             controller="stockMovement"
@@ -209,10 +202,7 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
                         <g:message code="request.approval.reject.label"  default="Reject" />
                     </g:link>
-                    <g:set var="canRollbackApproval"
-                           value="${(stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED) &&
-                                   (userHasRequestApproverRole || currentUser.roles.contains(Role.superuser()) || currentUser.roles.contains(Role.admin()))}" />
-                    <g:if test="${canRollbackApproval}" >
+                    <g:if test="${stockMovement?.canRollbackApproval(currentUser, currentLocation)}" >
                         <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                             <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
