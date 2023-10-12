@@ -27,6 +27,7 @@ class Event implements Comparable, Serializable {
     Date dateCreated
     Date lastUpdated
     User createdBy
+    Comment comment
 
     static mapping = {
         id generator: 'uuid'
@@ -38,6 +39,7 @@ class Event implements Comparable, Serializable {
         eventType(nullable: true)
         eventLocation(nullable: true)
         createdBy(nullable: true)
+        comment(nullable: true)
     }
 
     String toString() { return "$eventType $eventLocation on $eventDate" }
