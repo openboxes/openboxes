@@ -157,6 +157,12 @@ class OutboundStockMovementService {
             }
         }
 
+        // without this guard criteria wil throw a SQL syntax exception
+        // because it can't resolve condition 'in'("id", stockMovementsIds) with empty list
+        if(!stockMovementsIds) {
+            return []
+        }
+
         // Hydrate previously fetched OutboundStockMovementListItem ids, also paginate and sort the data
         def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
             'in'("id", stockMovementsIds)
