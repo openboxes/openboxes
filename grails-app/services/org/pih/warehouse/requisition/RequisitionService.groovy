@@ -831,10 +831,9 @@ class RequisitionService {
         requisition.status = requisitionStatus
         Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
         requisition.addToEvents(event)
-        requisition.save()
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus) {
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
         switch(newStatus) {
             case RequisitionStatus.VERIFYING:
@@ -860,9 +859,15 @@ class RequisitionService {
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
+                requisition.status = RequisitionStatus.REJECTED
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
+
+                Event event = createEvent(EventCode.REJECTED, requisition.origin, new Date(), currentUser)
+                event.comment = comment
+                requisition.addToEvents(event)
+
+                requisition.addToComments(comment)
                 break
             default:
                 requisition.status = newStatus

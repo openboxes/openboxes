@@ -115,10 +115,11 @@ class StockMovementService {
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
 
+        Comment comment = null
         // Update status only
         if (status && statusOnly) {
             RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
-            updateRequisitionStatus(stockMovement.id, requisitionStatus)
+            updateRequisitionStatus(stockMovement.id, requisitionStatus, comment)
         }
         // Determine whether we need to rollback change,
         else {
@@ -155,6 +156,10 @@ class StockMovementService {
                     case StockMovementStatusCode.REJECTED:
                         if (!stockMovement.pendingApproval) {
                             throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
+                        }
+                        comment = new Comment(jsonObject)
+                        if (!comment.comment) {
+                            throw new IllegalArgumentException("Comment is required before rejecting a request")
                         }
                         break
                     // RequisitionStatus.PICKING:
@@ -197,7 +202,7 @@ class StockMovementService {
                 }
                 // If the dependent actions were updated properly then we can update the
                 RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
-                updateRequisitionStatus(stockMovement.id, requisitionStatus)
+                updateRequisitionStatus(stockMovement.id, requisitionStatus, comment)
             }
         }
     }
@@ -246,7 +251,7 @@ class StockMovementService {
         return true
     }
 
-    void updateRequisitionStatus(String id, RequisitionStatus status) {
+    void updateRequisitionStatus(String id, RequisitionStatus status, Comment comment) {
 
         log.info "Update status ${id} " + status
         // TODO: In Grails the get below should be replaced by the data service get that joins the Events
@@ -262,7 +267,7 @@ class StockMovementService {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         } else {
-            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status)
+            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status, comment)
             publishEvent(new RequisitionStatusTransitionEvent(requisition))
         }
     }
