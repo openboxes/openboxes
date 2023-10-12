@@ -1,5 +1,4 @@
 <%@ page import="org.pih.warehouse.core.Role; org.pih.warehouse.auth.AuthService" %>
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
