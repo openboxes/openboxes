@@ -148,7 +148,7 @@ const useOutboundListTableData = (filterParams) => {
     }
   };
 
-  const rejectRequest = async (id, identifier) => {
+  const rejectRequest = (id, identifier) => async () => {
     dispatch(showSpinner());
     try {
       await stockMovementApi.updateStatus(id, RequisitionStatus.REJECTED);
