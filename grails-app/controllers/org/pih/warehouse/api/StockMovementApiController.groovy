@@ -16,6 +16,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
@@ -39,10 +40,12 @@ class StockMovementApiController {
     def outboundStockMovementService
     def stockMovementService
     def stockTransferService
+    def userService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
         Location origin = params.origin ? Location.get(params.origin) : null
+        params.isRequestApprover = userService.isUserInAllRoles(session?.user?.id, [RoleType.ROLE_REQUISITION_APPROVER], origin?.id)
 
         StockMovementDirection direction = params.direction ? params.direction as StockMovementDirection : null
         if (destination == origin || !params.direction) {
@@ -818,7 +821,13 @@ class StockMovementApiController {
         }
         // If request approval is required, check what type of list it is and return appropriate statuses
         if (isElectronicType) {
-            return RequisitionStatus.listRequestOptionsWhenApprovalRequired()
+            boolean isRequestApprover = userService.isUserInAllRoles(session?.user?.id, [RoleType.ROLE_REQUISITION_APPROVER], session.warehouse?.id)
+            if (isRequestApprover) {
+                return RequisitionStatus.listRequestOptionsWhenApprovalRequired()
+            }
+
+            // If request approval is required, but the user is not Approver user
+            return RequisitionStatus.listRequestOptionsWhenNonApprover()
         }
 
         return RequisitionStatus.listOutboundOptionsWhenApprovalRequired()

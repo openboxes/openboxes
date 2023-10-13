@@ -115,6 +115,10 @@ class OutboundStockMovementService {
                         not {
                             'in'("status", RequisitionStatus.listApproval())
                         }
+                    } else if (!params.isRequestApprover) {
+                        not {
+                            'in'("status", [RequisitionStatus.PENDING_APPROVAL, RequisitionStatus.REJECTED])
+                        }
                     }
                 }
             } else {
