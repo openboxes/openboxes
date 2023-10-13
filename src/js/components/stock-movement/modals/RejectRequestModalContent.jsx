@@ -61,8 +61,8 @@ const RejectRequestModalContent = ({
     recipient: { id: requestor?.id, label: requestor?.name },
   };
 
-  const submitRejection = () => {
-    rejectRequest();
+  const submitRejection = (value) => {
+    rejectRequest(value);
     closeRejectionModal();
   };
 

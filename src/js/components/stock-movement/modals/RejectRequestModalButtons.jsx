@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
 
-const RejectRequestModalButtons = ({ closeRejectionModal}) => (
+const RejectRequestModalButtons = ({ closeRejectionModal }) => (
   <div className="btn-toolbar justify-content-between pt-3">
     <button
       type="button"
