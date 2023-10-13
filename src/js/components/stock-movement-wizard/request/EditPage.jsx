@@ -1512,6 +1512,7 @@ class EditItemsPage extends Component {
       RequisitionStatus.CREATED,
       RequisitionStatus.EDITING,
       RequisitionStatus.VERIFYING,
+      RequisitionStatus.PENDING_APPROVAL,
     ];
     return canEditRequest(currentUser, values, currentLocation) && allowedStatuses.includes(status);
   }

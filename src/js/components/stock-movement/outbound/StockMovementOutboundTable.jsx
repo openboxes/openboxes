@@ -64,9 +64,29 @@ const StockMovementOutboundTable = ({
         statusCode,
         identifier,
       } = row.original;
+      const isUserRequestor = row.original?.requestedBy?.id === currentUser?.id;
       const actions = [];
 
-      if (statusCode === RequisitionStatus.PENDING_APPROVAL) {
+      const showAction = {
+        defaultLabel: 'Show Stock Movement',
+        label: 'react.stockMovement.action.show.label',
+        leftIcon: <RiInformationLine />,
+        href: '/openboxes/stockMovement/show',
+      };
+      actions.push(showAction);
+
+      if (canEditRequest(currentUser, row.original, currentLocation)) {
+        const editAction = {
+          defaultLabel: 'Edit Stock Movement',
+          label: 'react.stockMovement.action.edit.label',
+          leftIcon: <RiPencilLine />,
+          href: '/openboxes/stockMovement/edit',
+        };
+
+        actions.push(editAction);
+      }
+
+      if (statusCode === RequisitionStatus.PENDING_APPROVAL && isUserRequestApprover) {
         const approveAction = {
           defaultLabel: 'Approve',
           label: 'react.stockMovement.action.approve.label',
@@ -84,7 +104,9 @@ const StockMovementOutboundTable = ({
         };
         actions.push(rejectAction);
       }
-      if (statusCode === RequisitionStatus.APPROVED || statusCode === RequisitionStatus.REJECTED) {
+      if ((statusCode === RequisitionStatus.APPROVED ||
+          statusCode === RequisitionStatus.REJECTED) &&
+        (isUserRequestApprover || isUserRequestor || isUserAdmin)) {
         const rollbackAction = {
           defaultLabel: 'Rolllback',
           label: 'react.stockMovement.action.rollback.label',
@@ -113,8 +135,7 @@ const StockMovementOutboundTable = ({
     } = row.original;
     const actions = [];
 
-    if (isUserRequestApprover
-        && isApprovalRequired
+    if (isApprovalRequired
         && supports(origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)
     ) {
       return approverActions(row);

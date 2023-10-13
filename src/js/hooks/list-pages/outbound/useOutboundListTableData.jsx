@@ -161,10 +161,17 @@ const useOutboundListTableData = (filterParams) => {
     }
   };
 
-  const rollbackRequest = () => {
-    notification(NotificationType.WARNING)({
-      message: 'Not implemented',
-    });
+  const rollbackRequest = async (id) => {
+    dispatch(showSpinner());
+    try {
+      await stockMovementApi.rollbackApproval(id);
+      notification(NotificationType.SUCCESS)({
+        message: 'Successfully rolled back approval',
+      });
+      fireFetchData();
+    } finally {
+      dispatch(hideSpinner());
+    }
   };
 
   return {
