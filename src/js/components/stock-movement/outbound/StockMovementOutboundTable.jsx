@@ -86,7 +86,7 @@ const StockMovementOutboundTable = ({
         actions.push(editAction);
       }
 
-      if (statusCode === RequisitionStatus.PENDING_APPROVAL) {
+      if (statusCode === RequisitionStatus.PENDING_APPROVAL && isUserRequestApprover) {
         const approveAction = {
           defaultLabel: 'Approve',
           label: 'react.stockMovement.action.approve.label',
@@ -135,8 +135,7 @@ const StockMovementOutboundTable = ({
     } = row.original;
     const actions = [];
 
-    if (isUserRequestApprover
-        && isApprovalRequired
+    if (isApprovalRequired
         && supports(origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)
     ) {
       return approverActions(row);
