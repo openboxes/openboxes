@@ -22,7 +22,7 @@ const StockMovementOutboundList = (props) => {
   } = useOutboundFilters(props.sourceType);
 
   useTranslation('stockMovement', 'StockMovementType', 'reactTable');
-
+  const filters = filterFields(isRequestsList);
   return (
     <div className="d-flex flex-column list-page-main">
       <StockMovementOutboundHeader
@@ -32,7 +32,7 @@ const StockMovementOutboundList = (props) => {
       <StockMovementOutboundFilters
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
-        filterFields={filterFields}
+        filterFields={filters}
         formProps={{
           requisitionStatuses: props.requisitionStatuses,
           approvers: props.approvers,
