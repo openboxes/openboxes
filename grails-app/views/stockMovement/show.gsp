@@ -88,7 +88,7 @@
             <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
             </g:isUserInAllRoles>
-            <g:set var="isApprovalRequired" value="${userHasRequestApproverRole && stockMovement?.requisition?.approvalRequired}" />
+            <g:set var="isApprovalRequired" value="${stockMovement?.requisition?.approvalRequired && stockMovement?.origin?.isApprovalRequired()}" />
             <g:if test="${!isApprovalRequired}">
                 <g:if test="${stockMovement?.order}">
                     <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
@@ -163,8 +163,8 @@
                     </a>
                 </g:isSuperuser>
             </g:if>
+            <g:set var="currentUser" value="${AuthService.currentUser.get()}" />
             <g:if test="${isApprovalRequired}">
-                <g:set var="currentUser" value="${AuthService.currentUser.get()}" />
                 <g:if test="${stockMovement?.canUserEdit(currentUser, currentLocation)}">
                     <g:link
                             class="button"

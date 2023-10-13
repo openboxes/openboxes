@@ -32,6 +32,7 @@ import org.pih.warehouse.core.DocumentCode
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
@@ -2827,8 +2828,9 @@ class StockMovementService {
 
     void rollbackApproval(String stockMovementId) {
         StockMovement stockMovement = getStockMovement(stockMovementId)
+        Location currentLocation = AuthService.currentLocation.get()
         // TODO: remove .get() from current user in Grails 3 (with .get it will return null)
-        if (!canRollbackApproval(AuthService.currentUser.get(), stockMovement)) {
+        if (!canRollbackApproval(currentLocation, AuthService.currentUser.get(), stockMovement)) {
             String errorMessage = applicationTagLib.message(
                     code: "request.rollbackApproval.insufficientPermissions.message",
                     default: "Unable to rollback approval due to insufficient permissions",
@@ -2847,8 +2849,11 @@ class StockMovementService {
         }
     }
 
-    Boolean canRollbackApproval(User user, StockMovement stockMovement) {
-        return (stockMovement.canUserRollbackApproval(user) || userService.isUserAdmin(user)) && stockMovement.isInApprovalState()
+    Boolean canRollbackApproval(Location location, User user, StockMovement stockMovement) {
+        return (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
+                userService.isUserAdmin(user) ||
+                user?.id == stockMovement?.requestedBy?.id) &&
+                stockMovement.isInApprovalState()
     }
 
     def getApplicationTagLib() {

@@ -315,8 +315,8 @@ class OutboundStockMovement implements Serializable {
     Boolean canRollbackApproval(User user, Location location) {
         return (isInApprovalState() &&
                 (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
-                user?.roles?.contains(Role.superuser()) ||
-                user?.roles?.contains(Role.admin()) ||
+                user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
+                user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
                 user?.id == requestedBy?.id))
     }
 }
