@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.core.Role; org.pih.warehouse.auth.AuthService" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.core.Role" %>
+<%@ page import="org.pih.warehouse.auth.AuthService" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
@@ -178,30 +180,33 @@
                     </g:link>
                 </g:if>
                 <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
-                    <g:link
-                            class="button"
-                            controller="stockRequest"
-                            action="updateStatus"
-                            id="${stockMovement.id}"
-                            params="[status: StockMovementStatusCode.APPROVED]"
-                            disabled="${!stockMovement.pendingApproval}"
-                            disabledMessage="Request is not pending approval"
-                    >
-                        <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
-                        <g:message code="request.approval.approve.label"  default="Approve" />
-                    </g:link>
-                    <g:link
-                            class="button"
-                            controller="stockRequest"
-                            action="updateStatus"
-                            id="${stockMovement.id}"
-                            params="[status: StockMovementStatusCode.REJECTED]"
-                            disabled="${!stockMovement.pendingApproval}"
-                            disabledMessage="Request is not pending approval"
-                    >
-                        <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
-                        <g:message code="request.approval.reject.label"  default="Reject" />
-                    </g:link>
+                    <g:if test="${stockMovement?.requisition?.status == RequisitionStatus.PENDING_APPROVAL && userHasRequestApproverRole}">
+                        <g:link
+                                class="button"
+                                controller="stockRequest"
+                                action="updateStatus"
+                                id="${stockMovement.id}"
+                                params="[status: StockMovementStatusCode.APPROVED]"
+                                disabled="${!stockMovement.pendingApproval}"
+                                disabledMessage="Request is not pending approval"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
+                            <g:message code="request.approval.approve.label"  default="Approve" />
+                        </g:link>
+                        <g:link
+                                class="button"
+                                controller="stockRequest"
+                                action="updateStatus"
+                                id="${stockMovement.id}"
+                                params="[status: StockMovementStatusCode.REJECTED]"
+                                disabled="${!stockMovement.pendingApproval}"
+                                disabledMessage="Request is not pending approval"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
+                            <g:message code="request.approval.reject.label"  default="Reject" />
+                        </g:link>
+                    </g:if>
+
                     <g:if test="${stockMovement?.canRollbackApproval(currentUser, currentLocation)}" >
                         <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
