@@ -302,7 +302,8 @@ class OutboundStockMovement implements Serializable {
 
     // Function for checking if user in exact location can edit request
     // (with required approval)
-    Boolean canUserEdit(User user, Location location) {
+    Boolean canUserEdit(String userId, Location location) {
+        User user = User.get(userId)
         Boolean isUserRequestor = user.id == requestedBy?.id
         Boolean isLocationOrigin = origin?.id == location?.id
         Boolean isLocationDestination = destination?.id == location?.id
@@ -312,7 +313,8 @@ class OutboundStockMovement implements Serializable {
                 (status == RequisitionStatus.APPROVED && isLocationOrigin)
     }
 
-    Boolean canRollbackApproval(User user, Location location) {
+    Boolean canRollbackApproval(String userId, Location location) {
+        User user = User.get(userId)
         return (isInApprovalState() &&
                 (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
                 user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
