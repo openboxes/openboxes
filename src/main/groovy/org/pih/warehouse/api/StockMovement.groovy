@@ -497,7 +497,8 @@ class StockMovement implements Validateable{
         return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
     }
 
-    Boolean canRollbackApproval(User user, Location location) {
+    Boolean canRollbackApproval(String userId, Location location) {
+        User user = User.get(userId)
         return (isInApprovalState() &&
                 (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
                         user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
