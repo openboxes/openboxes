@@ -1,5 +1,5 @@
 import ActivityCode from 'consts/activityCode';
-import RequisitionStatus from 'consts/requisitionStatus';
+import StockMovementStatus from 'consts/stockMovementStatus';
 import { supports } from 'utils/supportedActivitiesUtils';
 
 const canEditRequest = (currentUser, request, location) => {
@@ -14,13 +14,16 @@ const canEditRequest = (currentUser, request, location) => {
   if (isApprovalRequired) {
     // If the location supports request approval, only the requestor is able to edit
     // If the request is rejected, then it cannot be edited
-    if (request.statusCode !== RequisitionStatus.APPROVED) {
+    if (request.statusCode !== StockMovementStatus.APPROVED &&
+      request.statusCode !== StockMovementStatus.PACKED &&
+      request.statusCode !== StockMovementStatus.PICKED
+    ) {
       return isUserRequestor &&
         (isLocationDestination || isLocationOrigin) &&
-        request.statusCode !== RequisitionStatus.REJECTED;
+        request.statusCode !== StockMovementStatus.REJECTED;
     }
     // If the request is approved, everyone from the fulfilling location can edit
-    return request.statusCode === RequisitionStatus.APPROVED && isLocationOrigin;
+    return isLocationOrigin;
   }
 
   // If request approval is not supported by the location we have to check if the

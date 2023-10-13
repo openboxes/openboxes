@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.StockMovementStatusCode
@@ -494,5 +495,13 @@ class StockMovement implements Validateable{
 
     Boolean isInApprovalState() {
         return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
+    }
+
+    Boolean canRollbackApproval(User user, Location location) {
+        return (isInApprovalState() &&
+                (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
+                        user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
+                        user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
+                        user?.id == requestedBy?.id))
     }
 }

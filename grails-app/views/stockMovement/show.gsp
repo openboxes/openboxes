@@ -1,4 +1,5 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.core.Role; org.pih.warehouse.auth.AuthService" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
 <%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
@@ -88,7 +89,7 @@
             <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
             </g:isUserInAllRoles>
-            <g:set var="isApprovalRequired" value="${userHasRequestApproverRole && stockMovement?.requisition?.approvalRequired}" />
+            <g:set var="isApprovalRequired" value="${stockMovement?.requisition?.approvalRequired && stockMovement?.origin?.isApprovalRequired()}" />
             <g:if test="${!isApprovalRequired}">
                 <g:if test="${stockMovement?.order}">
                     <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
@@ -163,7 +164,19 @@
                     </a>
                 </g:isSuperuser>
             </g:if>
+            <g:set var="currentUser" value="${AuthService.currentUser.get()}" />
             <g:if test="${isApprovalRequired}">
+                <g:if test="${stockMovement?.canUserEdit(currentUser, currentLocation)}">
+                    <g:link
+                            class="button"
+                            controller="stockMovement"
+                            action="edit"
+                            id="${stockMovement?.id}"
+                    >
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
+                    </g:link>
+                </g:if>
                 <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
                     <g:link
                             class="button"
@@ -189,8 +202,7 @@
                         <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
                         <g:message code="request.approval.reject.label"  default="Reject" />
                     </g:link>
-                    <g:set var="isApprovedOrRejected" value="${stockMovement?.status == RequisitionStatus.APPROVED || stockMovement?.status == RequisitionStatus.REJECTED}" />
-                    <g:if test="${isApprovedOrRejected}" >
+                    <g:if test="${stockMovement?.canRollbackApproval(currentUser, currentLocation)}" >
                         <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                             <g:message code="request.approval.rollback.label"  default="Rollback Approval" />

@@ -6,6 +6,9 @@ import org.pih.warehouse.api.StockMovementType
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
+import org.pih.warehouse.core.User
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItemStatusCode
 import org.pih.warehouse.requisition.Requisition
@@ -289,5 +292,29 @@ class OutboundStockMovement implements Serializable, Validateable {
         }
 
         this.lineItems = lineItems
+    }
+
+    Boolean isInApprovalState() {
+        return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
+    }
+
+    // Function for checking if user in exact location can edit request
+    // (with required approval)
+    Boolean canUserEdit(User user, Location location) {
+        Boolean isUserRequestor = user.id == requestedBy?.id
+        Boolean isLocationOrigin = origin?.id == location?.id
+        Boolean isLocationDestination = destination?.id == location?.id
+        return (isUserRequestor &&
+                status == RequisitionStatus.PENDING_APPROVAL &&
+                (isLocationDestination || isLocationOrigin)) ||
+                (status == RequisitionStatus.APPROVED && isLocationOrigin)
+    }
+
+    Boolean canRollbackApproval(User user, Location location) {
+        return (isInApprovalState() &&
+                (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
+                user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
+                user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
+                user?.id == requestedBy?.id))
     }
 }
