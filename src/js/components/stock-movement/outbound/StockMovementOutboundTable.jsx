@@ -281,6 +281,7 @@ const StockMovementOutboundTable = ({
       accessor: 'approvers',
       minWidth: 250,
       sortable: false,
+      show: isRequestsOpen,
       Cell: row =>
         (<TableCell
           {...row}

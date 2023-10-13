@@ -1,7 +1,7 @@
 import DateFilter from 'components/form-elements/DateFilter/DateFilter';
 import FilterSelectField from 'components/form-elements/FilterSelectField';
 
-export default {
+export default isRequest => ({
   requisitionStatusCode: {
     type: FilterSelectField,
     attributes: {
@@ -91,30 +91,33 @@ export default {
       loadOptions: fetchPeople,
     }),
   },
-  approver: {
-    type: FilterSelectField,
-    attributes: {
-      openOnClick: false,
-      autoload: false,
-      cache: false,
-      valueKey: 'id',
-      labelKey: 'name',
-      options: [],
-      filterOptions: options => options,
-      filterElement: true,
-      placeholder: 'react.stockMovement.request.approvers.label',
-      defaultPlaceholder: 'Approvers',
-      showLabelTooltip: true,
-      multi: true,
-      nullOption: true,
-      nullOptionDefaultLabel: 'None',
+  ...(isRequest && {
+    approver: {
+      type: FilterSelectField,
+      attributes: {
+        show: false,
+        openOnClick: false,
+        autoload: false,
+        cache: false,
+        valueKey: 'id',
+        labelKey: 'name',
+        options: [],
+        filterOptions: options => options,
+        filterElement: true,
+        placeholder: 'react.stockMovement.request.approvers.label',
+        defaultPlaceholder: 'Approvers',
+        showLabelTooltip: true,
+        multi: true,
+        nullOption: true,
+        nullOptionDefaultLabel: 'None',
+      },
+      getDynamicAttr: ({
+        approvers,
+      }) => ({
+        options: approvers,
+      }),
     },
-    getDynamicAttr: ({
-      approvers,
-    }) => ({
-      options: approvers,
-    }),
-  },
+  }),
   createdBy: {
     type: FilterSelectField,
     attributes: {
@@ -191,4 +194,4 @@ export default {
       filterElement: true,
     },
   },
-};
+});

@@ -48,8 +48,10 @@ const useOutboundFilters = (sourceType) => {
     dispatch(fetchAvailableApprovers());
   }, [currentLocation.id]);
 
+  const filters = filterFields(sourceType === 'ELECTRONIC');
+
   const clearFilterValues = () => {
-    const defaultValues = Object.keys(filterFields)
+    const defaultValues = Object.keys(filters)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), { direction: 'OUTBOUND' });
     const transformedParams = transformFilterParams(defaultValues, { direction: { name: 'direction' } });
     const queryFilterParams = queryString.stringify(transformedParams);
@@ -61,7 +63,7 @@ const useOutboundFilters = (sourceType) => {
 
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
-    const defaultValues = Object.keys(filterFields)
+    const defaultValues = Object.keys(filters)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
     // SET STATIC DEFAULT VALUES
@@ -116,7 +118,7 @@ const useOutboundFilters = (sourceType) => {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
     }
-    if (queryProps.approver) {
+    if (sourceType === 'ELECTRONIC' && queryProps.approver) {
       const approvers = getParamList(queryProps.approver);
       defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
       if (approvers.includes(selectNullOption.id)) {
