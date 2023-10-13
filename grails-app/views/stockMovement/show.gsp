@@ -1,6 +1,5 @@
 <%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
 <%@ page import="org.pih.warehouse.core.Role" %>
-<%@ page import="org.pih.warehouse.auth.AuthService" %>
 <%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
@@ -166,9 +165,8 @@
                     </a>
                 </g:isSuperuser>
             </g:if>
-            <g:set var="currentUser" value="${AuthService.currentUser.get()}" />
             <g:if test="${isApprovalRequired}">
-                <g:if test="${stockMovement?.canUserEdit(currentUser, currentLocation)}">
+                <g:if test="${stockMovement?.canUserEdit(session?.user?.id, currentLocation)}">
                     <g:link
                             class="button"
                             controller="stockMovement"
@@ -207,7 +205,7 @@
                         </g:link>
                     </g:if>
 
-                    <g:if test="${stockMovement?.canRollbackApproval(currentUser, currentLocation)}" >
+                    <g:if test="${stockMovement?.canRollbackApproval(session?.user?.id, currentLocation)}" >
                         <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
                             <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
                             <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
