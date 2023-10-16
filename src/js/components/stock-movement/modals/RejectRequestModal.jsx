@@ -21,7 +21,7 @@ const RejectRequestModal = ({
     shouldCloseOnOverlayClick={false}
   >
     <div>
-      <RejectRequestModalHeader id={request?.identifier} />
+      <RejectRequestModalHeader identifier={request?.identifier} />
       <RejectRequestModalContent
         requestor={request?.requestedBy}
         closeRejectionModal={closeRejectionModal}

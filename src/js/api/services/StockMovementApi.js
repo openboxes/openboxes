@@ -11,7 +11,12 @@ export default {
   getStockMovements: config => apiClient.get(STOCK_MOVEMENT_API, config),
   deleteStockMovement: id => apiClient.delete(STOCK_MOVEMENT_DELETE(id)),
   updateStatus: (id, status) => apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(id), { status }),
-  rejectRequest: (id, sender, recipient, comment) =>
+  rejectRequest: ({
+    id,
+    sender,
+    recipient,
+    comment,
+  }) =>
     apiClient.post(STOCK_MOVEMENT_UPDATE_STATUS(id), {
       status: RequisitionStatus.REJECTED,
       sender,

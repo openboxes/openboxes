@@ -57,8 +57,14 @@ const RejectRequestModalContent = ({
   rejectRequest,
 }) => {
   const initialValues = {
-    sender: { id: currentUser?.id, label: currentUser?.name },
-    recipient: { id: requestor?.id, label: requestor?.name },
+    sender: {
+      id: currentUser?.id,
+      label: currentUser?.name,
+    },
+    recipient: {
+      id: requestor?.id,
+      label: requestor?.name,
+    },
   };
 
   const submitRejection = (value) => {

@@ -2,23 +2,22 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import Translate from 'utils/Translate';
+import Button from 'components/form-elements/Button';
 
 const RejectRequestModalButtons = ({ closeRejectionModal }) => (
   <div className="btn-toolbar justify-content-between pt-3">
-    <button
+    <Button
       type="button"
-      className="btn btn-outline-primary ml-1"
       onClick={closeRejectionModal}
-    >
-      <Translate id="react.rejectRequestModal.cancel.label" defaultMessage="Cancel" />
-    </button>
-    <button
+      defaultLabel="Cancel"
+      label="react.rejectRequestModal.cancel.label"
+    />
+
+    <Button
       type="submit"
-      className="btn btn-primary align-self-end"
-    >
-      <Translate id="react.rejectRequestModal.confirmReject.label" defaultMessage="Confirm reject" />
-    </button>
+      defaultLabel="Confirm reject"
+      label="react.rejectRequestModal.confirmReject.label"
+    />
   </div>
 );
 

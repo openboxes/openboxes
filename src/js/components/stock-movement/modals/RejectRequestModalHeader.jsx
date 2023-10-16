@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
 
-const RejectRequestModalHeader = ({ id }) => (
+const RejectRequestModalHeader = ({ identifier }) => (
   <div className="header">
     <h4 className="title">
       <Translate
-        id="react.autosaveFeatureModal.title.label"
-        defaultMessage={`Please provide a reason for rejecting request: ${id}`}
-      />
+        id="react.rejectRequestModal.provideReason.label"
+        defaultMessage="Please provide a reason for rejecting request"
+      />: {identifier}
     </h4>
   </div>
 );
@@ -18,5 +18,5 @@ const RejectRequestModalHeader = ({ id }) => (
 export default RejectRequestModalHeader;
 
 RejectRequestModalHeader.propTypes = {
-  id: PropTypes.string.isRequired,
+  identifier: PropTypes.string.isRequired,
 };
