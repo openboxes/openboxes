@@ -70,7 +70,7 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="default.comment.label"/></label></td>
 								<td valign="top" class="value ${hasErrors(bean: comment, field: 'comment', 'errors')}">
-									<g:textArea name="comment" cols="100" rows="10" value="${comment?.comment }"/>
+									<g:textArea required="true" name="comment" cols="100" rows="10" value="${comment?.comment }"/>
 								</td>
 							</tr>
 						</tbody>
@@ -92,13 +92,5 @@
 			</div>
 		</div>
 	</div>
-<script type="text/javascript">
-	$(document).ready(function() {
-		const commentInput = $("form [name='comment']")
-		if (${isRequestRejected}) {
-			commentInput.attr('required', true)
-		}
-	});
-</script>
 </body>
 </html>
