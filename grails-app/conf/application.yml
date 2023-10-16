@@ -631,82 +631,54 @@ openboxes:
         pagination:
             enabled: true
             pageSize: 10
-
-#Add classes and event type and event closure for hibernate persistence handler.
-    publishEventForEntitiesAndFields:
-        User:
-            PRE_UPDATE:
-                eventName: onEventUserUpdated
-                fields:
-                    - ALL
-        Product:
-            INSERT:
-                eventName: onEventProductCreated
-                fields:
-                    - ALL
-            PRE_UPDATE:
-                eventName: onEventProductUpdated
-                fields:
-                    - ALL
-        Shipment:
-            INSERT:
-                eventName: onEventShipmentCreated
-                fields:
-                - ALL
-            PRE_UPDATE:
-                eventName: onEventShipmentUpdated
-                fields:
-                - currentStatus
-    application:
-        event:
-            webhook:
-                - hooks:
-                      enabled: true
-                      eventTypes:
-                          - "shipment.created"
-                          - "shipment.shipped"
-                      url: https://webhook.site/9969a2d6-9780-483d-beb4-50667d66497d
-                      headers:
-                        accept: json
-                        authorization: keys
-                - hooks:
-                      enabled: true
-                      eventTypes:
-                          - "shipment.created"
-                          - "shipment.shipped"
-                      url: https://webhook.url/id
-                      headers:
-                          accept: json
-                          authorization: keys
-                - hooks:
-                      enabled: true
-                      eventTypes:
-                          - "shipment.created"
-                          - "shipment.shipped"
-                      url: https://webhook.url/id
-                      headers:
-                          accept: json
-                          authorization: keys
-                - hooks:
-                      enabled: true
-                      eventTypes:
-                          - "shipment.created"
-                          - "shipment.shipped"
-                      url: https://webhook.url/id
-                      headers:
-                          accept: json
-                          authorization: keys
-            email:
-                "shipment.created":
-                    enabled: true
-                    template: "/email/shipmentCreated"
-                    subject: "email.subject.your.shipment.created"
-                    outboundRoleTypes:
-                        - "ROLE_SHIPMENT_NOTIFICATION"
-                        - "ROLE_SHIPMENT_OUTBOUND_CREATED_NOTIFICATION"
-                    inboundRoleTypes:
-                        - "ROLE_SHIPMENT_NOTIFICATION"
-                        - "ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION"
+    notifications:
+        - provider: webhook
+          enabled: true  # this defaults to true if missing
+          url: https://webhook1.site/9969a2d6-9780-483d-beb4-50667d66497d
+          method: POST           # forgot about this one earlier but we should support different methods
+          events:
+              - "shipment.shipped"
+          params: # not necessary now, but we may want to support some hardcoded params values
+              - key: value
+          headers: # this needs to be a list so we can pass an arbitrary number of key/value pairs
+              - accept: json
+              - x-something-auth: keys
+        - provider: webhook
+          enabled: false  # this defaults to true if missing
+          url: https://webhook2.site/9969a2d6-9780-483d-beb4-50667d66497d
+          method: POST           # forgot about this one earlier but we should support different methods
+          events:
+              - "shipment.shipped"
+          params: # not necessary now, but we may want to support some hardcoded params values
+              - key: value
+          headers: # this needs to be a list so we can pass an arbitrary number of key/value pairs
+              - accept: json
+              - x-something-auth: keys
+        - provider: webhook
+          enabled: true  # this defaults to true if missing
+          url: https://webhook3.site/9969a2d6-9780-483d-beb4-50667d66497d
+          method: POST           # forgot about this one earlier but we should support different methods
+          events:
+              - "shipment.shipped"
+              - "shipment.received"
+          params: # not necessary now, but we may want to support some hardcoded params values
+              - key: value
+          headers: # this needs to be a list so we can pass an arbitrary number of key/value pairs
+              - accept: json
+              - x-something-auth: keys
+        - provider: smtp
+          enabled: true
+          template: "/email/shipmentCreated"
+          subject: "email.shipmentShipped.message"
+          events:
+              - "shipment.shipped"
+        # need to rethink this (perhaps as "rules")
+          outboundRoleTypes:
+              - "ROLE_SHIPMENT_NOTIFICATION"
+              - "ROLE_SHIPMENT_OUTBOUND_CREATED_NOTIFICATION"
+          inboundRoleTypes:
+              - "ROLE_SHIPMENT_NOTIFICATION"
+              - "ROLE_SHIPMENT_INBOUND_CREATED_NOTIFICATION"
 mail:
     error:
         enabled: false

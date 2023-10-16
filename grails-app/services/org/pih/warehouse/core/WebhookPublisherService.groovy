@@ -16,32 +16,6 @@ class WebhookPublisherService {
     GrailsApplication grailsApplication
     def apiClientService
 
-    List<Map> getWebhookNotificationConfig(String eventType) {
-        def eventConfig = grailsApplication.config.openboxes.application.event.webhook;
-        List<Map> eventConfigList = []
-        if (eventConfig) {
-            eventConfig?.each { config ->
-                if(config?.hooks?.enabled){
-                    if(config?.hooks?.eventTypes?.contains(eventType)){
-                        eventConfigList << config?.hooks
-                    }else{
-                        log.info "eventType:${eventType} not configured, configured types are :${config?.hooks?.eventTypes}"
-                    }
-                }
-            }
-        }
-        return eventConfigList
-    }
-
-
-    @EventListener
-    void onEvent(ShipmentStatusTransitionEvent event){
-        getWebhookNotificationConfig(event.eventType)?.each {Map config ->
-            log.info "Firing event:${config}, event:${event}"
-            publishShippedEvent(event.source, config)
-        }
-    }
-
     def publishShippedEvent(Shipment shipment, Map config) {
 
 
@@ -75,9 +49,17 @@ class WebhookPublisherService {
     def publishEvent(Map payload, Map config) {
         try {
             String webhookUrl = config.url
-            Map headers = config.headers
+            Map headers = [:]
+            config.headers?.each{Map map ->
+                Set keys = map.keySet()
+                keys?.each {
+                    headers[it] = map[it]
+                }
+            }
             log.info "Payload:$payload, webhookUrl:${webhookUrl}, headers:${headers}"
-            apiClientService.post(webhookUrl, payload, headers)
+            if(config?.method == ApiClientService.METHOD_POST){
+                apiClientService.post(webhookUrl, payload, headers)
+            }
         } catch (Exception e) {
             log.error("Failed to publish webhook event due to error: " + e.message, e)
         }

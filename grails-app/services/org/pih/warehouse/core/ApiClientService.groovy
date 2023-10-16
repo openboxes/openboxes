@@ -27,6 +27,8 @@ import org.grails.web.json.JSONObject
 
 class ApiClientService {
 
+    public static final String METHOD_POST = "POST"
+
     JSONObject get(String url) {
         return execute(new HttpGet(url))
     }

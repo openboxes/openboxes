@@ -12,18 +12,20 @@ import org.pih.warehouse.core.StatusType
 
 enum ShipmentStatusCode {
 
-    CREATED(0, StatusType.PRIMARY),
-    PENDING(1, StatusType.WARNING),
-    SHIPPED(2, StatusType.SUCCESS),
-    PARTIALLY_RECEIVED(3,  StatusType.PRIMARY),
-    RECEIVED(4, StatusType.SUCCESS)
+    CREATED(0, StatusType.PRIMARY, "shipment.created"),
+    PENDING(1, StatusType.WARNING, "shipment.pending"),
+    SHIPPED(2, StatusType.SUCCESS, "shipment.shipped"),
+    PARTIALLY_RECEIVED(3,  StatusType.PRIMARY, "shipment.partially_shipped"),
+    RECEIVED(4, StatusType.SUCCESS, "shipment.received")
 
     int sortOrder
     StatusType variant
+    String eventType
 
-    ShipmentStatusCode(int sortOrder, StatusType variant) {
+    ShipmentStatusCode(int sortOrder, StatusType variant, String eventType) {
         this.sortOrder = sortOrder
         this.variant = variant
+        this.eventType = eventType
     }
 
     ShipmentStatusCode getDisplayStatus() {
