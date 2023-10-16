@@ -194,7 +194,7 @@
                         <g:link
                                 class="button"
                                 controller="stockRequest"
-                                action="rejectRequestWithComment"
+                                action="reject"
                             id="${stockMovement.id}"
                                 disabled="${!stockMovement.pendingApproval}"
                                 disabledMessage="Request is not pending approval"

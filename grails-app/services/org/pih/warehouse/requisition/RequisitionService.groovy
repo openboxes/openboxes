@@ -827,13 +827,18 @@ class RequisitionService {
         return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
-    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser) {
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser, Comment comment = null) {
         requisition.status = requisitionStatus
         Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
         requisition.addToEvents(event)
+
+        if (comment) {
+            event.comment = comment
+            requisition.addToComments(comment)
+        }
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment) {
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment = null) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
         switch(newStatus) {
             case RequisitionStatus.VERIFYING:
@@ -859,15 +864,9 @@ class RequisitionService {
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                requisition.status = RequisitionStatus.REJECTED
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser, comment)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
-
-                Event event = createEvent(EventCode.REJECTED, requisition.origin, new Date(), currentUser)
-                event.comment = comment
-                requisition.addToEvents(event)
-
-                requisition.addToComments(comment)
                 break
             default:
                 requisition.status = newStatus
@@ -896,6 +895,10 @@ class RequisitionService {
 
     void deleteComment(Comment comment, Requisition requisition) {
         requisition.removeFromComments(comment)
+        Event event = Event.findByComment(comment)
+        if (event) {
+            event.comment = null
+        }
     }
 
     Comment saveComment(Comment comment) {

@@ -95,7 +95,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		const commentInput = $("form [name='comment']")
-		if(${isRequestRejected}) {
+		if (${isRequestRejected}) {
 			commentInput.attr('required', true)
 		}
 	});

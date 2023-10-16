@@ -251,7 +251,7 @@ class StockMovementService {
         return true
     }
 
-    void updateRequisitionStatus(String id, RequisitionStatus status, Comment comment) {
+    void updateRequisitionStatus(String id, RequisitionStatus status, Comment comment = null) {
 
         log.info "Update status ${id} " + status
         // TODO: In Grails the get below should be replaced by the data service get that joins the Events

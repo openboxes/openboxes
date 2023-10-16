@@ -16,12 +16,12 @@
     <changeSet author="drodzewicz" id="111020231000-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="fk_comment"/>
+                <foreignKeyConstraintExists foreignKeyName="fk_event_comment"/>
             </not>
         </preConditions>
         <addForeignKeyConstraint baseColumnNames="comment_id"
                                  baseTableName="event"
-                                 constraintName="fk_comment"
+                                 constraintName="fk_event_comment"
                                  deferrable="false"
                                  initiallyDeferred="false"
                                  referencedColumnNames="id"

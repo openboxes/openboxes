@@ -264,7 +264,7 @@ class StockMovementController {
         }
 
         if (stockMovement.requisition?.status == RequisitionStatus.REJECTED) {
-            redirect(action: "show", id: params.id)
+            redirect(action: "show", params: params)
             return
         }
 
@@ -318,10 +318,10 @@ class StockMovementController {
         [stockMovement: stockMovement, comment: new Comment()]
     }
 
-    def rejectRequestWithComment = {
+    def reject = {
         Requisition requisition = Requisition.get(params.id)
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-        flash.message = g.message(code: "request.rejectReason.message.label") + ": ${stockMovement.identifier}"
+        flash.message = g.message(code: "request.rejectReason.message") + ": ${stockMovement.identifier}"
         Comment comment = new Comment(recipient: requisition.requestedBy)
         render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, approvalStatus: StockMovementStatusCode.REJECTED])
     }
