@@ -126,7 +126,7 @@
 
 <script>
   $(document).ready(function() {
-    fetchOrderItemsDerivedStatus();
+    setTimeout(fetchOrderItemsDerivedStatus, ${grailsApplication.config.openboxes.purchaseOrder.derivedStatusFetch.delay});
 
     $("#orderItemsStatusFilter").keyup(function(event){
       const filterCells = [1, 2]; // filter by product code or name

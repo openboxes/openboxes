@@ -1309,6 +1309,8 @@ openboxes.expirationDate.format = Constants.EXPIRATION_DATE_FORMAT
 openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
 
+openboxes.purchaseOrder.derivedStatusFetch.delay = 2000 // ms
+
 // Notifications configuration
 
 // delay is in ms
