@@ -1,3 +1,4 @@
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -29,9 +30,25 @@
 			<g:render template="summary" model="[stockMovement:stockMovement]" />
 			<div class="box">
 				<h2><warehouse:message code="default.add.label" args="[entityName]" /></h2>
-				<g:form action="${comment?.id ? 'updateComment' : 'saveComment'}">
-					<g:hiddenField name="id" value="${comment?.id}" />
+
+				<g:set var="formAction"  value="saveComment" />
+				<g:set var="isRequestRejected" value="${approvalStatus == StockMovementStatusCode.REJECTED}" />
+				<g:if test="${comment?.id}">
+					<g:set var="formAction"  value="updateComment" />
+				</g:if>
+				<g:elseif test="${isRequestRejected}">
+					<g:set var="formAction" value="updateStatus" />
+				</g:elseif>
+				<g:form action="${formAction}">
+					<g:if test="${isRequestRejected}">
+						<g:hiddenField name="status" value="${StockMovementStatusCode.REJECTED}" />
+						<g:hiddenField name="id" value="${stockMovement?.id}" />
+					</g:if>
+					<g:if test="${comment?.id}">
+						<g:hiddenField name="id" value="${comment?.id}" />
+					</g:if>
 					<g:hiddenField name="requisition" value="${stockMovement?.id}" />
+
 					<table>
 						<tbody>
 							<tr class="prop">
@@ -53,14 +70,20 @@
 							<tr class="prop">
 								<td valign="top" class="name"><label><warehouse:message code="default.comment.label"/></label></td>
 								<td valign="top" class="value ${hasErrors(bean: comment, field: 'comment', 'errors')}">
-									<g:textArea name="comment" cols="100" rows="10" value="${comment?.comment }"/>
+									<g:textArea required="true" name="comment" cols="100" rows="10" value="${comment?.comment }"/>
 								</td>
 							</tr>
 						</tbody>
 					</table>
 					<div class="buttons">
 						<button type="submit" class="button icon approve">
-							<warehouse:message code="default.button.save.label"/></button>
+							<g:if test="${isRequestRejected}">
+								<warehouse:message code="request.confirmReject.label" />
+							</g:if>
+							<g:else>
+								<warehouse:message code="default.button.save.label"/>
+							</g:else>
+						</button>
 						<g:link controller="stockMovement" action="show" id="${stockMovement?.id}" class="button icon trash">
 							<warehouse:message code="default.button.cancel.label"/></g:link>
 					</div>

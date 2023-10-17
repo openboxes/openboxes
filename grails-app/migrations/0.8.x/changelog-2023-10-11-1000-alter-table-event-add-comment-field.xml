@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="drodzewicz" id="111020231000-0">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="event" columnName="comment_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="event">
+            <column name="comment_id" type="CHAR(38)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="drodzewicz" id="111020231000-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_event_comment"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="comment_id"
+                                 baseTableName="event"
+                                 constraintName="fk_event_comment"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 referencedColumnNames="id"
+                                 referencedTableName="comment"
+        />
+    </changeSet>
+</databaseChangeLog>
