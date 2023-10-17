@@ -60,7 +60,7 @@ class ConsumptionController {
         command.transactionTypes = command.defaultTransactionTypes
 
         // If any parameters have changed we need to reset filters
-        if (command.hasParameterChanged()) {
+        if (command.parametersHash && command.hasParameterChanged()) {
             command.selectedProperties = []
             command.selectedTags = []
             command.selectedLocations = []
@@ -510,6 +510,9 @@ class ShowConsumptionCommand {
     }
 
     String generateParametersHash() {
+        if (!fromDate && !toDate && !fromLocations) {
+            return null
+        }
         String parameters = "${fromDate}:${toDate}:${fromLocations}"
         return DigestUtils.md5Hex(parameters.bytes)
     }
