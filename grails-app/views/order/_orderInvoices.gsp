@@ -15,7 +15,7 @@
             </tr>
             </thead>
             <tbody>
-                <g:each var="invoiceItem" in="${orderInstance?.invoiceItems?.sort { it?.invoice?.invoiceNumber }}" status="i">
+                <g:each var="invoiceItem" in="${orderInstance?.getSortedInvoiceItems()}" status="i">
                     <tr class="${i%2?'even':'odd'}">
                         <td>${invoiceItem?.orderItem?.id}</td>
                         <td>${invoiceItem?.product?.productCode}</td>

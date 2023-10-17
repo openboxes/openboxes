@@ -353,7 +353,7 @@
     </div>
     <script>
       $(document).ready(function() {
-        fetchOrderDerivedStatus();
+        setTimeout(fetchOrderDerivedStatus, ${grailsApplication.config.openboxes.purchaseOrder.derivedStatusFetch.delay});
       });
 
       function fetchOrderDerivedStatus() {
