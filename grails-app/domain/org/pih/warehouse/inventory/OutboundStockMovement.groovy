@@ -319,4 +319,9 @@ class OutboundStockMovement implements Serializable, Validateable {
                 user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
                 user?.id == requestedBy?.id))
     }
+
+    Boolean isApprovalRequired() {
+        // The requisition status has to be lower than PICKING (so comparing them will return -1)
+        return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
+    }
 }
