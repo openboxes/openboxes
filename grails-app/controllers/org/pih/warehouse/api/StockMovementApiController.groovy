@@ -852,8 +852,8 @@ class StockMovementApiController {
                     default: "Unable to rollback approval: ${e.message}",
                     args: [e.message]
             )
-            render([errorMessage: errorMessage], status: 500)
-
+            response.status = 500
+            render([errorMessage: errorMessage] as JSON)
         }
         render(status: 200)
     }
