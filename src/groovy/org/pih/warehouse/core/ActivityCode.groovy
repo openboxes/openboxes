@@ -44,10 +44,10 @@ enum ActivityCode {
     // Notifications
     ENABLE_NOTIFICATIONS('ENABLE_NOTIFICATIONS'),
     ENABLE_WEBHOOKS('ENABLE_WEBHOOKS'),
-    // For now this is meant for requests between two depots (checked only in that case).
-    // Perhaps we could also distinguish it for different type of downstream consumers and/or "upstream suppliers"
-    // (depot vs non managed locally ward)?
+    // Approval notifications (for all, for requestors, for approvers)
     DISABLE_APPROVAL_NOTIFICATIONS('DISABLE_APPROVAL_NOTIFICATIONS'),
+    DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS('DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS'),
+    DISABLE_DEPOT_APPROVAL_NOTIFICATIONS('DISABLE_DEPOT_APPROVAL_NOTIFICATIONS'),
 
     // Packing
     PACK_SHIPMENT('PACK_SHIPMENT'),
