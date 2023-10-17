@@ -90,11 +90,7 @@
             <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
                 <g:set var="userHasRequestApproverRole" value="${true}"/>
             </g:isUserInAllRoles>
-            <g:set var="isApprovalRequired"
-                   value="${stockMovement?.requisition?.approvalRequired &&
-                           stockMovement?.origin?.isApprovalRequired() &&
-                           stockMovement.status < RequisitionStatus.PICKING}"
-            />
+            <g:set var="isApprovalRequired" value="${stockMovement?.isApprovalRequired()}"/>
             <g:if test="${!isApprovalRequired}">
                 <g:if test="${stockMovement?.order}">
                     <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">

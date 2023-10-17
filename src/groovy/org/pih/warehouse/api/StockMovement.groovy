@@ -501,4 +501,8 @@ class StockMovement {
                         user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
                         user?.id == requestedBy?.id))
     }
+
+    Boolean isApprovalRequired() {
+        return requisition?.approvalRequired && origin?.approvalRequired && requisition.status < RequisitionStatus.PICKING
+    }
 }
