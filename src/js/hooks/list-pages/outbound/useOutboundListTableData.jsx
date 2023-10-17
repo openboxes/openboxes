@@ -148,10 +148,15 @@ const useOutboundListTableData = (filterParams) => {
     }
   };
 
-  const rejectRequest = async (id, identifier) => {
+  const rejectRequest = (id, identifier) => async ({ sender, recipient, comment }) => {
     dispatch(showSpinner());
     try {
-      await stockMovementApi.updateStatus(id, RequisitionStatus.REJECTED);
+      await stockMovementApi.rejectRequest({
+        id,
+        sender: sender?.id,
+        recipient: recipient?.id,
+        comment,
+      });
       notification(NotificationType.SUCCESS)({
         message: `You have successfully Rejected the request ${identifier}`,
       });
