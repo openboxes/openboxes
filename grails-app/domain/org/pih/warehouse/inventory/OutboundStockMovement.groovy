@@ -323,6 +323,6 @@ class OutboundStockMovement implements Serializable {
     }
 
     Boolean isApprovalRequired() {
-        return requisition?.approvalRequired && origin?.approvalRequired && requisition.status < RequisitionStatus.PICKING
+        return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
     }
 }
