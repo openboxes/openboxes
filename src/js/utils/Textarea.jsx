@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Textarea = ({
-  onChange, className = '', fieldRef, ...props
+  onChange, className = '', fieldRef, isResizable, ...props
 }) => {
   const handleChange = (event) => {
     const { value } = event.target;
@@ -21,7 +21,7 @@ const Textarea = ({
           event.preventDefault();
         }
       }}
-      className={`form-control form-control-xs ${className}`}
+      className={`form-control form-control-xs ${className} resizable-${isResizable}`}
       {...props}
       onChange={handleChange}
     />
@@ -34,9 +34,11 @@ Textarea.propTypes = {
   onChange: PropTypes.func,
   className: PropTypes.string,
   fieldRef: PropTypes.func,
+  isResizable: PropTypes.bool,
 };
 
 Textarea.defaultProps = {
+  isResizable: true,
   onChange: null,
   className: '',
   fieldRef: null,

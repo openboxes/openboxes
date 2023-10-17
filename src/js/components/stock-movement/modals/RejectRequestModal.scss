@@ -1,18 +1,3 @@
-.modal-title {
-  width: 100%;
-  font-size: 21px;
-  line-height: 24.61px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.modal-subtitle {
-  width: 100%;
-  font-size: 14px;
-  line-height: 21px;
-  margin-bottom: 9px;
-}
-
 // Classic form
 .classic-form {
   background-color: #fff;
@@ -96,4 +81,14 @@
       display: none;
     }
   }
+}
+
+.request-modal-select {
+  .select-xs {
+    height: 3em;
+  }
+}
+
+.request-modal-textarea {
+  height: 150px;
 }

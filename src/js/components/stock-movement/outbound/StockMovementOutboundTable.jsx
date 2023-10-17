@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
@@ -17,6 +17,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
+import RejectRequestModal from 'components/stock-movement/modals/RejectRequestModal';
 import ActivityCode from 'consts/activityCode';
 import RequisitionStatus from 'consts/requisitionStatus';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
@@ -52,11 +53,22 @@ const StockMovementOutboundTable = ({
     rejectRequest,
     rollbackRequest,
   } = useOutboundListTableData(filterParams);
-
+  const [isOpenRejectionModal, setIsOpenRejectionModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
+
+  const openRejectionModal = (request) => {
+    setIsOpenRejectionModal(true);
+    setSelectedRequest(request);
+  };
+
+  const closeRejectionModal = () => {
+    setIsOpenRejectionModal(false);
+    setSelectedRequest(null);
+  };
 
   const approverActions = useCallback(
     (row) => {
@@ -100,7 +112,9 @@ const StockMovementOutboundTable = ({
           label: 'react.stockMovement.action.reject.label',
           leftIcon: <RiCloseFill />,
           variant: 'danger',
-          onClick: id => rejectRequest(id, identifier),
+          onClick: () => {
+            openRejectionModal(row.original);
+          },
         };
         actions.push(rejectAction);
       }
@@ -326,55 +340,63 @@ const StockMovementOutboundTable = ({
   ], [requisitionStatuses]);
 
   return (
-    <div className="list-page-list-section">
-      <div className="title-text p-3 d-flex justify-content-between align-items-center">
-        <div>
-          {
-            isRequestsOpen
-            ? <Translate id="react.stockMovement.requests.label" defaultMessage="Requests" />
-            : <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
-          }
-          <span className="ml-1">{`(${tableData.totalCount})`}</span>
-        </div>
-        <Button
-          isDropdown
-          defaultLabel="Export"
-          label="react.default.button.export.label"
-          variant="secondary"
-          EndIcon={<RiDownload2Line />}
-        />
-        <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
-            <Translate
-              id="react.stockMovement.export.label"
-              defaultMessage="Export Stock Movements"
-            />
-          </a>
-          <a className="dropdown-item" onClick={exportPendingShipmentItems} href="#">
-            <Translate
-              id="react.stockMovement.export.pendingShipmentItems.label"
-              defaultMessage="Export pending shipment items"
-            />
-          </a>
-        </div>
-      </div>
-      <DataTable
-        manual
-        sortable
-        ref={tableRef}
-        columns={columns}
-        data={tableData.data}
-        loading={loading}
-        defaultPageSize={10}
-        pages={tableData.pages}
-        totalData={tableData.totalCount}
-        onFetchData={onFetchHandler}
-        noDataText={translate(
-          'react.stockMovement.empty.list.label',
-          'No Stock Movements match the given criteria',
-        )}
+    <>
+      <RejectRequestModal
+        request={selectedRequest}
+        closeRejectionModal={closeRejectionModal}
+        isOpenRejectionModal={isOpenRejectionModal}
+        rejectRequest={rejectRequest}
       />
-    </div>
+      <div className="list-page-list-section">
+        <div className="title-text p-3 d-flex justify-content-between align-items-center">
+          <div>
+            {
+              isRequestsOpen
+                ? <Translate id="react.stockMovement.requests.label" defaultMessage="Requests" />
+                : <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
+            }
+            <span className="ml-1">{`(${tableData.totalCount})`}</span>
+          </div>
+          <Button
+            isDropdown
+            defaultLabel="Export"
+            label="react.default.button.export.label"
+            variant="secondary"
+            EndIcon={<RiDownload2Line />}
+          />
+          <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+            <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
+              <Translate
+                id="react.stockMovement.export.label"
+                defaultMessage="Export Stock Movements"
+              />
+            </a>
+            <a className="dropdown-item" onClick={exportPendingShipmentItems} href="#">
+              <Translate
+                id="react.stockMovement.export.pendingShipmentItems.label"
+                defaultMessage="Export pending shipment items"
+              />
+            </a>
+          </div>
+        </div>
+        <DataTable
+          manual
+          sortable
+          ref={tableRef}
+          columns={columns}
+          data={tableData.data}
+          loading={loading}
+          defaultPageSize={10}
+          pages={tableData.pages}
+          totalData={tableData.totalCount}
+          onFetchData={onFetchHandler}
+          noDataText={translate(
+            'react.stockMovement.empty.list.label',
+            'No Stock Movements match the given criteria',
+          )}
+        />
+      </div>
+    </>
   );
 };
 
