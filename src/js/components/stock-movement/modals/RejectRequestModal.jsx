@@ -16,8 +16,7 @@ const RejectRequestModal = ({
 }) => (
   <Modal
     isOpen={isOpenRejectionModal}
-    overlayClassName="reject-request-modal-overlay"
-    className="reject-request-modal-content"
+    className="modal-content"
     shouldCloseOnOverlayClick={false}
   >
     <div>

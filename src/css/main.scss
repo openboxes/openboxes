@@ -1547,3 +1547,23 @@ div.search-input:focus-within {
     }
   }
 }
+
+.ReactModal__Overlay {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+.modal-content {
+  position: absolute;
+  top: 20%;
+  left: 23%;
+  background-color: #ffffff;
+  width: 55vw;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+// Disabling resizing of textarea
+.resizable-false {
+  resize: none;
+}
