@@ -418,12 +418,15 @@ class Requisition implements Comparable<Requisition>, Serializable {
         if (destination.isManagedLocally()) {
             // If request is from managed locally location (location with managed inventory), then check which
             // type of notifications are disabled (for approvers, requestors or all)
+            ActivityCode[] activities = []
             if (status == RequisitionStatus.PENDING_APPROVAL) {
                 // if submitted for approval, then check if approvers (from fulfilling location) should get notification
-                return !origin.supportsAny([ActivityCode.DISABLE_DEPOT_APPROVAL_NOTIFICATIONS, ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS])
+                activities = [ActivityCode.DISABLE_DEPOT_APPROVAL_NOTIFICATIONS, ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS]
+                return !origin.supportsAny(activities)
             } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
                 // if approved or rejected, then check if requestors (from requesting location) should get notification
-                return !destination.supportsAny([ActivityCode.DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS, ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS])
+                activities = [ActivityCode.DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS, ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS]
+                return !destination.supportsAny(activities)
             }
         }
 
