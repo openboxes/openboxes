@@ -14,10 +14,13 @@ const canEditRequest = (currentUser, request, location) => {
   if (isApprovalRequired) {
     // If the location supports request approval, only the requestor is able to edit
     // If the request is rejected, then it cannot be edited
-    if (request.statusCode !== StockMovementStatus.APPROVED &&
-      request.statusCode !== StockMovementStatus.PACKED &&
-      request.statusCode !== StockMovementStatus.PICKED
-    ) {
+    const statusesWithAbilityToEdit = [
+      StockMovementStatus.APPROVED,
+      StockMovementStatus.PACKED,
+      StockMovementStatus.PICKED,
+      StockMovementStatus.PICKING,
+    ];
+    if (!statusesWithAbilityToEdit.includes(request?.statusCode)) {
       return isUserRequestor &&
         (isLocationDestination || isLocationOrigin) &&
         request.statusCode !== StockMovementStatus.REJECTED;
