@@ -181,7 +181,7 @@
                     <g:if test="${stockMovement?.requisition?.status == RequisitionStatus.PENDING_APPROVAL && userHasRequestApproverRole}">
                         <g:link
                                 class="button"
-                                controller="stockRequest"
+                                controller="stockMovement"
                                 action="updateStatus"
                                 id="${stockMovement.id}"
                                 params="[status: StockMovementStatusCode.APPROVED]"
@@ -194,9 +194,8 @@
                         <g:link
                                 class="button"
                                 controller="stockRequest"
-                                action="updateStatus"
-                                id="${stockMovement.id}"
-                                params="[status: StockMovementStatusCode.REJECTED]"
+                                action="reject"
+                            id="${stockMovement.id}"
                                 disabled="${!stockMovement.pendingApproval}"
                                 disabledMessage="Request is not pending approval"
                         >

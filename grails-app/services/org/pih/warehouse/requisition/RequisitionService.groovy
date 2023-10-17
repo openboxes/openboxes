@@ -824,14 +824,18 @@ class RequisitionService {
         return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
     }
 
-    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser) {
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser, Comment comment = null) {
         requisition.status = requisitionStatus
         Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
         requisition.addToEvents(event)
-        requisition.save()
+
+        if (comment) {
+            event.comment = comment
+            requisition.addToComments(comment)
+        }
     }
 
-    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus) {
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment = null) {
         // OBPIH-5134 Request approval feature implements additional status transitions for a request
         switch(newStatus) {
             case RequisitionStatus.VERIFYING:
@@ -857,7 +861,7 @@ class RequisitionService {
                 if (!requisition.origin.approvalRequired) {
                     throw new IllegalArgumentException("Fulfilling location must support Request Approval")
                 }
-                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser)
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser, comment)
                 requisition.dateRejected = new Date()
                 requisition.rejectedBy = currentUser
                 break
@@ -888,6 +892,10 @@ class RequisitionService {
 
     void deleteComment(Comment comment, Requisition requisition) {
         requisition.removeFromComments(comment)
+        Event event = Event.findByComment(comment)
+        if (event) {
+            event.comment = null
+        }
     }
 
     Comment saveComment(Comment comment) {

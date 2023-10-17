@@ -270,6 +270,11 @@ class StockMovementController {
             )
         }
 
+        if (stockMovement.requisition?.status == RequisitionStatus.REJECTED) {
+            redirect(action: "show", params: params)
+            return
+        }
+
         redirect(action: "list", params: [
                 "flash"     : flash as JSON,
                 sourceType  : RequisitionSourceType.ELECTRONIC,
@@ -311,6 +316,14 @@ class StockMovementController {
         Requisition requisition = Requisition.get(params.id)
         StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
         [stockMovement: stockMovement, comment: new Comment()]
+    }
+
+    def reject() {
+        Requisition requisition = Requisition.get(params.id)
+        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
+        flash.message = g.message(code: "request.rejectReason.message") + ": ${stockMovement.identifier}"
+        Comment comment = new Comment(recipient: requisition.requestedBy)
+        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, approvalStatus: StockMovementStatusCode.REJECTED])
     }
 
     def editComment() {

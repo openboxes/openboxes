@@ -165,4 +165,5 @@
     <include file="0.8.x/changelog-2023-09-21-1330-alter-table-requisition-add-rejectedby-field.xml" />
     <include file="0.8.x/changelog-2023-09-21-1345-alter-table-event-add-createdby-field.xml" />
     <include file="0.8.x/changelog-2023-09-21-1400-add-eventtypes-for-request-approval-workflow.xml" />
+    <include file="0.8.x/changelog-2023-10-11-1000-alter-table-event-add-comment-field.xml" />
 </databaseChangeLog>
