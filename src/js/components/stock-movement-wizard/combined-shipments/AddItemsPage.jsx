@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import InventoryItemApi from 'api/services/InventoryItemApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
@@ -583,18 +584,25 @@ class AddItemsPage extends Component {
    * @param {object} lineItems
    * @public
    */
-  saveAndTransitionToNextStep(formValues, lineItems) {
-    if (_.some(lineItems, item => item.inventoryItem
-      && item.expirationDate !== item.inventoryItem.expirationDate)) {
-      if (_.some(lineItems, item => item.inventoryItem && item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
+  async saveAndTransitionToNextStep(formValues, lineItems) {
+    // If the expiration date or lot number changes (also qty has to be greater than 0)
+    // we want to validate the newly inputted date
+    const itemsForValidation = lineItems.filter(item =>
+      (item?.expirationDate !== item?.inventoryItem?.expirationDate ||
+        item?.lotNumber !== item?.inventoryItem?.lotNumber) &&
+      item?.inventoryItem?.quantity !== '0');
+
+    if (itemsForValidation.length) {
+      try {
+        // If the lot is invalid the response status will be 400, so it will be caught
+        await InventoryItemApi.validateLot({ items: itemsForValidation });
+      } catch {
         this.confirmInventoryItemExpirationDateUpdate(() =>
           this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
-      } else {
-        this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+        return;
       }
-    } else {
-      this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
     }
+    this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
   }
 
   /**
