@@ -96,9 +96,8 @@ nav:
       - Cleanup: developer-guide/release/cleanup.md
     - Hotfix Lifecycle: developer-guide/hotfix/index.md
   - API Guide:
-    - Overview: api-guide/index.md
-    - Generic API: api-guide/generic.md
-    - Getting Started: api-guide/getting-started.md
+    - Authentication: api-guide/authentication.md
+    - Using the Generic API: api-guide/generic.md
     - Searching: api-guide/lookup.md
     - Core:
         - Identifiers: api-guide/identifier.md

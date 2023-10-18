@@ -1,11 +1,15 @@
-## Authentication
-In order to authenticate, you need a valid user account. In order to get the full benefits of the API your user should 
-probably be in role Superuser. Once you have created a Superuser <cough> user, you can attempt to authenticate 
-using your username and password.
+# Authentication
+You need a valid user account before you can authenticate. To get the full benefits of the API, create a Superuser account, then authenticate using your username and password.
+
 ```
 $ curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
--d '{"username":"jmiranda","password":"password"}' https://openboxes.ngrok.io/openboxes/api/login
+-d '{"username":"jmiranda","password":"password"}' \
+https://openboxes.ngrok.io/openboxes/api/login
+```
 
+Result:
+
+```
 HTTP/1.1 200 OK
 Server: Apache-Coyote/1.1
 Set-Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531; Path=/openboxes
@@ -15,24 +19,24 @@ Date: Sun, 10 Jun 2018 21:21:10 GMT
 
 Authentication was successful
 ```
-NOTE: `-c cookies` option will create a cookies file (cookies.txt) and save your session information to be used in 
-subsequent requests. This saves a huge amount of headache when you're testing the API.
 
-## Cookie
-Once you have authenticated, you have two options to authorize requests.
+**NOTE**: The `-c cookies.txt` option creates a cookies file named `cookies.txt` and saves your session information for later requests. This prevents needing to pass authentication headers around in each request.
 
-### Cookie Header 
-Copy the JSESSIONID Cookie from the response header to make subsequent authenticated requests 
-to the API
+## Cookies
+After you authenticate, you have two options to authorize requests: the cookies header, and the cookies file.
+
+### Cookies Header 
+Copy the JSESSIONID cookie from the response header to make authenticated requests.
+
 ```
 $ curl -i -X POST -H "Content-Type: application/json" \
 -H "Cookie: JSESSIONID=062F3CF6129FC12B6BDD4D02E15BA531" \
 https://openboxes.ngrok.io/openboxes/api/categories
-
 ```
-### Cookie File
-Or use `-b cookies.txt` to read from a cookies file and start making requests against the API. 
-NOTE: You'll need to use the `-c cookies.txt` on the login request in order to generate the proper cookies.
+
+### Cookies File
+Or use `-b cookies.txt` to read from a cookies file and make requests against the API. Use the `-c cookies.txt` on the login request to generate the proper cookies.
+
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/categories
@@ -40,16 +44,17 @@ https://openboxes.ngrok.io/openboxes/api/categories
 
 ## Logout
 
-If you want to end your session, you can `POST` a request to the logout endpoint.
+`POST` a request to the logout endpoint to end your session.
+
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
 https://openboxes.ngrok.io/openboxes/api/logout
-
 ```
-## Exceptions
 
+## Exceptions
 ### Unauthorized Access
-If you try to access the API with no cookies (or an invalid/stale cookie) you'll receive the following error and will need to (re-)authenticate
+If you try to access the API with no cookies, or an invalid or stale cookie, this error shows.
+
 ```
 $ curl -i -X POST -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/categories
@@ -64,9 +69,11 @@ Date: Thu, 21 Jun 2018 04:21:29 GMT
 {"errorCode":401,"errorMessage":"Unauthorized user: Request categoryApi:save requires authentication"}
 ```
 
+Re-authenticate to fix this error.
 
 ## Pagination
-All API endpoints will return all objects if pagination parameters are not provided.
+All endpoints return all objects unless you give pagination parameters. For example, `max=1` limits your results to one page.
+
 ```
 $ curl -X POST -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/products?offset=0&max=1 | jsonlint
@@ -84,18 +91,22 @@ https://openboxes.ngrok.io/openboxes/api/products?offset=0&max=1 | jsonlint
     "lastUpdated": "2016-07-12T14:58:55Z"
   }
 ]
-
 ```
 
 ## Formatting
-While testing the API, I'd recommend installing jsonlint ...
-```css
+
+While not necessary, if you pipe all cURL responses through JSONLint, you get a more readable response.
+Install JSONlint with this command:
+
+```
 npm install jsonlint -g
 ```
 
-... and piping all curl responses through it to get a pretty response.
+Then add ` | jsonlint` at the end of your curl request.
+
 ```
-$ curl -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/products?max=1 | jsonlint
+$ curl -X POST -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/products?max=1 | jsonlint
 [
   {
     "id": "ff80818155df9de40155df9e329b0009",
@@ -110,9 +121,10 @@ $ curl -X POST -H "Content-Type: application/json" https://openboxes.ngrok.io/op
     "lastUpdated": "2016-07-12T14:58:55Z"
   }
 ]
-
 ```
-NOTE: You'll need to remove the `-i` argument from the following examples to prevent parsing errors:
+
+**CAUTION**: If you use the `-i` argument, then you get parsing errors.
+
 ```
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -131,5 +143,3 @@ Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '[', got 'undefined'
     at _combinedTickCallback (internal/process/next_tick.js:74:11)
     at process._tickCallback (internal/process/next_tick.js:98:9) 
 ```
-
-
