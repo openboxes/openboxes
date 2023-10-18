@@ -28,7 +28,8 @@ class InventoryItemApiController {
             }
 
             Integer availableQuantity = productAvailabilityService.getQuantityOnHand(inventoryItem)
-            if (inventoryItem?.expirationDate != Date.parse("MM/dd/yyyy", it?.expirationDate) && availableQuantity > 0) {
+            Date expirationDate = it?.expirationDate ? Date.parse("MM/dd/yyyy", it?.expirationDate) : null
+            if (inventoryItem?.expirationDate != expirationDate && availableQuantity > 0) {
                 return false
             }
 
