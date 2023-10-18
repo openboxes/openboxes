@@ -51,3 +51,7 @@ export const USERS_OPTIONS = `${API}/users`;
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;
 export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
+
+// INVENTORY ITEM
+export const INVENTORY_ITEM_API = `${API}/inventoryItem`;
+export const VALIDATE_LOT = `${INVENTORY_ITEM_API}/validateLot`;

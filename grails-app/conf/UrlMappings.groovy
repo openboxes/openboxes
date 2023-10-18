@@ -776,6 +776,12 @@ class UrlMappings {
             action = [GET: "listOfDemoData"]
         }
 
+        // Inventory Item
+        "/api/inventoryItem/validateLot"(parseRequest: true) {
+            controller = { "inventoryItemApi" }
+            action = [POST: "validateLot"]
+        }
+
         // Standard REST APIs
 
         "/api/${resource}s"(parseRequest: true) {
