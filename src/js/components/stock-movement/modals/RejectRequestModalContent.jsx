@@ -97,7 +97,7 @@ const RejectRequestModalContent = ({
               }),
             )}
           </div>
-          <div className="btn-toolbar justify-content-between pt-3">
+          <div className="btn-toolbar justify-content-between">
             <Button
               type="button"
               onClick={closeRejectionModal}

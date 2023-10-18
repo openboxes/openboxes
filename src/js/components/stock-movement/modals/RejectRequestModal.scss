@@ -90,5 +90,8 @@
 }
 
 .request-modal-textarea {
-  height: 150px;
+  .form-element-container {
+    height: 150px !important;
+    margin-bottom: 0;
+  }
 }
