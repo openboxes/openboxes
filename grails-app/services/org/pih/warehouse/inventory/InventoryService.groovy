@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import org.apache.commons.lang.StringUtils
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.LocalDate
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -69,6 +70,9 @@ class InventoryService implements ApplicationContextAware {
         return applicationContext.getBean("orderService")
     }
 
+    def getProductAvailabilityService() {
+        return applicationContext.getBean("productAvailabilityService")
+    }
 
     /**
      * Saves the specified warehouse
@@ -3430,6 +3434,24 @@ class InventoryService implements ApplicationContextAware {
                     }
                 }
             }
+        }
+    }
+
+    Boolean areLotsValid(List<Object> items) {
+        return items?.every {
+            InventoryItem inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.lotNumber, Product.findByProductCode(it?.productCode))
+
+            if (!inventoryItem) {
+                return true
+            }
+
+            Integer availableQuantity = productAvailabilityService.getQuantityOnHand(inventoryItem)
+            Date expirationDate = it?.expirationDate != JSONObject.NULL ? Date.parse("MM/dd/yyyy", it?.expirationDate) : null
+            if (inventoryItem?.expirationDate != expirationDate && availableQuantity > 0) {
+                return false
+            }
+
+            return true
         }
     }
 }

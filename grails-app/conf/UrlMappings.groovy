@@ -777,7 +777,7 @@ class UrlMappings {
         }
 
         // Inventory Item
-        "/api/inventoryItem/validateLot"(parseRequest: true) {
+        "/api/inventoryItem/validateLot" {
             controller = { "inventoryItemApi" }
             action = [POST: "validateLot"]
         }

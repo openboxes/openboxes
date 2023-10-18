@@ -10,33 +10,17 @@
 package org.pih.warehouse.api
 
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.pih.warehouse.inventory.InventoryItem
-import org.pih.warehouse.inventory.ProductAvailabilityService
-import org.pih.warehouse.product.Product
+import org.pih.warehouse.inventory.InventoryService
 
 class InventoryItemApiController {
 
-    ProductAvailabilityService productAvailabilityService
+    InventoryService inventoryService
 
     def validateLot = {
         JSONObject jsonObject = request.JSON
-        List<Boolean> areLotsValid = jsonObject?.items?.collect {
-            InventoryItem inventoryItem = InventoryItem.findByLotNumberAndProduct(it?.lotNumber, Product.findByProductCode(it?.productCode))
+        Boolean areLotsValid = inventoryService.areLotsValid(jsonObject?.items)
 
-            if (!inventoryItem) {
-                return true
-            }
-
-            Integer availableQuantity = productAvailabilityService.getQuantityOnHand(inventoryItem)
-            Date expirationDate = it?.expirationDate ? Date.parse("MM/dd/yyyy", it?.expirationDate) : null
-            if (inventoryItem?.expirationDate != expirationDate && availableQuantity > 0) {
-                return false
-            }
-
-            return true
-        }
-
-        if (areLotsValid.contains(false)) {
+        if (!areLotsValid) {
             render(status: 400)
             return
         }
