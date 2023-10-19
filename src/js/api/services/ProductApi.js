@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { INVENTORY_ITEM, INVENTORY_ITEMS, PRODUCT_API } from 'api/urls';
+import { INVENTORY_ITEM, PRODUCT_API } from 'api/urls';
 import apiClient from 'utils/apiClient';
 
 export default {
