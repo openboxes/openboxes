@@ -94,11 +94,11 @@ class DocumentTemplateService {
     }
 
     private createOrderContext(IXDocReport report, Order orderInstance) {
-
-        // Add data to the context
-        def orderItems = orderInstance?.orderItems?.findAll {
+        def activeOrderItems = orderInstance?.orderItems?.findAll {
             it.orderItemStatusCode != OrderItemStatusCode.CANCELED
-        }?.collect { OrderItem orderItem ->
+        }
+        // Add data to the context
+        def orderItems = activeOrderItems?.collect { OrderItem orderItem ->
             return [
                     code                : orderItem?.product?.productCode,
                     type                : "Item",
@@ -128,6 +128,22 @@ class DocumentTemplateService {
                     unitPrice           : "",
                     totalPrice          : orderAdjustment?.totalAdjustments ?: "",
                     expectedShippingDate: ""
+            ]
+        }
+        def groupedOrderItems = activeOrderItems?.groupBy { [product: it.product, unitOfMeasure: it.unitOfMeasure] }?.collect { k, v ->
+            def productSuppliers = v?.productSupplier?.findAll { it }
+            return [
+                code: k.product.productCode,
+                type: "Item",
+                status: v?.orderItemStatusCode?.first() ?: "",
+                description: k.product.name ?: "",
+                supplierCode: productSuppliers?.size() > 0 ? productSuppliers.first()?.supplierCode: "",
+                manufacturer: productSuppliers?.size() > 0 ? productSuppliers.first()?.manufacturer?.name: "",
+                manufacturerCode: productSuppliers?.size() > 0 ? productSuppliers.first()?.manufacturerCode: "",
+                unitOfMeasure: k.unitOfMeasure,
+                unitPrice: v?.unitPrice?.first(),
+                quantity: v?.sum { it.quantity },
+                totalPrice: v?.sum { it.totalPrice() }
             ]
         }
 
@@ -172,7 +188,7 @@ class DocumentTemplateService {
         order['origin.country'] = order?.origin?.address?.country ?: ""
 
         // Add order item fields to metadata
-        FieldsMetadata metadata = report.createFieldsMetadata();
+        FieldsMetadata metadata = report.createFieldsMetadata()
         metadata.addFieldAsList("orderItems.code")
         metadata.addFieldAsList("orderItems.description")
         metadata.addFieldAsList("orderItems.quantity")
@@ -184,15 +200,26 @@ class DocumentTemplateService {
         metadata.addFieldAsList("orderItems.totalPrice")
         metadata.addFieldAsList("orderItems.expectedShippingDate")
 
+        metadata.addFieldAsList("groupedOrderItems.code")
+        metadata.addFieldAsList("groupedOrderItems.description")
+        metadata.addFieldAsList("groupedOrderItems.quantity")
+        metadata.addFieldAsList("groupedOrderItems.supplierCode")
+        metadata.addFieldAsList("groupedOrderItems.manufacturer")
+        metadata.addFieldAsList("groupedOrderItems.manufacturerCode")
+        metadata.addFieldAsList("groupedOrderItems.unitOfMeasure")
+        metadata.addFieldAsList("groupedOrderItems.unitPrice")
+        metadata.addFieldAsList("groupedOrderItems.totalPrice")
+
         // Add order adjustment fields to metadata
         metadata.addFieldAsList("orderAdjustments.code")
         metadata.addFieldAsList("orderAdjustments.description")
         metadata.addFieldAsList("orderAdjustments.totalPrice")
 
-        IContext context = report.createContext();
+        IContext context = report.createContext()
         context.put("order", order)
-        context.put("orderItems", orderItems);
-        context.put("orderAdjustments", orderAdjustments);
+        context.put("orderItems", orderItems)
+        context.put("groupedOrderItems", groupedOrderItems)
+        context.put("orderAdjustments", orderAdjustments)
         return context
     }
 
