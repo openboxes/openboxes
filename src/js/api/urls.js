@@ -27,6 +27,7 @@ export const INVOICE_API = `${API}/invoices`;
 
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;
+export const INVENTORY_ITEM = (productCode, lotNumber) => `${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 
 // STOCK LIST
 export const STOCKLIST_API = `${API}/stocklists`;

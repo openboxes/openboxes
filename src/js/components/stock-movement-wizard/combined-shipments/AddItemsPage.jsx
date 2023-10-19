@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import ProductApi from 'api/services/ProductApi';
 import { ORDER_SHOW } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
@@ -116,8 +117,19 @@ const FIELDS = {
         label: 'react.stockMovement.lot.label',
         defaultMessage: 'Lot',
         flexWidth: '1',
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+        getDynamicAttr: ({
+          rowIndex,
+          values,
+          updateRow,
+          fetchInventoryItem,
+        }) => ({
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            fetchInventoryItem(values, rowIndex);
+          },
+          onChange: () => {
+            fetchInventoryItem(values, rowIndex, true);
+          },
         }),
       },
       expirationDate: {
@@ -259,6 +271,11 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsInCurrentStep = this.saveRequisitionItemsInCurrentStep.bind(this);
     this.importTemplate = this.importTemplate.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
+    this.fetchInventoryItem = this.fetchInventoryItem.bind(this);
+
+    this.debouncedInventoryItemFetch = _.debounce((lineItems, rowIndex) => {
+      this.fetchInventoryItem(lineItems, rowIndex);
+    }, 1000);
 
     this.debouncedProductsFetch = debounceProductsFetch(
       this.props.debounceTime,
@@ -327,6 +344,7 @@ class AddItemsPage extends Component {
       if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
+      this.fetchMissingInventoryItems(this.state.values);
       this.props.hideSpinner();
     });
   }
@@ -585,17 +603,56 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndTransitionToNextStep(formValues, lineItems) {
-    if (_.some(lineItems, item => item.inventoryItem
-      && item.expirationDate !== item.inventoryItem.expirationDate)) {
-      if (_.some(lineItems, item => item.inventoryItem && item.inventoryItem.quantity && item.inventoryItem.quantity !== '0')) {
-        this.confirmInventoryItemExpirationDateUpdate(() =>
-          this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
-      } else {
-        this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
-      }
-    } else {
-      this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+    if (_.some(lineItems, item =>
+      item?.expirationDate !== item?.fetchedInventoryItem?.inventoryItem?.expirationDate &&
+      item?.fetchedInventoryItem?.quantityOnHand > 0)) {
+      this.confirmInventoryItemExpirationDateUpdate(() =>
+        this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
+      return;
     }
+    this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
+  }
+
+  async fetchInventoryItem(values, rowIndex, isDebounced = false) {
+    if (isDebounced) {
+      this.debouncedInventoryItemFetch(values, rowIndex);
+      return;
+    }
+
+    this.debouncedInventoryItemFetch.cancel();
+    const lotNumber = values?.lineItems[rowIndex]?.lotNumber;
+    const productCode = values?.lineItems[rowIndex]?.product?.productCode;
+
+    if (!lotNumber || !productCode) {
+      return;
+    }
+
+    const { data } = await ProductApi.getInventoryItem(productCode, lotNumber);
+    const mappedLineItems = this.state.values?.lineItems.map((lineItem, index) => {
+      if (rowIndex === index) {
+        return {
+          ...lineItem,
+          fetchedInventoryItem: data,
+        };
+      }
+      return lineItem;
+    });
+
+    this.setState(previousState => ({
+      ...previousState,
+      values: {
+        ...previousState.values,
+        lineItems: mappedLineItems,
+      },
+    }));
+  }
+
+  fetchMissingInventoryItems(values) {
+    values.lineItems.forEach((item, index) => {
+      if (!item.fetchedInventoryItem) {
+        this.fetchInventoryItem(values, index);
+      }
+    });
   }
 
   /**
@@ -1026,6 +1083,7 @@ class AddItemsPage extends Component {
                     onResponse: this.fetchLineItems,
                     saveItems: this.saveRequisitionItemsInCurrentStep,
                     invalid,
+                    fetchInventoryItem: this.fetchInventoryItem,
                   }))}
               </div>
               <div className="submit-buttons">
