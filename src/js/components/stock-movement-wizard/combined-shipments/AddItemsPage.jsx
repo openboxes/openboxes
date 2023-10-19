@@ -604,6 +604,7 @@ class AddItemsPage extends Component {
    */
   saveAndTransitionToNextStep(formValues, lineItems) {
     if (_.some(lineItems, item =>
+      item?.expirationDate &&
       item?.expirationDate !== item?.fetchedInventoryItem?.inventoryItem?.expirationDate &&
       item?.fetchedInventoryItem?.quantityOnHand > 0)) {
       this.confirmInventoryItemExpirationDateUpdate(() =>
