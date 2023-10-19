@@ -151,6 +151,7 @@ class DocumentTemplateService {
         order.dateOrdered = orderInstance.dateOrdered
         order.dateApproved = orderInstance.dateApproved
         order.dateCompleted = orderInstance.dateCompleted
+        order.currentDate = new Date()
         order.currencyCode = orderInstance.currencyCode?:""
         order.exchangeRate = orderInstance.exchangeRate?:""
         order.total = orderInstance.total?:""
