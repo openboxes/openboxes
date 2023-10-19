@@ -42,6 +42,8 @@ const useTableData = ({
   const fireFetchData = () => {
     // Each time we fetch, we want to 'reset' the token/signal
     sourceRef.current = CancelToken.source();
+    // reset pagination on each search execution
+    tableRef.current.onPageChange(0);
     tableRef.current.fireFetchData();
   };
 
