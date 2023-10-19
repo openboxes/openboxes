@@ -44,10 +44,10 @@ enum ActivityCode {
     // Notifications
     ENABLE_NOTIFICATIONS('ENABLE_NOTIFICATIONS'),
     ENABLE_WEBHOOKS('ENABLE_WEBHOOKS'),
-    // Approval notifications (for all, for requestors, for approvers)
-    DISABLE_APPROVAL_NOTIFICATIONS('DISABLE_APPROVAL_NOTIFICATIONS'),
-    DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS('DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS'),
-    DISABLE_DEPOT_APPROVAL_NOTIFICATIONS('DISABLE_DEPOT_APPROVAL_NOTIFICATIONS'),
+    // Approval notifications (if requestor should get the notification about approval or rejection)
+    ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS('ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS'),
+    // Approval notifications (if fulfiller should get the notification about submited requests)
+    ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS('ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS'),
 
     // Packing
     PACK_SHIPMENT('PACK_SHIPMENT'),
@@ -94,9 +94,8 @@ enum ActivityCode {
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
                 ENABLE_WEBHOOKS,
-                DISABLE_APPROVAL_NOTIFICATIONS,
-                DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS,
-                DISABLE_DEPOT_APPROVAL_NOTIFICATIONS,
+                ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS,
+                ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS,
                 PACK_SHIPMENT,
                 PARTIAL_RECEIVING,
                 REQUIRE_ACCOUNTING,

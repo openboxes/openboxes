@@ -403,31 +403,15 @@ class Requisition implements Comparable<Requisition>, Serializable {
     }
 
     boolean shouldSendApprovalNotification() {
-        if (destination.isDownstreamConsumer()) {
-            // If request is from downstream consumer (location without managed inventory, that can submit request)
-            // don't send notifications if all approval notifications are disabled (DISABLE_APPROVAL_NOTIFICATIONS)
-            if (status == RequisitionStatus.PENDING_APPROVAL) {
-                // if submitted for approval, then check if approvers (from fulfilling location) should get notification
-                return !origin.supports(ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS)
-            } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
-                // if approved or rejected, then check if requestors (from requesting location) should get notification
-                return !destination.supports(ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS)
-            }
-        }
-
-        if (destination.isManagedLocally()) {
-            // If request is from managed locally location (location with managed inventory), then check which
-            // type of notifications are disabled (for approvers, requestors or all)
-            ActivityCode[] activities = []
-            if (status == RequisitionStatus.PENDING_APPROVAL) {
-                // if submitted for approval, then check if approvers (from fulfilling location) should get notification
-                activities = [ActivityCode.DISABLE_DEPOT_APPROVAL_NOTIFICATIONS, ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS]
-                return !origin.supportsAny(activities)
-            } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
-                // if approved or rejected, then check if requestors (from requesting location) should get notification
-                activities = [ActivityCode.DISABLE_CONSUMER_APPROVAL_NOTIFICATIONS, ActivityCode.DISABLE_APPROVAL_NOTIFICATIONS]
-                return !destination.supportsAny(activities)
-            }
+        if (status == RequisitionStatus.PENDING_APPROVAL) {
+            // if submitted for approval, then check if destination (requesting location)
+            // has enabled notifications to the approvers (fulfilling location)
+            // and should send notification to approvers
+            return destination.supports(ActivityCode.ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS)
+        } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
+            // if approved or rejected, then check if destination (requesting location)
+            // has enabled notifications and should get notification  about approval or rejection
+            return destination.supports(ActivityCode.ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS)
         }
 
         // by default always send approval workflow notifications (if not handled above)
