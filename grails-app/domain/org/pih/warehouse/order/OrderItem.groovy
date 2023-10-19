@@ -347,7 +347,9 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     Integer getQuantityInvoicedInStandardUom() {
-        allInvoiceItems?.findAll { it?.invoice?.datePosted != null }?.collect {  it.quantity }?.sum() ?: 0
+        allInvoiceItems?.findAll {
+            it?.invoice?.datePosted != null && !it?.invoice?.isPrepaymentInvoice
+        }?.collect {  it.quantity }?.sum() ?: 0
     }
 
     def getInvoices() {
