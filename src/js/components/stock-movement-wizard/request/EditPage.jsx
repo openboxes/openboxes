@@ -1177,6 +1177,7 @@ class EditItemsPage extends Component {
             associations: data?.associations,
             editPageItems: _.map(data, item => ({
               ...item,
+              quantityOnHandRequesting: item.quantityCounted,
               quantityOnHand: item.quantityOnHand || 0,
               // eslint-disable-next-line max-len
               reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
@@ -1426,6 +1427,7 @@ class EditItemsPage extends Component {
             $set: {
               ...values.editPageItems[editPageItemIndex],
               ...editPageItem,
+              quantityOnHandRequesting: editPageItem.quantityCounted,
               quantityOnHand: editPageItem.quantityOnHand || 0,
               quantityAvailable: editPageItem.quantityAvailable || 0,
               substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
