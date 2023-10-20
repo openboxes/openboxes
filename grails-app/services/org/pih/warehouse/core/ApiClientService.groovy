@@ -31,8 +31,8 @@ class ApiClientService {
         return execute(new HttpGet(url))
     }
 
-    JSONObject post(String url, Map requestData) {
-        return execute(new HttpPost(url), requestData)
+    JSONObject post(String url, Map payload, Map headers = [:]) {
+        return execute(new HttpPost(url), payload, headers)
     }
 
     def delete(String url) {
@@ -43,14 +43,20 @@ class ApiClientService {
         return execute(new HttpPut(url), requestData)
     }
 
-    JSONObject execute(HttpEntityEnclosingRequestBase request, Map requestData) {
-        if (requestData) {
-            JSONObject jsonObject = new JSONObject(requestData)
+    JSONObject execute(HttpEntityEnclosingRequestBase request, Map payload, Map headers) {
+        if (payload) {
+            JSONObject jsonObject = new JSONObject(payload)
             StringEntity entity = new StringEntity(jsonObject.toString(), "UTF-8")
             BasicHeader basicHeader = new BasicHeader(HTTP.CONTENT_TYPE,"application/json");
             entity.setContentType(basicHeader);
             request.setEntity(entity)
         }
+        if (headers) {
+            headers.each { name, value ->
+                request.setHeader(name, value)
+            }
+        }
+
         return execute(request)
     }
 
@@ -65,7 +71,7 @@ class ApiClientService {
         // Process response
         InputStream is = response.entity.content
         String data = IOUtils.toString(is, "UTF-8")
-        return new JSONObject(data)
+        return !data.isEmpty() ? new JSONObject(data) : null
     }
 
     static private getRequestConfig() {
