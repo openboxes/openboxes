@@ -122,13 +122,14 @@ const FIELDS = {
           values,
           updateRow,
           fetchInventoryItem,
+          debouncedInventoryItemFetch,
         }) => ({
           onBlur: () => {
             updateRow(values, rowIndex);
             fetchInventoryItem(values, rowIndex);
           },
           onChange: () => {
-            fetchInventoryItem(values, rowIndex, true);
+            debouncedInventoryItemFetch(values, rowIndex);
           },
         }),
       },
@@ -344,7 +345,6 @@ class AddItemsPage extends Component {
       if (!_.isNull(startIndex) && this.state.values.lineItems.length !== this.state.totalCount) {
         this.loadMoreRows({ startIndex: startIndex + this.props.pageSize });
       }
-      this.fetchMissingInventoryItems(this.state.values);
       this.props.hideSpinner();
     });
   }
@@ -603,10 +603,15 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndTransitionToNextStep(formValues, lineItems) {
-    if (_.some(lineItems, item =>
-      item?.expirationDate &&
-      item?.expirationDate !== item?.fetchedInventoryItem?.inventoryItem?.expirationDate &&
-      item?.fetchedInventoryItem?.quantityOnHand > 0)) {
+    const expirationDateOrLotChanged = _.some(lineItems, (item) => {
+      const inventoryItem = item?.fetchedInventoryItem?.inventoryItem || item?.inventoryItem;
+      const quantity = item?.fetchedInventoryItem?.quantity || item?.inventoryItem?.quantity;
+      return item?.expirationDate &&
+        item?.expirationDate !== inventoryItem?.expirationDate &&
+        quantity > 0;
+    });
+
+    if (expirationDateOrLotChanged) {
       this.confirmInventoryItemExpirationDateUpdate(() =>
         this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
       return;
@@ -614,12 +619,7 @@ class AddItemsPage extends Component {
     this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
   }
 
-  async fetchInventoryItem(values, rowIndex, isDebounced = false) {
-    if (isDebounced) {
-      this.debouncedInventoryItemFetch(values, rowIndex);
-      return;
-    }
-
+  async fetchInventoryItem(values, rowIndex) {
     this.debouncedInventoryItemFetch.cancel();
     const lotNumber = values?.lineItems[rowIndex]?.lotNumber;
     const productCode = values?.lineItems[rowIndex]?.product?.productCode;
@@ -633,7 +633,10 @@ class AddItemsPage extends Component {
       if (rowIndex === index) {
         return {
           ...lineItem,
-          fetchedInventoryItem: data,
+          fetchedInventoryItem: {
+            inventoryItem: data.inventoryItem,
+            quantity: data?.quantityOnHand,
+          },
         };
       }
       return lineItem;
@@ -646,14 +649,6 @@ class AddItemsPage extends Component {
         lineItems: mappedLineItems,
       },
     }));
-  }
-
-  fetchMissingInventoryItems(values) {
-    values.lineItems.forEach((item, index) => {
-      if (!item.fetchedInventoryItem) {
-        this.fetchInventoryItem(values, index);
-      }
-    });
   }
 
   /**
@@ -1085,6 +1080,7 @@ class AddItemsPage extends Component {
                     saveItems: this.saveRequisitionItemsInCurrentStep,
                     invalid,
                     fetchInventoryItem: this.fetchInventoryItem,
+                    debouncedInventoryItemFetch: this.debouncedInventoryItemFetch,
                   }))}
               </div>
               <div className="submit-buttons">
