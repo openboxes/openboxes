@@ -17,7 +17,6 @@ import org.pih.warehouse.auth.AuthService
 class WebhookPublisherService {
 
     def apiClientService
-    //def grailsApplication
 
     boolean transactional = false
 

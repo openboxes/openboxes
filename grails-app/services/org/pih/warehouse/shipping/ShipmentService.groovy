@@ -63,7 +63,6 @@ class ShipmentService {
     def documentService
     def personDataService
     def productAvailabilityService
-    def webhookPublisherService
     GrailsApplication grailsApplication
 
     /**

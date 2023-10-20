@@ -34,7 +34,7 @@ class ApiClientService {
         return execute(new HttpGet(url))
     }
 
-    JSONObject post(String url, Map payload, Map headers) {
+    JSONObject post(String url, Map payload, Map headers = [:]) {
         return execute(new HttpPost(url), payload, headers)
     }
 
@@ -54,10 +54,8 @@ class ApiClientService {
             entity.setContentType(basicHeader);
             request.setEntity(entity)
         }
-        log.info "headers " + headers
         if (headers) {
             headers.each { name, value ->
-                log.info "${name} = ${value}"
                 request.setHeader(name, value)
             }
         }
