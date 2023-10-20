@@ -43,6 +43,7 @@ enum ActivityCode {
 
     // Notifications
     ENABLE_NOTIFICATIONS('ENABLE_NOTIFICATIONS'),
+    ENABLE_WEBHOOKS('ENABLE_WEBHOOKS'),
 
     // Packing
     PACK_SHIPMENT('PACK_SHIPMENT'),
@@ -88,6 +89,7 @@ enum ActivityCode {
                 PICK_STOCK,
                 EXTERNAL,
                 ENABLE_NOTIFICATIONS,
+                ENABLE_WEBHOOKS,
                 PACK_SHIPMENT,
                 PARTIAL_RECEIVING,
                 REQUIRE_ACCOUNTING,
