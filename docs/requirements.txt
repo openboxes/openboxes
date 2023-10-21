@@ -1,2 +1,4 @@
 mkdocs==1.2.3
 mkdocs-material
+mkdocs-material-extensions
+materialx
