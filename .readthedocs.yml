@@ -4,3 +4,6 @@ version: 2
 
 build:
   os: ubuntu-22.04
+
+mkdocs:
+  configuration: mkdocs.yml
