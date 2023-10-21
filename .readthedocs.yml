@@ -6,6 +6,9 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.8"
-
+  commands:
+    - pip install materialx
+    - pip install mkdocs-material-extensions
+    - pip install mkdocs-material
 mkdocs:
   configuration: mkdocs.yml
