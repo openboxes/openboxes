@@ -414,8 +414,8 @@ class Requisition implements Comparable<Requisition>, Serializable {
             return destination.supports(ActivityCode.ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS)
         }
 
-        // by default always send approval workflow notifications (if not handled above)
-        return true
+        // If status is not handled above assume it is wrongly triggered and don't send notification
+        return false
     }
 
     Map toJson() {
