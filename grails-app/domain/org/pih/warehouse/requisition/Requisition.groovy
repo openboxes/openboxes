@@ -408,7 +408,7 @@ class Requisition implements Comparable<Requisition>, Serializable {
             // has enabled notifications to the approvers (fulfilling location)
             // and should send notification to approvers
             return destination.supports(ActivityCode.ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS)
-        } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
+        } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED, RequisitionStatus.ISSUED].contains(status)) {
             // if approved or rejected, then check if destination (requesting location)
             // has enabled notifications and should get notification  about approval or rejection
             return destination.supports(ActivityCode.ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS)
