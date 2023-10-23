@@ -94,11 +94,10 @@ class DocumentTemplateService {
     }
 
     private createOrderContext(IXDocReport report, Order orderInstance) {
-        def activeOrderItems = orderInstance?.orderItems?.findAll {
-            it.orderItemStatusCode != OrderItemStatusCode.CANCELED
-        }
         // Add data to the context
-        def orderItems = activeOrderItems?.collect { OrderItem orderItem ->
+        def orderItems = orderInstance?.orderItems?.findAll {
+            it.orderItemStatusCode != OrderItemStatusCode.CANCELED
+        }?.collect { OrderItem orderItem ->
             return [
                     code                : orderItem?.product?.productCode,
                     type                : "Item",
@@ -130,7 +129,10 @@ class DocumentTemplateService {
                     expectedShippingDate: ""
             ]
         }
-        def groupedOrderItems = activeOrderItems?.groupBy { [product: it.product, unitOfMeasure: it.unitOfMeasure] }?.collect { k, v ->
+
+        def orderItemsGroupedByProductAndUom = orderInstance?.orderItems?.findAll {
+            it.orderItemStatusCode != OrderItemStatusCode.CANCELED
+        }?.groupBy { [product: it.product, unitOfMeasure: it.unitOfMeasure] }?.collect { k, v ->
             def productSuppliers = v?.productSupplier?.findAll { it }
             return [
                 code: k.product.productCode,
@@ -151,7 +153,6 @@ class DocumentTemplateService {
         order.dateOrdered = orderInstance.dateOrdered
         order.dateApproved = orderInstance.dateApproved
         order.dateCompleted = orderInstance.dateCompleted
-        order.currentDate = new Date()
         order.currencyCode = orderInstance.currencyCode?:""
         order.exchangeRate = orderInstance.exchangeRate?:""
         order.total = orderInstance.total?:""
@@ -201,15 +202,15 @@ class DocumentTemplateService {
         metadata.addFieldAsList("orderItems.totalPrice")
         metadata.addFieldAsList("orderItems.expectedShippingDate")
 
-        metadata.addFieldAsList("groupedOrderItems.code")
-        metadata.addFieldAsList("groupedOrderItems.description")
-        metadata.addFieldAsList("groupedOrderItems.quantity")
-        metadata.addFieldAsList("groupedOrderItems.supplierCode")
-        metadata.addFieldAsList("groupedOrderItems.manufacturer")
-        metadata.addFieldAsList("groupedOrderItems.manufacturerCode")
-        metadata.addFieldAsList("groupedOrderItems.unitOfMeasure")
-        metadata.addFieldAsList("groupedOrderItems.unitPrice")
-        metadata.addFieldAsList("groupedOrderItems.totalPrice")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.code")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.description")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.quantity")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.supplierCode")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.manufacturer")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.manufacturerCode")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.unitOfMeasure")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.unitPrice")
+        metadata.addFieldAsList("orderItemsGroupedByProductAndUom.totalPrice")
 
         // Add order adjustment fields to metadata
         metadata.addFieldAsList("orderAdjustments.code")
@@ -219,8 +220,9 @@ class DocumentTemplateService {
         IContext context = report.createContext()
         context.put("order", order)
         context.put("orderItems", orderItems)
-        context.put("groupedOrderItems", groupedOrderItems)
+        context.put("orderItemsGroupedByProductAndUom", orderItemsGroupedByProductAndUom)
         context.put("orderAdjustments", orderAdjustments)
+        context.put("today", new Date())
         return context
     }
 
