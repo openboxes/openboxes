@@ -10,6 +10,7 @@
 package org.pih.warehouse.requisition
 
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
@@ -399,6 +400,22 @@ class Requisition implements Comparable<Requisition>, Serializable {
             return events.sort().iterator().next()
         }
         return null
+    }
+
+    boolean shouldSendApprovalNotification() {
+        if (status == RequisitionStatus.PENDING_APPROVAL) {
+            // if submitted for approval, then check if destination (requesting location)
+            // has enabled notifications to the approvers (fulfilling location)
+            // and should send notification to approvers
+            return destination.supports(ActivityCode.ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS)
+        } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED].contains(status)) {
+            // if approved or rejected, then check if destination (requesting location)
+            // has enabled notifications and should get notification  about approval or rejection
+            return destination.supports(ActivityCode.ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS)
+        }
+
+        // If status is not handled above assume it is wrongly triggered and don't send notification
+        return false
     }
 
     Map toJson() {

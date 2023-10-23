@@ -18,6 +18,8 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
     NotificationService notificationService
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        notificationService.publishRequisitionStatusTransitionNotifications(event.requisition)
+        if (event.requisition.shouldSendApprovalNotification()) {
+            notificationService.publishRequisitionStatusTransitionNotifications(event.requisition)
+        }
     }
 }
