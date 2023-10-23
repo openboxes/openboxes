@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="awalkowiak" id="1910202314000-0">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM location_type_supported_activities ltsa
+        WHERE ltsa.supported_activities_string = 'ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS' supported activity where location type has 'SUBMIT_REQUEST' or 'MANAGE_INVENTORY'</comment>
+    <sql>
+      INSERT INTO location_type_supported_activities (location_type_id, supported_activities_string)
+      SELECT
+        DISTINCT ltsa.location_type_id, 'ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS'
+        FROM location_type_supported_activities ltsa
+        JOIN location_type lt on ltsa.location_type_id = lt.id
+        WHERE ltsa.supported_activities_string = 'SUBMIT_REQUEST' OR ltsa.supported_activities_string = 'MANAGE_INVENTORY';
+    </sql>
+  </changeSet>
+  <changeSet author="awalkowiak" id="1910202314000-1">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM location_type_supported_activities ltsa
+        WHERE ltsa.supported_activities_string = 'ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS' supported activity where location type has 'SUBMIT_REQUEST' or 'MANAGE_INVENTORY'</comment>
+    <sql>
+      INSERT INTO location_type_supported_activities (location_type_id, supported_activities_string)
+      SELECT
+        DISTINCT ltsa.location_type_id, 'ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS'
+        FROM location_type_supported_activities ltsa
+        JOIN location_type lt on ltsa.location_type_id = lt.id
+        WHERE ltsa.supported_activities_string = 'SUBMIT_REQUEST' OR ltsa.supported_activities_string = 'MANAGE_INVENTORY';
+    </sql>
+  </changeSet>
+  <changeSet author="awalkowiak" id="1910202314000-2">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM location_supported_activities lsa
+        WHERE lsa.supported_activities_string = 'ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS' supported activity where location has 'SUBMIT_REQUEST' or 'MANAGE_INVENTORY'</comment>
+    <sql>
+      INSERT INTO location_supported_activities (location_id, supported_activities_string)
+      SELECT
+        DISTINCT lsa.location_id, 'ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS'
+        FROM location_supported_activities lsa
+        JOIN location l on lsa.location_id = l.id
+        WHERE lsa.supported_activities_string = 'SUBMIT_REQUEST' OR lsa.supported_activities_string = 'MANAGE_INVENTORY';
+    </sql>
+  </changeSet>
+  <changeSet author="awalkowiak" id="1910202314000-3">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="0">
+        SELECT count(*)
+        FROM location_supported_activities lsa
+        WHERE lsa.supported_activities_string = 'ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS';
+      </sqlCheck>
+    </preConditions>
+    <comment>Insert 'ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS' supported activity where location has 'SUBMIT_REQUEST' or 'MANAGE_INVENTORY'</comment>
+    <sql>
+      INSERT INTO location_supported_activities (location_id, supported_activities_string)
+      SELECT
+        DISTINCT lsa.location_id, 'ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS'
+        FROM location_supported_activities lsa
+        JOIN location l on lsa.location_id = l.id
+        WHERE lsa.supported_activities_string = 'SUBMIT_REQUEST' OR lsa.supported_activities_string = 'MANAGE_INVENTORY';
+    </sql>
+  </changeSet>
+</databaseChangeLog>
