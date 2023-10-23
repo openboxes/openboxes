@@ -544,6 +544,7 @@ class IndicatorDataService {
                             RequisitionStatus.ISSUED,
                             RequisitionStatus.PENDING_APPROVAL,
                             RequisitionStatus.REJECTED,
+                            RequisitionStatus.VERIFYING,
                     ],
             ]).get(0)
 
@@ -575,6 +576,7 @@ class IndicatorDataService {
                             RequisitionStatus.ISSUED,
                             RequisitionStatus.PENDING_APPROVAL,
                             RequisitionStatus.REJECTED,
+                            RequisitionStatus.VERIFYING,
                     ],
             ]).get(0)
 
@@ -605,6 +607,7 @@ class IndicatorDataService {
                             RequisitionStatus.ISSUED,
                             RequisitionStatus.PENDING_APPROVAL,
                             RequisitionStatus.REJECTED,
+                            RequisitionStatus.VERIFYING,
                     ],
             ]).get(0)
 
