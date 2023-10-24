@@ -5,6 +5,6 @@ import apiClient from 'utils/apiClient';
 
 export default {
   getProducts: config => apiClient.get(PRODUCT_API, config),
-  getInventoryItem: (productCode, lotNumber) =>
-    axios.get(INVENTORY_ITEM(productCode, lotNumber)),
+  getInventoryItem: (productId, lotNumber) =>
+    axios.get(INVENTORY_ITEM(productId, lotNumber)),
 };

@@ -103,7 +103,7 @@ class UrlMappings {
             controller = { "productApi" }
         }
 
-        "/api/products/$productCode/inventoryItems/$lotNumber"(parseRequest: true) {
+        "/api/products/$productId/inventoryItems/$lotNumber"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "getInventoryItem"]
         }

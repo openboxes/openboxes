@@ -279,7 +279,7 @@ class ProductApiController extends BaseDomainApiController {
     }
 
     def getInventoryItem = {
-        InventoryItem inventoryItem = InventoryItem.findByLotNumberAndProduct(params.lotNumber, Product.findByProductCode(params.productCode))
+        InventoryItem inventoryItem = InventoryItem.findByProductAndLotNumber(Product.load(params.productId), params.lotNumber)
         if (inventoryItem) {
             Integer quantityOnHand = productAvailabilityService.getQuantityOnHand(inventoryItem)
             render([inventoryItem: inventoryItem, quantityOnHand: quantityOnHand] as JSON)
