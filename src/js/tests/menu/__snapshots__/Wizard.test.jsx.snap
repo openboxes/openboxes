@@ -371,28 +371,26 @@ exports[`wizard component should match snapshot 1`] = `
                 <div
                   className="date-field"
                 >
-                  <div>
+                  <div
+                    className="react-datepicker-wrapper"
+                  >
                     <div
-                      className="react-datepicker-wrapper"
+                      className="react-datepicker__input-container"
                     >
-                      <div
-                        className="react-datepicker__input-container"
-                      >
-                        <input
-                          autoComplete="off"
-                          className="form-control form-control-xs "
-                          disabled={false}
-                          id="dateInvoiced"
-                          onBlur={[Function]}
-                          onChange={[Function]}
-                          onClick={[Function]}
-                          onFocus={[Function]}
-                          onKeyDown={[Function]}
-                          readOnly={false}
-                          type="text"
-                          value=""
-                        />
-                      </div>
+                      <input
+                        autoComplete="off"
+                        className="form-control form-control-xs "
+                        disabled={false}
+                        id="dateInvoiced"
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onClick={[Function]}
+                        onFocus={[Function]}
+                        onKeyDown={[Function]}
+                        readOnly={false}
+                        type="text"
+                        value=""
+                      />
                     </div>
                   </div>
                 </div>
@@ -865,28 +863,26 @@ exports[`wizardPage component should match snapshot 1`] = `
             <div
               className="date-field"
             >
-              <div>
+              <div
+                className="react-datepicker-wrapper"
+              >
                 <div
-                  className="react-datepicker-wrapper"
+                  className="react-datepicker__input-container"
                 >
-                  <div
-                    className="react-datepicker__input-container"
-                  >
-                    <input
-                      autoComplete="off"
-                      className="form-control form-control-xs "
-                      disabled={false}
-                      id="dateInvoiced"
-                      onBlur={[Function]}
-                      onChange={[Function]}
-                      onClick={[Function]}
-                      onFocus={[Function]}
-                      onKeyDown={[Function]}
-                      readOnly={false}
-                      type="text"
-                      value=""
-                    />
-                  </div>
+                  <input
+                    autoComplete="off"
+                    className="form-control form-control-xs "
+                    disabled={false}
+                    id="dateInvoiced"
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    readOnly={false}
+                    type="text"
+                    value=""
+                  />
                 </div>
               </div>
             </div>
