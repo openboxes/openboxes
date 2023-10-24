@@ -12,14 +12,17 @@ package org.pih.warehouse.reporting
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.validation.Validateable
 import groovy.time.TimeCategory
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
+import org.apache.commons.lang.ClassUtils
 import org.grails.core.DefaultGrailsDomainClass
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -488,7 +491,7 @@ class ShowConsumptionCommand implements Validateable {
     Boolean includeMonthlyBreakdown = Boolean.TRUE
     Boolean includeQuantityOnHand = Boolean.TRUE
 
-    def selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
+    List<String> selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
 
     // Payload
     Set<Transaction> debits = []
@@ -509,8 +512,21 @@ class ShowConsumptionCommand implements Validateable {
         parametersHash(nullable: true)
     }
 
-    def getAvailableProperties() {
-        Holders.grailsApplication.mappingContext.getPersistentEntity(Product.class.name).persistentPropertyNames
+    static String getTypePropertyName(Class type) {
+        String shortTypeName = ClassUtils.getShortClassName(type)
+        return shortTypeName.substring(0, 1).toLowerCase(Locale.ENGLISH) + shortTypeName.substring(1)
+    }
+
+    static List<ConsumptionReportProductProperty> getAvailableProperties() {
+        List<PersistentProperty> properties =
+            Holders.grailsApplication.mappingContext.getPersistentEntity(Product.class.name).persistentProperties
+        return properties.collect { PersistentProperty it ->
+            new ConsumptionReportProductProperty([
+                name: it.name,
+                naturalName: GrailsNameUtils.getNaturalName(it.name),
+                typePropertyName: getTypePropertyName(it.type)
+            ])
+        }
     }
 
     Boolean hasParameterChanged() {
@@ -537,6 +553,12 @@ class ShowConsumptionCommand implements Validateable {
     Float getNumberOfMonths() {
         return numberOfDays / 30
     }
+}
+
+class ConsumptionReportProductProperty {
+    String name
+    String naturalName
+    String typePropertyName
 }
 
 class ShowConsumptionRowCommand implements Validateable {

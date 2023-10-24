@@ -131,12 +131,12 @@
                         <g:hasRoleFinance>
                             <g:set var="hasRoleFinance" value="${true}"/>
                         </g:hasRoleFinance>
-                        <g:each var="propertyName" in="${command.availableProperties}">
-                            <g:set var="disabled" value="${'pricePerUnit'.equals(propertyName) && !hasRoleFinance}"/>
-                            <option value="${propertyName}"
-                                ${command.selectedProperties?.toList()?.contains(propertyName)?'selected':''}
+                        <g:each var="property" in="${command.availableProperties}">
+                            <g:set var="disabled" value="${'pricePerUnit'.equals(property.name) && !hasRoleFinance}"/>
+                            <option value="${property.name}"
+                                ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}
                                 ${disabled?'disabled':''}>
-                                ${propertyName}
+                                ${property.naturalName} (${property.typePropertyName})
                             </option>
                         </g:each>
                     </select>
