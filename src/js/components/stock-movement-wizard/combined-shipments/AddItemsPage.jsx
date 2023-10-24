@@ -143,8 +143,16 @@ const FIELDS = {
           autoComplete: 'off',
           placeholderText: 'MM/DD/YYYY',
         },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+        getDynamicAttr: ({
+          rowIndex,
+          values,
+          updateRow,
+          validateExpirationDate,
+        }) => ({
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            validateExpirationDate(values?.lineItems, rowIndex);
+          },
         }),
       },
       quantityRequested: {
@@ -234,6 +242,11 @@ const FIELDS = {
 
 const LOT_AND_EXPIRY_ERROR = 'react.stockMovement.error.lotAndExpiryControl.label';
 
+// It cannot be in the state, because updating state is not an atomic operation,
+// so the value of this can be changed after triggering the second modal
+// (when the modal is triggered onChange, onBlur triggers it second time)
+let isModalOpen = false;
+
 /* eslint class-methods-use-this: ["error",{ "exceptMethods": ["getLineItemsToBeSaved"] }] */
 /**
  * The second step of stock movement where user can add items to stock list.
@@ -273,6 +286,9 @@ class AddItemsPage extends Component {
     this.importTemplate = this.importTemplate.bind(this);
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.fetchInventoryItem = this.fetchInventoryItem.bind(this);
+    this.validateExpirationDate = this.validateExpirationDate.bind(this);
+    this.cancelSavingRequisitionItem = this.cancelSavingRequisitionItem.bind(this);
+    this.changeExpirationDate = this.changeExpirationDate.bind(this);
 
     this.debouncedInventoryItemFetch = _.debounce((lineItems, rowIndex) => {
       this.fetchInventoryItem(lineItems, rowIndex);
@@ -485,9 +501,10 @@ class AddItemsPage extends Component {
   /**
    * Shows Inventory item expiration date update confirmation dialog.
    * @param {function} onConfirm
+   * @param {function} onReject
    * @public
    */
-  confirmInventoryItemExpirationDateUpdate(onConfirm) {
+  confirmInventoryItemExpirationDateUpdate(onConfirm, onReject) {
     confirmAlert({
       title: this.props.translate('react.stockMovement.message.confirmSave.label', 'Confirm save'),
       message: this.props.translate(
@@ -501,8 +518,12 @@ class AddItemsPage extends Component {
         },
         {
           label: this.props.translate('react.default.no.label', 'No'),
+          onClick: onReject,
         },
       ],
+      afterClose: () => {
+        isModalOpen = false;
+      },
     });
   }
 
@@ -603,33 +624,20 @@ class AddItemsPage extends Component {
    * @public
    */
   saveAndTransitionToNextStep(formValues, lineItems) {
-    const expirationDateOrLotChanged = _.some(lineItems, (item) => {
-      const inventoryItem = item?.fetchedInventoryItem?.inventoryItem || item?.inventoryItem;
-      const quantity = item?.fetchedInventoryItem?.quantity || item?.inventoryItem?.quantity;
-      return item?.expirationDate &&
-        item?.expirationDate !== inventoryItem?.expirationDate &&
-        quantity > 0;
-    });
-
-    if (expirationDateOrLotChanged) {
-      this.confirmInventoryItemExpirationDateUpdate(() =>
-        this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems));
-      return;
-    }
     this.saveRequisitionItemsAndTransitionToNextStep(formValues, lineItems);
   }
 
   async fetchInventoryItem(values, rowIndex) {
     this.debouncedInventoryItemFetch.cancel();
     const lotNumber = values?.lineItems[rowIndex]?.lotNumber;
-    const productCode = values?.lineItems[rowIndex]?.product?.productCode;
+    const productId = values?.lineItems[rowIndex]?.product?.id;
 
-    if (!lotNumber || !productCode) {
+    if (!lotNumber || !productId) {
       return;
     }
 
-    const { data } = await ProductApi.getInventoryItem(productCode, lotNumber);
-    const mappedLineItems = this.state.values?.lineItems.map((lineItem, index) => {
+    const { data } = await ProductApi.getInventoryItem(productId, lotNumber);
+    const mappedLineItems = values?.lineItems.map((lineItem, index) => {
       if (rowIndex === index) {
         return {
           ...lineItem,
@@ -648,7 +656,65 @@ class AddItemsPage extends Component {
         ...previousState.values,
         lineItems: mappedLineItems,
       },
+    }), () => {
+      if (!values.lineItems?.[rowIndex]?.expirationDate) {
+        this.changeExpirationDate(mappedLineItems, rowIndex, data?.inventoryItem?.expirationDate);
+      }
+      this.validateExpirationDate(mappedLineItems, rowIndex);
+    });
+  }
+
+  validateExpirationDate(lineItems, rowIndex) {
+    const lineItem = lineItems?.[rowIndex];
+    const inventoryItem = lineItem?.fetchedInventoryItem?.inventoryItem ||
+      lineItem?.inventoryItem;
+    const quantity = (lineItem?.fetchedInventoryItem ?
+      lineItem?.fetchedInventoryItem?.quantity : lineItem?.inventoryItem?.quantity) || 0;
+    const expirationDateHasChanged = inventoryItem?.expirationDate &&
+      lineItem?.expirationDate &&
+      lineItem?.lotNumber &&
+      lineItem?.expirationDate !== inventoryItem?.expirationDate &&
+      quantity > 0;
+
+    if (expirationDateHasChanged && !isModalOpen) {
+      isModalOpen = true;
+      this.confirmInventoryItemExpirationDateUpdate(
+        () => this.saveRequisitionItems(this.state.values.lineItems),
+        () => this.cancelSavingRequisitionItem(lineItems, rowIndex),
+      );
+    }
+  }
+
+  changeExpirationDate(lineItems, rowIndex, newDate) {
+    const updatedLineItem = { ...lineItems?.[rowIndex], expirationDate: newDate };
+    this.setState(previousState => ({
+      ...previousState,
+      values: {
+        ...previousState.values,
+        lineItems: update(previousState?.values?.lineItems, {
+          [rowIndex]: { $set: updatedLineItem },
+        }),
+      },
     }));
+  }
+
+  cancelSavingRequisitionItem(lineItems, rowIndex) {
+    const mappedLineItems = lineItems?.map((item, index) => {
+      if (index === rowIndex) {
+        const expirationDate = item?.fetchedInventoryItem?.inventoryItem?.expirationDate ||
+          item?.inventoryItem?.expirationDate;
+        return { ...item, expirationDate };
+      }
+      return item;
+    });
+
+    this.setState({
+      ...this.state,
+      values: {
+        ...this.state.values,
+        lineItems: mappedLineItems,
+      },
+    });
   }
 
   /**
@@ -1081,6 +1147,7 @@ class AddItemsPage extends Component {
                     invalid,
                     fetchInventoryItem: this.fetchInventoryItem,
                     debouncedInventoryItemFetch: this.debouncedInventoryItemFetch,
+                    validateExpirationDate: this.validateExpirationDate,
                   }))}
               </div>
               <div className="submit-buttons">
