@@ -429,11 +429,11 @@ class IndicatorDataService {
         if (currentDate.month > endDate.month || (currentDate.month == endDate.month && currentDate.date > endDate.date)) {
             currentYearFormatted += 1
         }
-        def listLabel = ((currentYearFormatted - 4)..currentYearFormatted).collect { Integer it ->
-            yearType.labelYearPrefix + it.toString()
-        }
         def results = [:]
-        listLabel.each { results[it] = 0 }
+        ((currentYearFormatted - 4)..currentYearFormatted).each { Integer it ->
+            String label = yearType.labelYearPrefix + it.toString()
+            results[label] = 0
+        }
 
         // Process fetched data
         data.each { it ->
@@ -455,17 +455,13 @@ class IndicatorDataService {
             } else {
                 results[yearLabel] = it[0]
             }
-
-            // Check if the list with labels contains yearLabel
-            if (!listLabel.contains(yearLabel)) {
-                listLabel << yearLabel
-            }
         }
+        results = results.sort()
 
         List<IndicatorDatasets> datasets = [
             new IndicatorDatasets('Requisition count by year', results.values().toList())
         ]
-        IndicatorData indicatorData = new IndicatorData(datasets, listLabel)
+        IndicatorData indicatorData = new IndicatorData(datasets, results.keySet().toList())
         GraphData graphData = new GraphData(indicatorData)
         return graphData
     }
