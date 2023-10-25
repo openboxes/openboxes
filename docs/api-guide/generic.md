@@ -24,7 +24,7 @@
 
 **NOTE**: *You must [authenticate](./authentication.md) before you can use the generic API*.
 
-The generic API lets developers access any domain object without rewriting the boilerplate code. It has five operations:
+The generic API lets developers access any domain object without rewriting boilerplate code. It has five operations:
 
 - List
 	- `GET https://openboxes.ngrok.io/openboxes/api/generic/**resource**`
@@ -106,7 +106,7 @@ Output:
 
 ## Read 
 
-Use this command to access specific product information.
+Use this command to show specific product information.
 
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
@@ -193,9 +193,7 @@ Output:
 }
 ```
 
-**NOTE**: the `POST` request on multiple objects fails if there is a single error. However, cURL throws an error for only the first object that fails.
-
-This cURL command produces an error.
+**NOTE**: the `POST` request on multiple objects fails if a single error throws. However, cURL throws an error for only the first object that fails. For example, this command produces an error:
 
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
@@ -203,7 +201,7 @@ $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
 https://openboxes.ngrok.io/openboxes/api/generic/product
 ```
 
-And this is the error it produces.
+Output:
 
 ```
 {
@@ -249,7 +247,7 @@ Output:
 
 ### Update multiple products at once
 
-`POST` to the same endpoint, and include the ID within each product, to update multiple products at once.
+`POST` to the same endpoint and list each product ID to update multiple products at once.
 
 ```
 $ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
@@ -266,7 +264,7 @@ Output:
 		"id": "ff8081816407132d0164071eec250001",
 		"productCode": "BK71",
 		"name": "product 1+",
-		"description": "This is the penultimate product",
+		"description": "This is the next-to-last product",
 		"category": {
 			"id": "ROOT",
 			"name": "ROOT"
@@ -284,78 +282,26 @@ Output:
 }
 ```
 
+## Delete
 
-
-
-
-
-
-
-
-
-
-
-<!-- problem area-->
-
-## Search
-
-The Search API supports these operators on any string property of any object:
-
-* eq (This is the default. Specify `property` and `value` if you want an equality search.)
-* like
-* ilike
-
-Support for other property types (Integer, Date, BigDecimal) and operators (i.e. in, isNull, between, gt, ge, lt, le, 
-etc) will be added at some point in the future. In addition, there's no way to perform nested searches (i.e. search for 
-all shipment items that reference a particular product) at this time so please 
-
-**NOTE**: If you don't see a search operator or property type supported, please raise an issue on GitHub
-(https://github.com/openboxes/openboxes/issues).
+Use this command to delete a product.
 
 ```
-$ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt \
--d '{"searchAttributes":[{"property":"name", "operator":"ilike", "value":"Ace%"}]}' \
-https://openboxes.ngrok.io/openboxes/api/generic/product/search?max=1
-```
-```
-{
-	"data": [{
-		"id": "ff80818155df9de40155df9e321c0005",
-		"productCode": "00002",
-		"name": "Acetaminophen 325mg",
-		"description": null,
-		"category": {
-			"id": "1",
-			"name": "Medicines"
-		}
-	}]
-}
+$ curl -b cookies.txt -X DELETE \
+https://openboxes.ngrok.io/openboxes/api/generic/product/<id#>
 ```
 
-<!-- problem area over-->
-
-
-
-
-
-
-
-
-
-
-
-
-
-In addition to these basic examples, below are more specific use cases for the generic API.
+In addition to the basic `GET`, `READ`, `POST`, `UPDATE`, and `DELETE` commands, the following are some more specific uses for the generic API.
 
 ## Get a partial list of shipments
 
-To prevent tall lists, add the paging parameter `max=1` to your request. This outputs only one page of products.
+Add the paging parameter `max=1` to your request to prevent too-tall lists of products. This outputs only one page of products.
 
 (*See [Pagination](./authentication.md/#pagination) for more information.*)
 
 ```
-$ curl -b cookies.txt -X GET -H "Content-Type: application/json" https://openboxes.ngrok.io/openboxes/api/generic/shipment?max=1 | jsonlint
+$ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
+https://openboxes.ngrok.io/openboxes/api/generic/shipment?max=1 | jsonlint
 ```
 
 Output:
@@ -445,11 +391,11 @@ Output:
 }
 ```
 
-You can see how this output would get unwieldy without the paging parameter.
+You can see how the output can get overwhelming without the paging parameter.
 
 ## Read shipment details
 
-Now let's read the details for a specific shipment.
+Use this command to read the details for a specific shipment:
 
 ```
 $ curl -b cookies.txt -X GET -H "Content-Type: application/json" \
@@ -541,8 +487,8 @@ Output:
 }
 ```
 
-## Ask what fields a new shipment requires
-Pass an empty JSON object to the Create method and it'll tell you what fields it requires.
+## Create a new shipment
+All of these fields are required for each shipment. If even one is missing, cURL throws the error `"Property [{0}] of class [{1}] cannot be null"`.
 
 * name
 * origin
@@ -550,193 +496,58 @@ Pass an empty JSON object to the Create method and it'll tell you what fields it
 * expectedShippingDate
 * shipmentType
 
-```
-$ curl -b cookies.txt -X POST -H "Content-Type: application/json" -d '{}' \
-https://openboxes.ngrok.io/openboxes/api/generic/shipment|jsonlint
-```
-
-Output:
+Add the `name` with this command:
 
 ```
-{
-  "errorCode": 400,
-  "errorMessage": "Validation errors",
-  "data": [
-    {
-      "arguments": [
-        "destination",
-        "Shipment"
-      ],
-      "bindingFailure": false,
-      "class": "org.springframework.validation.FieldError",
-      "code": "nullable",
-      "codes": [
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.error.org.pih.warehouse.shipping.Shipment.destination",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.error.destination",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.error.org.pih.warehouse.core.Location",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.error",
-        "shipment.destination.nullable.error.org.pih.warehouse.shipping.Shipment.destination",
-        "shipment.destination.nullable.error.destination",
-        "shipment.destination.nullable.error.org.pih.warehouse.core.Location",
-        "shipment.destination.nullable.error",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.org.pih.warehouse.shipping.Shipment.destination",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.destination",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable.org.pih.warehouse.core.Location",
-        "org.pih.warehouse.shipping.Shipment.destination.nullable",
-        "shipment.destination.nullable.org.pih.warehouse.shipping.Shipment.destination",
-        "shipment.destination.nullable.destination",
-        "shipment.destination.nullable.org.pih.warehouse.core.Location",
-        "shipment.destination.nullable",
-        "nullable.org.pih.warehouse.shipping.Shipment.destination",
-        "nullable.destination",
-        "nullable.org.pih.warehouse.core.Location",
-        "nullable"
-      ],
-      "defaultMessage": "Property [{0}] of class [{1}] cannot be null",
-      "field": "destination",
-      "objectName": "org.pih.warehouse.shipping.Shipment",
-      "rejectedValue": null
-    },
-    {
-      "arguments": [
-        "expectedShippingDate",
-        "Shipment"
-      ],
-      "bindingFailure": false,
-      "class": "org.springframework.validation.FieldError",
-      "code": "nullable",
-      "codes": [
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.error.org.pih.warehouse.shipping.Shipment.expectedShippingDate",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.error.expectedShippingDate",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.error.java.util.Date",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.error",
-        "shipment.expectedShippingDate.nullable.error.org.pih.warehouse.shipping.Shipment.expectedShippingDate",
-        "shipment.expectedShippingDate.nullable.error.expectedShippingDate",
-        "shipment.expectedShippingDate.nullable.error.java.util.Date",
-        "shipment.expectedShippingDate.nullable.error",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.org.pih.warehouse.shipping.Shipment.expectedShippingDate",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.expectedShippingDate",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable.java.util.Date",
-        "org.pih.warehouse.shipping.Shipment.expectedShippingDate.nullable",
-        "shipment.expectedShippingDate.nullable.org.pih.warehouse.shipping.Shipment.expectedShippingDate",
-        "shipment.expectedShippingDate.nullable.expectedShippingDate",
-        "shipment.expectedShippingDate.nullable.java.util.Date",
-        "shipment.expectedShippingDate.nullable",
-        "nullable.org.pih.warehouse.shipping.Shipment.expectedShippingDate",
-        "nullable.expectedShippingDate",
-        "nullable.java.util.Date",
-        "nullable"
-      ],
-      "defaultMessage": "Property [{0}] of class [{1}] cannot be null",
-      "field": "expectedShippingDate",
-      "objectName": "org.pih.warehouse.shipping.Shipment",
-      "rejectedValue": null
-    },
-    {
-      "arguments": [
-        "name",
-        "Shipment"
-      ],
-      "bindingFailure": false,
-      "class": "org.springframework.validation.FieldError",
-      "code": "nullable",
-      "codes": [
-        "org.pih.warehouse.shipping.Shipment.name.nullable.error.org.pih.warehouse.shipping.Shipment.name",
-        "org.pih.warehouse.shipping.Shipment.name.nullable.error.name",
-        "org.pih.warehouse.shipping.Shipment.name.nullable.error.java.lang.String",
-        "org.pih.warehouse.shipping.Shipment.name.nullable.error",
-        "shipment.name.nullable.error.org.pih.warehouse.shipping.Shipment.name",
-        "shipment.name.nullable.error.name",
-        "shipment.name.nullable.error.java.lang.String",
-        "shipment.name.nullable.error",
-        "org.pih.warehouse.shipping.Shipment.name.nullable.org.pih.warehouse.shipping.Shipment.name",
-        "org.pih.warehouse.shipping.Shipment.name.nullable.name",
-        "org.pih.warehouse.shipping.Shipment.name.nullable.java.lang.String",
-        "org.pih.warehouse.shipping.Shipment.name.nullable",
-        "shipment.name.nullable.org.pih.warehouse.shipping.Shipment.name",
-        "shipment.name.nullable.name",
-        "shipment.name.nullable.java.lang.String",
-        "shipment.name.nullable",
-        "nullable.org.pih.warehouse.shipping.Shipment.name",
-        "nullable.name",
-        "nullable.java.lang.String",
-        "nullable"
-      ],
-      "defaultMessage": "Property [{0}] of class [{1}] cannot be null",
-      "field": "name",
-      "objectName": "org.pih.warehouse.shipping.Shipment",
-      "rejectedValue": null
-    },
-    {
-      "arguments": [
-        "origin",
-        "Shipment"
-      ],
-      "bindingFailure": false,
-      "class": "org.springframework.validation.FieldError",
-      "code": "nullable",
-      "codes": [
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.error.org.pih.warehouse.shipping.Shipment.origin",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.error.origin",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.error.org.pih.warehouse.core.Location",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.error",
-        "shipment.origin.nullable.error.org.pih.warehouse.shipping.Shipment.origin",
-        "shipment.origin.nullable.error.origin",
-        "shipment.origin.nullable.error.org.pih.warehouse.core.Location",
-        "shipment.origin.nullable.error",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.org.pih.warehouse.shipping.Shipment.origin",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.origin",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable.org.pih.warehouse.core.Location",
-        "org.pih.warehouse.shipping.Shipment.origin.nullable",
-        "shipment.origin.nullable.org.pih.warehouse.shipping.Shipment.origin",
-        "shipment.origin.nullable.origin",
-        "shipment.origin.nullable.org.pih.warehouse.core.Location",
-        "shipment.origin.nullable",
-        "nullable.org.pih.warehouse.shipping.Shipment.origin",
-        "nullable.origin",
-        "nullable.org.pih.warehouse.core.Location",
-        "nullable"
-      ],
-      "defaultMessage": "Property [{0}] of class [{1}] cannot be null",
-      "field": "origin",
-      "objectName": "org.pih.warehouse.shipping.Shipment",
-      "rejectedValue": null
-    },
-    {
-      "arguments": [
-        "shipmentType",
-        "Shipment"
-      ],
-      "bindingFailure": false,
-      "class": "org.springframework.validation.FieldError",
-      "code": "nullable",
-      "codes": [
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.error.org.pih.warehouse.shipping.Shipment.shipmentType",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.error.shipmentType",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.error.org.pih.warehouse.shipping.ShipmentType",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.error",
-        "shipment.shipmentType.nullable.error.org.pih.warehouse.shipping.Shipment.shipmentType",
-        "shipment.shipmentType.nullable.error.shipmentType",
-        "shipment.shipmentType.nullable.error.org.pih.warehouse.shipping.ShipmentType",
-        "shipment.shipmentType.nullable.error",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.org.pih.warehouse.shipping.Shipment.shipmentType",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.shipmentType",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable.org.pih.warehouse.shipping.ShipmentType",
-        "org.pih.warehouse.shipping.Shipment.shipmentType.nullable",
-        "shipment.shipmentType.nullable.org.pih.warehouse.shipping.Shipment.shipmentType",
-        "shipment.shipmentType.nullable.shipmentType",
-        "shipment.shipmentType.nullable.org.pih.warehouse.shipping.ShipmentType",
-        "shipment.shipmentType.nullable",
-        "nullable.org.pih.warehouse.shipping.Shipment.shipmentType",
-        "nullable.shipmentType",
-        "nullable.org.pih.warehouse.shipping.ShipmentType",
-        "nullable"
-      ],
-      "defaultMessage": "Property [{0}] of class [{1}] cannot be null",
-      "field": "shipmentType",
-      "objectName": "org.pih.warehouse.shipping.Shipment",
-      "rejectedValue": null
-    }
-  ]
-}
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"name":"product 0", "category.id":"ROOT"}' \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+**NOTE**: This is the same as the Create command above.
+
+Add the `origin`— composed of ID, name, and type— with this command:
+
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d `{"origin.id":"1234567890", "origin.name":"Depot 1", "origin.type": "DEPOT"}` \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+Add the `destination`— composed of ID, name, and type— with this command:
+
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d `{"destination.id":"0987654321", "destination.name":"Ward 2", "destination.type": "WARD"}` \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+Add the `expectedShippingDate` with this command:
+
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d `{"expectedShippingDate":"07/05/2018 00:00", "category.id":"ROOT"}` \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+Add the `shipmentType` with this command:
+
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d `{"shipmentType":"AIR", "category.id":"ROOT"}` \
+https://openboxes.ngrok.io/openboxes/api/generic/product
+```
+
+**NOTE**: `shipmentType` is an enum with three keys: AIR, LAND, and SEA.
+
+You can also specify all five fields in a single command:
+
+```
+$ curl -b cookies.txt -X POST -H "Content-Type: application/json" \
+-d `{"name":"product 0", "category.id":"ROOT", \
+"origin.id":"1234567890", "origin.name":"Depot 1", "origin.type": "DEPOT", \
+"destination.id":"0987654321", "destination.name":"Ward 2", "destination.type": "WARD", \
+"expectedShippingDate":"07/05/2018 00:00", "category.id":"ROOT", \
+"shipmentType":"AIR", "category.id":"ROOT"}` \
+https://openboxes.ngrok.io/openboxes/api/generic/product
 ```

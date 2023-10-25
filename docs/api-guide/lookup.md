@@ -2,11 +2,13 @@
 
 The Search API supports these operators on any string property of any object:
 
-* eq (This is the default. Specify `property` and `value` if you want an equality search.)
-* like
-* ilike
+* EQ (This is the default. Specify `property` and `value` to run an equality search.)
+* LIKE
+* ILIKE
 
-For example, to search for `Ace%` (using the regex `%`), use this command:
+**NOTE**: If you need OpenBoxes to support a different search operator or property type, [please raise an issue on GitHub](https://github.com/openboxes/openboxes/issues/new).
+
+For example, use this command to search for `Ace%` (using the regex `%`):
 
 ```
 $ curl -i -X GET -H "Content-Type: application/json" -b cookies.txt -d \
@@ -33,7 +35,7 @@ Output:
 
 ## Search for bin locations
 
-To filter by `parentLocation.id`, enter this command:
+Use this command to filter by `parentLocation.id`:
 
 ```
 $ curl -X GET -b cookies.txt -H "Content-Type: application/json" \
@@ -139,16 +141,16 @@ Output:
 
 ## Search in stocklists
 
-<!-- ??????? -->
-Supports filtering by `name`, `requisitionNumber`, `origin.id`, `destination.id` as well as other attributes to be documented at a later time.
-
-
-<!-- For example, to search for ............... -->
+Search by `/stocklists` to filter by `name`, `requisitionNumber`, `origin.id`, and `destination.id` in the same request.
 
 ```
-$ curl -X GET -b cookies.txt \
--H "Content-Type: application/json" \
+$ curl -X GET -b cookies.txt -H "Content-Type: application/json" \
 "https://openboxes.ngrok.io/openboxes/api/stocklists" | jsonlint
+```
+
+Output:
+
+```
 {
   "data": [
     {

@@ -1,5 +1,5 @@
 # Authentication
-You need a valid user account before you can authenticate. To get the full benefits of the API, create a Superuser account, then authenticate using your username and password.
+You need a valid user account before you can authenticate. First create a Superuser account, then authenticate with your username and password.
 
 ```
 $ curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
@@ -20,13 +20,13 @@ Date: Sun, 10 Jun 2018 21:21:10 GMT
 Authentication was successful
 ```
 
-**NOTE**: The `-c cookies.txt` option creates a cookies file named `cookies.txt` and saves your session information for later requests. This prevents needing to pass authentication headers around in each request.
+**NOTE**: The `-c cookies.txt` option creates a cookies file named `cookies.txt` and saves your session information for later requests.
 
 ## Cookies
-After you authenticate, you have two options to authorize requests: the cookies header, and the cookies file.
+After you authenticate, choose either the cookies header or cookies file to authorize requests.
 
 ### Cookies Header 
-Copy the JSESSIONID cookie from the response header to make authenticated requests.
+Copy the `JSESSIONID` cookie from the response header.
 
 ```
 $ curl -i -X POST -H "Content-Type: application/json" \
@@ -35,7 +35,7 @@ https://openboxes.ngrok.io/openboxes/api/categories
 ```
 
 ### Cookies File
-Or use `-b cookies.txt` to read from a cookies file and make requests against the API. Use the `-c cookies.txt` on the login request to generate the proper cookies.
+Or use `-b cookies.txt` to read from the cookies file with your saved session information.
 
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
@@ -44,7 +44,7 @@ https://openboxes.ngrok.io/openboxes/api/categories
 
 ## Logout
 
-`POST` a request to the logout endpoint to end your session.
+`POST` to the logout endpoint to end your session.
 
 ```
 $ curl -i -X POST -H "Content-Type: application/json" -b cookies.txt \
@@ -53,7 +53,7 @@ https://openboxes.ngrok.io/openboxes/api/logout
 
 ## Exceptions
 ### Unauthorized Access
-If you try to access the API with no cookies, or an invalid or stale cookie, this error shows.
+If you try to access the API with no cookies, or an invalid or stale cookie, you get this error.
 
 ```
 $ curl -i -X POST -H "Content-Type: application/json" \
@@ -102,7 +102,7 @@ Install JSONlint with this command:
 npm install jsonlint -g
 ```
 
-Then add ` | jsonlint` at the end of your curl request.
+Then add ` | jsonlint` at the end of your cURL request.
 
 ```
 $ curl -X POST -H "Content-Type: application/json" \
