@@ -48,7 +48,7 @@ class ProductSupplierExcelImporter extends AbstractExcelImporter {
     ]
 
     static Map propertyMap = [
-            active                                : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            active                                : ([expectedType: ExpectedPropertyType.StringType, defaultValue: true]),
             id                                    : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             code                                  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
             name                                  : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
