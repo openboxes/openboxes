@@ -1231,7 +1231,10 @@ class InventoryService implements ApplicationContextAware {
                     def quantityOnHand = quantityBinLocationMap[product][inventoryItem][binLocation]
 
                     def quantityAvailableMap = quantityAvailableInventoryItemMap[product][inventoryItem]
-                    def quantityAvailable = quantityAvailableMap ? quantityAvailableMap[binLocation] : 0
+                    def quantityAvailable =
+                        quantityAvailableMap
+                            ? quantityAvailableMap.find { key, value -> key?.id == binLocation?.id }?.value
+                            : 0
 
                     // We don't want to show the negative values on the frontend
                     quantityAvailable = quantityAvailable > 0 ? quantityAvailable : 0
