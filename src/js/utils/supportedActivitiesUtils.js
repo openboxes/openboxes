@@ -11,4 +11,3 @@ export const isRequestFromWard = (currentLocationId, destinationId, supportedAct
 
 export const supports = (locationSupportedActivities, activity) =>
   locationSupportedActivities?.includes(activity);
-

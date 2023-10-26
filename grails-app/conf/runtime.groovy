@@ -16,7 +16,7 @@ openboxes.identifier.purchaseOrder.properties = ["destinationPartyCode": "destin
 // Require approval on purchase orders
 openboxes.purchasing.approval.enabled = false
 openboxes.purchasing.approval.minimumAmount = 0.00
-openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_APPROVER]
+openboxes.purchasing.approval.defaultRoleTypes = [RoleType.ROLE_PURCHASE_APPROVER] // OBPIH-5799, OBPIH-5800
 
 // Experimental feature that approximates a costing method to provide a crude unit price used
 // for inventory valuation.
@@ -35,6 +35,9 @@ openboxes.browser.connection.status.timeout = 8000
 // Date configuration (OBPIH-5397)
 openboxes.display.date.format = Constants.DISPLAY_DATE_FORMAT
 openboxes.display.date.defaultValue = Constants.DISPLAY_DATE_DEFAULT_VALUE
+
+// OBPIH-5847
+openboxes.purchaseOrder.derivedStatusFetch.delay = 2000 // ms
 
 // Notifications configuration (OBPIH-5355)
 
@@ -68,7 +71,7 @@ openboxes.security.rbac.rules = [
     [controller: 'glAccountType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
     [controller: 'preferenceType', actions: ['delete'], accessRules: [minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
     [controller: 'purchaseOrderApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
-    [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_APPROVER]]],
+    [controller: 'purchaseOrderApi', actions: ['rollback'], accessRules: [ supplementalRoles: [RoleType.ROLE_PURCHASE_APPROVER]]],
     [controller: 'stockTransferApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_MANAGER]],
     [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
     [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
@@ -1261,3 +1264,16 @@ openboxes {
 
 // Order number prefix for bin replenishment case
 openboxes.stockTransfer.binReplenishment.prefix = Constants.REPLENISHMENT_PREFIX
+
+// Default webhook configuration (OBS-1515)
+openboxes {
+    webhook {
+        enabled = false
+        endpoint {
+            url = 'https://webhook.site/9969a2d6-9780-483d-beb4-50667d66497d'
+            headers  = [
+                header1: "value1"
+            ]
+        }
+    }
+}

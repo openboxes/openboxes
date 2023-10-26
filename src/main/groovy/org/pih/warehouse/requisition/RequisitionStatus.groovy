@@ -9,7 +9,7 @@
  **/
 package org.pih.warehouse.requisition
 
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders
 import org.pih.warehouse.inventory.StockMovementStatusCode
 import org.pih.warehouse.core.StatusType
 
@@ -169,7 +169,7 @@ enum RequisitionStatus {
     }
 
     static Closure mapToOption = { RequisitionStatus status ->
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         [
                 id: status.name(),
                 value: status.name(),

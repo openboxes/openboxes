@@ -139,7 +139,6 @@ export const fetchAvailableApprovers = () => async (dispatch) => {
   });
 };
 
-
 export async function fetchSessionInfo() {
   const url = '/api/getAppContext';
   const res = await apiClient.get(url);

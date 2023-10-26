@@ -621,12 +621,6 @@ openboxes:
     cycleCount:
         additionalColumns: {}
 
-    purchasing:
-        approval:
-            enabled: false
-            minimumAmount: 0.00
-            defaultRoleTypes: ["ROLE_APPROVER"]
-
     api:
         pagination:
             enabled: true

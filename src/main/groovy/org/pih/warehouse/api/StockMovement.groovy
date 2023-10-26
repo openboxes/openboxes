@@ -484,7 +484,7 @@ class StockMovement implements Validateable{
             default:
                 status = shipment?.status?.code
         }
-        def g = ApplicationHolder.application.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
     }
 

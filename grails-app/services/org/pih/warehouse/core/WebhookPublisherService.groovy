@@ -9,16 +9,16 @@
 **/
 package org.pih.warehouse.core
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
 
 
+@Transactional
 class WebhookPublisherService {
 
     def apiClientService
-
-    boolean transactional = false
 
     def publishShippedEvent(Shipment shipment) {
 
@@ -59,9 +59,9 @@ class WebhookPublisherService {
 
     def publishEvent(Map payload) {
         try {
-            boolean webhooksEnabled = ConfigurationHolder.config.openboxes.webhook.enabled
-            String webhookUrl = ConfigurationHolder.config.openboxes.webhook.endpoint.url
-            Map headers = ConfigurationHolder.config.openboxes.webhook.endpoint.headers
+            boolean webhooksEnabled = Holders.config.openboxes.webhook.enabled
+            String webhookUrl = Holders.config.openboxes.webhook.endpoint.url
+            Map headers = Holders.config.openboxes.webhook.endpoint.headers
             apiClientService.post(webhookUrl, payload, headers)
         } catch (Exception e) {
             log.error("Failed to publish webhook event due to error: " + e.message, e)
