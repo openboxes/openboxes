@@ -531,12 +531,6 @@ class ShowConsumptionCommand implements Validateable {
     }
 }
 
-class ConsumptionReportProductProperty {
-    String name
-    String naturalName
-    String typePropertyName
-}
-
 class ShowConsumptionRowCommand implements Validateable {
 
     Product product
