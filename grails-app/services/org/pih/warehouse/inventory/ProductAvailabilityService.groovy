@@ -1075,7 +1075,7 @@ class ProductAvailabilityService {
             }
 
             // If exists and it is not just updated availability in the UPDATE query, then add quantities from obsolete PA to the new main one
-            if (existingProductAvailability && existingProductAvailability != remainingProductAvailability) {
+            if (existingProductAvailability && existingProductAvailability.id != remainingProductAvailability.id) {
                 existingProductAvailability.quantityOnHand += remainingProductAvailability.quantityOnHand
                 existingProductAvailability.quantityAllocated += remainingProductAvailability.quantityAllocated
                 existingProductAvailability.quantityNotPicked += remainingProductAvailability.quantityNotPicked
