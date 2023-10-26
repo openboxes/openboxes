@@ -544,7 +544,7 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -562,7 +562,7 @@ class AddItemsPage extends Component {
   fetchAddItemsPageData() {
     this.props.showSpinner();
 
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
     apiClient.get(url)
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
@@ -588,7 +588,7 @@ class AddItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
     apiClient.get(url)
       .then((response) => {
         this.setLineItems(response, startIndex);
@@ -724,7 +724,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -775,7 +775,7 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
+    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
@@ -877,7 +877,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId) {
-    const removeItemsUrl = `/api/stockMovementItems/${itemId}/removeItem`;
+    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
 
     this.props.showSpinner();
     return apiClient.delete(removeItemsUrl)
@@ -893,7 +893,7 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
-    const removeItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
+    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
     this.props.showSpinner();
 
     return apiClient.delete(removeItemsUrl)
@@ -944,7 +944,7 @@ class AddItemsPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/api/stockMovements/${this.state.values.stockMovementId}/status`;
+    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'CHECKING' };
 
     if (this.state.values.statusCode === 'CREATED') {
@@ -998,7 +998,7 @@ class AddItemsPage extends Component {
       },
     };
 
-    const url = `/api/combinedShipmentItems/importTemplate/${stockMovementId}`;
+    const url = `/openboxes/api/combinedShipmentItems/importTemplate/${stockMovementId}`;
 
     return apiClient.post(url, formData, config)
       .then(() => {
@@ -1018,7 +1018,7 @@ class AddItemsPage extends Component {
   }
 
   exportTemplate(blank) {
-    const url = `/api/combinedShipmentItems/exportTemplate?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
+    const url = `/openboxes/api/combinedShipmentItems/exportTemplate?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
     apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, 'Order-items-template.csv', 'text/csv');
