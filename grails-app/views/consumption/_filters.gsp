@@ -1,4 +1,6 @@
-<%@ page import="org.pih.warehouse.product.Product; org.pih.warehouse.core.Constants" %>
+<%@ page import="org.pih.warehouse.CommandUtils" %>
+<%@ page import="org.pih.warehouse.product.Product" %>
+<%@ page import="org.pih.warehouse.core.Constants" %>
 <style>
 .chosen-container-multi .chosen-choices li.search-field input[type="text"] {
     height: 26px;
@@ -131,7 +133,7 @@
                         <g:hasRoleFinance>
                             <g:set var="hasRoleFinance" value="${true}"/>
                         </g:hasRoleFinance>
-                        <g:each var="property" in="${command.availableProperties}">
+                        <g:each var="property" in="${CommandUtils.getAvailableProperties(Product.class.name)}">
                             <g:set var="disabled" value="${'pricePerUnit'.equals(property.name) && !hasRoleFinance}"/>
                             <option value="${property.name}"
                                 ${command.selectedProperties?.toList()?.contains(property.name)?'selected':''}

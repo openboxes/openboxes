@@ -512,23 +512,6 @@ class ShowConsumptionCommand implements Validateable {
         parametersHash(nullable: true)
     }
 
-    static String getTypePropertyName(Class type) {
-        String shortTypeName = ClassUtils.getShortClassName(type)
-        return shortTypeName.substring(0, 1).toLowerCase(Locale.ENGLISH) + shortTypeName.substring(1)
-    }
-
-    static List<ConsumptionReportProductProperty> getAvailableProperties() {
-        List<PersistentProperty> properties =
-            Holders.grailsApplication.mappingContext.getPersistentEntity(Product.class.name).persistentProperties
-        return properties.collect { PersistentProperty it ->
-            new ConsumptionReportProductProperty([
-                name: it.name,
-                naturalName: GrailsNameUtils.getNaturalName(it.name),
-                typePropertyName: getTypePropertyName(it.type)
-            ])
-        }
-    }
-
     Boolean hasParameterChanged() {
         String newParametersHash = generateParametersHash()
         return !parametersHash.equals(newParametersHash)
