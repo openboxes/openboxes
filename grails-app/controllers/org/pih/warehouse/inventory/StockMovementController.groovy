@@ -13,7 +13,6 @@ package org.pih.warehouse.inventory
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVWriter
-import org.apache.commons.lang.NotImplementedException
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.api.StockMovementDirection
