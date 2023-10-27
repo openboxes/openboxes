@@ -8,7 +8,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
 import NotificationType from 'consts/notificationTypes';
-import { object } from 'prop-types';
 
 export const justRejectRequestError = (error) => Promise.reject(error);
 

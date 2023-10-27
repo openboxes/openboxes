@@ -20,6 +20,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
@@ -780,7 +781,7 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`); },
+            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId)); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -791,7 +792,7 @@ class EditItemsPage extends Component {
     } else {
       this.reviseRequisitionItems(formValues)
         .then(() => {
-          window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
+          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId));
         });
     }
   }
@@ -914,7 +915,10 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => {
-                  window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND');
+                  this.props.history.push({
+                    pathname: STOCK_MOVEMENT_URL.list(),
+                    search: 'direction=OUTBOUND',
+                  });
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
@@ -1010,4 +1014,7 @@ EditItemsPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   currentLocale: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };

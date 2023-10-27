@@ -8,6 +8,7 @@ import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
 import { hideSpinner, showSpinner } from 'actions';
+import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
@@ -165,7 +166,7 @@ class CreateStockTransfer extends Component {
         const stockTransfer = parseResponse(response.data.data);
         this.props.hideSpinner();
 
-        this.props.history.push(`/stockTransfer/create/${stockTransfer.id}`);
+        this.props.history.push(STOCK_TRANSFER_URL.edit(stockTransfer.id));
         this.props.nextPage({ stockTransfer });
       })
       .catch(() => this.props.hideSpinner());

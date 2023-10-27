@@ -20,8 +20,10 @@ import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentif
 import RejectRequestModal from 'components/stock-movement/modals/RejectRequestModal';
 import ActivityCode from 'consts/activityCode';
 import RequisitionStatus from 'consts/requisitionStatus';
+import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
+import { stringUrlInterceptor } from 'utils/apiClient';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import canEditRequest from 'utils/permissionUtils';
@@ -160,7 +162,7 @@ const StockMovementOutboundTable = ({
       defaultLabel: 'Show Stock Movement',
       label: 'react.stockMovement.action.show.label',
       leftIcon: <RiInformationLine />,
-      href: '/openboxes/stockMovement/show',
+      href: STOCK_MOVEMENT_URL.show,
     };
     actions.push(showAction);
 
@@ -175,10 +177,10 @@ const StockMovementOutboundTable = ({
         leftIcon: <RiPencilLine />,
       };
       if (isReturn) {
-        editAction.href = `/openboxes/stockTransfer/edit/${order?.id}`;
+        editAction.href = STOCK_TRANSFER_URL.genericEdit(order?.id);
         editAction.appendId = false;
       } else {
-        editAction.href = '/openboxes/stockMovement/edit';
+        editAction.href = STOCK_MOVEMENT_URL.genericEdit;
       }
       actions.push(editAction);
     }
@@ -258,7 +260,7 @@ const StockMovementOutboundTable = ({
         return (
           <TableCell
             {...row}
-            link={`/openboxes/stockMovement/show/${id}`}
+            link={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(id))}
             tooltip
             tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
           >
@@ -280,7 +282,7 @@ const StockMovementOutboundTable = ({
           {...row}
           tooltip
           tooltipLabel={row.original.description || row.original.name}
-          link={`/openboxes/stockMovement/show/${row.original.id}`}
+          link={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(row.original.id))}
         >
           <span className="mx-1">
             {translate(

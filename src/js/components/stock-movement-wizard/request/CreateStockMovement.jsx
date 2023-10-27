@@ -18,7 +18,8 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ActivityCode from 'consts/activityCode';
 import RoleType from 'consts/roleType';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import { REQUEST_URL } from 'consts/applicationUrls';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -403,7 +404,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(stringUrlInterceptor(`/stockMovement/createRequest/${resp.id}`));
+            this.props.history.push(REQUEST_URL.edit(resp.id));
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,

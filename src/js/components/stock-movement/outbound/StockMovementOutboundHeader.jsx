@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
 
 const StockMovementOutboundHeader = ({ showMyStockMovements, isRequestsOpen }) => (
@@ -30,7 +31,7 @@ const StockMovementOutboundHeader = ({ showMyStockMovements, isRequestsOpen }) =
       />
       <Link
         className="primary-button"
-        to="/openboxes/stockMovement/createOutbound"
+        to={STOCK_MOVEMENT_URL.createOutbound()}
       >
         <Translate
           id="react.stockMovement.createStockMovement.label"

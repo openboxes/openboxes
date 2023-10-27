@@ -33,6 +33,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -835,7 +836,7 @@ class AddItemsPage extends Component {
       if (!errors.length) {
         this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
           .then(() => {
-            window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
+            window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId));
           });
       } else {
         confirmAlert({
@@ -848,7 +849,7 @@ class AddItemsPage extends Component {
             {
               label: this.props.translate('react.default.yes.label', 'Yes'),
               onClick: () => {
-                window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
+                window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId));
               },
             },
             {

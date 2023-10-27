@@ -6,7 +6,7 @@ import { RiQuestionLine } from 'react-icons/ri';
 import { useChat } from 'react-live-chat-loader';
 import { connect } from 'react-redux';
 
-import { stringUrlInterceptor } from 'utils/apiClient';
+import { HELPSCOUT_CONFIGURATION } from 'api/urls';
 
 import './SupportButton.scss';
 
@@ -18,7 +18,7 @@ const SupportButton = ({ locale, text, className }) => {
   }, []);
 
   useEffect(() => {
-    axios.get(stringUrlInterceptor('/api/helpscout/configuration/'))
+    axios.get(HELPSCOUT_CONFIGURATION)
       .then((response) => {
         window.Beacon('destroy');
         window.Beacon('init', response.data.localizedHelpScoutKey);

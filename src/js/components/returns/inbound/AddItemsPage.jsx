@@ -18,12 +18,12 @@ import DateField from 'components/form-elements/DateField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -338,7 +338,7 @@ class AddItemsPage extends Component {
     if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
       this.saveStockTransferInCurrentStep(formValues.returnItems)
         .then(() => {
-          window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.inboundReturnId}`);
+          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.props.match.params.inboundReturnId));
         });
     } else {
       confirmAlert({
@@ -350,7 +350,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${this.props.match.params.inboundReturnId}`); },
+            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.props.match.params.inboundReturnId)); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

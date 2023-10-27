@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { SortableElement } from 'react-sortable-hoc';
 import { Tooltip } from 'react-tippy';
 
@@ -250,17 +251,18 @@ const GraphCard = SortableElement(({
   return (
     <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
-        {cardLink ?
-          <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(cardLink.code)} className="title-link">
+        {cardLink ? (
+          <Link target="_blank" rel="noopener noreferrer" to={cardLink} className="title-link">
             <span className="title-link">
               {translate(cardTitle, cardTitle)}
             </span>
-          </a>
-          :
-          <span className="title-link">
-            {translate(cardTitle, cardTitle)}
-          </span>
-        }
+          </Link>
+        )
+          : (
+            <span className="title-link">
+              {translate(cardTitle, cardTitle)}
+            </span>
+          )}
         {
           cardInfo ?
             <div className="graph-infos">

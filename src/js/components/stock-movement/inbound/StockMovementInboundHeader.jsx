@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
 
 const StockMovementInboundHeader = ({ showMyStockMovements }) => (
@@ -20,7 +21,7 @@ const StockMovementInboundHeader = ({ showMyStockMovements }) => (
       />
       <Link
         className="primary-button"
-        to="/openboxes/stockMovement/createCombinedShipments?direction=INBOUND"
+        to={{ pathname: STOCK_MOVEMENT_URL.createCombinedShipments(), search: 'direction=INBOUND' }}
       >
         <Translate
           id="react.stockMovement.createShipmentFromPO.label"
@@ -29,7 +30,7 @@ const StockMovementInboundHeader = ({ showMyStockMovements }) => (
       </Link>
       <Link
         className="primary-button"
-        to="/openboxes/stockMovement/createInbound"
+        to={STOCK_MOVEMENT_URL.createInbound()}
       >
         <Translate
           id="react.stockMovement.createStockMovement.label"

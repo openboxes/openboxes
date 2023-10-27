@@ -85,3 +85,10 @@ export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
 export const COMBINED_SHIPMENT_ITEMS_API = `${API}/combinedShipmentItems`;
 export const COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE = (id) => `${COMBINED_SHIPMENT_ITEMS_API}/importTemplate/${id}`;
 export const COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE = `${COMBINED_SHIPMENT_ITEMS_API}/exportTemplate`;
+
+export const HELPSCOUT_CONFIGURATION = `${CONTEXT_PATH}${API}/helpscout/configuration/`;
+
+export const ENABLE_LOCALIZATION = `${CONTEXT_PATH}/user/enableLocalizationMode`;
+export const DISABLE_LOCALIZATION = `${CONTEXT_PATH}/user/disableLocalizationMode`;
+
+export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?searchTerms=${term}`;

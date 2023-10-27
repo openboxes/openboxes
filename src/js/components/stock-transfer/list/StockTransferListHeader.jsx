@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
+import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
 
 const StockTransferListHeader = ({ isUserManager }) => (
@@ -14,7 +15,7 @@ const StockTransferListHeader = ({ isUserManager }) => (
     </span>
     {isUserManager &&
       <div className="d-flex justify-content-end buttons align-items-center">
-        <Link to="/openboxes/stockTransfer/create">
+        <Link to={STOCK_TRANSFER_URL.create()}>
           <Button
             defaultLabel="Create Stock Transfer"
             label="react.stockTransfer.createStockTransfer.label"

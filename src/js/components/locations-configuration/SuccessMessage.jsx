@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 import { withRouter } from 'react-router-dom';
 
+import { LOCATION_CONFIGURATION_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
@@ -36,19 +37,19 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
             />
           </p>
           <div className="success-buttons-section d-flex flex-column">
-            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = '/openboxes/locationsConfiguration/create'; }}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => history.push(LOCATION_CONFIGURATION_URL.create())}>
               <Translate
                 id="react.locationsConfiguration.success.createAnother"
                 defaultMessage="Create another location"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = stringUrlInterceptor('/location/list'); }}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = stringUrlInterceptor(LOCATION_URL.list()); }}>
               <Translate
                 id="react.locationsConfiguration.success.viewLocationList"
                 defaultMessage="View Location List"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary" onClick={() => history.push('/productsConfiguration/index')}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => history.push(PRODUCT_CONFIGURATION_URL.index())}>
               <Translate
                 id="react.locationsConfiguration.success.createCategoriesAndProducts="
                 defaultMessage="Create Categories and Products"

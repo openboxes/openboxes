@@ -9,7 +9,8 @@ import { withRouter } from 'react-router-dom';
 import { hideSpinner, showSpinner } from 'actions';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch } from 'utils/option-utils';
 import Translate from 'utils/Translate';
@@ -188,7 +189,7 @@ class CreateOutboundReturn extends Component {
             this.setState({
               values: resp,
             }, () => {
-              this.props.history.push(stringUrlInterceptor(`/stockTransfer/createOutboundReturn/${this.state.values.id}`));
+              this.props.history.push(STOCK_TRANSFER_URL.editOutbound(this.state.values.id));
               this.props.nextPage(this.state.values);
             });
           }

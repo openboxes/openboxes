@@ -19,6 +19,7 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -645,7 +646,7 @@ class SendMovementPage extends Component {
         this.stateTransitionToIssued()
           .then(() => {
             // redirect to requisition list
-            window.location = stringUrlInterceptor(`/stockMovement/show/${this.state.values.stockMovementId}`);
+            window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.state.values.stockMovementId));
           })
           .catch(() => this.props.hideSpinner());
       })
@@ -689,7 +690,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`);
+          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(values.stockMovementId));
         });
     } else {
       confirmAlert({
@@ -701,7 +702,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); },
+            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(values.stockMovementId)); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -881,7 +882,10 @@ class SendMovementPage extends Component {
                     <button
                       type="button"
                       onClick={() => {
-                        window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND');
+                        this.props.history.push({
+                          pathname: STOCK_MOVEMENT_URL.list(),
+                          search: 'direction=OUTBOUND',
+                        });
                       }}
                       className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                     >
@@ -995,4 +999,7 @@ SendMovementPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   minimumExpirationDate: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };

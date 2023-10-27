@@ -19,8 +19,10 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import Button from 'components/form-elements/Button';
+import { REQUISITION_TEMPLATE_URL } from 'consts/applicationUrls';
 import useStockListTableData from 'hooks/list-pages/stock-list/useStockListTableData';
 import ActionDots from 'utils/ActionDots';
+import { stringUrlInterceptor } from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -59,27 +61,27 @@ const StockListTable = ({
       defaultLabel: 'Show stock list',
       label: 'react.stocklists.show.label',
       leftIcon: <RiInformationLine />,
-      href: '/openboxes/requisitionTemplate/show',
+      href: REQUISITION_TEMPLATE_URL.show,
     },
     {
       defaultLabel: 'Edit stock list',
       label: 'react.stocklists.editStock.label',
       leftIcon: <RiPencilLine />,
-      href: '/openboxes/requisitionTemplate/editHeader',
+      href: REQUISITION_TEMPLATE_URL.editHeader,
       minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Edit stock list items',
       label: 'react.stocklists.items.editStock.label',
       leftIcon: <RiListUnordered />,
-      href: '/openboxes/requisitionTemplate/edit',
+      href: REQUISITION_TEMPLATE_URL.edit,
       minimumRequiredRole: 'Admin',
     },
     {
       defaultLabel: 'Import stock list items',
       label: 'react.stocklists.items.import.label',
       leftIcon: <RiUploadLine />,
-      href: '/openboxes/requisitionTemplate/batch',
+      href: REQUISITION_TEMPLATE_URL.batch,
       minimumRequiredRole: 'Admin',
     },
     {
@@ -166,7 +168,7 @@ const StockListTable = ({
         <TableCell
           {...row}
           tooltip
-          link={`/openboxes/requisitionTemplate/show/${row.original.id}`}
+          link={stringUrlInterceptor(REQUISITION_TEMPLATE_URL.show(row.original.id))}
         />),
     },
     {

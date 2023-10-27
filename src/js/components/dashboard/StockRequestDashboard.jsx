@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
 
 import { fetchTranslations } from 'actions';
+import { REQUEST_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
@@ -18,7 +20,7 @@ const COLUMNS = [
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2 btn-link',
     Cell: row => (
-      <a href={stringUrlInterceptor(`/stockMovement/show/${row.original.id}`)} >
+      <a href={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(row.original.id))} >
         { row.original.identifier }
       </a>
     ),
@@ -36,7 +38,7 @@ const COLUMNS = [
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2 btn-link',
     Cell: row => (
-      <a href={stringUrlInterceptor(`/stockMovement/show/${row.original.id}`)} >
+      <a href={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(row.original.id))}>
         { row.original.description }
       </a>
     ),
@@ -115,8 +117,8 @@ class StockRequestDashboard extends Component {
               defaultMessage="Stock Requests"
             />
           </h3>
-          <a
-            href={stringUrlInterceptor('/stockMovement/createRequest')}
+          <Link
+            to={REQUEST_URL.create()}
             className="btn btn-primary d-flex justify-content-center align-items-center font-weight-bold"
           >
             <i className="fa fa-plus mr-1" />
@@ -124,7 +126,7 @@ class StockRequestDashboard extends Component {
               id="react.stockMovement.createNewRequest.label"
               defaultMessage="Create New Request"
             />
-          </a>
+          </Link>
         </div>
         <ReactTable
           data={this.state.stockRequests}

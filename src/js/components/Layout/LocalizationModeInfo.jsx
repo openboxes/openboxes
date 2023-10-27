@@ -2,6 +2,7 @@ import React from 'react';
 
 import { RiGlobalLine, RiLogoutBoxRLine } from 'react-icons/ri';
 
+import { DISABLE_LOCALIZATION } from 'api/urls';
 import Button from 'components/form-elements/Button';
 import Translate from 'utils/Translate';
 
@@ -13,7 +14,7 @@ const LocalizationModeInfo = () => (
         <Translate id="react.default.localizationModeActive.label" defaultMessage="The localization mode is active" />
       </span>
     </div>
-    <a href="/openboxes/user/disableLocalizationMode">
+    <a href={DISABLE_LOCALIZATION}>
       <Button
         defaultLabel="Disable Localization Mode"
         label="react.default.disableLocalizationMode.label"

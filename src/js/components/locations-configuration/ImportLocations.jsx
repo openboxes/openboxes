@@ -6,11 +6,13 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION_IMPORT, LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
 import FileDrop from 'components/form-elements/FileDrop';
+import { LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess, stringUrlInterceptor } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -117,23 +119,23 @@ class ImportLocations extends Component {
               <a
                 type="button"
                 className="btn btn-outline-primary align-self-center w-auto mt-5"
-                href={stringUrlInterceptor('/location/list')}
+                href={stringUrlInterceptor(LOCATION_URL.list())}
               >
                 <Translate id="react.locationsConfiguration.viewLocations.label" defaultMessage="View Location List" />
               </a>
-              <a
+              <Link
                 type="button"
                 className="btn btn-outline-primary align-self-center w-auto mt-3"
-                href={stringUrlInterceptor('/productsConfiguration/index')}
+                to={PRODUCT_CONFIGURATION_URL.index()}
               >
                 <Translate id="react.locationsConfiguration.productWizard.label" defaultMessage="Product Creation Wizard" />
-              </a>
-              <a
+              </Link>
+              <Link
                 className="align-self-center w-auto mt-3"
-                href={stringUrlInterceptor('/')}
+                to="/"
               >
                 <Translate id="react.locationsConfiguration.exitToDashboard.label" defaultMessage="Exit to Dashboard" />
-              </a>
+              </Link>
             </React.Fragment>
           ) : (
             <React.Fragment>

@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { Async, components } from 'react-select';
 import { Tooltip } from 'react-tippy';
 
+import { GLOBAL_SEARCH } from 'api/urls';
 import { debounceGlobalSearch } from 'utils/option-utils';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -41,7 +42,7 @@ const GlobalSearch = ({
 
   const onKeyPressHandler = (event) => {
     if (event.key === 'Enter') {
-      window.location = `/openboxes/dashboard/globalSearch?searchTerms=${event.target.value}`;
+      window.location = GLOBAL_SEARCH(event.target.value);
     }
   };
 

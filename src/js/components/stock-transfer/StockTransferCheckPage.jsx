@@ -17,6 +17,7 @@ import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-table/react-table.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 
 
 const SelectTreeTable = (customTreeTableHOC(ReactTable));
@@ -166,7 +167,7 @@ class StockTransferSecondPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
-        window.location = stringUrlInterceptor(`/stockTransfer/show/${this.state.stockTransfer.id}`);
+        window.location = stringUrlInterceptor(STOCK_TRANSFER_URL.show(this.state.stockTransfer.id));
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -245,7 +246,7 @@ class StockTransferSecondPage extends Component {
             <button
               type="button"
               onClick={() => {
-                window.location = stringUrlInterceptor(`/stockTransfer/show/${this.state.stockTransfer.id}`);
+                window.location = stringUrlInterceptor(STOCK_TRANSFER_URL.show(this.state.stockTransfer.id));
               }}
               className="btn btn-outline-primary btn-form btn-xs"
               hidden={this.state.stockTransfer.status !== 'COMPLETED'}

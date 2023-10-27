@@ -18,6 +18,7 @@ import FilterInput from 'components/form-elements/FilterInput';
 import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import EditPickModal from 'components/stock-movement-wizard/modals/EditPickModal';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
@@ -675,7 +676,7 @@ class PickPage extends Component {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); }}
+                  onClick={() => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(values.stockMovementId)); }}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs ml-1"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -692,7 +693,7 @@ class PickPage extends Component {
                 :
               <button
                 type="button"
-                onClick={() => { window.location = stringUrlInterceptor('/stockMovement/list?type=REQUEST'); }}
+                onClick={() => this.props.history.push({ pathname: STOCK_MOVEMENT_URL.list(), search: 'type=REQUEST' })}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
@@ -773,4 +774,7 @@ PickPage.propTypes = {
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
   currentLocale: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };
