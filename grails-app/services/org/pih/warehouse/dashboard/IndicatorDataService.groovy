@@ -349,10 +349,14 @@ class IndicatorDataService {
         Date queryLimit = today.clone()
         queryLimit.set(month: today.month - querySize, date: 1)
 
-        List queryData = Shipment.executeQuery("""SELECT COUNT(s.id), s.destination, 
-        MONTH(s.lastUpdated), YEAR(s.lastUpdated) FROM Shipment s WHERE s.origin = :location 
-        AND s.currentStatus <> 'PENDING' AND s.lastUpdated > :limit 
-        GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination""",
+        List queryData = Shipment.executeQuery("""
+            SELECT COUNT(s.id), s.destination, MONTH(s.lastUpdated), YEAR(s.lastUpdated)
+            FROM Shipment s
+            WHERE s.origin = :location 
+            AND s.currentStatus <> 'PENDING'
+            AND s.lastUpdated > :limit 
+            GROUP BY MONTH(s.lastUpdated), YEAR(s.lastUpdated), s.destination
+        """,
                 ['location': location, 'limit': queryLimit])
         // queryData gives an array of arrays [[count, destination, month, year], ...] of sent stock
 
@@ -425,11 +429,11 @@ class IndicatorDataService {
         if (currentDate.month > endDate.month || (currentDate.month == endDate.month && currentDate.date > endDate.date)) {
             currentYearFormatted += 1
         }
-        def listLabel = ((currentYearFormatted - 4)..currentYearFormatted).collect { Integer it ->
-            yearType.labelYearPrefix + it.toString()
-        }
         def results = [:]
-        listLabel.each { results[it] = 0 }
+        ((currentYearFormatted - 4)..currentYearFormatted).each { Integer it ->
+            String label = yearType.labelYearPrefix + it.toString()
+            results[label] = 0
+        }
 
         // Process fetched data
         data.each { it ->
@@ -451,17 +455,13 @@ class IndicatorDataService {
             } else {
                 results[yearLabel] = it[0]
             }
-
-            // Check if the list with labels contains yearLabel
-            if (!listLabel.contains(yearLabel)) {
-                listLabel << yearLabel
-            }
         }
+        results = results.sort()
 
         List<IndicatorDatasets> datasets = [
             new IndicatorDatasets('Requisition count by year', results.values().toList())
         ]
-        IndicatorData indicatorData = new IndicatorData(datasets, listLabel)
+        IndicatorData indicatorData = new IndicatorData(datasets, results.keySet().toList())
         GraphData graphData = new GraphData(indicatorData)
         return graphData
     }
@@ -531,9 +531,18 @@ class IndicatorDataService {
                 SELECT COUNT(*) FROM Requisition 
                 WHERE dateCreated > :day 
                 AND origin = :location 
-                AND status <> 'ISSUED'
+                AND status NOT IN (:statuses)
             """,
-            ['day': fourDaysAgo, 'location': location]).get(0)
+            [
+                    'day': fourDaysAgo,
+                    'location': location,
+                    'statuses' : [
+                            RequisitionStatus.ISSUED,
+                            RequisitionStatus.PENDING_APPROVAL,
+                            RequisitionStatus.REJECTED,
+                            RequisitionStatus.VERIFYING,
+                    ],
+            ]).get(0)
 
         def createdAfterReturnOrderCount = Order.executeQuery("""
                 SELECT COUNT(DISTINCT o.id) FROM Order o
@@ -553,9 +562,19 @@ class IndicatorDataService {
                 WHERE dateCreated >= :dayFrom
                 AND dateCreated <= :dayTo
                 AND origin = :location 
-                AND status <> 'ISSUED'
+                AND status NOT IN (:statuses)
             """,
-            ['dayFrom': sevenDaysAgo, 'dayTo': fourDaysAgo, 'location': location]).get(0)
+            [
+                    'dayFrom': sevenDaysAgo,
+                    'dayTo': fourDaysAgo,
+                    'location': location,
+                    'statuses' : [
+                            RequisitionStatus.ISSUED,
+                            RequisitionStatus.PENDING_APPROVAL,
+                            RequisitionStatus.REJECTED,
+                            RequisitionStatus.VERIFYING,
+                    ],
+            ]).get(0)
 
         def createdBetweenReturnOrderCount = Order.executeQuery("""
                 SELECT COUNT(DISTINCT o.id) FROM Order o
@@ -575,9 +594,18 @@ class IndicatorDataService {
                 SELECT COUNT(*) FROM Requisition 
                 WHERE dateCreated < :day 
                 AND origin = :location 
-                AND status <> 'ISSUED'
+                AND status NOT IN (:statuses)
             """,
-            ['day': sevenDaysAgo, 'location': location]).get(0)
+            [
+                    'day': sevenDaysAgo,
+                    'location': location,
+                    'statuses' : [
+                            RequisitionStatus.ISSUED,
+                            RequisitionStatus.PENDING_APPROVAL,
+                            RequisitionStatus.REJECTED,
+                            RequisitionStatus.VERIFYING,
+                    ],
+            ]).get(0)
 
         def createdBeforeReturnOrderCount = Order.executeQuery("""
                 SELECT COUNT(DISTINCT o.id) FROM Order o
@@ -947,12 +975,20 @@ class IndicatorDataService {
             where r.origin.id = :location
             and r.requestedDeliveryDate >= :firstDayOfPreviousMonth 
             and r.requestedDeliveryDate < :firstDayOfCurrentMonth
+            and status not in (:statuses)
             group by r.type
         """,
                 [
                         'location': location.id,
                         'firstDayOfPreviousMonth': firstDayOfPreviousMonth,
                         'firstDayOfCurrentMonth': firstDayOfCurrentMonth,
+                        'statuses' : [
+                                RequisitionStatus.CREATED,
+                                RequisitionStatus.CANCELED,
+                                RequisitionStatus.ISSUED,
+                                RequisitionStatus.PENDING_APPROVAL,
+                                RequisitionStatus.REJECTED,
+                        ],
                 ])
 
         percentageAdHoc.each {

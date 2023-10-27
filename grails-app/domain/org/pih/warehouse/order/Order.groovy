@@ -395,11 +395,18 @@ class Order implements Serializable {
             invoiceItems += it.invoiceItems
         }
         orderItems?.each {
-            invoiceItems += it.invoiceItems
+            invoiceItems += it.allInvoiceItems
         }
         return invoiceItems
     }
 
+    List<InvoiceItem> getSortedInvoiceItems() {
+        invoiceItems?.sort { a, b ->
+            a?.invoice?.invoiceNumber <=> b?.invoice?.invoiceNumber ?:
+                a?.product?.productCode <=> b?.product?.productCode ?:
+                    a.id <=> b.id
+        } ?: []
+    }
 
     /**
      * Should only use in the context of displaying a single order (i.e. do not invoke on a list of orders).

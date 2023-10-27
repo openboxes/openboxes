@@ -307,6 +307,11 @@ class UrlMappings {
             action = [GET: "requisitionStatusCodes"]
         }
 
+        "/api/stockMovements/$id/rollbackApproval" {
+            controller = "stockMovementApi"
+            action = [PUT: "rollbackApproval"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

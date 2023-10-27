@@ -5,13 +5,13 @@ import queryString from 'query-string';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
+import { fetchAvailableApprovers, fetchRequisitionStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/outbound/FilterFields';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
-import { fetchLocationById, fetchUserById } from 'utils/option-utils';
+import { fetchLocationById, fetchUserById, selectNullOption } from 'utils/option-utils';
 
-const useOutboundFilters = (isRequestsList) => {
+const useOutboundFilters = (sourceType) => {
   const [filterParams, setFilterParams] = useState({});
   const [defaultFilterValues, setDefaultFilterValues] = useState({});
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -24,24 +24,34 @@ const useOutboundFilters = (isRequestsList) => {
     currentUser,
     currentLocale,
     shipmentTypes,
+    availableApprovers,
   } = useSelector(state => ({
     requisitionStatuses: state.requisitionStatuses.data,
     currentLocation: state.session.currentLocation,
     currentUser: state.session.user,
     currentLocale: state.session.activeLanguage,
     shipmentTypes: state.stockMovementCommon.shipmentTypes,
+    availableApprovers: state.approvers.data,
   }));
 
   useEffect(() => {
     // TODO: When having full React, if once fetched, fetch only if a current language differs
     // TODO: from the language, that we were fetching this for
-    dispatch(fetchRequisitionStatusCodes());
     dispatch(fetchShipmentTypes());
   }, [currentLocale]);
 
+  useEffect(() => {
+    dispatch(fetchRequisitionStatusCodes(sourceType));
+  }, [currentLocale, currentLocation.id]);
+
+  useEffect(() => {
+    dispatch(fetchAvailableApprovers());
+  }, [currentLocation.id]);
+
+  const filters = filterFields(sourceType === 'ELECTRONIC');
 
   const clearFilterValues = () => {
-    const defaultValues = Object.keys(filterFields)
+    const defaultValues = Object.keys(filters)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), { direction: 'OUTBOUND' });
     const transformedParams = transformFilterParams(defaultValues, { direction: { name: 'direction' } });
     const queryFilterParams = queryString.stringify(transformedParams);
@@ -53,7 +63,7 @@ const useOutboundFilters = (isRequestsList) => {
 
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
-    const defaultValues = Object.keys(filterFields)
+    const defaultValues = Object.keys(filters)
       .reduce((acc, key) => ({ ...acc, [key]: '' }), {});
 
     // SET STATIC DEFAULT VALUES
@@ -66,7 +76,7 @@ const useOutboundFilters = (isRequestsList) => {
 
     defaultValues.direction = 'OUTBOUND';
 
-    if (isRequestsList) {
+    if (sourceType === 'ELECTRONIC') {
       defaultValues.sourceType = 'ELECTRONIC';
     }
 
@@ -107,6 +117,13 @@ const useOutboundFilters = (isRequestsList) => {
     if (queryProps.shipmentType) {
       const shipTypes = getParamList(queryProps.shipmentType);
       defaultValues.shipmentType = shipmentTypes.filter(({ id }) => shipTypes.includes(id));
+    }
+    if (sourceType === 'ELECTRONIC' && queryProps.approver) {
+      const approvers = getParamList(queryProps.approver);
+      defaultValues.approver = availableApprovers.filter(({ id }) => approvers.includes(id));
+      if (approvers.includes(selectNullOption.id)) {
+        defaultValues.approver.push(selectNullOption);
+      }
     }
 
     setDefaultFilterValues(defaultValues);
@@ -155,6 +172,7 @@ const useOutboundFilters = (isRequestsList) => {
       requisitionStatusCode: { name: 'requisitionStatusCode', accessor: 'id' },
       receiptStatusCode: { name: 'receiptStatusCode' },
       shipmentType: { name: 'shipmentType', accessor: 'id' },
+      approver: { name: 'approver', accessor: 'id' },
     };
 
     const transformedParams = transformFilterParams(values, filterAccessors);
@@ -177,5 +195,5 @@ const useOutboundFilters = (isRequestsList) => {
 export default useOutboundFilters;
 
 useOutboundFilters.propTypes = {
-  isRequestsList: PropTypes.bool.isRequired,
+  sourceType: PropTypes.string.isRequired,
 };

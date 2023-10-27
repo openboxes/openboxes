@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="AlanNadolny" id="130920231252-0">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                select count(*) from role where role_type = "ROLE_REQUISITION_APPROVER";
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="role">
+            <column name="id" value="ROLE_REQUISITION_APPROVER"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="role_type" value="ROLE_REQUISITION_APPROVER"/>
+            <column name="name" value="Request approver"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

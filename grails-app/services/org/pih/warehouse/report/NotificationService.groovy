@@ -21,6 +21,9 @@ import org.pih.warehouse.core.MailService
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionSourceType
+import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.Shipment
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
@@ -223,4 +226,60 @@ class NotificationService {
         }
     }
 
+
+    void publishRequisitionStatusTransitionNotifications(Requisition requisition) {
+        switch(requisition.status) {
+            case RequisitionStatus.PENDING_APPROVAL:
+                List<Person> recipients = requisition.approvers ? Person.getAll(requisition.approvers.id) : []
+                publishRequisitionPendingApprovalNotifications(requisition, recipients)
+                break
+            case RequisitionStatus.APPROVED:
+                publishRequisitionStatusUpdateNotification(requisition, requisition.requestedBy)
+                break
+            case RequisitionStatus.REJECTED:
+                publishRequisitionStatusUpdateNotification(requisition, requisition.requestedBy)
+                break
+            case RequisitionStatus.ISSUED:
+                if (requisition?.sourceType == RequisitionSourceType.ELECTRONIC) {
+                    publishFulfillmentNotification(requisition.requestedBy, requisition)
+                }
+                break
+            default:
+                break
+        }
+    }
+
+    void publishRequisitionPendingApprovalNotifications(Requisition requisition, List<Person> recipients) {
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/approvalsAlert"
+
+        recipients.each { recipient ->
+            if (recipient?.email) {
+                String redirectToRequestsList = "/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC&approver=${recipient.id}"
+                String body = renderTemplate(template, [requisition: requisition, redirectUrl: redirectToRequestsList])
+                mailService.sendHtmlMail(subject, body, recipient.email)
+            }
+        }
+    }
+
+    void publishRequisitionStatusUpdateNotification(Requisition requisition, Person recipient) {
+        if (!recipient.email) {
+            return
+        }
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/approvalsStatusChanged"
+        String body = renderTemplate(template, [requisition: requisition])
+        mailService.sendHtmlMail(subject, body, recipient.email)
+    }
+
+
+    void publishFulfillmentNotification(Person requestor, Requisition requisition) {
+        String subject = "${requisition.requestNumber} ${requisition.name}"
+        String template = "/email/fulfillmentAlert"
+
+        if (requestor.email) {
+            String body = renderTemplate(template, [requisition: requisition])
+            mailService.sendHtmlMail(subject, body, requestor.email)
+        }
+    }
 }

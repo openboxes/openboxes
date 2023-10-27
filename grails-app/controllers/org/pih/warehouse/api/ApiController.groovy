@@ -146,7 +146,8 @@ class ApiController {
         String highestRole = user.getHighestRole(location)
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
-        boolean isUserApprover = userService.hasRoleApprover(session?.user)
+        boolean isUserApprover = userService.hasRolePurchaseApprover(session?.user)
+        boolean isUserRequestApprover = userService.isUserInAllRoles(session?.user?.id, [RoleType.ROLE_REQUISITION_APPROVER], session.warehouse?.id)
         // TODO: investigate why in isUserManager method in userService there is Assistant role included
         ArrayList<RoleType> managerRoles = [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER]
         boolean isUserManager = userService.getEffectiveRoles(user).any { managerRoles.contains(it.roleType) }
@@ -190,6 +191,7 @@ class ApiController {
                 isSuperuser          : isSuperuser,
                 isUserAdmin          : isUserAdmin,
                 isUserApprover       : isUserApprover,
+                isUserRequestApprover: isUserRequestApprover,
                 isUserManager        : isUserManager,
                 supportedActivities  : supportedActivities,
                 isImpersonated       : isImpersonated,

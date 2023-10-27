@@ -27,7 +27,7 @@ export const renderFormField = (fieldConfig, fieldName, props = {}) => {
 export const renderFormFields = ({
   renderInput,
   attributes: {
-    required, hidden, showError, tooltip, injectionData, trigger = 'click', ...otherAttributes
+    required, hidden, showError, subtext, tooltip, injectionData, trigger = 'click', ...otherAttributes
   },
   label: FieldLabel,
   defaultMessage,
@@ -95,7 +95,12 @@ export const renderFormFields = ({
       <div className="row">
         <div className="col-md-2 hidden" />
         <div className="help-block" style={{ float: 'left' }}>
-          {(error && (touched || fieldTouched || showError)) ? translate(`${error}`) : ''}
+          {
+            subtext && (<div>{translate(subtext)}</div>)
+          }
+          {
+            (error && (touched || fieldTouched || showError)) && (<div>{translate(`${error}`)}</div>)
+          }
         </div>
       </div>
     </div>

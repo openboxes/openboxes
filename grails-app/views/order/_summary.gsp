@@ -12,7 +12,6 @@
 		<g:set var="isAddingComment" value="${request.request.requestURL.toString().contains('addComment')}"/>
 		<g:set var="isAddingDocument" value="${request.request.requestURL.toString().contains('addDocument')}"/>
         %{-- For fetching derived statuses (preparing the list of order ids to be sent with request) --}%
-        <g:hiddenField id="orderId" name="orderId" value="${orderInstance?.id}"/>
 		<table width="50%">
 			<tbody>
 				<tr class="odd">
@@ -354,7 +353,7 @@
     </div>
     <script>
       $(document).ready(function() {
-        fetchOrderDerivedStatus();
+        setTimeout(fetchOrderDerivedStatus, ${grailsApplication.config.openboxes.purchaseOrder.derivedStatusFetch.delay});
       });
 
       function fetchOrderDerivedStatus() {

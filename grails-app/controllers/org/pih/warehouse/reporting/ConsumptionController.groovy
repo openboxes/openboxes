@@ -62,7 +62,7 @@ class ConsumptionController {
         command.transactionTypes = command.defaultTransactionTypes
 
         // If any parameters have changed we need to reset filters
-        if (command.hasParameterChanged()) {
+        if (command.parametersHash && command.hasParameterChanged()) {
             command.selectedProperties = []
             command.selectedTags = []
             command.selectedLocations = []
@@ -313,13 +313,13 @@ class ConsumptionController {
                         'Category'                                    : row.product?.category?.name,
                         'Formulary'                                   : row.product?.productCatalogsToString(),
                         'Tag'                                         : row.product?.tagsToString(),
-                        'Unit Price'                                  : g.formatNumber(number: row.pricePerUnit, format: '###.#', maxFractionDigits: 2) ?: '',
+                        'Unit Price'                                  : g.formatNumber(number: row.pricePerUnit, format: '###.#', maxFractionDigits: 4) ?: '',
                         'UoM'                                         : row.product.unitOfMeasure ?: '',
                         'Qty Issued'                                  : g.formatNumber(number: row.issuedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Qty Consumed'                                : g.formatNumber(number: row.consumedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Qty Returned'                                : g.formatNumber(number: row.returnedQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Total Consumption (Issued+Consumed-Returned)': g.formatNumber(number: row.totalConsumptionQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
-                        'Value Consumed'                              : g.formatNumber(number: valueConsumed, format: '###.#', maxFractionDigits: 1),
+                        'Value Consumed'                              : g.formatNumber(number: valueConsumed, format: '###.#', maxFractionDigits: 2),
                         'Average Monthly Consumption'                 : g.formatNumber(number: row.monthlyQuantity, format: '###.#', maxFractionDigits: 4) ?: '',
                         'Quantity on hand'                            : g.formatNumber(number: row.onHandQuantity, format: '###.#', maxFractionDigits: 1) ?: '',
                         'Months remaining'                            : g.formatNumber(number: row.numberOfMonthsRemaining, format: '###.#', maxFractionDigits: 0) ?: '',
@@ -511,6 +511,9 @@ class ShowConsumptionCommand implements Validateable {
     }
 
     String generateParametersHash() {
+        if (!fromDate && !toDate && !fromLocations) {
+            return null
+        }
         String parameters = "${fromDate}:${toDate}:${fromLocations}"
         return DigestUtils.md5Hex(parameters.bytes)
     }

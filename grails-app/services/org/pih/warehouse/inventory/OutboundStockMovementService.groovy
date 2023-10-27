@@ -11,6 +11,7 @@ package org.pih.warehouse.inventory
 
 import grails.gorm.transactions.Transactional
 import org.hibernate.ObjectNotFoundException
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.requisition.RequisitionSourceType
@@ -40,8 +41,17 @@ class OutboundStockMovementService {
         Date createdAfter = params.createdAfter ? Date.parse("MM/dd/yyyy", params.createdAfter) : null
         Date createdBefore = params.createdBefore ? Date.parse("MM/dd/yyyy", params.createdBefore) : null
         List<ShipmentType> shipmentTypes = params.list("shipmentType") ? params.list("shipmentType").collect{ ShipmentType.read(it) } : null
+        Boolean isApprovalRequired = stockMovement?.origin?.isApprovalRequired()
 
-        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
+        // OBPIH-5814
+        // This query returns a list of OutboundStockMovementListItem ids with applied filters
+        // which later will be hydrated by another OutboundStockMovementListItem.list()
+        // this is a workaround to prevent missing approvers data when filtering by approvers
+        def stockMovementsIds = OutboundStockMovementListItem.createCriteria().list() {
+            projections {
+                property "id"
+            }
+            setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
 
             if (stockMovement?.receiptStatusCodes) {
                 'in'("shipmentStatus", stockMovement.receiptStatusCodes)
@@ -99,6 +109,44 @@ class OutboundStockMovementService {
                     not {
                         'in'("status", [RequisitionStatus.CREATED, RequisitionStatus.ISSUED, RequisitionStatus.CANCELED])
                     }
+                    // If we want to get stock movements with electronic source type when approval is not required
+                    // we don't want to show the stock movements with approval statuses
+                    if (!isApprovalRequired) {
+                        not {
+                            'in'("status", RequisitionStatus.listApproval())
+                        }
+                    } else if (!params.isRequestApprover) {
+                        not {
+                            'in'("status", [RequisitionStatus.PENDING_APPROVAL, RequisitionStatus.REJECTED])
+                        }
+                    }
+                }
+            } else {
+                // If we are getting stock movements with default source type when approval is required
+                // we want to show stock movements just with APPROVED status
+                not {
+                    'in'("status", [RequisitionStatus.PENDING_APPROVAL, RequisitionStatus.REJECTED])
+                }
+                // When approval is not required, we want to hide stock movements with all of the
+                // approval statuses
+                if (!isApprovalRequired) {
+                    not {
+                        'in'("status", [RequisitionStatus.APPROVED])
+                    }
+                }
+            }
+            if (params.list("approver")) {
+                requisition {
+                    or {
+                        if (params.list("approver").contains("null")) {
+                            isEmpty("approvers")
+                        }
+                        if (stockMovement.approvers) {
+                            approvers {
+                                'in'("id", stockMovement.approvers.collect { it?.id })
+                            }
+                        }
+                    }
                 }
             }
             if(createdAfter) {
@@ -112,6 +160,17 @@ class OutboundStockMovementService {
                     'in'("shipmentType", shipmentTypes)
                 }
             }
+        }
+
+        // without this guard criteria wil throw a SQL syntax exception
+        // because it can't resolve condition 'in'("id", stockMovementsIds) with empty list
+        if(!stockMovementsIds) {
+            return []
+        }
+
+        // Hydrate previously fetched OutboundStockMovementListItem ids, also paginate and sort the data
+        def stockMovements = OutboundStockMovementListItem.createCriteria().list(max: max, offset: offset) {
+            'in'("id", stockMovementsIds)
 
             if (params.sort) {
                 if (params.sort == "destination.name") {

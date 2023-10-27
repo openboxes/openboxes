@@ -16,6 +16,7 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.importer.ImportDataCommand
@@ -39,10 +40,12 @@ class StockMovementApiController {
     def outboundStockMovementService
     def stockMovementService
     def stockTransferService
+    def userService
 
     def list() {
         Location destination = params.destination ? Location.get(params.destination) : null
         Location origin = params.origin ? Location.get(params.origin) : null
+        params.isRequestApprover = userService.isUserInAllRoles(session?.user?.id, [RoleType.ROLE_REQUISITION_APPROVER], origin?.id)
 
         StockMovementDirection direction = params.direction ? params.direction as StockMovementDirection : null
         if (destination == origin || !params.direction) {
@@ -63,6 +66,7 @@ class StockMovementApiController {
         stockMovement.requisitionStatusCodes = params.requisitionStatusCode ? params?.list("requisitionStatusCode") as RequisitionStatus[] : null
         stockMovement.requestType = params.requestType ? params.requestType as RequisitionType : null
         stockMovement.sourceType = params.sourceType ? params.sourceType as RequisitionSourceType : null
+        stockMovement.approvers = params.approver ? User.getAll(params.list("approver"))?.findAll{ it } : null
 
         if (params.q) {
             stockMovement.identifier = "%" + params.q + "%"
@@ -799,14 +803,50 @@ class StockMovementApiController {
     }
 
     def requisitionStatusCodes() {
-        def options = RequisitionStatus.listOutboundOptions()?.collect {
-            [
-                    id: it.name(),
-                    value: it.name(),
-                    label: "${g.message(code: 'enum.RequisitionStatus.' + it.name())}",
-                    variant: it.variant.name
-            ]
+        // Location for checking if approval is required
+        Location currentLocation = Location.get(session.warehouse.id)
+        // Indicator deciding if we should get statuses for request or for normal outbound
+        Boolean isElectronicType = params.get("sourceType") == RequisitionSourceType.ELECTRONIC.name()
+
+        List<String> statuses = getOutboundRequisitionStatusCodes(currentLocation.isApprovalRequired(), isElectronicType).collect(RequisitionStatus.mapToOption)
+
+        render([data: statuses] as JSON)
+    }
+
+    // Function for getting appropriate filter options based on current list and supporting requests approval
+    List<RequisitionStatus> getOutboundRequisitionStatusCodes(Boolean isApprovalRequired, Boolean isElectronicType) {
+        // If a location doesn't have approval required, return listOutboundOptions no matter what list is displayed
+        if (!isApprovalRequired) {
+            return RequisitionStatus.listOutboundOptions()
         }
-        render([data: options] as JSON)
+        // If request approval is required, check what type of list it is and return appropriate statuses
+        if (isElectronicType) {
+            boolean isRequestApprover = userService.isUserInAllRoles(session?.user?.id, [RoleType.ROLE_REQUISITION_APPROVER], session.warehouse?.id)
+            if (isRequestApprover) {
+                return RequisitionStatus.listRequestOptionsWhenApprovalRequired()
+            }
+
+            // If request approval is required, but the user is not Approver user
+            return RequisitionStatus.listRequestOptionsWhenNonApprover()
+        }
+
+        return RequisitionStatus.listOutboundOptionsWhenApprovalRequired()
+    }
+
+    def rollbackApproval = {
+        String stockMovementId = params.get("id")
+        try {
+            stockMovementService.rollbackApproval(stockMovementId)
+        } catch (Exception e) {
+            log.error("Unable to rollback stock movement with ID ${stockMovementId}: " + e.message)
+            String errorMessage = g.message(
+                    code: "request.rollbackApproval.error.message",
+                    default: "Unable to rollback approval: ${e.message}",
+                    args: [e.message]
+            )
+            response.status = 500
+            render([errorMessage: errorMessage] as JSON)
+        }
+        render(status: 200)
     }
 }

@@ -12,6 +12,9 @@ package org.pih.warehouse.requisition
 import org.pih.warehouse.picklist.Picklist
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.auth.AuthService
+import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.User
@@ -112,16 +115,42 @@ class Requisition implements Comparable<Requisition>, Serializable {
 
     Integer statusSortOrder
 
+    // Request approval fields
+    Person approvedBy
+    Person rejectedBy
+    Date dateApproved
+    Date dateRejected
+    Boolean approvalRequired
+
     // Removed comments, documents, events for the time being.
-    static transients = ["sortedStocklistItems", "requisitionItemsByDateCreated", "requisitionItemsByOrderIndex", "requisitionItemsByCategory", "shipment", "totalCost"]
+    static transients = [
+            "sortedStocklistItems",
+            "requisitionItemsByDateCreated",
+            "requisitionItemsByOrderIndex",
+            "requisitionItemsByCategory",
+            "shipment",
+            "totalCost",
+            "recentComment",
+            "mostRecentEvent"
+    ]
     static hasOne = [picklist: Picklist]
-    static hasMany = [requisitionItems: RequisitionItem, transactions: Transaction, shipments: Shipment]
+    static hasMany = [
+            requisitionItems: RequisitionItem,
+            transactions: Transaction,
+            shipments: Shipment,
+            comments: Comment,
+            events: Event,
+            approvers: Person,
+    ]
     static mapping = {
         id generator: 'uuid'
         requisitionItems cascade: "all-delete-orphan", sort: "orderIndex", order: 'asc', batchSize: 100
 
         statusSortOrder formula: RequisitionStatus.getStatusSortOrderFormula()
         monthRequested formula: "date_format(date_requested, '%M %Y')"
+        comments joinTable: [name: "requisition_comment", key: "requisition_id"], cascade: "all-delete-orphan"
+        events joinTable: [name: "requisition_event", key: "requisition_id"]
+        approvers joinTable: [name: "requisition_approvers", key: "requisition_id"]
     }
 
     static constraints = {
@@ -171,6 +200,17 @@ class Requisition implements Comparable<Requisition>, Serializable {
         replenishmentTypeCode(nullable: true)
         sortByCode(nullable: true)
         statusSortOrder(nullable: true)
+        approvedBy(nullable: true)
+        rejectedBy(nullable: true)
+        dateApproved(nullable: true)
+        dateRejected(nullable: true)
+        approvalRequired(nullable: true)
+    }
+
+    Comment getRecentComment() {
+        return comments?.sort({ a, b ->
+            b.dateCreated <=> a.dateCreated
+        })?.find{true}
     }
 
     def getRequisitionItemCount() {
@@ -350,6 +390,28 @@ class Requisition implements Comparable<Requisition>, Serializable {
         }?.sum() ?: 0
     }
 
+    Event getMostRecentEvent() {
+        if (events?.size() > 0) {
+            return events.sort().iterator().next()
+        }
+        return null
+    }
+
+    boolean shouldSendApprovalNotification() {
+        if (status == RequisitionStatus.PENDING_APPROVAL) {
+            // if submitted for approval, then check if destination (requesting location)
+            // has enabled notifications to the approvers (fulfilling location)
+            // and should send notification to approvers
+            return destination.supports(ActivityCode.ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS)
+        } else if ([RequisitionStatus.APPROVED, RequisitionStatus.REJECTED, RequisitionStatus.ISSUED].contains(status)) {
+            // if approved or rejected, then check if destination (requesting location)
+            // has enabled notifications and should get notification  about approval or rejection
+            return destination.supports(ActivityCode.ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS)
+        }
+
+        // If status is not handled above assume it is wrongly triggered and don't send notification
+        return false
+    }
 
     Map toJson() {
         [

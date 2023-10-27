@@ -1,0 +1,97 @@
+// Classic form
+.classic-form {
+  background-color: #fff;
+  margin-bottom: 16px;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+
+  .form-title {
+    width: 100%;
+    font-size: larger;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .form-subtitle {
+    width: 100%;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+  }
+
+  .form-group {
+    margin-top: 0px !important;
+    margin-bottom: 12px !important;
+    margin-right: 12px !important;
+    min-width: 100%;
+
+    @media (max-width: 730px) {
+      min-width: 100% !important;
+    }
+
+    .row {
+      margin-right: 0;
+      margin-left: 0;
+    }
+
+    .col-form-label {
+      text-align: unset !important;
+      max-width: unset !important;
+      min-width: 100%;
+      padding: 6px 0 !important;
+    }
+
+    .form-element-container {
+      height: 2.8em;
+      padding: 0;
+      max-width: unset !important;
+      flex-grow: 1;
+
+      input {
+        height: 3em;
+      }
+
+      .Select {
+        height: 3em;
+
+        .Select-control {
+          height: inherit;
+
+          .Select-value,
+          .Select-placeholder {
+            display: flex;
+            align-items: center;
+
+            .Select-value-label {
+              height: fit-content;
+            }
+          }
+        }
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  }
+}
+
+.request-modal-select {
+  .select-xs {
+    height: 3em;
+  }
+}
+
+.request-modal-textarea {
+  .form-element-container {
+    height: 150px !important;
+    margin-bottom: 0;
+  }
+}

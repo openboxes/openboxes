@@ -18,8 +18,10 @@ enum StockMovementStatusCode {
     CREATED(0),
     REQUESTING(1, PENDING),
     REQUESTED(2, PENDING),
+    PENDING_APPROVAL(2, PENDING_APPROVAL),
     VALIDATING(2, PENDING),
     VALIDATED(3, PENDING),
+    APPROVED(3, APPROVED),
     PICKING(3, PENDING),
     PICKED(4, PENDING),
     CHECKING(4, PENDING),
@@ -27,7 +29,8 @@ enum StockMovementStatusCode {
     PACKED(7, PENDING),
     REVIEWING(8, PENDING),
     DISPATCHED(9),
-    CANCELED(10)
+    CANCELED(10),
+    REJECTED(10, REJECTED),
 
     int sortOrder
     StockMovementStatusCode displayStatusCode

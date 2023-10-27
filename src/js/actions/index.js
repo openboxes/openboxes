@@ -8,6 +8,7 @@ import {
   CHANGE_CURRENT_LOCALE,
   CHANGE_CURRENT_LOCATION,
   CLOSE_INFO_BAR,
+  FETCH_APPROVERS,
   FETCH_BUYERS,
   FETCH_CONFIG,
   FETCH_CONFIG_AND_SET_ACTIVE,
@@ -49,6 +50,8 @@ import {
 import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
+import userApi from 'api/services/UserApi';
+import RoleType from 'consts/roleType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
 
@@ -122,6 +125,19 @@ export function fetchUsers() {
     });
   };
 }
+
+export const fetchAvailableApprovers = () => async (dispatch) => {
+  const response = await userApi.getUsersOptions({
+    params: {
+      roleTypes: RoleType.ROLE_REQUISITION_APPROVER,
+      active: true,
+    },
+  });
+  return dispatch({
+    type: FETCH_APPROVERS,
+    payload: response?.data?.data,
+  });
+};
 
 export async function fetchSessionInfo() {
   const url = '/api/getAppContext';
@@ -530,15 +546,16 @@ export function fetchShipmentStatusCodes() {
   };
 }
 
-export function fetchRequisitionStatusCodes() {
+export function fetchRequisitionStatusCodes(sourceType = null) {
   return (dispatch) => {
-    apiClient.get('/api/stockMovements/requisitionsStatusCodes')
-      .then((res) => {
-        dispatch({
-          type: FETCH_REQUISITION_STATUS_CODES,
-          payload: res.data.data,
-        });
+    apiClient.get('/api/stockMovements/requisitionsStatusCodes', {
+      params: { sourceType },
+    }).then((res) => {
+      dispatch({
+        type: FETCH_REQUISITION_STATUS_CODES,
+        payload: res.data.data,
       });
+    });
   };
 }
 

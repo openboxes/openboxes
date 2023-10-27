@@ -6,9 +6,16 @@ import { getTranslate } from 'react-localize-redux';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'react-s-alert';
 
-import { fetchRequisitionStatusCodes, hideSpinner, showSpinner } from 'actions';
+import {
+  fetchRequisitionStatusCodes,
+  hideSpinner,
+  showSpinner,
+} from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
 import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS } from 'api/urls';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useTableData from 'hooks/list-pages/useTableData';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -31,6 +38,7 @@ const useOutboundListTableData = (filterParams) => {
       createdBy,
       updatedBy,
       shipmentType,
+      approver,
     } = filterParams;
     return _.omitBy({
       ...filterParams,
@@ -44,6 +52,7 @@ const useOutboundListTableData = (filterParams) => {
       createdBy: createdBy?.id,
       updatedBy: updatedBy?.id,
       shipmentType: shipmentType?.map?.(({ id }) => id),
+      approver: approver?.map?.(({ id }) => id),
       ...sortingParams,
     }, (value) => {
       if (typeof value === 'object' && _.isEmpty(value)) return true;
@@ -126,6 +135,50 @@ const useOutboundListTableData = (filterParams) => {
     });
   };
 
+  const approveRequest = async (id, identifier) => {
+    dispatch(showSpinner());
+    try {
+      await stockMovementApi.updateStatus(id, RequisitionStatus.APPROVED);
+      notification(NotificationType.SUCCESS)({
+        message: `You have successfully Approved the request ${identifier}`,
+      });
+      fireFetchData();
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  const rejectRequest = (id, identifier) => async ({ sender, recipient, comment }) => {
+    dispatch(showSpinner());
+    try {
+      await stockMovementApi.rejectRequest({
+        id,
+        sender: sender?.id,
+        recipient: recipient?.id,
+        comment,
+      });
+      notification(NotificationType.SUCCESS)({
+        message: `You have successfully Rejected the request ${identifier}`,
+      });
+      fireFetchData();
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  const rollbackRequest = async (id) => {
+    dispatch(showSpinner());
+    try {
+      await stockMovementApi.rollbackApproval(id);
+      notification(NotificationType.SUCCESS)({
+        message: 'Successfully rolled back approval',
+      });
+      fireFetchData();
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
   return {
     tableData,
     tableRef,
@@ -134,6 +187,9 @@ const useOutboundListTableData = (filterParams) => {
     exportStockMovements,
     exportPendingShipmentItems,
     deleteConfirmAlert,
+    approveRequest,
+    rejectRequest,
+    rollbackRequest,
   };
 };
 

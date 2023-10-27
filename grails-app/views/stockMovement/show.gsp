@@ -1,10 +1,15 @@
-<%@ page import="org.pih.warehouse.requisition.RequisitionStatus; org.pih.warehouse.shipping.ShipmentStatusCode" %>
+<%@ page import="org.pih.warehouse.requisition.RequisitionStatus" %>
+<%@ page import="org.pih.warehouse.core.Role" %>
+<%@ page import="org.pih.warehouse.shipping.ShipmentStatusCode" %>
 <%@ page import="org.pih.warehouse.core.RoleType" %>
 <%@ page import="org.pih.warehouse.requisition.RequisitionSourceType" %>
+<%@ page import="org.pih.warehouse.inventory.StockMovementStatusCode" %>
+<%@ page import="org.pih.warehouse.core.ActivityCode"%>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="custom" />
+    <link rel="stylesheet" href="${createLinkTo(dir: 'css', file: 'badge.css')}" type="text/css" />
     <g:set var="entityName" value="${warehouse.message(code: 'stockMovement.label', default: 'Stock Movement')}" />
     <title>
         <warehouse:message code="stockMovement.label"/>
@@ -26,6 +31,12 @@
         <g:if test="${stockMovement?.documents}">
             <div class="right">
                 <div class="button-group">
+                    <g:if test="${stockMovement.electronicType}">
+                        <g:link controller="stockMovement" action="addComment" id="${stockMovement?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'comment_add.png')}" />&nbsp;
+                            <warehouse:message code="requisition.addComment.label" default="Add comment" />
+                        </g:link>
+                    </g:if>
                     <g:link controller="stockMovement" action="addDocument" class="button" id="${stockMovement?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'page_add.png')}" />&nbsp;
                         <warehouse:message code="stockMovement.uploadDocuments.label" />
@@ -75,78 +86,132 @@
             <g:set var="hasBeenPlaced" value="${stockMovement?.hasBeenShipped() || stockMovement?.hasBeenPartiallyReceived()}"/>
             <g:set var="isSameOrigin" value="${stockMovement?.origin?.id==session.warehouse.id}"/>
             <g:set var="isSameDestination" value="${stockMovement?.destination?.id==session.warehouse.id}"/>
-            <g:if test="${stockMovement?.order}">
-                <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                    <warehouse:message code="default.button.edit.label" />
-                </g:link>
-            </g:if>
-            <g:else>
-                <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
-                    <warehouse:message code="default.button.edit.label" />
-                </g:link>
-            </g:else>
-            <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
-                <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
-                <warehouse:message code="default.button.receive.label" />
-            </g:link>
-            <g:isUserAdmin>
-                <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
-                    <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                        <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+            <g:set var="userHasRequestApproverRole" value="${false}"/>
+            <g:isUserInAllRoles location="${stockMovement?.origin?.id}" roles="${[RoleType.ROLE_REQUISITION_APPROVER]}">
+                <g:set var="userHasRequestApproverRole" value="${true}"/>
+            </g:isUserInAllRoles>
+            <g:set var="isApprovalRequired" value="${stockMovement?.isApprovalRequired()}"/>
+            <g:if test="${!isApprovalRequired}">
+                <g:if test="${stockMovement?.order}">
+                    <g:link controller="stockTransfer" action="edit" id="${stockMovement?.order?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
                     </g:link>
                 </g:if>
-                <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
-                        stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
-                    <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
-                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
-                        <warehouse:message code="default.button.rollback.label" />
+                <g:else>
+                    <g:link controller="stockMovement" action="edit" id="${stockMovement?.id}" class="button">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
                     </g:link>
-                </g:elseif>
-            </g:isUserAdmin>
-                <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
-                <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
-                <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
-                    <g:if test="${stockMovement?.order}">
-                        <g:isUserAdmin>
-                            <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
-                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
-                                &nbsp;<warehouse:message code="default.button.delete.label" />
-                            </g:link>
-                        </g:isUserAdmin>
+                </g:else>
+                <g:link controller="partialReceiving" action="create" id="${stockMovement?.shipment?.id}" class="button">
+                    <img src="${resource(dir: 'images/icons/', file: 'handtruck.png')}" />&nbsp;
+                    <warehouse:message code="default.button.receive.label" />
+                </g:link>
+                <g:isUserAdmin>
+                    <g:if test="${stockMovement?.hasBeenReceived() || stockMovement?.hasBeenPartiallyReceived()}">
+                        <g:link controller="partialReceiving" action="rollbackLastReceipt" id="${stockMovement?.shipment?.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                            <warehouse:message code="stockMovement.rollbackLastReceipt.label" />
+                        </g:link>
                     </g:if>
-                    <g:else>
-                        <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                    <g:elseif test="${stockMovement?.hasBeenIssued() || ((stockMovement?.hasBeenShipped() ||
+                            stockMovement?.hasBeenPartiallyReceived()) && stockMovement?.isFromOrder)}">
+                        <g:link controller="stockMovement" action="rollback" id="${stockMovement.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_rotate_anticlockwise.png')}" />&nbsp;
+                            <warehouse:message code="default.button.rollback.label" />
+                        </g:link>
+                    </g:elseif>
+                </g:isUserAdmin>
+                    <g:set var="isPending" value="${stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus}" />
+                    <g:set var="originIsDepot" value="${stockMovement?.origin?.isDepot()}" />
+                    <g:if test="${isPending && (isSameOrigin || !originIsDepot) && !stockMovement?.electronicType}">
+                        <g:if test="${stockMovement?.order}">
+                            <g:isUserAdmin>
+                                <g:link class="button" controller="stockTransfer" action="remove" id="${stockMovement?.id}" params="[orderId: stockMovement?.order?.id]"
+                                        onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+                                    <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />
+                                    &nbsp;<warehouse:message code="default.button.delete.label" />
+                                </g:link>
+                            </g:isUserAdmin>
+                        </g:if>
+                        <g:else>
+                            <g:link controller="stockMovement" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
+                                    onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
+                                    disabledMessage="You do not have minimum required role to delete stock movement"
+                            >
+                                <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
+                                <warehouse:message code="default.button.delete.label" />
+                            </g:link>
+                        </g:else>
+                    </g:if>
+                    <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
+                        <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
                                 onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                                disabledMessage="You do not have minimum required role to delete stock movement"
+                                disabledMessage="You do not have minimum required role to delete stock request"
                         >
                             <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
                             <warehouse:message code="default.button.delete.label" />
                         </g:link>
-                    </g:else>
-                </g:if>
-                <g:if test="${isPending && (isSameOrigin || isSameDestination || !originIsDepot) && stockMovement?.electronicType}">
-                    <g:link controller="stockRequest" action="remove" id="${stockMovement.id}" params="[show:true]" class="button"
-                            onclick="return confirm('${warehouse.message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"
-                            disabledMessage="You do not have minimum required role to delete stock request"
+                    </g:if>
+
+                <g:isSuperuser>
+                    <a href="javascript:void(0);" class="button btn-show-dialog"
+                        data-height="600" data-width="1000"
+                       data-title="${warehouse.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
+                       data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
+                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
+                        <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
+                    </a>
+                </g:isSuperuser>
+            </g:if>
+            <g:if test="${isApprovalRequired}">
+                <g:if test="${stockMovement?.canUserEdit(session?.user?.id, currentLocation)}">
+                    <g:link
+                            class="button"
+                            controller="stockMovement"
+                            action="edit"
+                            id="${stockMovement?.id}"
                     >
-                        <img src="${resource(dir: 'images/icons/silk', file: 'delete.png')}" />&nbsp;
-                        <warehouse:message code="default.button.delete.label" />
+                        <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" />&nbsp;
+                        <warehouse:message code="default.button.edit.label" />
                     </g:link>
                 </g:if>
+                <g:supports location="${stockMovement.origin?.id}" activityCode="${ActivityCode.APPROVE_REQUEST}">
+                    <g:if test="${stockMovement?.requisition?.status == RequisitionStatus.PENDING_APPROVAL && userHasRequestApproverRole}">
+                        <g:link
+                                class="button"
+                                controller="stockMovement"
+                                action="updateStatus"
+                                id="${stockMovement.id}"
+                                params="[status: StockMovementStatusCode.APPROVED]"
+                                disabled="${!stockMovement.pendingApproval}"
+                                disabledMessage="Request is not pending approval"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'accept.png')}" />&nbsp;
+                            <g:message code="request.approval.approve.label"  default="Approve" />
+                        </g:link>
+                        <g:link
+                                class="button"
+                                controller="stockRequest"
+                                action="reject"
+                            id="${stockMovement.id}"
+                                disabled="${!stockMovement.pendingApproval}"
+                                disabledMessage="Request is not pending approval"
+                        >
+                            <img src="${resource(dir: 'images/icons/silk', file: 'decline.png')}" />&nbsp;
+                            <g:message code="request.approval.reject.label"  default="Reject" />
+                        </g:link>
+                    </g:if>
 
-            <g:isSuperuser>
-                <a href="javascript:void(0);" class="button btn-show-dialog"
-                    data-height="600" data-width="1000"
-                   data-title="${warehouse.message(code:'default.button.synchronize.label', default: 'Synchronize')}"
-                   data-url="${request.contextPath}/stockMovement/synchronizeDialog/${stockMovement?.id}">
-                    <img src="${resource(dir: 'images/icons/silk', file: 'arrow_join.png')}" />&nbsp;
-                    <warehouse:message code="default.button.synchronize.label" default="Synchronize"/>
-                </a>
-            </g:isSuperuser>
+                    <g:if test="${stockMovement?.canRollbackApproval(session?.user?.id, currentLocation)}" >
+                        <g:link controller="stockRequest" action="rollbackApproval" id="${stockMovement.id}" class="button">
+                            <img src="${resource(dir: 'images/icons/silk', file: 'arrow_undo.png')}" />&nbsp;
+                            <g:message code="request.approval.rollback.label"  default="Rollback Approval" />
+                        </g:link>
+                    </g:if>
+                </g:supports>
+            </g:if>
         </div>
     </div>
     <div class="yui-gf">
@@ -169,7 +234,7 @@
                                 <warehouse:message code="stockMovement.status.label"/>
                             </td>
                             <td class="value">
-                                <format:metadata obj="${stockMovement?.shipment?.status?.code ?: stockMovement?.requisition?.status }"/>
+                                <format:metadata obj="${stockMovement?.status ?: (stockMovement?.shipment?.status?.code ?: stockMovement?.statusCode)}"/>
                             </td>
                         </tr>
                         <tr class="prop">
@@ -206,6 +271,17 @@
                                 ${stockMovement?.stocklist?.name?:warehouse.message(code:"default.none.label")}
                             </td>
                         </tr>
+                        <g:if test="${stockMovement?.requisition?.approvers}">
+                            <g:set var="approversList" value="${stockMovement?.requisition?.approvers?.join(', ')}" />
+                            <tr class="prop">
+                                <td class="name">
+                                    <warehouse:message code="stockMovement.approvers.label"/>
+                                </td>
+                                <td class="value">
+                                    ${approversList}
+                                </td>
+                            </tr>
+                        </g:if>
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.comments.label"/>
@@ -358,6 +434,30 @@
                                 </g:else>
                             </td>
                         </tr>
+
+                        <g:if test="${stockMovement?.requisition?.approvedBy || stockMovement?.requisition?.rejectedBy}">
+                            <g:set var="person" value="${stockMovement?.requisition?.approvedBy ?: stockMovement?.requisition?.rejectedBy}" />
+                            <g:set var="date" value="${stockMovement?.requisition?.dateApproved ?: stockMovement?.requisition?.dateRejected}" />
+                            <g:set var="label" value="${stockMovement?.requisition?.dateApproved ? 'dateApproved' : 'dateRejected'}" />
+                            <tr class="prop">
+                                <td class="name">
+                                    <g:message code="stockMovement.${label}.label"/>
+                                </td>
+                                <td class="value">
+                                    <g:if test="${date && person}">
+                                        <span title="${g.formatDate(date: date)}">
+                                            <g:formatDate format="MMMM dd, yyyy" date="${date}"/>
+                                        </span>
+                                        <g:message code="default.by.label"/>
+                                        ${person}
+                                    </g:if>
+                                    <g:else>
+                                        <g:message code="default.none.label"/>
+                                    </g:else>
+                                </td>
+                            </tr>
+                        </g:if>
+
                         <tr class="prop">
                             <td class="name">
                                 <warehouse:message code="stockMovement.dateShipped.label"/>
@@ -450,26 +550,37 @@
                 <ul>
                     <g:if test="${!stockMovement?.origin?.isSupplier()}">
                         <li>
-                            <a href="${request.contextPath}/stockMovement/requisition/${stockMovement?.id}">
+                            <g:link controller="stockMovement" action="requisition" params="${[ id: stockMovement?.id ]}">
                                 <warehouse:message code="requestDetails.label"/>
-                            </a>
+                            </g:link>
                         </li>
                     </g:if>
                     <li>
-                        <a href="${request.contextPath}/stockMovement/packingList/${stockMovement?.id}">
+                        <g:link controller="stockMovement" action="packingList" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="shipping.packingList.label" />
-                        </a>
+                        </g:link>
                     </li>
                     <li>
-                        <a href="${request.contextPath}/stockMovement/receipts/${stockMovement?.id}">
+                        <g:link controller="stockMovement" action="receipts" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="receipts.label" default="Receipts"/>
-                        </a>
+                        </g:link>
                     </li>
                     <li>
-                        <a href="${request.contextPath}/stockMovement/documents/${stockMovement?.id}">
+                        <g:link controller="stockMovement" action="documents" params="${[ id: stockMovement?.id ]}">
                             <warehouse:message code="documents.label" default="Documents"/>
-                        </a>
+                        </g:link>
                     </li>
+                    <g:if test="${stockMovement.electronicType}">
+                        <g:set var="commentCount" value="${stockMovement?.requisition?.comments?.size()}" />
+                        <li
+                            data-count="${commentCount < 1000 ? commentCount : '999+' }"
+                            class="${commentCount > 0 ? 'tab-badge' : ''}"
+                        >
+                            <g:link controller="stockMovement" action="comments" params="${[ id: stockMovement?.id ]}">
+                                <warehouse:message code="comments.label" default="Comments"/>
+                            </g:link>
+                        </li>
+                    </g:if>
                 </ul>
             </div>
         </div>

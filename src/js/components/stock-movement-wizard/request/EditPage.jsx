@@ -27,6 +27,7 @@ import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
+import canEditRequest from 'utils/permissionUtils';
 import renderHandlingIcons from 'utils/product-handling-icons';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -1176,6 +1177,7 @@ class EditItemsPage extends Component {
             associations: data?.associations,
             editPageItems: _.map(data, item => ({
               ...item,
+              quantityOnHandRequesting: item.quantityCounted,
               quantityOnHand: item.quantityOnHand || 0,
               // eslint-disable-next-line max-len
               reasonCode: _.find(this.props.reasonCodes, ({ value }) => _.includes(item.reasonCode, value)),
@@ -1425,6 +1427,7 @@ class EditItemsPage extends Component {
             $set: {
               ...values.editPageItems[editPageItemIndex],
               ...editPageItem,
+              quantityOnHandRequesting: editPageItem.quantityCounted,
               quantityOnHand: editPageItem.quantityOnHand || 0,
               quantityAvailable: editPageItem.quantityAvailable || 0,
               substitutionItems: _.map(editPageItem.substitutionItems, sub => ({
@@ -1502,31 +1505,18 @@ class EditItemsPage extends Component {
       });
   }
 
-  /**
-   * If we are in requesting location (destination), allow to add items only for a person
-   * who created a stock request
-   *
-   * If we are in verifying/fulfilling location (origin), allow to add items for any person
-   * verifying the request
-   * @returns {boolean}
-   */
-  isUserAllowedToAddItems() {
-    const { requestedBy, origin, destination } = this.state.values;
-    const { currentUserId, currentLocationId } = this.props;
-    if (currentLocationId === origin?.id) {
-      return true;
-    }
-    return currentLocationId === destination?.id && requestedBy?.id === currentUserId;
-  }
-
   isAddingItemsAllowed() {
+    const { currentUser, currentLocation } = this.props;
+    const { values } = this.state;
+    const status = values?.associations?.requisition?.status;
+
     const allowedStatuses = [
       RequisitionStatus.CREATED,
       RequisitionStatus.EDITING,
       RequisitionStatus.VERIFYING,
+      RequisitionStatus.PENDING_APPROVAL,
     ];
-    return this.isUserAllowedToAddItems() &&
-      allowedStatuses.includes(this.state.values?.associations?.requisition?.status);
+    return canEditRequest(currentUser, values, currentLocation) && allowedStatuses.includes(status);
   }
 
   render() {
@@ -1676,8 +1666,8 @@ const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
   supportedActivities: state.session.supportedActivities,
   currentLocale: state.session.activeLanguage,
-  currentUserId: state.session.user?.id,
-  currentLocationId: state.session.currentLocation?.id,
+  currentUser: state.session.user,
+  currentLocation: state.session.currentLocation,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -1709,9 +1699,14 @@ EditItemsPage.propTypes = {
   pageSize: PropTypes.number.isRequired,
   supportedActivities: PropTypes.arrayOf(PropTypes.string).isRequired,
   currentLocale: PropTypes.string.isRequired,
-  currentUserId: PropTypes.string.isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
-  currentLocationId: PropTypes.string.isRequired,
+  currentLocation: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 };

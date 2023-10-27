@@ -1,7 +1,7 @@
 <%@ page import="org.pih.warehouse.core.ActivityCode; org.pih.warehouse.order.OrderTypeCode" %>
 <div class="box">
     <h2><warehouse:message code="default.filters.label"/></h2>
-    <g:form id="listForm" action="orderSummary" method="GET">
+    <g:form id="listForm" action="orderSummaryList" method="GET">
         <g:hiddenField name="max" value="${params.max ?: 10}"/>
         <div class="filter-list">
             <div class="filter-list-item">
@@ -73,7 +73,7 @@
                 <button type="submit" class="button icon search" name="search" value="true">
                     <warehouse:message code="default.search.label"/>
                 </button>
-                <g:link controller="order" action="orderSummary" class="button icon reload">
+                <g:link controller="order" action="orderSummaryList" class="button icon reload">
                     <warehouse:message code="default.button.cancel.label"/>
                 </g:link>
             </div>

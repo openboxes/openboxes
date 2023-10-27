@@ -148,17 +148,24 @@ class StockMovementsRequest extends Component {
             ...resp,
             stockMovementId: resp.id,
             movementNumber: resp.identifier,
+            approvers: resp.approvers?.map(user => ({
+              id: user.id,
+              value: user.id,
+              label: user.name,
+            })),
             origin: {
               id: resp.origin.id,
               type: originType ? originType.locationTypeCode : null,
               name: resp.origin.name,
               label: `${resp.origin.name} [${originType ? originType.description : null}]`,
+              supportedActivities: resp.origin.supportedActivities,
             },
             destination: {
               id: resp.destination.id,
               type: destinationType ? destinationType.locationTypeCode : null,
               name: resp.destination.name,
               label: `${resp.destination.name} [${destinationType ? destinationType.description : null}]`,
+              supportedActivities: resp.destination.supportedActivities,
             },
             requestedBy: {
               id: resp.requestedBy.id,

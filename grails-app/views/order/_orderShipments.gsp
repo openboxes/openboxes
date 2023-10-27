@@ -17,8 +17,8 @@
             </tr>
             </thead>
             <tbody>
-            <g:each var="orderItem" in="${orderInstance?.orderItems}" status="i">
-                <g:each var="shipmentItem" in="${orderItem.shipmentItems}" status="j">
+            <g:each var="orderItem" in="${orderInstance?.orderItems?.sort { a,b -> a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex }}" status="i">
+                <g:each var="shipmentItem" in="${orderItem.shipmentItems?.sort {it.dateCreated}}" status="j">
                     <tr class="${i%2?'even':'odd'}">
                         <td>
                             <g:if test="${!j}">

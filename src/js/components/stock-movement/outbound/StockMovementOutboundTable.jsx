@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { RiCloseFill } from 'react-icons/all';
 import {
-  RiArrowRightSLine,
+  RiArrowGoBackLine,
+  RiArrowRightSLine, RiCheckFill,
   RiDeleteBinLine,
   RiDownload2Line,
   RiInformationLine,
@@ -16,11 +17,16 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
+import RejectRequestModal from 'components/stock-movement/modals/RejectRequestModal';
+import ActivityCode from 'consts/activityCode';
+import RequisitionStatus from 'consts/requisitionStatus';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
+import canEditRequest from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
+import { supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -30,8 +36,10 @@ const StockMovementOutboundTable = ({
   translate,
   requisitionStatuses,
   currentLocation,
+  currentUser,
   isRequestsOpen,
   isUserAdmin,
+  isUserRequestApprover,
 }) => {
   const {
     tableData,
@@ -41,19 +49,111 @@ const StockMovementOutboundTable = ({
     exportStockMovements,
     exportPendingShipmentItems,
     deleteConfirmAlert,
+    approveRequest,
+    rejectRequest,
+    rollbackRequest,
   } = useOutboundListTableData(filterParams);
-
+  const [isOpenRejectionModal, setIsOpenRejectionModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const getStatusTooltip = status => translate(
     `react.stockMovement.status.${status.toLowerCase()}.description.label`,
     status.toLowerCase(),
   );
 
+  const openRejectionModal = (request) => {
+    setIsOpenRejectionModal(true);
+    setSelectedRequest(request);
+  };
+
+  const closeRejectionModal = () => {
+    setIsOpenRejectionModal(false);
+    setSelectedRequest(null);
+  };
+
+  const approverActions = useCallback(
+    (row) => {
+      const {
+        statusCode,
+        identifier,
+      } = row.original;
+      const isUserRequestor = row.original?.requestedBy?.id === currentUser?.id;
+      const actions = [];
+
+      const showAction = {
+        defaultLabel: 'Show Stock Movement',
+        label: 'react.stockMovement.action.show.label',
+        leftIcon: <RiInformationLine />,
+        href: '/openboxes/stockMovement/show',
+      };
+      actions.push(showAction);
+
+      if (canEditRequest(currentUser, row.original, currentLocation)) {
+        const editAction = {
+          defaultLabel: 'Edit Stock Movement',
+          label: 'react.stockMovement.action.edit.label',
+          leftIcon: <RiPencilLine />,
+          href: '/openboxes/stockMovement/edit',
+        };
+
+        actions.push(editAction);
+      }
+
+      if (statusCode === RequisitionStatus.PENDING_APPROVAL && isUserRequestApprover) {
+        const approveAction = {
+          defaultLabel: 'Approve',
+          label: 'react.stockMovement.action.approve.label',
+          leftIcon: <RiCheckFill />,
+          onClick: id => approveRequest(id, identifier),
+        };
+        actions.push(approveAction);
+
+        const rejectAction = {
+          defaultLabel: 'Reject',
+          label: 'react.stockMovement.action.reject.label',
+          leftIcon: <RiCloseFill />,
+          variant: 'danger',
+          onClick: () => {
+            openRejectionModal(row.original);
+          },
+        };
+        actions.push(rejectAction);
+      }
+      if ((statusCode === RequisitionStatus.APPROVED ||
+          statusCode === RequisitionStatus.REJECTED) &&
+        (isUserRequestApprover || isUserRequestor || isUserAdmin)) {
+        const rollbackAction = {
+          defaultLabel: 'Rolllback',
+          label: 'react.stockMovement.action.rollback.label',
+          leftIcon: <RiArrowGoBackLine />,
+          onClick: rollbackRequest,
+        };
+        actions.push(rollbackAction);
+      }
+      return actions;
+    },
+    [],
+  );
+
+
   // List of all actions for outbound Stock Movement rows
   const getActions = useCallback((row) => {
     const {
-      isPending, isReturn, order, origin, isReceived, isPartiallyReceived, currentStatus,
+      isPending,
+      isReturn,
+      order,
+      origin,
+      isReceived,
+      isPartiallyReceived,
+      currentStatus,
+      isApprovalRequired,
     } = row.original;
     const actions = [];
+
+    if (isApprovalRequired
+        && supports(origin?.supportedActivities, ActivityCode.APPROVE_REQUEST)
+    ) {
+      return approverActions(row);
+    }
 
     // Show
     const showAction = {
@@ -65,7 +165,10 @@ const StockMovementOutboundTable = ({
     actions.push(showAction);
 
     // Edit
-    if (!isReceived && !isPartiallyReceived) {
+    if (
+      !isReceived && !isPartiallyReceived &&
+      canEditRequest(currentUser, row.original, currentLocation)
+    ) {
       const editAction = {
         defaultLabel: 'Edit Stock Movement',
         label: 'react.stockMovement.action.edit.label',
@@ -129,19 +232,20 @@ const StockMovementOutboundTable = ({
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
       accessor: 'status',
       fixed: 'left',
-      width: 150,
+      width: 170,
       sortable: false,
-      Cell: (row) => {
-        const status = _.find(requisitionStatuses, _.matchesProperty('id', row.value));
-        return (
-          <TableCell
-            {...row}
-            tooltip
-            tooltipLabel={getStatusTooltip(row.value)}
-          >
-            <StatusIndicator variant={status?.variant} status={status?.label} />
-          </TableCell>);
-      },
+      Cell: row => (
+        <TableCell
+          {...row}
+          tooltip
+          tooltipLabel={getStatusTooltip(row.value)}
+        >
+          <StatusIndicator
+            variant={row?.original?.statusVariant}
+            status={row?.original?.statusLabel}
+          />
+        </TableCell>
+      ),
     },
     {
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
@@ -208,6 +312,20 @@ const StockMovementOutboundTable = ({
       Cell: row => (<TableCell {...row} defaultValue="None" />),
     },
     {
+      Header: <Translate id="react.stockMovement.request.approvers.label" defaultMessage="Approvers" />,
+      accessor: 'approvers',
+      minWidth: 250,
+      sortable: false,
+      show: isRequestsOpen,
+      Cell: row =>
+        (<TableCell
+          {...row}
+          tooltip
+          defaultValue="None"
+          value={row.value?.map(approver => approver.name)?.join(', ')}
+        />),
+    },
+    {
       Header: <Translate id="react.stockMovement.outbound.column.dateRequested.label" defaultMessage="Date Requested" />,
       accessor: 'dateRequested',
       width: 150,
@@ -222,55 +340,63 @@ const StockMovementOutboundTable = ({
   ], [requisitionStatuses]);
 
   return (
-    <div className="list-page-list-section">
-      <div className="title-text p-3 d-flex justify-content-between align-items-center">
-        <div>
-          {
-            isRequestsOpen
-            ? <Translate id="react.stockMovement.requests.label" defaultMessage="Requests" />
-            : <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
-          }
-          <span className="ml-1">{`(${tableData.totalCount})`}</span>
-        </div>
-        <Button
-          isDropdown
-          defaultLabel="Export"
-          label="react.default.button.export.label"
-          variant="secondary"
-          EndIcon={<RiDownload2Line />}
-        />
-        <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
-            <Translate
-              id="react.stockMovement.export.label"
-              defaultMessage="Export Stock Movements"
-            />
-          </a>
-          <a className="dropdown-item" onClick={exportPendingShipmentItems} href="#">
-            <Translate
-              id="react.stockMovement.export.pendingShipmentItems.label"
-              defaultMessage="Export pending shipment items"
-            />
-          </a>
-        </div>
-      </div>
-      <DataTable
-        manual
-        sortable
-        ref={tableRef}
-        columns={columns}
-        data={tableData.data}
-        loading={loading}
-        defaultPageSize={10}
-        pages={tableData.pages}
-        totalData={tableData.totalCount}
-        onFetchData={onFetchHandler}
-        noDataText={translate(
-          'react.stockMovement.empty.list.label',
-          'No Stock Movements match the given criteria',
-        )}
+    <>
+      <RejectRequestModal
+        request={selectedRequest}
+        closeRejectionModal={closeRejectionModal}
+        isOpenRejectionModal={isOpenRejectionModal}
+        rejectRequest={rejectRequest}
       />
-    </div>
+      <div className="list-page-list-section">
+        <div className="title-text p-3 d-flex justify-content-between align-items-center">
+          <div>
+            {
+              isRequestsOpen
+                ? <Translate id="react.stockMovement.requests.label" defaultMessage="Requests" />
+                : <Translate id="react.stockMovement.outbound.label" defaultMessage="Outbound" />
+            }
+            <span className="ml-1">{`(${tableData.totalCount})`}</span>
+          </div>
+          <Button
+            isDropdown
+            defaultLabel="Export"
+            label="react.default.button.export.label"
+            variant="secondary"
+            EndIcon={<RiDownload2Line />}
+          />
+          <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+            <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
+              <Translate
+                id="react.stockMovement.export.label"
+                defaultMessage="Export Stock Movements"
+              />
+            </a>
+            <a className="dropdown-item" onClick={exportPendingShipmentItems} href="#">
+              <Translate
+                id="react.stockMovement.export.pendingShipmentItems.label"
+                defaultMessage="Export pending shipment items"
+              />
+            </a>
+          </div>
+        </div>
+        <DataTable
+          manual
+          sortable
+          ref={tableRef}
+          columns={columns}
+          data={tableData.data}
+          loading={loading}
+          defaultPageSize={10}
+          pages={tableData.pages}
+          totalData={tableData.totalCount}
+          onFetchData={onFetchHandler}
+          noDataText={translate(
+            'react.stockMovement.empty.list.label',
+            'No Stock Movements match the given criteria',
+          )}
+        />
+      </div>
+    </>
   );
 };
 
@@ -279,7 +405,9 @@ const mapStateToProps = state => ({
   requisitionStatuses: state.requisitionStatuses.data,
   currentLocation: state.session.currentLocation,
   isUserAdmin: state.session.isUserAdmin,
+  isUserRequestApprover: state.session.isUserRequestApprover,
   currentLocale: state.session.activeLanguage,
+  currentUser: state.session.user,
 });
 
 export default connect(mapStateToProps)(StockMovementOutboundTable);
@@ -290,9 +418,13 @@ StockMovementOutboundTable.propTypes = {
   translate: PropTypes.func.isRequired,
   isRequestsOpen: PropTypes.bool.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
+  isUserRequestApprover: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+  }).isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
   }).isRequired,
   requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,

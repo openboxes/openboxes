@@ -151,7 +151,7 @@ class FieldArrayComponent extends Component {
         </div>
         <div
           className="text-center border mb-1 flex-grow-1 table-content"
-          style={{ overflowY: virtualized && isPaginated ? 'hidden' : overflowStyle, maxHeight: maxTableHeight }}
+          style={{ overflowX: 'hidden', overflowY: virtualized && isPaginated ? 'hidden' : overflowStyle, maxHeight: maxTableHeight }}
         >
           <TableBodyComponent
             fields={fields}

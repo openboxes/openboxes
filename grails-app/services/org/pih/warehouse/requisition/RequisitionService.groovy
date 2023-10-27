@@ -13,7 +13,13 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.DateUtil
+import javassist.NotFoundException
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Event
+import org.pih.warehouse.core.EventCode
+import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.ReasonCode
@@ -30,7 +36,7 @@ import org.pih.warehouse.product.Product
 class RequisitionService {
 
     GrailsApplication grailsApplication
-    def authService
+    AuthService authService
     def identifierService
     def inventoryService
 
@@ -808,5 +814,96 @@ class RequisitionService {
             FROM Requisition r 
             WHERE r.origin = :location AND r.dateCreated >= :startDate AND r.dateCreated <= :endDate AND r.isTemplate = false 
             """, ['location': location, 'startDate': startDate, 'endDate': endDate])[0] ?: 0
+    }
+
+    Event createEvent(EventCode eventCode, Location eventLocation, Date eventDate, User currentUser) {
+        EventType eventType = EventType.findByEventCode(eventCode)
+        if (!eventType) {
+            throw new NotFoundException("No event type with code ${eventCode} has been found")
+        }
+        return new Event(eventDate: eventDate, eventType: eventType, eventLocation: eventLocation, createdBy: currentUser)
+    }
+
+    Requisition transitionRequisitionStatus(Requisition requisition, RequisitionStatus requisitionStatus, EventCode eventCode, User currentUser, Comment comment = null) {
+        requisition.status = requisitionStatus
+        Event event = createEvent(eventCode, requisition.origin, new Date(), currentUser)
+        requisition.addToEvents(event)
+
+        if (comment) {
+            event.comment = comment
+            requisition.addToComments(comment)
+        }
+    }
+
+    void triggerRequisitionStatusTransition(Requisition requisition, User currentUser, RequisitionStatus newStatus, Comment comment = null) {
+        // OBPIH-5134 Request approval feature implements additional status transitions for a request
+        switch(newStatus) {
+            case RequisitionStatus.VERIFYING:
+                transitionRequisitionStatus(requisition, RequisitionStatus.VERIFYING, EventCode.SUBMITTED, currentUser)
+                requisition.approvalRequired = false
+                break
+            case RequisitionStatus.PENDING_APPROVAL:
+                if (!requisition.origin.approvalRequired) {
+                    throw new IllegalArgumentException("Fulfilling location must support Request Approval")
+                }
+                transitionRequisitionStatus(requisition, RequisitionStatus.PENDING_APPROVAL, EventCode.PENDING_APPROVAL, currentUser)
+                requisition.approvalRequired = true
+                break
+            case RequisitionStatus.APPROVED:
+                if (!requisition.origin.approvalRequired) {
+                    throw new IllegalArgumentException("Fulfilling location must support Request Approval")
+                }
+                transitionRequisitionStatus(requisition, RequisitionStatus.APPROVED, EventCode.APPROVED, currentUser)
+                requisition.dateApproved = new Date()
+                requisition.approvedBy = currentUser
+                break
+            case RequisitionStatus.REJECTED:
+                if (!requisition.origin.approvalRequired) {
+                    throw new IllegalArgumentException("Fulfilling location must support Request Approval")
+                }
+                transitionRequisitionStatus(requisition, RequisitionStatus.REJECTED, EventCode.REJECTED, currentUser, comment)
+                requisition.dateRejected = new Date()
+                requisition.rejectedBy = currentUser
+                break
+            default:
+                requisition.status = newStatus
+        }
+        requisition.save(flush: true)
+    }
+
+    void deleteEvent(Requisition requisition, Event event) {
+        requisition.removeFromEvents(event)
+        event.delete()
+        requisition.save()
+    }
+
+    void rollbackLastEvent(Requisition requisition) {
+        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        Event event = requisition.mostRecentEvent
+        if (!event) {
+            String errorMessage = g.message(
+                    code: "requisition.error.rollback.noRecentEvents",
+                    default: "Cannot rollback requisition because there are no recent events"
+            )
+            throw new RuntimeException(errorMessage)
+        }
+        deleteEvent(requisition, event)
+    }
+
+    void deleteComment(Comment comment, Requisition requisition) {
+        requisition.removeFromComments(comment)
+        Event event = Event.findByComment(comment)
+        if (event) {
+            event.comment = null
+        }
+    }
+
+    Comment saveComment(Comment comment) {
+        return comment.save()
+    }
+
+    void addCommentToRequisition(Comment comment, Requisition requisition) {
+        requisition.addToComments(comment)
+        requisition.save()
     }
 }

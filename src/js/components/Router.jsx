@@ -164,8 +164,10 @@ const StockMovementList = (props) => {
     case 'INBOUND':
       return <AsyncStockMovementInboundList {...props} />;
     case 'OUTBOUND': {
-      const isRequestsList = parsedSearchQuery?.sourceType?.toUpperCase() === 'ELECTRONIC';
-      return <AsyncStockMovementOutboundList {...props} isRequestsList={isRequestsList} />;
+      return (<AsyncStockMovementOutboundList
+        {...props}
+        sourceType={parsedSearchQuery?.sourceType?.toUpperCase()}
+      />);
     }
     default:
       return <Redirect to="/" />;

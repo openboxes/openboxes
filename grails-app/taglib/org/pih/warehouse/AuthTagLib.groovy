@@ -22,7 +22,7 @@ class AuthTagLib {
     def userService
 
     def supports = { attrs, body ->
-        def warehouseInstance = Location.get(session.warehouse.id)
+        def warehouseInstance = Location.get(attrs.location ?: session.warehouse.id)
         def authorized = true
 
         // Need to handle this case better
@@ -81,13 +81,19 @@ class AuthTagLib {
         }
     }
     def hasRoleApprover = { attrs, body ->
-        if (userService.hasRoleApprover(session?.user))
+        if (userService.hasRolePurchaseApprover(session?.user))
             out << body()
     }
 
     def hasRoleInvoice = { attrs, body ->
         if (userService.hasRoleInvoice(session?.user))
             out << body()
+    }
+
+    def isUserInAllRoles = {attrs, body ->
+       if (session.user && userService.isUserInAllRoles(session?.user?.id, attrs.roles, attrs.location)) {
+           out << body()
+       }
     }
 
     def isUserInRole = { attrs, body ->

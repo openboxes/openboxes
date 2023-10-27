@@ -68,6 +68,7 @@ export const debounceLocationsFetch = (
             id: obj.id,
             type: obj.locationType.locationTypeCode,
             name: obj.name,
+            supportedActivities: obj.supportedActivities,
             label: withOrgCode ? `${obj.organizationCode ? `${obj.organizationCode} - ` : ''}${label}` : label,
           };
         })))

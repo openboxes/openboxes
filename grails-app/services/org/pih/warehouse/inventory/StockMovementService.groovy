@@ -35,7 +35,9 @@ import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.RefreshOrderSummaryEvent
@@ -54,6 +56,7 @@ import org.pih.warehouse.requisition.RequisitionItemStatus
 import org.pih.warehouse.requisition.RequisitionItemType
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
+import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
 import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.Shipment
@@ -80,6 +83,7 @@ class StockMovementService {
     def dataService
     def forecastingService
     def outboundStockMovementService
+    UserService userService
 
     GrailsApplication grailsApplication
 
@@ -118,10 +122,11 @@ class StockMovementService {
         Boolean statusOnly =
                 jsonObject.containsKey("statusOnly") ? jsonObject.getBoolean("statusOnly") : false
 
+        Comment comment = null
         // Update status only
         if (status && statusOnly) {
             RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(stockMovementStatus)
-            updateRequisitionStatus(stockMovement.id, requisitionStatus)
+            updateRequisitionStatus(stockMovement.id, requisitionStatus, comment)
         }
         // Determine whether we need to rollback change,
         else {
@@ -142,8 +147,27 @@ class StockMovementService {
                     //RequisitionStatus.EDITING:
                     case StockMovementStatusCode.REQUESTED:
                         break
+                    //RequisitionStatus.PENDING_APPROVAL:
+                    case StockMovementStatusCode.PENDING_APPROVAL:
+                        break
                     //RequisitionStatus.VERIFYING:
                     case StockMovementStatusCode.VALIDATED:
+                        break
+                    //RequisitionStatus.APPROVED:
+                    case StockMovementStatusCode.APPROVED:
+                        if (!stockMovement.pendingApproval) {
+                            throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
+                        }
+                        break
+                    //RequisitionStatus.REJECTED:
+                    case StockMovementStatusCode.REJECTED:
+                        if (!stockMovement.pendingApproval) {
+                            throw new IllegalArgumentException("Cannot update to status ${jsonObject.status} because request is not pending approval")
+                        }
+                        comment = new Comment(jsonObject)
+                        if (!comment.comment) {
+                            throw new IllegalArgumentException("Comment is required before rejecting a request")
+                        }
                         break
                     // RequisitionStatus.PICKING:
                     case StockMovementStatusCode.PICKING:
@@ -185,7 +209,7 @@ class StockMovementService {
                 }
                 // If the dependent actions were updated properly then we can update the
                 RequisitionStatus requisitionStatus = RequisitionStatus.fromStockMovementStatus(status)
-                updateRequisitionStatus(stockMovement.id, requisitionStatus)
+                updateRequisitionStatus(stockMovement.id, requisitionStatus, comment)
             }
         }
     }
@@ -234,9 +258,10 @@ class StockMovementService {
         return true
     }
 
-    void updateRequisitionStatus(String id, RequisitionStatus status) {
+    void updateRequisitionStatus(String id, RequisitionStatus status, Comment comment = null) {
 
         log.info "Update status ${id} " + status
+        // TODO: In Grails the get below should be replaced by the data service get that joins the Events
         Requisition requisition = Requisition.get(id)
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
@@ -249,8 +274,8 @@ class StockMovementService {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         } else {
-            requisition.status = status
-            requisition.save(flush: true)
+            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status, comment)
+            publishEvent(new RequisitionStatusTransitionEvent(requisition))
         }
     }
 
@@ -305,6 +330,7 @@ class StockMovementService {
         if (stockMovement.requestedBy) requisition.requestedBy = stockMovement.requestedBy
         if (stockMovement.dateRequested) requisition.dateRequested = stockMovement.dateRequested
         if (stockMovement.requestType) requisition.type = stockMovement.requestType
+        if (stockMovement.approvers != null) requisition.approvers = stockMovement.approvers
         requisition.name = stockMovement.generateName()
 
         if (requisition.requisitionTemplate?.id != stockMovement.stocklist?.id) {
@@ -1712,6 +1738,7 @@ class StockMovementService {
         requisition.dateRequested = stockMovement.dateRequested
         requisition.name = stockMovement.generateName()
         requisition.requisitionItems = []
+        requisition.approvers = stockMovement.approvers
 
         stockMovement.lineItems.each { stockMovementItem ->
             RequisitionItem requisitionItem = RequisitionItem.createFromStockMovementItem(stockMovementItem)
@@ -1797,6 +1824,9 @@ class StockMovementService {
             stockMovement.lineItems.each { StockMovementItem stockMovementItem ->
                 ShipmentItem shipmentItem = findOrCreateShipmentItem(shipment, stockMovementItem.id)
                 if (!stockMovementItem.quantityRequested) {
+                    if (shipmentItem.invoiceItems) {
+                        throw new Exception("Shipment item for product ${shipmentItem.product.productCode} has invoice associated")
+                    }
                     shipment.removeFromShipmentItems(shipmentItem)
                     shipmentItem.delete(flush: true)
                 } else {
@@ -2071,6 +2101,9 @@ class StockMovementService {
     }
 
     void removeShipmentItem(ShipmentItem shipmentItem) {
+        if (shipmentItem.invoiceItems) {
+            throw new Exception("Shipment item for product ${shipmentItem.product.productCode} has invoice associated")
+        }
         Shipment shipment = shipmentItem.shipment
         OrderItem orderItem = OrderItem.get(shipmentItem.orderItemId)
         if (orderItem) {
@@ -2848,5 +2881,39 @@ class StockMovementService {
             validateQuantityRequested(stockMovement)
         }
         return true
+    }
+
+    void rollbackApproval(String stockMovementId) {
+        StockMovement stockMovement = getStockMovement(stockMovementId)
+        Location currentLocation = AuthService.currentLocation.get()
+        // TODO: remove .get() from current user in Grails 3 (with .get it will return null)
+        if (!canRollbackApproval(currentLocation, AuthService.currentUser.get(), stockMovement)) {
+            String errorMessage = applicationTagLib.message(
+                    code: "request.rollbackApproval.insufficientPermissions.message",
+                    default: "Unable to rollback approval due to insufficient permissions",
+            )
+            throw new IllegalAccessException(errorMessage)
+        }
+
+        Requisition requisition = stockMovement?.requisition
+        if (requisition.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]) {
+            requisitionService.rollbackLastEvent(requisition)
+            requisition.status = RequisitionStatus.PENDING_APPROVAL
+            requisition.approvedBy = null
+            requisition.rejectedBy = null
+            requisition.dateApproved = null
+            requisition.dateRejected = null
+        }
+    }
+
+    Boolean canRollbackApproval(Location location, User user, StockMovement stockMovement) {
+        return (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
+                userService.isUserAdmin(user) ||
+                user?.id == stockMovement?.requestedBy?.id) &&
+                stockMovement.isInApprovalState()
+    }
+
+    def getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
     }
 }

@@ -82,8 +82,7 @@ class AddOrganizationModal extends Component {
     return (
       <Modal
         isOpen={this.props.isOpen}
-        overlayClassName="configuration-modal-overlay"
-        className="configuration-modal-content"
+        className="modal-content"
         shouldCloseOnOverlayClick={false}
       >
         <div>

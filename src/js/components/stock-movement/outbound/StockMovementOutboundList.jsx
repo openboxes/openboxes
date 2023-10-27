@@ -13,32 +13,34 @@ import useOutboundFilters from 'hooks/list-pages/outbound/useOutboundFilters';
 import useTranslation from 'hooks/useTranslation';
 
 const StockMovementOutboundList = (props) => {
+  const isRequestsList = props.sourceType === 'ELECTRONIC';
   const {
     selectFiltersForMyStockMovements,
     defaultFilterValues,
     setFilterValues,
     filterParams,
-  } = useOutboundFilters(props.isRequestsList);
+  } = useOutboundFilters(props.sourceType);
 
   useTranslation('stockMovement', 'StockMovementType', 'reactTable');
-
+  const filters = filterFields(isRequestsList);
   return (
     <div className="d-flex flex-column list-page-main">
       <StockMovementOutboundHeader
-        isRequestsOpen={props.isRequestsList}
+        isRequestsOpen={isRequestsList}
         showMyStockMovements={selectFiltersForMyStockMovements}
       />
       <StockMovementOutboundFilters
         defaultValues={defaultFilterValues}
         setFilterParams={setFilterValues}
-        filterFields={filterFields}
+        filterFields={filters}
         formProps={{
           requisitionStatuses: props.requisitionStatuses,
+          approvers: props.approvers,
           shipmentTypes: props.shipmentTypes,
         }}
       />
       <StockMovementOutboundTable
-        isRequestsOpen={props.isRequestsList}
+        isRequestsOpen={isRequestsList}
         filterParams={filterParams}
       />
     </div>
@@ -51,6 +53,7 @@ const mapStateToProps = state => ({
   requisitionStatuses: state.requisitionStatuses.data,
   isRequisitionStatusesFetched: state.requisitionStatuses.fetched,
   shipmentTypes: state.stockMovementCommon.shipmentTypes,
+  approvers: state.approvers.data,
 });
 
 export default withRouter(connect(mapStateToProps, {
@@ -58,7 +61,7 @@ export default withRouter(connect(mapStateToProps, {
 })(StockMovementOutboundList));
 
 StockMovementOutboundList.propTypes = {
-  isRequestsList: PropTypes.bool.isRequired,
+  sourceType: PropTypes.string.isRequired,
   requisitionStatuses: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,
@@ -70,5 +73,11 @@ StockMovementOutboundList.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     description: PropTypes.string,
+  })).isRequired,
+  approvers: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    label: PropTypes.string,
+    value: PropTypes.string,
   })).isRequired,
 };

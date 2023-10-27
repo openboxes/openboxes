@@ -9,6 +9,7 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
 import org.pih.warehouse.core.Role
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.inventory.StockMovementStatusCode
@@ -48,6 +49,7 @@ class StockMovement implements Validateable{
     Date dateCreated
     Date lastUpdated
 
+
     ShipmentType shipmentType
     ShipmentStatusCode receiptStatusCode
     List<ShipmentStatusCode> receiptStatusCodes // For filtering
@@ -80,8 +82,12 @@ class StockMovement implements Validateable{
     Shipment shipment
     List documents
 
+    // Request approval fields
+    List<Person> approvers
+
     static transients = [
-            "electronicType"
+            "electronicType",
+            "pendingApproval"
     ]
 
     static constraints = {
@@ -128,6 +134,7 @@ class StockMovement implements Validateable{
             name                : name,
             description         : description,
             statusCode          : statusCode,
+            displayStatus       : getDisplayStatus(),
             identifier          : identifier,
             origin              : [
                 id                  : origin?.id,
@@ -138,6 +145,7 @@ class StockMovement implements Validateable{
                 organizationName    : origin?.organization?.name,
                 organizationCode    : origin?.organization?.code,
                 isDepot             : origin?.isDepot(),
+                supportedActivities : origin?.supportedActivities,
             ],
             destination         : [
                 id                  : destination?.id,
@@ -146,6 +154,7 @@ class StockMovement implements Validateable{
                 locationType        : destination?.locationType,
                 locationGroup       : destination?.locationGroup,
                 organizationName    : destination?.organization?.name,
+                supportedActivities : destination?.supportedActivities,
                 organizationCode    : destination?.organization?.code,
             ],
             order                : [
@@ -181,6 +190,7 @@ class StockMovement implements Validateable{
                 },
                 documents  : documents
             ],
+            approvers           : approvers,
             isFromOrder         : isFromOrder,
             isReturn            : isReturn,
             isShipped           : isShipped,
@@ -250,6 +260,10 @@ class StockMovement implements Validateable{
 
     Boolean isElectronicType() {
         requisition?.sourceType == RequisitionSourceType.ELECTRONIC
+    }
+
+    Boolean isPendingApproval() {
+        return requisition?.status == RequisitionStatus.PENDING_APPROVAL
     }
 
     Boolean isDeleteOrRollbackAuthorized(Location currentLocation) {
@@ -402,7 +416,8 @@ class StockMovement implements Validateable{
             isShipped: shipment?.status?.code >= ShipmentStatusCode.SHIPPED,
             isReceived: shipment?.status?.code >= ShipmentStatusCode.RECEIVED,
             requestType: requisition?.type,
-            lineItemCount: requisition.requisitionItemCount
+            lineItemCount: requisition.requisitionItemCount,
+            approvers: requisition.approvers?.toList()
         )
 
         // Include all requisition items except those that are substitutions or modifications because the
@@ -454,4 +469,45 @@ class StockMovement implements Validateable{
         ]
     }
 
+    String getDisplayStatus() {
+        def status
+        switch(requisition?.status) {
+            case RequisitionStatus.APPROVED:
+                status =  StockMovementStatusCode.APPROVED
+                break
+            case RequisitionStatus.REJECTED:
+                status = StockMovementStatusCode.REJECTED
+                break
+            case RequisitionStatus.PENDING_APPROVAL:
+                status = StockMovementStatusCode.PENDING_APPROVAL
+                break
+            default:
+                status = shipment?.status?.code
+        }
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        return "${g.message(code: 'enum.' + status?.getClass()?.getSimpleName() + '.' + status)}"
+    }
+
+    Boolean canUserRollbackApproval(User user) {
+        // Approval can be rolled back by user who is approver or requestor
+        return approvers?.contains(user) || requestedBy?.id == user?.id
+    }
+
+    Boolean isInApprovalState() {
+        return requisition?.status in [RequisitionStatus.APPROVED, RequisitionStatus.REJECTED]
+    }
+
+    Boolean canRollbackApproval(String userId, Location location) {
+        User user = User.get(userId)
+        return (isInApprovalState() &&
+                (user.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER]) ||
+                        user.hasRoles(location, [RoleType.ROLE_ADMIN]) ||
+                        user.hasRoles(location, [RoleType.ROLE_SUPERUSER]) ||
+                        user?.id == requestedBy?.id))
+    }
+
+    Boolean isApprovalRequired() {
+        // The requisition status has to be lower than PICKING (so comparing them will return -1)
+        return requisition?.approvalRequired && origin?.approvalRequired && RequisitionStatus.compare(requisition.status, RequisitionStatus.PICKING) == -1
+    }
 }

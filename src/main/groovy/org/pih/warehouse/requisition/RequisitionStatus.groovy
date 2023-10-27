@@ -9,24 +9,27 @@
  **/
 package org.pih.warehouse.requisition
 
+import grails.util.Holders
 import org.pih.warehouse.inventory.StockMovementStatusCode
-
 import org.pih.warehouse.core.StatusType
 
 enum RequisitionStatus {
 
     CREATED(1, null, StatusType.SUCCESS),
     EDITING(2, PENDING, StatusType.PRIMARY),
-    VERIFYING(3, PENDING, StatusType.WARNING),
-    PICKING(4, PENDING, StatusType.WARNING),
-    PICKED(5, PENDING, StatusType.PRIMARY),
-    PENDING(5,null, StatusType.PRIMARY),
-    CHECKING(6, PENDING, StatusType.WARNING),
-    ISSUED(7, null, StatusType.SUCCESS),
-    RECEIVED(8, null, StatusType.SUCCESS),
-    CANCELED(9, null, StatusType.DANGER),
-    DELETED(10, null, StatusType.DANGER),
-    ERROR(11, null, StatusType.DANGER),
+    PENDING_APPROVAL(3, null, StatusType.WARNING),
+    APPROVED(4, null, StatusType.SUCCESS),
+    REJECTED(5, null, StatusType.DANGER),
+    VERIFYING(6, PENDING, StatusType.WARNING),
+    PICKING(7, PENDING, StatusType.WARNING),
+    PICKED(8, PENDING, StatusType.PRIMARY),
+    PENDING(9,null, StatusType.PRIMARY),
+    CHECKING(10, PENDING, StatusType.WARNING),
+    ISSUED(11, null, StatusType.SUCCESS),
+    RECEIVED(12, null, StatusType.SUCCESS),
+    CANCELED(13, null, StatusType.DANGER),
+    DELETED(14, null, StatusType.DANGER),
+    ERROR(15, null, StatusType.DANGER),
     // for Outbound Stock Movement mapping
     DISPATCHED(0, null, StatusType.SUCCESS),
     REQUESTED(0, null, StatusType.PRIMARY),
@@ -64,15 +67,31 @@ enum RequisitionStatus {
     /* remove OPEN, FULFILLED */
 
     static list() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, PENDING_APPROVAL, APPROVED, REJECTED]
     }
 
+    // Default options for outbound list, without supporting request approval
     static listOutboundOptions() {
         [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
+    // Options for outbounds when current location is supporting request approval (Added approved)
+    static listOutboundOptionsWhenApprovalRequired() {
+        [CREATED, EDITING, APPROVED, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
+    }
+
+    // Options for request list when current location is supporting request approval (Added approved and waiting for approval)
+    static listRequestOptionsWhenApprovalRequired() {
+        [CREATED, EDITING, APPROVED, REJECTED, PENDING_APPROVAL, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
+    }
+
+    // Options for request list when current location is supporting request approval, but the user is not Approver
+    static listRequestOptionsWhenNonApprover() {
+        [CREATED, EDITING, APPROVED, PICKING, PICKED, CHECKING, CANCELED, PENDING, REQUESTED, DISPATCHED]
+    }
+
     static listPending() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, PENDING, REQUESTED]
+        [CREATED, EDITING, VERIFYING, PICKING, PICKED, CHECKING, PENDING, REQUESTED, APPROVED, PENDING_APPROVAL]
     }
 
     static listCompleted() {
@@ -83,8 +102,12 @@ enum RequisitionStatus {
         [CANCELED, DELETED]
     }
 
+    static listApproval() {
+        [APPROVED, REJECTED, PENDING_APPROVAL]
+    }
+
     static listAll() {
-        [CREATED, EDITING, VERIFYING, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
+        [CREATED, EDITING, VERIFYING, APPROVED, PENDING_APPROVAL, PICKING, PICKED, PENDING, CHECKING, FULFILLED, ISSUED, RECEIVED, CANCELED, DELETED, ERROR]
     }
 
     static toStockMovementStatus(RequisitionStatus requisitionStatus) {
@@ -110,6 +133,8 @@ enum RequisitionStatus {
                 return RequisitionStatus.EDITING
             case StockMovementStatusCode.REQUESTED:
                 return RequisitionStatus.VERIFYING
+            case StockMovementStatusCode.PENDING_APPROVAL:
+                return RequisitionStatus.PENDING_APPROVAL
             case StockMovementStatusCode.PACKED:
                 return RequisitionStatus.CHECKING
             case StockMovementStatusCode.VALIDATED:
@@ -125,6 +150,8 @@ enum RequisitionStatus {
         return "(case status " +
             "when '${CREATED}' then ${CREATED.sortOrder} " +
             "when '${EDITING}' then ${EDITING.sortOrder} " +
+            "when '${PENDING_APPROVAL}' then ${PENDING_APPROVAL.sortOrder} " +
+            "when '${APPROVED}' then ${APPROVED.sortOrder} " +
             "when '${VERIFYING}' then ${VERIFYING.sortOrder} " +
             "when '${PICKING}' then ${PICKING.sortOrder} " +
             "when '${PICKED}' then ${PICKED.sortOrder} " +
@@ -134,8 +161,20 @@ enum RequisitionStatus {
             "when '${RECEIVED}' then ${RECEIVED.sortOrder} " +
             "when '${CANCELED}' then ${CANCELED.sortOrder} " +
             "when '${DELETED}' then ${DELETED.sortOrder} " +
+            "when '${PENDING_APPROVAL}' then ${PENDING_APPROVAL.sortOrder} " +
+            "when '${APPROVED}' then ${APPROVED.sortOrder} " +
+            "when '${REJECTED}' then ${REJECTED.sortOrder} " +
             "else 0 " +
             "end)"
+    }
+
+    static Closure mapToOption = { RequisitionStatus status ->
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        [
+                id: status.name(),
+                value: status.name(),
+                label: "${g.message(code: 'enum.RequisitionStatus.' + status.name())}",
+        ]
     }
 
     String toString() { return name() }

@@ -42,7 +42,15 @@ const useTableData = ({
   const fireFetchData = () => {
     // Each time we fetch, we want to 'reset' the token/signal
     sourceRef.current = CancelToken.source();
-    tableRef.current.fireFetchData();
+    // reset pagination on each search execution
+    if (tableRef.current?.state?.page > 0) {
+      // onPageChange(pageIndex) triggers fireFetchData() when pageIndex !== currenPage
+      // which is why we are calling onPageChange(0) and fireFetchData() separately
+      // by doing that we are trying to avoid double fetching
+      tableRef.current.onPageChange(0);
+    } else {
+      tableRef.current.fireFetchData();
+    }
   };
 
   // If filterParams change, refetch the data with applied filters
