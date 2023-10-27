@@ -10,16 +10,12 @@
 package org.pih.warehouse.reporting
 
 import grails.converters.JSON
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.util.Holders
 import grails.validation.Validateable
 import groovy.time.TimeCategory
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.collections.FactoryUtils
 import org.apache.commons.collections.list.LazyList
-import org.grails.core.DefaultGrailsDomainClass
-import org.grails.datastore.mapping.model.PersistentEntity
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Tag
@@ -488,7 +484,7 @@ class ShowConsumptionCommand implements Validateable {
     Boolean includeMonthlyBreakdown = Boolean.TRUE
     Boolean includeQuantityOnHand = Boolean.TRUE
 
-    def selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
+    List<String> selectedProperties = LazyList.decorate(new ArrayList(), FactoryUtils.instantiateFactory(String.class))
 
     // Payload
     Set<Transaction> debits = []
@@ -507,10 +503,6 @@ class ShowConsumptionCommand implements Validateable {
         fromDate(nullable: true)
         toDate(nullable: true)
         parametersHash(nullable: true)
-    }
-
-    def getAvailableProperties() {
-        Holders.grailsApplication.mappingContext.getPersistentEntity(Product.class.name).persistentPropertyNames
     }
 
     Boolean hasParameterChanged() {
