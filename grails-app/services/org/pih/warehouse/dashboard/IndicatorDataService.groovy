@@ -634,7 +634,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
-        GraphData graphData = new GraphData(numbersIndicator, "/stockMovement/list?receiptStatusCode=PENDING")
+        GraphData graphData = new GraphData(numbersIndicator, baseUrl + "&receiptStatusCode=PENDING")
 
         return graphData
     }
