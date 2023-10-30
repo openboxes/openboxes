@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.orm.PagedResultList
 import grails.validation.ValidationException
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.json.JSONObject
 import org.hibernate.ObjectNotFoundException
 import org.hibernate.sql.JoinType
@@ -2913,7 +2914,7 @@ class StockMovementService {
                 stockMovement.isInApprovalState()
     }
 
-    def getApplicationTagLib() {
-        return grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+    ApplicationTagLib getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 }

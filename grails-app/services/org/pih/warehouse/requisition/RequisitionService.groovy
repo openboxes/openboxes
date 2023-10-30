@@ -12,6 +12,7 @@ package org.pih.warehouse.requisition
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.pih.warehouse.DateUtil
 import javassist.NotFoundException
 import org.pih.warehouse.auth.AuthService
@@ -878,7 +879,7 @@ class RequisitionService {
     }
 
     void rollbackLastEvent(Requisition requisition) {
-        def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+        ApplicationTagLib g = grailsApplication.mainContext.getBean(ApplicationTagLib)
         Event event = requisition.mostRecentEvent
         if (!event) {
             String errorMessage = g.message(
