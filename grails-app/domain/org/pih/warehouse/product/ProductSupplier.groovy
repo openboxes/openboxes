@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.product
 
+import grails.databinding.BindUsing
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
@@ -64,6 +65,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
+    @BindUsing({ productSupplier, source -> source["active"] != null ? source["active"] : true })
     Boolean active = Boolean.TRUE
 
     static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
