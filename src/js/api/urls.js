@@ -10,12 +10,20 @@ export const PURCHASE_ORDER_ROLLBACK_ORDER = id => `${PURCHASE_ORDER_API}/${id}/
 // STOCK MOVEMENT
 export const STOCK_MOVEMENT = `${CONTEXT_PATH}/stockMovement`;
 export const STOCK_MOVEMENT_API = `${API}/stockMovements`;
-export const STOCK_MOVEMENT_DELETE = id => `${STOCK_MOVEMENT_API}/${id}`;
+export const STOCK_MOVEMENT_BY_ID = id => `${STOCK_MOVEMENT_API}/${id}`;
 export const STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS = `${STOCK_MOVEMENT_API}/pendingRequisitionItems`;
 export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems`;
 export const STOCK_MOVEMENT_SHOW = id => `${STOCK_MOVEMENT}/show/${id}`;
 export const STOCK_MOVEMENT_UPDATE_STATUS = id => `${STOCK_MOVEMENT_API}/${id}/status`;
 export const STOCK_MOVEMENT_ROLLBACK_APPROVAL = id => `${STOCK_MOVEMENT_API}/${id}/rollbackApproval`;
+export const STOCK_MOVEMENT_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/stockMovementItems`;
+export const STOCK_MOVEMENT_UPDATE_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/updateItems`;
+export const STOCK_MOVEMENT_REMOVE_ALL_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/removeAllItems`;
+export const STOCK_MOVEMENT_STATUS = id => `${STOCK_MOVEMENT_BY_ID(id)}/status`;
+
+// STOCK MOVEMENT ITEMS
+export const STOCK_MOVEMENT_ITEM_API = `${API}/stockMovementItems`;
+export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_API}/${id}/removeItem`;
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
@@ -27,6 +35,7 @@ export const INVOICE_API = `${API}/invoices`;
 
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;
+export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 
 // STOCK LIST
 export const STOCKLIST_API = `${API}/stocklists`;
@@ -71,3 +80,8 @@ export const PUTAWAY_GENERATE_PDF = id => `/putAway/generatePdf/${id}`;
 
 // SUPPORT LINKS
 export const SUPPORT_LINKS = `${CONTEXT_PATH}${API}/supportLinks`;
+
+// COMBINED SHIPMENT ITEMS
+export const COMBINED_SHIPMENT_ITEMS_API = `${API}/combinedShipmentItems`;
+export const COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE = (id) => `${COMBINED_SHIPMENT_ITEMS_API}/importTemplate/${id}`;
+export const COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE = `${COMBINED_SHIPMENT_ITEMS_API}/exportTemplate`;
