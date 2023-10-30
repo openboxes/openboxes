@@ -26,6 +26,7 @@ import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.api.StockMovementItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
+import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
@@ -274,8 +275,8 @@ class StockMovementService {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         } else {
-            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status, comment)
-            publishEvent(new RequisitionStatusTransitionEvent(requisition))
+            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser, status, comment)
+            grailsApplication.mainContext.publishEvent(new RequisitionStatusTransitionEvent(requisition))
         }
     }
 
@@ -2885,9 +2886,8 @@ class StockMovementService {
 
     void rollbackApproval(String stockMovementId) {
         StockMovement stockMovement = getStockMovement(stockMovementId)
-        Location currentLocation = AuthService.currentLocation.get()
-        // TODO: remove .get() from current user in Grails 3 (with .get it will return null)
-        if (!canRollbackApproval(currentLocation, AuthService.currentUser.get(), stockMovement)) {
+        Location currentLocation = AuthService.currentLocation
+        if (!canRollbackApproval(currentLocation, AuthService.currentUser, stockMovement)) {
             String errorMessage = applicationTagLib.message(
                     code: "request.rollbackApproval.insufficientPermissions.message",
                     default: "Unable to rollback approval due to insufficient permissions",
