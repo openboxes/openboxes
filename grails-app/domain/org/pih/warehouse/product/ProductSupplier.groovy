@@ -65,7 +65,7 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Date dateCreated
     Date lastUpdated
 
-    @BindUsing({ obj, source -> source["active"] != null ? source["active"] : true })
+    @BindUsing({ productSupplier, source -> source["active"] != null ? source["active"] : true })
     Boolean active = Boolean.TRUE
 
     static transients = ["defaultProductPackage", "globalProductSupplierPreference", "attributes"]
