@@ -14,7 +14,16 @@ import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
-import { ORDER_SHOW } from 'api/urls';
+import {
+  COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE,
+  COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE,
+  ORDER_SHOW,
+  STOCK_MOVEMENT_BY_ID,
+  STOCK_MOVEMENT_ITEMS,
+  STOCK_MOVEMENT_REMOVE_ALL_ITEMS,
+  STOCK_MOVEMENT_ITEM_REMOVE, STOCK_MOVEMENT_STATUS,
+  STOCK_MOVEMENT_UPDATE_ITEMS,
+} from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
@@ -544,7 +553,7 @@ class AddItemsPage extends Component {
    * @public
    */
   fetchLineItems() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?stepNumber=2`;
+    const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?stepNumber=2`;
 
     return apiClient.get(url)
       .then((response) => {
@@ -562,8 +571,7 @@ class AddItemsPage extends Component {
   fetchAddItemsPageData() {
     this.props.showSpinner();
 
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}`;
-    apiClient.get(url)
+    apiClient.get(STOCK_MOVEMENT_BY_ID(this.state.values.stockMovementId))
       .then((resp) => {
         const { hasManageInventory } = resp.data.data;
         const { statusCode } = resp.data.data;
@@ -588,7 +596,7 @@ class AddItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/stockMovementItems?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
+    const url = `${STOCK_MOVEMENT_ITEMS(this.state.values.stockMovementId)}?offset=${startIndex}&max=${this.props.pageSize}&stepNumber=2`;
     apiClient.get(url)
       .then((response) => {
         this.setLineItems(response, startIndex);
@@ -724,14 +732,13 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItems(lineItems) {
     const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
     };
 
     if (payload.lineItems.length) {
-      return apiClient.post(updateItemsUrl, payload)
+      return apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId), payload)
         .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
     }
 
@@ -775,14 +782,13 @@ class AddItemsPage extends Component {
    */
   saveRequisitionItemsInCurrentStep(itemCandidatesToSave) {
     const itemsToSave = this.getLineItemsToBeSaved(itemCandidatesToSave);
-    const updateItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
     const payload = {
       id: this.state.values.stockMovementId,
       lineItems: itemsToSave,
     };
 
     if (payload.lineItems.length) {
-      return apiClient.post(updateItemsUrl, payload)
+      return apiClient.post(STOCK_MOVEMENT_UPDATE_ITEMS(this.state.values.stockMovementId), payload)
         .then((resp) => {
           const { lineItems } = resp.data.data;
 
@@ -877,10 +883,8 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId) {
-    const removeItemsUrl = `/openboxes/api/stockMovementItems/${itemId}/removeItem`;
-
     this.props.showSpinner();
-    return apiClient.delete(removeItemsUrl)
+    return apiClient.delete(STOCK_MOVEMENT_ITEM_REMOVE(itemId))
       .then(() => this.props.hideSpinner())
       .catch(() => {
         this.props.hideSpinner();
@@ -893,10 +897,9 @@ class AddItemsPage extends Component {
    * @public
    */
   removeAll() {
-    const removeItemsUrl = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/removeAllItems`;
     this.props.showSpinner();
 
-    return apiClient.delete(removeItemsUrl)
+    return apiClient.delete(STOCK_MOVEMENT_REMOVE_ALL_ITEMS(this.state.values.stockMovementId))
       .then(() => {
         this.setState({
           totalCount: 0,
@@ -944,11 +947,10 @@ class AddItemsPage extends Component {
    * @public
    */
   transitionToNextStep() {
-    const url = `/openboxes/api/stockMovements/${this.state.values.stockMovementId}/status`;
     const payload = { status: 'CHECKING' };
 
     if (this.state.values.statusCode === 'CREATED') {
-      return apiClient.post(url, payload);
+      return apiClient.post(STOCK_MOVEMENT_STATUS(this.state.values.stockMovementId), payload);
     }
     return Promise.resolve();
   }
@@ -998,9 +1000,8 @@ class AddItemsPage extends Component {
       },
     };
 
-    const url = `/openboxes/api/combinedShipmentItems/importTemplate/${stockMovementId}`;
-
-    return apiClient.post(url, formData, config)
+    return apiClient
+      .post(COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE(stockMovementId), formData, config)
       .then(() => {
         this.fetchLineItems();
         if (_.isNil(_.last(this.state.values.lineItems).product)) {
@@ -1018,7 +1019,7 @@ class AddItemsPage extends Component {
   }
 
   exportTemplate(blank) {
-    const url = `/openboxes/api/combinedShipmentItems/exportTemplate?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
+    const url = `${COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE}?vendor=${this.state.values.origin.id}&destination=${this.state.values.destination.id}${blank ? '&blank=true' : ''}`;
     apiClient.get(url, { responseType: 'blob' })
       .then((response) => {
         fileDownload(response.data, 'Order-items-template.csv', 'text/csv');
