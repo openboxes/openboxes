@@ -440,7 +440,8 @@ dependencies {
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:31.1-jre'
 
-    compile 'com.google.zxing:javase:3.5.1'  // barcode support
+    // barcode support
+    compile 'com.google.zxing:javase:3.5.1'
 
     testImplementation 'com.icegreen:greenmail:1.6.14'
 
@@ -748,9 +749,9 @@ dependencies {
 
     // Rest assured dependencies
     testImplementation 'io.rest-assured:rest-assured:3.2.0'
-    testImplementation 'org.testng:testng:6.14.3'
-
-
+    testImplementation ('org.testng:testng:6.14.3') {
+        exclude group: "com.beust", module: "jcommander"
+    }
 }
 
 /*
@@ -836,3 +837,4 @@ tasks.withType(Test) {
         exceptionFormat 'full'
     }
 }
+
