@@ -276,6 +276,9 @@ class AddItemsPage extends Component {
         lineItemsToBeUpdated.push(item);
       } else if (newQty !== oldQty || newRecipient !== oldRecipient) {
         lineItemsToBeUpdated.push(item);
+      } else if (item.inventoryItem?.expirationDate && item.expirationDate &&
+        item.inventoryItem?.expirationDate !== item.expirationDate) {
+        lineItemsToBeUpdated.push(item);
       }
     });
 
@@ -597,7 +600,7 @@ class AddItemsPage extends Component {
   saveAndTransitionToNextStep(formValues, lineItems) {
     this.props.showSpinner();
 
-    this.saveRequisitionItems(lineItems)
+    this.saveRequisitionItemsInCurrentStep(lineItems)
       .then((resp) => {
         let values = formValues;
         if (resp) {
@@ -642,27 +645,6 @@ class AddItemsPage extends Component {
   }
 
   /**
-   * Saves list of stock movement items with post method.
-   * @param {object} lineItems
-   * @public
-   */
-  saveRequisitionItems(lineItems) {
-    const itemsToSave = this.getLineItemsToBeSaved(lineItems);
-    const updateItemsUrl = `/api/stockMovements/${this.state.values.stockMovementId}/updateItems`;
-    const payload = {
-      id: this.state.values.stockMovementId,
-      lineItems: itemsToSave,
-    };
-
-    if (payload.lineItems.length) {
-      return apiClient.post(updateItemsUrl, payload)
-        .catch(() => Promise.reject(new Error('react.stockMovement.error.saveRequisitionItems.label')));
-    }
-
-    return Promise.resolve();
-  }
-
-  /**
    * Saves list of requisition items in current step (without step change). Used to export template.
    * @param {object} itemCandidatesToSave
    * @public
@@ -691,6 +673,7 @@ class AddItemsPage extends Component {
             currentLineItems: lineItemsBackendData,
             values: { ...this.state.values, lineItems: lineItemsBackendData },
           });
+          return resp;
         })
         .catch(() => Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items'))));
     }
