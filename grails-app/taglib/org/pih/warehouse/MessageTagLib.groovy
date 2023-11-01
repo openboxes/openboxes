@@ -39,25 +39,4 @@ class MessageTagLib {
         out << defaultTagLib.message.call(attrs)
     }
 
-    /**
-     * Utility function which handles rendering messages to the user
-     * available attributes:
-     * * style - style of a message container ex: message, error (default: message)
-     * * message - a single or a list of messages to be rendered in the template
-     * by default takes the value stored in flash.message.
-     * accepts data like: String, List<String>, Map<code: string, args: obj>, List<Map<code: string, args: obj>>
-     */
-    def renderMessage = { attrs ->
-        def messages = attrs?.message ?: flash.message
-        if (messages && !(messages instanceof List)) {
-            messages = [messages]
-        }
-        out << render(
-                template: "/taglib/renderMessage",
-                model: [
-                        style: attrs?.style ?: "message",
-                        messages: messages,
-                ]
-        )
-    }
 }

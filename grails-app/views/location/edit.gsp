@@ -17,7 +17,13 @@
 
 <body>
 <div class="body">
-    <warehouse:renderMessage />
+
+    <g:if test="${flash.message}">
+        <div class="message">${flash.message}</div>
+    </g:if>
+    <g:if test="${flash.warning}">
+        <div class="warning">${raw(flash.warning)}</div>
+    </g:if>
     <g:hasErrors bean="${locationInstance}">
         <div class="errors">
             <g:renderErrors bean="${locationInstance}" as="list"/>
