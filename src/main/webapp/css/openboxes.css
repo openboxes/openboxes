@@ -292,9 +292,17 @@ input:focus, select:focus, textarea:focus {
 /* MESSAGES AND ERRORS */
 
 .message {
-    background: #f3f8fc url(../images/skin/information.png) 8px 50% no-repeat;
+    background: #f3f8fc url(../images/icons/silk/information.png) 8px 50% no-repeat;
     border: 1px solid #b2d1ff;
     color: #006dba;
+    margin: 5px 0 5px 0;
+    padding: 5px 5px 5px 30px
+}
+
+.warning {
+    background: #FFF6BF url(../images/icons/silk/error.png) 8px 50% no-repeat;
+    border: 1px solid #FFD324;
+    color: #514721;
     margin: 5px 0 5px 0;
     padding: 5px 5px 5px 30px
 }
