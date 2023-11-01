@@ -38,5 +38,4 @@ class MessageTagLib {
 
         out << defaultTagLib.message.call(attrs)
     }
-
 }
