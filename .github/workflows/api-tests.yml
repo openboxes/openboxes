@@ -2,9 +2,9 @@ name: API tests
 
 on:
   pull_request:
-    branches: [ develop, 'release/**' ]
+    branches: [ develop, 'release/**', 'feature/**']
   push:
-    branches: [ develop, 'release/**' ]
+    branches: [ develop, 'release/**', 'feature/**' ]
 
 jobs:
   build:
