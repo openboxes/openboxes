@@ -389,6 +389,14 @@ war {
     zip64 = true
 }
 
+test {
+    systemProperty "username", System.getProperty("username")
+    systemProperty "password", System.getProperty("password")
+    systemProperty "server.host", System.getProperty("server.host")
+    systemProperty "server.path", System.getProperty("server.path")
+    systemProperty "server.port", System.getProperty("server.port")
+}
+
 dependencies {
     /*
      * Tomcat provides many libraries out of the box, while Grails, by
@@ -424,6 +432,7 @@ dependencies {
 
     implementation 'ch.qos.logback:logback-classic'
     implementation 'ch.qos.logback:logback-core'
+    testImplementation 'org.projectlombok:lombok:1.18.28'
 
     /*
      * Manage static assets in the grails-app/assets/ directory.
@@ -752,6 +761,7 @@ dependencies {
     testImplementation ('org.testng:testng:6.14.3') {
         exclude group: "com.beust", module: "jcommander"
     }
+    testImplementation 'org.hamcrest:hamcrest:2.2'
 }
 
 /*
