@@ -10,7 +10,7 @@ import { hideSpinner, showSpinner } from 'actions/index';
 import VerticalTabs from 'components/Layout/VerticalTabs';
 import ImportProducts from 'components/products-configuration/ImportProducts';
 import { PRODUCT_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -67,7 +67,7 @@ class ConfigureProducts extends Component {
             <Translate id="react.productsConfiguration.productListInfo2.label" />
           </div>
           <div>
-            <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(PRODUCT_URL.list())}>
+            <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={PRODUCT_URL.list()}>
               <Translate id="react.productsConfiguration.viewProducts.label" defaultMessage="View Products List" />
             </a>
           </div>

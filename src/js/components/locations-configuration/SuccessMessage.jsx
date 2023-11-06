@@ -5,7 +5,6 @@ import Modal from 'react-modal';
 import { withRouter } from 'react-router-dom';
 
 import { LOCATION_CONFIGURATION_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
@@ -43,7 +42,7 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
                 defaultMessage="Create another location"
               />
             </button>
-            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = stringUrlInterceptor(LOCATION_URL.list()); }}>
+            <button type="button" className="btn btn-outline-primary" onClick={() => { window.location = LOCATION_URL.list(); }}>
               <Translate
                 id="react.locationsConfiguration.success.viewLocationList"
                 defaultMessage="View Location List"

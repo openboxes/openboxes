@@ -15,7 +15,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
 import { INVOICE_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -341,7 +341,7 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     this.saveInvoiceItems(formValues)
       .then(() => {
-        window.location = stringUrlInterceptor(INVOICE_URL.show(formValues.id));
+        window.location = INVOICE_URL.show(formValues.id);
       })
       .catch(() => this.props.hideSpinner());
   }

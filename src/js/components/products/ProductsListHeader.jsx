@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 
 import Button from 'components/form-elements/Button';
 import { PRODUCT_URL } from 'consts/applicationUrls';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 const ProductsListHeader = ({ isUserAdmin }) => (
@@ -15,14 +14,14 @@ const ProductsListHeader = ({ isUserAdmin }) => (
     </span>
     {isUserAdmin &&
       <div className="d-flex justify-content-end buttons align-items-center">
-        <a href={stringUrlInterceptor(PRODUCT_URL.importCSV())}>
+        <a href={PRODUCT_URL.importCSV()}>
           <Button
             defaultLabel="Import products"
             label="react.productsList.importProducts.label"
             variant="primary-outline"
           />
         </a>
-        <a href={stringUrlInterceptor(PRODUCT_URL.create())}>
+        <a href={PRODUCT_URL.create()}>
           <Button
             defaultLabel="Add product"
             label="react.productsList.addProduct.label"

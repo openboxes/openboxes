@@ -17,7 +17,7 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -291,7 +291,7 @@ class SendMovementPage extends Component {
         .then(() => {
           apiClient.post(url, flattenRequest(payload))
             .then(() => {
-              window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId));
+              window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId);
             })
             .catch(() => {
               this.props.hideSpinner();
@@ -332,7 +332,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId));
+          window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId);
         });
     } else {
       confirmAlert({
@@ -344,7 +344,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId)); },
+            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -453,7 +453,7 @@ class SendMovementPage extends Component {
                     type="button"
                     disabled={invalid}
                     onClick={() => {
-                        window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId));
+                        window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.outboundReturnId);
                     }}
                     className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                   >

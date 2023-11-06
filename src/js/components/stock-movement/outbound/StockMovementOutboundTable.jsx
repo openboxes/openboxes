@@ -23,7 +23,6 @@ import RequisitionStatus from 'consts/requisitionStatus';
 import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useOutboundListTableData from 'hooks/list-pages/outbound/useOutboundListTableData';
 import ActionDots from 'utils/ActionDots';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import canEditRequest from 'utils/permissionUtils';
@@ -260,7 +259,7 @@ const StockMovementOutboundTable = ({
         return (
           <TableCell
             {...row}
-            link={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(id))}
+            link={STOCK_MOVEMENT_URL.show(id)}
             tooltip
             tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
           >
@@ -282,7 +281,7 @@ const StockMovementOutboundTable = ({
           {...row}
           tooltip
           tooltipLabel={row.original.description || row.original.name}
-          link={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(row.original.id))}
+          link={STOCK_MOVEMENT_URL.show(row.original.id)}
         >
           <span className="mx-1">
             {translate(

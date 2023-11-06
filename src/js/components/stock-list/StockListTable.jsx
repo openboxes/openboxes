@@ -22,7 +22,6 @@ import Button from 'components/form-elements/Button';
 import { REQUISITION_TEMPLATE_URL } from 'consts/applicationUrls';
 import useStockListTableData from 'hooks/list-pages/stock-list/useStockListTableData';
 import ActionDots from 'utils/ActionDots';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -168,7 +167,7 @@ const StockListTable = ({
         <TableCell
           {...row}
           tooltip
-          link={stringUrlInterceptor(REQUISITION_TEMPLATE_URL.show(row.original.id))}
+          link={REQUISITION_TEMPLATE_URL.show(row.original.id)}
         />),
     },
     {

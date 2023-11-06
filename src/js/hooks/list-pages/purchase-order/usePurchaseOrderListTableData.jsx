@@ -11,7 +11,6 @@ import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import { PURCHASE_ORDER_API } from 'api/urls';
 import { ORDER_URL } from 'consts/applicationUrls';
 import useTableData from 'hooks/list-pages/useTableData';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -171,7 +170,7 @@ const usePurchaseOrderListTableData = (filterParams) => {
       Alert.error('Order must be placed in order to print');
       return;
     }
-    window.open(stringUrlInterceptor(ORDER_URL.print(id)), '_blank');
+    window.open(ORDER_URL.print(id), '_blank');
   };
 
   const cancelOrder = () => {

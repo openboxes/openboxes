@@ -13,7 +13,6 @@ import InvoiceStatus from 'components/invoice/InvoiceStatus';
 import { INVOICE_URL } from 'consts/applicationUrls';
 import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
 import ActionDots from 'utils/ActionDots';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
@@ -94,7 +93,7 @@ const InvoiceListTable = ({
       Header: <Translate id="react.invoice.column.invoiceNumber.label" defaultMessage="Invoice Number" />,
       accessor: 'invoiceNumber',
       sortable: false,
-      Cell: row => <TableCell {...row} link={stringUrlInterceptor(INVOICE_URL.show(row.original.id))} />,
+      Cell: row => <TableCell {...row} link={INVOICE_URL.show(row.original.id)} />,
     },
     {
       Header: <Translate id="react.invoice.vendor.label" defaultMessage="Vendor" />,

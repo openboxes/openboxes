@@ -24,7 +24,6 @@ import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
 import { ORDER_URL, PURCHASE_ORDER_URL } from 'consts/applicationUrls';
 import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
 import ActionDots from 'utils/ActionDots';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -184,7 +183,7 @@ const PurchaseOrderListTable = ({
       Cell: row => (
         <TableCell
           {...row}
-          link={stringUrlInterceptor(ORDER_URL.show(row.original.id))}
+          link={ORDER_URL.show(row.original.id)}
         />
       ),
     },
@@ -197,7 +196,7 @@ const PurchaseOrderListTable = ({
         <TableCell
           {...row}
           tooltip
-          link={stringUrlInterceptor(ORDER_URL.show(row.original.id))}
+          link={ORDER_URL.show(row.original.id)}
         />
       ),
     },

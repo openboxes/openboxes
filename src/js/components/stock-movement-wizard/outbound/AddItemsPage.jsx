@@ -36,7 +36,7 @@ import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -1075,7 +1075,7 @@ class AddItemsPage extends Component {
     if (!errors.length) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId));
+          window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
     } else {
       confirmAlert({
@@ -1087,7 +1087,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId)); },
+            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

@@ -21,7 +21,7 @@ import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -781,7 +781,7 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId)); },
+            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -792,7 +792,7 @@ class EditItemsPage extends Component {
     } else {
       this.reviseRequisitionItems(formValues)
         .then(() => {
-          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId));
+          window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
     }
   }

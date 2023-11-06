@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { PRODUCT_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor }  from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 class ImportCategories extends Component {
@@ -50,7 +50,7 @@ class ImportCategories extends Component {
           <Translate id="react.productsConfiguration.downloadProductTemplate2.label" />&nbsp;
         </div>
         <div className="align-self-end">
-          <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(PRODUCT_URL.importCSV())}>
+          <a className="btn btn-primary" target="_blank" rel="noopener noreferrer" href={PRODUCT_URL.importCSV()}>
             <Translate id="react.productsConfiguration.importProducts.label" defaultMessage="Import Products List" />
           </a>
         </div>

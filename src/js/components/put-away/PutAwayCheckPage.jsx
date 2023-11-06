@@ -10,7 +10,7 @@ import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { ORDER_URL, PUTAWAY_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
@@ -80,7 +80,7 @@ class PutAwayCheckPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = stringUrlInterceptor(`${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`); },
+      () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;
@@ -258,7 +258,7 @@ class PutAwayCheckPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.putAway.alert.putAwayCompleted.label', 'Putaway was successfully completed!'), { timeout: 3000 });
-        window.location = stringUrlInterceptor(ORDER_URL.show(this.props.initialValues.putAway.id));
+        window.location = ORDER_URL.show(this.props.initialValues.putAway.id);
       })
       .catch(() => this.props.hideSpinner());
   }

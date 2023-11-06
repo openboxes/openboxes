@@ -18,7 +18,6 @@ import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentif
 import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useInboundListTableData from 'hooks/list-pages/inbound/useInboundListTableData';
 import ActionDots from 'utils/ActionDots';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
 import { mapShipmentTypes } from 'utils/option-utils';
 import StatusIndicator from 'utils/StatusIndicator';
@@ -160,7 +159,7 @@ const StockMovementInboundTable = ({
         return (
           <TableCell
             {...row}
-            link={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(stockMovementId))}
+            link={STOCK_MOVEMENT_URL.show(stockMovementId)}
             tooltip
             tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
           >
@@ -184,7 +183,7 @@ const StockMovementInboundTable = ({
         return (<TableCell
           {...row}
           tooltip
-          link={stringUrlInterceptor(STOCK_MOVEMENT_URL.show(stockMovementId))}
+          link={STOCK_MOVEMENT_URL.show(stockMovementId)}
           value={description || name}
         />);
       },

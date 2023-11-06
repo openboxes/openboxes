@@ -6,7 +6,6 @@ import { withRouter } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
 import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
@@ -21,7 +20,7 @@ const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
         onClick={() => history.push({ pathname: STOCK_MOVEMENT_URL.createCombinedShipments(), search: 'direction=INBOUND' })}
       />
       {supportedActivities.includes('PLACE_ORDER') &&
-        <a href={stringUrlInterceptor(ORDER_URL.create())}>
+        <a href={ORDER_URL.create()}>
           <Button
             defaultLabel="Create Order"
             label="react.purchaseOrder.createOrder.label"

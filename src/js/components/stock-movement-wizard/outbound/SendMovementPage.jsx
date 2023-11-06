@@ -26,7 +26,6 @@ import {
   handleError,
   handleSuccess,
   handleValidationErrors,
-  stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName } from 'utils/form-values-utils';
@@ -646,7 +645,7 @@ class SendMovementPage extends Component {
         this.stateTransitionToIssued()
           .then(() => {
             // redirect to requisition list
-            window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(this.state.values.stockMovementId));
+            window.location = STOCK_MOVEMENT_URL.show(this.state.values.stockMovementId);
           })
           .catch(() => this.props.hideSpinner());
       })
@@ -690,7 +689,7 @@ class SendMovementPage extends Component {
     if (_.isEmpty(errors)) {
       this.saveValues(values)
         .then(() => {
-          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(values.stockMovementId));
+          window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId);
         });
     } else {
       confirmAlert({
@@ -702,7 +701,7 @@ class SendMovementPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(values.stockMovementId)); },
+            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

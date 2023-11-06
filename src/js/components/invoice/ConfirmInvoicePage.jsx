@@ -15,7 +15,7 @@ import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import { INVOICE_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -320,7 +320,7 @@ class ConfirmInvoicePage extends Component {
     const url = `/api/invoices/${this.state.values.id}/submit`;
     apiClient.post(url)
       .then(() => {
-        window.location = stringUrlInterceptor(INVOICE_URL.show(this.state.values.id));
+        window.location = INVOICE_URL.show(this.state.values.id);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -329,7 +329,7 @@ class ConfirmInvoicePage extends Component {
     const url = `/api/invoices/${this.state.values.id}/post`;
     apiClient.post(url)
       .then(() => {
-        window.location = stringUrlInterceptor(INVOICE_URL.show(this.state.values.id));
+        window.location = INVOICE_URL.show(this.state.values.id);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -387,7 +387,7 @@ class ConfirmInvoicePage extends Component {
                   <button
                     type="button"
                     className="btn btn-outline-secondary float-right btn-form btn-xs"
-                    onClick={() => { window.location = stringUrlInterceptor(INVOICE_URL.show(values.id)); }}
+                    onClick={() => { window.location = INVOICE_URL.show(values.id); }}
                   >
                     <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                   </button>

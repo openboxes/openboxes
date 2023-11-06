@@ -20,7 +20,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -707,7 +707,7 @@ class AddItemsPage extends Component {
     if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
       this.saveRequisitionItemsInCurrentStep(formValues.lineItems)
         .then(() => {
-          window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId));
+          window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
     } else {
       confirmAlert({
@@ -719,7 +719,7 @@ class AddItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(formValues.stockMovementId)); },
+            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),

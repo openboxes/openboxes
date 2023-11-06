@@ -13,7 +13,6 @@ import StockTransferStatus from 'components/stock-transfer/list/StockTransferSta
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useStockTransferListTableData from 'hooks/list-pages/stock-transfer/useStockTransferListTableData';
 import ActionDots from 'utils/ActionDots';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { findActions } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
@@ -92,7 +91,7 @@ const StockTransferListTable = ({
       accessor: 'orderNumber',
       className: 'active-circle d-flex align-items-center',
       headerClassName: 'header',
-      Cell: row => <TableCell {...row} link={stringUrlInterceptor(STOCK_TRANSFER_URL.show(row.original.id))} />,
+      Cell: row => <TableCell {...row} link={STOCK_TRANSFER_URL.show(row.original.id)} />,
     },
     {
       Header: <Translate id="react.stockTransfer.column.createdBy.label" defaultMessage="Created by" />,

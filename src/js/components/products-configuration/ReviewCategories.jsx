@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { CATEGORY_URL } from 'consts/applicationUrls';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -69,7 +69,7 @@ class ReviewCategories extends Component {
                 <button type="button" onClick={this.downloadCategories} className="btn btn-outline-primary float-right mt-3">
                   <Translate id="react.productsConfiguration.downloadCsvFile.label" defaultMessage="Download CSV file" />
                 </button>
-                <a href={stringUrlInterceptor(CATEGORY_URL.tree())} className="btn btn-primary float-right mt-3" rel="noopener noreferrer" target="_blank">
+                <a href={CATEGORY_URL.tree()} className="btn btn-primary float-right mt-3" rel="noopener noreferrer" target="_blank">
                   <Translate id="react.productsConfiguration.viewCategoryPage.label" defaultMessage="View Category Page" />
                 </a>
               </div>) : (

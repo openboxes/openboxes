@@ -24,7 +24,6 @@ import {
   flattenRequest,
   handleSuccess,
   handleValidationErrors,
-  stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
@@ -525,7 +524,7 @@ class PackingPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(values.stockMovementId)); })}
+                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId); })}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>

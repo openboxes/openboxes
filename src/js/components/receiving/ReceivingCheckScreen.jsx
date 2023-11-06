@@ -17,7 +17,7 @@ import LabelField from 'components/form-elements/LabelField';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
 import TextField from 'components/form-elements/TextField';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, getReceivingPayloadContainers } from 'utils/form-values-utils';
 import Translate from 'utils/Translate';
@@ -252,7 +252,7 @@ class ReceivingCheckScreen extends Component {
       }, () => {
         this.setState({ completed: true });
         const { requisition, shipmentId } = formValues;
-        window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(requisition || shipmentId));
+        window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
       });
     }
   }
@@ -308,7 +308,7 @@ class ReceivingCheckScreen extends Component {
           }, () => {
             this.setState({ completed: true });
             const { requisition, shipmentId } = formValues;
-            window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(requisition || shipmentId));
+            window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
           }),
         },
         {
@@ -343,7 +343,7 @@ class ReceivingCheckScreen extends Component {
       .then(() => {
         const { requisition, shipmentId } = formValues;
 
-        window.location = stringUrlInterceptor(STOCK_MOVEMENT_URL.show(requisition || shipmentId));
+        window.location = STOCK_MOVEMENT_URL.show(requisition || shipmentId);
       })
       .catch(() => this.props.hideSpinner());
   }
