@@ -275,7 +275,7 @@ class LocationController {
                     flash.message = "${warehouse.message(code: 'user.photoTooLarge.message', args: [warehouse.message(code: 'location.label'), locationInstance.id])}"
                 }
 
-                redirect(action: "show", id: locationInstance.id)
+                redirect(action: "edit", id: locationInstance.id)
             } else {
                 "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
             }
@@ -298,7 +298,7 @@ class LocationController {
         def transaction = Transaction.get(params.id)
         transaction.delete()
         flash.message = "Transaction deleted"
-        redirect(action: "show", id: params.location.id)
+        redirect(action: "edit", id: params.location.id)
     }
 
     @Transactional
@@ -306,13 +306,13 @@ class LocationController {
         def shipment = Shipment.get(params.id)
         shipment.delete()
         flash.message = "Shipment deleted"
-        redirect(action: "show", id: params.location.id)
+        redirect(action: "edit", id: params.location.id)
     }
     def deleteOrder() {
         def order = Order.get(params.id)
         order.delete()
         flash.message = "Order deleted"
-        redirect(action: "show", id: params.location.id)
+        redirect(action: "edit", id: params.location.id)
     }
 
     @Transactional
@@ -320,20 +320,20 @@ class LocationController {
         def requestInstance = Requisition.get(params.id)
         requestInstance.delete()
         flash.message = "Request deleted"
-        redirect(action: "show", id: params.location.id)
+        redirect(action: "edit", id: params.location.id)
     }
     @Transactional
     def deleteEvent() {
         def event = Event.get(params.id)
         event.delete()
         flash.message = "Event deleted"
-        redirect(action: "show", id: params.location.id)
+        redirect(action: "edit", id: params.location.id)
     }
 
     def deleteUser() {
         userGormService.delete(params.id)
         flash.message = "User deleted"
-        redirect(action: "show", id: params.location.id)
+        redirect(action: "edit", id: params.location.id)
     }
 
     def showBinLocations() {
