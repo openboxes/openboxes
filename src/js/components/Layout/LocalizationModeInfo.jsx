@@ -14,7 +14,7 @@ const LocalizationModeInfo = () => (
         <Translate id="react.default.localizationModeActive.label" defaultMessage="The localization mode is active" />
       </span>
     </div>
-    <a href={DISABLE_LOCALIZATION}>
+    <a href={DISABLE_LOCALIZATION()}>
       <Button
         defaultLabel="Disable Localization Mode"
         label="react.default.disableLocalizationMode.label"

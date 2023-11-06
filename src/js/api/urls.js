@@ -89,6 +89,11 @@ export const COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE = `${COMBINED_SHIPMENT_ITEM
 export const HELPSCOUT_CONFIGURATION = `${CONTEXT_PATH}${API}/helpscout/configuration/`;
 
 export const ENABLE_LOCALIZATION = `${CONTEXT_PATH}/user/enableLocalizationMode`;
-export const DISABLE_LOCALIZATION = `${CONTEXT_PATH}/user/disableLocalizationMode`;
+export const DISABLE_LOCALIZATION = (languageCode) => {
+  if (languageCode) {
+    return `${CONTEXT_PATH}/user/disableLocalizationMode?locale=${languageCode}`;
+  }
+  return `${CONTEXT_PATH}/user/disableLocalizationMode`;
+};
 
 export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?searchTerms=${term}`;

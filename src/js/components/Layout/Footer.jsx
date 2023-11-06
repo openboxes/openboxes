@@ -60,7 +60,7 @@ const Footer = ({
               <a
                 className={`${locale === language.code ? 'selected' : ''}`}
                 key={language.code}
-                href={`${DISABLE_LOCALIZATION}?locale=${language.code}`}
+                href={DISABLE_LOCALIZATION(language.code)}
               >
                 {language.name}
               </a>
