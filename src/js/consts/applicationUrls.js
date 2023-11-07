@@ -1,7 +1,6 @@
 /**
  * Definitions of APPLICATION URLs used for redirecting to pages
  * */
-import { stringUrlInterceptor } from 'utils/apiClient';
 
 export const CONTEXT_PATH = window.CONTEXT_PATH ?? '/openboxes';
 
@@ -23,14 +22,14 @@ const PRODUCT_CONFIGURATION_URL = {
 
 const PRODUCT_URL = {
   base: '/product',
-  list: () => stringUrlInterceptor(`${PRODUCT_URL.base}/list`),
-  create: () => stringUrlInterceptor(`${PRODUCT_URL.base}/create`),
-  importCSV: () => stringUrlInterceptor(`${PRODUCT_URL.base}/importAsCsv`),
+  list: () => `${CONTEXT_PATH}${PRODUCT_URL.base}/list`,
+  create: () => `${CONTEXT_PATH}${PRODUCT_URL.base}/create`,
+  importCSV: () => `${CONTEXT_PATH}${PRODUCT_URL.base}/importAsCsv`,
 };
 
 const LOCATION_URL = {
   base: '/location',
-  list: () => stringUrlInterceptor(`${LOCATION_URL.base}/list`),
+  list: () => `${CONTEXT_PATH}${LOCATION_URL.base}/list`,
 };
 
 const STOCK_MOVEMENT_URL = {
@@ -44,7 +43,7 @@ const STOCK_MOVEMENT_URL = {
   editInbound: (id) => `${STOCK_MOVEMENT_URL.createInbound()}/${id}`,
   editOutbound: (id) => `${STOCK_MOVEMENT_URL.createOutbound()}/${id}`,
   editCombinedShipments: (id) => `${STOCK_MOVEMENT_URL.createCombinedShipments()}/${id}`,
-  show: (id) => stringUrlInterceptor(`${STOCK_MOVEMENT_URL.base}/show/${id}`),
+  show: (id) => `${CONTEXT_PATH}${STOCK_MOVEMENT_URL.base}/show/${id}`,
 };
 
 const REQUEST_URL = {
@@ -57,8 +56,8 @@ const INVOICE_URL = {
   base: '/invoice',
   create: () => `${INVOICE_URL.base}/create`,
   edit: (id) => `${INVOICE_URL.create()}/${id}`,
-  show: (id) => stringUrlInterceptor(`${INVOICE_URL.base}/show/${id}`),
-  addDocument: (id) => `${INVOICE_URL.base}/addDocument/${id}`,
+  show: (id) => `${CONTEXT_PATH}${INVOICE_URL.base}/show/${id}`,
+  addDocument: (id) => `${CONTEXT_PATH}${INVOICE_URL.base}/addDocument/${id}`,
 };
 
 const PUTAWAY_URL = {
@@ -76,19 +75,19 @@ const STOCK_TRANSFER_URL = {
   edit: (id) => `${STOCK_TRANSFER_URL.create()}/${id}`,
   editOutbound: (id) => `${STOCK_TRANSFER_URL.createOutbound()}/${id}`,
   editInbound: (id) => `${STOCK_TRANSFER_URL.createInbound()}/${id}`,
-  show: (id) => stringUrlInterceptor(`${STOCK_TRANSFER_URL.base}/show/${id}`),
-  print: (id) => stringUrlInterceptor(`${STOCK_TRANSFER_URL.base}/print/${id}`),
+  show: (id) => `${CONTEXT_PATH}${STOCK_TRANSFER_URL.base}/show/${id}`,
+  print: (id) => `${CONTEXT_PATH}${STOCK_TRANSFER_URL.base}/print/${id}`,
 };
 
 const ORDER_URL = {
   base: '/order',
-  list: () => stringUrlInterceptor(`${ORDER_URL.base}/list`),
-  create: () => stringUrlInterceptor(`${ORDER_URL.base}/create`),
-  show: (id) => stringUrlInterceptor(`${ORDER_URL.base}/show/${id}`),
-  print: (id) => stringUrlInterceptor(`${ORDER_URL.base}/print/${id}`),
-  addComment: (id) => `${ORDER_URL.base}/addComment/${id}`,
-  addDocument: (id) => `${ORDER_URL.base}/addDocument/${id}`,
-  placeOrder: (id) => `${ORDER_URL.base}/placeOrder/${id}`,
+  list: () => `${CONTEXT_PATH}${ORDER_URL.base}/list`,
+  create: () => `${CONTEXT_PATH}${ORDER_URL.base}/create`,
+  show: (id) => `${CONTEXT_PATH}${ORDER_URL.base}/show/${id}`,
+  print: (id) => `${CONTEXT_PATH}${ORDER_URL.base}/print/${id}`,
+  addComment: (id) => `${CONTEXT_PATH}${ORDER_URL.base}/addComment/${id}`,
+  addDocument: (id) => `${CONTEXT_PATH}${ORDER_URL.base}/addDocument/${id}`,
+  placeOrder: (id) => `${CONTEXT_PATH}${ORDER_URL.base}/placeOrder/${id}`,
 };
 
 const PURCHASE_ORDER_URL = {
@@ -100,34 +99,34 @@ const PURCHASE_ORDER_URL = {
 
 const INVENTORY_ITEM_URL = {
   base: '/inventoryItem',
-  showStockCard: (id) => stringUrlInterceptor(`${INVENTORY_ITEM_URL.base}/showStockCard/${id}`),
+  showStockCard: (id) => `${CONTEXT_PATH}${INVENTORY_ITEM_URL.base}/showStockCard/${id}`,
 };
 
 const REQUISITION_TEMPLATE_URL = {
   base: '/requisitionTemplate',
-  create: () => stringUrlInterceptor(`${REQUISITION_TEMPLATE_URL.base}/create`),
-  show: (id) => stringUrlInterceptor(`${REQUISITION_TEMPLATE_URL.base}/show/${id}`),
-  edit: (id) => `${REQUISITION_TEMPLATE_URL.base}/edit/${id}`,
-  batch: (id) => `${REQUISITION_TEMPLATE_URL.base}/batch/${id}`,
-  editHeader: (id) => `${REQUISITION_TEMPLATE_URL.base}/editHeader/${id}`,
+  create: () => `${CONTEXT_PATH}${REQUISITION_TEMPLATE_URL.base}/create`,
+  show: (id) => `${CONTEXT_PATH}${REQUISITION_TEMPLATE_URL.base}/show/${id}`,
+  edit: (id) => `${CONTEXT_PATH}${REQUISITION_TEMPLATE_URL.base}/edit/${id}`,
+  batch: (id) => `${CONTEXT_PATH}${REQUISITION_TEMPLATE_URL.base}/batch/${id}`,
+  editHeader: (id) => `${CONTEXT_PATH}${REQUISITION_TEMPLATE_URL.base}/editHeader/${id}`,
 };
 
 const STOCKLIST_URL = {
   base: '/stocklist',
-  pdf: (id) => stringUrlInterceptor(`${STOCKLIST_URL.base}/renderPdf/${id}`),
-  csv: (id) => stringUrlInterceptor(`${STOCKLIST_URL.base}/generateCsv/${id}`),
+  pdf: (id) => `${CONTEXT_PATH}${STOCKLIST_URL.base}/renderPdf/${id}`,
+  csv: (id) => `${CONTEXT_PATH}${STOCKLIST_URL.base}/generateCsv/${id}`,
 };
 
 const REPLENISHMENT_URL = {
   base: '/replenishment',
   create: () => `${REPLENISHMENT_URL.base}/create`,
   edit: (id) => `${REPLENISHMENT_URL.create()}/${id}`,
-  print: (id) => stringUrlInterceptor(`${REPLENISHMENT_URL.base}/print/${id}`),
+  print: (id) => `${CONTEXT_PATH}${REPLENISHMENT_URL.base}/print/${id}`,
 };
 
 const CATEGORY_URL = {
   base: '/category',
-  tree: () => stringUrlInterceptor(`${CATEGORY_URL.base}/tree`),
+  tree: () => `${CONTEXT_PATH}${CATEGORY_URL.base}/tree`,
 };
 
 export {

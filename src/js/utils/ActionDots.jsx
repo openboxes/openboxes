@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { RiMoreLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
-import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 const actionItemType = {
@@ -78,7 +77,7 @@ const ActionDots = ({
           const elementType = getActionItemType(action);
           let link = '';
           if (elementType === actionItemType.LINK || actionItemType.REACT_LINK) {
-            link = stringUrlInterceptor(buildLink(action));
+            link = buildLink(action);
           }
 
           return (
