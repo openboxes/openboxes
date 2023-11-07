@@ -1,3 +1,6 @@
+/**
+ * Definitions of APPLICATION URLs used for redirecting to pages
+ * */
 import { stringUrlInterceptor } from 'utils/apiClient';
 
 export const CONTEXT_PATH = window.CONTEXT_PATH ?? '/openboxes';

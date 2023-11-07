@@ -1,3 +1,7 @@
+/**
+ * Definitions of ENDPOINT URLs used for API calls
+ * */
+
 const API = '/api';
 const GENERIC_API = `${API}/generic`;
 const { CONTEXT_PATH } = window;
