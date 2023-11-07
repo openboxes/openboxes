@@ -8,12 +8,10 @@ export const PURCHASE_ORDER_DELETE = id => `${PURCHASE_ORDER_API}/${id}`;
 export const PURCHASE_ORDER_ROLLBACK_ORDER = id => `${PURCHASE_ORDER_API}/${id}/rollback`;
 
 // STOCK MOVEMENT
-export const STOCK_MOVEMENT = `${CONTEXT_PATH}/stockMovement`;
 export const STOCK_MOVEMENT_API = `${API}/stockMovements`;
 export const STOCK_MOVEMENT_BY_ID = id => `${STOCK_MOVEMENT_API}/${id}`;
 export const STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS = `${STOCK_MOVEMENT_API}/pendingRequisitionItems`;
 export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems`;
-export const STOCK_MOVEMENT_SHOW = id => `${STOCK_MOVEMENT}/show/${id}`;
 export const STOCK_MOVEMENT_UPDATE_STATUS = id => `${STOCK_MOVEMENT_API}/${id}/status`;
 export const STOCK_MOVEMENT_ROLLBACK_APPROVAL = id => `${STOCK_MOVEMENT_API}/${id}/rollbackApproval`;
 export const STOCK_MOVEMENT_ITEMS = id => `${STOCK_MOVEMENT_BY_ID(id)}/stockMovementItems`;
@@ -28,8 +26,6 @@ export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_API}/${id
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
 export const STOCK_TRANSFER_DELETE = id => `${STOCK_TRANSFER_API}/${id}`;
-export const STOCK_TRANSFER_PRINT = id => `${CONTEXT_PATH}/stockTransfer/print/${id}`;
-
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
 
@@ -67,13 +63,6 @@ export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
 export const LOCATION_TEMPLATE = `${CONTEXT_PATH}${LOCATION_API}/template`;
 export const LOCATION_IMPORT = `${CONTEXT_PATH}${LOCATION_API}/importCsv`;
 export const LOCATION = id => `${LOCATION_API}/${id}`;
-
-// ORDER
-export const ORDER = `${CONTEXT_PATH}/order`;
-export const ORDER_SHOW = id => `${ORDER}/show/${id}`;
-
-// REPLENISHMENT
-export const REPLENISHMENT_PRINT = id => `${CONTEXT_PATH}/replenishment/print/${id}`;
 
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = id => `/putAway/generatePdf/${id}`;

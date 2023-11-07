@@ -7,12 +7,12 @@ import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { ORDER_SHOW } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TextField from 'components/form-elements/TextField';
 import ProductSelect from 'components/product-select/ProductSelect';
+import { ORDER_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { debounceProductsInOrders } from 'utils/option-utils';
@@ -64,7 +64,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue,
         }) => ({
-          url: fieldValue?.orderId ? ORDER_SHOW(fieldValue.orderId) : '',
+          url: fieldValue?.orderId ? ORDER_URL.show(fieldValue.orderId) : '',
         }),
         attributes: {
           formatValue: fieldValue => fieldValue && fieldValue.orderNumber,

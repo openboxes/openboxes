@@ -74,6 +74,7 @@ const STOCK_TRANSFER_URL = {
   editOutbound: (id) => `${STOCK_TRANSFER_URL.createOutbound()}/${id}`,
   editInbound: (id) => `${STOCK_TRANSFER_URL.createInbound()}/${id}`,
   show: (id) => stringUrlInterceptor(`${STOCK_TRANSFER_URL.base}/show/${id}`),
+  print: (id) => stringUrlInterceptor(`${STOCK_TRANSFER_URL.base}/print/${id}`),
 };
 
 const ORDER_URL = {
@@ -118,6 +119,7 @@ const REPLENISHMENT_URL = {
   base: '/replenishment',
   create: () => `${REPLENISHMENT_URL.base}/create`,
   edit: (id) => `${REPLENISHMENT_URL.create()}/${id}`,
+  print: (id) => stringUrlInterceptor(`${REPLENISHMENT_URL.base}/print/${id}`),
 };
 
 const CATEGORY_URL = {

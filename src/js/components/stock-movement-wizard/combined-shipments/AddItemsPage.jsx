@@ -17,7 +17,6 @@ import ProductApi from 'api/services/ProductApi';
 import {
   COMBINED_SHIPMENT_ITEMS_EXPORT_TEMPLATE,
   COMBINED_SHIPMENT_ITEMS_IMPORT_TEMPLATE,
-  ORDER_SHOW,
   STOCK_MOVEMENT_BY_ID,
   STOCK_MOVEMENT_ITEM_REMOVE,
   STOCK_MOVEMENT_ITEMS,
@@ -33,7 +32,7 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import CombinedShipmentItemsModal from 'components/stock-movement-wizard/modals/CombinedShipmentItemsModal';
-import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -104,7 +103,7 @@ const FIELDS = {
         getDynamicAttr: ({
           fieldValue,
         }) => ({
-          url: fieldValue?.orderId ? ORDER_SHOW(fieldValue.orderId) : '',
+          url: fieldValue?.orderId ? ORDER_URL.show(fieldValue.orderId) : '',
         }),
         attributes: {
           formatValue: fieldValue => fieldValue && fieldValue.orderNumber,
