@@ -68,14 +68,14 @@ class InvoiceController {
         def invoiceInstance = Invoice.get(params.id)
         if (invoiceInstance) {
             try {
-                invoiceDataService.delete(invoiceInstance.id)
+                invoiceService.deleteInvoice(invoiceInstance)
                 flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
                 redirect(action: "list")
                 return
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
                 flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
-                redirect(action: "list", id: params.id)
+                redirect(action: "show", params: [ id: params.id ])
                 return
             }
         } else {
