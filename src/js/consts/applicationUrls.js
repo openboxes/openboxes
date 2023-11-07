@@ -38,8 +38,7 @@ const STOCK_MOVEMENT_URL = {
   createInbound: () => `${STOCK_MOVEMENT_URL.base}/createInbound`,
   createOutbound: () => `${STOCK_MOVEMENT_URL.base}/createOutbound`,
   createCombinedShipments: () => `${STOCK_MOVEMENT_URL.base}/createCombinedShipments`,
-  genericEdit: (id) => `${STOCK_MOVEMENT_URL.base}/edit/${id}`,
-  edit: (id) => `${STOCK_MOVEMENT_URL.base}/edit/${id}`,
+  genericEdit: (id) => `${CONTEXT_PATH}${STOCK_MOVEMENT_URL.base}/edit/${id}`,
   editInbound: (id) => `${STOCK_MOVEMENT_URL.createInbound()}/${id}`,
   editOutbound: (id) => `${STOCK_MOVEMENT_URL.createOutbound()}/${id}`,
   editCombinedShipments: (id) => `${STOCK_MOVEMENT_URL.createCombinedShipments()}/${id}`,
@@ -71,8 +70,8 @@ const STOCK_TRANSFER_URL = {
   create: () => `${STOCK_TRANSFER_URL.base}/create`,
   createOutbound: () => `${STOCK_TRANSFER_URL.base}/createOutboundReturn`,
   createInbound: () => `${STOCK_TRANSFER_URL.base}/createInboundReturn`,
-  genericEdit: (id) => `${STOCK_TRANSFER_URL.base}/edit/${id}`,
-  edit: (id) => `${STOCK_TRANSFER_URL.create()}/${id}`,
+  genericEdit: (id) => `${CONTEXT_PATH}${STOCK_TRANSFER_URL.base}/edit/${id}`,
+  edit: (id) => `${CONTEXT_PATH}${STOCK_TRANSFER_URL.create()}/${id}`,
   editOutbound: (id) => `${STOCK_TRANSFER_URL.createOutbound()}/${id}`,
   editInbound: (id) => `${STOCK_TRANSFER_URL.createInbound()}/${id}`,
   show: (id) => `${CONTEXT_PATH}${STOCK_TRANSFER_URL.base}/show/${id}`,
@@ -93,8 +92,8 @@ const ORDER_URL = {
 const PURCHASE_ORDER_URL = {
   base: '/purchaseOrder',
   create: () => `${PURCHASE_ORDER_URL.base}/create`,
-  edit: (id) => `${PURCHASE_ORDER_URL.base}/edit/${id}`,
-  addItems: (id) => `${PURCHASE_ORDER_URL.base}/addItems/${id}`,
+  edit: (id) => `${CONTEXT_PATH}${PURCHASE_ORDER_URL.base}/edit/${id}`,
+  addItems: (id) => `${CONTEXT_PATH}${PURCHASE_ORDER_URL.base}/addItems/${id}`,
 };
 
 const INVENTORY_ITEM_URL = {

@@ -176,8 +176,7 @@ const StockMovementOutboundTable = ({
         leftIcon: <RiPencilLine />,
       };
       if (isReturn) {
-        editAction.href = STOCK_TRANSFER_URL.genericEdit(order?.id);
-        editAction.appendId = false;
+        editAction.href = () => STOCK_TRANSFER_URL.genericEdit(order?.id);
       } else {
         editAction.href = STOCK_MOVEMENT_URL.genericEdit;
       }

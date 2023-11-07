@@ -62,8 +62,7 @@ const StockMovementInboundTable = ({
       href: STOCK_MOVEMENT_URL.show,
     };
     if (isReturn) {
-      showAction.href = STOCK_MOVEMENT_URL.show(order?.id);
-      showAction.appendId = false;
+      showAction.href = () => STOCK_MOVEMENT_URL.show(order?.id);
     }
     actions.push(showAction);
 
@@ -75,10 +74,9 @@ const StockMovementInboundTable = ({
         leftIcon: <RiPencilLine />,
       };
       if (isReturn) {
-        editAction.href = STOCK_TRANSFER_URL.edit(order?.id);
-        editAction.appendId = false;
+        editAction.href = () => STOCK_TRANSFER_URL.edit(order?.id);
       } else {
-        editAction.href = STOCK_MOVEMENT_URL.edit;
+        editAction.href = STOCK_MOVEMENT_URL.genericEdit;
       }
       actions.push(editAction);
     }

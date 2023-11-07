@@ -40,12 +40,12 @@ const ActionDots = ({
 
   /** Returns a URL with appended id to provided string
    * or resolves a function with argument of an id
-   * @param action: { href: {string} | {func}, appendId: boolean | undefined }
+   * @param action: { href: {string} | {func} }
    * @returns {string|null}
    */
   const buildLink = (action) => {
     if (typeof action.href === 'string') {
-      return action.href + (action.appendId === false ? '' : `/${id}`);
+      return `${action.href}/${id}`;
     }
     if (typeof action.href === 'function') {
       return action.href(id);
@@ -119,7 +119,6 @@ ActionDots.propTypes = {
     defaultLabel: PropTypes.string.isRequired,
     href: PropTypes.string,
     reactLink: PropTypes.bool,
-    appendId: PropTypes.bool,
     variant: PropTypes.string,
     onClick: PropTypes.func,
   })).isRequired,
