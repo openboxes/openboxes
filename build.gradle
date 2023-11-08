@@ -438,7 +438,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.10.1'
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
-    compile 'com.google.guava:guava:32.0.0-jre'
+    compile 'com.google.guava:guava:32.0.1-jre'
 
     compile 'com.google.zxing:javase:3.5.1'  // barcode support
 
