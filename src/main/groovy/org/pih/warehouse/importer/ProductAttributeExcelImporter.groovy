@@ -11,17 +11,17 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExpectedPropertyType
-import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.product.Attribute
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.product.ProductAttribute
-import org.springframework.validation.BeanPropertyBindingResult
 import org.grails.plugins.excelimport.ExcelImportService
 
-class ProductAttributeExcelImporter extends AbstractExcelImporter {
+class ProductAttributeExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+    @Delegate
+    ProductAttributeImportDataService productAttributeImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -41,51 +41,19 @@ class ProductAttributeExcelImporter extends AbstractExcelImporter {
             unitOfMeasureCode: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
-
     ProductAttributeExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-
+        productAttributeImportDataService = Holders.grailsApplication.mainContext.getBean("productAttributeImportDataService")
     }
-
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
-    }
-
-    void validateData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            ProductAttribute productAttribute = createOrUpdateProductAttribute(params)
-            if (!productAttribute.validate()) {
-                productAttribute.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index + 1}: Product attribute ${productAttribute} is invalid: ${error.getFieldError()}")
-                }
-            }
-        }
-    }
-
-    void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            ProductAttribute productAttribute = createOrUpdateProductAttribute(params)
-            if (productAttribute.validate()) {
-                productAttribute.product.save(failOnError: true)
-            }
-        }
-    }
-
-
-    ProductAttribute createOrUpdateProductAttribute(Map params) {
-        Product product = Product.findByProductCode(params.productCode)
-        Attribute attribute = Attribute.findByCode(params.attributeCode)
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.unitOfMeasureCode)
-        ProductAttribute productAttribute = ProductAttribute.findByProductAndAttribute(product, attribute)
-        if (!productAttribute) {
-            productAttribute = new ProductAttribute()
-            productAttribute.attribute = attribute
-            product.addToAttributes(productAttribute)
-        }
-        productAttribute.value = params.attributeValue
-        productAttribute.unitOfMeasure = unitOfMeasure?:attribute?.unitOfMeasureClass?.baseUom
-        return productAttribute
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
 }
