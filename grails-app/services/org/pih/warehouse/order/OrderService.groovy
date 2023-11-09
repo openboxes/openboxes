@@ -16,7 +16,6 @@ import grails.util.Holders
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.sql.JoinType
 
-import java.math.RoundingMode
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.BudgetCode
@@ -37,7 +36,7 @@ import org.pih.warehouse.core.UpdateUnitPriceMethodCode
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
-import org.pih.warehouse.data.PersonDataService
+import org.pih.warehouse.data.PersonService
 import org.pih.warehouse.data.ProductSupplierDataService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
@@ -64,7 +63,7 @@ class OrderService {
     IdentifierService identifierService
     InventoryService inventoryService
     ProductSupplierDataService productSupplierDataService
-    PersonDataService personDataService
+    PersonService personService
     GrailsApplication grailsApplication
 
     def getApplicationTagLib() {
@@ -832,7 +831,7 @@ class OrderService {
 
                     orderItem.quantity = parsedQty
                     orderItem.unitPrice = parsedUnitPrice
-                    orderItem.recipient = recipient ? personDataService.getPersonByNames(recipient) : null
+                    orderItem.recipient = recipient ? personService.getPersonByNames(recipient) : null
 
                     def estReadyDate = null
                     if (estimatedReadyDate) {

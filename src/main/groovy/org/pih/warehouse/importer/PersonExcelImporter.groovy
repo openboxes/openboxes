@@ -11,11 +11,24 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class PersonExcelImporter extends AbstractExcelImporter {
+class PersonExcelImporter extends AbstractExcelImporter implements DataImporter {
 
-    def excelImportService
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+    @Delegate
+    PersonImportDataService personImportDataService
+
+    PersonExcelImporter(String file){
+        super()
+        read(file)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        personImportDataService = Holders.grailsApplication.mainContext.getBean("personImportDataService")
+    }
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -35,35 +48,12 @@ class PersonExcelImporter extends AbstractExcelImporter {
             phoneNumber: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
-
-    PersonExcelImporter(String fileName) {
-        super(fileName)
-        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-    }
-
-    def getDataService() {
-        return Holders.grailsApplication.mainContext.getBean("personDataService")
-    }
-
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-
-    void validateData(ImportDataCommand command) {
-        dataService.validateData(command)
-    }
-
-
-    /**
-     * Import data from given map into database.
-     *
-     * @param location
-     * @param inventoryMapList
-     * @param errors
-     */
-    void importData(ImportDataCommand command) {
-        dataService.importData(command)
-    }
-
 }

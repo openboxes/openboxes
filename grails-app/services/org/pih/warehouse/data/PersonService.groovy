@@ -12,32 +12,9 @@ package org.pih.warehouse.data
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.core.Person
-import org.pih.warehouse.importer.ImportDataCommand
-import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
-class PersonDataService {
-
-    Boolean validateData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            Person person = createOrUpdatePerson(params)
-            if (!person.validate()) {
-                person.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index + 1} name = ${person.name}: ${error.getFieldError()}")
-                }
-            }
-        }
-    }
-
-    void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            Person person = createOrUpdatePerson(params)
-            if (person.validate()) {
-                person.save(failOnError: true)
-            }
-        }
-
-    }
+class PersonService {
 
     Person createOrUpdatePerson(Map params) {
         Person person = Person.findByFirstNameAndLastName(params.firstName, params.lastName)
