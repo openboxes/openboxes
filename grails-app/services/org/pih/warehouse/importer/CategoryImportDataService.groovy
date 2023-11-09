@@ -7,20 +7,21 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.data.CategoryService
 import org.pih.warehouse.product.Category
-import org.pih.warehouse.importer.ImportDataCommand
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
-class CategoryDataService {
+class CategoryImportDataService implements ImportDataService {
+    CategoryService categoryService
 
-    Boolean validateData(ImportDataCommand command) {
+    void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 
-            Category category = createOrUpdateCategory(params)
+            Category category = categoryService.createOrUpdateCategory(params)
 
             if (params.parentCategoryId) {
                 Category parentCategory = Category.get(params.parentCategoryId)
@@ -42,23 +43,10 @@ class CategoryDataService {
 
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            Category category = createOrUpdateCategory(params)
+            Category category = categoryService.createOrUpdateCategory(params)
             if (category.validate()) {
                 category.save(failOnError: true)
             }
         }
-
-    }
-
-    Category createOrUpdateCategory(Map params) {
-        Category category = Category.findByIdOrName(params.id, params.name)
-        if (!category) {
-            category = new Category()
-        }
-        category.name = params.name
-        if (params.parentCategoryId && category?.parentCategory?.id != params.parentCategoryId) {
-            category.parentCategory = Category.get(params.parentCategoryId)
-        }
-        return category
     }
 }

@@ -11,15 +11,17 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
-import org.pih.warehouse.data.CategoryDataService
 
-class CategoryExcelImporter extends AbstractExcelImporter {
+class CategoryExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
-    CategoryDataService categoryDataService
-
+    @Delegate
+    CategoryImportDataService categoryImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -38,21 +40,18 @@ class CategoryExcelImporter extends AbstractExcelImporter {
     ]
 
     CategoryExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-        categoryDataService = Holders.grailsApplication.mainContext.getBean("categoryDataService")
+        categoryImportDataService = Holders.grailsApplication.mainContext.getBean("categoryImportDataService")
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-    void validateData(ImportDataCommand command) {
-        categoryDataService.validateData(command)
-    }
-
-    void importData(ImportDataCommand command) {
-        categoryDataService.importData(command)
-    }
-
 }
