@@ -7,19 +7,16 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
-import org.pih.warehouse.importer.ImportDataCommand
-import org.pih.warehouse.product.ProductAssociation
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAssociation
 
-class ProductAssociationDataService {
-
-    /**
-     * Validate product association
-     */
-    Boolean validateData(ImportDataCommand command) {
+@Transactional
+class ProductAssociationImportDataService implements ImportDataService {
+    void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         List<Map> listOfValidatedProductAssociationParams = []
 
@@ -48,18 +45,18 @@ class ProductAssociationDataService {
                 if (params.hasMutualAssociation || it.hasMutualAssociation) {
                     return  (
                             params['product'] == it['product'] &&
-                            params['associatedProduct'] == it['associatedProduct'] &&
-                            params['code'] == it['code']
-                        ) || (
+                                    params['associatedProduct'] == it['associatedProduct'] &&
+                                    params['code'] == it['code']
+                    ) || (
                             params['product'] == it['associatedProduct'] &&
-                            params['associatedProduct'] == it['product'] &&
-                            params['code'] == it['code']
-                        )
+                                    params['associatedProduct'] == it['product'] &&
+                                    params['code'] == it['code']
+                    )
                 }
                 // if it is not a mutual association we can check for exact duplicate
                 return params['product'] == it['product'] &&
-                       params['associatedProduct'] == it['associatedProduct'] &&
-                       params['code'] == it['code']
+                        params['associatedProduct'] == it['associatedProduct'] &&
+                        params['code'] == it['code']
             }
             if (indexOfDuplicate >= 0) {
                 command.errors.reject("Row ${index + 1}: Duplicate association on row: ${indexOfDuplicate + 1}")
@@ -77,22 +74,22 @@ class ProductAssociationDataService {
 
             if (!productAssociationInstance.product) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${params['product.productCode']}' does not exist"
+                        "Row ${index + 1}: Product with code '${params['product.productCode']}' does not exist"
                 )
             }
             if (!productAssociationInstance.associatedProduct) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${params['associatedProduct.productCode']}' does not exist"
+                        "Row ${index + 1}: Product with code '${params['associatedProduct.productCode']}' does not exist"
                 )
             }
             if (productAssociationInstance.product && !productAssociationInstance.product.active) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${productAssociationInstance.product?.productCode}' is inactive"
+                        "Row ${index + 1}: Product with code '${productAssociationInstance.product?.productCode}' is inactive"
                 )
             }
             if (productAssociationInstance.associatedProduct && !productAssociationInstance.associatedProduct.active) {
                 command.errors.reject(
-                    "Row ${index + 1}: Product with code '${productAssociationInstance.associatedProduct?.productCode}' is inactive"
+                        "Row ${index + 1}: Product with code '${productAssociationInstance.associatedProduct?.productCode}' is inactive"
                 )
             }
             if (productAssociationInstance.product?.id == productAssociationInstance.associatedProduct?.id) {

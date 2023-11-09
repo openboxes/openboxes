@@ -12,10 +12,18 @@ package org.pih.warehouse.importer
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
 @Transactional
-class ProductAssociationExcelImporter extends AbstractExcelImporter {
+class ProductAssociationExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+    @Delegate
+    ProductAssociationImportDataService productAssociationImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -47,25 +55,19 @@ class ProductAssociationExcelImporter extends AbstractExcelImporter {
 
 
     ProductAssociationExcelImporter(String fileName) {
-        super(fileName)
-    }
-
-    def getDataService() {
-        return Holders.grailsApplication.mainContext.getBean("productAssociationDataService")
+        super()
+        read(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        productAssociationImportDataService = Holders.grailsApplication.mainContext.getBean("productAssociationImportDataService")
     }
 
 
     List<Map> getData() {
-        return Holders.grailsApplication.mainContext.getBean("excelImportService")
-                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-    void validateData(ImportDataCommand command) {
-        dataService.validateData(command)
-    }
-
-    void importData(ImportDataCommand command) {
-        dataService.importData(command)
-    }
-
 }
