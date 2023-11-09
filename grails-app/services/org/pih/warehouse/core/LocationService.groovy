@@ -19,16 +19,22 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.data.LocationDataService
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.LocationImportDataService
+import org.pih.warehouse.inventory.Inventory
 import util.ConfigHelper
+
+import javax.annotation.Nullable
 
 @Transactional
 class LocationService {
 
     GrailsApplication grailsApplication
     UserService userService
-    LocationDataService locationDataService
+    LocationImportDataService locationImportDataService
+    OrganizationService organizationService
+    IdentifierService identifierService
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {
@@ -696,13 +702,13 @@ class LocationService {
         command.data = csvReader.readAll()
 
         command.errors = null
-        locationDataService.validateData(command)
+        locationImportDataService.validateData(command)
 
         if (command.errors.allErrors) {
             throw new ValidationException("Failed to import template due to validation errors", command.errors)
         }
 
-        locationDataService.importData(command)
+        locationImportDataService.importData(command)
     }
 
     def deleteLocation(Location existingLocation) {
@@ -717,5 +723,84 @@ class LocationService {
             zone.removeFromLocations(existingLocation)
         }
         existingLocation.delete(flush: true)
+    }
+
+    Location createOrUpdateLocation(Map params) {
+        Location location
+        if (params.id) {
+            location = Location.findById(params.id)
+        } else if (params.locationNumber) {
+            location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
+        } else {
+            location = Location.findByName(params.name)
+        }
+        if (!location) {
+            location = new Location()
+        }
+
+        location.name = params.name
+        location.active = Boolean.valueOf(params.active)
+        location.locationNumber = params.locationNumber
+        location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
+        location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
+        location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
+        location.address = createOrUpdateAddress(params, location?.address?.id)
+        if (!location.inventory && !location.parentLocation) {
+            location.inventory = new Inventory(['warehouse': location])
+        }
+        def locationType = null
+        if (params.locationType) {
+            String locationTypeName = LocalizationUtil.getDefaultString(params.locationType as String)
+            // TODO: Replace with a single GORM .find with Closure when in Grails 3 (available since Grails 2.0)
+            LocationType matchedLocationType = LocationType
+                    .findAllByNameLike(locationTypeName + "%")
+                    .find{ LocalizationUtil.getDefaultString(it.name) == locationTypeName}
+            locationType = matchedLocationType
+        }
+
+        def currentLocationType = location.locationType
+
+        //Do not allow to change internal type location to non-internal
+        if (((currentLocationType?.isInternalLocation() || currentLocationType?.isZone()) && (locationType?.isInternalLocation() || locationType?.isZone())) || !(currentLocationType?.isInternalLocation() || currentLocationType?.isZone())) {
+            location.locationType = locationType
+            location.supportedActivities = currentLocationType && locationType == currentLocationType ? location.supportedActivities : location.supportedActivities?.clear()
+        }
+
+        // Add required association to organization for depots and suppliers
+        if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
+            def locationCode = identifierService.generateOrganizationIdentifier(params.organization)
+            Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
+                    organizationService.findOrCreateSupplierOrganization(params?.organization, locationCode) :
+                    organizationService.findOrCreateOrganization(params?.organization, locationCode)
+
+            location.organization = organization
+        }
+
+        return location
+    }
+
+    Address createOrUpdateAddress(Map params, @Nullable String addressId) {
+        Address address
+        if (addressId) {
+            address = Address.findById(addressId)
+        }
+
+        if (!address) {
+            address = new Address()
+        }
+
+        address.address = params.streetAddress ?: ''
+        address.address2 = params.streetAddress2 ?: ''
+        address.city = params.city ?: ''
+        address.stateOrProvince = params.stateOrProvince ?: ''
+        address.postalCode = params.postalCode ?: ''
+        address.country = params.country ?: ''
+        address.description = params.description ?: ''
+
+        if (address.validate() && !address.hasErrors()) {
+            address.save()
+        }
+
+        return address
     }
 }

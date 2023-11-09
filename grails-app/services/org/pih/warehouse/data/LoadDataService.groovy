@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat
 @Transactional
 class LoadDataService {
 
-    def locationDataService
+    def locationImportDataService
     def productService
     def productSupplierDataService
     def productCatalogService
@@ -44,8 +44,8 @@ class LoadDataService {
         ImportDataCommand command = new ImportDataCommand();
         command.setData(csvReader.readAll());
 
-        locationDataService.validateData(command);
-        locationDataService.importData(command);
+        locationImportDataService.validateData(command);
+        locationImportDataService.importData(command);
 
         csvReader.close();
     }

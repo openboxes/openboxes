@@ -11,11 +11,17 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
 class LocationExcelImporter extends AbstractExcelImporter {
 
-    def excelImportService
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+    @Delegate
+    LocationImportDataService locationImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -58,33 +64,18 @@ class LocationExcelImporter extends AbstractExcelImporter {
     ]
 
     LocationExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-    }
-
-    def getDataService() {
-        return Holders.grailsApplication.mainContext.getBean("locationDataService")
+        locationImportDataService = Holders.grailsApplication.mainContext.getBean("locationImportDataService")
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-
-    void validateData(ImportDataCommand command) {
-        dataService.validateData(command)
-    }
-
-
-    /**
-     * Import data from given map into database.
-     *
-     * @param location
-     * @param inventoryMapList
-     * @param errors
-     */
-    void importData(ImportDataCommand command) {
-        dataService.importData(command)
-    }
-
 }
