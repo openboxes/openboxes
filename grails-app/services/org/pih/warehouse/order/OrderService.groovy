@@ -37,7 +37,7 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.DataService
 import org.pih.warehouse.data.PersonService
-import org.pih.warehouse.data.ProductSupplierDataService
+import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryService
@@ -62,7 +62,7 @@ class OrderService {
     ShipmentService shipmentService
     IdentifierService identifierService
     InventoryService inventoryService
-    ProductSupplierDataService productSupplierDataService
+    ProductSupplierService productSupplierService
     PersonService personService
     GrailsApplication grailsApplication
 
@@ -785,7 +785,7 @@ class OrderService {
                                               manufacturerCode: manufacturerCode ?: null,
                                               supplier: supplier,
                                               sourceName: sourceName]
-                        ProductSupplier productSupplier = productSupplierDataService.getOrCreateNew(supplierParams, false)
+                        ProductSupplier productSupplier = productSupplierService.getOrCreateNew(supplierParams, false)
                         // Check if any of search term fields for productSupplier are filled
                         def supplierParamFilled = supplierCode || manufacturerName || manufacturerCode
 

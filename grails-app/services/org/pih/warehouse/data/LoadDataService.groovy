@@ -32,8 +32,8 @@ import java.text.SimpleDateFormat
 class LoadDataService {
 
     def locationImportDataService
+    def productSupplierImportDataService
     def productService
-    def productSupplierDataService
     def productCatalogService
     def inventoryService
     def identifierService
@@ -189,8 +189,8 @@ class LoadDataService {
 
         command.setData(csvItems);
 
-        productSupplierDataService.validate(command)
-        productSupplierDataService.process(command)
+        productSupplierImportDataService.validate(command)
+        productSupplierImportDataService.process(command)
 
         csvReader.close();
     }
