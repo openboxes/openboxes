@@ -17,48 +17,8 @@ import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
 
 @Transactional
-class ProductSupplierPreferenceDataService {
-
+class ProductSupplierPreferenceService {
     String DEFAULT = "DEFAULT"
-
-    Boolean validate(ImportDataCommand command) {
-        log.info "Validate data " + command.filename
-        command.data.eachWithIndex { params, index ->
-
-            String supplierCode = params.supplierCode
-            String organizationCode = params.organizationCode
-            String preferenceTypeName = params.preferenceTypeName
-
-            if (!supplierCode) {
-                command.errors.reject("Row ${index + 1}: Product source code is required")
-            } else if (!ProductSupplier.findByCode(supplierCode)) {
-                command.errors.reject("Row ${index + 1}: Product source with code: ${supplierCode}  does not exist")
-            }
-
-            if (!organizationCode) {
-                command.errors.reject("Row ${index + 1}: Organization code is required")
-            } else if (organizationCode != DEFAULT && !Organization.findByCode(organizationCode)) {
-                command.errors.reject("Row ${index + 1}: Organization with code: ${organizationCode}  does not exist")
-            }
-
-            if (!preferenceTypeName) {
-                command.errors.reject("Row ${index + 1}: Preference Type is required")
-            } else if (!PreferenceType.findByName(preferenceTypeName)) {
-                command.errors.reject("Row ${index + 1}: Preference Type with name: ${preferenceTypeName} does not exist")
-            }
-        }
-    }
-
-    void process(ImportDataCommand command) {
-        log.info "Process data " + command.filename
-
-        command.data.eachWithIndex { params, index ->
-            ProductSupplierPreference productSupplierPreference = createOrUpdate(params)
-            if (productSupplierPreference.validate()) {
-                productSupplierPreference.save(failOnError: true)
-            }
-        }
-    }
 
     def createOrUpdate(Map params) {
 

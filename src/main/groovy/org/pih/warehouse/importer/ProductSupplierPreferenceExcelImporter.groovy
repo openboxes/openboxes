@@ -11,9 +11,24 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class ProductSupplierPreferenceImporter extends AbstractExcelImporter {
+class ProductSupplierPreferenceExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+    @Delegate
+    ProductSupplierPreferenceImportDataService productSupplierPreferenceImportDataService
+
+    ProductSupplierPreferenceExcelImporter(String fileName) {
+        super()
+        read(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        productSupplierPreferenceImportDataService = Holders.grailsApplication.mainContext.getBean("productSupplierPreferenceImportDataService")
+    }
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -39,27 +54,13 @@ class ProductSupplierPreferenceImporter extends AbstractExcelImporter {
             preferenceComments   : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
-
-    ProductSupplierPreferenceImporter(String fileName) {
-        super(fileName)
-    }
-
-    def getDataService() {
-        return Holders.grailsApplication.mainContext.getBean("productSupplierPreferenceDataService")
-    }
-
-
     List<Map> getData() {
-        return Holders.grailsApplication.mainContext.getBean("excelImportService")
-                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
-    }
-
-    void validateData(ImportDataCommand command) {
-        dataService.validate(command)
-    }
-
-    void importData(ImportDataCommand command) {
-        dataService.process(command)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
 
 }
