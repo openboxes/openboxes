@@ -7,24 +7,21 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
-import grails.validation.ValidationException
-import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.data.ProductPackageService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
-class ProductPackageDataService {
+class ProductPackageImportDataService implements ImportDataService {
+    ProductPackageService productPackageService
 
-    def uomService
-
-    Boolean validate(ImportDataCommand command) {
+    void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
 
@@ -63,7 +60,7 @@ class ProductPackageDataService {
             }
 
 
-            def productPackage = createOrUpdate(params)
+            def productPackage = productPackageService.createOrUpdate(params)
             productPackage.product = product
             productPackage.productSupplier = productSupplier
 
@@ -75,46 +72,15 @@ class ProductPackageDataService {
         }
     }
 
-    void process(ImportDataCommand command) {
+    void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
         command.data.eachWithIndex { params, index ->
-            ProductPackage productPackage = createOrUpdate(params)
+            ProductPackage productPackage = productPackageService.createOrUpdate(params)
             if (productPackage.validate()) {
                 log.info "Product package ${productPackage.properties}"
                 boolean saved = productPackage.save(failOnError: true)
                 log.info "Product package ${productPackage.id} saved ${saved}"
             }
         }
-    }
-
-    def createOrUpdate(Map params) {
-        log.info("params: ${params}")
-        Product product = Product.findByProductCode(params.productCode)
-        ProductSupplier productSupplier = ProductSupplier.findByCode(params.productSupplierCode)
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.uomCode)
-        ProductPackage productPackage = findOrCreate(params)
-        productPackage.properties = params
-        if (!productPackage.name) {
-            productPackage.name = "${unitOfMeasure.code}/${params.quantity}"
-        }
-        if (!productPackage.description) {
-            productPackage.description = "${unitOfMeasure.name} of ${params.quantity}"
-        }
-        productPackage.product = product
-        productPackage.productSupplier = productSupplier
-        productPackage.uom = unitOfMeasure
-        return productPackage
-    }
-
-    def findOrCreate(Map params) {
-        ProductPackage productPackage = ProductPackage.get(params.id)
-
-        if (params.id && !productPackage) {
-            throw new ValidationException("Unable to find product package with ID ${params.id}")
-        }
-        if (!productPackage) {
-            productPackage = new ProductPackage(params)
-        }
-        return productPackage
     }
 }
