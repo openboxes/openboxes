@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { Bar, Doughnut, HorizontalBar, Line } from 'react-chartjs-2';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { SortableElement } from 'react-sortable-hoc';
 import { Tooltip } from 'react-tippy';
 
@@ -16,7 +15,6 @@ import Numbers from 'components/dashboard/Numbers';
 import NumbersRAG from 'components/dashboard/NumbersRAG';
 import NumbersTableCard from 'components/dashboard/NumbersTableCard';
 import TableCard from 'components/dashboard/TableCard';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 // TODO: OBPIH-4384 Refactor FilterComponent to be more generic.
@@ -173,9 +171,8 @@ class FilterComponent extends Component {
 
 const handleChartClick = (elements) => {
   const link = elements[0]._chart.data.datasets[0].links[elements[0]._index];
-
   if (link && link !== '') {
-    window.location = stringUrlInterceptor(link);
+    window.location = link;
   }
 };
 
@@ -252,11 +249,11 @@ const GraphCard = SortableElement(({
     <div className={`graph-card ${size === 'big' ? 'big-size' : ''} ${cardType === 'error' ? 'error-card' : ''}`}>
       <div className="header-card">
         {cardLink ? (
-          <Link target="_blank" rel="noopener noreferrer" to={cardLink} className="title-link">
+          <a target="_blank" rel="noopener noreferrer" href={cardLink} className="title-link">
             <span className="title-link">
               {translate(cardTitle, cardTitle)}
             </span>
-          </Link>
+          </a>
         )
           : (
             <span className="title-link">

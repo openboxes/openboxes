@@ -121,11 +121,6 @@ export const urlInterceptor = (config) => {
   return { ...config, url };
 };
 
-export const stringUrlInterceptor = (url) => {
-  const config = urlInterceptor({ url });
-  return config.url;
-};
-
 export const handleValidationErrors = (setState) => (error) => {
   if (error.response.status === 400) {
     const alertMessage = _.join(_.get(error, 'response.data.errorMessages', ''), ' ');

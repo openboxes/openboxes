@@ -9,7 +9,6 @@ import { Tooltip } from 'react-tippy';
 
 import DragHandle from 'components/dashboard/DragHandle';
 import { getColorByName } from 'consts/dataFormat/colorMapping';
-import { stringUrlInterceptor } from 'utils/apiClient';
 import { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'components/dashboard/Dashboard.scss';
@@ -159,7 +158,7 @@ const NumberCard = SortableElement(({
     );
 
   return (
-    cardLink ? <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(cardLink)} className="number-card">{card}</a> : <div className="number-card">{card}</div>
+    cardLink ? <a target="_blank" rel="noopener noreferrer" href={cardLink} className="number-card">{card}</a> : <div className="number-card">{card}</div>
   );
 });
 

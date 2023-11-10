@@ -4,13 +4,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { getColorByName } from 'consts/dataFormat/colorMapping';
-import { stringUrlInterceptor } from 'utils/apiClient';
 
 const NumbersRAG = ({ data }) => (
   <div className="big-gyr-indicator">
     {data.listColorNumber.map((value, index) =>
       (
-        <a className="number-indicator" href={stringUrlInterceptor(value.link)} key={index}>
+        <a className="number-indicator" href={value.link} key={index}>
           <div className="value" style={{ color: getColorByName(value.color, 'default') }}>
             <span className="circle" style={{ background: getColorByName(value.color, 'light') }} />
             {value.value}
