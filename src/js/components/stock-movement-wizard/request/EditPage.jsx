@@ -1600,7 +1600,7 @@ class EditItemsPage extends Component {
                   if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
                     this.props.history.push(DASHBOARD_URL.base);
                   } else {
-                    this.props.history.push({ pathname: STOCK_MOVEMENT_URL.list(), search: 'direction=INBOUND' });
+                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
                   }
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"

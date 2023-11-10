@@ -534,7 +534,7 @@ class PackingPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => this.props.history.push({ name: STOCK_MOVEMENT_URL.list(), search: 'direction=OUTBOUND' })}
+                onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listOutbound())}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>

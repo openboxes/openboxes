@@ -35,6 +35,9 @@ const LOCATION_URL = {
 const STOCK_MOVEMENT_URL = {
   base: '/stockMovement',
   list: () => `${STOCK_MOVEMENT_URL.base}/list`,
+  listInbound: () => `${STOCK_MOVEMENT_URL.base}/list?direction=INBOUND`,
+  listOutbound: () => `${STOCK_MOVEMENT_URL.base}/list?direction=OUTBOUND`,
+  listRequest: () => `${STOCK_MOVEMENT_URL.base}/list?direction=OUTBOUND&sourceType=ELECTRONIC`,
   createInbound: () => `${STOCK_MOVEMENT_URL.base}/createInbound`,
   createOutbound: () => `${STOCK_MOVEMENT_URL.base}/createOutbound`,
   createCombinedShipments: () => `${STOCK_MOVEMENT_URL.base}/createCombinedShipments`,

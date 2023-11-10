@@ -1307,10 +1307,7 @@ class AddItemsPage extends Component {
                   if (this.state.isRequestFromWard) {
                     this.props.history.push('/');
                   } else {
-                    this.props.history.push({
-                      pathname: STOCK_MOVEMENT_URL.list(),
-                      search: 'direction=INBOUND',
-                    });
+                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
                   }
                 }
               })
@@ -1338,10 +1335,7 @@ class AddItemsPage extends Component {
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
             this.props.history.push(DASHBOARD_URL.base);
           } else {
-            this.props.history.push({
-              pathname: STOCK_MOVEMENT_URL.list(),
-              search: 'direction=INBOUND',
-            });
+            this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
           }
         })
         .catch(() => {
@@ -1373,10 +1367,7 @@ class AddItemsPage extends Component {
               if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
                 this.props.history.push(DASHBOARD_URL.base);
               } else {
-                this.props.history.push({
-                  pathname: STOCK_MOVEMENT_URL.list(),
-                  search: 'direction=INBOUND',
-                });
+                this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
               }
             },
           },
@@ -1488,10 +1479,7 @@ class AddItemsPage extends Component {
     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
       this.props.history.push('/');
     } else {
-      this.props.history.push({
-        pathname: STOCK_MOVEMENT_URL.list(),
-        search: 'direction=INBOUND',
-      });
+      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
     }
     Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
     return Promise.resolve();

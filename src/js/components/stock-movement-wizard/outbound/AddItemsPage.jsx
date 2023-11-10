@@ -1409,10 +1409,7 @@ class AddItemsPage extends Component {
                   type="button"
                   disabled={invalid}
                   onClick={() => {
-                    this.props.history({
-                      pathname: STOCK_MOVEMENT_URL.list(),
-                      search: 'direction=OUTBOUND',
-                    });
+                    this.props.history(STOCK_MOVEMENT_URL.listOutbound());
                   }}
                   className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                 >

@@ -692,7 +692,7 @@ class PickPage extends Component {
                 :
               <button
                 type="button"
-                onClick={() => this.props.history.push({ pathname: STOCK_MOVEMENT_URL.list(), search: 'type=REQUEST' })}
+                onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listRequest())}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>

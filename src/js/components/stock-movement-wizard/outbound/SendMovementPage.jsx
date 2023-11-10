@@ -881,10 +881,7 @@ class SendMovementPage extends Component {
                     <button
                       type="button"
                       onClick={() => {
-                        this.props.history.push({
-                          pathname: STOCK_MOVEMENT_URL.list(),
-                          search: 'direction=OUTBOUND',
-                        });
+                        this.props.history.push( STOCK_MOVEMENT_URL.listOutbound());
                       }}
                       className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
                     >
