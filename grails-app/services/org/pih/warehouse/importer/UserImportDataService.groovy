@@ -7,22 +7,19 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.core.RoleType
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.User
+import org.pih.warehouse.core.UserService
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
-class UserDataService {
+class UserImportDataService implements ImportDataService {
+    UserService userService
 
-    /**
-     * Validate inventory levels
-     */
-    Boolean validateData(ImportDataCommand command) {
+    void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
 
         command.data.eachWithIndex { params, index ->
@@ -31,7 +28,7 @@ class UserDataService {
                 throw new IllegalArgumentException("Row ${index + 1}: username is required")
             }
 
-            User user = createOrUpdateUser(params)
+            User user = userService.createOrUpdateUser(params)
 
             log.info "User: ${user}"
             if (!user.validate()) {
@@ -41,7 +38,7 @@ class UserDataService {
             }
 
             // Implicitly validates the default roles
-            Role[] defaultRoles = extractDefaultRoles(params.defaultRoles)
+            Role[] defaultRoles = userService.extractDefaultRoles(params.defaultRoles)
         }
     }
 
@@ -49,8 +46,8 @@ class UserDataService {
         log.info "Import data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-            User user = createOrUpdateUser(params)
-            Role[] defaultRoles = extractDefaultRoles(params.defaultRoles)
+            User user = userService.createOrUpdateUser(params)
+            Role[] defaultRoles = userService.extractDefaultRoles(params.defaultRoles)
             log.info "user ${user.username} default role ${defaultRoles}"
 
             // Clear existing roles
@@ -67,33 +64,5 @@ class UserDataService {
             }
             user.save(failOnError: true)
         }
-
-    }
-
-    User createOrUpdateUser(Map params) {
-        User user = User.findByUsername(params.username)
-        if (!user) {
-            user = new User(params)
-            user.active = true
-            user.password = "password"
-        } else {
-            user.properties = params
-        }
-        return user
-    }
-
-
-    Role[] extractDefaultRoles(String defaultRolesString) {
-        String[] defaultRoles = defaultRolesString?.split(",")
-        Role[] roles = defaultRoles.collect { String roleTypeName ->
-            roleTypeName = roleTypeName.trim()
-            Role role = Role.findByName(roleTypeName)
-            if (!role) {
-                RoleType roleType = RoleType.valueOf(roleTypeName)
-                role = Role.findByRoleType(roleType)
-            }
-            return role
-        }
-        return roles
     }
 }
