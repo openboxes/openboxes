@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
 import javassist.NotFoundException
 import org.pih.warehouse.auth.AuthService
@@ -906,5 +907,74 @@ class RequisitionService {
     void addCommentToRequisition(Comment comment, Requisition requisition) {
         requisition.addToComments(comment)
         requisition.save()
+    }
+
+    RequisitionItem buildRequisitionItem(Map params) {
+        String productCode = params.productCode
+        Product product = Product.findByProductCode(productCode)
+        if(!product) {
+            throw new IllegalArgumentException("Product not found for ${productCode}")
+        }
+
+        def quantityRequested = params.quantity as Integer
+        if (!(quantityRequested > 0)) {
+            throw new IllegalArgumentException("Requested quantity should be greater than 0")
+        }
+
+        def deliveryDate = params.requestedDeliveryDate
+        if (!isDateOneWeekFromNow(deliveryDate)) {
+            throw new IllegalArgumentException("Delivery date must be after seven days from now")
+        }
+
+        def comments = params.destination
+        def requestNumber = params.requestNumber
+        def requisition = Requisition.findByRequestNumber(requestNumber)
+        if (!requisition) {
+            requisition = new Requisition(
+                    name: "Outbound Order ${requestNumber}",
+                    requestNumber: requestNumber,
+                    status: RequisitionStatus.CREATED
+            )
+
+            Location origin = Location.findByLocationNumber(params.origin)
+            if (!origin) {
+                throw new IllegalArgumentException("Location not found for origin ${params.origin}")
+            }
+            requisition.origin = origin
+
+            Location destination = Location.findByLocationNumber(params.destination)
+            if (!destination) {
+                throw new IllegalArgumentException("Location not found for destination ${params.destination}")
+            }
+            requisition.destination = destination
+            requisition.requestedDeliveryDate = deliveryDate.toDate()
+            requisition.requestedBy = authService.currentUser
+            requisition.save(failOnError: true)
+        }
+
+        def requisitionItem = RequisitionItem.createCriteria().get {
+            eq 'product' , product
+            eq "requisition", requisition
+        }
+        if (!requisitionItem) {
+            requisitionItem = new RequisitionItem()
+        }
+
+        requisitionItem.product = product
+        requisitionItem.quantity = quantityRequested
+        requisitionItem.comment = comments
+
+        requisition.addToRequisitionItems(requisitionItem)
+
+        return requisitionItem
+    }
+
+    boolean isDateOneWeekFromNow(def date) {
+        LocalDate today = LocalDate.now()
+        LocalDate oneWeekFromNow = new LocalDate(today.getYear(), today.getMonthOfYear(), today.getDayOfMonth()+7)
+        if(date > oneWeekFromNow) {
+            return true
+        }
+        return false
     }
 }
