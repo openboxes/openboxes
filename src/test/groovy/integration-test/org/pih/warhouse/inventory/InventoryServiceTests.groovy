@@ -18,6 +18,7 @@ import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.InventoryImportDataService
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
@@ -30,6 +31,7 @@ import testutils.DbHelper
 class InventoryServiceTests extends GroovyTestCase {
 
     def inventoryService
+    InventoryImportDataService inventoryImportDataService
     SessionFactory sessionFactory
 
     protected def transactionType_consumptionDebit
@@ -567,7 +569,7 @@ class InventoryServiceTests extends GroovyTestCase {
         command.importFile = file
         command.date = new Date()
 
-        def data = inventoryService.importInventoryData(command)
+        def data = inventoryImportDataService.importData(command)
 
         def productCodes = data.collect { it.productCode }.unique()
         productCodes.each {
