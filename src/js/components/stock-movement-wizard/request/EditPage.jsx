@@ -22,7 +22,7 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
-import { DASHBOARD_URL, REQUEST_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { DASHBOARD_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import RequisitionStatus from 'consts/requisitionStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
@@ -1636,7 +1636,7 @@ class EditItemsPage extends Component {
                     label="react.stockMovement.editRequestItems.label"
                     defaultLabel="Edit request items"
                     variant="primary-outline"
-                    onClick={() => this.props.history.push(REQUEST_URL.edit(this.state.values?.id))}
+                    onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id))}
                   />
                 }
                 <button

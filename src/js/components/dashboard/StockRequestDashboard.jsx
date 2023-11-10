@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
 
 import { fetchTranslations } from 'actions';
-import { REQUEST_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
@@ -118,7 +118,7 @@ class StockRequestDashboard extends Component {
             />
           </h3>
           <Link
-            to={REQUEST_URL.create()}
+            to={STOCK_MOVEMENT_URL.createRequest()}
             className="btn btn-primary d-flex justify-content-center align-items-center font-weight-bold"
           >
             <i className="fa fa-plus mr-1" />

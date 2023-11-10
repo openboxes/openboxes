@@ -18,7 +18,7 @@ import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import ActivityCode from 'consts/activityCode';
 import RoleType from 'consts/roleType';
-import { REQUEST_URL } from 'consts/applicationUrls';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceLocationsFetch, debouncePeopleFetch } from 'utils/option-utils';
@@ -404,7 +404,7 @@ class CreateStockMovement extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(REQUEST_URL.edit(resp.id));
+            this.props.history.push(STOCK_MOVEMENT_URL.editRequest(resp.id));
             this.props.nextPage({
               ...values,
               stockMovementId: resp.id,

@@ -13,7 +13,6 @@ import { ClimbingBoxLoader } from 'react-spinners';
 import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
 import Loading from 'components/Loading';
-import { CONTEXT_PATH } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
@@ -193,7 +192,7 @@ const Router = (props) => {
 
   return (
     <div>
-      <BrowserRouter basename={CONTEXT_PATH}>
+      <BrowserRouter>
         <FlashScopeListenerWrapper>
           <Switch>
             <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
