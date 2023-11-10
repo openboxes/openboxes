@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 import { fetchShipmentStatusCodes, fetchShipmentTypes } from 'actions';
 import filterFields from 'components/stock-movement/inbound/FilterFields';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import useCommonFiltersCleaner from 'hooks/list-pages/useCommonFiltersCleaner';
 import { getParamList, transformFilterParams } from 'utils/list-utils';
 import { fetchLocationById, fetchUserById } from 'utils/option-utils';
@@ -124,7 +125,7 @@ const useInboundFilters = () => {
       createdBy: currentUserValue.id,
     };
     history.push({
-      pathname: '/openboxes/stockMovement/list',
+      pathname: STOCK_MOVEMENT_URL.list(),
       search: queryString.stringify(searchQuery),
     });
 

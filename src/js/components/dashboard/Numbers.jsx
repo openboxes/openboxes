@@ -2,8 +2,6 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import { stringUrlInterceptor } from 'utils/apiClient';
-
 const Numbers = (props) => {
   const [data, options] = Object.values(props);
   return (
@@ -11,7 +9,7 @@ const Numbers = (props) => {
       {
       Object.keys(data).map((number) => {
         const { link, value, subtitle } = data[number];
-        const redirect = link ? { href: stringUrlInterceptor(link) } : {};
+        const redirect = link ? { href: link } : {};
         return (
           <a key={number} className="number-indicator" {...redirect}>
             <div className="value">

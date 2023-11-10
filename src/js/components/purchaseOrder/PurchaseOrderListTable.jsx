@@ -21,6 +21,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import PurchaseOrderStatus from 'components/purchaseOrder/PurchaseOrderStatus';
+import { ORDER_URL, PURCHASE_ORDER_URL } from 'consts/applicationUrls';
 import usePurchaseOrderListTableData from 'hooks/list-pages/purchase-order/usePurchaseOrderListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
@@ -62,21 +63,21 @@ const PurchaseOrderListTable = ({
       label: 'react.purchaseOrder.viewOrderDetails.label',
       defaultLabel: 'View order details',
       leftIcon: <RiInformationLine />,
-      href: '/openboxes/order/show',
+      href: ORDER_URL.show,
     },
     {
       label: 'react.purchaseOrder.addComment.label',
       defaultLabel: 'Add comment',
       leftIcon: <RiChat3Line />,
       activityCode: ['PLACE_ORDER'],
-      href: '/openboxes/order/addComment',
+      href: ORDER_URL.addComment,
     },
     {
       label: 'react.purchaseOrder.addDocument.label',
       defaultLabel: 'Add document',
       leftIcon: <RiFileLine />,
       activityCode: ['PLACE_ORDER'],
-      href: '/openboxes/order/addDocument',
+      href: ORDER_URL.addDocument,
     },
     {
       label: 'react.purchaseOrder.edit.label',
@@ -84,7 +85,7 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiPencilLine />,
       statuses: ['PENDING'],
       activityCode: ['PLACE_ORDER'],
-      href: '/openboxes/purchaseOrder/edit',
+      href: PURCHASE_ORDER_URL.edit,
     },
     {
       label: 'react.purchaseOrder.editLineItems.label',
@@ -92,7 +93,7 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiListUnordered />,
       statuses: ['PENDING'],
       activityCode: ['PLACE_ORDER'],
-      href: '/openboxes/purchaseOrder/addItems',
+      href: PURCHASE_ORDER_URL.addItems,
     },
     {
       label: 'react.purchaseOrder.placeOrder.label',
@@ -100,7 +101,7 @@ const PurchaseOrderListTable = ({
       leftIcon: <RiShoppingCartLine />,
       statuses: ['PENDING'],
       activityCode: ['PLACE_ORDER'],
-      href: '/openboxes/order/placeOrder',
+      href: ORDER_URL.placeOrder,
     },
     {
       label: 'react.purchaseOrder.printOrder.label',
@@ -179,14 +180,25 @@ const PurchaseOrderListTable = ({
       accessor: 'orderNumber',
       fixed: 'left',
       width: 150,
-      Cell: row => <TableCell {...row} link={`/openboxes/order/show/${row.original.id}`} />,
+      Cell: row => (
+        <TableCell
+          {...row}
+          link={ORDER_URL.show(row.original.id)}
+        />
+      ),
     },
     {
       Header: <Translate id="react.purchaseOrder.column.name.label" defaultMessage="Name" />,
       accessor: 'name',
       fixed: 'left',
       minWidth: 250,
-      Cell: row => <TableCell {...row} tooltip link={`/openboxes/order/show/${row.original.id}`} />,
+      Cell: row => (
+        <TableCell
+          {...row}
+          tooltip
+          link={ORDER_URL.show(row.original.id)}
+        />
+      ),
     },
     {
       Header: <Translate id="react.purchaseOrder.column.supplier.label" defaultMessage="Supplier" />,

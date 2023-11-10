@@ -11,7 +11,8 @@ import { Tooltip } from 'react-tippy';
 
 import { fetchTranslations, hideSpinner, showSpinner } from 'actions';
 import EmailModal from 'components/stock-list-management/EmailModal';
-import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import { INVENTORY_ITEM_URL, REQUISITION_TEMPLATE_URL, STOCKLIST_URL } from 'consts/applicationUrls';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import Input from 'utils/Input';
 import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -234,7 +235,7 @@ class StocklistManagement extends Component {
             <div className="align-self-center">
               <button
                 className="btn btn-outline-primary btn-xs"
-                onClick={() => { window.location = stringUrlInterceptor(`/inventoryItem/showStockCard/${this.state.productInfo.id}`); }}
+                onClick={() => { window.location = INVENTORY_ITEM_URL.showStockCard(this.state.productInfo.id); }}
               ><Translate id="react.stockListManagement.returnStockCard.label" defaultMessage="Return to stock card" />
               </button>
             </div>
@@ -315,7 +316,7 @@ class StocklistManagement extends Component {
                 }
 
                 return (
-                  <a href={stringUrlInterceptor(`/requisitionTemplate/show/${original.stocklistId}`)}>
+                  <a href={REQUISITION_TEMPLATE_URL.show(original.stocklistId)}>
                     <Tooltip
                       title={original.name}
                       theme="transparent"
@@ -536,13 +537,13 @@ class StocklistManagement extends Component {
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
-                      href={stringUrlInterceptor(`/stocklist/renderPdf/${original.stocklistId}`)}
+                      href={STOCKLIST_URL.pdf(original.stocklistId)}
                     ><Translate id="react.default.button.printPdf.label" defaultMessage="Print PDF" />
                     </a>
                     <a
                       className="btn btn-outline-secondary btn-xs mr-1"
                       disabled={original.edit || original.new}
-                      href={stringUrlInterceptor(`/stocklist/generateCsv/${original.stocklistId}`)}
+                      href={STOCKLIST_URL.csv(original.stocklistId)}
                     ><Translate id="react.default.button.printXls.label" defaultMessage="Print XLS" />
                     </a>
                     {original.manager ?

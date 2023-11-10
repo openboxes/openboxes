@@ -6,6 +6,7 @@ import { RiDownload2Line } from 'react-icons/ri';
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
+import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import useProductsListTableData from 'hooks/list-pages/product/useProductsListTableData';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
@@ -41,7 +42,7 @@ const ProductsListTable = ({
       accessor: 'productCode',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
-      Cell: row => <TableCell {...row} link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`} />,
+      Cell: row => <TableCell {...row} link={INVENTORY_ITEM_URL.showStockCard(row.original.id)} />,
       maxWidth: 150,
       fixed: true,
     },
@@ -58,7 +59,7 @@ const ProductsListTable = ({
           value={row.original.displayName ?? row.value}
           tooltip
           tooltipLabel={row.value}
-          link={`/openboxes/inventoryItem/showStockCard/${row.original.id}`}
+          link={INVENTORY_ITEM_URL.showStockCard(row.original.id)}
         />),
       minWidth: 200,
     },

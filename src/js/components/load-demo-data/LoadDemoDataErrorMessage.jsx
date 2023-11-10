@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
-import { stringUrlInterceptor } from 'utils/apiClient';
 import Translate from 'utils/Translate';
 
 import 'components/locations-configuration/SuccessMessage.scss';
@@ -30,7 +29,7 @@ const LoadDemoDataErrorMessage = ({ history, supportLinks }) => (
         </a>
       </p>
       <div className="success-buttons-section d-flex flex-column w-50">
-        <button type="button" className="btn btn-outline-primary" onClick={() => history.push(stringUrlInterceptor('/'))}>Back to dashboard</button>
+        <button type="button" className="btn btn-outline-primary" onClick={() => history.push('/')}>Back to dashboard</button>
       </div>
     </div>
   </div>

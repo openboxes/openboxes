@@ -10,7 +10,8 @@ import ReactTable from 'react-table';
 
 import { hideSpinner, showSpinner } from 'actions';
 import { extractNonCanceledItems } from 'components/stock-transfer/utils';
-import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -166,7 +167,7 @@ class StockTransferSecondPage extends Component {
       .then(() => {
         this.props.hideSpinner();
         Alert.success(this.props.translate('react.stockTransfer.alert.stockTransferCompleted.label', 'Stock transfer was successfully completed!'), { timeout: 3000 });
-        window.location = stringUrlInterceptor(`/stockTransfer/show/${this.state.stockTransfer.id}`);
+        window.location = STOCK_TRANSFER_URL.show(this.state.stockTransfer.id);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -245,7 +246,7 @@ class StockTransferSecondPage extends Component {
             <button
               type="button"
               onClick={() => {
-                window.location = stringUrlInterceptor(`/stockTransfer/show/${this.state.stockTransfer.id}`);
+                window.location = STOCK_TRANSFER_URL.show(this.state.stockTransfer.id);
               }}
               className="btn btn-outline-primary btn-form btn-xs"
               hidden={this.state.stockTransfer.status !== 'COMPLETED'}

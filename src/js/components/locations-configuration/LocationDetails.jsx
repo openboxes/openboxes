@@ -9,7 +9,6 @@ import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
-import { LOCATION_CREATE } from 'api/redirectUrls';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import ColorPickerField from 'components/form-elements/ColorPickerField';
 import FileField from 'components/form-elements/FileField';
@@ -18,7 +17,8 @@ import TextField from 'components/form-elements/TextField';
 import AddLocationGroupModal from 'components/locations-configuration/modals/AddLocationGroupModal';
 import AddOrganizationModal from 'components/locations-configuration/modals/AddOrganizationModal';
 import ActivityCode from 'consts/activityCode';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import { LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
+import apiClient from 'utils/apiClient';
 import Checkbox from 'utils/Checkbox';
 import { convertToBase64 } from 'utils/file-utils';
 import { renderFormField } from 'utils/form-utils';
@@ -28,7 +28,6 @@ import splitTranslation from 'utils/translation-utils';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'components/locations-configuration/LocationDetails.scss';
-
 
 function validate(values) {
   const errors = {};
@@ -263,7 +262,7 @@ class LocationDetails extends Component {
     apiClient.get(url).then((response) => {
       const location = response.data.data;
       if (!location) {
-        this.props.history.push(stringUrlInterceptor('/locationsConfiguration/create'));
+        this.props.history.push(LOCATION_CONFIGURATION_URL.create());
         return;
       }
       this.setState({
@@ -366,7 +365,7 @@ class LocationDetails extends Component {
           this.props.hideSpinner();
           Alert.success(this.props.translate('react.locationsConfiguration.alert.locationSaveCompleted.label', 'Location was successfully saved!'), { timeout: 3000 });
           const resp = response.data.data;
-          this.props.history.push(LOCATION_CREATE(resp.id));
+          this.props.history.push(LOCATION_CONFIGURATION_URL.edit(resp.id));
           this.props.nextPage({
             ...values,
             locationId: resp.id,

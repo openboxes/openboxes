@@ -11,7 +11,8 @@ import ArrayField from 'components/form-elements/ArrayField';
 import LabelField from 'components/form-elements/LabelField';
 import ModalWrapper from 'components/form-elements/ModalWrapper';
 import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfields';
-import apiClient, { parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import apiClient, { parseResponse } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 
@@ -55,7 +56,7 @@ const FIELDS = {
           if (fieldValue) {
             return (
               <div className="d-flex align-items-center justify-content-center">
-                <a target="_blank" rel="noopener noreferrer" href={stringUrlInterceptor(`/stockMovement/show/${fieldValue.id}`)}>
+                <a target="_blank" rel="noopener noreferrer" href={STOCK_MOVEMENT_URL.show(fieldValue.id)}>
                   {fieldValue.requestNumber}
                 </a>
               </div>

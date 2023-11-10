@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
+import { ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
 
 const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
@@ -16,10 +17,10 @@ const PurchaseOrderListHeader = ({ history, supportedActivities }) => (
       <Button
         defaultLabel="Create Shipment from PO"
         label="react.purchaseOrder.createShipmentFromPo.label"
-        onClick={() => history.push('/openboxes/stockMovement/createCombinedShipments?direction=INBOUND')}
+        onClick={() => history.push({ pathname: STOCK_MOVEMENT_URL.createCombinedShipments(), search: 'direction=INBOUND' })}
       />
       {supportedActivities.includes('PLACE_ORDER') &&
-        <a href="/openboxes/order/create">
+        <a href={ORDER_URL.create()}>
           <Button
             defaultLabel="Create Order"
             label="react.purchaseOrder.createOrder.label"

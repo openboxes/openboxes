@@ -10,7 +10,7 @@ const Logo = ({
 }) => (
   <div className="d-flex align-items-center logo-wrapper" data-testid="logo-wrapper">
     <div className="logo-square">
-      <Link to="/openboxes">
+      <Link to="/">
         <img
           src={logoUrl}
           alt="Openboxes"

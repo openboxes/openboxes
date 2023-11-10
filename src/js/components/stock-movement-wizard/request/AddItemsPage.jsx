@@ -21,9 +21,10 @@ import ProductSelectField from 'components/form-elements/ProductSelectField';
 import TextField from 'components/form-elements/TextField';
 import notification from 'components/Layout/notifications/notification';
 import ActivityCode from 'consts/activityCode';
+import { DASHBOARD_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
 import RequisitionStatus from 'consts/requisitionStatus';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { isRequestFromWard, supports } from 'utils/supportedActivitiesUtils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -1304,9 +1305,9 @@ class AddItemsPage extends Component {
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
                   if (this.state.isRequestFromWard) {
-                    this.props.history.push('/openboxes/');
+                    this.props.history.push('/');
                   } else {
-                    window.location = '/openboxes/stockMovement/list?direction=INBOUND';
+                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
                   }
                 }
               })
@@ -1331,11 +1332,11 @@ class AddItemsPage extends Component {
       this.props.showSpinner();
       return this.saveRequisitionItemsInCurrentStep(lineItems)
         .then(() => {
-          let redirectTo = '/stockMovement/list?direction=INBOUND';
           if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-            redirectTo = '/dashboard';
+            this.props.history.push(DASHBOARD_URL.base);
+          } else {
+            this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
           }
-          window.location = stringUrlInterceptor(redirectTo);
         })
         .catch(() => {
           this.props.hideSpinner();
@@ -1363,11 +1364,11 @@ class AddItemsPage extends Component {
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
             onClick: () => {
-              let redirectTo = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
               if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-                redirectTo = stringUrlInterceptor('/dashboard');
+                this.props.history.push(DASHBOARD_URL.base);
+              } else {
+                this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
               }
-              window.location = redirectTo;
             },
           },
           {
@@ -1475,14 +1476,12 @@ class AddItemsPage extends Component {
       'react.stockMovement.request.submitMessage.label',
       'Thank you for submitting your request. You can check the status of your request using stock movement number',
     );
-    let redirectToURL = '';
     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-      redirectToURL = stringUrlInterceptor('/');
+      this.props.history.push('/');
     } else {
-      redirectToURL = stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
+      this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
     }
     Alert.success(`${translatedSubmitMessage} ${movementNumber}`);
-    this.props.history.push(redirectToURL);
     return Promise.resolve();
   }
 

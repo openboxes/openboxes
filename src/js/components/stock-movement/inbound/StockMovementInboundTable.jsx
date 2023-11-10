@@ -15,6 +15,7 @@ import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import Button from 'components/form-elements/Button';
 import ShipmentIdentifier from 'components/stock-movement/common/ShipmentIdentifier';
+import { STOCK_MOVEMENT_URL, STOCK_TRANSFER_URL } from 'consts/applicationUrls';
 import useInboundListTableData from 'hooks/list-pages/inbound/useInboundListTableData';
 import ActionDots from 'utils/ActionDots';
 import { getShipmentTypeTooltip } from 'utils/list-utils';
@@ -58,11 +59,10 @@ const StockMovementInboundTable = ({
       defaultLabel: 'Show Stock Movement',
       label: 'react.stockMovement.action.show.label',
       leftIcon: <RiInformationLine />,
-      href: '/openboxes/stockMovement/show',
+      href: STOCK_MOVEMENT_URL.show,
     };
     if (isReturn) {
-      showAction.href = `/openboxes/stockMovement/show/${order?.id}`;
-      showAction.appendId = false;
+      showAction.href = () => STOCK_MOVEMENT_URL.show(order?.id);
     }
     actions.push(showAction);
 
@@ -74,10 +74,9 @@ const StockMovementInboundTable = ({
         leftIcon: <RiPencilLine />,
       };
       if (isReturn) {
-        editAction.href = `/openboxes/stockTransfer/edit/${order?.id}`;
-        editAction.appendId = false;
+        editAction.href = () => STOCK_TRANSFER_URL.edit(order?.id);
       } else {
-        editAction.href = '/openboxes/stockMovement/edit';
+        editAction.href = STOCK_MOVEMENT_URL.genericEdit;
       }
       actions.push(editAction);
     }
@@ -158,7 +157,7 @@ const StockMovementInboundTable = ({
         return (
           <TableCell
             {...row}
-            link={`/openboxes/stockMovement/show/${stockMovementId}`}
+            link={STOCK_MOVEMENT_URL.show(stockMovementId)}
             tooltip
             tooltipLabel={getShipmentTypeTooltip(translate, shipmentType?.displayName)}
           >
@@ -182,7 +181,7 @@ const StockMovementInboundTable = ({
         return (<TableCell
           {...row}
           tooltip
-          link={`/openboxes/stockMovement/show/${stockMovementId}`}
+          link={STOCK_MOVEMENT_URL.show(stockMovementId)}
           value={description || name}
         />);
       },

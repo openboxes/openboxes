@@ -8,13 +8,13 @@ import { connect } from 'react-redux';
 import { Tooltip } from 'react-tippy';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { ORDER_SHOW, STOCK_MOVEMENT_SHOW } from 'api/urls';
 import DocumentButton from 'components/DocumentButton';
 import ArrayField from 'components/form-elements/ArrayField';
 import DateField from 'components/form-elements/DateField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import { INVOICE_URL, ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -123,7 +123,7 @@ const INVOICE_ITEMS = {
           const orderId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].orderId;
-          return { url: orderId ? ORDER_SHOW(orderId) : '' };
+          return { url: orderId ? ORDER_URL.show(orderId): '' };
         },
       },
       shipmentNumber: {
@@ -135,7 +135,7 @@ const INVOICE_ITEMS = {
           const shipmentId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? STOCK_MOVEMENT_SHOW(shipmentId) : '' };
+          return { url: shipmentId ? STOCK_MOVEMENT_URL.show(shipmentId) : '' };
         },
       },
       budgetCode: {
@@ -319,7 +319,7 @@ class ConfirmInvoicePage extends Component {
     const url = `/api/invoices/${this.state.values.id}/submit`;
     apiClient.post(url)
       .then(() => {
-        window.location = stringUrlInterceptor(`/invoice/show/${this.state.values.id}`);
+        window.location = INVOICE_URL.show(this.state.values.id);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -328,7 +328,7 @@ class ConfirmInvoicePage extends Component {
     const url = `/api/invoices/${this.state.values.id}/post`;
     apiClient.post(url)
       .then(() => {
-        window.location = stringUrlInterceptor(`/invoice/show/${this.state.values.id}`);
+        window.location = INVOICE_URL.show(this.state.values.id);
       })
       .catch(() => this.props.hideSpinner());
   }
@@ -386,7 +386,7 @@ class ConfirmInvoicePage extends Component {
                   <button
                     type="button"
                     className="btn btn-outline-secondary float-right btn-form btn-xs"
-                    onClick={() => { window.location = stringUrlInterceptor(`/invoice/show/${values.id}`); }}
+                    onClick={() => { window.location = INVOICE_URL.show(values.id); }}
                   >
                     <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
                   </button>

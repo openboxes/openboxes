@@ -17,13 +17,13 @@ import LabelField from 'components/form-elements/LabelField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
 import PackingSplitLineModal from 'components/stock-movement-wizard/modals/PackingSplitLineModal';
+import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import {
   apiClientCustomResponseHandler as apiClient,
   flattenRequest,
   handleSuccess,
   handleValidationErrors,
-  stringUrlInterceptor,
 } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, matchesProductCodeOrName } from 'utils/form-values-utils';
@@ -524,7 +524,7 @@ class PackingPage extends Component {
                 <button
                   type="button"
                   disabled={invalid}
-                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = stringUrlInterceptor(`/stockMovement/show/${values.stockMovementId}`); })}
+                  onClick={() => this.savePackingData(values.packPageItems).then(() => { window.location = STOCK_MOVEMENT_URL.show(values.stockMovementId); })}
                   className="float-right mb-1 btn btn-outline-secondary align-self-end btn-xs"
                 >
                   <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -534,7 +534,7 @@ class PackingPage extends Component {
               <button
                 type="button"
                 disabled={invalid}
-                onClick={() => { window.location = stringUrlInterceptor('/stockMovement/list?direction=OUTBOUND'); }}
+                onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.listOutbound())}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
                 <span><i className="fa fa-sign-out pr-2" /> <Translate id="react.default.button.exit.label" defaultMessage="Exit" /> </span>
@@ -618,4 +618,7 @@ PackingPage.propTypes = {
   /** Return true if show only */
   showOnly: PropTypes.bool.isRequired,
   pageSize: PropTypes.number.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
 };

@@ -13,7 +13,6 @@ import Alert from 'react-s-alert';
 import { Tooltip } from 'react-tippy';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
-import { EDIT_REQUEST } from 'api/redirectUrls';
 import ArrayField from 'components/form-elements/ArrayField';
 import Button from 'components/form-elements/Button';
 import ButtonField from 'components/form-elements/ButtonField';
@@ -23,8 +22,9 @@ import TableRowWithSubfields from 'components/form-elements/TableRowWithSubfield
 import TextField from 'components/form-elements/TextField';
 import DetailsModal from 'components/stock-movement-wizard/modals/DetailsModal';
 import SubstitutionsModal from 'components/stock-movement-wizard/modals/SubstitutionsModal';
+import { DASHBOARD_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import RequisitionStatus from 'consts/requisitionStatus';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { formatProductDisplayName, showOutboundEditValidationErrors } from 'utils/form-values-utils';
 import canEditRequest from 'utils/permissionUtils';
@@ -1462,7 +1462,7 @@ class EditItemsPage extends Component {
         buttons: [
           {
             label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`); },
+            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId); },
           },
           {
             label: this.props.translate('react.default.no.label', 'No'),
@@ -1473,7 +1473,7 @@ class EditItemsPage extends Component {
     } else {
       this.reviseRequisitionItems(formValues)
         .then(() => {
-          window.location = stringUrlInterceptor(`/stockMovement/show/${formValues.stockMovementId}`);
+          window.location = STOCK_MOVEMENT_URL.show(formValues.stockMovementId);
         });
     }
   }
@@ -1597,9 +1597,11 @@ class EditItemsPage extends Component {
               <button
                 type="button"
                 onClick={() => {
-                  window.location = !this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')
-                    ? stringUrlInterceptor('/dashboard')
-                    : stringUrlInterceptor('/stockMovement/list?direction=INBOUND');
+                  if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
+                    this.props.history.push(DASHBOARD_URL.base);
+                  } else {
+                    this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
+                  }
                 }}
                 className="float-right mb-1 btn btn-outline-danger align-self-end btn-xs mr-2"
               >
@@ -1634,7 +1636,7 @@ class EditItemsPage extends Component {
                     label="react.stockMovement.editRequestItems.label"
                     defaultLabel="Edit request items"
                     variant="primary-outline"
-                    onClick={() => this.props.history.push(EDIT_REQUEST(this.state.values?.id))}
+                    onClick={() => this.props.history.push(STOCK_MOVEMENT_URL.editRequest(this.state.values?.id))}
                   />
                 }
                 <button

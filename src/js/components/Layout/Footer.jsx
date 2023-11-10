@@ -6,6 +6,7 @@ import { getLanguages, setActiveLanguage } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { changeCurrentLocale } from 'actions';
+import { DISABLE_LOCALIZATION, ENABLE_LOCALIZATION } from 'api/urls';
 import Translate from 'utils/Translate';
 
 
@@ -46,7 +47,7 @@ const Footer = ({
               <a
                 className={`${locale === language.code ? 'selected' : ''}`}
                 key={language.code}
-                href="/openboxes/user/enableLocalizationMode"
+                href={ENABLE_LOCALIZATION}
               >
                 {language.name}
               </a>
@@ -59,7 +60,7 @@ const Footer = ({
               <a
                 className={`${locale === language.code ? 'selected' : ''}`}
                 key={language.code}
-                href={`/openboxes/user/disableLocalizationMode?locale=${language.code}`}
+                href={DISABLE_LOCALIZATION(language.code)}
               >
                 {language.name}
               </a>

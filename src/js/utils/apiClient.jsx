@@ -8,7 +8,6 @@ import { confirmAlert } from 'react-confirm-alert';
 import notification from 'components/Layout/notifications/notification';
 import LoginModal from 'components/LoginModal';
 import NotificationType from 'consts/notificationTypes';
-import { object } from 'prop-types';
 
 export const justRejectRequestError = (error) => Promise.reject(error);
 
@@ -120,11 +119,6 @@ export const urlInterceptor = (config) => {
   const cleanedContextPath = _.trimEnd(contextPath, '/');
   const url = `${cleanedContextPath}/${cleanedUrl}`;
   return { ...config, url };
-};
-
-export const stringUrlInterceptor = (url) => {
-  const config = urlInterceptor({ url });
-  return config.url;
 };
 
 export const handleValidationErrors = (setState) => (error) => {

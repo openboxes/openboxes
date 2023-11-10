@@ -9,7 +9,7 @@ exports[`logo component should match snapshot 1`] = `
     className="logo-square"
   >
     <a
-      href="/openboxes"
+      href="/"
       onClick={[Function]}
     >
       <img

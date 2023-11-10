@@ -8,7 +8,8 @@ import { fetchTranslations } from 'actions';
 import LoadDemoDataInfo from 'components/load-demo-data/LoadDemoDataInfo';
 import LoadDemoDataProgressScreen from 'components/load-demo-data/LoadDemoDataProgressScreen';
 import LoadDemoDataWelcome from 'components/load-demo-data/LoadDemoDataWelcome';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import { LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
+import apiClient from 'utils/apiClient';
 
 export const LOAD_DATA_STEPS = {
   createFirstLocation: 'CREATE_FIRST_LOCATION',
@@ -44,13 +45,13 @@ class LoadDemoDataPage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push(stringUrlInterceptor('/'));
+    this.props.history.push('/');
   }
 
   stepHandler(step) {
     switch (step) {
       case LOAD_DATA_STEPS.createFirstLocation:
-        this.props.history.push(stringUrlInterceptor('/locationsConfiguration/create'));
+        this.props.history.push(LOCATION_CONFIGURATION_URL.create());
         break;
       default:
         this.setState({ currentStep: step });

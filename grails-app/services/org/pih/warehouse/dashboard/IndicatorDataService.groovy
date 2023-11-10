@@ -17,6 +17,7 @@ import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.shipping.Shipment
+import util.ConfigHelper
 
 @Transactional
 class IndicatorDataService {
@@ -40,6 +41,8 @@ class IndicatorDataService {
 
         List listLabels = []
 
+        String urlContextPath = ConfigHelper.contextPath;
+
         // Fill labels and links
         for (int i = 0; i < querySize; i++) {
             Integer daysCounter = i * 30
@@ -53,16 +56,16 @@ class IndicatorDataService {
 
             // Expired items
             if (i == 0) {
-                linksExpirationSummary[0] = "/inventory/listExpiredStock?status=expired"
+                linksExpirationSummary[0] = "${urlContextPath}/inventory/listExpiredStock?status=expired"
             }
 
             // 1, 3 and 6 months
             if (i == 1 || i == 3 || i == 6) {
-                linksExpirationSummary[i] = "/inventory/listExpiringStock?status=within" + daysCounter + "Days"
+                linksExpirationSummary[i] = "${urlContextPath}/inventory/listExpiringStock?status=within" + daysCounter + "Days"
             }
             // 12 month will be 360 days but will link to 365 in the report
             if (i == 12) {
-                linksExpirationSummary[i] = "/inventory/listExpiringStock?status=within365Days"
+                linksExpirationSummary[i] = "${urlContextPath}/inventory/listExpiringStock?status=within365Days"
             }
         }
 
@@ -94,7 +97,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, "/inventory/listExpiringStock")
+        GraphData graphData = new GraphData(indicatorData, "${urlContextPath}/inventory/listExpiringStock")
 
         return graphData
     }
@@ -322,12 +325,14 @@ class IndicatorDataService {
             listData.push(item.value ? item.value : 0)
         }
 
+        String urlContextPath = ConfigHelper.contextPath;
+
         List<String> links = [
-                "/inventory/listInStock",
-                "/inventory/listOverStock",
-                "/inventory/listReorderStock",
-                "/inventory/listLowStock",
-                "/inventory/listQuantityOnHandZero"]
+                "${urlContextPath}/inventory/listInStock",
+                "${urlContextPath}/inventory/listOverStock",
+                "${urlContextPath}/inventory/listReorderStock",
+                "${urlContextPath}/inventory/listLowStock",
+                "${urlContextPath}/inventory/listQuantityOnHandZero"]
 
         List<IndicatorDatasets> datasets = [
                 new IndicatorDatasets('Inventory Summary', listData, links)
@@ -619,8 +624,8 @@ class IndicatorDataService {
             """,
             ['day': sevenDaysAgo, 'location': location, 'orderType': returnOrderType]).get(0)
 
-
-        String baseUrl = '/stockMovement/list?direction=OUTBOUND'
+        String urlContextPath = ConfigHelper.contextPath;
+        String baseUrl = "${urlContextPath}/stockMovement/list?direction=OUTBOUND"
         String statusQuery = RequisitionStatus.listPending().collect { "&requisitionStatusCode=$it" }.join('')
         String dateFormat = "MM/dd/yyyy"
 
@@ -634,7 +639,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(green, yellow, red)
 
-        GraphData graphData = new GraphData(numbersIndicator, "/stockMovement/list?receiptStatusCode=PENDING")
+        GraphData graphData = new GraphData(numbersIndicator, baseUrl + "&receiptStatusCode=PENDING")
 
         return graphData
     }
@@ -645,9 +650,10 @@ class IndicatorDataService {
                 ['location': location]);
 
         // Initial state
-        ColorNumber pending = new ColorNumber(0, 'Pending', '/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING');
-        ColorNumber shipped = new ColorNumber(0, 'Shipped', '/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED');
-        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', '/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED');
+        String urlContextPath = ConfigHelper.contextPath;
+        ColorNumber pending = new ColorNumber(0, 'Pending', "${urlContextPath}/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING");
+        ColorNumber shipped = new ColorNumber(0, 'Shipped', "${urlContextPath}/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED");
+        ColorNumber partiallyReceived = new ColorNumber(0, 'Partially Received', "${urlContextPath}/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED");
 
         // Changes each ColorNumber if found in query
         query.each {
@@ -662,7 +668,7 @@ class IndicatorDataService {
 
         NumbersIndicator numbersIndicator = new NumbersIndicator(pending, shipped, partiallyReceived)
 
-        GraphData graphData = new GraphData(numbersIndicator, "/stockMovement/list?direction=INBOUND")
+        GraphData graphData = new GraphData(numbersIndicator, "${urlContextPath}/stockMovement/list?direction=INBOUND")
 
         return graphData
     }
@@ -717,12 +723,13 @@ class IndicatorDataService {
                     return map
                 }
 
+        String urlContextPath = ConfigHelper.contextPath;
         List<TableData> tableBody = discrepenciesByShipmentId.keySet().collect {
             def row = discrepenciesByShipmentId[it]
             return new TableData(row.shipmentNumber,
                     row.shipmentName,
                     row.count.toString(),
-                    "/stockMovement/show/${row.shipmentId}"
+                    "${urlContextPath}/stockMovement/show/${row.shipmentId}"
             )
         }
 
@@ -739,6 +746,7 @@ class IndicatorDataService {
         Date twoMonthsAgo = LocalDate.now().minusMonths(2).toDate()
 
         ApplicationTagLib g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+        String urlContextPath = ConfigHelper.contextPath;
 
         def results = Shipment.executeQuery("""
             select s.shipmentType.id, s.shipmentType.name, s.shipmentNumber, s.name, s.id
@@ -770,7 +778,7 @@ class IndicatorDataService {
             else numberDelayed['landAndSuitcase'] += 1
             def shipmentType = LocalizationUtil.getLocalizedString(it[1], new Locale("en"))
 
-            TableData tableData = new TableData(it[2], it[3], null, '/stockMovement/show/' + it[4], g.resource(dir: 'images/icons/shipmentType', file: "ShipmentType${shipmentType}.png"))
+            TableData tableData = new TableData(it[2], it[3], null, "${urlContextPath}/stockMovement/show/" + it[4], g.resource(dir: 'images/icons/shipmentType', file: "ShipmentType${shipmentType}.png"))
             return tableData
         }
 
@@ -969,6 +977,8 @@ class IndicatorDataService {
         List<String> listLabels = []
         List<Integer> listData = []
 
+        String urlContextPath = ConfigHelper.contextPath;
+
         def percentageAdHoc = Requisition.executeQuery("""
             select count(r.id), r.type
             from Requisition as r
@@ -1004,7 +1014,7 @@ class IndicatorDataService {
 
         IndicatorData indicatorData = new IndicatorData(datasets, listLabels)
 
-        GraphData graphData = new GraphData(indicatorData, '/stockMovement/list?direction=OUTBOUND')
+        GraphData graphData = new GraphData(indicatorData, "${urlContextPath}/stockMovement/list?direction=OUTBOUND")
 
         return graphData
     }

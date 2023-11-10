@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter, Redirect, Route, Switch,
+} from 'react-router-dom';
 import Alert from 'react-s-alert';
 import { ClimbingBoxLoader } from 'react-spinners';
 

@@ -38,6 +38,21 @@ const ActionDots = ({
     return actionItemType.BUTTON;
   };
 
+  /** Returns a URL with appended id to provided string
+   * or resolves a function with argument of an id
+   * @param action: { href: {string} | {func} }
+   * @returns {string|null}
+   */
+  const buildLink = (action) => {
+    if (typeof action.href === 'string') {
+      return `${action.href}/${id}`;
+    }
+    if (typeof action.href === 'function') {
+      return action.href(id);
+    }
+    return null;
+  };
+
   return (
     <div className={`btn-group ${getPositionClass()}`} data-testid="action-dots-component">
       <button
@@ -62,11 +77,11 @@ const ActionDots = ({
           const elementType = getActionItemType(action);
           let link = '';
           if (elementType === actionItemType.LINK || actionItemType.REACT_LINK) {
-            link = action.href + (action.appendId === false ? '' : `/${id}`);
+            link = buildLink(action);
           }
 
           return (
-            <React.Fragment key={action.href ? action.href : action.label}>
+            <React.Fragment key={action.label}>
               { elementType === actionItemType.BUTTON && (
                 <button
                   onClick={() => action.onClick(id)}
@@ -104,7 +119,6 @@ ActionDots.propTypes = {
     defaultLabel: PropTypes.string.isRequired,
     href: PropTypes.string,
     reactLink: PropTypes.bool,
-    appendId: PropTypes.bool,
     variant: PropTypes.string,
     onClick: PropTypes.func,
   })).isRequired,

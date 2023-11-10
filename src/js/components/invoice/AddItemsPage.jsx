@@ -8,13 +8,13 @@ import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
-import { ORDER_SHOW, STOCK_MOVEMENT_SHOW } from 'api/urls';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import { INVOICE_URL, ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
@@ -72,7 +72,7 @@ const FIELDS = {
           const orderId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].orderId;
-          return { url: orderId ? ORDER_SHOW(orderId) : '' };
+          return { url: orderId ? ORDER_URL.show(orderId) : '' };
         },
       },
       shipmentNumber: {
@@ -84,7 +84,7 @@ const FIELDS = {
           const shipmentId = values && values.invoiceItems
               && values.invoiceItems[rowIndex]
               && values.invoiceItems[rowIndex].shipmentId;
-          return { url: shipmentId ? STOCK_MOVEMENT_SHOW(shipmentId) : '' };
+          return { url: shipmentId ? STOCK_MOVEMENT_URL.show(shipmentId) : '' };
         },
       },
       budgetCode: {
@@ -340,7 +340,7 @@ class AddItemsPage extends Component {
   saveAndExit(formValues) {
     this.saveInvoiceItems(formValues)
       .then(() => {
-        window.location = stringUrlInterceptor(`/invoice/show/${formValues.id}`);
+        window.location = INVOICE_URL.show(formValues.id);
       })
       .catch(() => this.props.hideSpinner());
   }

@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
+import { INVOICE_URL } from 'consts/applicationUrls';
 import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
 import ActionDots from 'utils/ActionDots';
 import { findActions } from 'utils/list-utils';
@@ -34,19 +35,19 @@ const InvoiceListTable = ({
       label: 'react.invoice.viewDetails.label',
       defaultLabel: 'View Invoice Details',
       leftIcon: <RiInformationLine />,
-      href: '/openboxes/invoice/show',
+      href: INVOICE_URL.show,
     },
     {
       label: 'react.invoice.addDocument.label',
       defaultLabel: 'Add document',
       leftIcon: <RiFileLine />,
-      href: '/openboxes/invoice/addDocument',
+      href: INVOICE_URL.addDocument,
     },
     {
       label: 'react.invoice.edit.label',
       defaultLabel: 'Edit Invoice',
       leftIcon: <RiPencilLine />,
-      href: '/openboxes/invoice/create',
+      href: INVOICE_URL.edit,
     },
   ], []);
 
@@ -92,7 +93,7 @@ const InvoiceListTable = ({
       Header: <Translate id="react.invoice.column.invoiceNumber.label" defaultMessage="Invoice Number" />,
       accessor: 'invoiceNumber',
       sortable: false,
-      Cell: row => <TableCell {...row} link={`/openboxes/invoice/show/${row.original.id}`} />,
+      Cell: row => <TableCell {...row} link={INVOICE_URL.show(row.original.id)} />,
     },
     {
       Header: <Translate id="react.invoice.vendor.label" defaultMessage="Vendor" />,

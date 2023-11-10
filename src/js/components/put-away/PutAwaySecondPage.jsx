@@ -14,7 +14,8 @@ import { Tooltip } from 'react-tippy';
 import { hideSpinner, showSpinner } from 'actions';
 import { PUTAWAY_GENERATE_PDF } from 'api/urls';
 import SplitLineModal from 'components/put-away/SplitLineModal';
-import apiClient, { flattenRequest, parseResponse, stringUrlInterceptor } from 'utils/apiClient';
+import { ORDER_URL } from 'consts/applicationUrls';
+import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
 import showLocationChangedAlert from 'utils/location-change-alert';
@@ -70,7 +71,7 @@ class PutAwaySecondPage extends Component {
   componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = stringUrlInterceptor('/order/list?orderType=PUTAWAY_ORDER&status=PENDING'); },
+      () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
     );
 
     const location = this.state.location.id ? this.state.location : nextProps.location;

@@ -13,7 +13,8 @@ import { fetchCurrencies, hideSpinner, showSpinner } from 'actions';
 import DateField from 'components/form-elements/DateField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
-import apiClient, { stringUrlInterceptor } from 'utils/apiClient';
+import { INVOICE_URL } from 'consts/applicationUrls';
+import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { debounceOrganizationsFetch } from 'utils/option-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -165,7 +166,7 @@ class CreateInvoicePage extends Component {
         .then((response) => {
           if (response.data) {
             const resp = response.data.data;
-            this.props.history.push(stringUrlInterceptor(`/invoice/create/${resp.id}`));
+            this.props.history.push(INVOICE_URL.edit(resp.id));
             this.props.nextPage({
               ...values,
               id: resp.id,

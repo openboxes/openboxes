@@ -15,6 +15,7 @@ import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.requisition.RequisitionStatus
 import org.pih.warehouse.shipping.ShipmentStatus
 import org.pih.warehouse.shipping.ShipmentStatusCode
+import util.ConfigHelper
 
 class NumberDataService {
 
@@ -24,7 +25,8 @@ class NumberDataService {
         def binLocations = ProductAvailability.executeQuery("select count(*) from ProductAvailability pa where pa.location = :location and pa.quantityOnHand > 0",
                 ['location': location])
 
-        return new NumberData(binLocations[0], "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(binLocations[0], "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
 
     NumberData getInProgressShipments(def user, def location) {
@@ -57,16 +59,18 @@ class NumberDataService {
                 """,
                 ['location': location, 'user': user, 'orderType': returnOrderType]).get(0)
 
+        String urlContextPath = ConfigHelper.contextPath
         return new NumberData(
                 requisitionShipmentCount + returnOrderShipmentCount,
-                "/openboxes/stockMovement/list?direction=OUTBOUND&receiptStatusCode=PENDING&origin=" + location.id + "&createdBy=" + user.id
+                "${urlContextPath}/stockMovement/list?direction=OUTBOUND&receiptStatusCode=PENDING&origin=" + location.id + "&createdBy=" + user.id
         )
     }
     NumberData getInProgressPutaways(def user, def location) {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderType = :orderType AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location",
                 ['user': user, 'location': location, 'orderType': OrderType.findByCode(Constants.PUTAWAY_ORDER)])
 
-        return new NumberData(incompletePutaways[0], "/openboxes/order/list?orderType=PUTAWAY_ORDER&status=PENDING&orderedBy=" + user.id)
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(incompletePutaways[0], "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING&orderedBy=" + user.id)
     }
 
     NumberData getReceivingBin(def location) {
@@ -81,7 +85,8 @@ class NumberDataService {
                     'locationType': Constants.RECEIVING_LOCATION_TYPE_ID,
                 ])
 
-        return new NumberData(receivingBin[0], "/openboxes/report/showBinLocationReport?status=inStock")
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(receivingBin[0], "${urlContextPath}/report/showBinLocationReport?status=inStock")
     }
 
     NumberData getItemsInventoried(def location) {
@@ -113,7 +118,8 @@ class NumberDataService {
                     'location': location
                 ])
 
-        return new NumberData(productsInDefaultBin[0], "/openboxes/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(productsInDefaultBin[0], "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
 
     NumberData getProductWithNegativeInventory(def location) {
@@ -149,7 +155,8 @@ class NumberDataService {
             tooltipData = tooltipData.stripIndent()
         }
 
-        return new NumberData(numberOfProducts, "/openboxes/report/showBinLocationReport?location.id=" + location.id, tooltipData)
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(numberOfProducts, "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id, tooltipData)
     }
 
     NumberData getExpiredProductsInStock(def location) {
@@ -165,7 +172,8 @@ class NumberDataService {
                     'today' : today,
                 ])
 
-        return new NumberData(expiredProductsInStock[0], "/openboxes/inventory/listExpiredStock?status=expired")
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(expiredProductsInStock[0], "${urlContextPath}/inventory/listExpiredStock?status=expired")
     }
 
     NumberData getOpenStockRequests(def location) {
@@ -187,7 +195,8 @@ class NumberDataService {
                         ],
                 ])
 
-        return new NumberData(openStockRequests[0], "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC")
+        String urlContextPath = ConfigHelper.contextPath
+        return new NumberData(openStockRequests[0], "${urlContextPath}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC")
     }
 
     NumberData getInventoryValue (def location) {
