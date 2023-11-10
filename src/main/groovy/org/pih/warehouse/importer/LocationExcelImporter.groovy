@@ -15,7 +15,7 @@ import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class LocationExcelImporter extends AbstractExcelImporter {
+class LocationExcelImporter extends AbstractExcelImporter implements DataImporter {
 
     static cellReporter = new DefaultImportCellCollector()
 
