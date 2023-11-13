@@ -11,11 +11,15 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class ProductGroupExcelImporter extends AbstractExcelImporter {
+class ProductGroupExcelImporter extends AbstractExcelImporter implements DataImporter {
 
-    def excelImportService
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
 
     static Map cellMap = [sheet: 'Sheet1', startRow: 1, cellMap: []]
 
@@ -37,21 +41,27 @@ class ProductGroupExcelImporter extends AbstractExcelImporter {
 
 
     ProductGroupExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
 
 
     void validateData(ImportDataCommand command) {
+        throw new UnsupportedOperationException()
     }
 
     void importData(ImportDataCommand command) {
+        throw new UnsupportedOperationException()
     }
-
-
 }
