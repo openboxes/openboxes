@@ -9,8 +9,8 @@
       <sqlCheck expectedResult="YES">
         SELECT IS_NULLABLE
         FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE table_name="role"
-        AND column_name="name"
+        WHERE table_name='role'
+        AND column_name='name'
         AND TABLE_SCHEMA = DATABASE();
       </sqlCheck>
     </preConditions>
