@@ -672,11 +672,12 @@ class OrderController {
         OrderItem orderItem = OrderItem.get(params.id)
         def currentLocation = Location.get(session.warehouse.id)
         def isAccountingRequired = currentLocation?.isAccountingRequired()
-        if (!orderService.canOrderItemBeEdited(orderItem, session.user)) {
+        boolean canEditOrder = orderService.isOrderEditable(orderItem.order, session.user)
+        if (!canEditOrder) {
             throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
         }
         render(template: "orderItemFormDialog",
-                model: [orderItem:orderItem, canEdit: orderService.canOrderItemBeEdited(orderItem, session.user), isAccountingRequired: isAccountingRequired])
+                model: [orderItem:orderItem, canEdit: canEditOrder, isAccountingRequired: isAccountingRequired])
     }
 
     def productSourceFormDialog() {
@@ -752,7 +753,7 @@ class OrderController {
             order.addToOrderItems(orderItem)
         }
         else {
-            if (!orderService.canOrderItemBeEdited(orderItem, session.user)) {
+            if (!orderService.isOrderEditable(orderItem.order, session.user)) {
                 throw new UnsupportedOperationException("${warehouse.message(code: 'errors.noPermissions.label')}")
             }
             orderItem.properties = params
@@ -783,6 +784,7 @@ class OrderController {
 
     def getOrderItems() {
         def orderInstance = Order.get(params.id)
+        boolean canEditOrder = orderService.isOrderEditable(orderInstance, session.user)
         def orderItems = orderInstance.orderItems.collect {
             [
                     id: it.id,
@@ -802,7 +804,7 @@ class OrderController {
                     recipient: it.recipient,
                     isOrderPending: it?.order?.status == OrderStatus.PENDING,
                     dateCreated: it.dateCreated,
-                    canEdit: orderService.canOrderItemBeEdited(it, session.user),
+                    canEdit: canEditOrder,
                     manufacturerName: it.productSupplier?.manufacturer?.name,
                     text: it.toString(),
                     orderItemStatusCode: it.orderItemStatusCode.name(),
@@ -1007,7 +1009,7 @@ class OrderController {
 
     def cancelOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
-        def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
+        def canEdit = orderService.isOrderEditable(orderItem.order, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.CANCELED
             orderItem.disableRefresh = false
@@ -1019,7 +1021,7 @@ class OrderController {
 
     def restoreOrderItem() {
         OrderItem orderItem = OrderItem.get(params.id)
-        def canEdit = orderService.canOrderItemBeEdited(orderItem, session.user)
+        def canEdit = orderService.isOrderEditable(orderItem.order, session.user)
         if (canEdit) {
             orderItem.orderItemStatusCode = OrderItemStatusCode.PENDING
             orderItem.disableRefresh = false

@@ -709,6 +709,9 @@ class OrderService {
             log.info "Order line items " + orderItems
 
             Order order = Order.get(orderId)
+            if (!isOrderEditable(order, user)) {
+                throw new UnsupportedOperationException("You do not have permissions to perform this action")
+            }
 
             if (validateOrderItems(orderItems, order)) {
 
@@ -739,10 +742,6 @@ class OrderService {
                     } else {
                         orderItem = new OrderItem()
                         orderItem.orderIndex = order.orderItems ? order.orderItems.size() : 0
-                    }
-
-                    if (!canOrderItemBeEdited(orderItem, user)) {
-                        throw new UnsupportedOperationException("You do not have permissions to perform this action")
                     }
 
                     Product product
@@ -1038,11 +1037,8 @@ class OrderService {
         }
     }
 
-    def canOrderItemBeEdited(OrderItem orderItem, User user) {
-        def isPending = orderItem?.order?.status == OrderStatus.PENDING
-        def isApprover = userService.hasRolePurchaseApprover(user)
-
-        return isPending?:isApprover
+    boolean isOrderEditable(Order order, User user) {
+        return order?.pending ?: userService.hasRolePurchaseApprover(user)
     }
 
     String exportOrderItems(List<OrderItem> orderItems) {
@@ -1192,7 +1188,7 @@ class OrderService {
     }
 
     def removeOrderItem(OrderItem orderItem, User user) {
-        if (orderItem.hasShipmentAssociated() || !canOrderItemBeEdited(orderItem, user) || orderItem.hasInvoices) {
+        if (orderItem.hasShipmentAssociated() || !isOrderEditable(orderItem.order, user) || orderItem.hasInvoices) {
             throw new UnsupportedOperationException("You do not have permissions to perform this action")
         }
 
