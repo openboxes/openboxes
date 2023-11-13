@@ -5,7 +5,7 @@
 export const CONTEXT_PATH = window.CONTEXT_PATH ?? '/openboxes';
 
 const DASHBOARD_URL = {
-  base: '/dashboard',
+  base: `${CONTEXT_PATH}/dashboard`,
 };
 
 const LOCATION_CONFIGURATION_URL = {

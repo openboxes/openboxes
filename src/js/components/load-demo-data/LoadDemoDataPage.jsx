@@ -8,7 +8,7 @@ import { fetchTranslations } from 'actions';
 import LoadDemoDataInfo from 'components/load-demo-data/LoadDemoDataInfo';
 import LoadDemoDataProgressScreen from 'components/load-demo-data/LoadDemoDataProgressScreen';
 import LoadDemoDataWelcome from 'components/load-demo-data/LoadDemoDataWelcome';
-import { LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
+import { DASHBOARD_URL, LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
 
 export const LOAD_DATA_STEPS = {
@@ -45,7 +45,7 @@ class LoadDemoDataPage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push('/');
+    this.props.history.push(DASHBOARD_URL.base);
   }
 
   stepHandler(step) {

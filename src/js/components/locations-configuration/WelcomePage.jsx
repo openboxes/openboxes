@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { fetchTranslations } from 'actions';
-import { LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
+import { DASHBOARD_URL, LOCATION_CONFIGURATION_URL } from 'consts/applicationUrls';
 import Translate from 'utils/Translate';
 
 class WelcomePage extends Component {
@@ -20,7 +20,7 @@ class WelcomePage extends Component {
   }
 
   skipConfiguration() {
-    this.props.history.push('/');
+    this.props.history.push(DASHBOARD_URL.base);
   }
 
   createLocation() {
