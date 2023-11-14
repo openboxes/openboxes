@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+  <changeSet author="drodzewicz" id="061120231230-0">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_ADMIN' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Admin" />
+      <where>role_type='ROLE_ADMIN' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_ADMIN
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-1">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_MANAGER' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Manager" />
+      <where>role_type='ROLE_MANAGER' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_MANAGER
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-2">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_BROWSER' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Browser" />
+      <where>role_type='ROLE_BROWSER' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_BROWSER
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-3">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_ASSISTANT' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Assistant" />
+      <where>role_type='ROLE_ASSISTANT' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_ASSISTANT
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-4">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_SUPERUSER' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Superuser" />
+      <where>role_type='ROLE_SUPERUSER' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_SUPERUSER
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-5">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_ORDER_NOTIFICATION' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Order Notifications" />
+      <where>role_type='ROLE_ORDER_NOTIFICATION' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_ORDER_NOTIFICATION
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-6">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_AUTHENTICATED' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Authenticated" />
+      <where>role_type='ROLE_AUTHENTICATED' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_AUTHENTICATED
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-7">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_USER_NOTIFICATION' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="User Notifications" />
+      <where>role_type='ROLE_USER_NOTIFICATION' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_USER_NOTIFICATION
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-8">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_PRODUCT_NOTIFICATION' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Product Notifications" />
+      <where>role_type='ROLE_PRODUCT_NOTIFICATION' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_PRODUCT_NOTIFICATION
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-9">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_SHIPMENT_NOTIFICATION' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="All Shipment Notifications" />
+      <where>role_type='ROLE_SHIPMENT_NOTIFICATION' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_SHIPMENT_NOTIFICATION
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-10">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_ERROR_NOTIFICATION' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Error Notification" />
+      <where>role_type='ROLE_ERROR_NOTIFICATION' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_ERROR_NOTIFICATION
+    </comment>
+  </changeSet>
+
+  <changeSet author="drodzewicz" id="061120231230-11">
+    <preConditions onFail="MARK_RAN">
+      <sqlCheck expectedResult="1">
+        SELECT COUNT(*) FROM role WHERE role_type = 'ROLE_FEEDBACK_NOTIFICATION' AND (name IS NULL OR name = '');
+      </sqlCheck>
+    </preConditions>
+    <update tableName="role">
+      <column name="name" value="Feedback Notifications" />
+      <where>role_type='ROLE_FEEDBACK_NOTIFICATION' AND (name IS NULL OR name = '')</where>
+    </update>
+    <comment>
+      Add missing value for name column on "ROLE" table where role_type is ROLE_FEEDBACK_NOTIFICATION
+    </comment>
+  </changeSet>
+</databaseChangeLog>
