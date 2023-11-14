@@ -12,7 +12,7 @@ import Alert from 'react-s-alert';
 import { hideSpinner, showSpinner } from 'actions';
 import { LOCATION_IMPORT, LOCATION_TEMPLATE, SUPPORT_LINKS } from 'api/urls';
 import FileDrop from 'components/form-elements/FileDrop';
-import { LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
+import { DASHBOARD_URL, LOCATION_URL, PRODUCT_CONFIGURATION_URL } from 'consts/applicationUrls';
 import AlertMessage from 'utils/AlertMessage';
 import { handleError, handleSuccess } from 'utils/apiClient';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
@@ -132,7 +132,7 @@ class ImportLocations extends Component {
               </Link>
               <Link
                 className="align-self-center w-auto mt-3"
-                to="/"
+                to={DASHBOARD_URL.base}
               >
                 <Translate id="react.locationsConfiguration.exitToDashboard.label" defaultMessage="Exit to Dashboard" />
               </Link>

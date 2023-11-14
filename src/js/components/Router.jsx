@@ -13,6 +13,7 @@ import { ClimbingBoxLoader } from 'react-spinners';
 import CustomAlert from 'components/dashboard/CustomAlert';
 import MainLayoutRoute from 'components/Layout/MainLayoutRoute';
 import Loading from 'components/Loading';
+import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useConnectionListener from 'hooks/useConnectionListener';
 import FlashScopeListenerWrapper from 'wrappers/FlashScopeListenerWrapper';
 
@@ -172,7 +173,7 @@ const StockMovementList = (props) => {
       />);
     }
     default:
-      return <Redirect to="/" />;
+      return <Redirect to={DASHBOARD_URL.base} />;
   }
 };
 
