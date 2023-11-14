@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import grails.util.Holders
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.sql.JoinType
 
 import java.math.RoundingMode
@@ -65,6 +66,10 @@ class OrderService {
     ProductSupplierDataService productSupplierDataService
     PersonDataService personDataService
     GrailsApplication grailsApplication
+
+    def getApplicationTagLib() {
+        return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
 
     def getPurchaseOrders(Map params) {
         // Parse pagination parameters
@@ -710,7 +715,7 @@ class OrderService {
 
             Order order = Order.get(orderId)
             if (!isOrderEditable(order, user)) {
-                throw new UnsupportedOperationException("You do not have permissions to perform this action")
+                throw new UnsupportedOperationException(applicationTagLib.message(code: "errors.noPermissions.label", default: "You do not have permissions to perform this action"))
             }
 
             if (validateOrderItems(orderItems, order)) {
@@ -1174,8 +1179,9 @@ class OrderService {
 
     def deleteAdjustment(OrderAdjustment orderAdjustment, User user) {
         Order order = orderAdjustment.order;
+
         if (!canManageAdjustments(order, user) || orderAdjustment.hasInvoices){
-            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+            throw new UnsupportedOperationException(applicationTagLib.message(code: "errors.noPermissions.label", default: "You do not have permissions to perform this action"))
         }
 
         order.removeFromOrderAdjustments(orderAdjustment)
@@ -1188,8 +1194,9 @@ class OrderService {
     }
 
     def removeOrderItem(OrderItem orderItem, User user) {
+
         if (orderItem.hasShipmentAssociated() || !isOrderEditable(orderItem.order, user) || orderItem.hasInvoices) {
-            throw new UnsupportedOperationException("You do not have permissions to perform this action")
+            throw new UnsupportedOperationException(applicationTagLib.message(code: "errors.noPermissions.label", default: "You do not have permissions to perform this action"))
         }
 
         Order order = orderItem.order
@@ -1211,10 +1218,9 @@ class OrderService {
             return [:]
         }
 
-        def g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
         def orderSummaryList =  OrderSummary.findAllByIdInList(orderIds)
         def results = orderSummaryList.inject([:]) { map, OrderSummary orderSummary ->
-            map << [(orderSummary?.id): g.message(code: "enum.OrderSummaryStatus.${orderSummary?.derivedStatus}")]
+            map << [(orderSummary?.id): applicationTagLib.message(code: "enum.OrderSummaryStatus.${orderSummary?.derivedStatus}")]
         }
 
         // Check if any order was not fetched from OrderSummary, then get derived status from the old Order.displayStatus
@@ -1222,7 +1228,7 @@ class OrderService {
         (orderIds - summaryIds).each { String orderId ->
             Order order = Order.get(orderId)
             if (order && !results[order.id]) {
-                results[order.id] = g.message(code: "enum.OrderSummaryStatus.${order.displayStatus?.name()}")
+                results[order.id] = applicationTagLib.message(code: "enum.OrderSummaryStatus.${order.displayStatus?.name()}")
             }
         }
 
