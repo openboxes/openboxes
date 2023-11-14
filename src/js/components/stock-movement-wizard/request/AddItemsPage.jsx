@@ -1305,7 +1305,7 @@ class AddItemsPage extends Component {
                     'Request was successfully deleted',
                   ), { timeout: 3000 });
                   if (this.state.isRequestFromWard) {
-                    this.props.history.push('/');
+                    this.props.history.push(DASHBOARD_URL.base);
                   } else {
                     this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
                   }
@@ -1477,7 +1477,7 @@ class AddItemsPage extends Component {
       'Thank you for submitting your request. You can check the status of your request using stock movement number',
     );
     if (!this.props.supportedActivities.includes('MANAGE_INVENTORY') && this.props.supportedActivities.includes('SUBMIT_REQUEST')) {
-      this.props.history.push('/');
+      this.props.history.push(DASHBOARD_URL.base);
     } else {
       this.props.history.push(STOCK_MOVEMENT_URL.listInbound());
     }

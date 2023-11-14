@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
+import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useTranslation from 'hooks/useTranslation';
 import apiClient from 'utils/apiClient';
 import Translate from 'utils/Translate';
@@ -31,7 +32,7 @@ const ResettingInstanceInfoPage = ({ history }) => {
         </p>
         <p className="font-weight-bold">{resettingInstanceCommand}</p>
         <button
-          onClick={() => history.push('/')}
+          onClick={() => history.push(DASHBOARD_URL.base)}
           type="button"
           className="btn btn-outline-primary w-25 align-self-end"
         >

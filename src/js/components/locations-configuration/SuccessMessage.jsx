@@ -36,7 +36,13 @@ const SuccessMessage = ({ setShowSuccessMessage, history, successMessageOpen }) 
             />
           </p>
           <div className="success-buttons-section d-flex flex-column">
-            <button type="button" className="btn btn-outline-primary" onClick={() => history.push(LOCATION_CONFIGURATION_URL.create())}>
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={() => {
+                window.location = LOCATION_CONFIGURATION_URL.create();
+              }}
+            >
               <Translate
                 id="react.locationsConfiguration.success.createAnother"
                 defaultMessage="Create another location"
