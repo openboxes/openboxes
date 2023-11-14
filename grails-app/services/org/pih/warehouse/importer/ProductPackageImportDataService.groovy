@@ -61,7 +61,7 @@ class ProductPackageImportDataService implements ImportDataService {
             }
 
 
-            def productPackage = productPackageService.createOrUpdate(params)
+            ProductPackage productPackage = productPackageService.createOrUpdate(params)
             productPackage.product = product
             productPackage.productSupplier = productSupplier
 

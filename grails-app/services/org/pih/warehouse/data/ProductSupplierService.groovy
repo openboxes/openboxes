@@ -32,7 +32,7 @@ class ProductSupplierService {
     def identifierService
     def dataSource
 
-    def createOrUpdate(Map params) {
+    ProductSupplier createOrUpdate(Map params) {
         log.info("params: ${params}")
 
         def productCode = params.productCode

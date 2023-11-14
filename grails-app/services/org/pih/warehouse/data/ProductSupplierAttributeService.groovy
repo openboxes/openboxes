@@ -20,7 +20,7 @@ import org.pih.warehouse.product.ProductSupplier
 
 @Transactional
 class ProductSupplierAttributeService {
-    def createOrUpdate(Map params) {
+    ProductAttribute createOrUpdate(Map params) {
         def productCode = params.productCode
         def productSupplierCode = params.productSupplierCode
         def attributeCode = params.attributeCode

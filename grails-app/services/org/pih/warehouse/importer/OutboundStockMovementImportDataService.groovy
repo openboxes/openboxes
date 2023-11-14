@@ -45,7 +45,7 @@ class OutboundStockMovementImportDataService implements ImportDataService {
         log.info "Import data " + command.filename
         command.data.eachWithIndex {params, index ->
             RequisitionItem requisitionItem = requisitionService.buildRequisitionItem(params)
-            if(requisitionItem.validate()){
+            if (requisitionItem.validate()) {
                 requisitionItem.save(failOnError: true)
             }
         }

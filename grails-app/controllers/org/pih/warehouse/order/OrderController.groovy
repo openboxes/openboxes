@@ -17,9 +17,12 @@ import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.DocumentTemplateService
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ValidationCode
+import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.importer.CSVUtils
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -33,14 +36,10 @@ import java.math.RoundingMode
 
 @Transactional
 class OrderController {
-    def orderService
-    def stockMovementService
-    def reportService
-    def shipmentService
-    def uomService
-    def userService
-    def productSupplierService
-    def documentTemplateService
+    OrderService orderService
+    StockMovementService stockMovementService
+    ProductSupplierService productSupplierService
+    DocumentTemplateService documentTemplateService
 
     static allowedMethods = [save: "POST", update: "POST"]
 

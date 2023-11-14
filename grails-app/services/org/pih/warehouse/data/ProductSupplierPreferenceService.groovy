@@ -20,7 +20,7 @@ import org.pih.warehouse.product.ProductSupplierPreference
 class ProductSupplierPreferenceService {
     String DEFAULT = "DEFAULT"
 
-    def createOrUpdate(Map params) {
+    ProductSupplierPreference createOrUpdate(Map params) {
 
         String supplierCode = params.supplierCode
         String organizationCode = params.organizationCode

@@ -912,7 +912,7 @@ class RequisitionService {
     RequisitionItem buildRequisitionItem(Map params) {
         String productCode = params.productCode
         Product product = Product.findByProductCode(productCode)
-        if(!product) {
+        if (!product) {
             throw new IllegalArgumentException("Product not found for ${productCode}")
         }
 
@@ -952,7 +952,7 @@ class RequisitionService {
             requisition.save(failOnError: true)
         }
 
-        def requisitionItem = RequisitionItem.createCriteria().get {
+        RequisitionItem requisitionItem = RequisitionItem.createCriteria().get {
             eq 'product' , product
             eq "requisition", requisition
         }

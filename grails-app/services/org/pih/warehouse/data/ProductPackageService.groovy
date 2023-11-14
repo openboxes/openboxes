@@ -19,7 +19,7 @@ import org.pih.warehouse.product.ProductSupplier
 @Transactional
 class ProductPackageService {
 
-    def createOrUpdate(Map params) {
+    ProductPackage createOrUpdate(Map params) {
         log.info("params: ${params}")
         Product product = Product.findByProductCode(params.productCode)
         ProductSupplier productSupplier = ProductSupplier.findByCode(params.productSupplierCode)
@@ -38,7 +38,7 @@ class ProductPackageService {
         return productPackage
     }
 
-    def findOrCreate(Map params) {
+    ProductPackage findOrCreate(Map params) {
         ProductPackage productPackage = ProductPackage.get(params.id)
 
         if (params.id && !productPackage) {

@@ -25,7 +25,6 @@ import org.pih.warehouse.importer.LocationImportDataService
 import org.pih.warehouse.inventory.Inventory
 import util.ConfigHelper
 
-import javax.annotation.Nullable
 
 @Transactional
 class LocationService {
@@ -779,7 +778,7 @@ class LocationService {
         return location
     }
 
-    Address createOrUpdateAddress(Map params, @Nullable String addressId) {
+    Address createOrUpdateAddress(Map params, String addressId = null) {
         Address address
         if (addressId) {
             address = Address.findById(addressId)

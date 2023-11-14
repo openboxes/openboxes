@@ -93,8 +93,7 @@ class ProductSupplierAttributeImportDataService implements ImportDataService {
             // Validate UOM data type matches unless UOM not specified for attribute
             UnitOfMeasure uom = unitOfMeasure ? UnitOfMeasure.findByCode(unitOfMeasure) : null
             if (attribute.unitOfMeasureClass && attribute.unitOfMeasureClass?.type != uom?.uomClass?.type) {
-                command.errors.reject("Row ${index + 1}: Unit of Measure ${unitOfMeasure} " +
-                        "data type does not match the unit of measure data type for given attribute")
+                command.errors.reject("Row ${index + 1}: Unit of Measure ${unitOfMeasure} " + "data type does not match the unit of measure data type for given attribute")
             }
         }
     }
