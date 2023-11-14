@@ -1,7 +1,10 @@
 package org.pih.warehouse.dashboard
 
+import grails.compiler.GrailsTypeChecked
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.plugin.cache.Cacheable
+import groovy.transform.TypeCheckingMode
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
@@ -20,6 +23,7 @@ import org.pih.warehouse.shipping.Shipment
 import util.ConfigHelper
 
 @Transactional
+@GrailsTypeChecked(TypeCheckingMode.SKIP)
 class IndicatorDataService {
 
     def dashboardService
@@ -27,6 +31,7 @@ class IndicatorDataService {
     GrailsApplication grailsApplication
     def messageService
 
+    @Cacheable(value = "dashboardCache", key = { "getExpirationSummaryData-${location.id}${params.querySize}" })
     GraphData getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
         // Here it represents the last month we want to show
@@ -102,7 +107,8 @@ class IndicatorDataService {
         return graphData
     }
 
-    GraphData getFillRate(Location location, def destination, def params) {
+    @Cacheable(value = "dashboardCache", key = { "getFillRate-${location.id}${destination?.id ?: ''}${params.querySize}${params.listFiltersSelected}${params.value}" })
+    GraphData getFillRate(Location location, Location destination, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() : 6
         List listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
@@ -219,7 +225,8 @@ class IndicatorDataService {
         return graphData
     }
 
-    GraphData getFillRateSnapshot (Location origin, def params) {
+    @Cacheable(value = "dashboardCache", key = { "getFillRateSnapshot-${origin.id}${params.listFiltersSelected ?: ''}${params.value ?: ''}" })
+    GraphData getFillRateSnapshot(Location origin, def params) {
         String listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
         List averageFillRateResult = []
@@ -290,6 +297,7 @@ class IndicatorDataService {
         return graphData;
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getFillRateDestinations-${origin.id}" })
     List getFillRateDestinations(Location origin) {
         def destinations = dataService.executeQuery("""
             select 
@@ -308,8 +316,8 @@ class IndicatorDataService {
         return destinations
     }
 
-
-    GraphData getInventorySummaryData(def location) {
+    @Cacheable(value = "dashboardCache", key = { "getInventorySummaryData-${location.id ?: ''}" })
+    GraphData getInventorySummaryData(Location location) {
         def inventorySummary = dashboardService.getDashboardAlerts(location);
 
         def inventoryData = [
@@ -345,6 +353,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getSentStockMovements-${location.id}${params.querySize}" })
     GraphData getSentStockMovements(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
@@ -405,6 +414,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getRequisitionsByYear-${location.id}${params.yearType}" })
     GraphData getRequisitionsByYear(Location location, def params) {
         def yearTypes = grailsApplication.config.openboxes.dashboard.yearTypes ?: [:]
         def defaultType = yearTypes.fiscalYear ?: yearTypes.calendarYear
@@ -471,6 +481,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getReceivedStockData-${location.id}${params.querySize}" })
     GraphData getReceivedStockData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
@@ -525,6 +536,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getOutgoingStock-${location.id}" })
     GraphData getOutgoingStock(Location location) {
         Date today = new Date()
         today.clearTime()
@@ -644,6 +656,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getIncomingStock-${location.id}" })
     GraphData getIncomingStock(Location location) {
 
         def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
@@ -673,6 +686,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getDiscrepancy-${location.id}${params.querySize}" })
     GraphData getDiscrepancy(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
 
@@ -740,6 +754,7 @@ class IndicatorDataService {
         return graphData;
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getDelayedShipments-${location.id}" })
     GraphData getDelayedShipments(Location location) {
         Date oneWeekAgo = LocalDate.now().minusWeeks(1).toDate()
         Date oneMonthAgo = LocalDate.now().minusMonths(1).toDate()
@@ -797,6 +812,7 @@ class IndicatorDataService {
         return graphData;
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getProductsInventoried-${location.id}" })
     GraphData getProductsInventoried(Location location) {
         List monthsCount = [3, 6, 9, 12, 0]
         List listPercentageNumbers = []
@@ -870,6 +886,7 @@ class IndicatorDataService {
         return productsInventoried
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getLossCausedByExpiry-${location.id}${params.querySize}" })
     GraphData getLossCausedByExpiry(Location location, def params) {
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
@@ -959,6 +976,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getPercentageAdHoc-${location.id}" })
     GraphData getPercentageAdHoc(Location location) {
         Calendar calendar = Calendar.instance
         // we need to get all requisitions that were created from the first day of the previous month
@@ -1019,6 +1037,7 @@ class IndicatorDataService {
         return graphData
     }
 
+    @Cacheable(value = "dashboardCache", key = { "getStockOutLastMonth-${location.id}" })
     GraphData getStockOutLastMonth(Location location) {
 
         List<String> listLabels = []
