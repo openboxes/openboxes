@@ -4,13 +4,15 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 
+import { DASHBOARD_URL } from 'consts/applicationUrls';
+
 
 const Logo = ({
   logoUrl,
 }) => (
   <div className="d-flex align-items-center logo-wrapper" data-testid="logo-wrapper">
     <div className="logo-square">
-      <Link to="/">
+      <Link to={DASHBOARD_URL.base}>
         <img
           src={logoUrl}
           alt="Openboxes"
