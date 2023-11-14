@@ -16,6 +16,7 @@ import org.pih.warehouse.product.ProductAssociation
 
 @Transactional
 class ProductAssociationImportDataService implements ImportDataService {
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         List<Map> listOfValidatedProductAssociationParams = []
@@ -137,6 +138,7 @@ class ProductAssociationImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
 

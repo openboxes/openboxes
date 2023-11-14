@@ -30,6 +30,7 @@ class InventoryImportDataService implements ImportDataService {
     InventoryService inventoryService
     GrailsApplication grailsApplication
 
+    @Override
     void validateData(ImportDataCommand command) {
         def dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
         def calendar = Calendar.getInstance()
@@ -125,6 +126,7 @@ class InventoryImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         def dateFormatter = new SimpleDateFormat("yy-mm")
 

@@ -21,6 +21,7 @@ class ProductSynonymImportDataService implements ImportDataService {
     ProductService productService
     GrailsApplication grailsApplication
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
 
@@ -85,6 +86,7 @@ class ProductSynonymImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
 

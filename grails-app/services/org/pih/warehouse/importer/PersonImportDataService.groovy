@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class PersonImportDataService implements ImportDataService {
     PersonService personService
 
+    @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Person person = personService.createOrUpdatePerson(params)
@@ -29,6 +30,7 @@ class PersonImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Person person = personService.createOrUpdatePerson(params)

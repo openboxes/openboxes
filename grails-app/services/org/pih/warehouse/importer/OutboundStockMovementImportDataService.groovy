@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class OutboundStockMovementImportDataService implements ImportDataService {
     RequisitionService requisitionService
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
@@ -39,6 +40,7 @@ class OutboundStockMovementImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
         command.data.eachWithIndex {params, index ->

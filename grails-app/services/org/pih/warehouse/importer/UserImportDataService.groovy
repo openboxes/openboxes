@@ -19,6 +19,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class UserImportDataService implements ImportDataService {
     UserService userService
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
 
@@ -42,6 +43,7 @@ class UserImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
 

@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class CategoryImportDataService implements ImportDataService {
     CategoryService categoryService
 
+    @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 
@@ -41,6 +42,7 @@ class CategoryImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Category category = categoryService.createOrUpdateCategory(params)

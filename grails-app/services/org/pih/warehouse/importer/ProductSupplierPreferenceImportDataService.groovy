@@ -22,6 +22,7 @@ class ProductSupplierPreferenceImportDataService implements ImportDataService {
 
     String DEFAULT = "DEFAULT"
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
@@ -50,6 +51,7 @@ class ProductSupplierPreferenceImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
 

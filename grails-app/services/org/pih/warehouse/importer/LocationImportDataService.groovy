@@ -22,6 +22,7 @@ import org.pih.warehouse.core.Organization
 class LocationImportDataService implements ImportDataService {
     LocationService locationService
 
+    @Override
     void validateData(ImportDataCommand command) {
 
         def locationNamesToImport = command.data.collect {it.name}
@@ -107,6 +108,7 @@ class LocationImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Location location = locationService.createOrUpdateLocation(params)

@@ -21,6 +21,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class ProductPackageImportDataService implements ImportDataService {
     ProductPackageService productPackageService
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
@@ -72,6 +73,7 @@ class ProductPackageImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
         command.data.eachWithIndex { params, index ->

@@ -22,6 +22,7 @@ import org.pih.warehouse.product.ProductSupplier
 class ProductSupplierAttributeImportDataService implements ImportDataService {
     ProductSupplierAttributeService productSupplierAttributeService
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
@@ -98,6 +99,7 @@ class ProductSupplierAttributeImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
 

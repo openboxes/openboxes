@@ -18,6 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 class TagImportDataService implements ImportDataService {
     TagService tagService
 
+    @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Tag tag = tagService.createOrUpdateTag(params)
@@ -30,6 +31,7 @@ class TagImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             Tag tag = tagService.createOrUpdateTag(params)

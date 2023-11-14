@@ -9,11 +9,6 @@
  **/
 package org.pih.warehouse.importer
 
-interface DataImporter {
-
+interface DataImporter extends ImportDataService {
     List<Map> getData()
-
-    void validateData(ImportDataCommand command)
-
-    void importData(ImportDataCommand command)
 }

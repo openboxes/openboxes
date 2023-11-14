@@ -15,6 +15,7 @@ import org.pih.warehouse.product.Product
 @Transactional
 class ProductImportDataService implements ImportDataService {
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "validate data test "
         // Iterate over each row and validate values
@@ -25,6 +26,7 @@ class ProductImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "import data"
 

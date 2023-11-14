@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat
 class ProductSupplierImportDataService implements ImportDataService {
     ProductSupplierService productSupplierService
 
+    @Override
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
@@ -131,6 +132,7 @@ class ProductSupplierImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
 

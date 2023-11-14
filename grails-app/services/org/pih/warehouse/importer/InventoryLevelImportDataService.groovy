@@ -16,6 +16,7 @@ import org.pih.warehouse.data.DataService
 class InventoryLevelImportDataService implements ImportDataService {
     DataService dataService
 
+    @Override
     void validateData(ImportDataCommand command) {
         println "validate inventory levels " + command.filename
         command.data.each { row, index ->
@@ -25,6 +26,7 @@ class InventoryLevelImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         println "Import inventory levels " + command.location + " filename " + command.filename
         command.data.eachWithIndex { row, index ->

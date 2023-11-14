@@ -19,6 +19,7 @@ import org.pih.warehouse.core.User
 @Transactional
 class UserLocationImportDataService implements ImportDataService {
 
+    @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 
@@ -45,6 +46,7 @@ class UserLocationImportDataService implements ImportDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
             User user = User.findByUsername(params.username)
