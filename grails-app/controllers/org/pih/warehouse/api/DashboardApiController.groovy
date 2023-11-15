@@ -87,7 +87,7 @@ class DashboardApiController {
     def getExpirationSummary() {
         Location location = Location.get(params.locationId)
         def expirationSummary = indicatorDataService.getExpirationSummaryData(location, params)
-        render(expirationSummary.toJson() as JSON)
+        render(expirationSummary as JSON)
     }
 
     def getFillRate() {
@@ -115,7 +115,7 @@ class DashboardApiController {
     def getInventorySummary() {
         Location location = Location.get(params.locationId)
         def inventorySummary = indicatorDataService.getInventorySummaryData(location)
-        render(inventorySummary.toJson() as JSON)
+        render(inventorySummary as JSON)
     }
 
     def getSentStockMovements() {

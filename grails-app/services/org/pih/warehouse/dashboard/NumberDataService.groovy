@@ -22,7 +22,7 @@ class NumberDataService {
 
     def dataService
 
-    @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location.id}"})
+    @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
     NumberData getInventoryByLotAndBin(Location location) {
         def binLocations = ProductAvailability.executeQuery("select count(*) from ProductAvailability pa where pa.location = :location and pa.quantityOnHand > 0",
                 ['location': location])
@@ -31,7 +31,7 @@ class NumberDataService {
         return new NumberData(binLocations[0], "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getInProgressShipments-${location.id}${user.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getInProgressShipments-${location?.id}${user?.id}" })
     NumberData getInProgressShipments(User user, Location location) {
 
         OrderType returnOrderType = OrderType.get(Constants.RETURN_ORDER)
@@ -69,7 +69,7 @@ class NumberDataService {
         )
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getInProgressPutaways-${location.id}${user.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getInProgressPutaways-${location?.id}${user?.id}" })
     NumberData getInProgressPutaways(User user, Location location) {
         def incompletePutaways = Order.executeQuery("select count(o.id) from Order o where o.orderType = :orderType AND o.status = 'PENDING' AND o.orderedBy = :user AND o.destination = :location",
                 ['user': user, 'location': location, 'orderType': OrderType.findByCode(Constants.PUTAWAY_ORDER)])
@@ -78,7 +78,7 @@ class NumberDataService {
         return new NumberData(incompletePutaways[0], "${urlContextPath}/order/list?orderType=PUTAWAY_ORDER&status=PENDING&orderedBy=" + user.id)
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getReceivingBin-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getReceivingBin-${location?.id}" })
     NumberData getReceivingBin(Location location) {
         def receivingBin = ProductAvailability.executeQuery("""
             SELECT COUNT(distinct pa.product.id) from ProductAvailability pa 
@@ -95,7 +95,7 @@ class NumberDataService {
         return new NumberData(receivingBin[0], "${urlContextPath}/report/showBinLocationReport?status=inStock")
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getItemsInventoried-${location?.id}" })
     NumberData getItemsInventoried(Location location) {
         Date firstOfMonth = LocalDate.now().withDayOfMonth(1).toDate();
 
@@ -115,7 +115,7 @@ class NumberDataService {
         return new NumberData(itemsInventoried[0])
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getDefaultBin-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getDefaultBin-${location?.id}" })
     NumberData getDefaultBin(Location location) {
         def productsInDefaultBin = ProductAvailability.executeQuery("""
             SELECT COUNT(distinct pa.product.id) FROM ProductAvailability pa
@@ -130,7 +130,7 @@ class NumberDataService {
         return new NumberData(productsInDefaultBin[0], "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id + "&status=inStock")
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getProductWithNegativeInventory-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getProductWithNegativeInventory-${location?.id}" })
     NumberData getProductWithNegativeInventory(Location location) {
 
         def productsWithNegativeInventory = ProductAvailability.executeQuery("""
@@ -168,7 +168,7 @@ class NumberDataService {
         return new NumberData(numberOfProducts, "${urlContextPath}/report/showBinLocationReport?location.id=" + location.id, tooltipData)
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getExpiredProductsInStock-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getExpiredProductsInStock-${location?.id}" })
     NumberData getExpiredProductsInStock(Location location) {
         Date today = LocalDate.now().toDate()
         def expiredProductsInStock = ProductAvailability.executeQuery("""
@@ -186,7 +186,7 @@ class NumberDataService {
         return new NumberData(expiredProductsInStock[0], "${urlContextPath}/inventory/listExpiredStock?status=expired")
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getOpenStockRequests-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getOpenStockRequests-${location?.id}" })
     NumberData getOpenStockRequests(Location location) {
         def openStockRequests = Requisition.executeQuery("""
             SELECT COUNT(distinct r.id) FROM Requisition r
@@ -210,7 +210,7 @@ class NumberDataService {
         return new NumberData(openStockRequests[0], "${urlContextPath}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC")
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getInventoryValue-${location.id}" })
+    @Cacheable(value = "dashboardCache", key = { "getInventoryValue-${location?.id}" })
     NumberData getInventoryValue(Location location) {
         def inventoryValue = ProductAvailability.executeQuery("""select sum (pa.quantityOnHand * p.pricePerUnit) 
                 from ProductAvailability as pa
@@ -221,7 +221,7 @@ class NumberDataService {
         return new NumberData(inventoryValue[0])
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getOpenPurchaseOrdersCount-${params.value}" })
+    @Cacheable(value = "dashboardCache", key = { "getOpenPurchaseOrdersCount-${params?.value}" })
     NumberData getOpenPurchaseOrdersCount(Map params) {
         def openPurchaseOrdersCount = 0
 
