@@ -52,7 +52,7 @@
             </g:each>
 
         </table>
-        <div class="pagination">
+        <div class="paginateButtons">
             <g:paginate total="${productSummaries.totalCount}"/>
         </div>
     </div>
