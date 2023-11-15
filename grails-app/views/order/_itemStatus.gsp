@@ -2,7 +2,7 @@
     <h2>
         <warehouse:message code="order.itemStatus.label" default="Item Status"/>
     </h2>
-    <g:if test="${isPutawayOrder}">
+    <g:if test="${!isPutawayOrder}">
         <input type="text" id="orderItemsStatusFilter" class="text large" placeholder="${g.message(code: 'order.filterByProduct.label', default: 'Filter by product name or code')}"/>
     </g:if>
     <g:if test="${orderItems}">
