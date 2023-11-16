@@ -19,14 +19,14 @@
             </g:link>
         </div>
         <div id="list-productComponent" class="box content scaffold-create" role="main">
-            <h1><warehouse:message code="default.list.label" args="[entityName]" /></h1>
+            <h2><warehouse:message code="default.list.label" args="[entityName]" /></h2>
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>
             <f:table collection="${productComponentList}" properties="['id', 'assemblyProduct', 'componentProduct', 'quantity', 'unitOfMeasure']"/>
             <g:set var="totalCount" value="${productComponentCount ?: 0}"/>
             <g:if test="${totalCount > params.max}">
-                <div class="pagination">
+                <div class="paginateButtons">
                     <g:paginate total="${productComponentCount ?: 0}" />
                 </div>
             </g:if>
