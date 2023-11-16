@@ -306,11 +306,11 @@ class UserService {
             }
             if (roleIds) {
                 or {
-                    roles {
+                    roles(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
                         'in'("id", roleIds)
                     }
                     if (location) {
-                        locationRoles {
+                        locationRoles(JoinType.LEFT_OUTER_JOIN.joinTypeValue)  {
                             'in'("role.id", roleIds)
                             eq("location.id", location.id)
                         }
