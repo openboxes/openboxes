@@ -94,13 +94,13 @@ class DashboardApiController {
         Location location = Location.get(params.locationId)
         Location destination = Location.get(params.destinationLocation)
         def fillRate = indicatorDataService.getFillRate(location, destination, params)
-        render(fillRate.toJson() as JSON)
+        render(fillRate as JSON)
     }
 
     def getFillRateSnapshot() {
         Location location = Location.get(params.locationId)
         def fillRateSnapshot = indicatorDataService.getFillRateSnapshot(location, params)
-        render(fillRateSnapshot.toJson() as JSON)
+        render(fillRateSnapshot as JSON)
     }
 
     def getFillRateDestinations() {
@@ -121,31 +121,31 @@ class DashboardApiController {
     def getSentStockMovements() {
         Location location = Location.get(params.locationId)
         def sentStockMovements = indicatorDataService.getSentStockMovements(location, params)
-        render(sentStockMovements.toJson() as JSON)
+        render(sentStockMovements as JSON)
     }
 
     def getRequisitionsByYear() {
         Location location = Location.get(params.locationId)
         def requisitionsByYear = indicatorDataService.getRequisitionsByYear(location, params)
-        render(requisitionsByYear.toJson() as JSON)
+        render(requisitionsByYear as JSON)
     }
 
     def getReceivedStockMovements() {
         Location location = Location.get(params.locationId)
         def receivedStockMovements = indicatorDataService.getReceivedStockData(location, params)
-        render(receivedStockMovements.toJson() as JSON)
+        render(receivedStockMovements as JSON)
     }
 
     def getOutgoingStock() {
         Location location = Location.get(params.locationId)
         def outgoingStock = indicatorDataService.getOutgoingStock(location)
-        render(outgoingStock.toJson() as JSON)
+        render(outgoingStock as JSON)
     }
 
     def getIncomingStock() {
         Location location = Location.get(params.locationId)
         def incomingStock = indicatorDataService.getIncomingStock(location)
-        render(incomingStock.toJson() as JSON)
+        render(incomingStock as JSON)
     }
 
     def getDiscrepancy() {
@@ -169,25 +169,25 @@ class DashboardApiController {
     def getLossCausedByExpiry() {
         Location location = Location.get(params.locationId)
         def lossCausedByExpiry = indicatorDataService.getLossCausedByExpiry(location, params)
-        render (lossCausedByExpiry.toJson() as JSON)
+        render (lossCausedByExpiry as JSON)
     }
 
     def getProductsInventoried() {
         Location location = Location.get(params.locationId)
         def productsInventoried = indicatorDataService.getProductsInventoried(location)
-        render (productsInventoried.toJson() as JSON)
+        render (productsInventoried as JSON)
     }
 
     def getPercentageAdHoc() {
         Location location = Location.get(session?.warehouse?.id)
         def percentageAdHoc = indicatorDataService.getPercentageAdHoc(location)
-        render (percentageAdHoc.toJson() as JSON)
+        render (percentageAdHoc as JSON)
     }
 
     def getStockOutLastMonth() {
         Location location = Location.get(session?.warehouse?.id)
         def stockOutLastMonth = indicatorDataService.getStockOutLastMonth(location)
-        render (stockOutLastMonth.toJson() as JSON)
+        render (stockOutLastMonth as JSON)
     }
 
     def getOpenStockRequests() {
