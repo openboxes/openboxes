@@ -480,6 +480,11 @@ class UrlMappings {
             action = [GET: "getPrepaymentItems"]
         }
 
+        "/api/invoices/validateInvoiceItem" {
+            controller = "invoiceApi"
+            action = [POST: "validateInvoiceItem"]
+        }
+
         "/api/invoiceStatuses"(parseRequest: true) {
             controller = { "invoiceApi" }
             action = [GET: "statusOptions"]
