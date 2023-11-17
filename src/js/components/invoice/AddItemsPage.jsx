@@ -202,9 +202,7 @@ class AddItemsPage extends Component {
     this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
     this.validateInvoiceItem = this.validateInvoiceItem.bind(this);
 
-    this.debouncedInvoiceItemValidation = _.debounce((invoiceItem, rowIndex) => {
-      this.validateInvoiceItem(invoiceItem, rowIndex);
-    }, 1000);
+    this.debouncedInvoiceItemValidation = _.debounce(this.validateInvoiceItem, 1000);
   }
 
   /**
@@ -362,11 +360,11 @@ class AddItemsPage extends Component {
       });
   }
 
-  validate() {
+  validate(values) {
     const errors = {};
     errors.invoiceItems = [];
 
-    _.forEach(this.state.values.invoiceItems, (item, key) => {
+    _.forEach(values?.invoiceItems, (item, key) => {
       if (_.has(item, 'isValid') && !item.isValid) {
         errors.invoiceItems[key] = { quantity: 'react.invoice.errors.quantityToInvoice.label' };
       }
@@ -387,19 +385,16 @@ class AddItemsPage extends Component {
       quantity,
     });
 
-    const mappedInvoiceItems = this.state.values.invoiceItems.map((item, index) => {
-      if (index === rowIndex) {
-        return { ...item, quantity, isValid: data.isValid };
-      }
-      return item;
+    const updatedValues = update(this.state.values, {
+      invoiceItems: {
+        [rowIndex]: {
+          isValid: { $set: data.isValid },
+          quantity: { $set: quantity },
+        },
+      },
     });
 
-    this.setState(previousState => ({
-      values: {
-        ...previousState.values,
-        invoiceItems: mappedInvoiceItems,
-      },
-    }));
+    this.setState({ values: updatedValues });
   }
 
   saveAndExit(formValues) {
@@ -416,7 +411,7 @@ class AddItemsPage extends Component {
         onSubmit={() => {}}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        validate={() => this.validate()}
+        validate={this.validate}
         render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
