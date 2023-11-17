@@ -20,9 +20,6 @@ import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.invoice.InvoiceStatus
-import org.pih.warehouse.product.Product
-import org.pih.warehouse.shipping.Shipment
-import org.pih.warehouse.shipping.ShipmentItem
 
 class InvoiceApiController {
 

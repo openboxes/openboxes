@@ -32,6 +32,7 @@ export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
 export const STOCK_TRANSFER_DELETE = id => `${STOCK_TRANSFER_API}/${id}`;
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
+export const VALIDATE_INVOICE_ITEM = `${INVOICE_API}/validateInvoiceItem`;
 
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;
