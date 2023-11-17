@@ -300,53 +300,6 @@ openboxes:
                 labelYearPrefix: ""
                 yearFormat: "yyyy"
 
-    # OpenBoxes identifier config
-    identifier:
-        numeric: "0123456789"
-        alphabetic: "ABCDEFGHJKMNPQRSTUVXYZ"
-        alphanumeric: "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
-        transaction:
-            format: "AAA-AAA-AAA"
-        order:
-            format: "NNNLLL"
-        organization:
-            format: "AAA"
-            minSize: 2
-            maxSize: 4
-        product:
-            format: "LLNN"
-        productSupplier:
-            format: "NNNN"
-            prefix:
-                enabled: true
-        receipt:
-            format: "NNNLLL"
-        requisition:
-            format: "NNNLLL"
-        shipment:
-            format: "NNNLLL"
-        sequenceNumber:
-            format: "00000"
-        invoice:
-            format: "NNNLLL"
-        location:
-            format: "NNNLLL"
-        purchaseOrder:
-            generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
-            sequenceNumber:
-                format: "000000"
-            format: 'PO-$\{destinationPartyCode}-$\{sequenceNumber}' # single quote for curly braces escape character
-            properties:
-                destinationPartyCode: "destinationParty.code"
-        productCode:
-            generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
-            delimiter: "-"
-            format: "${productTypeCode}${delimiter}${sequenceNumber}"
-            properties:
-                productTypeCode: "code"
-        defaultProductType:
-            id: "DEFAULT"
-
     order:
         orderStatusPropertyMap:
             PLACED: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
