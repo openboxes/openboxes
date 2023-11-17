@@ -2,9 +2,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
-import grails.plugin.cache.Cacheable
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.core.Organization
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.User
 import org.pih.warehouse.dashboard.NumberData
@@ -89,7 +87,7 @@ class DashboardApiController {
     def getExpirationSummary() {
         Location location = Location.get(params.locationId)
         def expirationSummary = indicatorDataService.getExpirationSummaryData(location, params)
-        render(expirationSummary.toJson() as JSON)
+        render(expirationSummary as JSON)
     }
 
     def getFillRate() {
@@ -106,7 +104,7 @@ class DashboardApiController {
     }
 
     def getFillRateDestinations() {
-        Location location = Location.get(params.locationId?:session.warehouse.id)
+        Location location = Location.get(params.locationId ?: session.warehouse.id)
         def destinations = []
         def defaultDestination = [code : "react.dashboard.locationFilter.all.label", message : messageService.getMessage("react.dashboard.locationFilter.all")]
         destinations << [id: "", name: defaultDestination]
@@ -117,7 +115,7 @@ class DashboardApiController {
     def getInventorySummary() {
         Location location = Location.get(params.locationId)
         def inventorySummary = indicatorDataService.getInventorySummaryData(location)
-        render(inventorySummary.toJson() as JSON)
+        render(inventorySummary as JSON)
     }
 
     def getSentStockMovements() {
@@ -178,19 +176,19 @@ class DashboardApiController {
         Location location = Location.get(params.locationId)
         def productsInventoried = indicatorDataService.getProductsInventoried(location)
         render (productsInventoried.toJson() as JSON)
-     }
+    }
 
     def getPercentageAdHoc() {
         Location location = Location.get(session?.warehouse?.id)
         def percentageAdHoc = indicatorDataService.getPercentageAdHoc(location)
         render (percentageAdHoc.toJson() as JSON)
-     }
+    }
 
     def getStockOutLastMonth() {
         Location location = Location.get(session?.warehouse?.id)
         def stockOutLastMonth = indicatorDataService.getStockOutLastMonth(location)
         render (stockOutLastMonth.toJson() as JSON)
-     }
+    }
 
     def getOpenStockRequests() {
         Location location = Location.get(params.locationId)

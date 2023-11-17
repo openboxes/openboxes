@@ -12,6 +12,7 @@ package org.pih.warehouse.user
 import grails.converters.JSON
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.plugin.cache.CacheEvict
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.core.ActivityCode
 import grails.util.Holders
@@ -189,6 +190,7 @@ class DashboardController {
     //@CacheFlush(["dashboardCache", "megamenuCache", "inventoryBrowserCache", "fastMoversCache",
     //        "binLocationReportCache", "binLocationSummaryCache", "quantityOnHandCache", "selectTagCache",
     //        "selectTagsCache", "selectCategoryCache", "selectCatalogsCache", "forecastCache"])
+    @CacheEvict(value = "dashboardCache", allEntries = true)
     def flushCache() {
         flash.message = "Data caches have been flushed and inventory snapshot job was triggered"
         RefreshProductAvailabilityJob.triggerNow([locationId: session.warehouse.id, forceRefresh: true])

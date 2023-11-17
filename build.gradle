@@ -588,7 +588,8 @@ dependencies {
     compile 'org.grails.plugins:browser-detection:3.4.0'
 
     // enable `import grails.plugin.cache.Cacheable`
-    implementation 'org.grails.plugins:cache'
+    implementation 'org.grails.plugins:cache:4.0.3'
+    compile 'org.grails.plugins:cache-ehcache:3.0.0'
 
     // enable `grails test-app -coverage`
     testImplementation('org.grails.plugins:code-coverage:2.0.3-3') {
