@@ -184,10 +184,11 @@ class InvoiceApiController {
         render([data: prepaymentItems, totalCount: prepaymentItems.size()] as JSON)
     }
 
-    def validateInvoiceItem() {
-        JSONObject jsonObject = request.JSON
-        InvoiceItem invoiceItem = InvoiceItem.load(jsonObject?.invoiceItemId)
-        Boolean isValid = invoiceService.validateInvoiceItem(invoiceItem, jsonObject?.quantity as Integer)
-        render([isValid: isValid] as JSON)
+    def validateInvoiceItem(InvoiceItem invoiceItem) {
+        if (!invoiceItem.validate(['quantity'])) {
+            throw new ValidationException("Invalid invoice item", invoiceItem.errors)
+        }
+
+        render(status: 200)
     }
 }

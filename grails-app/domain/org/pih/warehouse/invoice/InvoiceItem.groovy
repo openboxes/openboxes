@@ -82,8 +82,17 @@ class InvoiceItem implements Serializable {
         product(nullable: true)
         glAccount(nullable: true)
         budgetCode(nullable: true)
+        quantity(nullable: false, min: 0, validator: { quantity, obj ->
+            InvoiceItem.withNewSession {
+                InvoiceItem notUpdatedInvoiceItem = InvoiceItem.get(obj?.id)
+                if (notUpdatedInvoiceItem) {
+                    Boolean isValid = quantity + (obj?.shipmentItem?.quantityInvoiced - notUpdatedInvoiceItem?.quantity) <= obj?.shipmentItem?.quantity
+                    return isValid ? true : ['invoiceItem.invalidQuantity.label']
+                }
 
-        quantity(nullable: false, min: 0) // min = 0 for canceled items
+                return true
+            }
+        }) // min = 0 for canceled items
         quantityUom(nullable: true)
         quantityPerUom(nullable: false)
         amount(nullable: true)

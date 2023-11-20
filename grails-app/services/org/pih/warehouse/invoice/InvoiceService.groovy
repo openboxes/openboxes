@@ -430,13 +430,4 @@ class InvoiceService {
         invoiceItem.shipmentItems?.each { ShipmentItem si -> si.removeFromInvoiceItems(invoiceItem) }
         invoiceItem.delete()
     }
-
-    Boolean validateInvoiceItem(InvoiceItem invoiceItem, Integer newQuantity) {
-        if (invoiceItem) {
-            ShipmentItem shipmentItem = invoiceItem?.shipmentItem
-            Integer invoicedQuantity = shipmentItem.invoiceItems.sum { it.quantity ?: 0 }
-            return newQuantity + (invoicedQuantity - invoiceItem.quantity) <= shipmentItem.quantity
-        }
-        return false
-    }
 }

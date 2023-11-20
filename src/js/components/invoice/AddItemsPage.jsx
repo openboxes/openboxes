@@ -8,7 +8,6 @@ import { Form } from 'react-final-form';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
-import invoiceApi from 'api/services/InvoiceApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
@@ -20,6 +19,7 @@ import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
+import invoiceItemApi from 'api/services/InvoiceItemApi';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -140,18 +140,19 @@ const FIELDS = {
           validateInvoiceItem,
           debouncedInvoiceItemValidation,
         }) => ({
-          onBlur: (event) => {
+          onBlur: () => {
             updateRow(values, rowIndex);
             validateInvoiceItem({
-              invoiceItemId: values.invoiceItems[rowIndex].id,
-              quantity: event.target.value,
+              invoiceItem: values.invoiceItems[rowIndex],
               rowIndex,
             });
           },
           onChange: (event) => {
             debouncedInvoiceItemValidation({
-              invoiceItemId: values.invoiceItems[rowIndex].id,
-              quantity: event,
+              invoiceItem: {
+                ...values.invoiceItems[rowIndex],
+                quantity: event,
+              },
               rowIndex,
             });
           },
@@ -366,7 +367,7 @@ class AddItemsPage extends Component {
 
     _.forEach(values?.invoiceItems, (item, key) => {
       if (_.has(item, 'isValid') && !item.isValid) {
-        errors.invoiceItems[key] = { quantity: 'react.invoice.errors.quantityToInvoice.label' };
+        errors.invoiceItems[key] = { quantity: item?.errorMessage };
       }
     });
 
@@ -374,27 +375,37 @@ class AddItemsPage extends Component {
   }
 
   async validateInvoiceItem({
-    invoiceItemId,
-    quantity,
+    invoiceItem,
     rowIndex,
   }) {
     this.debouncedInvoiceItemValidation.cancel();
 
-    const { data } = await invoiceApi.validateInvoiceItem({
-      invoiceItemId,
-      quantity,
-    });
+    await invoiceItemApi.validateInvoiceItem(invoiceItem)
+      .then(() => {
+        const updatedValues = update(this.state.values, {
+          invoiceItems: {
+            [rowIndex]: {
+              isValid: { $set: true },
+              quantity: { $set: invoiceItem.quantity },
+            },
+          },
+        });
 
-    const updatedValues = update(this.state.values, {
-      invoiceItems: {
-        [rowIndex]: {
-          isValid: { $set: data.isValid },
-          quantity: { $set: quantity },
-        },
-      },
-    });
+        this.setState({ values: updatedValues });
+      })
+      .catch(err => {
+        const updatedValues = update(this.state.values, {
+          invoiceItems: {
+            [rowIndex]: {
+              isValid: { $set: false },
+              errorMessage: { $set: err?.response?.data?.errorMessages?.[0] || '' },
+              quantity: { $set: invoiceItem.quantity },
+            },
+          },
+        });
 
-    this.setState({ values: updatedValues });
+        this.setState({ values: updatedValues });
+      });
   }
 
   saveAndExit(formValues) {

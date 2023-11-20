@@ -480,11 +480,6 @@ class UrlMappings {
             action = [GET: "getPrepaymentItems"]
         }
 
-        "/api/invoices/validateInvoiceItem" {
-            controller = "invoiceApi"
-            action = [POST: "validateInvoiceItem"]
-        }
-
         "/api/invoiceStatuses"(parseRequest: true) {
             controller = { "invoiceApi" }
             action = [GET: "statusOptions"]
@@ -493,6 +488,12 @@ class UrlMappings {
         "/api/invoiceTypeCodes"(parseRequest: true) {
             controller = { "invoiceApi" }
             action = [GET: "invoiceTypeCodes"]
+        }
+
+        // TODO: Investigate the proper way to handle validation as a REST resource
+        "/api/invoiceItems/$id/validation"(parseRequest: true) {
+            controller = "invoiceApi"
+            action = [POST: "validateInvoiceItem"]
         }
 
         // Stock Transfer API
