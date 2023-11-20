@@ -34,7 +34,7 @@ class IndicatorDataService {
     def messageService
 
     @Cacheable(value = "dashboardCache", key = { "getExpirationSummaryData-${location?.id}${params?.querySize}" })
-    JSONObject getExpirationSummaryData(Location location, def params) {
+    Map getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
         // Here it represents the last month we want to show
         // Add + 1 to include today (expired items) as the first point
@@ -113,7 +113,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getFillRate-${location?.id}${destination?.id}${params?.querySize}${params?.listFiltersSelected}${params?.value}" })
-    JSONObject getFillRate(Location location, Location destination, def params) {
+    Map getFillRate(Location location, Location destination, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() : 6
         List listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
@@ -234,7 +234,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getFillRateSnapshot-${origin?.id}${params?.listFiltersSelected}${params?.value}" })
-    JSONObject getFillRateSnapshot(Location origin, def params) {
+    Map getFillRateSnapshot(Location origin, def params) {
         String listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
         List averageFillRateResult = []
@@ -328,7 +328,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getInventorySummaryData-${location?.id}" })
-    JSONObject getInventorySummaryData(Location location) {
+    Map getInventorySummaryData(Location location) {
         def inventorySummary = dashboardService.getDashboardAlerts(location);
 
         def inventoryData = [
@@ -368,7 +368,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getSentStockMovements-${location?.id}${params?.querySize}" })
-    JSONObject getSentStockMovements(Location location, def params) {
+    Map getSentStockMovements(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
@@ -432,7 +432,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getRequisitionsByYear-${location?.id}${params?.yearType}" })
-    JSONObject getRequisitionsByYear(Location location, def params) {
+    Map getRequisitionsByYear(Location location, def params) {
         def yearTypes = grailsApplication.config.openboxes.dashboard.yearTypes ?: [:]
         def defaultType = yearTypes.fiscalYear ?: yearTypes.calendarYear
         def yearType = params.yearType ? yearTypes[params.yearType] : defaultType
@@ -503,7 +503,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getReceivedStockData-${location?.id}${params?.querySize}" })
-    JSONObject getReceivedStockData(Location location, def params) {
+    Map getReceivedStockData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
@@ -561,7 +561,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getOutgoingStock-${location?.id}" })
-    JSONObject getOutgoingStock(Location location) {
+    Map getOutgoingStock(Location location) {
         Date today = new Date()
         today.clearTime()
         Date fourDaysAgo = today - 4
@@ -684,7 +684,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getIncomingStock-${location?.id}" })
-    JSONObject getIncomingStock(Location location) {
+    Map getIncomingStock(Location location) {
 
         def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
                 ['location': location]);
@@ -843,7 +843,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getProductsInventoried-${location?.id}" })
-    JSONObject getProductsInventoried(Location location) {
+    Map getProductsInventoried(Location location) {
         List monthsCount = [3, 6, 9, 12, 0]
         List listPercentageNumbers = []
         Map listErrorSuccessIntervals = [
@@ -920,7 +920,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getLossCausedByExpiry-${location?.id}${params?.querySize}" })
-    JSONObject getLossCausedByExpiry(Location location, def params) {
+    Map getLossCausedByExpiry(Location location, def params) {
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         LocalDate queryLimit = LocalDate.now().minusMonths(querySize).withDayOfMonth(1)
@@ -1013,7 +1013,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getPercentageAdHoc-${location?.id}" })
-    JSONObject getPercentageAdHoc(Location location) {
+    Map getPercentageAdHoc(Location location) {
         Calendar calendar = Calendar.instance
         // we need to get all requisitions that were created from the first day of the previous month
         // current month is an edge case that we need to handle
@@ -1077,7 +1077,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getStockOutLastMonth-${location?.id}" })
-    JSONObject getStockOutLastMonth(Location location) {
+    Map getStockOutLastMonth(Location location) {
 
         List<String> listLabels = []
         List<Integer> listData = []
