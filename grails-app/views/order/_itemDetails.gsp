@@ -63,7 +63,7 @@
                                 ${orderItem?.productSupplier?.supplierCode}
                             </td>
                             <td class="center">
-                                ${orderItem?.productSupplier?.manufacturer}
+                                ${orderItem?.productSupplier?.manufacturer?.name}
                             </td>
                             <td class="center">
                                 ${orderItem?.productSupplier?.manufacturerCode}
