@@ -29,19 +29,7 @@ class ProductSupplierImportDataService implements ImportDataService {
     void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
-
-            def active = params.active
-            def productCode = params.productCode
-            def supplierName = params.supplierName
-            def manufacturerName = params.manufacturerName
-            def preferenceType = params.globalPreferenceTypeName
-            def uomCode = params.defaultProductPackageUomCode
-            def packageQuantity = params.defaultProductPackageQuantity
-            def validityStartDate = params.globalPreferenceTypeValidityStartDate
-            def validityEndDate = params.globalPreferenceTypeValidityEndDate
-            def contractPriceValidUntil = params.contractPriceValidUntil
-
-            if (active && !(active instanceof Boolean)) {
+            if (params.active && !(params.active instanceof Boolean)) {
                 command.errors.reject("Row ${index + 1}: Active field has to be either empty or a boolean value (true/false)")
             }
 
@@ -49,18 +37,18 @@ class ProductSupplierImportDataService implements ImportDataService {
                 command.errors.reject("Row ${index + 1}: Product Source Name is required")
             }
 
-            if (!productCode) {
+            if (!params.productCode) {
                 command.errors.reject("Row ${index + 1}: Product Code is required")
-            } else if (productCode && !Product.findByProductCode(productCode)) {
-                command.errors.reject("Row ${index + 1}: Product with productCode ${productCode} does not exist")
+            } else if (params.productCode && !Product.findByProductCode(params.productCode)) {
+                command.errors.reject("Row ${index + 1}: Product with productCode ${params.productCode} does not exist")
             }
 
-            if (supplierName && !Organization.findByName(supplierName)) {
-                command.errors.reject("Row ${index + 1}: Supplier with name '${supplierName}' does not exist")
+            if (params.supplierName && !Organization.findByName(params.supplierName)) {
+                command.errors.reject("Row ${index + 1}: Supplier with name '${params.supplierName}' does not exist")
             }
 
-            if (manufacturerName && !Organization.findByName(manufacturerName)) {
-                command.errors.reject("Row ${index + 1}: Manufacturer with name '${manufacturerName}' does not exist")
+            if (params.manufacturerName && !Organization.findByName(params.manufacturerName)) {
+                command.errors.reject("Row ${index + 1}: Manufacturer with name '${params.manufacturerName}' does not exist")
             }
 
             try {
@@ -74,59 +62,59 @@ class ProductSupplierImportDataService implements ImportDataService {
             }
 
 
-            if (preferenceType && !PreferenceType.findByName(preferenceType)) {
-                command.errors.reject("Row ${index + 1}: Preference Type with name '${preferenceType}' does not exist")
+            if (params.globalPreferenceTypeName && !PreferenceType.findByName(params.globalPreferenceTypeName)) {
+                command.errors.reject("Row ${index + 1}: Preference Type with name '${params.globalPreferenceTypeName}' does not exist")
             }
 
-            log.info("uomCode " + uomCode)
-            if (uomCode) {
-                def unitOfMeasure = UnitOfMeasure.findByCode(uomCode)
+            log.info("uomCode " + params.defaultProductPackageUomCode)
+            if (params.defaultProductPackageUomCode) {
+                def unitOfMeasure = UnitOfMeasure.findByCode(params.defaultProductPackageUomCode)
                 if (!unitOfMeasure) {
-                    command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} does not exist")
+                    command.errors.reject("Row ${index + 1}: Unit of measure ${params.defaultProductPackageUomCode} does not exist")
                 }
-                if (unitOfMeasure && !packageQuantity) {
-                    command.errors.reject("Row ${index + 1}: Unit of measure ${uomCode} requires a quantity")
+                if (unitOfMeasure && !params.defaultProductPackageQuantity) {
+                    command.errors.reject("Row ${index + 1}: Unit of measure ${params.defaultProductPackageUomCode} requires a quantity")
                 }
-                if (unitOfMeasure && packageQuantity && packageQuantity % 1 != 0) {
+                if (unitOfMeasure && params.defaultProductPackageQuantity && params.defaultProductPackageQuantity % 1 != 0) {
                     command.errors.reject("Row ${index + 1}: Unit of measure quntity must be a whole number")
                 }
             }
 
             Date minDate = ConfigHelper.getMinimumExpirationDate()
             def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-            if (validityStartDate) {
+            if (params.globalPreferenceTypeValidityStartDate) {
                 try {
-                    def startDate = dateFormat.parse(validityStartDate)
+                    def startDate = dateFormat.parse(params.globalPreferenceTypeValidityStartDate)
 
                     if (minDate > startDate) {
-                        command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                        command.errors.reject("Row ${index + 1}: Validity start date ${params.globalPreferenceTypeValidityStartDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
                     }
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity start date ${validityStartDate} is invalid. "+ e.message)
+                    command.errors.reject("Row ${index + 1}: Validity start date ${params.globalPreferenceTypeValidityStartDate} is invalid. "+ e.message)
                 }
             }
 
-            if (validityEndDate) {
+            if (params.globalPreferenceTypeValidityEndDate) {
                 try {
-                    def endDate = dateFormat.parse(validityEndDate)
+                    def endDate = dateFormat.parse(params.globalPreferenceTypeValidityEndDate)
 
                     if (minDate > endDate) {
-                        command.errors.reject("Row ${index + 1}: Validity start date ${validityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                        command.errors.reject("Row ${index + 1}: Validity start date ${params.globalPreferenceTypeValidityEndDate} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
                     }
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Validity end date ${validityEndDate} is invalid. " + e.message)
+                    command.errors.reject("Row ${index + 1}: Validity end date ${params.globalPreferenceTypeValidityEndDate} is invalid. " + e.message)
                 }
             }
 
-            if (contractPriceValidUntil) {
+            if (params.contractPriceValidUntil) {
                 try {
-                    def validUntilDate = dateFormat.parse(contractPriceValidUntil)
+                    def validUntilDate = dateFormat.parse(params.contractPriceValidUntil)
 
                     if (minDate > validUntilDate) {
-                        command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
+                        command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${params.contractPriceValidUntil} is invalid. Please enter a date after ${minDate.getYear()+1900}.")
                     }
                 } catch (Exception e) {
-                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${contractPriceValidUntil} is invalid. " + e.message)
+                    command.errors.reject("Row ${index + 1}: Contract Price Valid Until date ${params.contractPriceValidUntil} is invalid. " + e.message)
                 }
             }
         }
