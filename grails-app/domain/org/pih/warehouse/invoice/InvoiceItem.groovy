@@ -82,16 +82,18 @@ class InvoiceItem implements Serializable {
         product(nullable: true)
         glAccount(nullable: true)
         budgetCode(nullable: true)
-        quantity(nullable: false, min: 0, validator: { quantity, obj ->
-            InvoiceItem.withNewSession {
-                InvoiceItem notUpdatedInvoiceItem = InvoiceItem.get(obj?.id)
-                if (notUpdatedInvoiceItem) {
-                    Boolean isValid = quantity + (obj?.shipmentItem?.quantityInvoiced - notUpdatedInvoiceItem?.quantity) <= obj?.shipmentItem?.quantity
+        quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
+                Integer notUpdatedQuantity = obj.getPersistentValue('quantity')
+                ShipmentItem shipmentItem = obj?.shipmentItem
+                if (notUpdatedQuantity != null) {
+                    // An invoice item has a valid quantity when the new quantity,
+                    // summed with the already invoiced quantity from all of the invoiced items,
+                    // subtracting the old quantity of the current invoice item is lower than the shipment item quantity
+                    Boolean isValid = quantity + (shipmentItem?.quantityInvoiced - notUpdatedQuantity) <= shipmentItem?.quantity
                     return isValid ? true : ['invoiceItem.invalidQuantity.label']
                 }
 
                 return true
-            }
         }) // min = 0 for canceled items
         quantityUom(nullable: true)
         quantityPerUom(nullable: false)

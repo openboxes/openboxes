@@ -491,7 +491,7 @@ class UrlMappings {
         }
 
         // TODO: Investigate the proper way to handle validation as a REST resource
-        "/api/invoiceItems/$id/validation"(parseRequest: true) {
+        "/api/invoiceItems/$id/validation" {
             controller = "invoiceApi"
             action = [POST: "validateInvoiceItem"]
         }

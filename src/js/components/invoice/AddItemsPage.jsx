@@ -380,32 +380,31 @@ class AddItemsPage extends Component {
   }) {
     this.debouncedInvoiceItemValidation.cancel();
 
-    await invoiceItemApi.validateInvoiceItem(invoiceItem)
-      .then(() => {
-        const updatedValues = update(this.state.values, {
-          invoiceItems: {
-            [rowIndex]: {
-              isValid: { $set: true },
-              quantity: { $set: invoiceItem.quantity },
-            },
+    try {
+      await invoiceItemApi.validateInvoiceItem(invoiceItem);
+      const updatedValues = update(this.state.values, {
+        invoiceItems: {
+          [rowIndex]: {
+            isValid: { $set: true },
+            quantity: { $set: invoiceItem.quantity },
           },
-        });
-
-        this.setState({ values: updatedValues });
-      })
-      .catch(err => {
-        const updatedValues = update(this.state.values, {
-          invoiceItems: {
-            [rowIndex]: {
-              isValid: { $set: false },
-              errorMessage: { $set: err?.response?.data?.errorMessages?.[0] || '' },
-              quantity: { $set: invoiceItem.quantity },
-            },
-          },
-        });
-
-        this.setState({ values: updatedValues });
+        },
       });
+
+      this.setState({ values: updatedValues });
+    } catch (err) {
+      const updatedValues = update(this.state.values, {
+        invoiceItems: {
+          [rowIndex]: {
+            isValid: { $set: false },
+            errorMessage: { $set: err?.response?.data?.errorMessages?.[0] || '' },
+            quantity: { $set: invoiceItem.quantity },
+          },
+        },
+      });
+
+      this.setState({ values: updatedValues });
+    }
   }
 
   saveAndExit(formValues) {

@@ -256,7 +256,7 @@ class ShipmentItem implements Comparable, Serializable {
         return inventoryItem?.lotStatus == LotStatusCode.RECALLED
     }
 
-    Integer getQuantityInvoiced() {
+    int getQuantityInvoiced() {
         return invoiceItems.sum { it.quantity ?: 0 }
     }
 
