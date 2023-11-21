@@ -578,7 +578,8 @@ class DocumentController {
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String body = templateService.renderTemplate(document, model)
 
-        response.contentType = 'image/png'
+        response.contentType = 'image/png'    
+        // TODO Move labelary URL to application.yml 
         response.outputStream << Request.Post('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
             .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
             .execute()
@@ -593,6 +594,7 @@ class DocumentController {
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
         String renderedContent = templateService.renderTemplate(document, model)
+        // TODO Move labelary URL to application.yml 
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
     }
