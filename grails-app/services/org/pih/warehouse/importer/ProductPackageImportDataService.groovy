@@ -11,7 +11,6 @@ package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.data.ProductPackageService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
@@ -19,7 +18,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
 class ProductPackageImportDataService implements ImportDataService {
-    ProductPackageService productPackageService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -61,7 +59,7 @@ class ProductPackageImportDataService implements ImportDataService {
             }
 
 
-            ProductPackage productPackage = productPackageService.createOrUpdate(params)
+            ProductPackage productPackage = bindProductPackage(params)
             productPackage.product = product
             productPackage.productSupplier = productSupplier
 
@@ -70,6 +68,7 @@ class ProductPackageImportDataService implements ImportDataService {
                     command.errors.reject("Row ${index + 1}: ${error.getFieldError()}")
                 }
             }
+            productPackage.discard()
         }
     }
 
@@ -77,12 +76,36 @@ class ProductPackageImportDataService implements ImportDataService {
     void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
         command.data.eachWithIndex { params, index ->
-            ProductPackage productPackage = productPackageService.createOrUpdate(params)
+            ProductPackage productPackage = bindProductPackage(params)
             if (productPackage.validate()) {
                 log.info "Product package ${productPackage.properties}"
                 boolean saved = productPackage.save(failOnError: true)
                 log.info "Product package ${productPackage.id} saved ${saved}"
             }
         }
+    }
+
+    ProductPackage bindProductPackage(Map params) {
+        log.info("params: ${params}")
+
+        ProductPackage productPackage = ProductPackage.get(params.id)
+        if (!productPackage) {
+            productPackage = new ProductPackage();
+            productPackage.properties = params
+        }
+        Product product = Product.findByProductCode(params.productCode)
+        ProductSupplier productSupplier = ProductSupplier.findByCode(params.productSupplierCode)
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.uomCode)
+
+        if (!productPackage.name) {
+            productPackage.name = "${unitOfMeasure.code}/${params.quantity}"
+        }
+        if (!productPackage.description) {
+            productPackage.description = "${unitOfMeasure.name} of ${params.quantity}"
+        }
+        productPackage.product = product
+        productPackage.productSupplier = productSupplier
+        productPackage.uom = unitOfMeasure
+        return productPackage
     }
 }

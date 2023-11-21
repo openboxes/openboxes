@@ -48,7 +48,7 @@ class UserLocationImportDataService implements ImportDataService {
 
     @Override
     void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
+        command.data.each { params ->
             User user = User.findByUsername(params.username)
             Location location = Location.findByNameOrLocationNumber(params.locationName, params.locationName)
             RoleType roleType = RoleType.valueOf(params.roleName)

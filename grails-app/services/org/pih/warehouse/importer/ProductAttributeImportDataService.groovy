@@ -10,6 +10,9 @@
 package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
+import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.product.Attribute
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
 import org.pih.warehouse.product.ProductService
 import org.springframework.validation.BeanPropertyBindingResult
@@ -22,7 +25,7 @@ class ProductAttributeImportDataService implements ImportDataService {
     @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            ProductAttribute productAttribute = productService.createOrUpdateProductAttribute(params)
+            ProductAttribute productAttribute = bindProductAttribute(params)
             if (!productAttribute.validate()) {
                 productAttribute.errors.each { BeanPropertyBindingResult error ->
                     command.errors.reject("Row ${index + 1}: Product attribute ${productAttribute} is invalid: ${error.getFieldError()}")
@@ -34,12 +37,25 @@ class ProductAttributeImportDataService implements ImportDataService {
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            ProductAttribute productAttribute = productService.createOrUpdateProductAttribute(params)
+            ProductAttribute productAttribute = bindProductAttribute(params)
             if (productAttribute.validate()) {
                 productAttribute.product.save(failOnError: true)
             }
         }
     }
 
-
+    ProductAttribute bindProductAttribute(Map params) {
+        Product product = Product.findByProductCode(params.productCode)
+        Attribute attribute = Attribute.findByCode(params.attributeCode)
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.unitOfMeasureCode)
+        ProductAttribute productAttribute = ProductAttribute.findByProductAndAttribute(product, attribute)
+        if (!productAttribute) {
+            productAttribute = new ProductAttribute()
+            productAttribute.attribute = attribute
+            product.addToAttributes(productAttribute)
+        }
+        productAttribute.value = params.attributeValue
+        productAttribute.unitOfMeasure = unitOfMeasure ?: attribute?.unitOfMeasureClass?.baseUom
+        return productAttribute
+    }
 }

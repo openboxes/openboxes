@@ -29,7 +29,7 @@ class UserImportDataService implements ImportDataService {
                 throw new IllegalArgumentException("Row ${index + 1}: username is required")
             }
 
-            User user = userService.createOrUpdateUser(params)
+            User user = bindUser(params)
 
             log.info "User: ${user}"
             if (!user.validate()) {
@@ -37,6 +37,7 @@ class UserImportDataService implements ImportDataService {
                     command.errors.reject("${index + 1}: username = ${user.username} ${error.getFieldError()}")
                 }
             }
+            user.discard()
 
             // Implicitly validates the default roles
             Role[] defaultRoles = userService.extractDefaultRoles(params.defaultRoles)
@@ -48,7 +49,7 @@ class UserImportDataService implements ImportDataService {
         log.info "Import data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-            User user = userService.createOrUpdateUser(params)
+            User user = bindUser(params)
             Role[] defaultRoles = userService.extractDefaultRoles(params.defaultRoles)
             log.info "user ${user.username} default role ${defaultRoles}"
 
@@ -66,5 +67,17 @@ class UserImportDataService implements ImportDataService {
             }
             user.save(failOnError: true)
         }
+    }
+
+    User bindUser(Map params) {
+        User user = User.findByUsername(params.username)
+        if (!user) {
+            user = new User(params)
+            user.active = true
+            user.password = "password"
+        } else {
+            user.properties = params
+        }
+        return user
     }
 }

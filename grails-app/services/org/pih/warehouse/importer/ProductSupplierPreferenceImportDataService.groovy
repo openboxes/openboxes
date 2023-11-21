@@ -12,14 +12,11 @@ package org.pih.warehouse.importer
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
-import org.pih.warehouse.data.ProductSupplierPreferenceService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierPreference
 
 @Transactional
 class ProductSupplierPreferenceImportDataService implements ImportDataService {
-    ProductSupplierPreferenceService productSupplierPreferenceService
-
     String DEFAULT = "DEFAULT"
 
     @Override
@@ -56,10 +53,38 @@ class ProductSupplierPreferenceImportDataService implements ImportDataService {
         log.info "Process data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-            ProductSupplierPreference productSupplierPreference = productSupplierPreferenceService.createOrUpdate(params)
+            ProductSupplierPreference productSupplierPreference = bindProductSupplierPreference(params)
             if (productSupplierPreference.validate()) {
                 productSupplierPreference.save(failOnError: true)
             }
         }
+    }
+
+    ProductSupplierPreference bindProductSupplierPreference(Map params) {
+        ProductSupplier productSupplier = ProductSupplier.findByCode(params.supplierCode)
+        Organization organization = null
+        if (params.organizationCode != DEFAULT) {
+            organization = Organization.findByCode(params.organizationCode)
+        }
+        PreferenceType preferenceType = PreferenceType.findByName(params.preferenceTypeName)
+
+        ProductSupplierPreference productSupplierPreference = ProductSupplierPreference
+                .findByProductSupplierAndDestinationParty(productSupplier, organization)
+
+        if (productSupplierPreference) {
+            productSupplierPreference.preferenceType = preferenceType
+            productSupplierPreference.validityStartDate = params.validityStartDate
+            productSupplierPreference.validityEndDate = params.validityEndDate
+            productSupplierPreference.comments = params.preferenceComments
+        } else {
+            productSupplierPreference = new ProductSupplierPreference()
+            productSupplierPreference.productSupplier = productSupplier
+            productSupplierPreference.destinationParty = organization
+            productSupplierPreference.preferenceType = preferenceType
+            productSupplierPreference.validityStartDate = params.validityStartDate
+            productSupplierPreference.validityEndDate = params.validityEndDate
+            productSupplierPreference.comments = params.preferenceComments
+        }
+        return productSupplierPreference
     }
 }

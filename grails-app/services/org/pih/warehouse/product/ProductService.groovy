@@ -870,21 +870,6 @@ class ProductService {
         return ReportUtil.getCsvForListOfMapEntries(rows)
     }
 
-    ProductAttribute createOrUpdateProductAttribute(Map params) {
-        Product product = Product.findByProductCode(params.productCode)
-        Attribute attribute = Attribute.findByCode(params.attributeCode)
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.findByCode(params.unitOfMeasureCode)
-        ProductAttribute productAttribute = ProductAttribute.findByProductAndAttribute(product, attribute)
-        if (!productAttribute) {
-            productAttribute = new ProductAttribute()
-            productAttribute.attribute = attribute
-            product.addToAttributes(productAttribute)
-        }
-        productAttribute.value = params.attributeValue
-        productAttribute.unitOfMeasure = unitOfMeasure?:attribute?.unitOfMeasureClass?.baseUom
-        return productAttribute
-    }
-
     /**
      * Find or create a category with the given name.
      *

@@ -521,18 +521,6 @@ class UserService {
         user.save(failOnError: true)
     }
 
-    User createOrUpdateUser(Map params) {
-        User user = User.findByUsername(params.username)
-        if (!user) {
-            user = new User(params)
-            user.active = true
-            user.password = "password"
-        } else {
-            user.properties = params
-        }
-        return user
-    }
-
     Role[] extractDefaultRoles(String defaultRolesString) {
         String[] defaultRoles = defaultRolesString?.split(",")
         Role[] roles = defaultRoles.collect { String roleTypeName ->

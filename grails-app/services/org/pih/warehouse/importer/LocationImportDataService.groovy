@@ -12,15 +12,20 @@ package org.pih.warehouse.importer
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.core.Address
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
-import org.pih.warehouse.core.LocationService
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
+import org.pih.warehouse.core.OrganizationService
+import org.pih.warehouse.inventory.Inventory
 
 @Transactional
 class LocationImportDataService implements ImportDataService {
-    LocationService locationService
+    OrganizationService organizationService
+    IdentifierService identifierService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -111,10 +116,81 @@ class LocationImportDataService implements ImportDataService {
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            Location location = locationService.createOrUpdateLocation(params)
+            Location location = bindLocation(params)
             if (!location.validate() || !location.save(failOnError: true)) {
                 throw new ValidationException("Invalid location ${location.name}", location.errors)
             }
         }
+    }
+
+    Location bindLocation(Map params) {
+        Location location
+        if (params.id) {
+            location = Location.findById(params.id)
+        } else if (params.locationNumber) {
+            location = Location.findByNameOrLocationNumber(params.name, params.locationNumber)
+        } else {
+            location = Location.findByName(params.name)
+        }
+        if (!location) {
+            location = new Location()
+        }
+
+        location.name = params.name
+        location.active = Boolean.valueOf(params.active)
+        location.locationNumber = params.locationNumber
+        location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
+        location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
+        location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
+        location.address = bindAddress(params, location?.address?.id)
+
+        if (!location.inventory && !location.parentLocation) {
+            location.inventory = new Inventory(['warehouse': location])
+        }
+        def locationType = null
+        if (params.locationType) {
+            String locationTypeName = LocalizationUtil.getDefaultString(params.locationType as String)
+            // TODO: Replace with a single GORM .find with Closure when in Grails 3 (available since Grails 2.0)
+            LocationType matchedLocationType = LocationType
+                    .findAllByNameLike(locationTypeName + "%")
+                    .find{ LocalizationUtil.getDefaultString(it.name) == locationTypeName}
+            locationType = matchedLocationType
+        }
+
+        def currentLocationType = location.locationType
+
+        boolean isCurrentLocationTypeInternalOrZone = currentLocationType?.isInternalLocation() || currentLocationType?.isZone()
+        boolean isNewLocationTypeInternalOrZone = locationType?.isInternalLocation() || locationType?.isZone()
+        //Do not allow to change internal type location to non-internal
+        if ((isCurrentLocationTypeInternalOrZone && isNewLocationTypeInternalOrZone) || !isCurrentLocationTypeInternalOrZone) {
+            location.locationType = locationType
+            location.supportedActivities = currentLocationType && locationType == currentLocationType ? location.supportedActivities : location.supportedActivities?.clear()
+        }
+
+        // Add required association to organization for depots and suppliers
+        if (!(location.locationType?.isInternalLocation() || location.locationType?.isZone()) && !location.organization) {
+            def locationCode = identifierService.generateOrganizationIdentifier(params.organization)
+            Organization organization = (location.locationType?.locationTypeCode == LocationTypeCode.SUPPLIER) ?
+                    organizationService.findOrCreateSupplierOrganization(params?.organization, locationCode) :
+                    organizationService.findOrCreateOrganization(params?.organization, locationCode)
+
+            location.organization = organization
+        }
+
+        return location
+    }
+
+    Address bindAddress(Map params, String addressId = null) {
+        Address address
+        if (addressId) {
+            address = Address.findById(addressId)
+        }
+
+        if (!address) {
+            address = new Address()
+        }
+        address.properties = params
+
+        return address
     }
 }

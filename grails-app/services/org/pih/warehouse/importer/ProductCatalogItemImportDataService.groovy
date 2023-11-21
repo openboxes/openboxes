@@ -10,36 +10,57 @@
 package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.data.CategoryService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductCatalogItem
-import org.pih.warehouse.product.ProductCatalogService
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
 class ProductCatalogItemImportDataService implements ImportDataService {
-    ProductCatalogService productCatalogService
 
     @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            ProductCatalogItem productCatalogItem = productCatalogService.createOrUpdateProductCatalogItem(params)
+            ProductCatalogItem productCatalogItem = bindProductCatalogItem(params)
             if (!productCatalogItem.validate()) {
                 productCatalogItem.errors.each { BeanPropertyBindingResult error ->
                     command.errors.reject("Row ${index + 1}: Product catalog item is invalid: ${error.getFieldError()}")
                 }
             }
+            productCatalogItem.discard()
         }
     }
 
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            ProductCatalogItem productCatalog = productCatalogService.createOrUpdateProductCatalogItem(params)
+            ProductCatalogItem productCatalog = bindProductCatalogItem(params)
             if (productCatalog.validate()) {
                 productCatalog.save(failOnError: true)
             }
         }
+    }
+
+    ProductCatalogItem bindProductCatalogItem(Map params) {
+        Product product = Product.findByProductCode(params.productCode)
+
+        if (!product) {
+            throw new IllegalArgumentException("Could not locate product with code: " + params.productCode);
+        }
+
+        ProductCatalog productCatalog = ProductCatalog.findByCode(params.productCatalogCode);
+
+        if(!productCatalog) {
+            throw new IllegalArgumentException("Could not locate product catalog with code: " + params.productCatalogCode);
+        }
+
+        ProductCatalogItem productCatalogItem = ProductCatalogItem.findByProductAndProductCatalog(product, productCatalog)
+        if (!productCatalogItem) {
+            productCatalogItem = new ProductCatalogItem()
+            productCatalogItem.product = product
+            productCatalogItem.productCatalog = productCatalog
+        }
+
+        return productCatalogItem
     }
 }

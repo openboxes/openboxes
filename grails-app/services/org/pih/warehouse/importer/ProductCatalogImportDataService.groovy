@@ -10,20 +10,16 @@
 package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.data.CategoryService
-import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
-import org.pih.warehouse.product.ProductCatalogService
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
 class ProductCatalogImportDataService implements ImportDataService {
-    ProductCatalogService productCatalogService
 
     @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            ProductCatalog productCatalog = productCatalogService.createOrUpdateProductCatalog(params)
+            ProductCatalog productCatalog = bindProductCatalog(params)
             if (!productCatalog.validate()) {
                 productCatalog.errors.each { BeanPropertyBindingResult error ->
                     command.errors.reject("Row ${index + 1}: Product catalog ${productCatalog.name} is invalid: ${error.getFieldError()}")
@@ -36,10 +32,19 @@ class ProductCatalogImportDataService implements ImportDataService {
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            ProductCatalog productCatalog = productCatalogService.createOrUpdateProductCatalog(params)
+            ProductCatalog productCatalog = bindProductCatalog(params)
             if (productCatalog.validate()) {
                 productCatalog.save(failOnError: true)
             }
         }
+    }
+
+    ProductCatalog bindProductCatalog(Map params) {
+        ProductCatalog productCatalog = ProductCatalog.findByIdOrName(params.id, params.name)
+        if (!productCatalog) {
+            productCatalog = new ProductCatalog()
+        }
+        productCatalog.properties = params
+        return productCatalog
     }
 }

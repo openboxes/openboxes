@@ -12,7 +12,6 @@ package org.pih.warehouse.importer
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.data.ProductSupplierAttributeService
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
@@ -20,7 +19,6 @@ import org.pih.warehouse.product.ProductSupplier
 
 @Transactional
 class ProductSupplierAttributeImportDataService implements ImportDataService {
-    ProductSupplierAttributeService productSupplierAttributeService
 
     @Override
     void validateData(ImportDataCommand command) {
@@ -103,10 +101,31 @@ class ProductSupplierAttributeImportDataService implements ImportDataService {
         log.info "Process data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-            ProductAttribute productAttribute = productSupplierAttributeService.createOrUpdate(params)
+            ProductAttribute productAttribute = bindProductSupplierAttribute(params)
             if (productAttribute.validate()) {
                 productAttribute.save(failOnError: true, flush: true)
             }
         }
+    }
+
+    ProductAttribute bindProductSupplierAttribute(Map params) {
+        ProductSupplier productSupplier = ProductSupplier.findByCode(params.productSupplierCode)
+        Attribute attribute = Attribute.findByCode(params.attributeCode)
+        ProductAttribute productAttribute = ProductAttribute.findByAttributeAndProductSupplier(attribute, productSupplier)
+        Product product = Product.findByProductCode(params.productCode)
+        UnitOfMeasure uom = params.unitOfMeasure ? UnitOfMeasure.findByCode(params.unitOfMeasure) : null
+
+        if (productAttribute) {
+            productAttribute.value = params.attributeValue
+            productAttribute.unitOfMeasure = uom
+        } else {
+            productAttribute = new ProductAttribute()
+            productAttribute.attribute = attribute
+            productAttribute.productSupplier = productSupplier
+            productAttribute.value = params.attributeValue
+            productAttribute.unitOfMeasure = uom
+            product.addToAttributes(productAttribute)
+        }
+        return productAttribute
     }
 }

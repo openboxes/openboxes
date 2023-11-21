@@ -16,16 +16,6 @@ import org.pih.warehouse.core.Person
 @Transactional
 class PersonService {
 
-    Person createOrUpdatePerson(Map params) {
-        Person person = Person.findByFirstNameAndLastName(params.firstName, params.lastName)
-        if (!person) {
-            person = new Person(params)
-        } else {
-            person.properties = params
-        }
-        return person
-    }
-
     Person getPersonByNames(String[] names) {
         return Person.findByFirstNameAndLastName(names[0], names[1])
     }

@@ -11,17 +11,14 @@ package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Tag
-import org.pih.warehouse.data.TagService
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
 class TagImportDataService implements ImportDataService {
-    TagService tagService
-
     @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            Tag tag = tagService.createOrUpdateTag(params)
+            Tag tag = bindTag(params)
             if (!tag.validate()) {
                 tag.errors.each { BeanPropertyBindingResult error ->
                     command.errors.reject("Row ${index + 1}: Tag ${tag.tag} is invalid: ${error.getFieldError()}")
@@ -34,10 +31,20 @@ class TagImportDataService implements ImportDataService {
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            Tag tag = tagService.createOrUpdateTag(params)
+            Tag tag = bindTag(params)
             if (tag.validate()) {
                 tag.save(failOnError: true)
             }
         }
+    }
+
+    Tag bindTag(Map params) {
+        Tag tag = Tag.findByIdOrTag(params.id, params.tag)
+        if (!tag) {
+            tag = new Tag()
+        }
+        tag.id = params.id
+        tag.tag = params.tag
+        return tag
     }
 }

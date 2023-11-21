@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.ProductCatalogItemImportDataService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.Transaction
@@ -34,9 +35,9 @@ class LoadDataService {
     def locationImportDataService
     def productSupplierImportDataService
     def productService
-    def productCatalogService
     def inventoryService
     def identifierService
+    ProductCatalogItemImportDataService productCatalogItemImportDataService
 
     def importLocations(URL csvURL) {
         CSVMapReader csvReader = new CSVMapReader(csvURL.newInputStream().newReader());
@@ -143,7 +144,7 @@ class LoadDataService {
         csvReader.initFieldKeys()
 
         csvReader.eachLine { Map attr ->
-            productCatalogService.createOrUpdateProductCatalogItem(attr).save(failOnError: true)
+            productCatalogItemImportDataService.bindProductCatalogItem(attr).save(failOnError: true)
         }
 
         csvReader.close();

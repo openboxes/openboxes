@@ -10,19 +10,17 @@
 package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.data.CategoryService
 import org.pih.warehouse.product.Category
 import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
 class CategoryImportDataService implements ImportDataService {
-    CategoryService categoryService
 
     @Override
     void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 
-            Category category = categoryService.createOrUpdateCategory(params)
+            Category category = bindCategory(params)
 
             if (params.parentCategoryId) {
                 Category parentCategory = Category.get(params.parentCategoryId)
@@ -45,10 +43,22 @@ class CategoryImportDataService implements ImportDataService {
     @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            Category category = categoryService.createOrUpdateCategory(params)
+            Category category = bindCategory(params)
             if (category.validate()) {
                 category.save(failOnError: true)
             }
         }
+    }
+
+    Category bindCategory(Map params) {
+        Category category = Category.findByIdOrName(params.id, params.name)
+        if (!category) {
+            category = new Category()
+        }
+        category.name = params.name
+        if (params.parentCategoryId && category?.parentCategory?.id != params.parentCategoryId) {
+            category.parentCategory = Category.get(params.parentCategoryId)
+        }
+        return category
     }
 }
