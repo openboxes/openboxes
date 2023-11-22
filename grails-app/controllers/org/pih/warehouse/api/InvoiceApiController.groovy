@@ -185,7 +185,7 @@ class InvoiceApiController {
     }
 
     def validateInvoiceItem(InvoiceItem invoiceItem) {
-        if (!invoiceItem.validate(['quantity'])) {
+        if (!invoiceItem.validate()) {
             throw new ValidationException("Invalid invoice item", invoiceItem.errors)
         }
 

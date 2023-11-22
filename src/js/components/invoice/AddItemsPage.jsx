@@ -381,7 +381,7 @@ class AddItemsPage extends Component {
     this.debouncedInvoiceItemValidation.cancel();
 
     try {
-      await invoiceItemApi.validateInvoiceItem(invoiceItem);
+      await invoiceItemApi.validateInvoiceItem(_.pick(invoiceItem, ['quantity', 'id', 'shipmentId']));
       const updatedValues = update(this.state.values, {
         invoiceItems: {
           [rowIndex]: {
