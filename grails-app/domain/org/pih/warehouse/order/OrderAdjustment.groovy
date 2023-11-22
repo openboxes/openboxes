@@ -114,6 +114,8 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     @Override
     int compareTo(OrderAdjustment o) {
-        return dateCreated <=> o.dateCreated
+        return dateCreated <=> o.dateCreated ?:
+                lastUpdated <=> o.lastUpdated ?:
+                        id <=> o.id
     }
 }
