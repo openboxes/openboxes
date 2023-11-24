@@ -22,7 +22,6 @@ class AuthController {
     def authService
     GrailsApplication grailsApplication
     def recaptchaService
-    def ravenClient
     def userAgentIdentService
 
     static allowedMethods = [login: "GET", doLogin: "POST", logout: "GET"]
@@ -190,7 +189,6 @@ class AuthController {
 
                 // Send failures to Sentry for auditing purposes
                 def exception = new ValidationException("reCAPTCHA challenge failed", userInstance.errors)
-                ravenClient.captureException(exception, 'root', 'error', request)
             }
 
             // Create account

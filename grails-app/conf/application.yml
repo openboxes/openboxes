@@ -300,53 +300,6 @@ openboxes:
                 labelYearPrefix: ""
                 yearFormat: "yyyy"
 
-    # OpenBoxes identifier config
-    identifier:
-        numeric: "0123456789"
-        alphabetic: "ABCDEFGHJKMNPQRSTUVXYZ"
-        alphanumeric: "0123456789ABCDEFGHJKMNPQRSTUVWXYZ"
-        transaction:
-            format: "AAA-AAA-AAA"
-        order:
-            format: "NNNLLL"
-        organization:
-            format: "AAA"
-            minSize: 2
-            maxSize: 4
-        product:
-            format: "LLNN"
-        productSupplier:
-            format: "NNNN"
-            prefix:
-                enabled: true
-        receipt:
-            format: "NNNLLL"
-        requisition:
-            format: "NNNLLL"
-        shipment:
-            format: "NNNLLL"
-        sequenceNumber:
-            format: "00000"
-        invoice:
-            format: "NNNLLL"
-        location:
-            format: "NNNLLL"
-        purchaseOrder:
-            generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
-            sequenceNumber:
-                format: "000000"
-            format: 'PO-$\{destinationPartyCode}-$\{sequenceNumber}' # single quote for curly braces escape character
-            properties:
-                destinationPartyCode: "destinationParty.code"
-        productCode:
-            generatorType: "SEQUENCE" # IdentifierGeneratorTypeCode.SEQUENCE
-            delimiter: "-"
-            format: "${productTypeCode}${delimiter}${sequenceNumber}"
-            properties:
-                productTypeCode: "code"
-        defaultProductType:
-            id: "DEFAULT"
-
     order:
         orderStatusPropertyMap:
             PLACED: ["productCode", "sourceName", "supplierCode", "manufacturer", "manufacturerCode", "quantity", "unitPrice", "unitOfMeasure", "budgetCode"]
@@ -601,9 +554,8 @@ openboxes:
 
     # Disable feature during development
     shipping:
-        splitPickItems.enabled: true
         search:
-        maxResults: 1000
+            maxResults: 1000
 
     # Automatically create temporary receiving locations for shipments
     receiving:
@@ -641,41 +593,25 @@ mail:
 uiperformance:
     enabled: false
 
-# TODO OBGM 1: Add jqueryValidation plugin config if will be needed
-# TODO OBGM 2: Add log4j plugin config if will be needed
-# TODO OBGM 3: Add springcache plugin config if will be needed
-# TODO OBGM 4: Add raven plugin config if will be needed
-# TODO OBGM 5: Add Joda-Time plugin config if will be needed
-# TODO OBGM 6: Add resources plugin config if will be needed
+# TODO OBGM 1: Compare the loggers in log4j = { } to make sure they exist in logback.groovy
+# TODO OBGM 2: Add grails-cache plugin config if will be needed (See OBGM-71)
+# TODO OBGM 3: Investigate if Joda-Time plugin is still needed
+# TODO OBGM 4: Add resources plugin config if will be needed
 
-# TODO OBGM: Not sure about params below
-#grails:
-#    exceptionresolver:
-#        params:
-#            exclude: ['password', 'passwordConfirm']
-#    # scaffolding templates configuration
-#    scaffolding:
-#        templates:
-#            domainSuffix: 'Instance'
-#    # Set to false to use the new Grails 1.2 JSONBuilder in the render method
-#    json:
-#        legacy:
-#            builder: false
-#    # enabled native2ascii conversion of i18n properties files
-#    enable:
-#        native2ascii: true
-#    # whether to install the java.util.logging bridge for sl4j. Disable fo AppEngine!
-#    logging:
-#        jul:
-#            usebridge: true
-#    # packages to include in Spring bean scanning
-#    spring:
-#        bean:
-#            packages: []
-#    # request parameters to mask when logging exceptions
-#    exceptionresolver:
-#        params:
-#            exclude: ['password']
+grails:
+    # request parameters to mask when logging exceptions
+    exceptionresolver:
+        params:
+            exclude:
+                - 'password'
+                - 'passwordConfirm'
+    # enabled native2ascii conversion of i18n properties files
+    enable:
+        native2ascii: true
+    # whether to install the java.util.logging bridge for sl4j. Disable fo AppEngine!
+    logging:
+        jul:
+            usebridge: true
 #    validateable:
 #        packages: [
 #        'org.pih.warehouse.inventory',
