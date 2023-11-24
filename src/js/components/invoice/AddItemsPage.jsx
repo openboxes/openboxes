@@ -19,7 +19,7 @@ import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
 import Translate from 'utils/Translate';
-
+import invoiceItemApi from 'api/services/InvoiceItemApi';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -127,14 +127,35 @@ const FIELDS = {
         type: TextField,
         label: 'react.invoice.qty.label',
         defaultMessage: 'Qty',
-        flexWidth: '1',
+        flexWidth: '1.1',
         required: true,
         attributes: {
           type: 'number',
           showError: true,
         },
-        getDynamicAttr: ({ rowIndex, values, updateRow }) => ({
-          onBlur: () => updateRow(values, rowIndex),
+        getDynamicAttr: ({
+          rowIndex,
+          values,
+          updateRow,
+          validateInvoiceItem,
+          debouncedInvoiceItemValidation,
+        }) => ({
+          onBlur: () => {
+            updateRow(values, rowIndex);
+            validateInvoiceItem({
+              invoiceItem: values.invoiceItems[rowIndex],
+              rowIndex,
+            });
+          },
+          onChange: (event) => {
+            debouncedInvoiceItemValidation({
+              invoiceItem: {
+                ...values.invoiceItems[rowIndex],
+                quantity: event,
+              },
+              rowIndex,
+            });
+          },
         }),
       },
       uom: {
@@ -180,6 +201,9 @@ class AddItemsPage extends Component {
     this.removeItem = this.removeItem.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
+    this.validateInvoiceItem = this.validateInvoiceItem.bind(this);
+
+    this.debouncedInvoiceItemValidation = _.debounce(this.validateInvoiceItem, 1000);
   }
 
   /**
@@ -337,6 +361,52 @@ class AddItemsPage extends Component {
       });
   }
 
+  validate(values) {
+    const errors = {};
+    errors.invoiceItems = [];
+
+    _.forEach(values?.invoiceItems, (item, key) => {
+      if (_.has(item, 'isValid') && !item.isValid) {
+        errors.invoiceItems[key] = { quantity: item?.errorMessage };
+      }
+    });
+
+    return errors;
+  }
+
+  async validateInvoiceItem({
+    invoiceItem,
+    rowIndex,
+  }) {
+    this.debouncedInvoiceItemValidation.cancel();
+
+    try {
+      await invoiceItemApi.validateInvoiceItem(_.pick(invoiceItem, ['quantity', 'id', 'shipmentId']));
+      const updatedValues = update(this.state.values, {
+        invoiceItems: {
+          [rowIndex]: {
+            isValid: { $set: true },
+            quantity: { $set: invoiceItem.quantity },
+          },
+        },
+      });
+
+      this.setState({ values: updatedValues });
+    } catch (err) {
+      const updatedValues = update(this.state.values, {
+        invoiceItems: {
+          [rowIndex]: {
+            isValid: { $set: false },
+            errorMessage: { $set: err?.response?.data?.errorMessages?.[0] || '' },
+            quantity: { $set: invoiceItem.quantity },
+          },
+        },
+      });
+
+      this.setState({ values: updatedValues });
+    }
+  }
+
   saveAndExit(formValues) {
     this.saveInvoiceItems(formValues)
       .then(() => {
@@ -351,12 +421,14 @@ class AddItemsPage extends Component {
         onSubmit={() => {}}
         mutators={{ ...arrayMutators }}
         initialValues={this.state.values}
-        render={({ handleSubmit, values }) => (
+        validate={this.validate}
+        render={({ handleSubmit, values, invalid }) => (
           <div className="d-flex flex-column">
             <span className="buttons-container">
               <button
                 type="button"
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
+                disabled={invalid}
                 onClick={() => this.saveAndExit(values)}
               >
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
@@ -375,6 +447,8 @@ class AddItemsPage extends Component {
                     removeItem: this.removeItem,
                     updateRow: this.updateRow,
                     saveInvoiceItems: this.saveInvoiceItems,
+                    validateInvoiceItem: this.validateInvoiceItem,
+                    debouncedInvoiceItemValidation: this.debouncedInvoiceItemValidation,
                   }))}
               </div>
               <div className="font-weight-bold float-right mr-5er e mt-1">
@@ -390,6 +464,7 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
+                  disabled={invalid}
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 >

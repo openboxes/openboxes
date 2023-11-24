@@ -256,6 +256,10 @@ class ShipmentItem implements Comparable, Serializable {
         return inventoryItem?.lotStatus == LotStatusCode.RECALLED
     }
 
+    int getQuantityInvoiced() {
+        return invoiceItems.sum { it.quantity ?: 0 }
+    }
+
     /**
      * Sorts shipping items by associated product name, then lot number, then quantity,
      * and finally by id.

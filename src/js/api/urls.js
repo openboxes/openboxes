@@ -30,8 +30,13 @@ export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_API}/${id
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
 export const STOCK_TRANSFER_DELETE = id => `${STOCK_TRANSFER_API}/${id}`;
+
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
+
+// INVOICE ITEM
+export const INVOICE_ITEM_API = `${API}/invoiceItems`;
+export const VALIDATE_INVOICE_ITEM = id => `${INVOICE_ITEM_API}/${id}/validation`;
 
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;
