@@ -45,6 +45,7 @@ import org.pih.warehouse.core.PartyRole
 import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.UploadService
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.OutboundStockMovementListItem
@@ -83,10 +84,42 @@ import java.math.RoundingMode
 
 class BootStrap {
 
-    def uploadService
+    UploadService uploadService
     DataSource dataSource
 
     def init = { servletContext ->
+        log.info("Registering JSON marshallers ...")
+        registerJsonMarshallers()
+
+        log.info("Executing database migrations ...")
+        executeDatabaseMigrations()
+
+        // Create uploads directory if it doesn't already exist
+        log.info("Creating uploads directory ...")
+        uploadService.findOrCreateUploadsDirectory()
+
+        Boolean isRefreshAnalyticsDataOnStartupEnabled = Holders.config.openboxes.refreshAnalyticsDataOnStartup.enabled
+        if (isRefreshAnalyticsDataOnStartupEnabled) {
+            log.info("Refresh analytics data on startup ...")
+            refreshAnalyticsData()
+        }
+    }
+
+    void refreshAnalyticsData() {
+        // Refresh stock out data on startup to make sure the fact table is created
+        RefreshStockoutDataJob.triggerNow()
+
+        // Refresh demand data on startup to make sure the materialized views are created
+        RefreshDemandDataJob.triggerNow()
+
+        // Refresh inventory snapshot data
+        RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE])
+
+        // Refresh order summary materialized view
+        RefreshOrderSummaryJob.triggerNow()
+    }
+
+    void registerJsonMarshallers() {
 
         // Static data
         JSON.registerObjectMarshaller(ContainerType) { ContainerType containerType ->
@@ -555,9 +588,13 @@ class BootStrap {
         JSON.registerObjectMarshaller(InvoiceItemCandidate) { InvoiceItemCandidate invoiceItemCandidate ->
             return invoiceItemCandidate.toJson()
         }
+    }
 
+    def destroy = {
 
+    }
 
+    void executeDatabaseMigrations() {
         // ================================    Static Data    ============================================
         //
         // Use the 'demo' environment to create a database with 'static' and 'demo' data.  Then
@@ -642,29 +679,6 @@ class BootStrap {
             liquibase?.database?.close()
         }
         log.info("Finished running liquibase changelog(s)!")
-
-        // Create uploads directory if it doesn't already exist
-        uploadService.findOrCreateUploadsDirectory()
-
-        Boolean refreshAnalyticsDataOnStartup = Holders.config.openboxes.refreshAnalyticsDataOnStartup.enabled
-        if (refreshAnalyticsDataOnStartup) {
-            // Refresh stock out data on startup to make sure the fact table is created
-            RefreshStockoutDataJob.triggerNow()
-
-            // Refresh demand data on startup to make sure the materialized views are created
-            RefreshDemandDataJob.triggerNow()
-
-            // Refresh inventory snapshot data
-            RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE])
-
-            // Refresh order summary materialized view
-            RefreshOrderSummaryJob.triggerNow()
-        }
-    }
-
-
-    def destroy = {
-
     }
 
 }
