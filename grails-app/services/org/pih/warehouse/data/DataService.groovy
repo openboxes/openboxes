@@ -497,6 +497,9 @@ class DataService {
             "Status" { it?.status }
             "Bin Location" { it?.binLocation }
             "Preferred" { it?.preferred }
+            "Target Bin Location" { it?.internalLocation }
+            "Preferred Putaway Location" { it?.preferredBinLocation }
+            "Default Replenishment Source" { it?.replenishmentLocation }
             "ABC Class" { it?.abcClass }
             "Min Quantity" { it?.minQuantity }
             "Reorder Quantity" { it?.reorderQuantity }
@@ -507,19 +510,22 @@ class DataService {
         })
         inventoryLevels.each { inventoryLevel ->
             csv << [
-                    productCode       : inventoryLevel?.product?.productCode,
-                    productName       : inventoryLevel?.product?.displayNameWithLocaleCode,
-                    inventory         : inventoryLevel?.inventory?.warehouse?.name,
-                    status            : inventoryLevel?.status,
-                    binLocation       : inventoryLevel?.binLocation ?: "",
-                    preferred         : inventoryLevel?.preferred ?: "",
-                    abcClass          : inventoryLevel?.abcClass ?: "",
-                    minQuantity       : inventoryLevel?.minQuantity ?: "",
-                    reorderQuantity   : inventoryLevel?.reorderQuantity ?: "",
-                    maxQuantity       : inventoryLevel?.maxQuantity ?: "",
-                    forecastQuantity  : inventoryLevel?.forecastQuantity ?: "",
-                    forecastPeriodDays: inventoryLevel?.forecastPeriodDays ?: "",
-                    unitOfMeasure     : inventoryLevel?.product?.unitOfMeasure ?: "EA"
+                    productCode             : inventoryLevel?.product?.productCode,
+                    productName             : inventoryLevel?.product?.displayNameWithLocaleCode,
+                    inventory               : inventoryLevel?.inventory?.warehouse?.name,
+                    status                  : inventoryLevel?.status,
+                    binLocation             : inventoryLevel?.binLocation ?: "",
+                    preferred               : inventoryLevel?.preferred ?: "",
+                    internalLocation        : inventoryLevel?.internalLocation ?: "",
+                    preferredBinLocation    : inventoryLevel?.preferredBinLocation ?: "",
+                    replenishmentLocation   : inventoryLevel?.replenishmentLocation ?: "",
+                    abcClass                : inventoryLevel?.abcClass ?: "",
+                    minQuantity             : inventoryLevel?.minQuantity ?: "",
+                    reorderQuantity         : inventoryLevel?.reorderQuantity ?: "",
+                    maxQuantity             : inventoryLevel?.maxQuantity ?: "",
+                    forecastQuantity        : inventoryLevel?.forecastQuantity ?: "",
+                    forecastPeriodDays      : inventoryLevel?.forecastPeriodDays ?: "",
+                    unitOfMeasure           : inventoryLevel?.product?.unitOfMeasure ?: "EA"
             ]
         }
         return CSVUtils.prependBomToCsvString(csv.writer.toString())
