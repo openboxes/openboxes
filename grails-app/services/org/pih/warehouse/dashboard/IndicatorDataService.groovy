@@ -34,7 +34,7 @@ class IndicatorDataService {
     def messageService
 
     @Cacheable(value = "dashboardCache", key = { "getExpirationSummaryData-${location?.id}${params?.querySize}" })
-    JSONObject getExpirationSummaryData(Location location, def params) {
+    Map getExpirationSummaryData(Location location, def params) {
         // querySize = value of the date filter (1 month, 3 months, etc.)
         // Here it represents the last month we want to show
         // Add + 1 to include today (expired items) as the first point
@@ -113,7 +113,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getFillRate-${location?.id}${destination?.id}${params?.querySize}${params?.listFiltersSelected}${params?.value}" })
-    GraphData getFillRate(Location location, Location destination, def params) {
+    Map getFillRate(Location location, Location destination, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() : 6
         List listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
@@ -227,11 +227,14 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData)
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getFillRateSnapshot-${origin?.id}${params?.listFiltersSelected}${params?.value}" })
-    GraphData getFillRateSnapshot(Location origin, def params) {
+    Map getFillRateSnapshot(Location origin, def params) {
         String listFiltersSelected = params.list('listFiltersSelected').toList()
         List listValues = params.list('value').toList()
         List averageFillRateResult = []
@@ -299,7 +302,10 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData, null)
 
-        return graphData;
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getFillRateDestinations-${origin?.id}" })
@@ -322,7 +328,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getInventorySummaryData-${location?.id}" })
-    JSONObject getInventorySummaryData(Location location) {
+    Map getInventorySummaryData(Location location) {
         def inventorySummary = dashboardService.getDashboardAlerts(location);
 
         def inventoryData = [
@@ -362,7 +368,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getSentStockMovements-${location?.id}${params?.querySize}" })
-    GraphData getSentStockMovements(Location location, def params) {
+    Map getSentStockMovements(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
@@ -419,11 +425,14 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData)
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getRequisitionsByYear-${location?.id}${params?.yearType}" })
-    GraphData getRequisitionsByYear(Location location, def params) {
+    Map getRequisitionsByYear(Location location, def params) {
         def yearTypes = grailsApplication.config.openboxes.dashboard.yearTypes ?: [:]
         def defaultType = yearTypes.fiscalYear ?: yearTypes.calendarYear
         def yearType = params.yearType ? yearTypes[params.yearType] : defaultType
@@ -486,11 +495,15 @@ class IndicatorDataService {
         ]
         IndicatorData indicatorData = new IndicatorData(datasets, results.keySet().toList())
         GraphData graphData = new GraphData(indicatorData)
-        return graphData
+
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getReceivedStockData-${location?.id}${params?.querySize}" })
-    GraphData getReceivedStockData(Location location, def params) {
+    Map getReceivedStockData(Location location, def params) {
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         Date today = new Date()
         today.clearTime()
@@ -541,11 +554,14 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData)
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getOutgoingStock-${location?.id}" })
-    GraphData getOutgoingStock(Location location) {
+    Map getOutgoingStock(Location location) {
         Date today = new Date()
         today.clearTime()
         Date fourDaysAgo = today - 4
@@ -661,11 +677,14 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(numbersIndicator, baseUrl + "&receiptStatusCode=PENDING")
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getIncomingStock-${location?.id}" })
-    GraphData getIncomingStock(Location location) {
+    Map getIncomingStock(Location location) {
 
         def query = Shipment.executeQuery("""select s.currentStatus, count(s) from Shipment s where s.destination = :location and s.currentStatus <> 'RECEIVED' group by s.currentStatus""",
                 ['location': location]);
@@ -691,7 +710,10 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(numbersIndicator, "${urlContextPath}/stockMovement/list?direction=INBOUND")
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getDiscrepancy-${location?.id}${params?.querySize}" })
@@ -821,7 +843,7 @@ class IndicatorDataService {
     }
 
     @Cacheable(value = "dashboardCache", key = { "getProductsInventoried-${location?.id}" })
-    GraphData getProductsInventoried(Location location) {
+    Map getProductsInventoried(Location location) {
         List monthsCount = [3, 6, 9, 12, 0]
         List listPercentageNumbers = []
         Map listErrorSuccessIntervals = [
@@ -891,11 +913,14 @@ class IndicatorDataService {
 
         GraphData productsInventoried = new GraphData(multipleNumbersIndicator)
 
-        return productsInventoried
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return productsInventoried.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getLossCausedByExpiry-${location?.id}${params?.querySize}" })
-    GraphData getLossCausedByExpiry(Location location, def params) {
+    Map getLossCausedByExpiry(Location location, def params) {
 
         Integer querySize = params.querySize ? params.querySize.toInteger() - 1 : 5
         LocalDate queryLimit = LocalDate.now().minusMonths(querySize).withDayOfMonth(1)
@@ -981,11 +1006,14 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData)
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getPercentageAdHoc-${location?.id}" })
-    GraphData getPercentageAdHoc(Location location) {
+    Map getPercentageAdHoc(Location location) {
         Calendar calendar = Calendar.instance
         // we need to get all requisitions that were created from the first day of the previous month
         // current month is an edge case that we need to handle
@@ -1042,11 +1070,14 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData, "${urlContextPath}/stockMovement/list?direction=OUTBOUND")
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     @Cacheable(value = "dashboardCache", key = { "getStockOutLastMonth-${location?.id}" })
-    GraphData getStockOutLastMonth(Location location) {
+    Map getStockOutLastMonth(Location location) {
 
         List<String> listLabels = []
         List<Integer> listData = []
@@ -1074,7 +1105,10 @@ class IndicatorDataService {
 
         GraphData graphData = new GraphData(indicatorData)
 
-        return graphData
+        // TODO: Move this back to DashboardApiController
+        // It is moved here because grails-cache parsing it's value to
+        // LinkedHashMap instead of IndicatorData, so we can't use toJSON in the controller
+        return graphData.toJson()
     }
 
     private List fillLabels(int querySize) {
