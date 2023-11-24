@@ -14,10 +14,8 @@ import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.Validateable
-import groovy.text.Template
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
-import org.grails.gsp.GroovyPagesTemplateEngine
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.order.Order
@@ -37,7 +35,7 @@ class DocumentController {
     def fileService
     def shipmentService
     GrailsApplication grailsApplication
-    GroovyPagesTemplateEngine groovyPagesTemplateEngine
+    TemplateService templateService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -536,7 +534,7 @@ class DocumentController {
         InventoryItem inventoryItem = InventoryItem.load(params?.inventoryItem?.id)
 
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = renderTemplate(document, model)
+        String renderedContent = templateService.renderTemplate(document, model)
 
         try {
             if (params.protocol=="usb") {
@@ -568,7 +566,7 @@ class DocumentController {
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = renderTemplate(document, model)
+        String renderedContent = templateService.renderTemplate(document, model)
         log.info "renderedContent: ${renderedContent}"
         render(renderedContent)
     }
@@ -578,9 +576,10 @@ class DocumentController {
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String body = renderTemplate(document, model)
+        String body = templateService.renderTemplate(document, model)
 
-        response.contentType = 'image/png'
+        response.contentType = 'image/png'    
+        // TODO Move labelary URL to application.yml 
         response.outputStream << Request.Post('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/')
             .bodyString(body, ContentType.APPLICATION_FORM_URLENCODED)
             .execute()
@@ -594,26 +593,11 @@ class DocumentController {
         InventoryItem inventoryItem = InventoryItem.load(params.inventoryItem?.id)
         Location location = Location.load(session.warehouse.id)
         Map model = [document: document, inventoryItem: inventoryItem, location: location]
-        String renderedContent = renderTemplate(document, model)
+        String renderedContent = templateService.renderTemplate(document, model)
+        // TODO Move labelary URL to application.yml 
         String url = "http://labelary.com/viewer.html?zpl=" + renderedContent
         redirect(url: url)
     }
-
-
-    private String renderTemplate(Document document, Map model) {
-        String templateContent = new String(document.fileContents)
-        Template template =
-                groovyPagesTemplateEngine.createTemplate(templateContent, document.name)
-
-        log.info "Template content: " + templateContent
-        log.info "Model: " + model
-
-        Writable renderedTemplate = template.make(model)
-        StringWriter stringWriter = new StringWriter()
-        renderedTemplate.writeTo(stringWriter)
-        return stringWriter.toString()
-    }
-
 
 }
 
