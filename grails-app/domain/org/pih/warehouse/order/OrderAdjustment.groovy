@@ -16,7 +16,7 @@ import org.pih.warehouse.invoice.InvoiceItem
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 
-class OrderAdjustment implements Serializable {
+class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
 
     def publishRefreshEvent() {
         if (order?.isPurchaseOrder && !disableRefresh) {
@@ -110,5 +110,12 @@ class OrderAdjustment implements Serializable {
 
     Boolean getHasRegularInvoice() {
         return invoices.any { it.invoiceType == null || it.invoiceType?.code == InvoiceTypeCode.INVOICE }
+    }
+
+    @Override
+    int compareTo(OrderAdjustment o) {
+        return dateCreated <=> o.dateCreated ?:
+                lastUpdated <=> o.lastUpdated ?:
+                        id <=> o.id
     }
 }

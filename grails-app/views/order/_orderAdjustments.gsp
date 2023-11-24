@@ -17,9 +17,9 @@
             </tr>
             </thead>
             <tbody>
-            <g:each var="orderAdjustment" in="${orderInstance.orderAdjustments?.sort { it.dateCreated }}" status="status">
+            <g:each var="orderAdjustment" in="${orderInstance.orderAdjustments?.sort()}" status="status">
                 <g:set var="isAdjustmentCanceled" value="${orderAdjustment.canceled}"/>
-                <tr class="${status%2==0?'odd':'even'}" style="${isAdjustmentCanceled ? 'background-color: #ffcccb;' : ''}">
+                <tr class="${status % 2 == 0 ? 'odd' : 'even'}" style="${isAdjustmentCanceled ? 'background-color: #ffcccb;' : ''}">
                     <td>
                         ${orderAdjustment?.orderItem?.product?:g.message(code:'default.all.label')}
                     </td>

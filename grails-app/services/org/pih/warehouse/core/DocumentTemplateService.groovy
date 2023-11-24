@@ -114,7 +114,7 @@ class DocumentTemplateService {
                     expectedShippingDate: orderItem?.estimatedReadyDate ? orderItem?.estimatedReadyDate?.format("MMM dd, yyyy") : ""
             ]
         }
-        def orderAdjustments = orderInstance?.orderAdjustments?.findAll { !it.canceled }?.collect { OrderAdjustment orderAdjustment ->
+        def orderAdjustments = orderInstance?.orderAdjustments?.findAll { !it.canceled }?.sort()?.collect { OrderAdjustment orderAdjustment ->
             return [
                     code                : orderAdjustment?.orderAdjustmentType?.code?:"",
                     type                : "Adjustment",
