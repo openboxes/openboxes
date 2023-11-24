@@ -648,8 +648,10 @@ class BootStrap {
             liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
             liquibase.update(null as Contexts, new LabelExpression());
 
-            // FIXME Not good that we'll need to update this on subsequent versions so this needs some more thought
-            List previousChangelogVersions = ["0.5.x", "0.6.x", "0.7.x", "0.8.x"]
+            // Find directories with names matching current versions pattern
+            List<String> changelogVersions = new File('grails-app/migrations').list().findAll { it.matches("[0-9].[0-9].x") }
+            // Exclude the newest changelog version, this one should be run separately
+            List<String> previousChangelogVersions = changelogVersions.tail()
 
             // Check if the executed changelog versions include one of the previous versions
             // and if so, then we need to keep running the old updates to catch up to 0.9.x
