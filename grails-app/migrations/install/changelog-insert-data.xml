@@ -372,6 +372,46 @@
             <column name="name" value="Partially Received"/>
             <column name="sort_order" valueNumeric="3"/>
         </insert>
+        <insert tableName="event_type">
+            <column name="id" value="abb5b3d2-da3e-4a4c-9e3c-de139147f822"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" value="2023-09-21T00:00"/>
+            <column name="description" value="Request has been sent for approval"/>
+            <column name="event_code" value="PENDING_APPROVAL"/>
+            <column name="last_updated" value="2023-09-21T00:00"/>
+            <column name="name" value="Waiting for approval"/>
+            <column name="sort_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="event_type">
+            <column name="id" value="1738ff9b-b9fb-4369-81d6-08f61f058137"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" value="2023-09-21T00:00"/>
+            <column name="description" value="Request has been approved"/>
+            <column name="event_code" value="APPROVED"/>
+            <column name="last_updated" value="2023-09-21T00:00"/>
+            <column name="name" value="Approved"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="event_type">
+            <column name="id" value="30e81101-e20e-47cc-aef0-9004609dd38e"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" value="2023-09-21T00:00"/>
+            <column name="description" value="Request has been submitted"/>
+            <column name="event_code" value="SUBMITTED"/>
+            <column name="last_updated" value="2023-09-21T00:00"/>
+            <column name="name" value="Submitted"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
+        <insert tableName="event_type">
+            <column name="id" value="32fa3298-439c-4f12-a3bc-9a29ddf11a21"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" value="2023-09-21T00:00"/>
+            <column name="description" value="Request has been rejected"/>
+            <column name="event_code" value="REJECTED"/>
+            <column name="last_updated" value="2023-09-21T00:00"/>
+            <column name="name" value="Rejected"/>
+            <column name="sort_order" valueNumeric="0"/>
+        </insert>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1692069478960-8">
         <insert tableName="inventory">
@@ -680,31 +720,11 @@
         </insert>
         <insert tableName="location_type_supported_activities">
             <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
+            <column name="supported_activities_string" value="ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS"/>
         </insert>
         <insert tableName="location_type_supported_activities">
             <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
-        </insert>
-        <insert tableName="location_type_supported_activities">
-            <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
-        </insert>
-        <insert tableName="location_type_supported_activities">
-            <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
-        </insert>
-        <insert tableName="location_type_supported_activities">
-            <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
-        </insert>
-        <insert tableName="location_type_supported_activities">
-            <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
-        </insert>
-        <insert tableName="location_type_supported_activities">
-            <column name="location_type_id" value="2"/>
-            <column name="supported_activities_string" value="SUBMIT_REQUEST"/>
+            <column name="supported_activities_string" value="ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS"/>
         </insert>
         <insert tableName="location_type_supported_activities">
             <column name="location_type_id" value="3"/>
@@ -1334,11 +1354,18 @@
             <column name="name" value="Out of Stock Notifications"/>
         </insert>
         <insert tableName="role">
-            <column name="id" value="ROLE_APPROVER"/>
+            <column name="id" value="ROLE_PURCHASE_APPROVER"/>
             <column name="version" valueNumeric="0"/>
             <column name="description"/>
-            <column name="role_type" value="ROLE_APPROVER"/>
-            <column name="name" value="Approver"/>
+            <column name="role_type" value="ROLE_PURCHASE_APPROVER"/>
+            <column name="name" value="Purchase approver"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="ROLE_REQUISITION_APPROVER"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="description"/>
+            <column name="role_type" value="ROLE_REQUISITION_APPROVER"/>
+            <column name="name" value="Request approver"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ROLE_PRODUCT_MANAGER"/>
@@ -1903,11 +1930,7 @@
     <changeSet author="jmiranda (generated)" id="1692069478960-35">
         <insert tableName="user_role">
             <column name="user_id" value="1"/>
-            <column name="role_id" value="1"/>
-        </insert>
-        <insert tableName="user_role">
-            <column name="user_id" value="2"/>
-            <column name="role_id" value="2"/>
+            <column name="role_id" value="5"/>
         </insert>
         <insert tableName="user_role">
             <column name="user_id" value="1"/>
@@ -1916,6 +1939,14 @@
         <insert tableName="user_role">
             <column name="user_id" value="1"/>
             <column name="role_id" value="ff80818162d9f9cc0162d9fbf09e0002"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" value="1"/>
+            <column name="role_id" value="ff808181681c757c01681c89c4960001"/>
+        </insert>
+        <insert tableName="user_role">
+            <column name="user_id" value="2"/>
+            <column name="role_id" value="2"/>
         </insert>
     </changeSet>
 </databaseChangeLog>
