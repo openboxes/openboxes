@@ -10,6 +10,7 @@ openboxes.identifier.alphanumeric = Constants.RANDOM_IDENTIFIER_ALPHANUMERIC_CHA
 openboxes.identifier.transaction.format = Constants.DEFAULT_TRANSACTION_NUMBER_FORMAT
 openboxes.identifier.order.format = Constants.DEFAULT_ORDER_NUMBER_FORMAT
 openboxes.identifier.product.format = Constants.DEFAULT_PRODUCT_NUMBER_FORMAT
+openboxes.identifier.productSupplier.format = Constants.DEFAULT_PRODUCT_SUPPLIER_NUMBER_FORMAT
 openboxes.identifier.productSupplier.prefix.enabled = true
 openboxes.identifier.receipt.format = Constants.DEFAULT_RECEIPT_NUMBER_FORMAT
 openboxes.identifier.requisition.format = Constants.DEFAULT_REQUISITION_NUMBER_FORMAT
