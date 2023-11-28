@@ -39,6 +39,8 @@ grails:
         databasemigration:
             updateOnStart: false
             updateOnStartFileName: changelog.groovy
+        sentry:
+            dsn: https://{PUBLIC_KEY}:{SECRET_KEY}@app.getsentry.com/{PATH}{PROJECT_ID}
 
 info:
     app:
@@ -261,6 +263,10 @@ environments:
             username: "openboxes"
             password: "openboxes"
             url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+        grails:
+            plugin:
+                sentry:
+                    active: false
     test:
         dataSource:
             dumpQueriesOnException: true
@@ -282,6 +288,10 @@ environments:
             username: "openboxes"
             password: "openboxes"
             url: jdbc:mysql://localhost:3306/openboxes?serverTimezone=UTC&useSSL=false
+        grails:
+            plugin:
+                sentry:
+                    active: true
 ---
 openboxes:
     ajaxRequest:
