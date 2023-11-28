@@ -649,7 +649,7 @@ class BootStrap {
             liquibase.update(null as Contexts, new LabelExpression());
 
             // Find directories with names matching current versions pattern
-            List<String> changelogVersions = new File('grails-app/migrations').list().findAll { it.matches("[0-9].[0-9].x") }
+            List<String> changelogVersions = new File('grails-app/migrations').list().findAll { it.matches("[0-9]{1,3}.[0-9]{1,3}.x") }
             // Exclude the newest changelog version, this one should be run separately
             List<String> previousChangelogVersions = changelogVersions.tail()
 
