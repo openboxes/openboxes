@@ -651,7 +651,7 @@ class BootStrap {
             // Find directories with names matching current versions pattern
             List<String> changelogVersions = new File('grails-app/migrations').list().findAll { it.matches("[0-9]{1,3}.[0-9]{1,3}.x") }
             // Exclude the newest changelog version, this one should be run separately
-            List<String> previousChangelogVersions = changelogVersions.tail()
+            List<String> previousChangelogVersions = changelogVersions.size() ? changelogVersions.tail() : []
 
             // Check if the executed changelog versions include one of the previous versions
             // and if so, then we need to keep running the old updates to catch up to 0.9.x
