@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
@@ -40,6 +41,8 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
+    GrailsApplication grailsApplication
+    TransactionEntryDataService transactionEntryDataService
 
     def authService
     def dataService
@@ -586,7 +589,7 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     Map getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries, Boolean useBinLocation) {
-        def startTime = System.currentTimeMillis()
+        long startTime = System.currentTimeMillis()
         def quantityMap = [:]
 
         def reachedInventoryTransaction = [:]
@@ -606,10 +609,10 @@ class InventoryService implements ApplicationContextAware {
                 // There are cases where the transaction entry might be null, so we need to check for this edge case
                 if (transactionEntry) {
 
-                    def inventoryItem = transactionEntry.inventoryItem
-                    def product = inventoryItem.product
-                    def transaction = transactionEntry.transaction
-                    def binLocation = transactionEntry.binLocation
+                    InventoryItem inventoryItem = transactionEntry.inventoryItem
+                    Product product = inventoryItem.product
+                    Transaction transaction = transactionEntry.transaction
+                    Location binLocation = transactionEntry.binLocation
 
                     // first see if this is an entry we can skip (because we've already reached a product inventory transaction
                     // for this product, or a inventory transaction for this inventory item)
@@ -639,38 +642,43 @@ class InventoryService implements ApplicationContextAware {
                         }
 
                         // now update quantity as necessary
-                        def transactionCode = transactionEntry.transaction.transactionType.transactionCode
-                        if (transactionCode == TransactionCode.CREDIT) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] += transactionEntry.quantity
-                            }
-                        } else if (transactionCode == TransactionCode.DEBIT) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] -= transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] -= transactionEntry.quantity
-                            }
-                        } else if (transactionCode == TransactionCode.INVENTORY) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] += transactionEntry.quantity
-                            }
-                            // mark that we are done with this inventory item (after this transaction)
-                            if (!reachedInventoryTransaction[product]) {
-                                reachedInventoryTransaction[product] = [:]
-                            }
-                            reachedInventoryTransaction[product][inventoryItem] = transaction
-                        } else if (transactionCode == TransactionCode.PRODUCT_INVENTORY) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] += transactionEntry.quantity
-                            }
-                            // mark that we are done with this product (after this transaction)
-                            reachedProductInventoryTransaction[product] = transaction
+                        TransactionCode transactionCode = transactionEntry.transaction.transactionType.transactionCode
+                        switch (transactionCode) {
+                            case TransactionCode.CREDIT:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] += transactionEntry.quantity
+                                }
+                                break
+                            case TransactionCode.DEBIT:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] -= transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] -= transactionEntry.quantity
+                                }
+                                break
+                            case TransactionCode.INVENTORY:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] += transactionEntry.quantity
+                                }
+                                // mark that we are done with this inventory item (after this transaction)
+                                if (!reachedInventoryTransaction[product]) {
+                                    reachedInventoryTransaction[product] = [:]
+                                }
+                                reachedInventoryTransaction[product][inventoryItem] = transaction
+                                break
+                            case TransactionCode.PRODUCT_INVENTORY:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] += transactionEntry.quantity
+                                }
+                                // mark that we are done with this product (after this transaction)
+                                reachedProductInventoryTransaction[product] = transaction
+                                break
                         }
                     }
                 }
@@ -838,9 +846,9 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    List getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
+    List<QuantityByBinLocationDto> getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
 
-        def binLocations = []
+        List<QuantityByBinLocationDto> binLocations = []
 
         def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
 
@@ -854,28 +862,25 @@ class InventoryService implements ApplicationContextAware {
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantity != 0 || includeOutOfStock) {
-                        binLocations << [
-                            id               : binLocation?.id,
-                            status           : status(quantity),
-                            value            : value,
-                            category         : product.category,
-                            product          : product,
-                            inventoryItem    : inventoryItem,
-                            binLocation      : binLocation,
-                            quantity         : quantity,
-                            isOnHold         : binLocation?.isOnHold()
-                        ]
+                        binLocations.add(
+                            new QuantityByBinLocationDto([
+                                id               : binLocation?.id,
+                                status           : status(quantity),
+                                value            : value,
+                                category         : product.category,
+                                product          : product,
+                                inventoryItem    : inventoryItem,
+                                binLocation      : binLocation,
+                                quantity         : quantity,
+                                isOnHold         : binLocation?.isOnHold()
+                            ]))
                     }
                 }
             }
         }
 
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { a, b ->
-            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
-        }
-
-        return binLocations
+        return binLocations.sort()
     }
 
     /**
@@ -2714,6 +2719,186 @@ class InventoryService implements ApplicationContextAware {
 
         return quantityMap
     }
+
+
+    /**
+     *
+     * @param command
+     */
+    def validateInventoryData(ImportDataCommand command) {
+
+        def dateFormatter = new SimpleDateFormat("yyyy-MM-dd")
+        def calendar = Calendar.getInstance()
+        command.data.eachWithIndex { row, index ->
+            def rowIndex = index + 1
+
+            if (!command.warnings[index]) {
+                command.warnings[index] = []
+            }
+
+            def product = Product.findByProductCode(row.productCode)
+            if (!product) {
+                command.errors.reject("error.product.notExists", "Row ${rowIndex}: Product '${row.productCode}' does not exist")
+                command.warnings[index] << "Product '${row.productCode}' does not exist"
+            } else {
+                def lotNumber = row.lotNumber
+                if (lotNumber instanceof Double) {
+                    command.warnings[index] << "Lot number '${lotNumber}' must be a string"
+                    row.lotNumber = lotNumber.toInteger().toString()
+                }
+
+                row.isNewItem = false
+                def inventoryItem = InventoryItem.findByProductAndLotNumber(product, lotNumber)
+                if (!inventoryItem) {
+                    row.isNewItem = true
+                    command.warnings[index] << "Inventory item for lot number '${lotNumber}' does not exist and will be created"
+                }
+
+                Location location = getCurrentLocation()
+                if (row.binLocation == 'Default') {
+                    row.binLocation = null
+                }
+                def binLocation = Location.findByParentLocationAndName(location, row.binLocation)
+                if (!binLocation && row.binLocation) {
+                    command.errors.reject("error.product.notExists", "Row ${rowIndex}: Bin location '${row.binLocation.trim()}' does not exist in this depot")
+                    command.warnings[index] << "Bin location '${row.binLocation.trim()}' does not exist in this depot"
+                }
+
+                if (row.expirationDate && !row.lotNumber) {
+                    command.errors.reject("error.lotNumber.notExists", "Row ${rowIndex}: Items with an expiry date must also have a lot number")
+                }
+
+                if (product.lotAndExpiryControl && (!row.expirationDate || !row.lotNumber)) {
+                    command.errors.reject(
+                        "error.lotAndExpiryControl.required",
+                        "Row ${rowIndex}: Both lot number and expiry date are required for the '${product.productCode} ${product.name}' product."
+                    )
+                }
+
+                def expirationDate = null
+                try {
+                    if (row.expirationDate) {
+                        if (row.expirationDate instanceof String) {
+                            expirationDate = dateFormatter.parse(row.expirationDate)
+                            calendar.setTime(expirationDate)
+                            expirationDate = calendar.getTime()
+                        } else if (row.expirationDate instanceof Date) {
+                            expirationDate = row.expirationDate
+                        } else if (row.expirationDate instanceof LocalDate) {
+                            expirationDate = row.expirationDate.toDate()
+                        } else {
+                            expirationDate = row.expirationDate
+                            command.warnings[index] << "Expiration date '${row.expirationDate}' has unknown format ${row?.expirationDate?.class}"
+                        }
+                        // Minimum date is either configured or we use the epoch date
+                        Date minExpirationDate = grailsApplication.config.getProperty("openboxes.expirationDate.minValue", Date.class, new Date(0L))
+                        if (minExpirationDate > expirationDate) {
+                            command.errors.reject("Expiration date for item ${row.productCode} is not valid. Please enter a date after ${minExpirationDate.getYear()+1900}.")
+                        }
+
+                        row.isNewExpirationDate = inventoryItem?.expirationDate && expirationDate != inventoryItem.expirationDate
+
+                        if (expirationDate <= new Date()) {
+                            command.warnings[index] << "Expiration date '${row.expirationDate}' is not valid"
+                        }
+
+                    }
+                } catch (ParseException e) {
+                    command.errors.reject("error.expirationDate.invalid", "Row ${rowIndex}: Product '${row.productCode}' must have a valid date (or no date)")
+                }
+
+
+                def levenshteinDistance = StringUtils.getLevenshteinDistance(product.name, row.product)
+                if (row.product && levenshteinDistance > 0) {
+                    command.warnings[index] << "Product name [${row.product}] does not appear to be the same as in the database [${product.name}] (Levenshtein distance: ${levenshteinDistance})"
+                }
+
+            }
+
+            if (row.quantity && (row.quantity as int) < 0) {
+                command.errors.reject("error.quantity.negative", "Row ${rowIndex}: Product '${row.productCode}' must have positive quantity")
+            }
+        }
+    }
+
+    /**
+     *
+     * @param command
+     * @return
+     */
+    void importInventoryData(ImportDataCommand command) {
+        def dateFormatter = new SimpleDateFormat("yy-mm")
+
+        def transaction = new Transaction()
+        transaction.transactionDate = command.date
+        transaction.transactionType = TransactionType.get(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
+        transaction.transactionNumber = generateTransactionNumber()
+        transaction.comment = "Imported from ${command.filename} on ${new Date()}"
+        transaction.inventory = command.location.inventory
+
+        def calendar = Calendar.getInstance()
+        command.data.eachWithIndex { row, index ->
+            println "${index}: ${row}"
+            // ignore a line if physical qoh is empty
+            if (row.quantity == null) {
+                return
+            }
+            def transactionEntry = new TransactionEntry()
+            transactionEntry.quantity = row.quantity.toInteger()
+            transactionEntry.comments = row.comments
+
+            // Find an existing product, should fail if not found
+            def product = Product.findByProductCode(row.productCode)
+            assert product != null
+
+            // Check the Levenshtein distance between the given name and stored product name (make sure they're close)
+            println "Levenshtein distance: " + StringUtils.getLevenshteinDistance(product.name, row.product)
+
+            // Handler for the lot number
+            def lotNumber = row.lotNumber
+            if (lotNumber instanceof Double) {
+                lotNumber = lotNumber.toInteger().toString()
+            }
+            println "Lot Number: " + lotNumber
+
+            // Expiration date should be the last day of the month
+            def expirationDate = null
+            if (row.expirationDate instanceof String) {
+                expirationDate = dateFormatter.parse(row.expirationDate)
+                calendar.setTime(expirationDate)
+                expirationDate = calendar.getTime()
+            } else if (row.expirationDate instanceof Date) {
+                expirationDate = row.expirationDate
+            } else if (row.expirationDate instanceof LocalDate) {
+                expirationDate = row.expirationDate.toDate()
+            } else {
+                expirationDate = row.expirationDate
+            }
+
+            // Find or create an inventory item
+            def inventoryItem = findAndUpdateOrCreateInventoryItem(product, lotNumber, expirationDate)
+            println "Inventory item: " + inventoryItem.id + " " + inventoryItem.dateCreated + " " + inventoryItem.lastUpdated
+            transactionEntry.inventoryItem = inventoryItem
+
+            // Find the bin location
+            if (row.binLocation) {
+                def binLocation = Location.findByNameAndParentLocation(row.binLocation, command.location)
+                log.info "Bin location: " + row.binLocation
+                log.info "Location: " + command.location
+                assert binLocation != null
+                transactionEntry.binLocation = binLocation
+            }
+
+            transaction.addToTransactionEntries(transactionEntry)
+        }
+        // Force refresh of inventory snapshot table
+        transaction.forceRefresh = Boolean.TRUE
+        transaction.save(flush: true, failOnError: true)
+        log.info "Transaction ${transaction?.transactionNumber} saved successfully! "
+        log.info "Added ${transaction?.transactionEntries?.size()} transaction entries"
+    }
+
+
     /**
      * Calculate pending quantity for a given product and location.
      *
@@ -3086,8 +3271,9 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List getBinLocationDetails(Location location) {
-        List transactionEntries = getTransactionEntriesByLocation(location)
+        List<TransactionEntry> transactionEntries = getTransactionEntriesByLocation(location)
         return getQuantityByBinLocation(transactionEntries, true)
+
     }
 
     List getBinLocationDetails(Location location, Date date) {
@@ -3116,26 +3302,15 @@ class InventoryService implements ApplicationContextAware {
         return results
     }
 
-    List getTransactionEntriesByLocation(Location location) {
+    List<TransactionEntry> getTransactionEntriesByLocation(Location location) {
         def startTime = System.currentTimeMillis()
 
         if (!location?.inventory) {
             throw new RuntimeException("Location must have an inventory")
         }
-
-        def transactions = Transaction.createCriteria().list {
-            // eager fetch transaction and transaction type
-            fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
-            // FIXME OBGM-211
-            //fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
-            //fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
-
-            eq("inventory", location.inventory)
-            order("transactionDate", "asc")
-            order("dateCreated", "asc")
-        }
-
-        return transactions*.transactionEntries.flatten()
+        List<TransactionEntry> transactionEntries = transactionEntryDataService.findAllByLocation(location)
+        log.debug("Transaction entries fetched in: " + (System.currentTimeMillis() - startTime) + " ms")
+        return transactionEntries
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {
