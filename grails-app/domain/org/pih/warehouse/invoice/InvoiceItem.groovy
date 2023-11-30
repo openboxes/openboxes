@@ -83,6 +83,7 @@ class InvoiceItem implements Serializable {
         glAccount(nullable: true)
         budgetCode(nullable: true)
         quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
+            if (!obj.invoice.isPrepaymentInvoice) {
                 Integer originalQuantityInvoiced = obj.getPersistentValue('quantity')
                 ShipmentItem shipmentItem = obj?.shipmentItem
                 if (originalQuantityInvoiced != null) {
@@ -92,8 +93,10 @@ class InvoiceItem implements Serializable {
                     Boolean isValid = quantity + (shipmentItem?.quantityInvoiced - originalQuantityInvoiced) <= shipmentItem?.quantity
                     return isValid ? true : ['invoiceItem.invalidQuantity.label']
                 }
-
                 return true
+            }
+            return true
+
         }) // min = 0 for canceled items
         quantityUom(nullable: true)
         quantityPerUom(nullable: false)
