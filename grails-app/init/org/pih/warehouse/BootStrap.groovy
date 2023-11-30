@@ -77,6 +77,8 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
+import org.springframework.core.io.Resource
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.quartz.Scheduler
 import util.LiquibaseUtil
 
@@ -648,8 +650,16 @@ class BootStrap {
             liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
             liquibase.update(null as Contexts, new LabelExpression());
 
+            // Get all directories from /migrations
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
+            Resource[] resources = resolver.getResources("file:grails-app/migrations/*")
+
             // Find directories with names matching current versions pattern
-            List<String> changelogVersions = new File('grails-app/migrations').list().findAll { it.matches("[0-9]{1,3}.[0-9]{1,3}.x") }
+            List<String> changelogVersions = resources
+                    .collect { it.filename }
+                    .findAll { it.matches("[0-9]{1,3}.[0-9]{1,3}.x") }
+                    .reverse()
+
             // Exclude the newest changelog version, this one should be run separately
             List<String> previousChangelogVersions = changelogVersions.size() ? changelogVersions.tail() : []
 
