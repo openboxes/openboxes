@@ -71,7 +71,7 @@ class PersonDataService {
     }
 
     String[] extractNames(String combinedNames) {
-        String[] names = combinedNames.split(" ", 2)
+        String[] names = combinedNames.split(" ", 2)*.trim()
         if (names.length <= 1) {
             throw new RuntimeException("Recipient ${combinedNames} must have at least two names (i.e. first name and last name)")
         }
