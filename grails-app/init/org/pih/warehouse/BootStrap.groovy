@@ -77,6 +77,7 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
+import org.quartz.Scheduler
 import util.LiquibaseUtil
 
 import javax.sql.DataSource
@@ -94,29 +95,34 @@ class BootStrap {
         log.info("Executing database migrations ...")
         executeDatabaseMigrations()
 
+        log.info("Starting Quartz scheduler ...")
+        Scheduler scheduler = Holders.grailsApplication.mainContext.getBean( 'quartzScheduler' )
+        scheduler.start()
+
         // Create uploads directory if it doesn't already exist
         log.info("Creating uploads directory ...")
         uploadService.findOrCreateUploadsDirectory()
 
-        Boolean isRefreshAnalyticsDataOnStartupEnabled = Holders.config.openboxes.refreshAnalyticsDataOnStartup.enabled
-        if (isRefreshAnalyticsDataOnStartupEnabled) {
-            log.info("Refresh analytics data on startup ...")
-            refreshAnalyticsData()
-        }
+        refreshAnalyticsData()
     }
 
     void refreshAnalyticsData() {
-        // Refresh stock out data on startup to make sure the fact table is created
-        RefreshStockoutDataJob.triggerNow()
+        Boolean isRefreshAnalyticsDataOnStartupEnabled = Holders.config.openboxes.refreshAnalyticsDataOnStartup.enabled
+        if (isRefreshAnalyticsDataOnStartupEnabled) {
+            log.info("Refresh analytics data on startup ...")
 
-        // Refresh demand data on startup to make sure the materialized views are created
-        RefreshDemandDataJob.triggerNow()
+            // Refresh stock out data on startup to make sure the fact table is created
+            RefreshStockoutDataJob.triggerNow()
 
-        // Refresh inventory snapshot data
-        RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE])
+            // Refresh demand data on startup to make sure the materialized views are created
+            RefreshDemandDataJob.triggerNow()
 
-        // Refresh order summary materialized view
-        RefreshOrderSummaryJob.triggerNow()
+            // Refresh inventory snapshot data
+            RefreshProductAvailabilityJob.triggerNow([forceRefresh: Boolean.TRUE])
+
+            // Refresh order summary materialized view
+            RefreshOrderSummaryJob.triggerNow()
+        }
     }
 
     void registerJsonMarshallers() {
