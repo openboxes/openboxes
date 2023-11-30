@@ -83,17 +83,22 @@ class InvoiceItem implements Serializable {
         glAccount(nullable: true)
         budgetCode(nullable: true)
         quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
-                Integer originalQuantityInvoiced = obj.getPersistentValue('quantity')
-                ShipmentItem shipmentItem = obj?.shipmentItem
-                if (originalQuantityInvoiced != null) {
-                    // An invoice item has a valid quantity when the new quantity,
-                    // summed with the already invoiced quantity from all of the invoiced items,
-                    // subtracting the old quantity of the current invoice item is lower than the shipment item quantity
-                    Boolean isValid = quantity + (shipmentItem?.quantityInvoiced - originalQuantityInvoiced) <= shipmentItem?.quantity
-                    return isValid ? true : ['invoiceItem.invalidQuantity.label']
-                }
-
+            // If the invoice is a prepayment, the validation below doesn't make sense, because
+            // we do not have shipmentItem at this point.
+            if (obj.invoice.isPrepaymentInvoice) {
                 return true
+            }
+
+            Integer originalQuantityInvoiced = obj.getPersistentValue('quantity')
+            ShipmentItem shipmentItem = obj?.shipmentItem
+            if (originalQuantityInvoiced != null) {
+                // An invoice item has a valid quantity when the new quantity,
+                // summed with the already invoiced quantity from all of the invoiced items,
+                // subtracting the old quantity of the current invoice item is lower than the shipment item quantity
+                Boolean isValid = quantity + (shipmentItem?.quantityInvoiced - originalQuantityInvoiced) <= shipmentItem?.quantity
+                return isValid ? true : ['invoiceItem.invalidQuantity.label']
+            }
+            return true
         }) // min = 0 for canceled items
         quantityUom(nullable: true)
         quantityPerUom(nullable: false)
