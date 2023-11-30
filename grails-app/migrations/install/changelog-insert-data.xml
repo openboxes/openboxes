@@ -1018,20 +1018,9 @@
             <column name="id" value="1"/>
             <column name="version" valueNumeric="1"/>
             <column name="date_created" value="2010-08-25T00:00"/>
-            <column name="email" value="admin@openboxes.com"/>
+            <column name="email" value="admin@admin.com"/>
             <column name="first_name" value="Miss"/>
             <column name="last_name" value="Administrator"/>
-            <column name="last_updated" value="2010-08-25T00:00"/>
-            <column name="phone_number"/>
-            <column name="active" valueBoolean="true"/>
-        </insert>
-        <insert tableName="person">
-            <column name="id" value="2"/>
-            <column name="version" valueNumeric="5"/>
-            <column name="date_created" value="2010-08-25T00:00"/>
-            <column name="email" value="manager@openboxes.org"/>
-            <column name="first_name" value="Mister"/>
-            <column name="last_name" value="Manager"/>
             <column name="last_updated" value="2010-08-25T00:00"/>
             <column name="phone_number"/>
             <column name="active" valueBoolean="true"/>
@@ -1913,19 +1902,6 @@
             <column name="timezone"/>
             <column name="dashboard_config"/>
         </insert>
-        <insert tableName="user">
-            <column name="id" value="2"/>
-            <column name="last_login_date"/>
-            <column name="manager_id" value="1"/>
-            <column name="password" value="password"/>
-            <column name="username" value="manager"/>
-            <column name="warehouse_id" value="1"/>
-            <column name="photo"/>
-            <column name="locale"/>
-            <column name="remember_last_location"/>
-            <column name="timezone"/>
-            <column name="dashboard_config"/>
-        </insert>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1692069478960-35">
         <insert tableName="user_role">
@@ -1943,10 +1919,6 @@
         <insert tableName="user_role">
             <column name="user_id" value="1"/>
             <column name="role_id" value="ff808181681c757c01681c89c4960001"/>
-        </insert>
-        <insert tableName="user_role">
-            <column name="user_id" value="2"/>
-            <column name="role_id" value="2"/>
         </insert>
     </changeSet>
 </databaseChangeLog>
