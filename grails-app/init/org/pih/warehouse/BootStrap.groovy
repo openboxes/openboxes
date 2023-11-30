@@ -272,6 +272,7 @@ class BootStrap {
                 productCode        : product.productCode,
                 name               : product.name,
                 description        : product.description,
+                categoryId         : product.category?.id,
                 category           : product.category?.name,
                 unitOfMeasure      : product.unitOfMeasure,
                 pricePerUnit       : product.pricePerUnit,

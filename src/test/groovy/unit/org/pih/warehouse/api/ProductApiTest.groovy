@@ -1,6 +1,10 @@
 package unit.org.pih.warehouse.api
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationConfig
 import groovy.transform.builder.Builder
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
@@ -12,11 +16,17 @@ import lombok.AllArgsConstructor
 import lombok.Data
 import lombok.NoArgsConstructor
 import org.grails.web.json.JSONObject
+import org.junit.Test
+import org.pih.warehouse.product.ProductType
+import org.pih.warehouse.product.ProductTypeCode
 import spock.lang.Shared
 import spock.lang.Specification
+import util.StringUtil
+
 import static io.restassured.RestAssured.*
 import io.restassured.response.Response
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.notNullValue
 import static org.hamcrest.Matchers.lessThanOrEqualTo
@@ -43,6 +53,12 @@ class ProductApiTest extends Specification {
 
     @Shared
     RequestSpecification requestSpecification
+
+    @Shared
+    String categoryId
+
+    @Shared
+    String productTypeId
 
     // Executed before the first spock test is executed
     void setupSpec() {
@@ -77,6 +93,31 @@ class ProductApiTest extends Specification {
                 setAccept(ContentType.JSON).build()
     }
 
+    void "should have at-least one product type"(){
+        given: "an authenticated user"
+        RequestSpecification request = given().spec(requestSpecification).log().all()
+
+        when: "we get products from the API"
+        // FIXME figure out better way to set up baseURI using RestAssured API
+        Response response = request.when().get("/api/generic/productType?max=10")
+        println "response.body():${response.body().toString()}"
+
+        // FIXME Should be replaced by Product domain class once we
+        List<ProductTypeResponse> productTypes = response.then().log().all().extract().body().jsonPath().
+                getList("data", ProductTypeResponse.class)
+
+        then: "expected a 200 response with at most 10 products"
+        response.then().assertThat().statusCode(200)
+
+        // Get a single product to pass to the next test
+        when: "we attempt to share a product with the next test"
+        ProductTypeResponse productType = response.then().body().extract().jsonPath().getObject("data[0]", ProductTypeResponse)
+        productTypeId = productType.id
+        then: "productType should not be null"
+        assertThat(productTypeId, is(notNullValue()))
+    }
+
+    @Test
     void "should return a list of products"() {
         given: "an authenticated user"
         RequestSpecification request = given().spec(requestSpecification).log().all()
@@ -98,6 +139,8 @@ class ProductApiTest extends Specification {
         when: "we attempt to share a product with the next test"
         ProductResponse product = response.then().body().extract().jsonPath().getObject("data[0]", ProductResponse)
         productId = product.id
+        categoryId = product.categoryId
+        println "categoryId:${categoryId}, productId:${productId}"
 
         then: "product should not be null"
         assertThat(productId, is(notNullValue()))
@@ -117,14 +160,6 @@ class ProductApiTest extends Specification {
         then:
         response.then().assertThat().statusCode(200)
 
-//        then: "data should not be null"
-//        Assert.assertNotNull(data)
-//        and: "product should not be null"
-//        Assert.assertNotNull(data.product, "Response should have product object")
-//        and: "product ID should not be null"
-//        Assert.assertEquals(data.product.id, productId, "Product id should match with requested id:${productId}")
-//        and: "demand should not be null"
-//        Assert.assertNotNull(data.demand, "Demand Object should not be null")
     }
 
     void "get demand summary of product"() {
@@ -157,22 +192,132 @@ class ProductApiTest extends Specification {
 
         then:
         response.then().assertThat().statusCode(200)
-//        Assert.assertEquals(data.product.id, productId, "Product id should be ${productId}")
-//        and:
-//        Assert.assertEquals(data.location.id, locationId, "Location id should be ${locationId}")
-//        and:
-//        Integer quantityOnHand = data.quantityOnHand ?: 0
-//        Assert.assertEquals(quantityOnHand, 0, "QuantityOnHand should be 0")
+
+        then:
+        assertThat(data.product.id, is(equalTo(productId)))
+
+    }
+
+    void "create new product"(){
+        given:
+        RequestSpecification httpRequest = given().spec(requestSpecification).contentType(ContentType.JSON)
+        //create object of objectmapper class
+        ObjectMapper objectMapper = new ObjectMapper();
+        ProductRequest product = new ProductRequest()
+        String randomString = StringUtil.randomString()
+        String productName = "Test Product ${randomString}"
+        String productCode = "Test_Product_Code_${randomString}"
+        product.name = productName
+        product.productCode = productCode
+
+        CategoryResponse category = new CategoryResponse()
+        category.id = categoryId
+        product.category = category
+
+        ProductTypeResponse productType = new ProductTypeResponse()
+        productType.id = productTypeId
+        product.productType = productType
+
+        String jsonbody = objectMapper.writeValueAsString(product);
+        //printing out the json
+        System.out.println("::jsonstring " + jsonbody);
+
+        when: "api/products POST called"
+        Response response = httpRequest.body(jsonbody).post("/api/generic/product")
+        JsonPath jsonPathEvaluator = response.jsonPath()
+        def data = jsonPathEvaluator.get("data")
+        println "data:${data}"
+        ProductResponse productResponse = response.then().body().extract().jsonPath().getObject("data", ProductResponse)
+        System.out.println("productResponse " + productResponse.dump());
+
+        then:
+        response.then().assertThat().statusCode(201)
+
+        then:
+        assertThat(productName, is(equalTo(productResponse.name)))
+
+    }
+
+    void "update existing product"(){
+        given:
+        RequestSpecification httpRequest = given().spec(requestSpecification).contentType(ContentType.JSON)
+        //create object of objectmapper class
+        ObjectMapper objectMapper = new ObjectMapper();
+        ProductRequest product = new ProductRequest()
+        String randomString = StringUtil.randomString()
+        String productName = "Test Product ${randomString}"
+        String productCode = "Test_Product_Code_${randomString}"
+        product.name = productName
+        product.productCode = productCode
+
+        CategoryResponse category = new CategoryResponse()
+        category.id = categoryId
+        product.category = category
+
+        ProductTypeResponse productType = new ProductTypeResponse()
+        productType.id = productTypeId
+        product.productType = productType
+
+        String jsonbody = objectMapper.writeValueAsString(product);
+        //printing out the json
+        System.out.println("::jsonstring " + jsonbody);
+
+        when: "api/products POST called"
+        Response response = httpRequest.body(jsonbody).put("/api/generic/product/${productId}")
+        JsonPath jsonPathEvaluator = response.jsonPath()
+        def data = jsonPathEvaluator.get("data")
+        println "data:${data}"
+        ProductResponse productResponse = response.then().body().extract().jsonPath().getObject("data", ProductResponse)
+        System.out.println("productResponse " + productResponse.dump());
+
+        then:
+        response.then().assertThat().statusCode(200)
+
+        then:
+        assertThat(productName, is(equalTo(productResponse.name)))
+
     }
 }
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+//@Data
+//@Builder
+//@NoArgsConstructor
+//@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class ProductResponse {
     String id
     String productCode
     String name
+    String categoryId
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+class ProductRequest {
+    String id
+    String productCode
+    String name
+    CategoryResponse category
+    ProductTypeResponse productType
+}
+
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+class CategoryResponse {
+    String id
+    String name
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+class ProductTypeResponse {
+
+    String id
+    String name
+
+    String code
+    String productIdentifierFormat
+    Integer sequenceNumber = 0
+
 }

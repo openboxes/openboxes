@@ -10,6 +10,7 @@
 package util
 
 import groovy.text.SimpleTemplateEngine
+import org.apache.commons.lang3.RandomStringUtils
 
 import java.text.DateFormat
 import java.text.MessageFormat
@@ -50,6 +51,11 @@ class StringUtil {
             return dateFormat.format(date)
         }
         return null
+    }
+
+    static String randomString(int size = 5){
+        String randomString = RandomStringUtils.random(size, "abcdefghijklmnopqrstuvwxyz")
+        return randomString
     }
 
 
