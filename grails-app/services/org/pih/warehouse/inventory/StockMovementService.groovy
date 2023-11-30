@@ -61,6 +61,7 @@ import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
 import org.pih.warehouse.shipping.ShipmentWorkflow
+import org.springframework.transaction.TransactionStatus
 
 class StockMovementService {
 
@@ -267,7 +268,11 @@ class StockMovementService {
             // Ignore backwards state transitions since it occurs normally when users go back and edit pages earlier in the workflow
             log.warn("Transition from ${requisition.status.name()} to ${status.name()} is not allowed - use rollback instead")
         } else {
-            requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status, comment)
+            // We want to commit the current transaction so we are able to get a fresh Requisition later in an published async event
+            Requisition.withTransaction { TransactionStatus transactionStatus ->
+                requisitionService.triggerRequisitionStatusTransition(requisition, AuthService.currentUser.get(), status, comment)
+                transactionStatus.flush()
+            }
             publishEvent(new RequisitionStatusTransitionEvent(requisition))
         }
     }
