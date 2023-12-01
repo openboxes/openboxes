@@ -654,10 +654,11 @@ class BootStrap {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
             Resource[] resources = resolver.getResources("file:grails-app/migrations/*")
 
-            // Find directories with names matching current versions pattern
+            // Find directories with names matching current versions pattern which
+            // will match to any version number between 0.0.x to 999.999.x
             List<String> changelogVersions = resources
                     .collect { it.filename }
-                    .findAll { it.matches("[0-9]{1,3}.[0-9]{1,3}.x") }
+                    .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
                     .reverse()
 
             // Exclude the newest changelog version, this one should be run separately
