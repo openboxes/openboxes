@@ -1604,7 +1604,7 @@ databaseChangeLog = {
 
             column(name: "quantity_ordered", type: "DECIMAL(65)")
 
-            column(name: "adjustments_count", type: "DECIMAL(44)")
+            column(name: "adjustments_count", type: "DECIMAL(45)")
 
             column(name: "quantity_shipped", type: "DECIMAL(65, 4)")
 
@@ -1616,13 +1616,13 @@ databaseChangeLog = {
 
             column(name: "adjustments_invoiced", type: "DECIMAL(63, 2)")
 
-            column(name: "items_ordered", type: "DECIMAL(44)")
+            column(name: "items_ordered", type: "DECIMAL(45)")
 
-            column(name: "items_shipped", type: "DECIMAL(44)")
+            column(name: "items_shipped", type: "DECIMAL(45)")
 
-            column(name: "items_received", type: "DECIMAL(44)")
+            column(name: "items_received", type: "DECIMAL(45)")
 
-            column(name: "items_invoiced", type: "DECIMAL(44)")
+            column(name: "items_invoiced", type: "DECIMAL(45)")
 
             column(name: "order_status", type: "VARCHAR(255)")
 
