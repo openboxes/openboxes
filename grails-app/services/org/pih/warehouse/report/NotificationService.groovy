@@ -16,7 +16,6 @@ import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.codehaus.groovy.grails.plugins.web.taglib.RenderTagLib
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
-import org.hibernate.Hibernate
 import org.pih.warehouse.api.PartialReceipt
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.MailService
@@ -270,11 +269,6 @@ class NotificationService {
         if (!recipient.email) {
             return
         }
-        // Due to the fact that we get LazyInitializationException thrown when building this mail
-        // Specifically when accessing mostRecentEvent value, we want to hydrate this value
-        // so we have access to it outside outside of the session
-        // TODO in grails 3 create a @service method which would fetch all of the necessary data without the need to refetch Requisition
-        Hibernate.initialize(requisition.mostRecentEvent)
         String subject = "${requisition.requestNumber} ${requisition.name}"
         String template = "/email/approvalsStatusChanged"
         String body = renderTemplate(template, [requisition: requisition])
