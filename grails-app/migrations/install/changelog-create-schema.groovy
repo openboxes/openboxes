@@ -1592,50 +1592,6 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "jmiranda (generated)", id: "1692045990425-57") {
-        createTable(tableName: "order_summary_mv") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
-                constraints(nullable: "false", unique: "true")
-            }
-
-            column(defaultValue: "", name: "order_id", type: "CHAR(38)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "quantity_ordered", type: "DECIMAL(65)")
-
-            column(name: "adjustments_count", type: "DECIMAL(45)")
-
-            column(name: "quantity_shipped", type: "DECIMAL(65, 4)")
-
-            column(name: "quantity_received", type: "DECIMAL(65, 4)")
-
-            column(name: "quantity_canceled", type: "DECIMAL(65, 4)")
-
-            column(name: "quantity_invoiced", type: "DECIMAL(65, 2)")
-
-            column(name: "adjustments_invoiced", type: "DECIMAL(63, 2)")
-
-            column(name: "items_ordered", type: "DECIMAL(45)")
-
-            column(name: "items_shipped", type: "DECIMAL(45)")
-
-            column(name: "items_received", type: "DECIMAL(45)")
-
-            column(name: "items_invoiced", type: "DECIMAL(45)")
-
-            column(name: "order_status", type: "VARCHAR(255)")
-
-            column(name: "shipment_status", type: "VARCHAR(17)")
-
-            column(name: "receipt_status", type: "VARCHAR(18)")
-
-            column(name: "payment_status", type: "VARCHAR(18)")
-
-            column(name: "derived_status", type: "VARCHAR(255)")
-        }
-    }
-
     changeSet(author: "jmiranda (generated)", id: "1692045990425-58") {
         createTable(tableName: "order_type") {
             column(name: "id", type: "CHAR(38)") {
