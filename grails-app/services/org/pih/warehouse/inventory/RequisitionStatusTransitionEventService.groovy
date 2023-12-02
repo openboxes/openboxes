@@ -10,7 +10,6 @@
 package org.pih.warehouse.inventory
 
 import org.pih.warehouse.report.NotificationService
-import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionStatusTransitionEvent
 import org.springframework.context.ApplicationListener
 
@@ -19,12 +18,8 @@ class RequisitionStatusTransitionEventService implements ApplicationListener<Req
     NotificationService notificationService
 
     void onApplicationEvent(RequisitionStatusTransitionEvent event) {
-        // Fetch the Requisition again to avoid LazyInitializationException when building the email template
-        // In some of the templates we access some deeply nested values like event comments and statuses
-        // TODO in grails 3 create a @service method which would fetch all of the necessary data without the need to refetch Requisition
-        Requisition requisition = Requisition.get(event.requisition.id)
-        if (requisition.shouldSendApprovalNotification()) {
-            notificationService.publishRequisitionStatusTransitionNotifications(requisition)
+        if (event.requisition.shouldSendApprovalNotification()) {
+            notificationService.publishRequisitionStatusTransitionNotifications(event.requisition)
         }
     }
 }

@@ -255,7 +255,7 @@ class StockMovementService {
 
         log.info "Update status ${id} " + status
         // TODO: In Grails the get below should be replaced by the data service get that joins the Events
-        Requisition requisition = Requisition.get(id)
+        Requisition requisition = requisitionService.getRequisitionWithEvents(id)
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()
