@@ -83,9 +83,10 @@ class InvoiceItem implements Serializable {
         glAccount(nullable: true)
         budgetCode(nullable: true)
         quantity(nullable: false, min: 0, validator: { Integer quantity, InvoiceItem obj ->
-            // If the invoice is a prepayment, the validation below doesn't make sense, because
+            // If the invoice is a prepayment or the item is an order adjustment,
+            // the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
-            if (obj.invoice.isPrepaymentInvoice) {
+            if (obj.invoice.isPrepaymentInvoice || obj.orderAdjustment) {
                 return true
             }
 
