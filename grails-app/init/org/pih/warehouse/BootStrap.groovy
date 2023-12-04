@@ -662,7 +662,7 @@ class BootStrap {
                     .reverse()
 
             // Exclude the newest changelog version, this one should be run separately
-            List<String> previousChangelogVersions = changelogVersions.size() ? changelogVersions.tail() : []
+            List<String> previousChangelogVersions = !changelogVersions.empty ? changelogVersions.tail() : []
 
             // Check if the executed changelog versions include one of the previous versions
             // and if so, then we need to keep running the old updates to catch up to 0.9.x
