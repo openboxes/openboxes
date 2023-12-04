@@ -327,7 +327,7 @@ class ProductSupplierDataService {
         productSupplier.manufacturerCode = params.manufacturerCode
 
         if (productSupplier.validate()) {
-            productSupplier.save(failOnError: true, flush: true)
+            productSupplier.save(failOnError: true)
         }
         return productSupplier
     }
