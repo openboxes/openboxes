@@ -7,32 +7,28 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.Address
+import org.pih.warehouse.core.IdentifierService
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.core.OrganizationService
 import org.pih.warehouse.inventory.Inventory
-import org.pih.warehouse.LocalizationUtil
-
-import javax.annotation.Nullable
 
 @Transactional
-class LocationDataService {
+class LocationImportDataService implements ImportDataService {
+    OrganizationService organizationService
+    IdentifierService identifierService
 
-    def organizationService
-    def identifierService
-
-    /**
-     * Validate inventory levels
-     */
-    Boolean validateData(ImportDataCommand command) {
+    @Override
+    void validateData(ImportDataCommand command) {
 
         def locationNamesToImport = command.data.collect {it.name}
         def locationNumbersToImport = command.data.collect {it.locationNumber}
@@ -117,16 +113,17 @@ class LocationDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
-            Location location = createOrUpdateLocation(params)
+            Location location = bindLocation(params)
             if (!location.validate() || !location.save(failOnError: true)) {
                 throw new ValidationException("Invalid location ${location.name}", location.errors)
             }
         }
     }
 
-    Location createOrUpdateLocation(Map params) {
+    Location bindLocation(Map params) {
         Location location
         if (params.id) {
             location = Location.findById(params.id)
@@ -145,7 +142,8 @@ class LocationDataService {
         location.locationGroup = params.locationGroup ? LocationGroup.findByName(params.locationGroup) : null
         location.parentLocation = params.parentLocation ? Location.findByNameOrLocationNumber(params.parentLocation, params.parentLocation) : null
         location.organization = params.organization ? Organization.findByCodeOrName(params.organization, params.organization) : null
-        location.address = createOrUpdateAddress(params, location?.address?.id)
+        location.address = bindAddress(params, location?.address?.id)
+
         if (!location.inventory && !location.parentLocation) {
             location.inventory = new Inventory(['warehouse': location])
         }
@@ -161,8 +159,10 @@ class LocationDataService {
 
         def currentLocationType = location.locationType
 
+        boolean isCurrentLocationTypeInternalOrZone = currentLocationType?.isInternalLocation() || currentLocationType?.isZone()
+        boolean isNewLocationTypeInternalOrZone = locationType?.isInternalLocation() || locationType?.isZone()
         //Do not allow to change internal type location to non-internal
-        if (((currentLocationType?.isInternalLocation() || currentLocationType?.isZone()) && (locationType?.isInternalLocation() || locationType?.isZone())) || !(currentLocationType?.isInternalLocation() || currentLocationType?.isZone())) {
+        if ((isCurrentLocationTypeInternalOrZone && isNewLocationTypeInternalOrZone) || !isCurrentLocationTypeInternalOrZone) {
             location.locationType = locationType
             location.supportedActivities = currentLocationType && locationType == currentLocationType ? location.supportedActivities : location.supportedActivities?.clear()
         }
@@ -180,7 +180,7 @@ class LocationDataService {
         return location
     }
 
-    Address createOrUpdateAddress(Map params, @Nullable String addressId) {
+    Address bindAddress(Map params, String addressId = null) {
         Address address
         if (addressId) {
             address = Address.findById(addressId)
@@ -189,18 +189,7 @@ class LocationDataService {
         if (!address) {
             address = new Address()
         }
-
-        address.address = params.streetAddress ?: ''
-        address.address2 = params.streetAddress2 ?: ''
-        address.city = params.city ?: ''
-        address.stateOrProvince = params.stateOrProvince ?: ''
-        address.postalCode = params.postalCode ?: ''
-        address.country = params.country ?: ''
-        address.description = params.description ?: ''
-
-        if (address.validate() && !address.hasErrors()) {
-            address.save()
-        }
+        address.properties = params
 
         return address
     }

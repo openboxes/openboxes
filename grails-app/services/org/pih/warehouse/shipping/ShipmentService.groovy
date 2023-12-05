@@ -59,7 +59,7 @@ class ShipmentService {
     def inventoryService
     def identifierService
     def documentService
-    def personDataService
+    def personService
     def productAvailabilityService
     def authService
 
@@ -2072,7 +2072,7 @@ class ShipmentService {
             }
             // Recipient string only includes name
             else {
-                person = personDataService.getOrCreatePersonFromNames(recipient)
+                person = personService.getOrCreatePersonFromNames(recipient)
             }
         }
         return person

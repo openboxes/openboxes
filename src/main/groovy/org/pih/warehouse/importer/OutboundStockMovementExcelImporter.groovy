@@ -11,9 +11,18 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
+class OutboundStockMovementExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+
+    @Delegate
+    OutboundStockMovementImportDataService outboundStockMovementImportDataService
 
     static Map columnMap = [
         sheet   : 'Sheet1',
@@ -40,31 +49,18 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter {
     ]
 
     OutboundStockMovementExcelImporter(String fileName) {
-        super(fileName)
-    }
-
-    def getDataService() {
-        return Holders.grailsApplication.mainContext.getBean("outboundStockMovementDataService")
-    }
-
-    /**
-     * Validate Outbound Stock Movement constraints
-     * @param command
-     */
-    void validateData(ImportDataCommand command) {
-        dataService.validateData(command)
+        super()
+        read(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        outboundStockMovementImportDataService = Holders.grailsApplication.mainContext.getBean("outboundStockMovementImportDataService")
     }
 
     List<Map> getData() {
-        Holders.grailsApplication.mainContext.getBean("excelImportService")
-                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
-    }
-
-    /**
-     * Import data from given map into database.
-     * @param command
-     */
-    void importData(ImportDataCommand command) {
-        dataService.importData(command)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
 }

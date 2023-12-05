@@ -9,43 +9,51 @@
  **/
 package org.pih.warehouse.importer
 
+import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
 import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
+import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductCatalogItem
+import org.springframework.validation.BeanPropertyBindingResult
 
-class CategoryExcelImporter extends AbstractExcelImporter implements DataImporter {
+@Transactional
+class ProductCatalogItemExcelImporter extends AbstractExcelImporter implements DataImporter {
 
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
 
     @Delegate
-    CategoryImportDataService categoryImportDataService
+    ProductCatalogItemImportDataService productCatalogItemImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
             startRow : 1,
             columnMap: [
-                    'A': 'id',
-                    'B': 'name',
-                    'C': 'parentCategoryId'
+                    'A': 'productCatalogCode',
+                    'B': 'productCode',
+                    'C': 'productName'
             ]
     ]
 
     static Map propertyMap = [
-            id              : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            name            : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
-            parentCategoryId: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
+            productCatalogCode: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productCode       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
+            productName       : ([expectedType: ExpectedPropertyType.StringType, defaultValue: null])
     ]
 
-    CategoryExcelImporter(String fileName) {
+
+    ProductCatalogItemExcelImporter(String fileName) {
         super()
         read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-        categoryImportDataService = Holders.grailsApplication.mainContext.getBean("categoryImportDataService")
+        productCatalogItemImportDataService = Holders.grailsApplication.mainContext.getBean("productCatalogItemImportDataService")
     }
+
 
     List<Map> getData() {
         excelImportService.columns(

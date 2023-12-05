@@ -24,7 +24,6 @@ import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.LocalizationUtil
 import util.ReportUtil
 import java.text.SimpleDateFormat
@@ -480,40 +479,6 @@ class ProductService {
             }
         }
         return quickCategories
-    }
-
-    /**
-     * Validate the data in the given import command object.
-     *
-     * @param command
-     */
-    void validateData(ImportDataCommand command) {
-        log.info "validate data test "
-        // Iterate over each row and validate values
-        command?.data?.each { Map params ->
-            log.info "validate data " + params
-            params.prompts = [:]
-            params.prompts["product.id"] = Product.findAllByActiveAndNameLike(true, "%" + params.search1 + "%")
-        }
-    }
-
-    /**
-     * Import the data in the given import command object
-     * @param command
-     */
-    void importData(ImportDataCommand command) {
-        log.info "import data"
-
-        try {
-            // Iterate over each row
-            command?.data?.each { Map params ->
-                log.info "import data " + params
-            }
-        } catch (Exception e) {
-            log.error("Error importing data ", e)
-            throw e
-        }
-
     }
 
     /**

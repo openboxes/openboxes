@@ -12,15 +12,19 @@ package org.pih.warehouse.importer
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
-import org.pih.warehouse.product.ProductCatalog
-import org.springframework.validation.BeanPropertyBindingResult
 
 @Transactional
-class ProductCatalogExcelImporter extends AbstractExcelImporter {
+class ProductCatalogExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
+    @Delegate
+    ProductCatalogImportDataService productCatalogImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -41,52 +45,19 @@ class ProductCatalogExcelImporter extends AbstractExcelImporter {
             description: ([expectedType: ExpectedPropertyType.StringType, defaultValue: null]),
     ]
 
-
     ProductCatalogExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        productCatalogImportDataService = Holders.grailsApplication.mainContext.getBean("productCatalogImportDataService")
     }
-
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-
-    Boolean validateData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            ProductCatalog productCatalog = createOrUpdateProductCatalog(params)
-            if (!productCatalog.validate()) {
-                productCatalog.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index + 1}: Product catalog ${productCatalog.name} is invalid: ${error.getFieldError()}")
-                }
-            }
-            productCatalog.discard()
-        }
-
-    }
-
-    void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            ProductCatalog productCatalog = createOrUpdateProductCatalog(params)
-            if (productCatalog.validate()) {
-                productCatalog.save(failOnError: true)
-            }
-        }
-    }
-
-
-    ProductCatalog createOrUpdateProductCatalog(Map params) {
-        ProductCatalog productCatalog = ProductCatalog.findByIdOrName(params.id, params.name)
-        if (!productCatalog) {
-            productCatalog = new ProductCatalog()
-        }
-        productCatalog.id = params.id
-        productCatalog.code = params.code
-        productCatalog.name = params.name
-        productCatalog.description = params.description
-        return productCatalog
-    }
-
-
 }

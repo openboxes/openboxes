@@ -11,13 +11,18 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
 import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class InventoryItemExcelImporter extends AbstractExcelImporter {
+class InventoryItemExcelImporter extends AbstractExcelImporter implements DataImporter {
 
-    def dataService
+    static cellReporter = new DefaultImportCellCollector()
+
     ExcelImportService excelImportService
+
+    @Delegate
+    InventoryLevelImportDataService inventoryLevelImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -71,24 +76,19 @@ class InventoryItemExcelImporter extends AbstractExcelImporter {
 
 
     InventoryItemExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
         dataService = Holders.grailsApplication.mainContext.getBean("dataService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-
-    void validateData(ImportDataCommand command) {
-        dataService.validateInventoryLevels(command)
-    }
-
-    void importData(ImportDataCommand command) {
-        dataService.importInventoryLevels(command)
-    }
-
-
 }

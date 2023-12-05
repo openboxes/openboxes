@@ -19,16 +19,17 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.sql.JoinType
-import org.pih.warehouse.data.LocationDataService
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.LocationImportDataService
 import util.ConfigHelper
+
 
 @Transactional
 class LocationService {
 
     GrailsApplication grailsApplication
     UserService userService
-    LocationDataService locationDataService
+    LocationImportDataService locationImportDataService
 
     Location findInternalLocation(Location parentLocation, String[] names) {
         return Location.createCriteria().get {
@@ -696,13 +697,13 @@ class LocationService {
         command.data = csvReader.readAll()
 
         command.errors = null
-        locationDataService.validateData(command)
+        locationImportDataService.validateData(command)
 
         if (command.errors.allErrors) {
             throw new ValidationException("Failed to import template due to validation errors", command.errors)
         }
 
-        locationDataService.importData(command)
+        locationImportDataService.importData(command)
     }
 
     def deleteLocation(Location existingLocation) {

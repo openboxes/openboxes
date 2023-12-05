@@ -11,9 +11,18 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class ProductSynonymExcelImporter extends AbstractExcelImporter {
+class ProductSynonymExcelImporter extends AbstractExcelImporter implements DataImporter {
+
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+
+    @Delegate
+    ProductSynonymImportDataService productSynonymImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -35,24 +44,18 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter {
 
 
     ProductSynonymExcelImporter(String fileName) {
-        super(fileName)
-    }
-
-    def getDataService() {
-        return Holders.grailsApplication.mainContext.getBean("productSynonymDataService")
+        super()
+        read(fileName)
+        excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        productSynonymImportDataService = Holders.grailsApplication.mainContext.getBean("productSynonymImportDataService")
     }
 
     List<Map> getData() {
-        return Holders.grailsApplication.mainContext.getBean("excelImportService")
-                .convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-    void validateData(ImportDataCommand command) {
-        dataService.validateData(command)
-    }
-
-    void importData(ImportDataCommand command) {
-        dataService.importData(command)
-    }
-
 }

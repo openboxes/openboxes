@@ -7,21 +7,21 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Attribute
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAttribute
 import org.pih.warehouse.product.ProductSupplier
 
 @Transactional
-class ProductSupplierAttributeDataService {
+class ProductSupplierAttributeImportDataService implements ImportDataService {
 
-    Boolean validate(ImportDataCommand command) {
+    @Override
+    void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
         command.data.eachWithIndex { params, index ->
 
@@ -91,44 +91,38 @@ class ProductSupplierAttributeDataService {
             // Validate UOM data type matches unless UOM not specified for attribute
             UnitOfMeasure uom = unitOfMeasure ? UnitOfMeasure.findByCode(unitOfMeasure) : null
             if (attribute.unitOfMeasureClass && attribute.unitOfMeasureClass?.type != uom?.uomClass?.type) {
-                command.errors.reject("Row ${index + 1}: Unit of Measure ${unitOfMeasure} " +
-                    "data type does not match the unit of measure data type for given attribute")
+                command.errors.reject("Row ${index + 1}: Unit of Measure ${unitOfMeasure} " + "data type does not match the unit of measure data type for given attribute")
             }
         }
     }
 
-    void process(ImportDataCommand command) {
+    @Override
+    void importData(ImportDataCommand command) {
         log.info "Process data " + command.filename
 
         command.data.eachWithIndex { params, index ->
-            ProductAttribute productAttribute = createOrUpdate(params)
+            ProductAttribute productAttribute = bindProductSupplierAttribute(params)
             if (productAttribute.validate()) {
                 productAttribute.save(failOnError: true, flush: true)
             }
         }
     }
 
-    def createOrUpdate(Map params) {
-        def productCode = params.productCode
-        def productSupplierCode = params.productSupplierCode
-        def attributeCode = params.attributeCode
-        def attributeValue = params.attributeValue
-        def unitOfMeasure = params.unitOfMeasure
-
-        Product product = Product.findByProductCode(productCode)
-        ProductSupplier productSupplier = ProductSupplier.findByCode(productSupplierCode)
-        Attribute attribute = Attribute.findByCode(attributeCode)
+    ProductAttribute bindProductSupplierAttribute(Map params) {
+        ProductSupplier productSupplier = ProductSupplier.findByCode(params.productSupplierCode)
+        Attribute attribute = Attribute.findByCode(params.attributeCode)
         ProductAttribute productAttribute = ProductAttribute.findByAttributeAndProductSupplier(attribute, productSupplier)
-        UnitOfMeasure uom = unitOfMeasure ? UnitOfMeasure.findByCode(unitOfMeasure) : null
+        Product product = Product.findByProductCode(params.productCode)
+        UnitOfMeasure uom = params.unitOfMeasure ? UnitOfMeasure.findByCode(params.unitOfMeasure) : null
 
         if (productAttribute) {
-            productAttribute.value = attributeValue
+            productAttribute.value = params.attributeValue
             productAttribute.unitOfMeasure = uom
         } else {
             productAttribute = new ProductAttribute()
             productAttribute.attribute = attribute
             productAttribute.productSupplier = productSupplier
-            productAttribute.value = attributeValue
+            productAttribute.value = params.attributeValue
             productAttribute.unitOfMeasure = uom
             product.addToAttributes(productAttribute)
         }

@@ -520,4 +520,18 @@ class UserService {
         }
         user.save(failOnError: true)
     }
+
+    Role[] extractDefaultRoles(String defaultRolesString) {
+        String[] defaultRoles = defaultRolesString?.split(",")
+        Role[] roles = defaultRoles.collect { String roleTypeName ->
+            roleTypeName = roleTypeName.trim()
+            Role role = Role.findByName(roleTypeName)
+            if (!role) {
+                RoleType roleType = RoleType.valueOf(roleTypeName)
+                role = Role.findByRoleType(roleType)
+            }
+            return role
+        }
+        return roles
+    }
 }

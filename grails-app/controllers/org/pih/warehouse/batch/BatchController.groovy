@@ -24,9 +24,9 @@ import org.pih.warehouse.importer.ProductCatalogExcelImporter
 import org.pih.warehouse.importer.ProductCatalogItemExcelImporter
 import org.pih.warehouse.importer.ProductExcelImporter
 import org.pih.warehouse.importer.ProductPackageExcelImporter
-import org.pih.warehouse.importer.ProductSupplierAttributeImporter
+import org.pih.warehouse.importer.ProductSupplierAttributeExcelImporter
 import org.pih.warehouse.importer.ProductSupplierExcelImporter
-import org.pih.warehouse.importer.ProductSupplierPreferenceImporter
+import org.pih.warehouse.importer.ProductSupplierPreferenceExcelImporter
 import org.pih.warehouse.importer.ProductAssociationExcelImporter
 import org.pih.warehouse.importer.ProductSynonymExcelImporter
 import org.pih.warehouse.importer.TagExcelImporter
@@ -163,10 +163,10 @@ class BatchController {
                             dataImporter = new ProductSupplierExcelImporter(command?.filename)
                             break
                         case "productSupplierPreference":
-                            dataImporter = new ProductSupplierPreferenceImporter(command?.filename)
+                            dataImporter = new ProductSupplierPreferenceExcelImporter(command?.filename)
                             break
                         case "productSupplierAttribute":
-                            dataImporter = new ProductSupplierAttributeImporter(command?.filename)
+                            dataImporter = new ProductSupplierAttributeExcelImporter(command?.filename)
                             break
                         case "productPackage":
                             dataImporter = new ProductPackageExcelImporter(command?.filename)

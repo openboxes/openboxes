@@ -7,7 +7,7 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Location
@@ -15,15 +15,12 @@ import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.Role
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
-import org.pih.warehouse.importer.ImportDataCommand
 
 @Transactional
-class UserLocationDataService {
+class UserLocationImportDataService implements ImportDataService {
 
-    /**
-     * Validate inventory levels
-     */
-    Boolean validateData(ImportDataCommand command) {
+    @Override
+    void validateData(ImportDataCommand command) {
         command.data.eachWithIndex { params, index ->
 
             User user = User.findByUsername(params.username)
@@ -49,8 +46,9 @@ class UserLocationDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
+        command.data.each { params ->
             User user = User.findByUsername(params.username)
             Location location = Location.findByNameOrLocationNumber(params.locationName, params.locationName)
             RoleType roleType = RoleType.valueOf(params.roleName)
@@ -70,8 +68,5 @@ class UserLocationDataService {
 
             user.save(failOnError: true)
         }
-
     }
-
-
 }

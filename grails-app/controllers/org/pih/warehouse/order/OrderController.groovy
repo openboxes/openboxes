@@ -11,22 +11,18 @@ package org.pih.warehouse.order
 
 import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import grails.converters.JSON
-import grails.plugins.csv.CSVWriter
 import grails.validation.ValidationException
 import grails.gorm.transactions.Transactional
-import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.api.StockMovement
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.BudgetCode
-import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
-import org.pih.warehouse.core.Document
-import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.DocumentTemplateService
 import org.pih.warehouse.core.Organization
-import org.pih.warehouse.core.UomService
-import org.pih.warehouse.core.User
 import org.pih.warehouse.core.ValidationCode
+import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.importer.CSVUtils
+import org.pih.warehouse.inventory.StockMovementService
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.shipping.Shipment
@@ -40,14 +36,10 @@ import java.math.RoundingMode
 
 @Transactional
 class OrderController {
-    def orderService
-    def stockMovementService
-    def reportService
-    def shipmentService
-    def uomService
-    def userService
-    def productSupplierDataService
-    def documentTemplateService
+    OrderService orderService
+    StockMovementService stockMovementService
+    ProductSupplierService productSupplierService
+    DocumentTemplateService documentTemplateService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -695,7 +687,7 @@ class OrderController {
         }
 
         try {
-            productSupplier = productSupplierDataService.createProductSupplierWithoutPackage(params)
+            productSupplier = productSupplierService.createProductSupplierWithoutPackage(params)
         } catch (Exception e) {
             log.error("Error " + e.message, e)
             render(status: 500, text: "Error creating product source")
@@ -735,7 +727,7 @@ class OrderController {
             }
         }
         if (params.productSupplier || params.supplierCode) {
-            productSupplier = productSupplierDataService.getOrCreateNew(params, params.productSupplier == "Create New")
+            productSupplier = productSupplierService.getOrCreateNew(params, params.productSupplier == "Create New")
         }
         params.remove("productSupplier")
         if (params.budgetCode) {

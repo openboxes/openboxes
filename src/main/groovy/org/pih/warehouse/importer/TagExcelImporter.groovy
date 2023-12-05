@@ -9,16 +9,20 @@
  **/
 package org.pih.warehouse.importer
 
-import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
-import org.pih.warehouse.core.Tag
-import org.springframework.validation.BeanPropertyBindingResult
 
-class TagExcelImporter extends AbstractExcelImporter {
+class TagExcelImporter extends AbstractExcelImporter implements DataImporter {
 
-    def excelImportService
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+
+    @Delegate
+    TagImportDataService tagImportDataService
 
     static Map columnMap = [
             sheet    : 'Sheet1',
@@ -35,46 +39,18 @@ class TagExcelImporter extends AbstractExcelImporter {
     ]
 
     TagExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
+        tagImportDataService = Holders.grailsApplication.mainContext.getBean("tagImportDataService")
     }
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-    void validateData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            Tag tag = createOrUpdateTag(params)
-            if (!tag.validate()) {
-                tag.errors.each { BeanPropertyBindingResult error ->
-                    command.errors.reject("Row ${index + 1}: Tag ${tag.tag} is invalid: ${error.getFieldError()}")
-                }
-            }
-            tag.discard()
-        }
-    }
-
-    @Transactional
-    void importData(ImportDataCommand command) {
-        command.data.eachWithIndex { params, index ->
-            Tag tag = createOrUpdateTag(params)
-            if (tag.validate()) {
-                tag.save(failOnError: true)
-            }
-        }
-    }
-
-
-    Tag createOrUpdateTag(Map params) {
-        Tag tag = Tag.findByIdOrTag(params.id, params.tag)
-        if (!tag) {
-            tag = new Tag()
-        }
-        tag.id = params.id
-        tag.tag = params.tag
-        return tag
-    }
-
-
 }

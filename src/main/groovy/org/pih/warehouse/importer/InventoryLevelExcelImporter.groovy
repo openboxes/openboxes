@@ -11,12 +11,18 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class InventoryLevelExcelImporter extends AbstractExcelImporter {
+class InventoryLevelExcelImporter extends AbstractExcelImporter implements DataImporter {
 
-    def dataService
-    def excelImportService
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+
+    @Delegate
+    InventoryLevelImportDataService inventoryLevelImportDataService
 
     static Map cellMap = [sheet: 'Sheet1', startRow: 1, cellMap: []]
 
@@ -78,25 +84,19 @@ class InventoryLevelExcelImporter extends AbstractExcelImporter {
 
 
     InventoryLevelExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-        dataService = Holders.grailsApplication.mainContext.getBean("dataService")
+        inventoryLevelImportDataService = Holders.grailsApplication.mainContext.getBean("inventoryLevelImportDataService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-
-    void validateData(ImportDataCommand command) {
-        dataService.validateInventoryLevels(command)
-
-    }
-
-    void importData(ImportDataCommand command) {
-        dataService.importInventoryLevels(command)
-    }
-
-
 }

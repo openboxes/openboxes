@@ -11,12 +11,18 @@ package org.pih.warehouse.importer
 
 import grails.util.Holders
 import org.grails.plugins.excelimport.AbstractExcelImporter
+import org.grails.plugins.excelimport.DefaultImportCellCollector
+import org.grails.plugins.excelimport.ExcelImportService
 import org.grails.plugins.excelimport.ExpectedPropertyType
 
-class ProductExcelImporter extends AbstractExcelImporter {
+class ProductExcelImporter extends AbstractExcelImporter implements DataImporter {
 
-    def productService
-    def excelImportService
+    static cellReporter = new DefaultImportCellCollector()
+
+    ExcelImportService excelImportService
+
+    @Delegate
+    ProductImportDataService productImportDataService
 
     static Map cellMap = [
             sheet: 'Sheet1', startRow: 1, cellMap: []]
@@ -55,33 +61,19 @@ class ProductExcelImporter extends AbstractExcelImporter {
 
 
     ProductExcelImporter(String fileName) {
-        super(fileName)
+        super()
+        read(fileName)
         excelImportService = Holders.grailsApplication.mainContext.getBean("excelImportService")
-        productService = Holders.grailsApplication.mainContext.getBean("productService")
+        productImportDataService = Holders.grailsApplication.mainContext.getBean("productImportDataService")
     }
 
 
     List<Map> getData() {
-        return excelImportService.convertColumnMapConfigManyRows(workbook, columnMap, null, null, propertyMap)
+        excelImportService.columns(
+                workbook,
+                columnMap,
+                cellReporter,
+                propertyMap
+        )
     }
-
-
-    void validateData(ImportDataCommand command) {
-        productService.validateData(command)
-    }
-
-
-    /**
-     * Import data from given inventoryMapList into database.
-     *
-     * @param location
-     * @param inventoryMapList
-     * @param errors
-     */
-    void importData(ImportDataCommand command) {
-        productService.importData(command)
-
-    }
-
-
 }

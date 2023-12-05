@@ -7,20 +7,22 @@
  * the terms of this license.
  * You must not remove this notice, or any other, from this software.
  **/
-package org.pih.warehouse.data
+package org.pih.warehouse.importer
 
 import grails.core.GrailsApplication
+import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.Synonym
 import org.pih.warehouse.core.SynonymTypeCode
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductService
 
-class ProductSynonymDataService {
-
-    def productService
+@Transactional
+class ProductSynonymImportDataService implements ImportDataService {
+    ProductService productService
     GrailsApplication grailsApplication
 
-    Boolean validateData(ImportDataCommand command) {
+    @Override
+    void validateData(ImportDataCommand command) {
         log.info "Validate data " + command.filename
 
         // List to store product codes and a locale that we've already added a DISPLAY_NAME synonym for during this one import
@@ -28,7 +30,7 @@ class ProductSynonymDataService {
 
         command.data.eachWithIndex { params, index ->
             // check for required fields
-            Synonym.PROPERTIES.each {columnName, paramAccessor ->
+            Synonym.PROPERTIES.each { columnName, paramAccessor ->
                 if(!params[paramAccessor]) {
                     command.errors.reject("Row ${index + 1}: '${columnName?.toLowerCase()}' is required")
                 }
@@ -84,6 +86,7 @@ class ProductSynonymDataService {
         }
     }
 
+    @Override
     void importData(ImportDataCommand command) {
         log.info "Import data " + command.filename
 
@@ -92,5 +95,4 @@ class ProductSynonymDataService {
             productService.addSynonymToProduct(product.id, params['synonymTypeCode'], params['name'], params['locale'])
         }
     }
-
 }
