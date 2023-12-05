@@ -1711,7 +1711,7 @@ databaseChangeLog = {
             }
 
             column(name: "code", type: "VARCHAR(255)") {
-                constraints(nullable: "false", unique: "true")
+                constraints(nullable: "false")
             }
 
             column(name: "date_created", type: "datetime") {
@@ -2167,7 +2167,7 @@ databaseChangeLog = {
             column(name: "active", type: "BIT(1)")
 
             column(name: "code", type: "VARCHAR(255)") {
-                constraints(nullable: "false", unique: "true")
+                constraints(nullable: "false")
             }
 
             column(name: "date_created", type: "datetime") {
@@ -3772,6 +3772,14 @@ databaseChangeLog = {
 
     changeSet(author: "jmiranda (generated)", id: "1692045990425-137") {
         addUniqueConstraint(columnNames: "product_id, product_supplier_id, uom_id, quantity", constraintName: "product_package_uniq_idx", tableName: "product_package")
+    }
+
+    changeSet(author: "jmiranda (generated)", id: "1692045990425-788") {
+        addUniqueConstraint(columnNames: "code", constraintName: "party_type_code_uniq_idx", tableName: "party_type")
+    }
+
+    changeSet(author: "jmiranda (generated)", id: "1692045990425-789") {
+        addUniqueConstraint(columnNames: "code", constraintName: "code_idx", tableName: "product_catalog")
     }
 
     changeSet(author: "jmiranda (generated)", id: "1692045990425-138") {
