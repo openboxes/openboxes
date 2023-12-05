@@ -210,6 +210,18 @@ class StockMovementController {
             (!isRequestedUrlForStockRequest && stockMovement.electronicType)) {
                 throw new IllegalAccessException("You can't delete the stock movement: ${stockMovement.name} using this URL")
         }
+
+        // If a shipment has items with invoice quantity greater than 0,
+        // it means there is a connected invoice, and we cannot delete stock movement
+        if (stockMovement?.shipment?.hasInvoicedItem()) {
+            flash.message = g.message(
+                    code: 'stockMovement.delete.error.message',
+                    default: 'The Stock Movement could not be deleted',
+            )
+            redirect(action: "show", id: params.id)
+            return
+        }
+
         if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
             if (stockMovement?.shipment?.currentStatus == ShipmentStatusCode.PENDING || !stockMovement?.shipment?.currentStatus) {
                 try {
