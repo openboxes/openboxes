@@ -20,6 +20,7 @@ class InventoryItemExcelImporter extends AbstractExcelImporter implements DataIm
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     InventoryLevelImportDataService inventoryLevelImportDataService
 

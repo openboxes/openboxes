@@ -20,6 +20,7 @@ class TagExcelImporter extends AbstractExcelImporter implements DataImporter {
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     TagImportDataService tagImportDataService
 

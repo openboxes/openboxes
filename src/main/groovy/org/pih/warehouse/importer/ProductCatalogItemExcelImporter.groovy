@@ -26,6 +26,7 @@ class ProductCatalogItemExcelImporter extends AbstractExcelImporter implements D
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     ProductCatalogItemImportDataService productCatalogItemImportDataService
 

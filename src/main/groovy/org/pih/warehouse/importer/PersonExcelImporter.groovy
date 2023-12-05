@@ -20,6 +20,7 @@ class PersonExcelImporter extends AbstractExcelImporter implements DataImporter 
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     PersonImportDataService personImportDataService
 

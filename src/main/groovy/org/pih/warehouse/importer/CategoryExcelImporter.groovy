@@ -20,6 +20,7 @@ class CategoryExcelImporter extends AbstractExcelImporter implements DataImporte
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     CategoryImportDataService categoryImportDataService
 

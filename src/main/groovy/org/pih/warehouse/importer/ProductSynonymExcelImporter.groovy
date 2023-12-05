@@ -20,6 +20,7 @@ class ProductSynonymExcelImporter extends AbstractExcelImporter implements DataI
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     ProductSynonymImportDataService productSynonymImportDataService
 

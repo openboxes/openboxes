@@ -20,6 +20,7 @@ class UserExcelImporter extends AbstractExcelImporter implements DataImporter {
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     UserImportDataService userImportDataService
 

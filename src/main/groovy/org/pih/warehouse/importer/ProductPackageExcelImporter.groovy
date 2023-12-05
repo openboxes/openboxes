@@ -20,6 +20,7 @@ class ProductPackageExcelImporter extends AbstractExcelImporter implements DataI
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     ProductPackageImportDataService productPackageImportDataService
 

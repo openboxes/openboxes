@@ -20,6 +20,7 @@ class OutboundStockMovementExcelImporter extends AbstractExcelImporter implement
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     OutboundStockMovementImportDataService outboundStockMovementImportDataService
 

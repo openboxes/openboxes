@@ -20,6 +20,7 @@ class LocationExcelImporter extends AbstractExcelImporter implements DataImporte
     static cellReporter = new DefaultImportCellCollector()
 
     ExcelImportService excelImportService
+
     @Delegate
     LocationImportDataService locationImportDataService
 

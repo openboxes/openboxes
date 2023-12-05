@@ -13,14 +13,18 @@ import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVMapReader
 import org.pih.warehouse.core.*
 import org.pih.warehouse.importer.ImportDataCommand
+import org.pih.warehouse.importer.LocationImportDataService
 import org.pih.warehouse.importer.ProductCatalogItemImportDataService
+import org.pih.warehouse.importer.ProductSupplierImportDataService
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
+import org.pih.warehouse.inventory.InventoryService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
+import org.pih.warehouse.product.ProductService
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
 import org.pih.warehouse.requisition.RequisitionItem
@@ -32,11 +36,11 @@ import java.text.SimpleDateFormat
 @Transactional
 class LoadDataService {
 
-    def locationImportDataService
-    def productSupplierImportDataService
-    def productService
-    def inventoryService
-    def identifierService
+    LocationImportDataService locationImportDataService
+    ProductSupplierImportDataService productSupplierImportDataService
+    ProductService productService
+    InventoryService inventoryService
+    IdentifierService identifierService
     ProductCatalogItemImportDataService productCatalogItemImportDataService
 
     def importLocations(URL csvURL) {
