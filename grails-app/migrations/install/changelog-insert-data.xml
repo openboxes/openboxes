@@ -54,41 +54,6 @@
             <column name="description"/>
         </insert>
     </changeSet>
-    <changeSet author="jmiranda (generated)" id="1692069478960-2">
-        <insert tableName="comment">
-            <column name="id" value="1"/>
-            <column name="version" valueNumeric="0"/>
-            <column name="comment" value="We need to ship this as soon as possible!"/>
-            <column name="date_created" value="2010-08-25T00:00"/>
-            <column name="date_read"/>
-            <column name="date_sent"/>
-            <column name="last_updated" value="2010-08-25T00:00"/>
-            <column name="recipient_id" value="2"/>
-            <column name="sender_id" value="1"/>
-        </insert>
-        <insert tableName="comment">
-            <column name="id" value="2"/>
-            <column name="version" valueNumeric="0"/>
-            <column name="comment" value="Did you ship this yet?!?!?!?"/>
-            <column name="date_created" value="2010-08-25T00:00"/>
-            <column name="date_read"/>
-            <column name="date_sent"/>
-            <column name="last_updated" value="2010-08-25T00:00"/>
-            <column name="recipient_id" value="2"/>
-            <column name="sender_id" value="1"/>
-        </insert>
-        <insert tableName="comment">
-            <column name="id" value="3"/>
-            <column name="version" valueNumeric="0"/>
-            <column name="comment" value="What is taking so long?"/>
-            <column name="date_created" value="2010-08-25T00:00"/>
-            <column name="date_read"/>
-            <column name="date_sent"/>
-            <column name="last_updated" value="2010-08-25T00:00"/>
-            <column name="recipient_id" value="2"/>
-            <column name="sender_id" value="1"/>
-        </insert>
-    </changeSet>
     <changeSet author="jmiranda (generated)" id="1692069478960-3">
         <insert tableName="container_type">
             <column name="id" value="1"/>
@@ -163,36 +128,6 @@
             <column name="sort_order" valueNumeric="0"/>
         </insert>
     </changeSet>
-<!--    <changeSet author="jmiranda (generated)" id="1692069478960-4">-->
-<!--        <insert tableName="document">-->
-<!--            <column name="id" value="1"/>-->
-<!--            <column name="version" valueNumeric="0"/>-->
-<!--            <column name="content_type" value="text/plain"/>-->
-<!--            <column name="date_created" value="2010-08-25T00:00"/>-->
-<!--            <column name="document_number"/>-->
-<!--            <column name="document_type_id" value="3"/>-->
-<!--            <column name="extension"/>-->
-<!--            <column name="file_contents" valueComputed="UNSUPPORTED FOR DIFF: BINARY DATA"/>-->
-<!--            <column name="file_uri"/>-->
-<!--            <column name="filename" value="packing-list.pdf"/>-->
-<!--            <column name="last_updated" value="2010-08-25T00:00"/>-->
-<!--            <column name="name"/>-->
-<!--        </insert>-->
-<!--        <insert tableName="document">-->
-<!--            <column name="id" value="2"/>-->
-<!--            <column name="version" valueNumeric="0"/>-->
-<!--            <column name="content_type" value="text/plain"/>-->
-<!--            <column name="date_created" value="2010-08-25T00:00"/>-->
-<!--            <column name="document_number"/>-->
-<!--            <column name="document_type_id" value="5"/>-->
-<!--            <column name="extension"/>-->
-<!--            <column name="file_contents" valueComputed="UNSUPPORTED FOR DIFF: BINARY DATA"/>-->
-<!--            <column name="file_uri"/>-->
-<!--            <column name="filename" value="invoice.pdf"/>-->
-<!--            <column name="last_updated" value="2010-08-25T00:00"/>-->
-<!--            <column name="name"/>-->
-<!--        </insert>-->
-<!--    </changeSet>-->
     <changeSet author="jmiranda (generated)" id="1692069478960-5">
         <insert tableName="document_type">
             <column name="id" value="1"/>
