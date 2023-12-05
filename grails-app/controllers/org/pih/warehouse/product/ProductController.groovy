@@ -810,6 +810,7 @@ class ProductController {
      *
      * @return
      */
+    @Transactional
     def addProductGroupToProduct() {
         println "addProductGroupToProduct() " + params
         def product = Product.get(params.id)

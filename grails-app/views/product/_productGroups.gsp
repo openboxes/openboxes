@@ -11,7 +11,7 @@
                 </tr>
             </thead>
             <tbody>
-                <g:each var="productGroup" in="${productInstance.productGroups}">
+                <g:each var="productGroup" in="${productInstance?.productGroups}">
                     <tr>
                         <td class="top">
                             <g:link controller="productGroup" action="edit" id="${productGroup.id}">
@@ -46,7 +46,7 @@
                         </td>
                     </tr>
                 </g:each>
-                <g:unless test="${productInstance.productGroups}">
+                <g:unless test="${productInstance?.productGroups}">
                     <tr>
                         <td class="center empty" colspan="4">
                             <warehouse:message code="default.none.label"/>
