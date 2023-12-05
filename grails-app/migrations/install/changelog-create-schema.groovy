@@ -3336,24 +3336,6 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "jmiranda (generated)", id: "1692045990425-119") {
-        createTable(tableName: "stockout_fact") {
-            column(name: "date_dimension_id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "location_dimension_id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "product_dimension_id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "quantity_on_hand", type: "SMALLINT")
-        }
-    }
-
     changeSet(author: "jmiranda (generated)", id: "1692045990425-120") {
         createTable(tableName: "synonym") {
             column(name: "id", type: "CHAR(38)") {
