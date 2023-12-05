@@ -49,6 +49,7 @@ class ProductController {
     def productMergeService
     UploadService uploadService
     def localizationService
+    ProductDataService productDataService
 
     static allowedMethods = [save: "POST", update: "POST"]
 
@@ -810,7 +811,6 @@ class ProductController {
      *
      * @return
      */
-    @Transactional
     def addProductGroupToProduct() {
         println "addProductGroupToProduct() " + params
         def product = Product.get(params.id)
@@ -820,7 +820,7 @@ class ProductController {
                 productGroup = new ProductGroup(name: params.productGroup, category: product.category)
             }
             product.addToProductGroups(productGroup)
-            product.save(failOnError: true)
+            productDataService.save(product)
         }
         render(template: 'productGroups', model: [productInstance: product])
     }
@@ -846,7 +846,6 @@ class ProductController {
     /**
      * Delete product group from database
      */
-    @Transactional
     def removeFromProductGroups() {
         println "removeFromProductGroup() " + params
 
@@ -854,11 +853,11 @@ class ProductController {
         if (product) {
             def productGroup = ProductGroup.get(params.id)
             product.removeFromProductGroups(productGroup)
-            product.save(flush: true)
+            productDataService.save(product)
         } else {
             response.status = 404
         }
-        render(template: 'productGroups', model: [product: product, productGroups: product?.productGroups])
+        render(template: 'productGroups', model: [productInstance: product, productGroups: product?.productGroups])
     }
 
     /**
