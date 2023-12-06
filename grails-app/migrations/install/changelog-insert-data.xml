@@ -435,23 +435,28 @@
             <column name="address_id" value="1"/>
             <column name="date_created" value="2010-08-25T00:00"/>
             <column name="last_updated" value="2010-08-25T00:00"/>
-            <column name="logo_url"/>
             <column name="name" value="Main Warehouse"/>
             <column name="inventory_id" value="1"/>
-            <column name="manager_id" value="2"/>
-            <column name="logo"/>
-            <column name="managed_locally" valueBoolean="true"/>
+            <column name="manager_id" value="1"/>
             <column name="active" valueBoolean="true"/>
             <column name="location_type_id" value="2"/>
-            <column name="parent_location_id"/>
-            <column name="bg_color"/>
-            <column name="fg_color"/>
-            <column name="location_group_id"/>
+            <column name="bg_color" value="FFFFFF"/>
+            <column name="fg_color" value="000000"/>
             <column name="sort_order" valueNumeric="0"/>
-            <column name="location_number"/>
-            <column name="description"/>
-            <column name="organization_id"/>
-            <column name="zone_id"/>
+            <column name="organization_id" value="1"/>
+        </insert>
+        <insert tableName="location">
+            <column name="id" value="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" value="2010-08-25T00:00"/>
+            <column name="last_updated" value="2010-08-25T00:00"/>
+            <column name="name" value="Main Supplier"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="location_type_id" value="4"/>
+            <column name="bg_color" value="FFFFFF"/>
+            <column name="fg_color" value="000000"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="organization_id" value="2"/>
         </insert>
     </changeSet>
     <changeSet author="jmiranda (generated)" id="1692069478960-11">
@@ -830,9 +835,22 @@
             <column name="last_updated" value="2020-12-26T00:00"/>
             <column name="party_type_id" value="1"/>
             <column name="class" value="org.pih.warehouse.core.Organization"/>
-            <column name="code" value="MAIN"/>
+            <column name="code" value="MO"/>
             <column name="description"/>
-            <column name="name" value="Main Corporation"/>
+            <column name="name" value="Main Organization"/>
+            <column name="default_location_id"/>
+            <column name="active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="party">
+            <column name="id" value="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="date_created" value="2020-12-26T00:00"/>
+            <column name="last_updated" value="2020-12-26T00:00"/>
+            <column name="party_type_id" value="1"/>
+            <column name="class" value="org.pih.warehouse.core.Organization"/>
+            <column name="code" value="SO"/>
+            <column name="description"/>
+            <column name="name" value="Supplier Organization"/>
             <column name="default_location_id"/>
             <column name="active" valueBoolean="true"/>
         </insert>
@@ -844,6 +862,14 @@
             <column name="end_date"/>
             <column name="party_id" value="1"/>
             <column name="role_type" value="ROLE_ORGANIZATION"/>
+            <column name="start_date"/>
+        </insert>
+        <insert tableName="party_role">
+            <column name="id" value="2"/>
+            <column name="version" valueNumeric="0"/>
+            <column name="end_date"/>
+            <column name="party_id" value="2"/>
+            <column name="role_type" value="ROLE_SUPPLIER"/>
             <column name="start_date"/>
         </insert>
     </changeSet>
