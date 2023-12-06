@@ -1,3 +1,5 @@
+package install
+
 databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-132") {

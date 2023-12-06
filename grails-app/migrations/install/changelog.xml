@@ -11,8 +11,12 @@
 
 	<!-- Disable foreign key checks in case data is not inserted in correct order -->
 	<include file="install/changelog-disable-foreign-key-checks.groovy"/>
+
+	<!-- Import system data (types, roles, etc)	-->
+	<include file="install/changelog-insert-system-data.xml"/>
+	<!-- Import user data (location, users, etc) -->
 	<include file="install/changelog-insert-data.xml"/>
-<!--	<include file="install/changelog-insert-data-core.groovy"/>-->
+
 	<!-- Enable foreign key checks when done inserting data -->
 	<include file="install/changelog-enable-foreign-key-checks.groovy"/>
 
