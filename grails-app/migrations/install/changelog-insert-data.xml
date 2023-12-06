@@ -1175,77 +1175,77 @@
             <column name="version" valueNumeric="0"/>
             <column name="description"/>
             <column name="role_type" value="ROLE_ADMIN"/>
-            <column name="name"/>
+            <column name="name" value="Admin"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="2"/>
             <column name="version" valueNumeric="0"/>
             <column name="description"/>
             <column name="role_type" value="ROLE_MANAGER"/>
-            <column name="name"/>
+            <column name="name" value="Manager"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="3"/>
             <column name="version" valueNumeric="0"/>
             <column name="description"/>
             <column name="role_type" value="ROLE_BROWSER"/>
-            <column name="name"/>
+            <column name="name" value="Browser"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="4"/>
             <column name="version" valueNumeric="0"/>
             <column name="description"/>
             <column name="role_type" value="ROLE_ASSISTANT"/>
-            <column name="name"/>
+            <column name="name" value="Assistant"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="5"/>
             <column name="version" valueNumeric="0"/>
             <column name="description"/>
             <column name="role_type" value="ROLE_SUPERUSER"/>
-            <column name="name"/>
+            <column name="name" value="Superuser"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff80818162d9f9cc0162d9fbbeb40001"/>
             <column name="version" valueNumeric="0"/>
             <column name="description" value="Role that represents users who should receive notifications about users."/>
             <column name="role_type" value="ROLE_USER_NOTIFICATION"/>
-            <column name="name"/>
+            <column name="name" value="User Notifications"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff80818162d9f9cc0162d9fbf09e0002"/>
             <column name="version" valueNumeric="0"/>
             <column name="description" value="Role that represents users who should receive notifications about products."/>
             <column name="role_type" value="ROLE_PRODUCT_NOTIFICATION"/>
-            <column name="name"/>
+            <column name="name" value="Product Notifications"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff80818162d9f9cc0162d9fc1c220003"/>
             <column name="version" valueNumeric="0"/>
             <column name="description" value="Role that represents users who should receive notifications about shipments."/>
             <column name="role_type" value="ROLE_SHIPMENT_NOTIFICATION"/>
-            <column name="name"/>
+            <column name="name" value="All Shipment Notifications"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff80818162d9f9cc0162d9fc48990004"/>
             <column name="version" valueNumeric="0"/>
             <column name="description" value="Role that represents users who should receive notifications about errors."/>
             <column name="role_type" value="ROLE_ERROR_NOTIFICATION"/>
-            <column name="name"/>
+            <column name="name" value="Error Notification"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff80818162d9f9cc0162d9fc74fa0005"/>
             <column name="version" valueNumeric="0"/>
             <column name="description" value="Role that represents users who should receive notifications about feedback."/>
             <column name="role_type" value="ROLE_FEEDBACK_NOTIFICATION"/>
-            <column name="name"/>
+            <column name="name" value="Feedback Notifications"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff80818162debf330162dec0548e0001"/>
             <column name="version" valueNumeric="0"/>
             <column name="description" value="Role that represents users who should receive notifications about orders."/>
             <column name="role_type" value="ROLE_ORDER_NOTIFICATION"/>
-            <column name="name"/>
+            <column name="name" value="Order Notifications"/>
         </insert>
         <insert tableName="role">
             <column name="id" value="ff808181681c757c01681c89c4960001"/>

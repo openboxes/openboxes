@@ -3006,7 +3006,9 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "name", type: "VARCHAR(255)")
+            column(name: "name", type: "VARCHAR(255)") {
+                constraints(nullable: "false")
+            }
         }
     }
 
