@@ -19,7 +19,7 @@ class InventoryLevelImportDataService implements ImportDataService {
     @Override
     void validateData(ImportDataCommand command) {
         println "validate inventory levels " + command.filename
-        command.data.each { row, index ->
+        command.data.eachWithIndex { row, index ->
             if (!dataService.validateInventoryLevel(row)) {
                 command.errors.reject("Row ${index + 1}: Failed validation")
             }

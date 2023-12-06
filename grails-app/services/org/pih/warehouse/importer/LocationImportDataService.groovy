@@ -189,7 +189,10 @@ class LocationImportDataService implements ImportDataService {
         if (!address) {
             address = new Address()
         }
+
         address.properties = params
+        address.address = params.streetAddress ?: ''
+        address.address2 = params.streetAddress2 ?: ''
 
         return address
     }

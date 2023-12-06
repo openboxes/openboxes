@@ -194,8 +194,8 @@ class LoadDataService {
 
         command.setData(csvItems);
 
-        productSupplierImportDataService.validate(command)
-        productSupplierImportDataService.process(command)
+        productSupplierImportDataService.validateData(command)
+        productSupplierImportDataService.importData(command)
 
         csvReader.close();
     }
