@@ -32,8 +32,6 @@ import org.pih.warehouse.requisition.RequisitionType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentStatusCode
 
-import javax.xml.bind.ValidationException
-
 class StockMovementApiController {
 
     def dataService
