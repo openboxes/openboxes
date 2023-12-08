@@ -3,21 +3,20 @@
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-	<include file="install/changelog-create-schema.groovy"/>
-	<!-- FIXME Create separate changelogs when we're closer to release -->
-	<!--	<include file="install/changelog-create-tables.groovy"/>-->
-	<!--	<include file="install/changelog-create-indices.groovy"/>-->
-	<!--	<include file="install/changelog-add-foreign-key-constraints.groovy"/>-->
-	<!--	<include file="install/changelog-add-unique-constraints.groovy"/>-->
+	<!-- First create a db schema -->
+	<include file="install/changelog-create-tables.groovy"/>
+	<include file="install/changelog-add-unique-constraints.groovy"/>
+	<include file="install/changelog-create-indices.groovy"/>
+	<include file="install/changelog-add-foreign-key-constraints.groovy"/>
 
 	<!-- Disable foreign key checks in case data is not inserted in correct order -->
 	<include file="install/changelog-disable-foreign-key-checks.groovy"/>
-	<include file="install/changelog-insert-data.xml"/>
-<!--	<include file="install/changelog-insert-data-core.groovy"/>-->
-<!--	<include file="install/changelog-insert-data-static.xml"/>-->
-<!--	<include file="install/changelog-insert-data-roles.xml"/>-->
-<!--	<include file="install/changelog-insert-data-user-roles.xml"/>-->
-<!--	<include file="install/changelog-insert-data-location-type-supported-activities.xml"/>-->
+
+	<!-- Import system data (types, roles, etc)	-->
+	<include file="install/changelog-insert-system-data.groovy"/>
+	<!-- Import user data (location, users, etc) -->
+	<include file="install/changelog-insert-data.groovy"/>
+
 	<!-- Enable foreign key checks when done inserting data -->
 	<include file="install/changelog-enable-foreign-key-checks.groovy"/>
 
