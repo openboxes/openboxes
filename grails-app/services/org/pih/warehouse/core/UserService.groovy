@@ -9,8 +9,10 @@
  **/
 package org.pih.warehouse.core
 
+import com.google.gson.Gson
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
@@ -474,11 +476,18 @@ class UserService {
     }
 
     def getDashboardConfig(User user, String id) {
-        def fullConfig = grailsApplication.config.openboxes.dashboardConfig
-        def mainDashboardId = grailsApplication.config.openboxes.dashboardConfig.mainDashboardId
+        Gson gson = new Gson()
+        // Creating a deep copy of the dashboard configuration
+        // to avoid overriding config properties.
+        // Deep copy is created here using the gson library
+        // in the way mentioned in this article: https://www.baeldung.com/java-deep-copy
+        def fullConfig = gson.fromJson(
+                gson.toJson(Holders.config.openboxes.dashboardConfig),
+                Object
+        )
+        def mainDashboardId = Holders.config.openboxes.dashboardConfig.mainDashboardId
         def resultConfig = [
-                // Clone to not overwrite the main config in the line 422
-                dashboard: fullConfig.dashboards[id ?: mainDashboardId].clone(),
+                dashboard: fullConfig.dashboards[id ?: mainDashboardId],
                 dashboardWidgets: fullConfig.dashboardWidgets
         ]
         def userConfig = user.deserializeDashboardConfig()
