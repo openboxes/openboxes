@@ -147,8 +147,13 @@ class ProductAssociationDataService {
             if (productAssociationInstance.validate()) {
                 if (params.hasMutualAssociation) {
                     Map otherAssociationParams = params.clone() as Map
+                    // Reverse the properties for the mutual association
                     otherAssociationParams['product.id'] = params['associatedProduct.id']
+                    otherAssociationParams['product.productCode'] = params['associatedProduct.productCode']
+                    otherAssociationParams['product.name'] = params['associatedProduct.name']
                     otherAssociationParams['associatedProduct.id'] = params['product.id']
+                    otherAssociationParams['associatedProduct.productCode'] = params['product.productCode']
+                    otherAssociationParams['associatedProduct.name'] = params['product.name']
                     ProductAssociation mutualAssociationInstance = new ProductAssociation(otherAssociationParams)
 
                     productAssociationInstance.mutualAssociation = mutualAssociationInstance
