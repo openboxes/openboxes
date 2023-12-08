@@ -350,7 +350,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
     }
 
     def getInvoices() {
-        return invoiceItems*.invoice.unique()
+        return allInvoiceItems*.invoice.unique()
     }
 
     Boolean getHasInvoices() {

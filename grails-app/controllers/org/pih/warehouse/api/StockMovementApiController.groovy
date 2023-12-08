@@ -195,6 +195,18 @@ class StockMovementApiController {
             // TODO: Tech huddle around this area (if looking into currentLocation in API like that is ok)
             def currentLocation = Location.get(session?.warehouse?.id)
             if (stockMovement.isDeleteOrRollbackAuthorized(currentLocation)) {
+                // If a shipment has items with invoice quantity greater than 0,
+                // it means there is a connected invoice, and we cannot delete stock movement
+                if (stockMovement?.shipment?.hasInvoicedItem()) {
+                    String message = g.message(
+                            code: 'stockMovement.delete.error.message',
+                            default: 'The Stock Movement could not be deleted'
+                    )
+                    response.status = 400
+                    render([errorMessage: message] as JSON)
+                    return
+                }
+
                 if (stockMovement?.isPending() || !stockMovement?.shipment?.currentStatus) {
                     try {
                         stockMovementService.deleteStockMovement(params.id)
