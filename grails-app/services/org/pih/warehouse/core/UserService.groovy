@@ -477,6 +477,10 @@ class UserService {
 
     def getDashboardConfig(User user, String id) {
         Gson gson = new Gson()
+        // Creating a deep copy of the dashboard configuration
+        // to avoid overriding config properties.
+        // Deep copy is created here using the gson library
+        // in the way mentioned in this article: https://www.baeldung.com/java-deep-copy
         def fullConfig = gson.fromJson(
                 gson.toJson(Holders.config.openboxes.dashboardConfig),
                 Object
