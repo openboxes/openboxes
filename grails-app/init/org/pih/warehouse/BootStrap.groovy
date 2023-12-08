@@ -77,6 +77,8 @@ import org.pih.warehouse.shipping.ContainerType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentItem
 import org.pih.warehouse.shipping.ShipmentType
+import org.springframework.core.io.Resource
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.quartz.Scheduler
 import util.LiquibaseUtil
 
@@ -648,8 +650,19 @@ class BootStrap {
             liquibase = new Liquibase('views/drop-all-views.xml', new ClassLoaderResourceAccessor(), database)
             liquibase.update(null as Contexts, new LabelExpression());
 
-            // FIXME Not good that we'll need to update this on subsequent versions so this needs some more thought
-            List previousChangelogVersions = ["0.5.x", "0.6.x", "0.7.x", "0.8.x"]
+            // Get all directories from /migrations
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
+            Resource[] resources = resolver.getResources("file:grails-app/migrations/*")
+
+            // Find directories with names matching current versions pattern which
+            // will match to any version number between 0.0.x to 999.999.x
+            List<String> changelogVersions = resources
+                    .collect { it.filename }
+                    .findAll { it.matches("\\d{1,3}.\\d{1,3}.x") }
+                    .reverse()
+
+            // Exclude the newest changelog version, this one should be run separately
+            List<String> previousChangelogVersions = !changelogVersions.empty ? changelogVersions.tail() : []
 
             // Check if the executed changelog versions include one of the previous versions
             // and if so, then we need to keep running the old updates to catch up to 0.9.x
