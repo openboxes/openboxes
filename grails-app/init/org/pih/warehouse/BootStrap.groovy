@@ -14,7 +14,6 @@ import grails.util.Holders
 import liquibase.Contexts
 import liquibase.LabelExpression
 import liquibase.Liquibase
-import liquibase.changelog.ChangeSet
 import liquibase.changelog.DatabaseChangeLog
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
@@ -664,19 +663,17 @@ class BootStrap {
             // Exclude the newest changelog version, this one should be run separately
             List<String> previousChangelogVersions = !changelogVersions.empty ? changelogVersions.tail() : []
 
-            // Check if the executed changelog versions include one of the previous versions
-            // and if so, then we need to keep running the old updates to catch up to 0.9.x
-            boolean hasExecutedAnyPreviousChangesets =
-                executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
-
-            // FIXME Remove !hasExecutedAnyPreviousChangesets once this goes to production
             //If nothing has been created yet, let's create all new database objects with the install scripts
-            List<ChangeSet> hasExecutedAnyChangesets = database.getRanChangeSetList()
-            if (!hasExecutedAnyChangesets || !hasExecutedAnyPreviousChangesets) {
+            if (!executedChangelogVersions) {
                 log.info("Running install changelog ...")
                 liquibase = new Liquibase("install/changelog.xml", new ClassLoaderResourceAccessor(), database)
                 liquibase.update(null as Contexts, new LabelExpression());
             }
+
+            // Check if the executed changelog versions include one of the previous versions
+            // and if so, then we need to keep running the old updates to catch up to 0.9.x
+            boolean hasExecutedAnyPreviousChangesets =
+                executedChangelogVersions.any { previousChangelogVersions.contains(it.version) }
 
             if (hasExecutedAnyPreviousChangesets) {
                 log.info("Running upgrade changelog ...")
