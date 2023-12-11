@@ -52,6 +52,7 @@ import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.requisition.ReplenishmentTypeCode
 import org.pih.warehouse.requisition.Requisition
+import org.pih.warehouse.requisition.RequisitionDataService
 import org.pih.warehouse.requisition.RequisitionItem
 import org.pih.warehouse.requisition.RequisitionItemSortByCode
 import org.pih.warehouse.requisition.RequisitionItemStatus
@@ -86,6 +87,7 @@ class StockMovementService {
     def forecastingService
     def outboundStockMovementService
     UserService userService
+    RequisitionDataService requisitionDataService
 
     GrailsApplication grailsApplication
 
@@ -263,8 +265,7 @@ class StockMovementService {
     void updateRequisitionStatus(String id, RequisitionStatus status, Comment comment = null) {
 
         log.info "Update status ${id} " + status
-        // TODO: In Grails the get below should be replaced by the data service get that joins the Events
-        Requisition requisition = requisitionService.getRequisitionWithEvents(id)
+        Requisition requisition = requisitionDataService.getRequisitionWithEvents(id)
         if (status == RequisitionStatus.CHECKING) {
             Shipment shipment = requisition.shipment
             shipment?.expectedShippingDate = new Date()

@@ -16,7 +16,6 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
 import org.pih.warehouse.DateUtil
 import javassist.NotFoundException
-import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Comment
@@ -835,14 +834,6 @@ class RequisitionService {
         if (comment) {
             event.comment = comment
             requisition.addToComments(comment)
-        }
-    }
-
-    // TODO in Grails 3 move this method to @Service RequisitionDataService
-    Requisition getRequisitionWithEvents(String id) {
-        return Requisition.createCriteria().get {
-            createAlias('events', 'events', CriteriaSpecification.LEFT_JOIN)
-            eq("id", id)
         }
     }
 
