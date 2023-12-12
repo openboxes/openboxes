@@ -134,19 +134,12 @@ bootRun {
         '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005'
     ]
     systemProperties System.properties
-    println "systemProperties:${systemProperties}"
     if (project.hasProperty('args')) {
         args project.args.split(',')
     }
-    println "args:${args}"
 }
 
 String getSystemProperty(String key){
-//    System.properties.keySet()?.each {
-//        println "it.class:${it.class}"
-//        println "$it:${System.getProperty(it)}"
-//    }
-    println "System.getProperty(${key}):${System.getProperty(key)}"
     return System.getProperty(key)
 }
 
@@ -873,10 +866,5 @@ tasks.withType(Test) {
     }
 }
 
-task printProp << {
-    println customProp
-    println customPropp
-    println customProppp
-}
 
 
