@@ -1436,12 +1436,6 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "openboxes (generated)", id: "1700664714834-377") {
-        createIndex(indexName: "FKFD8E50671A43AB29", tableName: "click_stream_request") {
-            column(name: "click_stream_id")
-        }
-    }
-
     changeSet(author: "openboxes (generated)", id: "1700664714834-378") {
         createIndex(indexName: "fk_budget_code_created_by", tableName: "budget_code") {
             column(name: "created_by_id")

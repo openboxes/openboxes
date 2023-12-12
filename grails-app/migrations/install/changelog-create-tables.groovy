@@ -162,64 +162,6 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "openboxes (generated)", id: "1700664714834-7") {
-        createTable(tableName: "click_stream") {
-            column(name: "id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "date_created", type: "datetime") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "hostname", type: "VARCHAR(255)")
-
-            column(name: "last_updated", type: "datetime") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "referrer", type: "VARCHAR(255)")
-
-            column(name: "session_id", type: "CHAR(38)") {
-                constraints(nullable: "false")
-            }
-        }
-    }
-
-    changeSet(author: "openboxes (generated)", id: "1700664714834-8") {
-        createTable(tableName: "click_stream_request") {
-            column(name: "id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "click_stream_id", type: "BIGINT") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "date_created", type: "datetime") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "port", type: "INT")
-
-            column(name: "protocol", type: "VARCHAR(8)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "query", type: "VARCHAR(255)")
-
-            column(name: "server", type: "VARCHAR(255)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "uri", type: "VARCHAR(255)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "person", type: "VARCHAR(255)")
-        }
-    }
-
     changeSet(author: "openboxes (generated)", id: "1700664714834-9") {
         createTable(tableName: "comment") {
             column(name: "id", type: "CHAR(38)") {
