@@ -146,10 +146,12 @@ class ProductAssociationDataService {
             ProductAssociation productAssociationInstance = new ProductAssociation(params)
             if (productAssociationInstance.validate()) {
                 if (params.hasMutualAssociation) {
-                    Map otherAssociationParams = params.clone() as Map
-                    otherAssociationParams['product.id'] = params['associatedProduct.id']
-                    otherAssociationParams['associatedProduct.id'] = params['product.id']
-                    ProductAssociation mutualAssociationInstance = new ProductAssociation(otherAssociationParams)
+                    ProductAssociation mutualAssociationInstance = new ProductAssociation(
+                        product: productAssociationInstance.associatedProduct,
+                        associatedProduct: productAssociationInstance.product,
+                        quantity: params.quantity,
+                        code: params.code
+                    )
 
                     productAssociationInstance.mutualAssociation = mutualAssociationInstance
                     mutualAssociationInstance.mutualAssociation = productAssociationInstance
