@@ -180,7 +180,7 @@ databaseChangeLog = {
 
             column(name: "referrer", type: "VARCHAR(255)")
 
-            column(name: "session_id", type: "VARCHAR(255)") {
+            column(name: "session_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
         }
@@ -1174,7 +1174,7 @@ databaseChangeLog = {
 
             column(name: "description", type: "VARCHAR(255)")
 
-            column(name: "organization_id", type: "VARCHAR(255)")
+            column(name: "organization_id", type: "CHAR(38)")
 
             column(name: "zone_id", type: "CHAR(38)")
         }
@@ -1192,7 +1192,7 @@ databaseChangeLog = {
 
             column(name: "location_group_name", type: "VARCHAR(255)")
 
-            column(name: "location_id", type: "VARCHAR(255)") {
+            column(name: "location_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1312,7 +1312,7 @@ databaseChangeLog = {
 
             column(name: "expiration_date", type: "datetime")
 
-            column(name: "inventory_item_id", type: "VARCHAR(255)") {
+            column(name: "inventory_item_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1642,7 +1642,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-60") {
         createTable(tableName: "party") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1658,7 +1658,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "party_type_id", type: "VARCHAR(255)") {
+            column(name: "party_type_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1680,7 +1680,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-61") {
         createTable(tableName: "party_role") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1690,7 +1690,7 @@ databaseChangeLog = {
 
             column(name: "end_date", type: "datetime")
 
-            column(name: "party_id", type: "VARCHAR(255)") {
+            column(name: "party_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1704,7 +1704,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-62") {
         createTable(tableName: "party_type") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2296,7 +2296,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "product_id", type: "VARCHAR(255)") {
+            column(name: "product_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -2478,7 +2478,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-86") {
         createTable(tableName: "product_supplier") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2502,7 +2502,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "manufacturer_id", type: "VARCHAR(255)")
+            column(name: "manufacturer_id", type: "CHAR(38)")
 
             column(name: "manufacturer_code", type: "VARCHAR(255)")
 
@@ -2518,7 +2518,7 @@ databaseChangeLog = {
 
             column(name: "ndc", type: "VARCHAR(255)")
 
-            column(name: "product_id", type: "VARCHAR(255)") {
+            column(name: "product_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -2528,13 +2528,13 @@ databaseChangeLog = {
 
             column(name: "standard_lead_time_days", type: "DECIMAL(19, 2)")
 
-            column(name: "supplier_id", type: "VARCHAR(255)")
+            column(name: "supplier_id", type: "CHAR(38)")
 
             column(name: "supplier_code", type: "VARCHAR(255)")
 
             column(name: "supplier_name", type: "VARCHAR(255)")
 
-            column(name: "unit_of_measure_id", type: "VARCHAR(255)")
+            column(name: "unit_of_measure_id", type: "CHAR(38)")
 
             column(name: "unit_price", type: "DECIMAL(19, 4)")
 
@@ -2582,11 +2582,11 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-88") {
         createTable(tableName: "product_tag") {
-            column(name: "product_id", type: "VARCHAR(255)") {
+            column(name: "product_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
-            column(name: "tag_id", type: "VARCHAR(255)")
+            column(name: "tag_id", type: "CHAR(38)")
         }
     }
 
@@ -2946,7 +2946,7 @@ databaseChangeLog = {
 
             column(name: "comment", type: "VARCHAR(255)")
 
-            column(name: "recipient_id", type: "VARCHAR(255)")
+            column(name: "recipient_id", type: "CHAR(38)")
 
             column(name: "substitutable", type: "BIT(1)") {
                 constraints(nullable: "false")
@@ -3378,7 +3378,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-121") {
         createTable(tableName: "tag") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3386,7 +3386,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "created_by_id", type: "VARCHAR(255)")
+            column(name: "created_by_id", type: "CHAR(38)")
 
             column(name: "date_created", type: "datetime") {
                 constraints(nullable: "false")
@@ -3400,7 +3400,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "updated_by_id", type: "VARCHAR(255)")
+            column(name: "updated_by_id", type: "CHAR(38)")
 
             column(name: "is_active", type: "TINYINT(3)")
         }
@@ -3580,7 +3580,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "transaction_type_id", type: "VARCHAR(255)") {
+            column(name: "transaction_type_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
