@@ -509,6 +509,41 @@ databaseChangeLog = {
         }
 
         insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "2")
+            column(name: "supported_activities_string", value: "ADJUST_INVENTORY")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "2")
+            column(name: "supported_activities_string", value: "SUBMIT_REQUEST")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "2")
+            column(name: "supported_activities_string", value: "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "2")
+            column(name: "supported_activities_string", value: "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "2")
+            column(name: "supported_activities_string", value: "PICK_STOCK")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "2")
+            column(name: "supported_activities_string", value: "PUTAWAY_STOCK")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "3")
+            column(name: "supported_activities_string", value: "DYNAMIC_CREATION")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
             column(name: "location_type_id", value: "3")
             column(name: "supported_activities_string", value: "SEND_STOCK")
         }
@@ -534,8 +569,13 @@ databaseChangeLog = {
         }
 
         insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "2")
-            column(name: "supported_activities_string", value: "ADJUST_INVENTORY")
+            column(name: "location_type_id", value: "5")
+            column(name: "supported_activities_string", value: "DYNAMIC_CREATION")
+        }
+
+        insert(tableName: "location_type_supported_activities") {
+            column(name: "location_type_id", value: "6")
+            column(name: "supported_activities_string", value: "DYNAMIC_CREATION")
         }
 
         insert(tableName: "location_type_supported_activities") {
@@ -586,36 +626,6 @@ databaseChangeLog = {
         insert(tableName: "location_type_supported_activities") {
             column(name: "location_type_id", value: "HOLD_LOCATION")
             column(name: "supported_activities_string", value: "PUTAWAY_STOCK")
-        }
-
-        insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "2")
-            column(name: "supported_activities_string", value: "SUBMIT_REQUEST")
-        }
-
-        insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "2")
-            column(name: "supported_activities_string", value: "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS")
-        }
-
-        insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "2")
-            column(name: "supported_activities_string", value: "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS")
-        }
-
-        insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "3")
-            column(name: "supported_activities_string", value: "DYNAMIC_CREATION")
-        }
-
-        insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "6")
-            column(name: "supported_activities_string", value: "DYNAMIC_CREATION")
-        }
-
-        insert(tableName: "location_type_supported_activities") {
-            column(name: "location_type_id", value: "5")
-            column(name: "supported_activities_string", value: "DYNAMIC_CREATION")
         }
     }
 
