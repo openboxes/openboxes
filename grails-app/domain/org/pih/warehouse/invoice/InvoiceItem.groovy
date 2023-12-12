@@ -86,13 +86,13 @@ class InvoiceItem implements Serializable {
             // If the invoice is a prepayment or the item is an order adjustment,
             // the validation below doesn't make sense, because
             // we do not have shipmentItem at this point.
-            if (obj.invoice.isPrepaymentInvoice || obj.orderAdjustment) {
+            if (obj.invoice?.isPrepaymentInvoice || obj.orderAdjustment) {
                 return true
             }
 
             Integer originalQuantityInvoiced = obj.getPersistentValue('quantity')
             ShipmentItem shipmentItem = obj?.shipmentItem
-            if (originalQuantityInvoiced != null) {
+            if (originalQuantityInvoiced != null && shipmentItem) {
                 // An invoice item has a valid quantity when the new quantity,
                 // summed with the already invoiced quantity from all of the invoiced items,
                 // subtracting the old quantity of the current invoice item is lower than the shipment item quantity
