@@ -671,5 +671,9 @@ class Shipment implements Comparable, Serializable {
         Event event = events.find { Event event -> event?.eventType?.eventCode == EventCode.CUSTOMS_RELEASE }
         return event?.eventDate
     }
+
+    boolean hasInvoicedItem() {
+        shipmentItems.any { it.quantityInvoiced > 0 }
+    }
 }
 
