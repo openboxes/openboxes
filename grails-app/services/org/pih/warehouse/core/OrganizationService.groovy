@@ -45,7 +45,18 @@ class OrganizationService {
     }
 
     Organization findOrCreateOrganization(String name, String code, List<RoleType> roleTypes) {
-        Organization organization = Organization.findByCodeOrName(code, name)
+        Organization organization = org.pih.warehouse.core.Organization.find {
+            or {
+                and {
+                    eq("code", code)
+                    ne("code", "")
+                }
+                and {
+                    eq("name", name)
+                    ne("name", "")
+                }
+            }
+        }
         if (!organization) {
             organization = new Organization()
             organization.name = name
