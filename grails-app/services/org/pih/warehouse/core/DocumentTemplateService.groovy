@@ -133,7 +133,7 @@ class DocumentTemplateService {
 
         def orderItemsGroupedByProductAndUom = orderInstance?.orderItems?.findAll {
             it.orderItemStatusCode != OrderItemStatusCode.CANCELED
-        }?.groupBy { [product: it.product, unitOfMeasure: it.unitOfMeasure] }?.collect { k, v ->
+        }?.sort()?.groupBy { [product: it.product, unitOfMeasure: it.unitOfMeasure] }?.collect { k, v ->
             def productSuppliers = v?.productSupplier?.findAll { it }
             return [
                 code: k.product.productCode,
