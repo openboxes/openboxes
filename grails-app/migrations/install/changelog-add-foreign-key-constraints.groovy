@@ -970,10 +970,6 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "location_id", baseTableName: "location_supported_activities", constraintName: "FKF58372688ABEBD5", deferrable: "false", initiallyDeferred: "false", onDelete: "RESTRICT", onUpdate: "RESTRICT", referencedColumnNames: "id", referencedTableName: "location", validate: "true")
     }
 
-    changeSet(author: "openboxes (generated)", id: "1700664714834-705") {
-        addForeignKeyConstraint(baseColumnNames: "click_stream_id", baseTableName: "click_stream_request", constraintName: "FKFD8E50671A43AB29", deferrable: "false", initiallyDeferred: "false", onDelete: "RESTRICT", onUpdate: "RESTRICT", referencedColumnNames: "id", referencedTableName: "click_stream", validate: "true")
-    }
-
     changeSet(author: "openboxes (generated)", id: "1700664714834-706") {
         addForeignKeyConstraint(baseColumnNames: "product_id", baseTableName: "inventory_item", constraintName: "FKFE019416DED5FAE7", deferrable: "false", initiallyDeferred: "false", onDelete: "RESTRICT", onUpdate: "RESTRICT", referencedColumnNames: "id", referencedTableName: "product", validate: "true")
     }

@@ -4,7 +4,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-1") {
         createTable(tableName: "address") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -40,7 +40,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-2") {
         createTable(tableName: "attribute") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -130,7 +130,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-6") {
         createTable(tableName: "category") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -162,67 +162,9 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "openboxes (generated)", id: "1700664714834-7") {
-        createTable(tableName: "click_stream") {
-            column(name: "id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "date_created", type: "datetime") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "hostname", type: "VARCHAR(255)")
-
-            column(name: "last_updated", type: "datetime") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "referrer", type: "VARCHAR(255)")
-
-            column(name: "session_id", type: "VARCHAR(255)") {
-                constraints(nullable: "false")
-            }
-        }
-    }
-
-    changeSet(author: "openboxes (generated)", id: "1700664714834-8") {
-        createTable(tableName: "click_stream_request") {
-            column(name: "id", type: "BIGINT") {
-                constraints(nullable: "false", primaryKey: "true")
-            }
-
-            column(name: "click_stream_id", type: "BIGINT") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "date_created", type: "datetime") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "port", type: "INT")
-
-            column(name: "protocol", type: "VARCHAR(8)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "query", type: "VARCHAR(255)")
-
-            column(name: "server", type: "VARCHAR(255)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "uri", type: "VARCHAR(255)") {
-                constraints(nullable: "false")
-            }
-
-            column(name: "person", type: "VARCHAR(255)")
-        }
-    }
-
     changeSet(author: "openboxes (generated)", id: "1700664714834-9") {
         createTable(tableName: "comment") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -252,7 +194,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-10") {
         createTable(tableName: "consumption") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -344,7 +286,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-12") {
         createTable(tableName: "container") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -394,7 +336,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-13") {
         createTable(tableName: "container_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -470,7 +412,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-15") {
         createTable(tableName: "document") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -506,7 +448,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-16") {
         createTable(tableName: "document_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -536,7 +478,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-17") {
         createTable(tableName: "donor") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -558,7 +500,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-18") {
         createTable(tableName: "event") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -588,7 +530,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-19") {
         createTable(tableName: "event_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -618,7 +560,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-20") {
         createTable(tableName: "fulfillment") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -644,7 +586,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-21") {
         createTable(tableName: "fulfillment_item") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -764,7 +706,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-26") {
         createTable(tableName: "inventory") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -782,7 +724,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-27") {
         createTable(tableName: "inventory_item") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -840,7 +782,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-29") {
         createTable(tableName: "inventory_level") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1068,7 +1010,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-36") {
         createTable(tableName: "local_transfer") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1124,7 +1066,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-38") {
         createTable(tableName: "location") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1174,7 +1116,7 @@ databaseChangeLog = {
 
             column(name: "description", type: "VARCHAR(255)")
 
-            column(name: "organization_id", type: "VARCHAR(255)")
+            column(name: "organization_id", type: "CHAR(38)")
 
             column(name: "zone_id", type: "CHAR(38)")
         }
@@ -1192,7 +1134,7 @@ databaseChangeLog = {
 
             column(name: "location_group_name", type: "VARCHAR(255)")
 
-            column(name: "location_id", type: "VARCHAR(255)") {
+            column(name: "location_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1216,7 +1158,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-40") {
         createTable(tableName: "location_group") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1264,7 +1206,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-43") {
         createTable(tableName: "location_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1312,7 +1254,7 @@ databaseChangeLog = {
 
             column(name: "expiration_date", type: "datetime")
 
-            column(name: "inventory_item_id", type: "VARCHAR(255)") {
+            column(name: "inventory_item_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1326,7 +1268,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-46") {
         createTable(tableName: "order") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1504,7 +1446,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-54") {
         createTable(tableName: "order_item") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1642,7 +1584,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-60") {
         createTable(tableName: "party") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1658,7 +1600,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "party_type_id", type: "VARCHAR(255)") {
+            column(name: "party_type_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1680,7 +1622,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-61") {
         createTable(tableName: "party_role") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1690,7 +1632,7 @@ databaseChangeLog = {
 
             column(name: "end_date", type: "datetime")
 
-            column(name: "party_id", type: "VARCHAR(255)") {
+            column(name: "party_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -1704,7 +1646,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-62") {
         createTable(tableName: "party_type") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1806,7 +1748,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-65") {
         createTable(tableName: "person") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -1944,7 +1886,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-69") {
         createTable(tableName: "product") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2078,7 +2020,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-71") {
         createTable(tableName: "product_attribute") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2296,7 +2238,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "product_id", type: "VARCHAR(255)") {
+            column(name: "product_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -2478,7 +2420,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-86") {
         createTable(tableName: "product_supplier") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2502,7 +2444,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "manufacturer_id", type: "VARCHAR(255)")
+            column(name: "manufacturer_id", type: "CHAR(38)")
 
             column(name: "manufacturer_code", type: "VARCHAR(255)")
 
@@ -2518,7 +2460,7 @@ databaseChangeLog = {
 
             column(name: "ndc", type: "VARCHAR(255)")
 
-            column(name: "product_id", type: "VARCHAR(255)") {
+            column(name: "product_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -2528,13 +2470,13 @@ databaseChangeLog = {
 
             column(name: "standard_lead_time_days", type: "DECIMAL(19, 2)")
 
-            column(name: "supplier_id", type: "VARCHAR(255)")
+            column(name: "supplier_id", type: "CHAR(38)")
 
             column(name: "supplier_code", type: "VARCHAR(255)")
 
             column(name: "supplier_name", type: "VARCHAR(255)")
 
-            column(name: "unit_of_measure_id", type: "VARCHAR(255)")
+            column(name: "unit_of_measure_id", type: "CHAR(38)")
 
             column(name: "unit_price", type: "DECIMAL(19, 4)")
 
@@ -2582,11 +2524,11 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-88") {
         createTable(tableName: "product_tag") {
-            column(name: "product_id", type: "VARCHAR(255)") {
+            column(name: "product_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
-            column(name: "tag_id", type: "VARCHAR(255)")
+            column(name: "tag_id", type: "CHAR(38)")
         }
     }
 
@@ -2650,7 +2592,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-93") {
         createTable(tableName: "receipt") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2682,7 +2624,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-94") {
         createTable(tableName: "receipt_item") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2732,7 +2674,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-95") {
         createTable(tableName: "reference_number") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2748,7 +2690,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-96") {
         createTable(tableName: "reference_number_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2776,7 +2718,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-97") {
         createTable(tableName: "requisition") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2906,7 +2848,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-101") {
         createTable(tableName: "requisition_item") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -2946,7 +2888,7 @@ databaseChangeLog = {
 
             column(name: "comment", type: "VARCHAR(255)")
 
-            column(name: "recipient_id", type: "VARCHAR(255)")
+            column(name: "recipient_id", type: "CHAR(38)")
 
             column(name: "substitutable", type: "BIT(1)") {
                 constraints(nullable: "false")
@@ -2994,7 +2936,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-102") {
         createTable(tableName: "role") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3016,7 +2958,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-103") {
         createTable(tableName: "shipment") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3116,7 +3058,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-108") {
         createTable(tableName: "shipment_item") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3164,7 +3106,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-109") {
         createTable(tableName: "shipment_method") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3200,7 +3142,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-111") {
         createTable(tableName: "shipment_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3228,7 +3170,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-112") {
         createTable(tableName: "shipment_workflow") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3296,7 +3238,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-117") {
         createTable(tableName: "shipper") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3324,7 +3266,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-118") {
         createTable(tableName: "shipper_service") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3378,7 +3320,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-121") {
         createTable(tableName: "tag") {
-            column(name: "id", type: "VARCHAR(255)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3386,7 +3328,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "created_by_id", type: "VARCHAR(255)")
+            column(name: "created_by_id", type: "CHAR(38)")
 
             column(name: "date_created", type: "datetime") {
                 constraints(nullable: "false")
@@ -3400,7 +3342,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "updated_by_id", type: "VARCHAR(255)")
+            column(name: "updated_by_id", type: "CHAR(38)")
 
             column(name: "is_active", type: "TINYINT(3)")
         }
@@ -3408,7 +3350,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-122") {
         createTable(tableName: "transaction") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3464,7 +3406,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-123") {
         createTable(tableName: "transaction_entry") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3536,7 +3478,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-125") {
         createTable(tableName: "transaction_type") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3580,7 +3522,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "transaction_type_id", type: "VARCHAR(255)") {
+            column(name: "transaction_type_id", type: "CHAR(38)") {
                 constraints(nullable: "false")
             }
 
@@ -3592,7 +3534,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-127") {
         createTable(tableName: "unit_of_measure") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
@@ -3700,7 +3642,7 @@ databaseChangeLog = {
 
     changeSet(author: "openboxes (generated)", id: "1700664714834-130") {
         createTable(tableName: "user") {
-            column(defaultValue: "", name: "id", type: "CHAR(38)") {
+            column(name: "id", type: "CHAR(38)") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
