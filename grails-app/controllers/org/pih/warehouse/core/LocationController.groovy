@@ -95,12 +95,6 @@ class LocationController {
                 params.supportedActivities = supportedActivities?.empty ? [ActivityCode.NONE.id] : supportedActivities
             }
 
-            // when we are passing address with id which is empty string or null
-            // then grails try to find an address with this id instead of creating a new one
-            if (!params.address.id) {
-                params.address.remove("id")
-            }
-
             locationInstance.properties = params
 
             if (!locationInstance.id && !locationInstance.organization) {
