@@ -144,9 +144,7 @@ class RoleInterceptor {
         (superuserActions[controllerName]?.contains("*")
             || superuserControllers?.contains(controllerName)
             || superuserActions[controllerName]?.contains(actionName)
-            || superuserActions['*'].any {
-                actionName?.startsWith(it)
-            })
+            || superuserActions['*'].any {actionName?.startsWith(it)})
     }
 
     static Boolean needAdmin(controllerName, actionName) {
