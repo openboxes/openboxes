@@ -379,7 +379,9 @@
                 <g:if test="${!locationInstance?.isInternalLocation() && !locationInstance?.isZoneLocation()}">
 
                     <div id="location-address-tab">
+                    <g:if test="${locationInstance?.address}">
                         <g:hiddenField name="address.id" value="${locationInstance?.address?.id}"/>
+                    </g:if>
                         <div class="box">
                             <h2>
                                 <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}"
