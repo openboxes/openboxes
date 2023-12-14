@@ -637,7 +637,7 @@ dependencies {
     }
 
     // list all scheduled jobs at e.g. http://localhost:8080/openboxes/quartz
-    implementation('org.grails.plugins:quartz-monitor:1.3') {
+    compile('org.grails.plugins:quartz-monitor:1.3') {
         // will pull in old asset-pipeline and quartz dependencies otherwise
         transitive = false
     }
