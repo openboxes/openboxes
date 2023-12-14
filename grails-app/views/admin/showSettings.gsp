@@ -357,7 +357,7 @@
                                     <tr>
                                         <td colspan="2">
                                             <div class="buttons">
-                                                <g:link controller="jobs" action="index" class="button">
+                                                <g:link controller="quartz" action="list" class="button">
                                                     ${g.message(code:'jobs.backgroundJobs.label', default: 'Background Jobs')}
                                                 </g:link>
                                             </div>
