@@ -118,6 +118,7 @@ class Order implements Serializable {
             "pending",
             "placed",
             "shipped",
+            "partiallyShipped",
             "partiallyReceived",
             "received",
             "canceled",
@@ -257,6 +258,10 @@ class Order implements Serializable {
      */
     Boolean isShipped() {
         return activeOrderItems?.every { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
+    }
+
+    Boolean isPartiallyShipped() {
+        return activeOrderItems?.any { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
     }
 
     /**
@@ -457,7 +462,7 @@ class Order implements Serializable {
     }
 
     Boolean getCanGenerateInvoice() {
-        return hasPrepaymentInvoice && isShipped() && !hasRegularInvoice
+        return hasPrepaymentInvoice && partiallyShipped && !hasRegularInvoice
     }
 
     def getActiveOrderItems() {
