@@ -45,7 +45,8 @@ class RoleInterceptor {
         'productType'               : ['edit', 'delete', 'save', 'update'],
         'transactionEntry'          : ['edit', 'delete', 'save', 'update'],
         'user'                      : ['impersonate'],
-        'productsConfigurationApi'  : ['downloadCategories', 'importCategories']
+        'productsConfigurationApi'  : ['downloadCategories', 'importCategories'],
+        'quartz'                    : ['*']
     ]
 
     def static invoiceActions = [
@@ -140,9 +141,12 @@ class RoleInterceptor {
     }
 
     static Boolean needSuperuser(controllerName, actionName) {
-        superuserControllers?.contains(controllerName) || superuserActions[controllerName]?.contains(actionName) || superuserActions['*'].any {
-            actionName?.startsWith(it)
-        }
+        (superuserActions[controllerName]?.contains("*")
+            || superuserControllers?.contains(controllerName)
+            || superuserActions[controllerName]?.contains(actionName)
+            || superuserActions['*'].any {
+                actionName?.startsWith(it)
+            })
     }
 
     static Boolean needAdmin(controllerName, actionName) {
