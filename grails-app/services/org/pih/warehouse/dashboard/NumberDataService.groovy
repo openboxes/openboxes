@@ -2,7 +2,6 @@ package org.pih.warehouse.dashboard
 
 import grails.plugin.cache.Cacheable
 import org.joda.time.LocalDate
-import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -23,7 +22,6 @@ import util.ConfigHelper
 class NumberDataService {
 
     def dataService
-    AuthService authService
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
     NumberData getInventoryByLotAndBin(Location location) {
@@ -213,8 +211,8 @@ class NumberDataService {
         return new NumberData(openStockRequests[0], "${urlContextPath}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC")
     }
 
-    @Cacheable(value = "dashboardCache", key = { "getRequestsPendingApproval-${location?.id}" })
-    NumberData getRequestsPendingApproval(Location location) {
+    @Cacheable(value = "dashboardCache", key = { "getRequestsPendingApproval-${location?.id}-${currentUser?.id}" })
+    NumberData getRequestsPendingApproval(Location location, User currentUser) {
         def openStockRequests = Requisition.executeQuery("""
             SELECT COUNT(distinct r.id) FROM Requisition r
             WHERE r.origin = :location
@@ -226,9 +224,11 @@ class NumberDataService {
                         'sourceType' : RequisitionSourceType.ELECTRONIC,
                         'status' : RequisitionStatus.PENDING_APPROVAL,
                 ])
-        String redirectLink = authService.currentUser.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER])
-                ? "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=PENDING_APPROVAL&sourceType=ELECTRONIC"
-                : "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
+
+        String urlContextPath = ConfigHelper.contextPath
+        String redirectLink = currentUser.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER])
+                ? "${urlContextPath}/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=PENDING_APPROVAL&sourceType=ELECTRONIC"
+                : "${urlContextPath}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
 
         return new NumberData(openStockRequests[0], redirectLink)
     }
