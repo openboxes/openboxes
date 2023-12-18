@@ -196,6 +196,12 @@ class DashboardApiController {
         render (numberData as JSON)
     }
 
+    def getRequestsPendingApproval() {
+        Location location = Location.get(params.locationId)
+        NumberData numberData = numberDataService.getRequestsPendingApproval(location)
+        render (numberData as JSON)
+    }
+
     def getInventoryValue() {
         Location location = Location.get(params.locationId)
         NumberData numberData = numberDataService.getInventoryValue(location)
