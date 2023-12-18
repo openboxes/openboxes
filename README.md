@@ -72,16 +72,16 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 ### Install Dependencies
 
 #### Required
-* [Java 7 (must install Java 7)](https://www.azul.com/downloads/?version=java-7-lts&package=jdk)
-* [MySQL 5.7](https://downloads.mysql.com/archives/community/)
+* [Java 8 (must install Java 8)](https://www.oracle.com/pl/java/technologies/javase/javase8-archive-downloads.html) or via SDK
+* [MySQL 5.7](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
   * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
 * [SDK Man](https://sdkman.io/install)
-* [Grails 1.3.9](https://grails.org/download.html)
+* [Grails 3.3.10](https://grails.org/download.html)
 * NPM 6.14.6
 * Node 14+
 
 #### Optional
-* [IntelliJ IDEA 14.1](https://www.jetbrains.com/idea/download/)
+* [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
 * Chrome
 
 ### Basic setup instructions for developers
@@ -92,17 +92,24 @@ These instructions are for developers only.  If you are a user/implementer, plea
 #### 1. Install Dependencies
 Install required dependencies above
 
-#### 2. Install Grails
+#### 2. Install Grails and Java 8*
 Check that you have SDK Man installed properly (otherwise follow instructions on the skdman install page).
 ```
 $ sdk version
 SDKMAN 5.13.2
 ```
 
-Install Grails 1.3.9
+Install Grails 3.3.10
 ```
-$ sdk install grails 1.3.9
+$ sdk install grails 3.3.10
 ```
+
+Install Java 8*
+```
+$ sdk install java 8.0.332-zulu
+```
+
+`*` - in case you have not installed Java yet.
 
 #### 3. Clone repository 
 If you are a core contributor:
@@ -236,9 +243,9 @@ http://localhost:6060
 ## Troubleshooting
 
 ### How to Debug 
-* Run Grails in debug mode
+* Run Grails normally
     ```
-    grails-debug run-app
+    grails run-app
     ```
 * In Intellij navigate to Run > Edit Configurations
 * Create a new Remote Debug Configuration
