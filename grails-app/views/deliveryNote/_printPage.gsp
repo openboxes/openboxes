@@ -65,7 +65,7 @@
                                     </g:each>
                                 </td>
                             </g:if>
-                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container && it.container?.parentContainer }}}">
+                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container?.parentContainer }}}">
                                 <td class="center middle" rowspan="${numInventoryItem}">
                                     <g:each in="${shipmentItems}" var="shipmentItem">
                                         <div>
