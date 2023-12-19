@@ -888,13 +888,13 @@ class ShipmentController {
 
 
     def saveComment() {
-        def shipmentInstance = Shipment.get(params.shipmentId)
-        def recipient = (params.recipientId) ? User.get(params.recipientId) : null
-        def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
-        if (shipmentInstance) {
-            shipmentInstance.addToComments(comment).save(flush: true)
-            flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.comment, shipmentInstance.name])}"
+        Shipment shipmentInstance = Shipment.get(params.shipmentId)
+        if (!shipmentInstance) {
+            throw new Exception("Could not locate shipment with ID " + params.shipmentId)
         }
+        User recipient = (params.recipientId) ? User.get(params.recipientId) : null
+        shipmentService.addShipmentComment(shipmentInstance, params.comment,  session.user, recipient)
+        flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.comment, shipmentInstance.name])}"
         redirect(action: 'showDetails', id: params.shipmentId)
     }
 

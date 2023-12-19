@@ -2376,4 +2376,11 @@ class ShipmentService {
         }
         return referenceNumber
     }
+
+    Comment addShipmentComment(Shipment shipment, String content, User sender, User recipient) {
+        Comment comment = new Comment(comment: content, sender: sender, recipient: recipient)
+        comment.save()
+        shipment.addToComments(comment)
+        return comment
+    }
 }
