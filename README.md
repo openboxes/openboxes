@@ -1,5 +1,3 @@
-![unit tests](https://github.com/openboxes/openboxes/actions/workflows/unit-tests.yml/badge.svg)
-![integration tests](https://github.com/openboxes/openboxes/actions/workflows/integration-tests.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
 ![dbdocs](https://github.com/openboxes/openboxes/actions/workflows/dbdocs.yml/badge.svg)
 ![docker image](https://github.com/openboxes/openboxes/actions/workflows/docker-image.yml/badge.svg)
