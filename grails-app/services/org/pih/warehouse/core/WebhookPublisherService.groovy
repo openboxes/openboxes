@@ -32,8 +32,8 @@ class WebhookPublisherService {
                 id       : shipment.id,
                 type     : "shipment.shipped",
                 timestamp: new Date().time,
-                user     : AuthService.currentUser.get()?.id,
-                location : AuthService.currentLocation.get()?.id,
+                user     : AuthService.currentUser?.id,
+                location : AuthService.currentLocation?.id,
                 data     : [
                         id            : shipment.id,
                         shipmentNumber: shipment.shipmentNumber,
