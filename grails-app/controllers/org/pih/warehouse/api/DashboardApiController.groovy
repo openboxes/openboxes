@@ -171,47 +171,47 @@ class DashboardApiController {
     def getLossCausedByExpiry() {
         Location location = Location.get(params.locationId)
         def lossCausedByExpiry = indicatorDataService.getLossCausedByExpiry(location, params)
-        render (lossCausedByExpiry as JSON)
+        render(lossCausedByExpiry as JSON)
     }
 
     def getProductsInventoried() {
         Location location = Location.get(params.locationId)
         def productsInventoried = indicatorDataService.getProductsInventoried(location)
-        render (productsInventoried as JSON)
+        render(productsInventoried as JSON)
     }
 
     def getPercentageAdHoc() {
         Location location = Location.get(session?.warehouse?.id)
         def percentageAdHoc = indicatorDataService.getPercentageAdHoc(location)
-        render (percentageAdHoc as JSON)
+        render(percentageAdHoc as JSON)
     }
 
     def getStockOutLastMonth() {
         Location location = Location.get(session?.warehouse?.id)
         def stockOutLastMonth = indicatorDataService.getStockOutLastMonth(location)
-        render (stockOutLastMonth as JSON)
+        render(stockOutLastMonth as JSON)
     }
 
     def getOpenStockRequests() {
         Location location = Location.get(params.locationId)
         NumberData numberData = numberDataService.getOpenStockRequests(location)
-        render (numberData as JSON)
+        render(numberData as JSON)
     }
 
     def getRequestsPendingApproval() {
         Location location = Location.get(params.locationId)
         NumberData numberData = numberDataService.getRequestsPendingApproval(location, authService.currentUser)
-        render (numberData as JSON)
+        render(numberData as JSON)
     }
 
     def getInventoryValue() {
         Location location = Location.get(params.locationId)
         NumberData numberData = numberDataService.getInventoryValue(location)
-        render (numberData as JSON)
+        render(numberData as JSON)
     }
 
     def getOpenPurchaseOrdersCount() {
         NumberData numberData = numberDataService.getOpenPurchaseOrdersCount(params)
-        render (numberData as JSON)
+        render(numberData as JSON)
     }
 }

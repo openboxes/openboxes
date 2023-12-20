@@ -1,7 +1,10 @@
 package org.pih.warehouse.dashboard
 
+import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.RoleType
@@ -22,6 +25,7 @@ import util.ConfigHelper
 class NumberDataService {
 
     def dataService
+    GrailsApplication grailsApplication
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
     NumberData getInventoryByLotAndBin(Location location) {
@@ -213,24 +217,29 @@ class NumberDataService {
 
     @Cacheable(value = "dashboardCache", key = { "getRequestsPendingApproval-${location?.id}-${currentUser?.id}" })
     NumberData getRequestsPendingApproval(Location location, User currentUser) {
-        def openStockRequests = Requisition.executeQuery("""
-            SELECT COUNT(distinct r.id) FROM Requisition r
-            WHERE r.origin = :location
-            AND r.sourceType = :sourceType
-            AND r.status  = :status
-            """,
-                [
-                        'location': location,
-                        'sourceType' : RequisitionSourceType.ELECTRONIC,
-                        'status' : RequisitionStatus.PENDING_APPROVAL,
-                ])
+        int requisitionCount = Requisition.createCriteria().get {
+            projections {
+                count('id')
+            }
+            eq("origin", location)
+            eq("sourceType", RequisitionSourceType.ELECTRONIC)
+            eq("status",  RequisitionStatus.PENDING_APPROVAL)
+        }
 
-        String urlContextPath = ConfigHelper.contextPath
-        String redirectLink = currentUser.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER])
-                ? "${urlContextPath}/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=PENDING_APPROVAL&sourceType=ELECTRONIC"
-                : "${urlContextPath}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC"
+        ApplicationTagLib g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
 
-        return new NumberData(openStockRequests[0], redirectLink)
+        Map linkParams = [
+            direction: StockMovementDirection.OUTBOUND,
+            sourceType: RequisitionSourceType.ELECTRONIC,
+        ]
+
+        if(currentUser.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER])) {
+            linkParams.requisitionStatusCode = RequisitionStatus.PENDING_APPROVAL
+        }
+
+        String redirectLink = g.createLink(controller: "stockMovement", action: "list", params: linkParams)
+
+        return new NumberData(requisitionCount, redirectLink)
     }
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryValue-${location?.id}" })
