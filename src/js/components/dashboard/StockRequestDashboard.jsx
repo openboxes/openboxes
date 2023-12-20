@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 
 import PropTypes from 'prop-types';
+import { RiStickyNoteFill } from 'react-icons/ri';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
+import { Tooltip } from 'react-tippy';
 
 import { fetchTranslations } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
@@ -31,6 +33,24 @@ const COLUMNS = [
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
     maxWidth: 200,
+    Cell: (row) => (
+      <span className="d-flex align-items-center">
+        <span className="d-inline-block text-overflow-ellipsis">
+          {row.original.displayStatus}
+        </span>
+        {row.original.recentComment && (
+        <Tooltip
+          html={row.original.recentComment.comment}
+          theme="transparent"
+          delay="150"
+          duration="250"
+          hideDelay="50"
+        >
+          <RiStickyNoteFill className="text-warning mr-1" />
+        </Tooltip>
+        )}
+      </span>
+    ),
   },
   {
     Header: 'Description',

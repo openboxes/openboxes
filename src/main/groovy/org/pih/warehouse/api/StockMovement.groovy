@@ -5,6 +5,7 @@ import org.apache.commons.collections.list.LazyList
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -57,6 +58,7 @@ class StockMovement implements Validateable{
     String trackingNumber
     String driverName
     String comments
+    List<Comment> shipmentComments
     String currentStatus
     Float totalValue
 
@@ -87,7 +89,8 @@ class StockMovement implements Validateable{
 
     static transients = [
             "electronicType",
-            "pendingApproval"
+            "pendingApproval",
+            "recentComment"
     ]
 
     static constraints = {
@@ -115,6 +118,8 @@ class StockMovement implements Validateable{
         trackingNumber(nullable: true)
         driverName(nullable: true)
         comments(nullable: true)
+        recentComment(nullable: true)
+        shipmentComments(nullable: true)
         totalValue(nullable: true)
         lineItemCount(nullable: true)
 
@@ -179,6 +184,7 @@ class StockMovement implements Validateable{
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
+            recentComment       : recentComment,
             requestedBy         : requestedBy,
             lineItems           : lineItems,
             lineItemCount       : lineItemCount,
@@ -203,6 +209,15 @@ class StockMovement implements Validateable{
             requestType         : requestType,
             sourceType          : sourceType?.name,
         ]
+    }
+
+    Comment getRecentComment() {
+        if (shipmentComments?.size() > 0) {
+            return shipmentComments?.sort({ a, b ->
+                b.dateCreated <=> a.dateCreated
+            }).iterator().next()
+        }
+        return null
     }
 
     /**
@@ -361,6 +376,7 @@ class StockMovement implements Validateable{
                 driverName: shipment.driverName,
                 trackingNumber: trackingNumber?.identifier,
                 comments: shipment.additionalInformation,
+                shipmentComments: shipment.comments,
                 lineItemCount: shipment.shipmentItemCount
         )
 
@@ -404,6 +420,7 @@ class StockMovement implements Validateable{
             requisition: requisition,
             shipment: shipment,
             comments: shipment?.additionalInformation,
+            shipmentComments: requisition.comments?.toList(),
             shipmentType: shipment?.shipmentType,
             dateShipped: shipment?.expectedShippingDate,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
