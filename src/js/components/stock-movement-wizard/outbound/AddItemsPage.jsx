@@ -349,6 +349,7 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isDraftAvailable: false,
+      lastRequestData: [],
     };
 
     this.props.showSpinner();
@@ -888,7 +889,7 @@ class AddItemsPage extends Component {
         });
       }
 
-      return apiClient.post(updateItemsUrl, payload)
+      const saveItemsRequest = (data) => apiClient.post(updateItemsUrl, data)
         .then((resp) => {
           const { lineItems } = resp.data.data;
           const lineItemsBackendData = _.map(lineItems, val => ({ ...val, disabled: true }));
@@ -987,7 +988,20 @@ class AddItemsPage extends Component {
           }
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
+
+      const payloadLineItemsWithoutDuplications = payload?.lineItems
+        .filter(item => !this.state.lastRequestData?.find(savedItem =>
+          savedItem.id === item.id
+          && savedItem.quantityRequested === item.quantityRequested,
+        ));
+
+      if (payloadLineItemsWithoutDuplications.length) {
+        this.setState({ lastRequestData: payload?.lineItems }, () =>
+          saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications }),
+        );
+      }
     }
+
     this.setState(previousState => ({
       values: {
         ...previousState.values,
