@@ -42,6 +42,7 @@ import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import requestsQueue from 'utils/requestsQueue';
 
 
 const DELETE_BUTTON_FIELD = {
@@ -373,6 +374,7 @@ class AddItemsPage extends Component {
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
+    this.requestsQueue = requestsQueue();
   }
 
 
@@ -889,7 +891,7 @@ class AddItemsPage extends Component {
         });
       }
 
-      const saveItemsRequest = (data) => apiClient.post(updateItemsUrl, data)
+      const saveItemsRequest = (data) => () => apiClient.post(updateItemsUrl, data)
         .then((resp) => {
           const { lineItems } = resp.data.data;
           const lineItemsBackendData = _.map(lineItems, val => ({ ...val, disabled: true }));
@@ -995,9 +997,13 @@ class AddItemsPage extends Component {
           && savedItem.quantityRequested === item.quantityRequested,
         ));
 
+      this.requestsQueue.enqueueRequest(
+        saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications })
+      );
+
       if (payloadLineItemsWithoutDuplications.length) {
         this.setState({ lastRequestData: payload?.lineItems }, () =>
-          saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications }),
+          this.requestsQueue.processRequests(),
         );
       }
     }
