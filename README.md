@@ -93,7 +93,7 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 * [MySQL 5.7](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
   * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
 * [SDK Man](https://sdkman.io/install)
-* [Grails 3.3.10](https://grails.org/download.html)
+* [Grails 3.3.17](https://grails.org/download.html)
 * NPM 6.14.6
 * Node 14+
 
