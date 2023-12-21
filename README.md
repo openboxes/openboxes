@@ -90,8 +90,9 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 
 #### Required
 * [Java 8 (must install Java 8)](https://www.oracle.com/pl/java/technologies/javase/javase8-archive-downloads.html) or via SDK
-* [MySQL 5.7](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
+* [MySQL 5.7 or MySQL 8.0](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
   * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
+  * Issues related to the MySQL 8 upgrade could be found [here](https://github.com/openboxes/openboxes/issues?q=is%3Aissue+mysql+8+is%3Aopen+)
 * [SDK Man](https://sdkman.io/install)
 * [Grails 3.3.17](https://grails.org/download.html)
 * NPM 6.14.6
