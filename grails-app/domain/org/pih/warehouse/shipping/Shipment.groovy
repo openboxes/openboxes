@@ -675,5 +675,13 @@ class Shipment implements Comparable, Serializable {
     boolean hasInvoicedItem() {
         shipmentItems.any { it.quantityInvoiced > 0 }
     }
+
+    Boolean hasParentContainer() {
+        shipmentItems?.any { it?.container?.parentContainer }
+    }
+
+    Boolean hasChildContainer() {
+        shipmentItems?.any { it?.container }
+    }
 }
 
