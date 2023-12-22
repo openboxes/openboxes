@@ -68,6 +68,7 @@ const FIELDS = {
         getDynamicAttr: ({ fieldValue }) => ({
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
+          color: fieldValue?.color,
         }),
         attributes: {
           className: 'text-left ml-1',

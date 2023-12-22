@@ -90,14 +90,18 @@
         <g:elseif test="${requisitionItem?.isSubstituted()}">
             <div class="canceled">
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
+                <span style="color: ${requisitionItem?.product?.color ?: "black"}">
+                    <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
+                </span>
                 <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
                     <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
-                        <format:displayName product="${substitutionItem?.product}" showTooltip="${true}" />
+                        <span style="color: ${requisitionItem?.product?.color ?: "black"}">
+                            <format:displayName product="${substitutionItem?.product}" showTooltip="${true}" />
+                        </span>
                         <g:renderHandlingIcons product="${substitutionItem?.product}" />
                     </g:link>
                 </div>
@@ -105,7 +109,9 @@
         </g:elseif>
         <g:else>
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
+                <span style="color: ${requisitionItem?.product?.color ?: "black"}">
+                    <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
+                </span>
                 <g:renderHandlingIcons product="${requisitionItem?.product}" />
             </g:link>
         </g:else>
