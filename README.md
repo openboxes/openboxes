@@ -1,8 +1,9 @@
-[![Build Status](https://travis-ci.org/openboxes/openboxes.svg?branch=develop)](https://travis-ci.org/openboxes/openboxes)
 [![Documentation Status](https://readthedocs.org/projects/openboxes/badge/?version=develop)](https://readthedocs.org/projects/openboxes/?badge=develop)
+![dbdocs](https://github.com/openboxes/openboxes/actions/workflows/dbdocs.yml/badge.svg)
+![docker image](https://github.com/openboxes/openboxes/actions/workflows/docker-image.yml/badge.svg)
 [![Financial Contributors on Open Collective](https://opencollective.com/openboxes/all/badge.svg?label=financial+contributors)](https://opencollective.com/openboxes) 
-[![Slack Signup](http://slack-signup.openboxes.com/badge.svg)](http://slack-signup.openboxes.com)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Join the chat at https://gitter.im/openboxes/openboxes](https://badges.gitter.im/openboxes/openboxes.svg)](https://gitter.im/openboxes/openboxes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+[![Join the chat at https://gitter.im/openboxes/openboxes](https://badges.gitter.im/openboxes/openboxes.svg)](https://gitter.im/openboxes/openboxes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OpenBoxes
 =========
@@ -16,7 +17,7 @@ OpenBoxes is an Open Source Inventory and Supply Chain Management System. The in
 ### Code Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="https://github.com/openboxes/openboxes/graphs/contributors"><img src="https://opencollective.com/openboxes/contributors.svg?width=890&button=false" /></a>
+<a href="https://github.com/openboxes/openboxes/graphs/contributors"><img src="https://opencollective.com/openboxes/contributors.svg?width=890&button=true" /></a>
 
 ### Financial Contributors
 
@@ -51,7 +52,23 @@ By using this software in any fashion, you are agreeing to be bound by
 the terms of this license.
 You must not remove this notice, or any other, from this software.
 
-## Deploy to your Azure VPC
+## Deployment Options
+
+We currently support deploying the OpenBoxes application to DigitalOcean and Azure. We would like to support other deployment options like Amazon Web Services, Vultr, Linode, and others but don't have the resources to build and maintain these deployment options at the moment. If interested in other deployment options, please participate in the [discussion here](https://community.openboxes.com/t/adding-openboxes-to-linode/761) to help us better understand your requirements and expectations regarding deployment. For instance, it would be helpful to hear from service providers who would like to manage multiple customers or users who aren't tech savvy but prefer a certain deployment platform because of its ease of use.
+
+### Deploy to DigitalOcean
+
+The *Deploy to DigitalOcean* button will redirect you to DigitalOcean, where you will be able to choose 
+
+For more information and step-by-step instructions go to: 
+https://community.openboxes.com/t/install-openboxes-via-digitalocean-marketplace/311
+
+For our DigitalOcean marketplace app go to:
+https://marketplace.digitalocean.com/apps/openboxes-server?refcode=da4712a483b4
+
+[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://marketplace.digitalocean.com/apps/openboxes-server?refcode=da4712a483b4&action=deploy)
+
+### Deploy to Azure
 
 *Deploy to Azure* button will bring you to Azure portal, where after filling a few of the properties you can get your OpenBoxes environment in a matter of minutes. In the Azure setup screen, look at each property's tooltip description to understand its purpose.
 
@@ -72,16 +89,17 @@ https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1719435265/Push-button+dep
 ### Install Dependencies
 
 #### Required
-* [Java 7 (must install Java 7)](https://www.azul.com/downloads/?version=java-7-lts&package=jdk)
-* [MySQL 5.7](https://downloads.mysql.com/archives/community/)
+* [Java 8 (must install Java 8)](https://www.oracle.com/pl/java/technologies/javase/javase8-archive-downloads.html) or via SDK
+* [MySQL 5.7 or MySQL 8.0](https://downloads.mysql.com/archives/community/) or [MariaDB 10.11.4](https://mariadb.com/kb/en/mariadb-10-11-4-release-notes/)
   * Mac users: 5.7.31 is the latest 5.7.x with a pre-built installer and works fine
+  * Issues related to the MySQL 8 upgrade could be found [here](https://github.com/openboxes/openboxes/issues?q=is%3Aissue+mysql+8+is%3Aopen+)
 * [SDK Man](https://sdkman.io/install)
-* [Grails 1.3.9](https://grails.org/download.html)
+* [Grails 3.3.17](https://grails.org/download.html)
 * NPM 6.14.6
 * Node 14+
 
 #### Optional
-* [IntelliJ IDEA 14.1](https://www.jetbrains.com/idea/download/)
+* [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
 * Chrome
 
 ### Basic setup instructions for developers
@@ -92,17 +110,24 @@ These instructions are for developers only.  If you are a user/implementer, plea
 #### 1. Install Dependencies
 Install required dependencies above
 
-#### 2. Install Grails
+#### 2. Install Grails and Java 8*
 Check that you have SDK Man installed properly (otherwise follow instructions on the skdman install page).
 ```
 $ sdk version
 SDKMAN 5.13.2
 ```
 
-Install Grails 1.3.9
+Install Grails 3.3.10
 ```
-$ sdk install grails 1.3.9
+$ sdk install grails 3.3.10
 ```
+
+Install Java 8*
+```
+$ sdk install java 8.0.332-zulu
+```
+
+`*` - in case you have not installed Java yet.
 
 #### 3. Clone repository 
 If you are a core contributor:
@@ -236,9 +261,9 @@ http://localhost:6060
 ## Troubleshooting
 
 ### How to Debug 
-* Run Grails in debug mode
+* Run Grails normally
     ```
-    grails-debug run-app
+    grails run-app
     ```
 * In Intellij navigate to Run > Edit Configurations
 * Create a new Remote Debug Configuration
