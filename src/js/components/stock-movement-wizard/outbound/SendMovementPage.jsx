@@ -9,6 +9,7 @@ import Dropzone from 'react-dropzone';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from "react-router-dom";
 import Alert from 'react-s-alert';
 import { Tooltip } from 'react-tippy';
 
@@ -967,7 +968,7 @@ const mapStateToProps = state => ({
   minimumExpirationDate: state.session.minimumExpirationDate,
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
+export default withRouter(connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage));
 
 SendMovementPage.propTypes = {
   /** Initial component's data */
