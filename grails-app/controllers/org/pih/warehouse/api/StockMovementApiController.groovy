@@ -830,10 +830,7 @@ class StockMovementApiController {
         // If a location doesn't have approval required, return listOutboundOptions when we are on outbound list
         // but if we are on the requests list return listRequestsOptions
         if (!isApprovalRequired) {
-            if (isElectronicType) {
-                return RequisitionStatus.listRequestOptions()
-            }
-            return RequisitionStatus.listOutboundOptions()
+            return isElectronicType ? RequisitionStatus.listRequestOptions() : RequisitionStatus.listOutboundOptions()
         }
         // If request approval is required, check what type of list it is and return appropriate statuses
         if (isElectronicType) {
