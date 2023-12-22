@@ -704,6 +704,11 @@ class UrlMappings {
             action = [GET: "getOpenStockRequests"]
         }
 
+        "/api/dashboard/requestsPendingApproval"(parseRequest: true) {
+            controller = { "dashboardApi" }
+            action = [GET: "getRequestsPendingApproval"]
+        }
+
         "/api/dashboard/inventoryValue"(parseRequest: true) {
             controller = { "dashboardApi" }
             action = [GET: "getInventoryValue"]
