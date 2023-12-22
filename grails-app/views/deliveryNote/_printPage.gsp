@@ -56,7 +56,7 @@
                             <td class="center middle" rowspan="${numInventoryItem}">
                                     ${i + 1}
                             </td>
-                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasChildContainer()}}">
                                 <td class="middle center" rowspan="${numInventoryItem}">
                                     <g:each in="${shipmentItems}" var="shipmentItem">
                                         <div>
@@ -65,7 +65,7 @@
                                     </g:each>
                                 </td>
                             </g:if>
-                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.shipmentItems?.any { it.container }}}">
+                            <g:if test="${requisitionItems.find { it.requisition?.shipment?.hasParentContainer()}}">
                                 <td class="center middle" rowspan="${numInventoryItem}">
                                     <g:each in="${shipmentItems}" var="shipmentItem">
                                         <div>
