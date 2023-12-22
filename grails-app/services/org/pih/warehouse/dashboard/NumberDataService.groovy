@@ -1,9 +1,13 @@
 package org.pih.warehouse.dashboard
 
+import grails.core.GrailsApplication
 import grails.plugin.cache.Cacheable
+import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.joda.time.LocalDate
+import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
@@ -21,6 +25,7 @@ import util.ConfigHelper
 class NumberDataService {
 
     def dataService
+    GrailsApplication grailsApplication
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryByLotAndBin-${location?.id}"})
     NumberData getInventoryByLotAndBin(Location location) {
@@ -208,6 +213,33 @@ class NumberDataService {
 
         String urlContextPath = ConfigHelper.contextPath
         return new NumberData(openStockRequests[0], "${urlContextPath}/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC")
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getRequestsPendingApproval-${location?.id}-${currentUser?.id}" })
+    NumberData getRequestsPendingApproval(Location location, User currentUser) {
+        int requisitionCount = Requisition.createCriteria().get {
+            projections {
+                count('id')
+            }
+            eq("origin", location)
+            eq("sourceType", RequisitionSourceType.ELECTRONIC)
+            eq("status",  RequisitionStatus.PENDING_APPROVAL)
+        }
+
+        ApplicationTagLib g = grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+
+        Map linkParams = [
+            direction: StockMovementDirection.OUTBOUND,
+            sourceType: RequisitionSourceType.ELECTRONIC,
+        ]
+
+        if(currentUser.hasRoles(location, [RoleType.ROLE_REQUISITION_APPROVER])) {
+            linkParams.requisitionStatusCode = RequisitionStatus.PENDING_APPROVAL
+        }
+
+        String redirectLink = g.createLink(controller: "stockMovement", action: "list", params: linkParams)
+
+        return new NumberData(requisitionCount, redirectLink)
     }
 
     @Cacheable(value = "dashboardCache", key = { "getInventoryValue-${location?.id}" })

@@ -674,6 +674,10 @@ openboxes {
                             widgetId: "openStockRequests",
                             order   : 5
                         ],
+                        [
+                                widgetId: "requestsPendingApproval",
+                                order   : 6
+                        ],
 
                         [
                             widgetId: "delayedShipments",
@@ -840,6 +844,15 @@ openboxes {
                 numberType = 'number'
                 type = 'number'
                 endpoint = "/api/dashboard/openStockRequests"
+            }
+            requestsPendingApproval {
+                enabled = true
+                title = "react.dashboard.requestsPendingApproval.title.label"
+                info = "react.dashboard.requestsPendingApproval.info.label"
+                subtitle = "react.dashboard.requests.subtitle.label"
+                numberType = 'number'
+                type = 'number'
+                endpoint = "/api/dashboard/requestsPendingApproval"
             }
             inventoryValue {
                 enabled = true
