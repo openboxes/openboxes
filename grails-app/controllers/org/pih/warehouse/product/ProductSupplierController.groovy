@@ -34,30 +34,7 @@ class ProductSupplierController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        def productSuppliers = ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
-            if (params.product?.id) {
-                eq('product.id', params.product.id)
-            }
-            if (params.supplierId) {
-                eq('supplier.id', params.supplierId)
-            }
-            if (params.manufacturerId) {
-                eq('manufacturer.id', params.manufacturerId)
-            }
-            if (params.q) {
-                or {
-                    ilike("productCode", "%" + params.q + "%")
-                    ilike("code", "%" + params.q + "%")
-                    ilike("name", "%" + params.q + "%")
-                    ilike("supplierCode", "%" + params.q + "%")
-                    ilike("supplierName", "%" + params.q + "%")
-                    ilike("manufacturerCode", "%" + params.q + "%")
-                    ilike("manufacturerName", "%" + params.q + "%")
-                }
-            }
-        }
-        [productSupplierInstanceList: productSuppliers, productSupplierInstanceTotal: productSuppliers.totalCount]
+        render(view: "/common/react")
     }
 
     def create() {
