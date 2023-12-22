@@ -80,7 +80,7 @@ enum RequisitionStatus {
         [CREATED, EDITING, APPROVED, PICKING, PICKED, CHECKING, ISSUED, CANCELED, PENDING, REQUESTED, DISPATCHED]
     }
 
-    // Options for request list when current location is supporting request approval (Added approved and waiting for approval)
+    // Options for request list when current location is supporting request approval (Added approved, rejected and waiting for approval)
     static listRequestOptionsWhenApprovalRequired() {
         [PENDING_APPROVAL, APPROVED, PICKING, PICKED, CHECKING, REJECTED]
     }
