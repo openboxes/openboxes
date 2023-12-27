@@ -159,6 +159,11 @@ const AsyncStockMovementOutboundList = Loadable({
   loading: Loading,
 });
 
+const AsyncProductSupplierList = Loadable({
+  loader: () => import('components/productSupplier/ProductSupplierList'),
+  loading: Loading,
+});
+
 
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
@@ -226,6 +231,7 @@ const Router = (props) => {
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
             <MainLayoutRoute path="**/product/list" component={AsyncProductsList} />
             <MainLayoutRoute path="**/stockTransfer/list" component={AsyncStockTransferList} />
+            <MainLayoutRoute path="**/productSupplier/list" component={AsyncProductSupplierList} />
             <MainLayoutRoute path="**/dashboard/:configId?" component={Dashboard} />
             <MainLayoutRoute path="**/" component={Dashboard} />
           </Switch>

@@ -127,6 +127,11 @@ const CATEGORY_URL = {
   tree: () => `${CATEGORY_URL.base}/tree`,
 };
 
+const PRODUCT_SUPPLIER_URL = {
+  base: `${CONTEXT_PATH}/productSupplier`,
+  create: () => `${PRODUCT_SUPPLIER_URL.base}/create`,
+};
+
 export {
   CATEGORY_URL,
   DASHBOARD_URL,
@@ -144,4 +149,5 @@ export {
   STOCK_MOVEMENT_URL,
   STOCK_TRANSFER_URL,
   STOCKLIST_URL,
+  PRODUCT_SUPPLIER_URL,
 };
