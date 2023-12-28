@@ -9,11 +9,8 @@
  **/
 package org.pih.warehouse.data
 
-import grails.core.GrailsApplication
-import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
-import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
@@ -25,14 +22,12 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierListDto
 import org.pih.warehouse.product.ProductSupplierListParams
 import org.pih.warehouse.product.ProductSupplierPreference
-import util.ConfigHelper
 
 import java.text.SimpleDateFormat
 
@@ -53,7 +48,7 @@ class ProductSupplierService {
         Set<String> usedAliases = new HashSet<>()
 
         List<ProductSupplier> productSuppliers =
-            ProductSupplier.createCriteria().list(max: params.max ?: 10, offset: params.offset ?: 0) {
+            ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
                 if (params.searchTerm) {
                     createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                     createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
