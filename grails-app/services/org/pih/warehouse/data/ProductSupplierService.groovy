@@ -9,28 +9,143 @@
  **/
 package org.pih.warehouse.data
 
-import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
+import org.hibernate.criterion.Criterion
+import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Projections
+import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.Subqueries
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 import org.pih.warehouse.core.UnitOfMeasure
-import org.pih.warehouse.importer.ImportDataCommand
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.product.ProductSupplierListDto
+import org.pih.warehouse.product.ProductSupplierListParams
 import org.pih.warehouse.product.ProductSupplierPreference
-import util.ConfigHelper
 
 import java.text.SimpleDateFormat
 
 @Transactional
 class ProductSupplierService {
 
+    public static final PREFERENCE_TYPE_NONE = "NONE"
+
+    public static final PREFERENCE_TYPE_MULTIPLE = "MULTIPLE"
+
     def identifierService
     def dataSource
+
+
+    List<ProductSupplierListDto> getProductSuppliers(ProductSupplierListParams params) {
+        // Store added aliases to avoid duplicate alias exceptions for product and supplier
+        // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
+        Set<String> usedAliases = new HashSet<>()
+
+        List<ProductSupplier> productSuppliers =
+            ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
+                if (params.searchTerm) {
+                    createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                    createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.addAll(["product", "supplier"])
+                    or {
+                        ilike("p.productCode", "%" + params.searchTerm + "%")
+                        ilike("code", "%" + params.searchTerm + "%")
+                        ilike("s.code", "%" + params.searchTerm + "%")
+                    }
+                }
+                if (params.product) {
+                    eq("product.id", params.product)
+                }
+                if (params.active != null) {
+                    eq("active", params.active)
+                }
+                if (params.supplier) {
+                    eq("supplier.id", params.supplier)
+                }
+                if (params.preferenceType) {
+                    add(getPreferenceTypeCriteria(params.preferenceType))
+                }
+                if (params.createdFrom) {
+                    ge("dateCreated", params.createdFrom)
+                }
+                if (params.createdTo) {
+                    lte("dateCreated", params.createdTo)
+                }
+                if (params.sort) {
+                    String orderDirection = params.order ?: "asc"
+                    switch (params.sort) {
+                        case "productCode":
+                            if (!usedAliases.contains("product")) {
+                                createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                                usedAliases.add("product")
+                            }
+                            order("p.productCode", orderDirection)
+                            break
+                        case "productName":
+                            if (!usedAliases.contains("product")) {
+                                createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                            }
+                            order("p.name", orderDirection)
+                            break
+                        case "code":
+                            order("code", orderDirection)
+                            break
+                        case "supplierName":
+                            if (!usedAliases.contains("supplier")) {
+                                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                                usedAliases.add("supplier")
+                            }
+                            order("s.name", orderDirection)
+                            break
+                        case "supplierCode":
+                            if (!usedAliases.contains("supplier")) {
+                                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                                usedAliases.add("supplier")
+                            }
+                            order("s.code", orderDirection)
+                            break
+                        case "dateCreated":
+                            order("dateCreated", orderDirection)
+                            break
+                        case "active":
+                            order("active", orderDirection)
+                            break
+                        default:
+                            break
+                    }
+                }
+            }
+        productSuppliers.resultList = productSuppliers.collect { ProductSupplier it -> it.toJson() }
+        return productSuppliers as List<ProductSupplierListDto>
+    }
+
+    private static Criterion getPreferenceTypeCriteria(String preferenceType) {
+        if (preferenceType == PREFERENCE_TYPE_NONE) {
+            return Restrictions.isEmpty("productSupplierPreferences")
+        }
+        if (preferenceType == PREFERENCE_TYPE_MULTIPLE) {
+            return Restrictions.sizeGt("productSupplierPreferences", 1)
+        }
+        // If we are searching by a specific preference type, we want to search for a product supplier
+        // that has only one preference (first statement) and its id is equal to the provided id (second statement)
+        return Restrictions
+                .and(Restrictions.sizeEq("productSupplierPreferences", 1),
+                        Subqueries.exists(DetachedCriteria.forClass(ProductSupplierPreference, 'pp')
+                            .createAlias("pp.preferenceType", 'pt')
+                            .setProjection(Projections.property("pp.id"))
+                            .add(Restrictions.and(
+                                    Restrictions.eq("pt.id", preferenceType),
+                                    // Join the product supplier preferences table by productSupplier.id = productPreference.supplierId
+                                    Restrictions.eqProperty("pp.productSupplier.id", "this.id")))))
+
+
+    }
 
     ProductSupplier createOrUpdate(Map params) {
         log.info("params: ${params}")

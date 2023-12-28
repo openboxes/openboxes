@@ -56,4 +56,12 @@ class ProductSupplierPreference {
             "Preference Type Validity End Date"    : ["property": "validityEndDate", "dateFormat": "MM/dd/yyyy"],
             "Preference Type Comment"              : "comments",
     ]
+
+    ProductSupplierPreferenceListDto toJson() {
+        return new ProductSupplierPreferenceListDto(
+                id: id,
+                destinationParty: destinationParty,
+                preferenceType: preferenceType
+        )
+    }
 }
