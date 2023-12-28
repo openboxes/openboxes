@@ -151,4 +151,21 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             "Date created"                        : ["property": "dateCreated", "dateFormat": "MM/dd/yyyy"],
             "Last updated"                        : ["property": "lastUpdated", "dateFormat": "MM/dd/yyyy"]
     ]
+
+    ProductSupplierListDto toJson() {
+        return new ProductSupplierListDto(
+            id: id,
+            productCode: product.productCode,
+            name: name,
+            productName: product.name,
+            code: code,
+            supplierName: supplier?.name,
+            supplierCode: supplier?.code,
+            productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
+            packageSize: "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}",
+            eachPrice: defaultProductPackage?.productPrice ? defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity : 0.0,
+            dateCreated: dateCreated,
+            active: active
+        )
+    }
 }
