@@ -130,7 +130,7 @@ const ProductSupplierListTable = () => {
         pages={tableData.pages}
         totalData={tableData.totalCount}
         onFetchData={onFetchHandler}
-        noDataText="No orders match the given criteria"
+        noDataText="No product sources match the given criteria"
         footerComponent={() => (
           <span className="title-text p-1 d-flex flex-1 justify-content-end" />
         )}
