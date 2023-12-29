@@ -162,7 +162,8 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             supplierName: supplier?.name,
             supplierCode: supplier?.code,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
-            packageSize: "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}",
+            packageSize: defaultProductPackage ? "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}" : null,
+            packagePrice: defaultProductPackage?.productPrice?.price ?: 0.0,
             eachPrice: defaultProductPackage?.productPrice ? defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity : 0.0,
             dateCreated: dateCreated,
             active: active
