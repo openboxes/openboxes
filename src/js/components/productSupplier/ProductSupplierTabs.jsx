@@ -1,12 +1,9 @@
-import React, {useState} from 'react';
-
-import queryString from 'query-string';
-import { useHistory, useLocation } from 'react-router-dom';
+import React from 'react';
 
 import { DETAILS_TAB, PREFERENCE_TYPES_TAB } from 'consts/productSupplierList';
+import useProductSupplierTabs from 'hooks/list-pages/productSupplier/useProductSupplierTabs';
+import useQueryParams from 'hooks/useQueryParams';
 import Translate from 'utils/Translate';
-import useQueryParams from "hooks/useQueryParams";
-import useProductSupplierTabs from "hooks/list-pages/productSupplier/useProductSupplierTabs";
 
 const tabs = {
   [DETAILS_TAB]: {
