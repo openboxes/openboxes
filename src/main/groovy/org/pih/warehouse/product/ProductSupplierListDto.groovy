@@ -22,6 +22,8 @@ class ProductSupplierListDto {
 
     String packageSize
 
+    BigDecimal packagePrice
+
     BigDecimal eachPrice
 
     Date dateCreated
