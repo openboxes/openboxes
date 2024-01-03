@@ -1,37 +1,19 @@
-class Queue {
-  queue = [];
+import { TaskQueue } from 'cwait';
 
-  enqueue = (request) => this.queue.push(request);
-
-  dequeue = () => this.queue.shift();
-
-  isEmpty = () => !this.queue.length;
-}
+const MAX_SIMULTANEOUS_REQUESTS = 1;
 
 const requestsQueue = () => {
-  const queue = new Queue();
+  const queue = new TaskQueue(Promise, MAX_SIMULTANEOUS_REQUESTS);
 
-  const currentRequest = { processing: false };
-
+  // when tasks amount is equal to MAX_SIMULTANEOUS_REQUESTS
+  // then the requests are processed automatically,
+  // so we don't have to start processing manually
   const enqueueRequest = (request) => {
-    queue.enqueue(request);
+    queue.add(request);
   };
-
-  const processRequests = (async () => {
-    if (!currentRequest.processing && !queue.isEmpty()) {
-      const request = queue.dequeue();
-      currentRequest.processing = true;
-
-      await request();
-
-      currentRequest.processing = false;
-      await processRequests();
-    }
-  });
 
   return {
     enqueueRequest,
-    processRequests,
   };
 };
 

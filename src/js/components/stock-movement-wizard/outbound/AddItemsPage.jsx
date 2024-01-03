@@ -997,14 +997,12 @@ class AddItemsPage extends Component {
           && savedItem.quantityRequested === item.quantityRequested,
         ));
 
-      this.requestsQueue.enqueueRequest(
-        saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications })
-      );
-
       if (payloadLineItemsWithoutDuplications.length) {
         this.setState({ lastRequestData: payload?.lineItems }, () =>
-          this.requestsQueue.processRequests(),
-        );
+          this.requestsQueue.enqueueRequest(
+            saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications }),
+          ),
+        )
       }
     }
 
