@@ -1,5 +1,39 @@
 # Stock Movements
 
+**NOTE: Before you can make stock movements, you must be logged in to a location. Otherwise, you'll get this error:**
+
+```
+{
+  "errorCode": 500,
+  "cause": "java.lang.NullPointerException",
+  "errorMessage": "Cannot get property 'id' on null object"
+}
+```
+
+To see what location you're logged in to, use `filters.SecurityFilters`:
+
+```
+2023-12-28 07:10:51,353 [http-bio-0.0.0.0-8080-exec-366] \
+INFO filters.SecurityFilters - errors.handleException: [user:admin, location:null]
+```
+
+If this throws an error, you're not logged in. Either re-authenticate or call the Choose Location API to fix this.
+
+When you authenticate, enter a location property in your JSON body:
+
+```
+curl -i -c cookies.txt -X POST -H "Content-Type: application/json" \
+-d '{"username": "<username>", "password": "<password>", "location": "<locationId>"}' \
+https://example.openboxes.com/openboxes/api/login
+```
+
+Or, if you're already logged in, call the Choose Location API:
+
+```
+curl -i -c cookies.txt -X GET \
+https://example.openboxes.com/openboxes/api/chooseLocation/<locationId>
+```
+
 ## List 
 Return stock movements 
 
