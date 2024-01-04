@@ -16,6 +16,7 @@ import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
+import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductCatalog
@@ -79,12 +80,24 @@ class SelectOptionsApiController {
     }
 
     def preferenceTypeOptions() {
+        List<Map<String, String>> defaultPreferenceTypes = [
+            [
+                id: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
+                label: g.message(code: "react.productSupplier.preferenceType.multiple.label", default: "Multiple")
+            ],
+            [
+                id: ProductSupplierService.PREFERENCE_TYPE_NONE,
+                label: g.message(code: 'react.productSupplier.preferenceType.none.label', default: "None")
+            ],
+        ]
         List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
             [
                 id: it.id,
                 label: it.name
             ]
         }
-        render([data: preferenceTypes] as JSON)
+        defaultPreferenceTypes.addAll(preferenceTypes)
+
+        render([data: defaultPreferenceTypes] as JSON)
     }
 }

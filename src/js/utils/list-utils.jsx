@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import queryString from 'query-string';
 // Temporary 'hard-coded' checking for role to display an action in dropdown or not
 export const hasMinimumRequiredRole = (role, highestUserRole) => {
   // TODO: Figure out better way to check roles
@@ -64,4 +65,20 @@ export const getCurrentEventComment = (event, currentStatus) => {
     return null;
   }
   return event?.comment;
+};
+
+// Clears query params keeping the ones that are included in fieldsToIgnore,
+// and returns stringified query params
+export const clearQueryParams = ({ fieldsToIgnore, queryParams }) => {
+  const resultParams = Object.entries(queryParams).reduce((acc, [key, value]) => {
+    if (fieldsToIgnore.includes(key)) {
+      return {
+        ...acc,
+        [key]: value,
+      };
+    }
+    return acc;
+  }, {});
+
+  return queryString.stringify(resultParams);
 };

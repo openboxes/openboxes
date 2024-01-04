@@ -57,3 +57,6 @@ export const HIDE_INFO_BAR = 'HIDE_INFO_BAR';
 export const CLOSE_INFO_BAR = 'CLOSE_INFO_BAR';
 export const SHOW_INFO_BAR_MODAL = 'SHOW_INFO_BAR_MODAL';
 export const HIDE_INFO_BAR_MODAL = 'HIDE_INFO_BAR_MODAL';
+
+// Product supplier
+export const FETCH_PREFERENCE_TYPES = 'FETCH_PREFERENCE_TYPES';

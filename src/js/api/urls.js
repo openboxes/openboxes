@@ -3,7 +3,7 @@
  * */
 
 const API = '/api';
-const GENERIC_API = `${API}/generic`;
+export const GENERIC_API = `${API}/generic`;
 const { CONTEXT_PATH } = window;
 
 // PURCHASE ORDER
@@ -68,6 +68,9 @@ export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
 
 // USERS
 export const USERS_OPTIONS = `${API}/users`;
+
+// PREFERENCE TYPES
+export const PREFERENCE_TYPE_OPTIONS = `${API}/preferenceTypeOptions`;
 
 // LOCATIONS
 export const LOCATION_API = `${API}/locations`;

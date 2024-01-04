@@ -20,6 +20,7 @@ import {
   FETCH_MENU_CONFIG,
   FETCH_NUMBERS,
   FETCH_PAYMENT_TERMS,
+  FETCH_PREFERENCE_TYPES,
   FETCH_PURCHASE_ORDER_STATUSES,
   FETCH_REASONCODES,
   FETCH_REQUISITION_STATUS_CODES,
@@ -49,6 +50,7 @@ import {
 } from 'actions/types';
 import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
+import productSupplierApi from 'api/services/ProductSupplierApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import userApi from 'api/services/UserApi';
 import { ORGANIZATION_API } from 'api/urls';
@@ -681,3 +683,11 @@ export const hideInfoBarModal = name => ({
     name,
   },
 });
+
+export const fetchPreferenceTypes = (config) => async (dispatch) => {
+  const preferenceTypes = await productSupplierApi.getPreferenceTypeOptions(config);
+  return dispatch({
+    type: FETCH_PREFERENCE_TYPES,
+    payload: preferenceTypes?.data?.data,
+  });
+};

@@ -116,6 +116,9 @@ class ProductSupplierService {
                         case "active":
                             order("active", orderDirection)
                             break
+                        case "name":
+                            order("name", orderDirection)
+                            break
                         default:
                             break
                     }

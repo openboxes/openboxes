@@ -1,25 +1,45 @@
-import { useState } from 'react';
+import _ from 'lodash';
 
 import { PRODUCT_SUPPLIER_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
 
-const useProductSupplierListTableData = () => {
+const useProductSupplierListTableData = (filterParams) => {
   const errorMessageId = 'react.productSupplier.error.productSupplierList.label';
   const defaultErrorMessage = 'Unable to fetch product sources';
 
   const defaultSorting = {
     sort: 'dateCreated',
-    order: 'asc',
+    order: 'desc',
   };
 
-  // TODO: To be removed after adding filters
-  const [filterParams] = useState({ offset: 0, max: 10 });
-
-  const getParams = () => {};
+  const getParams = ({
+    offset,
+    state,
+    sortingParams,
+  }) => {
+    const {
+      product,
+      supplier,
+      preferenceType,
+    } = filterParams;
+    return _.omitBy({
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      ...sortingParams,
+      ...filterParams,
+      product: product?.id,
+      supplier: supplier?.id,
+      preferenceType: preferenceType?.id,
+    }, (val) => {
+      if (typeof val === 'boolean') {
+        return !val;
+      }
+      return _.isEmpty(val);
+    });
+  };
 
   const {
     tableRef,
-    // fireFetchData,
     loading,
     onFetchHandler,
     tableData,
