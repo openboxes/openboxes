@@ -56,10 +56,8 @@ export default {
       defaultPlaceholder: 'Preference Type',
       showLabelTooltip: true,
     },
-    // TODO: To be replaced by the preferenceType options when API endpoint is ready
-    getDynamicAttr: () => ({
-      options: [],
-      disabled: true,
+    getDynamicAttr: ({ preferenceTypes }) => ({
+      options: preferenceTypes,
     }),
   },
   createdFrom: {
