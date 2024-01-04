@@ -2,25 +2,60 @@ import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 
+import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
+import { connect } from 'react-redux';
+
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
+import ActionDots from 'utils/ActionDots';
+import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
+import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 
-const ProductSupplierListTable = ({ filterParams }) => {
+const ProductSupplierListTable = ({ filterParams, currentUser }) => {
+  const actions = [
+    {
+      defaultLabel: 'Edit',
+      label: 'react.productSupplier.edit.label',
+      leftIcon: <RiPencilLine />,
+      // href: STOCK_TRANSFER_URL.genericEdit(order?.id),
+    },
+    {
+      defaultLabel: 'Delete Product Source',
+      label: 'react.productSupplier.delete.label',
+      leftIcon: <RiDeleteBinLine />,
+      variant: 'danger',
+      // onClick: deleteConfirmAlert,
+    },
+  ];
   const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
-      fixed: 'left',
       sortable: false,
       style: {
         overflow: 'visible',
         zIndex: 1,
+      },
+      fixed: 'left',
+      Cell: (row) => {
+        const clickableActions = hasPermissionsToProductSourceActions(currentUser)
+          ? { actions }
+          : {};
+
+        return (
+          <ActionDots
+            dropdownPlacement="right"
+            dropdownClasses="action-dropdown-offset"
+            id={row.original.id}
+            {...clickableActions}
+          />
+        );
       },
     },
     {
@@ -146,7 +181,11 @@ const ProductSupplierListTable = ({ filterParams }) => {
   );
 };
 
-export default ProductSupplierListTable;
+const mapStateToProps = (state) => ({
+  currentUser: state.session.user,
+});
+
+export default connect(mapStateToProps)(ProductSupplierListTable);
 
 ProductSupplierListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

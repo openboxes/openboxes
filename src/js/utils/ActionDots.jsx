@@ -15,6 +15,10 @@ const actionItemType = {
 const ActionDots = ({
   actions, id, dropdownPlacement, dropdownClasses,
 }) => {
+  const actionsClassName = actions
+  ? 'action-dots-enabled'
+  : 'action-dots-disabled';
+
   const getPositionClass = () => {
     switch (dropdownPlacement) {
       case 'top':
@@ -57,21 +61,24 @@ const ActionDots = ({
     <div className={`btn-group ${getPositionClass()}`} data-testid="action-dots-component">
       <button
         data-testid="dropdown-toggle"
-        className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"
+        className={`action-dots dropdown-toggle d-flex align-items-center justify-content-center ${actionsClassName}`}
         data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
       >
         <RiMoreLine />
       </button>
-      <div data-testid="dropdown-menu" className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
-        {actions && actions.map((action) => {
+      {actions && (
+        <div
+          data-testid="dropdown-menu"
+          className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
+        {actions.map((action) => {
           const itemClasses = `d-flex align-items-center gap-8 dropdown-item ${action.variant === 'danger' ? 'font-red-ob' : ''}`;
           const itemValue = (
             <React.Fragment>
               {action.leftIcon && action.leftIcon}
               {action.label &&
-              <Translate id={action.label} defaultMessage={action.defaultLabel} />}
+                <Translate id={action.label} defaultMessage={action.defaultLabel}/>}
             </React.Fragment>
           );
           const elementType = getActionItemType(action);
@@ -82,25 +89,26 @@ const ActionDots = ({
 
           return (
             <React.Fragment key={action.label}>
-              { elementType === actionItemType.BUTTON && (
+              {elementType === actionItemType.BUTTON && (
                 <button
                   onClick={() => action.onClick(id)}
                   className={itemClasses}
                 >
                   {itemValue}
                 </button>)}
-              { elementType === actionItemType.LINK && (
+              {elementType === actionItemType.LINK && (
                 <a href={link} className={itemClasses}>
                   {itemValue}
                 </a>)}
-              { elementType === actionItemType.REACT_LINK && (
+              {elementType === actionItemType.REACT_LINK && (
                 <Link to={link} className={itemClasses}>
                   {itemValue}
                 </Link>)}
             </React.Fragment>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

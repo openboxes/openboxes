@@ -1097,12 +1097,9 @@ div.search-input:focus-within {
   border-radius: 18px;
   color: var(--blue-primary);
   border: none;
+
   &:focus {
     outline: none;
-  }
-  &:hover {
-    background-color: var(--blue-primary);
-    color: #FFFFFF;
   }
 
   .dropdown-menu {
@@ -1120,6 +1117,18 @@ div.search-input:focus-within {
       color: var(--color-red) !important;
     }
   }
+}
+
+.action-dots-enabled {
+
+  &:hover {
+    background-color: var(--blue-primary);
+    color: #FFFFFF;
+  }
+}
+
+.action-dots-disabled {
+  cursor: auto !important;
 }
 
 // List pages common styling

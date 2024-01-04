@@ -41,4 +41,12 @@ const canEditRequest = (currentUser, request, location) => {
   return isLocationDestination && isUserRequestor;
 };
 
+// To have permissions for product source list actions
+// user has to be at least admin and has product manager permissions
+export const hasPermissionsToProductSourceActions = (user) => {
+  const hasProductManagerPermission = true;
+  const isAdmin = false;
+  return hasProductManagerPermission && isAdmin;
+};
+
 export default canEditRequest;
