@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 
+import PropTypes from 'prop-types';
+
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
@@ -9,7 +11,7 @@ import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
 
-const ProductSupplierListTable = () => {
+const ProductSupplierListTable = ({ filterParams }) => {
   const columns = useMemo(() => [
     {
       Header: ' ',
@@ -47,21 +49,25 @@ const ProductSupplierListTable = () => {
         />
       ),
       minWidth: 250,
+      sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.defaultPackSize.label" defaultMessage="Default Pack Size" />,
       accessor: 'packageSize',
       minWidth: 250,
+      sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.packagePrice.label" defaultMessage="Package Price" />,
       accessor: 'packagePrice',
       minWidth: 200,
+      sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.eachPrice.label" defaultMessage="Each Price" />,
       accessor: 'eachPrice',
       minWidth: 150,
+      sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.supplier.label" defaultMessage="Supplier" />,
@@ -106,7 +112,7 @@ const ProductSupplierListTable = () => {
     tableData,
     onFetchHandler,
     loading,
-  } = useProductSupplierListTableData();
+  } = useProductSupplierListTableData(filterParams);
 
   return (
     <ListTableWrapper>
@@ -140,3 +146,7 @@ const ProductSupplierListTable = () => {
 };
 
 export default ProductSupplierListTable;
+
+ProductSupplierListTable.propTypes = {
+  filterParams: PropTypes.shape({}).isRequired,
+};
