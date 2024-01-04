@@ -3,7 +3,7 @@
  * */
 
 const API = '/api';
-const GENERIC_API = `${API}/generic`;
+export const GENERIC_API = `${API}/generic`;
 const { CONTEXT_PATH } = window;
 
 // PURCHASE ORDER
