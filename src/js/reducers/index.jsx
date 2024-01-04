@@ -11,6 +11,7 @@ import infoBarVisibilityReducer from 'reducers/infoBarVisibilityReducer';
 import invoiceReducer from 'reducers/invoiceReducer';
 import locationReducer from 'reducers/locationReducer';
 import organizationsReducer from 'reducers/organizationsReducer';
+import productSupplierReducer from 'reducers/productSupplierReducer';
 import purchaseOrderReducer from 'reducers/purchaseOrderReducer';
 import reasonCodesReducer from 'reducers/reasonCodesReducer';
 import requisitionStatusCodes from 'reducers/requisitionStatusCodes';
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   location: locationReducer,
   infoBar: infoBarReducer,
   infoBarVisibility: infoBarVisibilityReducer,
+  productSupplier: productSupplierReducer,
 });
 
 export default rootReducer;
