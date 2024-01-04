@@ -56,7 +56,7 @@ const PreferenceTypeColumn = ({ productSupplierPreferences, productSupplierId })
       </span>
       <PreferenceTypeModal
         productSupplierId={productSupplierId}
-        isOpen={!!preferenceTypeModalData.length}
+        isOpen={Boolean(preferenceTypeModalData.length)}
         modalData={preferenceTypeModalData}
         closeModal={closeModal}
       />

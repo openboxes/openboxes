@@ -14,47 +14,32 @@ const PreferenceTypeModal = ({
   modalData,
   productSupplierId,
 }) => {
-  const mapPreferenceTypes = (preferenceTypes) => {
-    const defaultPreferenceTypePlaceholder = (
-      <p className="default-preference-type">
-        <span className="preference-type-location">Default: </span>
-      </p>
-    );
+  const mappedPreferenceTypes = modalData?.reduce((acc, preferenceType) => {
+    const {
+      preferenceType: { name },
+      destinationParty,
+    } = preferenceType;
 
-    return preferenceTypes?.reduce((acc, preferenceType) => {
-      const {
-        preferenceType: { name },
-        destinationParty,
-      } = preferenceType;
-
-      if (!destinationParty) {
-        return {
-          ...acc,
-          default: (
-            <p className="default-preference-type">
-              <span className="preference-type-location">Default: </span>
-              <span>{name}</span>
-            </p>
-          ),
-        };
-      }
-
+    if (!destinationParty) {
       return {
         ...acc,
-        preferenceTypes: [
-          ...acc.preferenceTypes,
-          <p>
-            <span className="preference-type-location">
-              {destinationParty?.name}
-              :
-              {' '}
-            </span>
-            <span>{name}</span>
-          </p>,
-        ],
+        default: {
+          name,
+        },
       };
-    }, { preferenceTypes: [], default: defaultPreferenceTypePlaceholder });
-  };
+    }
+
+    return {
+      ...acc,
+      preferenceTypes: [
+        ...acc.preferenceTypes,
+        {
+          destination: destinationParty?.name,
+          name,
+        },
+      ],
+    };
+  }, { preferenceTypes: [], default: null });
 
   const redirectToEditProductSource = (id) => {
     window.location = PRODUCT_SUPPLIER_URL.edit(id);
@@ -79,10 +64,22 @@ const PreferenceTypeModal = ({
         </div>
         <div className="preference-type-modal-list-container">
           <div>
-            {mapPreferenceTypes(modalData).default}
+            <p className="default-preference-type">
+              <span className="preference-type-location">Default: </span>
+              <span>{mappedPreferenceTypes?.default?.name}</span>
+            </p>
           </div>
           <div className="preference-type-modal-list">
-            {mapPreferenceTypes(modalData).preferenceTypes}
+            {mappedPreferenceTypes?.preferenceTypes?.map((preferenceType) => (
+              <p>
+                <span className="preference-type-location">
+                  {preferenceType?.destination}
+                  :
+                  {' '}
+                </span>
+                <span>{preferenceType?.name}</span>
+              </p>
+            ))}
           </div>
         </div>
         <div className="d-flex justify-content-end mt-3">
