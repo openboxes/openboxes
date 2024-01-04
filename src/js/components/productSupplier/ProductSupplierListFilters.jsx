@@ -17,9 +17,11 @@ const ProductSupplierListFilters = ({
   const {
     debounceTime,
     minSearchLength,
+    preferenceTypes,
   } = useSelector((state) => ({
     debounceTime: state.session.searchConfig.debounceTime,
     minSearchLength: state.session.searchConfig.minSearchLength,
+    preferenceTypes: state.productSupplier.preferenceTypes,
   }));
 
   const debouncedProductsFetch = useCallback(
@@ -46,6 +48,7 @@ const ProductSupplierListFilters = ({
         formProps={{
           debouncedProductsFetch,
           debouncedOrganizationsFetch,
+          preferenceTypes,
         }}
         defaultValues={defaultValues}
         allowEmptySubmit

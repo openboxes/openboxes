@@ -1,5 +1,9 @@
-import queryString from 'query-string';
+import { useEffect } from 'react';
 
+import queryString from 'query-string';
+import { useSelector } from 'react-redux';
+
+import { fetchPreferenceTypes } from 'actions';
 import filterFields from 'components/productSupplier/FilterFields';
 import { DETAILS_TAB } from 'consts/productSupplierList';
 import useCommonFilters from 'hooks/list-pages/useCommonFilters';
@@ -16,7 +20,26 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     filtersInitialized,
     setFiltersInitialized,
     history,
+    dispatch,
   } = useCommonFilters();
+
+  const {
+    preferenceTypes,
+  } = useSelector((state) => ({
+    preferenceTypes: state.productSupplier.preferenceTypes,
+  }));
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const config = {
+      signal: controller.signal,
+    };
+    dispatch(fetchPreferenceTypes(config));
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   const clearFilterValues = () => {
     const { pathname, search } = history.location;
@@ -72,7 +95,10 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
     if (queryProps.active) {
       defaultValues.active = queryProps.active;
     }
-    // TODO: Include logic for the preference type when API endpoint is ready
+    if (queryProps.preferenceType) {
+      defaultValues.preferenceType = preferenceTypes
+        .find(({ id }) => id === queryProps.preferenceType);
+    }
 
     setDefaultFilterValues(defaultValues);
     setFiltersInitialized(true);
