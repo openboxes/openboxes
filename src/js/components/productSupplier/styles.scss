@@ -25,3 +25,38 @@
 .cell-content {
   color: var(--blue-primary);
 }
+
+.modal-content {
+  width: auto !important;
+  min-width: 437px;
+  left: 50% !important;
+  transform: translate(-50%);
+
+  .default-preference-type {
+    background-color: var(--blue-100);
+    padding: 8px;
+    margin-bottom: 16px !important;
+  }
+
+  .preference-type-location {
+    color: var(--gray-400);
+  }
+
+  .preference-type-modal-header {
+    font-size: 32px;
+  }
+
+  .preference-type-modal-list-container {
+    padding: 0 4px 0 4px;
+
+    .preference-type-modal-list {
+      overflow-y: auto;
+      max-height: 310px;
+    }
+
+    p {
+      font-size: 21px;
+      margin: 0;
+    }
+  }
+}
