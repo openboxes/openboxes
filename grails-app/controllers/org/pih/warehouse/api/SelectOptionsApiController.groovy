@@ -12,6 +12,7 @@ package org.pih.warehouse.api
 import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.PaymentTerm
+import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
@@ -77,4 +78,13 @@ class SelectOptionsApiController {
         render([data: users] as JSON)
     }
 
+    def preferenceTypeOptions() {
+        List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
+            [
+                id: it.id,
+                label: it.name
+            ]
+        }
+        render([data: preferenceTypes] as JSON)
+    }
 }
