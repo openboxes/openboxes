@@ -2,6 +2,8 @@ import _ from 'lodash';
 import queryString from 'query-string';
 
 import glAccountApi from 'api/services/GlAccountApi';
+import organizationApi from 'api/services/OrganizationApi';
+import productApi from 'api/services/ProductApi';
 import productGroupApi from 'api/services/ProductGroupApi';
 import userApi from 'api/services/UserApi';
 import apiClient from 'utils/apiClient';
@@ -114,6 +116,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
             color: obj.color,
             exactMatch: obj.exactMatch,
             active: obj.active,
+            label: `${obj.productCode} - ${obj.displayName ?? obj.name}`,
           }
         ))))
         .catch(() => callback([]));
@@ -250,6 +253,16 @@ export const fetchProductsGlAccounts = async (params) => {
 
 export const fetchProductGroups = async () => {
   const { data } = await productGroupApi.getProductGroupsOptions();
+  return data.data;
+};
+
+export const fetchProduct = async (id) => {
+  const { data } = await productApi.getProduct(id);
+  return data.data;
+};
+
+export const fetchOrganization = async (id) => {
+  const { data } = await organizationApi.getOrganization(id);
   return data.data;
 };
 
