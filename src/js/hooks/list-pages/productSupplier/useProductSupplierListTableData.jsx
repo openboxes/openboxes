@@ -21,21 +21,19 @@ const useProductSupplierListTableData = (filterParams) => {
       product,
       supplier,
     } = filterParams;
-    return {
-      ..._.omitBy({
-        offset: `${offset}`,
-        max: `${state.pageSize}`,
-        ...sortingParams,
-        ...filterParams,
-        product: product?.id,
-        supplier: supplier?.id,
-      }, (val) => {
-        if (typeof val === 'boolean') {
-          return !val;
-        }
-        return _.isEmpty(val);
-      }),
-    };
+    return _.omitBy({
+      offset: `${offset}`,
+      max: `${state.pageSize}`,
+      ...sortingParams,
+      ...filterParams,
+      product: product?.id,
+      supplier: supplier?.id,
+    }, (val) => {
+      if (typeof val === 'boolean') {
+        return !val;
+      }
+      return _.isEmpty(val);
+    });
   };
 
   const {
