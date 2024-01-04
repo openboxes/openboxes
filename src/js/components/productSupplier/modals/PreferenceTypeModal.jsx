@@ -71,7 +71,7 @@ const PreferenceTypeModal = ({
           </div>
           <div className="preference-type-modal-list">
             {mappedPreferenceTypes?.preferenceTypes?.map((preferenceType) => (
-              <p>
+              <p key={preferenceType?.destination}>
                 <span className="preference-type-location">
                   {preferenceType?.destination}
                   :
