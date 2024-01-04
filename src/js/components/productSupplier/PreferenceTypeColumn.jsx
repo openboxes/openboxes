@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { RiInformationLine } from 'react-icons/ri';
 
+import PreferenceTypeModal from 'components/productSupplier/modals/PreferenceTypeModal';
 import Translate from 'utils/Translate';
 
 const getLabel = (productSupplierPreferences) => {
@@ -16,20 +18,49 @@ const getLabel = (productSupplierPreferences) => {
     return {
       id: 'react.productSupplier.preferenceType.multiple.label',
       defaultMessage: 'Multiple',
+      icon: <RiInformationLine />,
+      className: 'cell-content',
     };
   }
   return productSupplierPreferences[0].preferenceType?.id;
 };
 
-const PreferenceTypeColumn = ({ productSupplierPreferences }) => {
+const PreferenceTypeColumn = ({ productSupplierPreferences, productSupplierId }) => {
+  const [preferenceTypeModalData, setPreferenceTypeModalData] = useState([]);
   const label = getLabel(productSupplierPreferences);
 
+  const onCellClick = () => {
+    if (productSupplierPreferences.length > 1) {
+      setPreferenceTypeModalData(productSupplierPreferences);
+    }
+  };
+
+  const closeModal = () => setPreferenceTypeModalData([]);
+
   return (
-    <span>
-      {_.isObject(label)
-        ? <Translate id={label.id} defaultMessage={label.defaultMessage} />
-        : label}
-    </span>
+    <>
+      <span
+        className={label?.className}
+        onClick={onCellClick}
+        role="presentation"
+      >
+        {_.isObject(label)
+          ? (
+            <>
+              <Translate id={label.id} defaultMessage={label.defaultMessage} />
+              {' '}
+              {label?.icon}
+            </>
+          )
+          : label}
+      </span>
+      <PreferenceTypeModal
+        productSupplierId={productSupplierId}
+        isOpen={Boolean(preferenceTypeModalData.length)}
+        modalData={preferenceTypeModalData}
+        closeModal={closeModal}
+      />
+    </>
   );
 };
 
@@ -65,4 +96,5 @@ PreferenceTypeColumn.propTypes = {
       name: PropTypes.string,
     }),
   })).isRequired,
+  productSupplierId: PropTypes.string.isRequired,
 };

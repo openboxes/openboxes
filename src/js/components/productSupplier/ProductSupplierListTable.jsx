@@ -45,6 +45,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
       Header: <Translate id="react.productSupplier.column.preferenceType.label" defaultMessage="Preference Type" />,
       Cell: (row) => (
         <PreferenceTypeColumn
+          productSupplierId={row.original.id}
           productSupplierPreferences={row.original.productSupplierPreferences}
         />
       ),
