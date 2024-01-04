@@ -83,11 +83,11 @@ class SelectOptionsApiController {
         List<Map<String, String>> defaultPreferenceTypes = [
             [
                 id: ProductSupplierService.PREFERENCE_TYPE_MULTIPLE,
-                label: g.message(code: 'react.productSupplier.preferenceType.multiple.label')
+                label: g.message(code: "react.productSupplier.preferenceType.multiple.label", default: "Multiple")
             ],
             [
                 id: ProductSupplierService.PREFERENCE_TYPE_NONE,
-                label: g.message(code: 'react.productSupplier.preferenceType.none.label')
+                label: g.message(code: 'react.productSupplier.preferenceType.none.label', default: "None")
             ],
         ]
         List<Map<String, String>> preferenceTypes = genericApiService.getList(PreferenceType.class.simpleName, [:]).collect {
