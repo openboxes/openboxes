@@ -3,11 +3,12 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
+import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
 import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
@@ -15,15 +16,18 @@ import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
-import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 
-const ProductSupplierListTable = ({ filterParams, currentUser }) => {
-  const actions = [
+const ProductSupplierListTable = ({ filterParams }) => {
+  const { currentUser } = useSelector((state) => ({
+    currentUser: state.session.user,
+  }));
+
+  const getActions = (id) => [
     {
       defaultLabel: 'Edit',
       label: 'react.productSupplier.edit.label',
       leftIcon: <RiPencilLine />,
-      // href: STOCK_TRANSFER_URL.genericEdit(order?.id),
+      href: PRODUCT_SUPPLIER_URL.edit(id),
     },
     {
       defaultLabel: 'Delete Product Source',
@@ -33,6 +37,7 @@ const ProductSupplierListTable = ({ filterParams, currentUser }) => {
       // onClick: deleteConfirmAlert,
     },
   ];
+
   const columns = useMemo(() => [
     {
       Header: ' ',
@@ -45,7 +50,7 @@ const ProductSupplierListTable = ({ filterParams, currentUser }) => {
       fixed: 'left',
       Cell: (row) => {
         const clickableActions = hasPermissionsToProductSourceActions(currentUser)
-          ? { actions }
+          ? { actions: getActions(row.original.id) }
           : {};
 
         return (
@@ -181,11 +186,7 @@ const ProductSupplierListTable = ({ filterParams, currentUser }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  currentUser: state.session.user,
-});
-
-export default connect(mapStateToProps)(ProductSupplierListTable);
+export default ProductSupplierListTable;
 
 ProductSupplierListTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,

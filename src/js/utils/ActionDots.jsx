@@ -16,8 +16,12 @@ const ActionDots = ({
   actions, id, dropdownPlacement, dropdownClasses,
 }) => {
   const actionsClassName = actions
-  ? 'action-dots-enabled'
-  : 'action-dots-disabled';
+    ? 'action-dots-enabled'
+    : 'action-dots-disabled';
+
+  const toggleData = actions
+    ? { 'data-toggle': 'dropdown' }
+    : {};
 
   const getPositionClass = () => {
     switch (dropdownPlacement) {
@@ -62,9 +66,9 @@ const ActionDots = ({
       <button
         data-testid="dropdown-toggle"
         className={`action-dots dropdown-toggle d-flex align-items-center justify-content-center ${actionsClassName}`}
-        data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
+        {...toggleData}
       >
         <RiMoreLine />
       </button>
