@@ -13,4 +13,9 @@ class ProductSupplierApiController {
         List<ProductSupplierListDto> productSuppliers = productSupplierService.getProductSuppliers(filterParams)
         render([data: productSuppliers, totalCount: productSuppliers.totalCount] as JSON)
     }
+
+    def delete() {
+        productSupplierService.delete(params.id)
+        render status: 204
+    }
 }
