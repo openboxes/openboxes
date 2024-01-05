@@ -10,6 +10,7 @@ export const hasMinimumRequiredRole = (role, highestUserRole) => {
     highestUserRoleIndex <= userRoleIndex;
 };
 
+export const hasRole = (user, role) => user?.roles?.includes(role);
 
 export const findActions = (actionList, row, props) => {
   const { supportedActivities = [], highestRole, customFilter } = props;
