@@ -81,16 +81,22 @@ enum RequisitionStatus {
     }
 
     // Options for request list when current location is supporting request approval (Added approved, rejected and waiting for approval)
+    // statuses only when approvals are supported: waiting for approval, approved, rejected,
     static listRequestOptionsWhenApprovalRequired() {
         [PENDING_APPROVAL, APPROVED, PICKING, PICKED, CHECKING, REJECTED]
     }
 
     // Options for request list when current location is supporting request approval, but the user is not Approver
+    // Those options are similar to options when location supports request approval and the user is approver,
+    // but without “waiting for approval” and “rejected”
     static listRequestOptionsWhenNonApprover() {
         [APPROVED, PICKING, PICKED, CHECKING]
     }
 
     // Default options for requests list
+    // Only outbounds are: created and editing
+    // These statuses are only for returns, hence outbound only, not requests: dispatched, requested, pending, canceled
+    // Issued requests no longer show in requests list but only on outbounds list
     static listRequestOptions() {
         [VERIFYING, PICKING, PICKED, CHECKING]
     }
