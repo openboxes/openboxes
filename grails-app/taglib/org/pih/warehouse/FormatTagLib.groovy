@@ -118,6 +118,20 @@ class FormatTagLib {
     }
 
     /**
+     * Custom tag to display a product synonym name for DISPLAY_NAME in appropriate color
+     *
+     * Attributes:
+     * product (required): the product to display
+     * showTooltip (optional): When true returns span tag with title attribute of default product name
+     * showProductCode (optional): appends a product code to the beginning of the product name
+     * locale (optional): the locale to localize for; if no locale is specified, the current locale is used
+     *
+     */
+    def displayNameWithColor = { attrs ->
+        out << "<span style='color: ${attrs?.product?.color ?: "inherit"}'> ${displayName(attrs)} </span>"
+    }
+
+    /**
      * Custom tag to display a category
      *
      * Attributes:
