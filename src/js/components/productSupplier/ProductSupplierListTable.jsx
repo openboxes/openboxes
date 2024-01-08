@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
-
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
