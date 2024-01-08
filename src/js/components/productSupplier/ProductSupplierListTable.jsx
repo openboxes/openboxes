@@ -1,16 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
 
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
+import productSupplierApi from 'api/services/ProductSupplierApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
+import CustomModal from 'utils/CustomModal';
 import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
@@ -18,23 +20,54 @@ import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
 
 const ProductSupplierListTable = ({ filterParams }) => {
+  const [isDeleteConfirmationOpened, setIsDeleteConfirmationOpened] = useState(false);
+  const [selectedProductSupplierId, setSelectedProductSupplierId] = useState(null);
+
   const { currentUser } = useSelector((state) => ({
     currentUser: state.session.user,
   }));
+
+  const closeDeleteConfirmationModal = () => {
+    setIsDeleteConfirmationOpened(false);
+  };
+
+  const deleteProductSupplier = () => {
+    productSupplierApi.deleteProductSupplier(selectedProductSupplierId);
+  };
+
+  const deleteConfirmationModalButtons = [
+    {
+      variant: 'transparent',
+      defaultLabel: 'Cancel',
+      label: 'Cancel',
+      onClick: closeDeleteConfirmationModal,
+    },
+    {
+      variant: 'danger',
+      defaultLabel: 'Delete',
+      label: '',
+      onClick: deleteProductSupplier,
+    },
+  ];
 
   const getActions = (id) => [
     {
       defaultLabel: 'Edit',
       label: 'react.productSupplier.edit.label',
       leftIcon: <RiPencilLine />,
-      href: PRODUCT_SUPPLIER_URL.edit(id),
+      onClick: () => {
+        window.location = PRODUCT_SUPPLIER_URL.edit(id);
+      },
     },
     {
       defaultLabel: 'Delete Product Source',
       label: 'react.productSupplier.delete.label',
       leftIcon: <RiDeleteBinLine />,
       variant: 'danger',
-      // onClick: deleteConfirmAlert,
+      onClick: () => {
+        setIsDeleteConfirmationOpened(true);
+        setSelectedProductSupplierId(id);
+      },
     },
   ];
 
@@ -156,33 +189,44 @@ const ProductSupplierListTable = ({ filterParams }) => {
   } = useProductSupplierListTableData(filterParams);
 
   return (
-    <ListTableWrapper>
-      <ListTableTitleWrapper>
-        <span>
-          <Translate id="react.productSupplier.listProductSources.label" defaultMessage="List Product Sources" />
-          &nbsp;
-          (
-          {tableData?.totalCount}
-          )
-        </span>
-      </ListTableTitleWrapper>
-      <DataTable
-        manual
-        sortable
-        ref={tableRef}
-        columns={columns}
-        data={tableData.data}
-        loading={loading}
-        defaultPageSize={10}
-        pages={tableData.pages}
-        totalData={tableData.totalCount}
-        onFetchData={onFetchHandler}
-        noDataText="No product sources match the given criteria"
-        footerComponent={() => (
-          <span className="title-text p-1 d-flex flex-1 justify-content-end" />
-        )}
+    <>
+      <CustomModal
+        titleLabel="react.productSupplier.deleteConfirmation.title.label"
+        defaultTitle="Are you sure?"
+        contentLabel="react.productSupplier.deleteConfirmation.content.label"
+        defaultContent="Are you sure you want to delete this Product Source?"
+        isOpen={isDeleteConfirmationOpened}
+        onClose={closeDeleteConfirmationModal}
+        buttons={deleteConfirmationModalButtons}
       />
-    </ListTableWrapper>
+      <ListTableWrapper>
+        <ListTableTitleWrapper>
+          <span>
+            <Translate id="react.productSupplier.listProductSources.label" defaultMessage="List Product Sources" />
+            &nbsp;
+            (
+            {tableData?.totalCount}
+            )
+          </span>
+        </ListTableTitleWrapper>
+        <DataTable
+          manual
+          sortable
+          ref={tableRef}
+          columns={columns}
+          data={tableData.data}
+          loading={loading}
+          defaultPageSize={10}
+          pages={tableData.pages}
+          totalData={tableData.totalCount}
+          onFetchData={onFetchHandler}
+          noDataText="No product sources match the given criteria"
+          footerComponent={() => (
+            <span className="title-text p-1 d-flex flex-1 justify-content-end" />
+          )}
+        />
+      </ListTableWrapper>
+    </>
   );
 };
 
