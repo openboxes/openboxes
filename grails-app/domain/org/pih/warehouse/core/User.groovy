@@ -91,7 +91,7 @@ class User extends Person {
         return defaultRoles
     }
 
-    List<String> getAllRolesNames() {
+    List<String> getAllRoleNames() {
         return roles?.roleType*.name()
     }
 
@@ -152,7 +152,7 @@ class User extends Person {
                 "lastName" : (anonymize) ? lastInitial : lastName,
                 "email"    : anonymize ? StringUtil.mask(email) : email,
                 "username" : anonymize ? StringUtil.mask(username) : username,
-                "roles"    : getAllRolesNames(),
+                "roles"    : getAllRoleNames(),
         ]
     }
 

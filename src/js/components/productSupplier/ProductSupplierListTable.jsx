@@ -31,8 +31,12 @@ const ProductSupplierListTable = ({ filterParams }) => {
     setIsDeleteConfirmationOpened(false);
   };
 
-  const deleteProductSupplier = () => {
-    productSupplierApi.deleteProductSupplier(selectedProductSupplierId);
+  const deleteProductSupplier = async () => {
+    try {
+      await productSupplierApi.deleteProductSupplier(selectedProductSupplierId);
+    } finally {
+      setIsDeleteConfirmationOpened(false);
+    }
   };
 
   const deleteConfirmationModalButtons = [
