@@ -1,14 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
-import productSupplierApi from 'api/services/ProductSupplierApi';
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
-import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
+import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
 import CustomModal from 'utils/CustomModal';
@@ -19,60 +17,18 @@ import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
 
 const ProductSupplierListTable = ({ filterParams }) => {
-  const [isDeleteConfirmationOpened, setIsDeleteConfirmationOpened] = useState(false);
-  const [selectedProductSupplierId, setSelectedProductSupplierId] = useState(null);
-
-  const { currentUser } = useSelector((state) => ({
+  const { currentUser, isAdmin } = useSelector((state) => ({
     currentUser: state.session.user,
+    isAdmin: state.session.isUserAdmin,
   }));
 
-  const closeDeleteConfirmationModal = () => {
-    setIsDeleteConfirmationOpened(false);
-  };
-
-  const deleteProductSupplier = async () => {
-    try {
-      await productSupplierApi.deleteProductSupplier(selectedProductSupplierId);
-    } finally {
-      setIsDeleteConfirmationOpened(false);
-    }
-  };
-
-  const deleteConfirmationModalButtons = [
-    {
-      variant: 'transparent',
-      defaultLabel: 'Cancel',
-      label: 'Cancel',
-      onClick: closeDeleteConfirmationModal,
-    },
-    {
-      variant: 'danger',
-      defaultLabel: 'Delete',
-      label: '',
-      onClick: deleteProductSupplier,
-    },
-  ];
-
-  const getActions = (id) => [
-    {
-      defaultLabel: 'Edit',
-      label: 'react.productSupplier.edit.label',
-      leftIcon: <RiPencilLine />,
-      onClick: () => {
-        window.location = PRODUCT_SUPPLIER_URL.edit(id);
-      },
-    },
-    {
-      defaultLabel: 'Delete Product Source',
-      label: 'react.productSupplier.delete.label',
-      leftIcon: <RiDeleteBinLine />,
-      variant: 'danger',
-      onClick: () => {
-        setIsDeleteConfirmationOpened(true);
-        setSelectedProductSupplierId(id);
-      },
-    },
-  ];
+  const {
+    isDeleteConfirmationOpened,
+    deleteConfirmationModalButtons,
+    closeDeleteConfirmationModal,
+    getActions,
+    modalLabels,
+  } = useProductSupplierActions();
 
   const columns = useMemo(() => [
     {
@@ -85,7 +41,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
       },
       fixed: 'left',
       Cell: (row) => {
-        const clickableActions = hasPermissionsToProductSourceActions(currentUser)
+        const clickableActions = hasPermissionsToProductSourceActions(currentUser, isAdmin)
           ? { actions: getActions(row.original.id) }
           : {};
 
@@ -194,10 +150,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
   return (
     <>
       <CustomModal
-        titleLabel="react.productSupplier.deleteConfirmation.title.label"
-        defaultTitle="Are you sure?"
-        contentLabel="react.productSupplier.deleteConfirmation.content.label"
-        defaultContent="Are you sure you want to delete this Product Source?"
+        labels={modalLabels}
         isOpen={isDeleteConfirmationOpened}
         onClose={closeDeleteConfirmationModal}
         buttons={deleteConfirmationModalButtons}

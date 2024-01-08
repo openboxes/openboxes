@@ -10,10 +10,7 @@ import Translate from 'utils/Translate';
 import 'utils/utils.scss';
 
 const CustomModal = ({
-  titleLabel,
-  defaultTitle,
-  contentLabel,
-  defaultContent,
+  labels: { title, content },
   isOpen,
   onClose,
   buttons,
@@ -25,9 +22,9 @@ const CustomModal = ({
   >
     <div className={`d-flex flex-column ${className}`}>
       <div className="d-flex justify-content-between">
-        {(titleLabel && defaultTitle) && (
+        {(title?.label && title?.default) && (
         <p className="custom-modal-title">
-          <Translate id={titleLabel} defaultMessage={defaultTitle} />
+          <Translate id={title?.label} defaultMessage={title?.default} />
         </p>
         )}
         <RiCloseFill
@@ -38,15 +35,16 @@ const CustomModal = ({
         />
       </div>
       <div>
-        {(contentLabel && defaultContent) && (
+        {(content?.label && content?.default) && (
         <p className="custom-modal-text">
-          <Translate id={contentLabel} defaultMessage={defaultContent} />
+          <Translate id={content?.label} defaultMessage={content?.default} />
         </p>
         )}
       </div>
       <div className="d-flex justify-content-end">
-        {buttons && buttons.map((button) => (
+        {buttons?.map?.((button) => (
           <Button
+            key={button?.label}
             variant={button?.variant}
             defaultLabel={button?.defaultLabel}
             label={button?.label}
@@ -61,10 +59,16 @@ const CustomModal = ({
 export default CustomModal;
 
 CustomModal.propTypes = {
-  titleLabel: PropTypes.string,
-  defaultTitle: PropTypes.string,
-  contentLabel: PropTypes.string,
-  defaultContent: PropTypes.string,
+  labels: PropTypes.shape({
+    title: PropTypes.shape({
+      label: PropTypes.string,
+      default: PropTypes?.string,
+    }),
+    content: PropTypes.shape({
+      label: PropTypes.string,
+      default: PropTypes?.string,
+    }),
+  }),
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.string.isRequired,
   className: PropTypes.string,
@@ -77,10 +81,16 @@ CustomModal.propTypes = {
 };
 
 CustomModal.defaultProps = {
-  titleLabel: '',
-  defaultTitle: '',
-  contentLabel: '',
-  defaultContent: '',
+  labels: {
+    title: {
+      label: '',
+      content: '',
+    },
+    content: {
+      label: '',
+      content: '',
+    },
+  },
   buttons: [],
   className: '',
 };

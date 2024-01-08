@@ -45,9 +45,8 @@ const canEditRequest = (currentUser, request, location) => {
 
 // To have permissions for product source list actions
 // user has to be at least admin and has product manager permissions
-export const hasPermissionsToProductSourceActions = (user) => {
+export const hasPermissionsToProductSourceActions = (user, isAdmin) => {
   const hasProductManagerPermission = hasRole(user, RoleType.ROLE_PRODUCT_MANAGER);
-  const isAdmin = hasRole(user, RoleType.ROLE_ADMIN) || hasRole(user, RoleType.ROLE_SUPERUSER);
   return hasProductManagerPermission && isAdmin;
 };
 
