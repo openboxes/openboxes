@@ -1,0 +1,25 @@
+.custom-modal-content {
+  min-height: 173px;
+  min-width: 600px !important;
+  top: 28% !important;
+
+  div {
+    gap: 15px;
+  }
+
+  .custom-modal-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--blue-800);
+  }
+
+  .custom-modal-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--gray-600);
+  }
+
+  svg {
+    color: var(--blue-700);
+  }
+}
