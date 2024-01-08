@@ -1024,6 +1024,13 @@ div.search-input:focus-within {
   }
 }
 
+.danger-button {
+  @extend %button-base;
+
+  background-color: var(--color-red);
+  color: white;
+}
+
 .secondary-button {
   @extend %button-base;
 
@@ -1564,7 +1571,8 @@ div.search-input:focus-within {
 .modal-content {
   position: absolute;
   top: 20%;
-  left: 23%;
+  left: 50%;
+  transform: translate(-50%);
   background-color: #ffffff;
   width: 55vw;
   padding: 20px;
