@@ -38,6 +38,7 @@ import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import requestsQueue from 'utils/requestsQueue';
 import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -349,6 +350,7 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isDraftAvailable: false,
+      lastRequestData: [],
     };
 
     this.props.showSpinner();
@@ -372,6 +374,7 @@ class AddItemsPage extends Component {
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
+    this.requestsQueue = requestsQueue();
   }
 
 
@@ -888,7 +891,7 @@ class AddItemsPage extends Component {
         });
       }
 
-      return apiClient.post(updateItemsUrl, payload)
+      const saveItemsRequest = (data) => () => apiClient.post(updateItemsUrl, data)
         .then((resp) => {
           const { lineItems } = resp.data.data;
           const lineItemsBackendData = _.map(lineItems, val => ({ ...val, disabled: true }));
@@ -987,7 +990,22 @@ class AddItemsPage extends Component {
           }
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
+
+      const payloadLineItemsWithoutDuplications = payload?.lineItems
+        .filter(item => !this.state.lastRequestData?.find(savedItem =>
+          savedItem.id === item.id
+          && savedItem.quantityRequested === item.quantityRequested,
+        ));
+
+      if (payloadLineItemsWithoutDuplications.length) {
+        this.setState({ lastRequestData: payload?.lineItems }, () =>
+          this.requestsQueue.enqueueRequest(
+            saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications }),
+          ),
+        )
+      }
     }
+
     this.setState(previousState => ({
       values: {
         ...previousState.values,
