@@ -118,7 +118,6 @@ class Order implements Serializable {
             "pending",
             "placed",
             "shipped",
-            "partiallyShipped",
             "partiallyReceived",
             "received",
             "canceled",
@@ -260,10 +259,6 @@ class Order implements Serializable {
         return activeOrderItems?.every { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
     }
 
-    Boolean isPartiallyShipped() {
-        return activeOrderItems?.any { OrderItem orderItem -> orderItem.isCompletelyFulfilled() }
-    }
-
     /**
      * After an order is placed and before it is completed received, the order can
      * be partially received.  This occurs when the order contains items that have
@@ -290,7 +285,7 @@ class Order implements Serializable {
         return (status == OrderStatus.CANCELED)
     }
 
-    def getShipments() {
+    List<Shipment> getShipments() {
         return orderItems.collect { it.listShipments() }.flatten().unique() { it?.id }
     }
 
@@ -462,7 +457,9 @@ class Order implements Serializable {
     }
 
     Boolean getCanGenerateInvoice() {
-        return hasPrepaymentInvoice && partiallyShipped && !hasRegularInvoice
+        boolean hasShippedShipmentsWithoutInvoice = shipments.any { it.hasShipped() && !it.hasInvoicedItem() }
+        boolean hasOrderAdjustmentsWithoutInvoice = orderAdjustments.any { !it.isInvoiced }
+        return hasPrepaymentInvoice && (hasShippedShipmentsWithoutInvoice || hasOrderAdjustmentsWithoutInvoice)
     }
 
     def getActiveOrderItems() {

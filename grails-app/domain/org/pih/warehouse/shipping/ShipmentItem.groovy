@@ -55,7 +55,7 @@ class ShipmentItem implements Comparable, Serializable {
 
     static transients = ["comments", "orderItemId", "quantityReceivedAndCanceled", "quantityCanceled", "quantityReceived", "quantityRemaining",
                          "orderNumber", "orderId", "purchaseOrders", "orderName", "quantityRemainingToShip", "quantityPerUom", "hasRecalledLot", "quantityPicked", "quantityPickedFromOrders",
-                         "unavailableQuantityPicked", "paymentTerm", "quantityInvoiced"]
+                         "unavailableQuantityPicked", "paymentTerm", "quantityInvoiced", "isInvoiced"]
 
     static mapping = {
         id generator: 'uuid'
@@ -258,6 +258,10 @@ class ShipmentItem implements Comparable, Serializable {
 
     Integer getQuantityInvoiced() {
         return invoiceItems?.sum { it.quantity ?: 0 }
+    }
+
+    boolean getIsInvoiced() {
+        return quantityInvoiced > 0
     }
 
     /**

@@ -263,15 +263,19 @@ class InvoiceService {
                 invoice.addToInvoiceItems(invoiceItem)
             } else {
                 orderItem?.shipmentItems?.each { ShipmentItem shipmentItem ->
-                    InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
-                    invoice.addToInvoiceItems(invoiceItem)
+                    if (!shipmentItem.isInvoiced) {
+                        InvoiceItem invoiceItem = createFromShipmentItem(shipmentItem)
+                        invoice.addToInvoiceItems(invoiceItem)
+                    }
                 }
             }
         }
 
         order.orderAdjustments.each { OrderAdjustment orderAdjustment ->
-            InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
-            invoice.addToInvoiceItems(invoiceItem)
+            if (!orderAdjustment.isInvoiced) {
+                InvoiceItem invoiceItem = createFromOrderAdjustment(orderAdjustment)
+                invoice.addToInvoiceItems(invoiceItem)
+            }
         }
 
         return invoice.save()

@@ -303,7 +303,7 @@ class OrderItem implements Serializable, Comparable<OrderItem> {
      *
      * @return
      */
-    def listShipments() {
+    List<Shipment> listShipments() {
         return shipmentItems*.shipment
     }
 
