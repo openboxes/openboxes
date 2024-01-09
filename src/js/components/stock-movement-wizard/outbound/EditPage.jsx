@@ -89,6 +89,7 @@ const FIELDS = {
           formatValue: formatProductDisplayName,
         },
         getDynamicAttr: ({ subfield, fieldValue }) => ({
+          color: fieldValue?.color,
           className: subfield ? 'text-center' : 'text-left ml-1',
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,

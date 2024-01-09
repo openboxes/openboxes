@@ -216,6 +216,7 @@ const FIELDS = {
           flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
+          color: fieldValue?.color,
         }),
         attributes: {
           className: 'text-left',
