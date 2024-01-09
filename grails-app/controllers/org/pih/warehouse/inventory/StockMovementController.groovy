@@ -101,28 +101,24 @@ class StockMovementController {
 
         // Redirect logic for the e-request
         if (stockMovement?.electronicType) {
-            switch (stockMovementDirection) {
-                case StockMovementDirection.OUTBOUND:
-                    redirect(action: "verifyRequest", params: params)
-                    break
-                case StockMovementDirection.INBOUND:
-                    User currentUser = AuthService.currentUser
-                    RequisitionStatus requisitionStatus = stockMovement.requisition?.status
-                    // If a request's status is created or a user is a requestor logged in, in a location
-                    // with submit request and without manage inventory, and the request has waiting for approval
-                    // status, we want to redirect to add items page (OBPIH-5981)
-                    if (requisitionStatus == RequisitionStatus.CREATED
-                        || (userService.isUserRequestor(currentUser)
-                            && currentLocation.downstreamConsumer
-                            && requisitionStatus == RequisitionStatus.PENDING_APPROVAL)) {
-                                redirect(action: "createRequest", params: params)
-                                return
-                    }
-                    redirect(action: "verifyRequest", params: params)
-                    break
-                default:
-                    break
+            if (stockMovementDirection == StockMovementDirection.INBOUND) {
+                User currentUser = AuthService.currentUser
+                RequisitionStatus requisitionStatus = stockMovement.requisition?.status
+                // If a request's status is created or a user is a requestor logged in, in a location
+                // with submit request and without manage inventory, and the request has waiting for approval
+                // status, we want to redirect to add items page (OBPIH-5981)
+                if (requisitionStatus == RequisitionStatus.CREATED) {
+                    redirect(action: "createRequest", params: params)
+                    return
+                }
+                if (requisitionStatus == RequisitionStatus.PENDING_APPROVAL
+                    && userService.isUserRequestor(currentUser)
+                    && currentLocation.downstreamConsumer) {
+                        redirect(action: "createRequest", params: params)
+                        return
+                }
             }
+            redirect(action: "verifyRequest", params: params)
             return
         }
 
