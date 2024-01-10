@@ -38,16 +38,16 @@ const COLUMNS = [
         <span className="d-inline-block text-overflow-ellipsis">
           {row.original.displayStatus}
         </span>
-        {row.original.recentComment && (
-        <Tooltip
-          html={row.original.recentComment.comment}
-          theme="transparent"
-          delay="150"
-          duration="250"
-          hideDelay="50"
-        >
-          <RiStickyNoteFill className="text-warning mr-1" />
-        </Tooltip>
+        {row.original.recentRequisitionComment && (
+          <Tooltip
+            html={row.original.recentRequisitionComment?.comment}
+            theme="transparent"
+            delay="150"
+            duration="250"
+            hideDelay="50"
+          >
+            <RiStickyNoteFill className="text-warning mr-1" />
+          </Tooltip>
         )}
       </span>
     ),

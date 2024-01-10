@@ -58,7 +58,7 @@ class StockMovement implements Validateable{
     String trackingNumber
     String driverName
     String comments
-    List<Comment> shipmentComments
+    List<Comment> requisitionComments
     String currentStatus
     Float totalValue
 
@@ -90,7 +90,7 @@ class StockMovement implements Validateable{
     static transients = [
             "electronicType",
             "pendingApproval",
-            "recentComment"
+            "recentRequisitionComment"
     ]
 
     static constraints = {
@@ -118,8 +118,7 @@ class StockMovement implements Validateable{
         trackingNumber(nullable: true)
         driverName(nullable: true)
         comments(nullable: true)
-        recentComment(nullable: true)
-        shipmentComments(nullable: true)
+        requisitionComments(nullable: true)
         totalValue(nullable: true)
         lineItemCount(nullable: true)
 
@@ -184,7 +183,7 @@ class StockMovement implements Validateable{
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
-            recentComment       : recentComment,
+            recentRequisitionComment: recentRequisitionComment,
             requestedBy         : requestedBy,
             lineItems           : lineItems,
             lineItemCount       : lineItemCount,
@@ -211,9 +210,9 @@ class StockMovement implements Validateable{
         ]
     }
 
-    Comment getRecentComment() {
-        if (shipmentComments?.size() > 0) {
-            return shipmentComments?.sort({ a, b ->
+    Comment getRecentRequisitionComment() {
+        if (requisitionComments?.size() > 0) {
+            return requisitionComments?.sort({ a, b ->
                 b.dateCreated <=> a.dateCreated
             }).iterator().next()
         }
@@ -376,7 +375,6 @@ class StockMovement implements Validateable{
                 driverName: shipment.driverName,
                 trackingNumber: trackingNumber?.identifier,
                 comments: shipment.additionalInformation,
-                shipmentComments: shipment.comments,
                 lineItemCount: shipment.shipmentItemCount
         )
 
@@ -420,7 +418,7 @@ class StockMovement implements Validateable{
             requisition: requisition,
             shipment: shipment,
             comments: shipment?.additionalInformation,
-            shipmentComments: requisition.comments?.toList(),
+            requisitionComments: requisition.comments?.toList(),
             shipmentType: shipment?.shipmentType,
             dateShipped: shipment?.expectedShippingDate,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,
