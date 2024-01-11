@@ -33,7 +33,9 @@
                         <td>${associatedProduct?.productCode}</td>
                         <td>
                             <g:link controller="inventoryItem" action="showStockCard" id="${associatedProduct.id}" fragment="ui-tabs-1">
-                                <format:displayName product="${associatedProduct}" showTooltip="${true}" />
+                                <cache:block key="${associatedProduct?.id}">
+                                    <format:displayNameWithColor product="${associatedProduct}" showTooltip="${true}" />
+                                </cache:block>
                             </g:link>
                         </td>
                         <td class="center">
