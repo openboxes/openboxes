@@ -33,7 +33,9 @@
 
                         <td>
                             <g:link controller="product" action="edit" id="${productAssociation?.associatedProduct?.id}">
-                                <format:displayName product="${productAssociation?.associatedProduct}" showProductCode="${true}" showTooltip="${true}" />
+                                <cache:block key="${productAssociation?.associatedProduct?.id}">
+                                    <format:displayNameWithColor product="${productAssociation?.associatedProduct}" showProductCode="${true}" showTooltip="${true}" />
+                                </cache:block>
                             </g:link>
                         </td>
 
