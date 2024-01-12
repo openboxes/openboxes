@@ -9,7 +9,6 @@ import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColum
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
-import CustomModal from 'utils/CustomModal';
 import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
@@ -23,11 +22,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
   }));
 
   const {
-    isDeleteConfirmationOpened,
-    deleteConfirmationModalButtons,
-    closeDeleteConfirmationModal,
     getActions,
-    modalLabels,
   } = useProductSupplierActions();
 
   const columns = useMemo(() => [
@@ -148,41 +143,33 @@ const ProductSupplierListTable = ({ filterParams }) => {
   } = useProductSupplierListTableData(filterParams);
 
   return (
-    <>
-      <CustomModal
-        labels={modalLabels}
-        isOpen={isDeleteConfirmationOpened}
-        onClose={closeDeleteConfirmationModal}
-        buttons={deleteConfirmationModalButtons}
+    <ListTableWrapper>
+      <ListTableTitleWrapper>
+        <span>
+          <Translate id="react.productSupplier.listProductSources.label" defaultMessage="List Product Sources" />
+          &nbsp;
+          (
+          {tableData?.totalCount}
+          )
+        </span>
+      </ListTableTitleWrapper>
+      <DataTable
+        manual
+        sortable
+        ref={tableRef}
+        columns={columns}
+        data={tableData.data}
+        loading={loading}
+        defaultPageSize={10}
+        pages={tableData.pages}
+        totalData={tableData.totalCount}
+        onFetchData={onFetchHandler}
+        noDataText="No product sources match the given criteria"
+        footerComponent={() => (
+          <span className="title-text p-1 d-flex flex-1 justify-content-end" />
+        )}
       />
-      <ListTableWrapper>
-        <ListTableTitleWrapper>
-          <span>
-            <Translate id="react.productSupplier.listProductSources.label" defaultMessage="List Product Sources" />
-            &nbsp;
-            (
-            {tableData?.totalCount}
-            )
-          </span>
-        </ListTableTitleWrapper>
-        <DataTable
-          manual
-          sortable
-          ref={tableRef}
-          columns={columns}
-          data={tableData.data}
-          loading={loading}
-          defaultPageSize={10}
-          pages={tableData.pages}
-          totalData={tableData.totalCount}
-          onFetchData={onFetchHandler}
-          noDataText="No product sources match the given criteria"
-          footerComponent={() => (
-            <span className="title-text p-1 d-flex flex-1 justify-content-end" />
-          )}
-        />
-      </ListTableWrapper>
-    </>
+    </ListTableWrapper>
   );
 };
 
