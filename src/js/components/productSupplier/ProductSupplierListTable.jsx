@@ -16,14 +16,17 @@ import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
 
 const ProductSupplierListTable = ({ filterParams }) => {
-  const { currentUser, isAdmin } = useSelector((state) => ({
-    currentUser: state.session.user,
-    isAdmin: state.session.isUserAdmin,
-  }));
+  const {
+    tableRef,
+    tableData,
+    onFetchHandler,
+    loading,
+    fireFetchData,
+  } = useProductSupplierListTableData(filterParams);
 
   const {
     getActions,
-  } = useProductSupplierActions();
+  } = useProductSupplierActions({ fireFetchData });
 
   const columns = useMemo(() => [
     {
@@ -35,20 +38,14 @@ const ProductSupplierListTable = ({ filterParams }) => {
         zIndex: 1,
       },
       fixed: 'left',
-      Cell: (row) => {
-        const clickableActions = hasPermissionsToProductSourceActions(currentUser, isAdmin)
-          ? { actions: getActions(row.original.id) }
-          : {};
-
-        return (
-          <ActionDots
-            dropdownPlacement="right"
-            dropdownClasses="action-dropdown-offset"
-            id={row.original.id}
-            {...clickableActions}
-          />
-        );
-      },
+      Cell: (row) => (
+        <ActionDots
+          dropdownPlacement="right"
+          dropdownClasses="action-dropdown-offset"
+          id={row.original.id}
+          actions={getActions(row.original.id)}
+        />
+      ),
     },
     {
       Header: <Translate id="react.productSupplier.column.productCode.label" defaultMessage="Product Code" />,
@@ -134,13 +131,6 @@ const ProductSupplierListTable = ({ filterParams }) => {
       ),
     },
   ], []);
-
-  const {
-    tableRef,
-    tableData,
-    onFetchHandler,
-    loading,
-  } = useProductSupplierListTableData(filterParams);
 
   return (
     <ListTableWrapper>

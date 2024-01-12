@@ -1105,6 +1105,16 @@ div.search-input:focus-within {
   color: var(--blue-primary);
   border: none;
 
+  &:hover {
+    background-color: var(--blue-primary);
+    color: #FFFFFF;
+  }
+
+  &:disabled {
+    cursor: auto !important;
+    pointer-events: none;
+  }
+
   &:focus {
     outline: none;
   }
@@ -1124,18 +1134,6 @@ div.search-input:focus-within {
       color: var(--color-red) !important;
     }
   }
-}
-
-.action-dots-enabled {
-
-  &:hover {
-    background-color: var(--blue-primary);
-    color: #FFFFFF;
-  }
-}
-
-.action-dots-disabled {
-  cursor: auto !important;
 }
 
 // List pages common styling

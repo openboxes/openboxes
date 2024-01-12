@@ -15,14 +15,6 @@ const actionItemType = {
 const ActionDots = ({
   actions, id, dropdownPlacement, dropdownClasses,
 }) => {
-  const actionsClassName = actions
-    ? 'action-dots-enabled'
-    : 'action-dots-disabled';
-
-  const toggleData = actions
-    ? { 'data-toggle': 'dropdown' }
-    : {};
-
   const getPositionClass = () => {
     switch (dropdownPlacement) {
       case 'top':
@@ -65,10 +57,11 @@ const ActionDots = ({
     <div className={`btn-group ${getPositionClass()}`} data-testid="action-dots-component">
       <button
         data-testid="dropdown-toggle"
-        className={`action-dots dropdown-toggle d-flex align-items-center justify-content-center ${actionsClassName}`}
+        className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"
         aria-haspopup="true"
         aria-expanded="false"
-        {...toggleData}
+        disabled={!actions.length}
+        data-toggle="dropdown"
       >
         <RiMoreLine />
       </button>

@@ -1,7 +1,6 @@
 import ActivityCode from 'consts/activityCode';
 import RoleType from 'consts/roleType';
 import StockMovementStatus from 'consts/stockMovementStatus';
-import { hasRole } from 'utils/list-utils';
 import { supports } from 'utils/supportedActivitiesUtils';
 
 const canEditRequest = (currentUser, request, location) => {
@@ -42,6 +41,8 @@ const canEditRequest = (currentUser, request, location) => {
   // who created a stock request
   return isLocationDestination && isUserRequestor;
 };
+
+export const hasRole = (user, role) => user?.roles?.includes(role);
 
 // To have permissions for product source list actions
 // user has to be at least admin and has product manager permissions
