@@ -157,13 +157,18 @@ class AddItemsPage extends Component {
       inboundReturn: {},
       sortOrder: 0,
       formValues: { returnItems: [] },
+      initialFormValues: { returnItems: [] },
       // isFirstPageLoaded: false,
     };
 
     this.props.showSpinner();
     this.removeItem = this.removeItem.bind(this);
     this.getSortOrder = this.getSortOrder.bind(this);
-    this.confirmSave = this.confirmSave.bind(this);
+    this.confirmEmptyQuantitySave = this.confirmEmptyQuantitySave.bind(this);
+    this.confirmExpirationDateSave = this.confirmExpirationDateSave.bind(this);
+    this.confirmEmptyQuantitySave = this.confirmEmptyQuantitySave.bind(this);
+    this.confirmValidationErrorOnPreviousPage =
+      this.confirmValidationErrorOnPreviousPage.bind(this);
     this.validate = this.validate.bind(this);
     this.updateFormValues = this.updateFormValues.bind(this);
   }
@@ -231,22 +236,92 @@ class AddItemsPage extends Component {
     return errors;
   }
 
-  confirmSave(onConfirm) {
-    confirmAlert({
-      title: this.props.translate('react.inboundReturns.message.confirmSave.label', 'Confirm save'),
-      message: this.props.translate(
-        'react.inboundReturns.confirmSave.message',
-        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
-      ),
-      buttons: [
-        {
-          label: this.props.translate('react.default.yes.label', 'Yes'),
-          onClick: onConfirm,
-        },
-        {
-          label: this.props.translate('react.default.no.label', 'No'),
-        },
-      ],
+  confirmValidationErrorOnExit() {
+    return new Promise((resolve) => {
+      confirmAlert({
+        title: this.props.translate('react.inboundReturns.confirmSave.label', 'Confirm save'),
+        message: this.props.translate(
+          'react.inboundReturns.confirmExit.message',
+          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
+        ),
+        willUnmount: () => resolve(false),
+        buttons: [
+          {
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => resolve(true),
+          },
+          {
+            label: this.props.translate('react.default.no.label', 'No'),
+            onClick: () => resolve(false),
+          },
+        ],
+      });
+    });
+  }
+
+  confirmValidationErrorOnPreviousPage() {
+    return new Promise((resolve) => {
+      confirmAlert({
+        title: this.props.translate('react.inboundReturns.confirmPreviousPage.label', 'Validation error'),
+        message: this.props.translate('react.inboundReturns.confirmPreviousPage.message', 'Cannot save due to validation error on page'),
+        willUnmount: () => resolve(false),
+        buttons: [
+          {
+            label: this.props.translate('react.inboundReturns.confirmPreviousPage.correctError.label', 'Correct error'),
+            onClick: () => resolve(true),
+          },
+          {
+            label: this.props.translate('react.inboundReturns.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
+            onClick: () => resolve(false),
+          },
+        ],
+      });
+    });
+  }
+
+  confirmEmptyQuantitySave() {
+    return new Promise((resolve) => {
+      confirmAlert({
+        title: this.props.translate('react.inboundReturns.message.confirmSave.label', 'Confirm save'),
+        message: this.props.translate(
+          'react.inboundReturns.confirmSave.message',
+          'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+        ),
+        willUnmount: () => resolve(false),
+        buttons: [
+          {
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => resolve(true),
+          },
+          {
+            label: this.props.translate('react.default.no.label', 'No'),
+            onClick: () => resolve(false),
+          },
+        ],
+      });
+    });
+  }
+
+  confirmExpirationDateSave() {
+    return new Promise((resolve) => {
+      confirmAlert({
+        title: this.props.translate('react.inboundReturns.message.confirmSave.label', 'Confirm save'),
+        message: this.props.translate(
+          'react.stockMovement.confirmExpiryDateUpdate.message',
+          'This will update the expiry date across all depots in the system. Are you sure you want to proceed?',
+        ),
+        willUnmount: () => resolve(false),
+        buttons: [
+          {
+            label: this.props.translate('react.default.yes.label', 'Yes'),
+            onClick: () => resolve(true),
+          },
+          {
+            label: this.props.translate('react.default.no.label', 'No'),
+            onClick: () => resolve(false),
+          },
+        ],
+      });
     });
   }
 
@@ -266,6 +341,7 @@ class AddItemsPage extends Component {
           this.setState({
             inboundReturn,
             formValues: { returnItems },
+            initialFormValues: { returnItems },
             sortOrder,
           }, () => this.props.hideSpinner());
         })
@@ -273,33 +349,13 @@ class AddItemsPage extends Component {
     }
   }
 
-  nextPage(formValues) {
-    const returnItems = _.filter(formValues.returnItems, val => !_.isEmpty(val) && val.product);
-
-    if (_.some(returnItems, item => !item.quantity || item.quantity === '0')) {
-      this.confirmSave(() =>
-        this.saveStockTransfer(returnItems, this.state.inboundReturn.status !== 'PLACED' ? 'PLACED' : null)
-          .then(() => {
-            this.props.nextPage(this.state.inboundReturn);
-          })
-          .catch(() => this.props.hideSpinner()));
-    } else {
-      this.saveStockTransfer(returnItems, this.state.inboundReturn.status !== 'PLACED' ? 'PLACED' : null)
-        .then(() => {
-          this.props.nextPage(this.state.inboundReturn);
-        })
-        .catch(() => this.props.hideSpinner());
-    }
-  }
-
-  saveStockTransferInCurrentStep(returnItems) {
-    this.props.showSpinner();
-    return this.saveStockTransfer(returnItems, null)
-      .catch(() => this.props.hideSpinner());
+  async nextPage(formValues) {
+    this.saveStockTransferInCurrentStep(formValues, this.state.inboundReturn.status !== 'PLACED' ? 'PLACED' : null)
+      .then(() => this.props.nextPage(this.state.inboundReturn));
   }
 
   saveStockTransfer(returnItems, status) {
-    const itemsToSave = _.filter(returnItems, item => item.product && item.quantity > 0);
+    const itemsToSave = _.filter(returnItems, (item) => item.product && item.quantity > 0);
     const updateItemsUrl = `/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
     const payload = {
       ...this.state.inboundReturn,
@@ -314,61 +370,71 @@ class AddItemsPage extends Component {
       this.props.showSpinner();
       return apiClient.post(updateItemsUrl, flattenRequest(payload))
         .then(() => this.fetchInboundReturn())
-        .catch(() => {
-          this.props.hideSpinner();
-          return Promise.reject(new Error(this.props.translate('react.inboundReturns.error.saveOrderItems.label', 'Could not save order items')));
-        });
+        .catch(() => Promise.reject(new Error(this.props.translate('react.inboundReturns.error.saveOrderItems.label', 'Could not save order items'))))
+        .finally(() => this.props.hideSpinner());
     }
 
     return Promise.reject();
   }
 
-  save(formValues) {
-    const returnItems = _.filter(formValues.returnItems, item => !_.isEmpty(item));
+  async saveStockTransferInCurrentStep(formValues, status = null) {
+    const returnItems = _.filter(formValues.returnItems, (item) => !_.isEmpty(item) && item.product);
 
-    if (_.some(returnItems, item => !item.quantity || item.quantity === '0')) {
-      this.confirmSave(() => this.saveItems(returnItems));
-    } else {
-      this.saveItems(returnItems);
+    const hasEmptyOrZeroValues = _.some(returnItems, (item) => !item.quantity || item.quantity === '0');
+
+    const hasExpirationDateBeenUpdated = _.some(returnItems, (item) => {
+      const initialValue = _.find(this.state.initialFormValues.returnItems, { id: item.id });
+      return item.expirationDate !== initialValue?.expirationDate;
+    });
+
+    if (hasEmptyOrZeroValues) {
+      const isConfirmed = await this.confirmEmptyQuantitySave();
+      if (!isConfirmed) {
+        return Promise.reject();
+      }
     }
+
+    if (hasExpirationDateBeenUpdated) {
+      const isConfirmed = await this.confirmExpirationDateSave();
+      if (!isConfirmed) {
+        return Promise.reject();
+      }
+    }
+
+    return this.saveStockTransfer(returnItems, status);
   }
 
-  saveAndExit(formValues) {
-    const errors = this.validate(formValues).returnItems;
-    if (errors.length && errors.every(obj => typeof obj === 'object' && _.isEmpty(obj))) {
-      this.saveStockTransferInCurrentStep(formValues.returnItems)
-        .then(() => {
-          window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.inboundReturnId);
-        });
-    } else {
-      confirmAlert({
-        title: this.props.translate('react.inboundReturns.confirmSave.label', 'Confirm save'),
-        message: this.props.translate(
-          'react.inboundReturns.confirmExit.message',
-          'Validation errors occurred. Are you sure you want to exit and lose unsaved data?',
-        ),
-        buttons: [
-          {
-            label: this.props.translate('react.default.yes.label', 'Yes'),
-            onClick: () => { window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.inboundReturnId); },
-          },
-          {
-            label: this.props.translate('react.default.no.label', 'No'),
-          },
-        ],
-      });
-    }
-  }
-
-  saveItems(returnItems) {
-    this.props.showSpinner();
-
-    this.saveStockTransferInCurrentStep(returnItems)
+  async save(formValues) {
+    this.saveStockTransferInCurrentStep(formValues)
       .then(() => {
-        this.props.hideSpinner();
-        Alert.success(this.props.translate('react.inboundReturns.alert.saveSuccess.label', 'Changes saved successfully'), { timeout: 3000 });
-      })
-      .catch(() => this.props.hideSpinner());
+        Alert.success(
+          this.props.translate(
+            'react.inboundReturns.alert.saveSuccess.label',
+            'Changes saved successfully',
+          ),
+          { timeout: 3000 },
+        );
+      });
+  }
+
+  async saveAndExit(formValues) {
+    const errors = this.validate(formValues).returnItems;
+    const hasErrors = errors.length && errors.some((obj) => typeof obj === 'object' && !_.isEmpty(obj));
+
+    if (hasErrors) {
+      const isConfirmed = await this.confirmValidationErrorOnExit();
+      if (!isConfirmed) {
+        return;
+      }
+    } else {
+      try {
+        await this.saveStockTransferInCurrentStep(formValues);
+      } catch (error) {
+        return;
+      }
+    }
+
+    window.location = STOCK_MOVEMENT_URL.show(this.props.match.params.inboundReturnId);
   }
 
   refresh() {
@@ -412,25 +478,16 @@ class AddItemsPage extends Component {
       });
   }
 
-  previousPage(values, invalid) {
+  async previousPage(values, invalid) {
     if (!invalid) {
-      this.saveStockTransferInCurrentStep(values.returnItems)
-        .then(() => this.props.previousPage(this.state.inboundReturn));
+      await this.saveStockTransfer(values.returnItems, null);
     } else {
-      confirmAlert({
-        title: this.props.translate('react.inboundReturns.confirmPreviousPage.label', 'Validation error'),
-        message: this.props.translate('react.inboundReturns.confirmPreviousPage.message', 'Cannot save due to validation error on page'),
-        buttons: [
-          {
-            label: this.props.translate('react.inboundReturns.confirmPreviousPage.correctError.label', 'Correct error'),
-          },
-          {
-            label: this.props.translate('react.inboundReturns.confirmPreviousPage.continue.label', 'Continue (lose unsaved work)'),
-            onClick: () => this.props.previousPage(this.state.inboundReturn),
-          },
-        ],
-      });
+      const correctErrors = await this.confirmValidationErrorOnPreviousPage();
+      if (correctErrors) {
+        return;
+      }
     }
+    this.props.previousPage(this.state.inboundReturn);
   }
 
   render() {
