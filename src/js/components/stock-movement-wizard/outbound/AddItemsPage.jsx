@@ -906,8 +906,9 @@ class AddItemsPage extends Component {
             // TODO: Add new api endpoints in StockMovementItemApiController
             // for POST and PUT (create and update) that returns only updated items data
             // and separate autosave logic from save button logic
-            const savedItemsProductCodes = lineItemsBackendData.map(item => item.productCode);
-            const savedItemsIds = lineItemsBackendData.map(item => item.id);
+            const savedItemsIds = data?.lineItems?.map(item => item.id);
+            const backendResponseIds = lineItemsBackendData.map(item => item.id);
+            const backendResponseProductCodes = lineItemsBackendData.map(item => item.productCode);
             // We are sending item by item to API. Here we have to find
             // newly saved item to replace its equivalent in state
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
@@ -917,21 +918,23 @@ class AddItemsPage extends Component {
                 (item.rowSaveStatus === RowSaveStatus.SAVING ||
                   item.rowSaveStatus === RowSaveStatus.SAVED ||
                   !item.rowSaveStatus) &&
-                !_.includes(savedItemsIds, item.id)
+                _.includes(savedItemsIds, item.id)
               ) {
                 return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
               // line is disabled by default
+              const savedIds = item?.id ? savedItemsIds : backendResponseIds;
               if (
-                _.includes(savedItemsIds, item.id) &&
+                _.includes(savedIds, item.id) &&
                 item.rowSaveStatus !== RowSaveStatus.ERROR
               ) {
                 return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
               }
+
               if (
-                _.includes(savedItemsProductCodes, item.product?.productCode)
+                _.includes(backendResponseProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
                 && item.rowSaveStatus === RowSaveStatus.SAVING
               ) {
@@ -992,7 +995,7 @@ class AddItemsPage extends Component {
         });
 
       const payloadLineItemsWithoutDuplications = payload?.lineItems
-        .filter(item => !this.state.lastRequestData?.find(savedItem =>
+        .filter(item => !item?.id || !this.state.lastRequestData?.find(savedItem =>
           savedItem.id === item.id
           && savedItem.quantityRequested === item.quantityRequested,
         ));
@@ -1002,7 +1005,7 @@ class AddItemsPage extends Component {
           this.requestsQueue.enqueueRequest(
             saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications }),
           ),
-        )
+        );
       }
     }
 
@@ -1010,7 +1013,7 @@ class AddItemsPage extends Component {
       values: {
         ...previousState.values,
         lineItems: previousState.values.lineItems.map((item) => {
-          if (parseInt(item.quantityRequested, 10) === 0) {
+          if (parseInt(item.quantityRequested, 10) === 0 && !item?.id) {
             return { ...item, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
           }
           return item;
