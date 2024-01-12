@@ -25,6 +25,7 @@ import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
+import org.pih.warehouse.product.ProductSupplierDataService
 import org.pih.warehouse.product.ProductSupplierListDto
 import org.pih.warehouse.product.ProductSupplierListParams
 import org.pih.warehouse.product.ProductSupplierPreference
@@ -40,6 +41,7 @@ class ProductSupplierService {
 
     def identifierService
     def dataSource
+    ProductSupplierDataService productSupplierGormService
 
 
     List<ProductSupplierListDto> getProductSuppliers(ProductSupplierListParams params) {
@@ -336,5 +338,9 @@ class ProductSupplierService {
             productSupplier.save(failOnError: true)
         }
         return productSupplier
+    }
+
+    void delete(String productSupplierId) {
+        productSupplierGormService.delete(productSupplierId)
     }
 }

@@ -106,4 +106,4 @@ export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?sea
 export const ORGANIZATION_API = `${API}/organizations`;
 
 // PRODUCT SUPPLIER
-export const PRODUCT_SUPPLIER_API = `${API}/productSupplier`;
+export const PRODUCT_SUPPLIER_API = `${API}/productSuppliers`;
