@@ -137,6 +137,7 @@ class StockMovementController {
                 redirect(action: "createInbound", params: params)
                 break
             default:
+                redirect(action: "createOutbound", params: params)
                 break
         }
     }
