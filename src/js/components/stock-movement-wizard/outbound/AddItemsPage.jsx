@@ -908,7 +908,7 @@ class AddItemsPage extends Component {
             // and separate autosave logic from save button logic
             const savedItemsIds = data?.lineItems?.map(item => item.id);
             const backendResponseIds = lineItemsBackendData.map(item => item.id);
-            const backendProductCodes = lineItemsBackendData.map(item => item.productCode);
+            const backendResponseProductCodes = lineItemsBackendData.map(item => item.productCode);
             // We are sending item by item to API. Here we have to find
             // newly saved item to replace its equivalent in state
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
@@ -935,7 +935,7 @@ class AddItemsPage extends Component {
 
               if (
                 itemToChange
-                && _.includes(backendProductCodes, item.product?.productCode)
+                && _.includes(backendResponseProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
                 && item.rowSaveStatus === RowSaveStatus.SAVING
               ) {
