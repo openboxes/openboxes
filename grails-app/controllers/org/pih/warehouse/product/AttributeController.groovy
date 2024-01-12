@@ -15,6 +15,8 @@ import org.pih.warehouse.core.EntityTypeCode
 @Transactional
 class AttributeController {
 
+    AttributeService attributeService
+
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def index() {
@@ -22,8 +24,11 @@ class AttributeController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [attributeInstanceList: Attribute.list(params), attributeInstanceTotal: Attribute.count()]
+        params.max = Math.min(params.int('max', 10), 100)
+        params.offset = params.int('offset', 0)
+        List<Attribute> attributes =
+                attributeService.searchAttributes(params.q, [max: params.max, offset: params.offset])
+        [attributeInstanceList: attributes, attributeInstanceTotal: attributes.totalCount]
     }
 
     def show() {
