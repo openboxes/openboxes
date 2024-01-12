@@ -24,10 +24,10 @@ class AttributeController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.int('offset') ?: 0
+        params.max = Math.min(params.int('max', 10), 100)
+        params.offset = params.int('offset', 0)
         List<Attribute> attributes =
-                attributeService.getAttributes(params.offset, params.max, params.q)
+                attributeService.searchAttributes(params.q, [max: params.max, offset: params.offset])
         [attributeInstanceList: attributes, attributeInstanceTotal: attributes.totalCount]
     }
 
