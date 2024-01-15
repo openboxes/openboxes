@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import arrayMutators from 'final-form-arrays';
-import update from 'immutability-helper';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -12,6 +11,7 @@ import { connect } from 'react-redux';
 import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
+import ProductApi from 'api/services/ProductApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
@@ -52,18 +52,12 @@ const FIELDS = {
   returnItems: {
     type: ArrayField,
     arrowsNavigation: true,
-    addButton: ({
-      // eslint-disable-next-line react/prop-types
-      addRow, getSortOrder, values, updateFormValues,
-    }) => (
+    // eslint-disable-next-line react/prop-types
+    addButton: ({ addRow, getSortOrder }) => (
       <button
         type="button"
         className="btn btn-outline-success btn-xs"
-        onClick={() => {
-          const row = { sortOrder: getSortOrder() };
-          addRow(row);
-          updateFormValues(update(values, { returnItems: { $push: [row] } }));
-        }}
+        onClick={() => addRow({ sortOrder: getSortOrder() })}
       >
         <span><i className="fa fa-plus pr-2" /><Translate id="react.default.button.addLine.label" defaultMessage="Add line" /></span>
       </button>),
@@ -75,16 +69,13 @@ const FIELDS = {
         headerAlign: 'left',
         flexWidth: '4',
         required: true,
-        getDynamicAttr: ({
-          updateFormValues, rowIndex, values, originId, focusField,
-        }) => ({
+        getDynamicAttr: ({ rowIndex, originId, focusField }) => ({
           locationId: originId,
           onExactProductSelected: ({ product }) => {
             if (focusField && product) {
               focusField(rowIndex, 'quantity');
             }
           },
-          onBlur: () => updateFormValues(values),
         }),
       },
       lotNumber: {
@@ -92,9 +83,6 @@ const FIELDS = {
         label: 'react.inboundReturns.lot.label',
         defaultMessage: 'Lot',
         flexWidth: '1',
-        getDynamicAttr: ({ values, updateFormValues }) => ({
-          onBlur: () => updateFormValues(values),
-        }),
       },
       expirationDate: {
         type: DateField,
@@ -106,9 +94,6 @@ const FIELDS = {
           autoComplete: 'off',
           placeholderText: 'MM/DD/YYYY',
         },
-        getDynamicAttr: ({ values, updateFormValues }) => ({
-          onBlur: () => updateFormValues(values),
-        }),
       },
       quantity: {
         type: TextField,
@@ -119,9 +104,6 @@ const FIELDS = {
         attributes: {
           type: 'number',
         },
-        getDynamicAttr: ({ values, updateFormValues }) => ({
-          onBlur: () => updateFormValues(values),
-        }),
       },
       recipient: {
         type: SelectField,
@@ -129,7 +111,7 @@ const FIELDS = {
         defaultMessage: 'Recipient',
         flexWidth: '1.5',
         getDynamicAttr: ({
-          recipients, addRow, rowCount, rowIndex, getSortOrder, updateFormValues, values,
+          recipients, addRow, rowCount, rowIndex, getSortOrder,
         }) => ({
           options: recipients,
           onTabPress: rowCount === rowIndex + 1 ? () =>
@@ -138,7 +120,6 @@ const FIELDS = {
             addRow({ sortOrder: getSortOrder() }) : null,
           arrowDown: rowCount === rowIndex + 1 ? () =>
             addRow({ sortOrder: getSortOrder() }) : null,
-          onBlur: () => updateFormValues(values),
         }),
         attributes: {
           labelKey: 'name',
@@ -157,7 +138,6 @@ class AddItemsPage extends Component {
       inboundReturn: {},
       sortOrder: 0,
       formValues: { returnItems: [] },
-      initialFormValues: { returnItems: [] },
       // isFirstPageLoaded: false,
     };
 
@@ -170,7 +150,6 @@ class AddItemsPage extends Component {
     this.confirmValidationErrorOnPreviousPage =
       this.confirmValidationErrorOnPreviousPage.bind(this);
     this.validate = this.validate.bind(this);
-    this.updateFormValues = this.updateFormValues.bind(this);
   }
 
   componentDidMount() {
@@ -196,11 +175,6 @@ class AddItemsPage extends Component {
 
     return this.state.sortOrder;
   }
-
-  updateFormValues(values) {
-    this.setState({ formValues: values });
-  }
-
   dataFetched = false;
 
   validate(values) {
@@ -341,7 +315,6 @@ class AddItemsPage extends Component {
           this.setState({
             inboundReturn,
             formValues: { returnItems },
-            initialFormValues: { returnItems },
             sortOrder,
           }, () => this.props.hideSpinner());
         })
@@ -382,11 +355,6 @@ class AddItemsPage extends Component {
 
     const hasEmptyOrZeroValues = _.some(returnItems, (item) => !item.quantity || item.quantity === '0');
 
-    const hasExpirationDateBeenUpdated = _.some(returnItems, (item) => {
-      const initialValue = _.find(this.state.initialFormValues.returnItems, { id: item.id });
-      return item.expirationDate !== initialValue?.expirationDate;
-    });
-
     if (hasEmptyOrZeroValues) {
       const isConfirmed = await this.confirmEmptyQuantitySave();
       if (!isConfirmed) {
@@ -394,7 +362,23 @@ class AddItemsPage extends Component {
       }
     }
 
-    if (hasExpirationDateBeenUpdated) {
+    let isSomeItemsDontMatchExpirationDate = false;
+    const itemsWithLotAndExpirationDate = returnItems.filter(it => it.expirationDate && it.lotNumber);
+
+    // Trying to find at least one instance where the data that we are trying to save
+    // does not match the expiration date of the existing inventoryItem in the system
+    for (const it of itemsWithLotAndExpirationDate) {
+      const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
+      if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
+        isSomeItemsDontMatchExpirationDate = true;
+        break;
+      }
+    }
+
+    // After find at least a single instance where expiration date we are trying to save
+    // does not match the existing inventoryItem expiration date, we want to inform the user
+    // that certain updates to th expiration date in the system will be performed
+    if (isSomeItemsDontMatchExpirationDate) {
       const isConfirmed = await this.confirmExpirationDateSave();
       if (!isConfirmed) {
         return Promise.reject();
@@ -532,9 +516,7 @@ class AddItemsPage extends Component {
                     recipients: this.props.recipients,
                     removeItem: this.removeItem,
                     getSortOrder: this.getSortOrder,
-                    updateFormValues: this.updateFormValues,
                     originId: this.props.initialValues.origin.id,
-                    values,
                   }))}
               </div>
               <div className="submit-buttons">
