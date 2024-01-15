@@ -16,11 +16,12 @@ const CustomConfirmModal = ({
 }) => (
   <div className={`d-flex flex-column custom-modal-content justify-content-between bg-white ${className}`}>
     <div className="d-flex justify-content-between">
-      {(title?.label && title?.default) && (
+      {(title?.label && title?.default)
+        && (
         <p className="custom-modal-title">
           <Translate id={title?.label} defaultMessage={title?.default} />
         </p>
-      )}
+        )}
       <RiCloseFill
         size="32px"
         className="cursor-pointer"

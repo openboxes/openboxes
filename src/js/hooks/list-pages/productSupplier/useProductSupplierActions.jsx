@@ -20,8 +20,8 @@ const useProductSupplierActions = ({ fireFetchData }) => {
   const deleteProductSupplier = async (onClose, productSupplierId) => {
     try {
       await productSupplierApi.deleteProductSupplier(productSupplierId);
-    } finally {
       fireFetchData?.();
+    } finally {
       onClose?.();
     }
   };
@@ -64,24 +64,23 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     });
   };
 
-  const getActions = useCallback((productSupplierId) => (hasPermissionsToProductSourceActions(currentUser, isAdmin)
-    ? [
-      {
-        defaultLabel: 'Edit',
-        label: 'react.productSupplier.edit.label',
-        leftIcon: <RiPencilLine />,
-        onClick: () => {
-          window.location = PRODUCT_SUPPLIER_URL.edit(productSupplierId);
-        },
+  const getActions = useCallback((productSupplierId) => (hasPermissionsToProductSourceActions(currentUser, isAdmin) ? [
+    {
+      defaultLabel: 'Edit',
+      label: 'react.productSupplier.edit.label',
+      leftIcon: <RiPencilLine />,
+      onClick: () => {
+        window.location = PRODUCT_SUPPLIER_URL.edit(productSupplierId);
       },
-      {
-        defaultLabel: 'Delete Product Source',
-        label: 'react.productSupplier.delete.label',
-        leftIcon: <RiDeleteBinLine />,
-        variant: 'danger',
-        onClick: () => openConfirmationModal(productSupplierId),
-      },
-    ] : []), []);
+    },
+    {
+      defaultLabel: 'Delete Product Source',
+      label: 'react.productSupplier.delete.label',
+      leftIcon: <RiDeleteBinLine />,
+      variant: 'danger',
+      onClick: () => openConfirmationModal(productSupplierId),
+    },
+  ] : []), [currentUser, isAdmin]);
 
   return {
     getActions,
