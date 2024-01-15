@@ -934,7 +934,8 @@ class AddItemsPage extends Component {
               }
 
               if (
-                _.includes(backendResponseProductCodes, item.product?.productCode)
+                itemToChange
+                && _.includes(backendResponseProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
                 && item.rowSaveStatus === RowSaveStatus.SAVING
               ) {
