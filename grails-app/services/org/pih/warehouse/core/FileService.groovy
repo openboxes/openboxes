@@ -367,7 +367,7 @@ class FileService {
         // Add all reference numbers
         shipmentInstance.referenceNumbers.each { ReferenceNumber referenceNumber ->
             log.info "Reference number ${referenceNumber?.referenceNumberType} = " + referenceNumber?.identifier
-            FormatTagLib formatTag = grailsApplication.mainContext.getBean('FormatTagLib')
+            FormatTagLib formatTag = grailsApplication.mainContext.getBean('org.pih.warehouse.FormatTagLib')
             String referenceNumberType = formatTag.metadata(obj: referenceNumber.referenceNumberType)
             referenceNumberType = referenceNumberType.toUpperCase().replaceAll(" ", "_")
             mappings.put(referenceNumberType, referenceNumber?.identifier)
