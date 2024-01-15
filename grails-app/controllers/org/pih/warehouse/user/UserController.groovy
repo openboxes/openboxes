@@ -10,6 +10,7 @@
 package org.pih.warehouse.user
 
 import grails.validation.ValidationException
+import org.apache.http.auth.AuthenticationException
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationRoleDataService
@@ -270,6 +271,29 @@ class UserController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
         }
+    }
+
+    def changePassword() {
+        User user = userGormService.get(params?.id)
+        if (user) {
+            try {
+                userService.changePassword(user, params?.password, params?.passwordConfirm)
+                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), user.id])}"
+                redirect(action: "edit", id: user.id)
+            } catch (ValidationException e) {
+                // This read function is used to avoid getting lazy initialization exceptions in
+                // rendering the edit page, it is done like in the update function above
+                user = User.read(params.id)
+                user.errors = e.errors
+                render(view: "edit", model: [userInstance: user])
+            } catch (AuthenticationException e) {
+                flash.message = e.message
+                redirect(action: "edit", id: user.id)
+            }
+            return
+        }
+        flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
+        redirect(action: "list")
     }
 
     def disableLocalizationMode() {
