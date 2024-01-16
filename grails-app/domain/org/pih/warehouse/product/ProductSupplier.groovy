@@ -152,11 +152,12 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             "Last updated"                        : ["property": "lastUpdated", "dateFormat": "MM/dd/yyyy"]
     ]
 
-    ProductSupplierListDto toJson() {
-        return new ProductSupplierListDto(
+    Map toJson() {
+        [
             id: id,
             productCode: product.productCode,
             name: name,
+            productId: product.id,
             productName: product.name,
             code: code,
             supplierName: supplier?.name,
@@ -164,9 +165,9 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
             packageSize: defaultProductPackage ? "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}" : null,
             packagePrice: defaultProductPackage?.productPrice?.price ?: 0.0,
-            eachPrice: defaultProductPackage?.productPrice ? defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity : 0.0,
+            unitPrice: defaultProductPackage?.productPrice ? defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity : 0.0,
             dateCreated: dateCreated,
             active: active
-        )
+        ]
     }
 }
