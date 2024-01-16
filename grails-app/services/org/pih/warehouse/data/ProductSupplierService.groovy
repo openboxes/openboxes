@@ -11,8 +11,10 @@ package org.pih.warehouse.data
 
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
+import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
+import org.hibernate.criterion.Order
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
@@ -26,7 +28,7 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierDataService
-import org.pih.warehouse.product.ProductSupplierListDto
+
 import org.pih.warehouse.product.ProductSupplierListParams
 import org.pih.warehouse.product.ProductSupplierPreference
 
@@ -44,90 +46,100 @@ class ProductSupplierService {
     ProductSupplierDataService productSupplierGormService
 
 
-    List<ProductSupplierListDto> getProductSuppliers(ProductSupplierListParams params) {
+    List<ProductSupplier> getProductSuppliers(ProductSupplierListParams params) {
         // Store added aliases to avoid duplicate alias exceptions for product and supplier
         // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
         Set<String> usedAliases = new HashSet<>()
 
-        List<ProductSupplier> productSuppliers =
-            ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
-                if (params.searchTerm) {
-                    createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
-                    createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
-                    usedAliases.addAll(["product", "supplier"])
-                    or {
-                        ilike("p.productCode", "%" + params.searchTerm + "%")
-                        ilike("code", "%" + params.searchTerm + "%")
-                        ilike("s.code", "%" + params.searchTerm + "%")
-                    }
-                }
-                if (params.product) {
-                    eq("product.id", params.product)
-                }
-                if (params.active != null) {
-                    eq("active", params.active)
-                }
-                if (params.supplier) {
-                    eq("supplier.id", params.supplier)
-                }
-                if (params.preferenceType) {
-                    add(getPreferenceTypeCriteria(params.preferenceType))
-                }
-                if (params.createdFrom) {
-                    ge("dateCreated", params.createdFrom)
-                }
-                if (params.createdTo) {
-                    lte("dateCreated", params.createdTo)
-                }
-                if (params.sort) {
-                    String orderDirection = params.order ?: "asc"
-                    switch (params.sort) {
-                        case "productCode":
-                            if (!usedAliases.contains("product")) {
-                                createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
-                                usedAliases.add("product")
-                            }
-                            order("p.productCode", orderDirection)
-                            break
-                        case "productName":
-                            if (!usedAliases.contains("product")) {
-                                createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
-                            }
-                            order("p.name", orderDirection)
-                            break
-                        case "code":
-                            order("code", orderDirection)
-                            break
-                        case "supplierName":
-                            if (!usedAliases.contains("supplier")) {
-                                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
-                                usedAliases.add("supplier")
-                            }
-                            order("s.name", orderDirection)
-                            break
-                        case "supplierCode":
-                            if (!usedAliases.contains("supplier")) {
-                                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
-                                usedAliases.add("supplier")
-                            }
-                            order("s.code", orderDirection)
-                            break
-                        case "dateCreated":
-                            order("dateCreated", orderDirection)
-                            break
-                        case "active":
-                            order("active", orderDirection)
-                            break
-                        case "name":
-                            order("name", orderDirection)
-                            break
-                        default:
-                            break
-                    }
+        return ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
+            if (params.searchTerm) {
+                createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                usedAliases.addAll(["product", "supplier"])
+                or {
+                    ilike("p.productCode", "%" + params.searchTerm + "%")
+                    ilike("code", "%" + params.searchTerm + "%")
+                    ilike("s.code", "%" + params.searchTerm + "%")
                 }
             }
-        productSuppliers.resultList = productSuppliers.collect { ProductSupplier it -> it.toJson() }
-        return productSuppliers as List<ProductSupplierListDto>
+            if (params.product) {
+                eq("product.id", params.product)
+            }
+            if (params.active != null) {
+                eq("active", params.active)
+            }
+            if (params.supplier) {
+                eq("supplier.id", params.supplier)
+            }
+            if (params.preferenceType) {
+                add(getPreferenceTypeCriteria(params.preferenceType))
+            }
+            if (params.createdFrom) {
+                ge("dateCreated", params.createdFrom)
+            }
+            if (params.createdTo) {
+                lte("dateCreated", params.createdTo)
+            }
+            if (params.sort) {
+                String orderDirection = params.order ?: "asc"
+                getSortOrder(params.sort, orderDirection, delegate, usedAliases)
+            }
+        }
+    }
+
+    private static void getSortOrder(String sort, String orderDirection, Criteria criteria, Set<String> usedAliases) {
+        switch (sort) {
+            case "productCode":
+                if (!usedAliases.contains("product")) {
+                    criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("product")
+                }
+                criteria.addOrder(getOrderDirection("p.productCode", orderDirection))
+                break
+            case "productName":
+                if (!usedAliases.contains("product")) {
+                    criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("product")
+                }
+                criteria.addOrder(getOrderDirection("p.name", orderDirection))
+                break
+            case "code":
+                criteria.addOrder(getOrderDirection("code", orderDirection))
+                break
+            case "supplierName":
+                if (!usedAliases.contains("supplier")) {
+                    criteria.createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("supplier")
+                }
+                criteria.addOrder(getOrderDirection("s.name", orderDirection))
+                break
+            case "supplierCode":
+                if (!usedAliases.contains("supplier")) {
+                    criteria.createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
+                    usedAliases.add("supplier")
+                }
+                criteria.addOrder(getOrderDirection("s.code", orderDirection))
+                break
+            case "dateCreated":
+                criteria.addOrder(getOrderDirection("dateCreated", orderDirection))
+                break
+            case "active":
+                criteria.addOrder(getOrderDirection("active", orderDirection))
+                break
+            case "name":
+                criteria.addOrder(getOrderDirection("name", orderDirection))
+                break
+            default:
+                break
+
+        }
+    }
+
+    private static Order getOrderDirection(String sort, String order) {
+        if (order == "desc") {
+            return Order.desc(sort)
+        }
+        return Order.asc(sort)
     }
 
     private static Criterion getPreferenceTypeCriteria(String preferenceType) {
