@@ -16,9 +16,10 @@ import grails.util.Holders
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.apache.commons.collections.ListUtils
+import org.apache.http.auth.AuthenticationException
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.auth.AuthService
-import org.pih.warehouse.core.Role
+import org.grails.plugins.web.taglib.ApplicationTagLib
 
 @Transactional
 class UserService {
@@ -51,14 +52,8 @@ class UserService {
         // to compare the password with confirm password before
         // setting the new password in the database
         userInstance.properties = params
-        if (params.changePassword && userInstance.password != params.password) {
-            userInstance.password = params?.password?.encodeAsPassword()
-            userInstance.passwordConfirm = params?.passwordConfirm?.encodeAsPassword()
-        } else {
-            // Needed to bypass the password == passwordConfirm validation
-            userInstance.passwordConfirm = userInstance.password
-        }
-
+        // Needed to bypass the password == passwordConfirm validation
+        userInstance.passwordConfirm = userInstance.password
         // Do not allow user to set his/her locale to translation mode locale
         def localizationModeLocale = new Locale(grailsApplication.config.openboxes.locale.localizationModeLocale)
         if (params.locale && new Locale(params.locale) == localizationModeLocale) {
@@ -92,6 +87,21 @@ class UserService {
         return userInstance.save(failOnError: true)
     }
 
+    void changePassword(User user, String password, String passwordConfirm) {
+        if (!canUserEditPassword(AuthService.currentUser, user)) {
+            String errorMessage = applicationTagLib.message(
+                    code: 'errors.accessDenied.message',
+                    default: 'Apologies, but you are not authorized to access this page or to perform this action.',
+            )
+            throw new AuthenticationException(errorMessage)
+        }
+
+        if (user.password != password) {
+            user.password = password?.encodeAsPassword()
+            user.passwordConfirm = passwordConfirm?.encodeAsPassword()
+            user.save(failOnError: true)
+        }
+    }
 
     void assignDefaultRoles(User userInstance) {
         try {
@@ -542,5 +552,13 @@ class UserService {
             return role
         }
         return roles
+    }
+
+    Boolean canUserEditPassword(User currentUser, User userToEdit) {
+        currentUser?.id == userToEdit.id || isUserAdmin(currentUser)
+    }
+
+    def getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean(ApplicationTagLib)
     }
 }

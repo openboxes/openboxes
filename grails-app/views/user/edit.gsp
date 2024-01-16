@@ -16,6 +16,10 @@
         <div class="message">${flash.message}</div>
     </g:if>
 
+    <g:if test="${flash.error}">
+        <div class="errors">${flash.error}</div>
+    </g:if>
+
     <g:hasErrors bean="${userInstance}">
         <div class="errors">
             <g:renderErrors bean="${userInstance}" as="list" />
@@ -130,7 +134,6 @@
                             <g:form method="post">
                                 <g:hiddenField name="id" value="${userInstance?.id}" />
                                 <g:hiddenField name="version" value="${userInstance?.version}" />
-                                <g:hiddenField name="changePassword" value="${true}"/>
                                 <table>
                                     <tbody>
                                         <tr class="prop">
@@ -161,7 +164,7 @@
                                         </td>
                                         <td>
                                             <div class="buttons left">
-                                                <g:actionSubmit class="button icon approve" action="update" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
+                                                <g:actionSubmit class="button icon approve" action="changePassword" value="${warehouse.message(code: 'default.button.save.label', default: 'Save')}" />
                                                 &nbsp;
                                                 <g:link class="cancel" action="show" id="${userInstance?.id }">${warehouse.message(code: 'default.button.cancel.label', default: 'Cancel')}</g:link>
                                             </div>
