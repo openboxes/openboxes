@@ -429,6 +429,14 @@ class AddItemsPage extends Component {
                 type="button"
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
                 disabled={invalid}
+                onClick={() => this.saveInvoiceItems(values)}
+              >
+                <span><i className="fa fa-floppy-o pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary float-right btn-form btn-xs"
+                disabled={invalid}
                 onClick={() => this.saveAndExit(values)}
               >
                 <span><i className="fa fa-sign-out pr-2" /><Translate id="react.default.button.saveAndExit.label" defaultMessage="Save and exit" /></span>
