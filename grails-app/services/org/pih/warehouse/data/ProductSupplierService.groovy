@@ -60,6 +60,12 @@ class ProductSupplierService {
                     ilike("p.productCode", "%" + params.searchTerm + "%")
                     ilike("code", "%" + params.searchTerm + "%")
                     ilike("s.code", "%" + params.searchTerm + "%")
+                    ilike("name", "%" + params.searchTerm + "%")
+                    ilike("supplierCode", "%" + params.searchTerm + "%")
+                    ilike("supplierName", "%" + params.searchTerm + "%")
+                    ilike("manufacturerCode", "%" + params.searchTerm + "%")
+                    ilike("manufacturerName", "%" + params.searchTerm + "%")
+                    ilike("productCode", "%" + params.searchTerm + "%")
                 }
             }
             if (params.product) {
