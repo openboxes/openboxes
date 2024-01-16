@@ -1,15 +1,12 @@
 import React, { useCallback } from 'react';
 
-import { confirmAlert } from 'react-confirm-alert';
 import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
-import CustomConfirmModal from 'utils/CustomConfirmModal';
+import confirmationModal from 'utils/confirmationModalUtils';
 import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
-
-import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const useProductSupplierActions = ({ fireFetchData }) => {
   const { currentUser, isAdmin } = useSelector((state) => ({
@@ -37,7 +34,7 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     },
   };
 
-  const deleteConfirmationModalButtons = (onClose, productSupplierId) => ([
+  const deleteConfirmationModalButtons = (productSupplierId) => (onClose) => ([
     {
       variant: 'transparent',
       defaultLabel: 'Cancel',
@@ -53,14 +50,9 @@ const useProductSupplierActions = ({ fireFetchData }) => {
   ]);
 
   const openConfirmationModal = (productSupplierId) => {
-    confirmAlert({
-      customUI: ({ onClose }) => (
-        <CustomConfirmModal
-          labels={modalLabels}
-          onClose={onClose}
-          buttons={deleteConfirmationModalButtons(onClose, productSupplierId)}
-        />
-      ),
+    confirmationModal({
+      buttons: deleteConfirmationModalButtons(productSupplierId),
+      ...modalLabels,
     });
   };
 
