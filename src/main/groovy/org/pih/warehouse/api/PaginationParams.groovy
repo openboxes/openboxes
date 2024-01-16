@@ -2,7 +2,7 @@ package org.pih.warehouse.api
 
 class PaginationParams {
 
-    Integer offset = 0
+    Integer offset
 
-    Integer max = 10
+    Integer max
 }
