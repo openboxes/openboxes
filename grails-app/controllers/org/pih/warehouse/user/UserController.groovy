@@ -287,7 +287,7 @@ class UserController {
                 user.errors = e.errors
                 render(view: "edit", model: [userInstance: user])
             } catch (AuthenticationException e) {
-                flash.message = e.message
+                flash.error = e.message
                 redirect(action: "edit", id: user.id)
             }
             return
