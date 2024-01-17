@@ -1,4 +1,5 @@
 import ActivityCode from 'consts/activityCode';
+import RoleType from 'consts/roleType';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import { supports } from 'utils/supportedActivitiesUtils';
 
@@ -39,6 +40,15 @@ const canEditRequest = (currentUser, request, location) => {
   // If we are in requesting location (destination), allow to add items only for a person
   // who created a stock request
   return isLocationDestination && isUserRequestor;
+};
+
+export const hasRole = (user, role) => user?.roles?.includes(role);
+
+// To have permissions for product source list actions
+// user has to be at least admin and has product manager permissions
+export const hasPermissionsToProductSourceActions = (user, isAdmin) => {
+  const hasProductManagerPermission = hasRole(user, RoleType.ROLE_PRODUCT_MANAGER);
+  return hasProductManagerPermission && isAdmin;
 };
 
 export default canEditRequest;

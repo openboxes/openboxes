@@ -43,6 +43,7 @@ const useProductSupplierListTableData = (filterParams) => {
     loading,
     onFetchHandler,
     tableData,
+    fireFetchData,
   } = useTableData({
     filterParams,
     url: PRODUCT_SUPPLIER_API,
@@ -57,6 +58,7 @@ const useProductSupplierListTableData = (filterParams) => {
     loading,
     tableRef,
     onFetchHandler,
+    fireFetchData,
   };
 };
 
