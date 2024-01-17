@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.apache.commons.csv.CSVPrinter
 import org.grails.web.json.JSONObject
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Organization
@@ -31,6 +32,12 @@ class InvoiceApiController {
         def location = Location.get(session.warehouse.id)
         params.partyFromId = location?.organization?.id
         def invoices = invoiceService.getInvoices(params)
+        if (params.format == "csv") {
+            CSVPrinter csv = invoiceService.getInvoicesCsv(invoices)
+            response.setHeader("Content-disposition", "attachment; filename=\"Invoices-${new Date().format("MM/dd/yyyy")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+            return
+        }
         render([data: invoices, totalCount: invoices?.totalCount] as JSON)
     }
 
