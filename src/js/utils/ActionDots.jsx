@@ -58,20 +58,24 @@ const ActionDots = ({
       <button
         data-testid="dropdown-toggle"
         className="action-dots dropdown-toggle d-flex align-items-center justify-content-center"
-        data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
+        disabled={!actions.length}
+        data-toggle="dropdown"
       >
         <RiMoreLine />
       </button>
-      <div data-testid="dropdown-menu" className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
-        {actions && actions.map((action) => {
+      {actions && (
+        <div
+          data-testid="dropdown-menu"
+          className={`${dropdownClasses} dropdown-menu dropdown-menu-right nav-item padding-8`}>
+        {actions.map((action) => {
           const itemClasses = `d-flex align-items-center gap-8 dropdown-item ${action.variant === 'danger' ? 'font-red-ob' : ''}`;
           const itemValue = (
             <React.Fragment>
               {action.leftIcon && action.leftIcon}
               {action.label &&
-              <Translate id={action.label} defaultMessage={action.defaultLabel} />}
+                <Translate id={action.label} defaultMessage={action.defaultLabel}/>}
             </React.Fragment>
           );
           const elementType = getActionItemType(action);
@@ -82,25 +86,26 @@ const ActionDots = ({
 
           return (
             <React.Fragment key={action.label}>
-              { elementType === actionItemType.BUTTON && (
+              {elementType === actionItemType.BUTTON && (
                 <button
                   onClick={() => action.onClick(id)}
                   className={itemClasses}
                 >
                   {itemValue}
                 </button>)}
-              { elementType === actionItemType.LINK && (
+              {elementType === actionItemType.LINK && (
                 <a href={link} className={itemClasses}>
                   {itemValue}
                 </a>)}
-              { elementType === actionItemType.REACT_LINK && (
+              {elementType === actionItemType.REACT_LINK && (
                 <Link to={link} className={itemClasses}>
                   {itemValue}
                 </Link>)}
             </React.Fragment>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

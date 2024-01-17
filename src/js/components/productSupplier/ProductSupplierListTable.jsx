@@ -1,27 +1,51 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
+import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
+import ActionDots from 'utils/ActionDots';
+import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
 import ListTableWrapper from 'wrappers/ListTableWrapper';
 
 const ProductSupplierListTable = ({ filterParams }) => {
+  const {
+    tableRef,
+    tableData,
+    onFetchHandler,
+    loading,
+    fireFetchData,
+  } = useProductSupplierListTableData(filterParams);
+
+  const {
+    getActions,
+  } = useProductSupplierActions({ fireFetchData });
+
   const columns = useMemo(() => [
     {
       Header: ' ',
       width: 50,
-      fixed: 'left',
       sortable: false,
       style: {
         overflow: 'visible',
         zIndex: 1,
       },
+      fixed: 'left',
+      Cell: (row) => (
+        <ActionDots
+          dropdownPlacement="right"
+          dropdownClasses="action-dropdown-offset"
+          id={row.original.id}
+          actions={getActions(row.original.id)}
+        />
+      ),
     },
     {
       Header: <Translate id="react.productSupplier.column.productCode.label" defaultMessage="Product Code" />,
@@ -107,13 +131,6 @@ const ProductSupplierListTable = ({ filterParams }) => {
       ),
     },
   ], []);
-
-  const {
-    tableRef,
-    tableData,
-    onFetchHandler,
-    loading,
-  } = useProductSupplierListTableData(filterParams);
 
   return (
     <ListTableWrapper>

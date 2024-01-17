@@ -107,3 +107,4 @@ export const ORGANIZATION_API = `${API}/organizations`;
 
 // PRODUCT SUPPLIER
 export const PRODUCT_SUPPLIER_API = `${API}/productSuppliers`;
+export const PRODUCT_SUPPLIER_BY_ID = (id) => `${PRODUCT_SUPPLIER_API}/${id}`;

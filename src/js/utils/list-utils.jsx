@@ -10,7 +10,6 @@ export const hasMinimumRequiredRole = (role, highestUserRole) => {
     highestUserRoleIndex <= userRoleIndex;
 };
 
-
 export const findActions = (actionList, row, props) => {
   const { supportedActivities = [], highestRole, customFilter } = props;
   // Filter out by status if any provided
