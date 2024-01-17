@@ -350,7 +350,6 @@ class AddItemsPage extends Component {
       totalCount: 0,
       isFirstPageLoaded: false,
       isDraftAvailable: false,
-      lastRequestData: [],
     };
 
     this.props.showSpinner();
@@ -914,11 +913,11 @@ class AddItemsPage extends Component {
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               if (
-                parseInt(item.quantityRequested, 10) === 0 &&
-                (item.rowSaveStatus === RowSaveStatus.SAVING ||
-                  item.rowSaveStatus === RowSaveStatus.SAVED ||
-                  !item.rowSaveStatus) &&
-                _.includes(savedItemsIds, item.id)
+                parseInt(item.quantityRequested, 10) === 0
+                && (item.rowSaveStatus === RowSaveStatus.SAVING
+                  || item.rowSaveStatus === RowSaveStatus.SAVED
+                  || !item.rowSaveStatus)
+                && _.includes(savedItemsIds, item.id)
               ) {
                 return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
@@ -927,10 +926,11 @@ class AddItemsPage extends Component {
               // line is disabled by default
               const savedIds = item?.id ? savedItemsIds : backendResponseIds;
               if (
-                _.includes(savedIds, item.id) &&
-                item.rowSaveStatus !== RowSaveStatus.ERROR
+                _.includes(savedIds, item.id)
+                && item.rowSaveStatus !== RowSaveStatus.ERROR
               ) {
-                return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
+                const editedItem = lineItemsBackendData.find(savedItem => savedItem.id === item.id)
+                return { ...editedItem, rowSaveStatus: RowSaveStatus.SAVED };
               }
 
               if (
@@ -941,6 +941,7 @@ class AddItemsPage extends Component {
               ) {
                 return { ...itemToChange, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
+
               return item;
             });
 
@@ -995,19 +996,9 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
 
-      const payloadLineItemsWithoutDuplications = payload?.lineItems
-        .filter(item => !item?.id || !this.state.lastRequestData?.find(savedItem =>
-          savedItem.id === item.id
-          && savedItem.quantityRequested === item.quantityRequested,
-        ));
-
-      if (payloadLineItemsWithoutDuplications.length) {
-        this.setState({ lastRequestData: payload?.lineItems }, () =>
-          this.requestsQueue.enqueueRequest(
-            saveItemsRequest({ ...payload, lineItems: payloadLineItemsWithoutDuplications }),
-          ),
-        );
-      }
+      this.requestsQueue.enqueueRequest(
+        saveItemsRequest(payload),
+      );
     }
 
     this.setState(previousState => ({
