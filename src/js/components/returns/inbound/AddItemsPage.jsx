@@ -8,18 +8,21 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
-import Alert from 'react-s-alert';
 
 import { fetchUsers, hideSpinner, showSpinner } from 'actions';
 import ProductApi from 'api/services/ProductApi';
+import stockTransferApi from 'api/services/StockTransferApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import DateField from 'components/form-elements/DateField';
 import ProductSelectField from 'components/form-elements/ProductSelectField';
 import SelectField from 'components/form-elements/SelectField';
 import TextField from 'components/form-elements/TextField';
+import notification from 'components/Layout/notifications/notification';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
+import NotificationType from 'consts/notificationTypes';
+import StockTransferStatus from 'consts/stockTransferStatus';
+import { flattenRequest, parseResponse } from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -302,8 +305,7 @@ class AddItemsPage extends Component {
   fetchInboundReturn() {
     if (this.props.match.params.inboundReturnId) {
       this.props.showSpinner();
-      const url = `/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
-      apiClient.get(url)
+      stockTransferApi.getStockTransfer(this.props.match.params.inboundReturnId)
         .then((resp) => {
           const inboundReturn = parseResponse(resp.data.data);
           const returnItems = inboundReturn.stockTransferItems.length
@@ -323,13 +325,15 @@ class AddItemsPage extends Component {
   }
 
   async nextPage(formValues) {
-    this.saveStockTransferInCurrentStep(formValues, this.state.inboundReturn.status !== 'PLACED' ? 'PLACED' : null)
+    const status = this.state.inboundReturn.status === StockTransferStatus.PLACED
+      ? StockTransferStatus.PLACED
+      : null;
+    this.saveStockTransferInCurrentStep(formValues, status)
       .then(() => this.props.nextPage(this.state.inboundReturn));
   }
 
   saveStockTransfer(returnItems, status) {
     const itemsToSave = _.filter(returnItems, (item) => item.product && item.quantity > 0);
-    const updateItemsUrl = `/api/stockTransfers/${this.props.match.params.inboundReturnId}`;
     const payload = {
       ...this.state.inboundReturn,
       stockTransferItems: itemsToSave,
@@ -341,7 +345,10 @@ class AddItemsPage extends Component {
 
     if (payload.stockTransferItems.length) {
       this.props.showSpinner();
-      return apiClient.post(updateItemsUrl, flattenRequest(payload))
+      return stockTransferApi.updateStockTransfer(
+        this.props.match.params.inboundReturnId,
+        flattenRequest(payload),
+      )
         .then(() => this.fetchInboundReturn())
         .catch(() => Promise.reject(new Error(this.props.translate('react.inboundReturns.error.saveOrderItems.label', 'Could not save order items'))))
         .finally(() => this.props.hideSpinner());
@@ -362,7 +369,6 @@ class AddItemsPage extends Component {
       }
     }
 
-    let isSomeItemsDontMatchExpirationDate = false;
     const itemsWithLotAndExpirationDate = returnItems.filter(it => it.expirationDate && it.lotNumber);
 
     // Trying to find at least one instance where the data that we are trying to save
@@ -370,18 +376,13 @@ class AddItemsPage extends Component {
     for (const it of itemsWithLotAndExpirationDate) {
       const { data } = await ProductApi.getInventoryItem(it.product?.id, it.lotNumber);
       if (data.inventoryItem && data.inventoryItem.expirationDate !== it.expirationDate) {
-        isSomeItemsDontMatchExpirationDate = true;
-        break;
-      }
-    }
-
-    // After find at least a single instance where expiration date we are trying to save
-    // does not match the existing inventoryItem expiration date, we want to inform the user
-    // that certain updates to th expiration date in the system will be performed
-    if (isSomeItemsDontMatchExpirationDate) {
-      const isConfirmed = await this.confirmExpirationDateSave();
-      if (!isConfirmed) {
-        return Promise.reject();
+        // After finding at least a single instance where expiration date we are trying to save
+        // does not match the existing inventoryItem expiration date, we want to inform the user
+        // that certain updates to th expiration date in the system will be performed
+        const shouldUpdateLotExpirationDate = await this.confirmExpirationDateSave();
+        if (!shouldUpdateLotExpirationDate) {
+          return Promise.reject();
+        }
       }
     }
 
@@ -389,16 +390,13 @@ class AddItemsPage extends Component {
   }
 
   async save(formValues) {
-    this.saveStockTransferInCurrentStep(formValues)
-      .then(() => {
-        Alert.success(
-          this.props.translate(
-            'react.inboundReturns.alert.saveSuccess.label',
-            'Changes saved successfully',
-          ),
-          { timeout: 3000 },
-        );
-      });
+    await this.saveStockTransferInCurrentStep(formValues);
+    notification(NotificationType.SUCCESS)({
+      message: this.props.translate(
+        'react.inboundReturns.alert.saveSuccess.label',
+        'Changes saved successfully',
+      ),
+    });
   }
 
   async saveAndExit(formValues) {
@@ -441,9 +439,7 @@ class AddItemsPage extends Component {
   }
 
   removeItem(itemId) {
-    const removeItemsUrl = `/api/stockTransferItems/${itemId}`;
-
-    return apiClient.delete(removeItemsUrl)
+    return stockTransferApi.deleteStockTransfer(itemId)
       .catch(() => {
         this.props.hideSpinner();
         return Promise.reject(new Error('react.inboundReturns.error.deleteOrderItem.label'));
@@ -452,9 +448,7 @@ class AddItemsPage extends Component {
 
   removeAll() {
     this.props.showSpinner();
-    const removeItemsUrl = `/api/stockTransfers/${this.props.match.params.inboundReturnId}/removeAllItems`;
-
-    return apiClient.delete(removeItemsUrl)
+    return stockTransferApi.removeAllItems(this.props.match.params.inboundReturnId)
       .then(() => this.fetchInboundReturn())
       .catch(() => {
         this.props.hideSpinner();
@@ -463,14 +457,13 @@ class AddItemsPage extends Component {
   }
 
   async previousPage(values, invalid) {
-    if (!invalid) {
-      await this.saveStockTransfer(values.returnItems, null);
-    } else {
+    if (invalid) {
       const correctErrors = await this.confirmValidationErrorOnPreviousPage();
       if (correctErrors) {
         return;
       }
     }
+    await this.saveStockTransfer(values.returnItems, null);
     this.props.previousPage(this.state.inboundReturn);
   }
 

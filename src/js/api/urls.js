@@ -29,7 +29,8 @@ export const STOCK_MOVEMENT_ITEM_REMOVE = id => `${STOCK_MOVEMENT_ITEM_API}/${id
 
 // STOCK TRANSFER
 export const STOCK_TRANSFER_API = `${API}/stockTransfers`;
-export const STOCK_TRANSFER_DELETE = id => `${STOCK_TRANSFER_API}/${id}`;
+export const STOCK_TRANSFER_BY_ID = id => `${STOCK_TRANSFER_API}/${id}`;
+export const STOCK_TRANSFER_REMOVE_ALL_ITEMS = id => `${STOCK_TRANSFER_BY_ID(id)}/removeAllItems`;
 
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
