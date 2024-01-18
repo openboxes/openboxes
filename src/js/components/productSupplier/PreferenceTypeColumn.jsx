@@ -22,7 +22,7 @@ const getLabel = (productSupplierPreferences) => {
       className: 'cell-content',
     };
   }
-  return productSupplierPreferences[0].preferenceType?.id;
+  return productSupplierPreferences[0].preferenceType?.name;
 };
 
 const PreferenceTypeColumn = ({ productSupplierPreferences, productSupplierId }) => {

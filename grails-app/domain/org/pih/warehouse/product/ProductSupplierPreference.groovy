@@ -57,11 +57,11 @@ class ProductSupplierPreference {
             "Preference Type Comment"              : "comments",
     ]
 
-    ProductSupplierPreferenceListDto toJson() {
-        return new ProductSupplierPreferenceListDto(
-                id: id,
-                destinationParty: destinationParty,
-                preferenceType: preferenceType
-        )
+    Map toJson() {
+        [
+            id: id,
+            destinationParty: destinationParty,
+            preferenceType: preferenceType
+        ]
     }
 }
