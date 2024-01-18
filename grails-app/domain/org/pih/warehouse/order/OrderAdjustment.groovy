@@ -9,7 +9,9 @@
 **/
 package org.pih.warehouse.order
 
+import grails.databinding.BindUsing
 import grails.util.Holders
+import org.pih.warehouse.EmptyStringsToNullBinder
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.invoice.InvoiceItem
@@ -29,9 +31,15 @@ class OrderAdjustment implements Serializable, Comparable<OrderAdjustment> {
     }
 
     String id
+
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "amount")})
     BigDecimal amount
+
+    @BindUsing({ obj, source -> EmptyStringsToNullBinder.bindEmptyStringToNull(source, "percentage")})
     BigDecimal percentage
+
     String description      // overrides description of order adjustment type
+
     String comments
 
     OrderAdjustmentType orderAdjustmentType

@@ -115,6 +115,27 @@
 		</div>
 	</div>
 <script type="text/javascript">
+	// Method to disable a field, if some other field is filled
+	// e.g. if percentage is filled, we want the amount field to be disabled
+	const disableField = (fieldToDisable, valueToCheck) => {
+		if (valueToCheck) {
+			fieldToDisable.attr("disabled", true);
+			return;
+		}
+		fieldToDisable.removeAttr("disabled");
+	}
+
+	$(document).ready(function() {
+		const percentage = $("#percentage").val();
+		const amount = $("#amount").val();
+
+		// Disable amount field, if percentage field is filled
+		disableField($("#amount"), percentage);
+
+		// Disable percentage field, if amount field is filled
+		disableField($("#percentage"), amount)
+	});
+
 	function validateForm() {
 		var budgetCode = $("#budgetCode").val();
 		var description = $("#description").val();
@@ -131,7 +152,12 @@
 	}
 
 	function saveOrderAdjustment() {
-		var data = $("#orderAdjustmentForm").serialize();
+		const form = $("#orderAdjustmentForm");
+		// We have to remove disabled attribute in order for the inputs to be included in the payload after serializing the form
+		// Without that, the percentage or amount are not included in the form at all, hence we couldn't clear those fields
+		const disabled = form.find(':input:disabled').removeAttr('disabled');
+		const data = form.serialize();
+		disabled.attr('disabled', 'disabled');
 		if (validateForm()) {
 			$.ajax({
 				url:'${g.createLink(controller:'order', action:'saveAdjustment')}',
@@ -158,6 +184,16 @@
 		}
 		return false;
 	}
+
+	$("#percentage").live('change', function() {
+		const percentage = $("#percentage").val();
+		disableField($("#amount"), percentage);
+	});
+
+	$("#amount").live('change', function() {
+		const amount = $("#amount").val();
+		disableField($("#percentage"), amount);
+	});
 </script>
 </body>
 </html>
