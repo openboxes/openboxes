@@ -64,11 +64,15 @@ class PutawayApiController {
             throw new IllegalArgumentException("User must be logged into a location to perform putaway")
         }
 
+        Order order = Order.get(jsonObject.id)
+        if (order && Putaway.getPutawayStatus(order.status) == PutawayStatus.COMPLETED) {
+            throw new IllegalArgumentException("Can't update completed putaway")
+        }
+
         User currentUser = User.get(session.user.id)
 
         Putaway putaway = new Putaway()
         bindPutawayData(putaway, currentUser, currentLocation, jsonObject)
-        Order order
 
         // Putaway stock
         if (putaway?.putawayStatus?.equals(PutawayStatus.COMPLETED)) {
