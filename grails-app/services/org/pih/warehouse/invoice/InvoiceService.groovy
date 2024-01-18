@@ -10,8 +10,10 @@
 package org.pih.warehouse.invoice
 
 import grails.gorm.transactions.Transactional
+import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.UnitOfMeasure
+import org.pih.warehouse.importer.CSVUtils
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderAdjustment
 import org.pih.warehouse.order.OrderItem
@@ -30,8 +32,8 @@ class InvoiceService {
 
     def getInvoices(Map params) {
         // Parse pagination parameters
-        def max = params.max ? params.int("max") : 10
-        def offset = params.offset ? params.int("offset") : 0
+        Integer max = params.max ? params.int("max") : (params.format == "csv" ? null : 10)
+        Integer offset = params.offset ? params.int("offset") : (params.format == "csv" ? null : 0)
 
         // Parse date parameters
         params.dateInvoiced = params.dateInvoiced ? Date.parse("MM/dd/yyyy", params.dateInvoiced) : null
@@ -429,5 +431,33 @@ class InvoiceService {
         invoiceItem.orderItems?.each { OrderItem oi -> oi.removeFromInvoiceItems(invoiceItem) }
         invoiceItem.shipmentItems?.each { ShipmentItem si -> si.removeFromInvoiceItems(invoiceItem) }
         invoiceItem.delete()
+    }
+
+    CSVPrinter getInvoicesCsv(List<InvoiceList> invoices) {
+        CSVPrinter csv = CSVUtils.getCSVPrinter()
+        csv.printRecord(
+    "# items",
+            "Status",
+            "Invoice Type",
+            "Invoice Number",
+            "Vendor",
+            "Vendor invoice number",
+            "Total Value",
+            "Currency"
+        )
+
+        invoices?.each { InvoiceList invoiceListItem ->
+            csv.printRecord(
+                invoiceListItem?.itemCount,
+                invoiceListItem?.status?.name(),
+                invoiceListItem?.invoiceTypeCode?.name(),
+                invoiceListItem?.invoiceNumber,
+                "${invoiceListItem?.partyCode} ${invoiceListItem?.partyName}",
+                invoiceListItem?.vendorInvoiceNumber,
+                invoiceListItem?.invoice?.totalValue,
+                invoiceListItem?.currency,
+            )
+        }
+        return csv
     }
 }
