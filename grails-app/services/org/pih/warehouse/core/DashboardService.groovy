@@ -17,8 +17,10 @@ import org.pih.warehouse.inventory.InventoryStatus
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.Product
 import org.pih.warehouse.requisition.RequisitionItem
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 
 @Transactional(readOnly=true)
@@ -251,7 +253,7 @@ class DashboardService {
     }
 
 
-    def getTotalStock(Location location, List<Category> categories) {
+    def getTotalStock(Location location, List<Category> categories = []) {
         long startTime = System.currentTimeMillis()
         def inventoryItems = getInventoryItems(location, categories)
         log.debug "Get total stock: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -294,13 +296,13 @@ class DashboardService {
     }
 
     String exportLatestInventoryDate(location) {
-        def formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
-        def sw = new StringWriter()
+        SimpleDateFormat formatDate = new SimpleDateFormat("dd/MMM/yyyy hh:mm:ss")
+        StringWriter sw = new StringWriter()
 
-        def inventoryItems = getTotalStock(location)
-        def products = inventoryItems.collect { it.product }
+        Map<Product, Object> inventoryItemsMap = getTotalStock(location).collectEntries { [it.product, it ] }
+        Set<Product> products = inventoryItemsMap.keySet()
 
-        def latestInventoryDates = TransactionEntry.executeQuery("""
+        List<Object> latestInventoryDates = TransactionEntry.executeQuery("""
                 select ii.product.id, max(t.transactionDate)
                 from TransactionEntry as te
                 left join te.inventoryItem as ii
@@ -313,19 +315,13 @@ class DashboardService {
 
 
         // Convert to map
-        def latestInventoryDateMap = [:]
-        latestInventoryDates.each {
-            latestInventoryDateMap[it[0]] = it[1]
-        }
+        Map<String, Timestamp> latestInventoryDateMap = latestInventoryDates.collectEntries { [it[0], it[1]] }
 
-        def inventoryLevelMap = [:]
-        def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
-        inventoryLevels.each { inventoryLevel ->
-            inventoryLevelMap[inventoryLevel.product] = inventoryLevel
-        }
+        Map<Product, InventoryLevel> inventoryLevelMap = InventoryLevel
+                .findAllByInventory(location.inventory)
+                .collectEntries { [it.product, it] }
 
-
-        def csvWriter = new CSVWriter(sw, {
+        CSVWriter csvWriter = new CSVWriter(sw, {
             "Product Code" { it.productCode }
             "Name" { it.name }
             "ABC" { it.abcClass }
@@ -335,16 +331,15 @@ class DashboardService {
         })
 
         products.each { product ->
-            def latestInventoryDate = latestInventoryDateMap[product.id]
-            def row = [
+            Timestamp latestInventoryDate = latestInventoryDateMap[product.id]
+            csvWriter << [
                     productCode        : product.productCode ?: "",
                     name               : product.name,
                     unitOfMeasure      : product.unitOfMeasure ?: "",
                     abcClass           : inventoryLevelMap[product]?.abcClass ?: "",
                     latestInventoryDate: latestInventoryDate ? "${formatDate.format(latestInventoryDate)}" : "",
-                    quantityOnHand     : quantityMap[product] ?: ""
+                    quantityOnHand     : inventoryItemsMap[product]?.quantity ?: ""
             ]
-            csvWriter << row
         }
         return sw.toString()
     }
