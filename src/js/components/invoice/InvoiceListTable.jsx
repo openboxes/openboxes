@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
 import {
+  RiDownload2Line,
   RiFileLine,
   RiInformationLine,
   RiPencilLine,
@@ -9,6 +10,7 @@ import {
 import { connect } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
+import Button from 'components/form-elements/Button';
 import InvoiceStatus from 'components/invoice/InvoiceStatus';
 import { INVOICE_URL } from 'consts/applicationUrls';
 import useInvoiceListTableData from 'hooks/list-pages/invoice/useInvoiceListTableData';
@@ -26,7 +28,11 @@ const InvoiceListTable = ({
   invoiceStatuses,
 }) => {
   const {
-    tableRef, tableData, loading, onFetchHandler,
+    tableRef,
+    tableData,
+    loading,
+    onFetchHandler,
+    downloadInvoices,
   } = useInvoiceListTableData(filterParams);
 
   // List of all actions for invoice rows
@@ -124,6 +130,41 @@ const InvoiceListTable = ({
         <span>
           <Translate id="react.invoice.list.label" defaultMessage="List Invoices" />
         </span>
+        <div className="btn-group">
+          <Button
+            isDropdown
+            defaultLabel="Export"
+            label="react.default.button.export.label"
+            variant="secondary"
+            EndIcon={<RiDownload2Line />}
+          />
+          <div
+            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            aria-labelledby="dropdownMenuButton"
+          >
+            <button
+              type="button"
+              className="dropdown-item"
+              onClick={() => downloadInvoices()}
+            >
+              <Translate
+                id="react.invoice.export.invoice.label"
+                defaultMessage="Export Invoices"
+              />
+            </button>
+            <button
+              type="button"
+              className="dropdown-item"
+              onClick={() => {}}
+              disabled
+            >
+              <Translate
+                id="react.invoice.export.invoiceLineDetails.label"
+                defaultMessage="Export Invoice Line Details"
+              />
+            </button>
+          </div>
+        </div>
       </div>
       <DataTable
         manual
