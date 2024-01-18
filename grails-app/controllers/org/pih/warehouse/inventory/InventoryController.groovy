@@ -1359,7 +1359,6 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}" + '"' + ","
@@ -1392,7 +1391,6 @@ class InventoryController {
             csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
-            csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
             csv += (inventoryLevel?.minQuantity ?: "") + ","
             csv += (inventoryLevel?.reorderQuantity ?: "") + ","
