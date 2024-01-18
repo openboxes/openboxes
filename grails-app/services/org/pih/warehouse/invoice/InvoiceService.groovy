@@ -32,8 +32,8 @@ class InvoiceService {
 
     def getInvoices(Map params) {
         // Parse pagination parameters
-        def max = params.max ? params.int("max") : null
-        def offset = params.offset ? params.int("offset") : null
+        Integer max = params.max ? params.int("max") : (params.format == "csv" ? null : 10)
+        Integer offset = params.offset ? params.int("offset") : (params.format == "csv" ? null : 0)
 
         // Parse date parameters
         params.dateInvoiced = params.dateInvoiced ? Date.parse("MM/dd/yyyy", params.dateInvoiced) : null
