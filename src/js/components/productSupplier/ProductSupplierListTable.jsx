@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
@@ -10,7 +9,6 @@ import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
-import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
