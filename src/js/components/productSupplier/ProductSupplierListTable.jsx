@@ -1,15 +1,14 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
+import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierListTableData from 'hooks/list-pages/productSupplier/useProductSupplierListTableData';
 import ActionDots from 'utils/ActionDots';
-import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import StatusIndicator from 'utils/StatusIndicator';
 import Translate from 'utils/Translate';
 import ListTableTitleWrapper from 'wrappers/ListTableTitleWrapper';
@@ -58,7 +57,14 @@ const ProductSupplierListTable = ({ filterParams }) => {
       accessor: 'productName',
       minWidth: 350,
       fixed: 'left',
-      Cell: (row) => <TableCell {...row} tooltip />,
+      Cell: (row) =>
+        (
+          <TableCell
+            {...row}
+            tooltip
+            link={INVENTORY_ITEM_URL.showStockCard(row.original.productId)}
+          />
+        ),
     },
     {
       Header: <Translate id="react.productSupplier.column.sourceCode.label" defaultMessage="Source Code" />,
@@ -90,7 +96,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
     },
     {
       Header: <Translate id="react.productSupplier.column.eachPrice.label" defaultMessage="Each Price" />,
-      accessor: 'eachPrice',
+      accessor: 'unitPrice',
       minWidth: 150,
       sortable: false,
     },

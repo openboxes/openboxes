@@ -52,7 +52,7 @@ const ProductSupplierListFilters = ({
         }}
         defaultValues={defaultValues}
         allowEmptySubmit
-        searchFieldDefaultPlaceholder="Search by source code, product code, supplier code"
+        searchFieldDefaultPlaceholder="Search by source code, product code, supplier code etc."
         searchFieldPlaceholder="react.productSupplier.searchField.placeholder.label"
         hidden={false}
         ignoreClearFilters={ignoreClearFilters}
