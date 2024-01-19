@@ -2109,6 +2109,9 @@ class StockMovementService {
     }
 
     void removeShipmentItem(ShipmentItem shipmentItem) {
+        if (!shipmentItem) {
+            return
+        }
         if (shipmentItem.invoiceItems) {
             throw new Exception("Shipment item for product ${shipmentItem.product.productCode} has invoice associated")
         }
