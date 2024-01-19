@@ -523,7 +523,8 @@ class SendMovementPage extends Component {
             this.removeFiles(_.map(files, file => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
-          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')));
+          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')))
+          .finally(() => this.props.hideSpinner());
       } else if (files.length === 1) {
         this.sendFile(files[0])
           .then(() => {
@@ -531,7 +532,8 @@ class SendMovementPage extends Component {
             this.removeFile(files[0].name);
             this.prepareRequestAndSubmitStockMovement(values);
           })
-          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')));
+          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')))
+          .finally(() => this.props.hideSpinner());
       } else {
         this.prepareRequestAndSubmitStockMovement(values);
       }
