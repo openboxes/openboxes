@@ -870,7 +870,7 @@ class AddItemsPage extends Component {
    * @param {boolean} withStateChange
    * @public
    */
-  saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
+  async saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
     // We filter out items which were already sent to save
     const filteredCandidates = itemCandidatesToSave
       .filter(item => item.rowSaveStatus !== RowSaveStatus.SAVING);
@@ -996,9 +996,13 @@ class AddItemsPage extends Component {
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
 
-      this.requestsQueue.enqueueRequest(
-        saveItemsRequest(payload),
-      );
+      if (this.props.isAutosaveEnabled) {
+        this.requestsQueue.enqueueRequest(
+          saveItemsRequest(payload),
+        );
+      } else {
+        await saveItemsRequest(payload)();
+      }
     }
 
     this.setState(previousState => ({
