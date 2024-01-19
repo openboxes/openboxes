@@ -98,7 +98,7 @@ export const handleError = (error) => {
       break;
     default:
       notification(NotificationType.ERROR_FILLED)({
-        message: error,
+        message: error?.message,
         details: errorMessage || errorMessages,
       });
   }
