@@ -63,8 +63,9 @@ class Receipt implements Serializable, Comparable<Receipt> {
         actualDeliveryDate(nullable: false,
                 validator: { value, obj ->
                     // can't be delivered before it is shipped!
-                    if (!(value + 1).after(obj.shipment.actualShippingDate)) {
-                        return ["invalid.mustOccurOnOrAfterActualShippingDate", value, obj.shipment.actualShippingDate]
+                    Date actualShippingDate = obj?.shipment?.actualShippingDate
+                    if (actualShippingDate && !(value + 1).after(actualShippingDate)) {
+                        return ["invalid.mustOccurOnOrAfterActualShippingDate", value, actualShippingDate]
                     }
                 }
         )
