@@ -114,7 +114,7 @@ class ProductApiController extends BaseDomainApiController {
     def search() {
         def minLength = grailsApplication.config.openboxes.typeahead.minLength
 
-        if (params.name && params.name.size() < minLength) {
+        if (params?.name?.size() < minLength) {
             render([data: []])
             return
         }
