@@ -637,10 +637,12 @@ class StockMovementService {
 
     void removeStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
-        ShipmentItem shipmentItem = ShipmentItem.get(id)
         if (requisitionItem) {
             removeRequisitionItem(requisitionItem)
-        } else {
+            return
+        }
+        ShipmentItem shipmentItem = ShipmentItem.get(id)
+        if (shipmentItem) {
             removeShipmentItem(shipmentItem)
         }
     }
@@ -2109,9 +2111,6 @@ class StockMovementService {
     }
 
     void removeShipmentItem(ShipmentItem shipmentItem) {
-        if (!shipmentItem) {
-            return
-        }
         if (shipmentItem.invoiceItems) {
             throw new Exception("Shipment item for product ${shipmentItem.product.productCode} has invoice associated")
         }
