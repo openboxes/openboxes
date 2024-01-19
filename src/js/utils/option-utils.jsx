@@ -81,7 +81,7 @@ export const debounceLocationsFetch = (
 export const debounceGlobalSearch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/json/globalSearch?term=${searchTerm}`)
+      apiClient.get(encodeURI(`/json/globalSearch?term=${searchTerm}`))
         .then(result => callback(_.map(result.data, obj => (
           {
             value: obj.url,
@@ -101,7 +101,7 @@ export const debounceGlobalSearch = (waitTime, minSearchLength) =>
 export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`)
+      apiClient.get(encodeURI(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&location.id=${locationId}`))
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,
@@ -125,7 +125,7 @@ export const debounceProductsFetch = (waitTime, minSearchLength, locationId) =>
 export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`)
+      apiClient.get(encodeURI(`/api/products/search?name=${searchTerm}&productCode=${searchTerm}&availableItems=true`))
         .then(result => callback(_.map(result.data.data, obj => (
           {
             id: obj.id,
@@ -148,7 +148,7 @@ export const debounceAvailableItemsFetch = (waitTime, minSearchLength) =>
 export const debounceProductsInOrders = (waitTime, minSearchLength, vendor, destination) =>
   _.debounce((searchTerm, callback) => {
     if (searchTerm && searchTerm.length >= minSearchLength) {
-      apiClient.get(`/api/combinedShipmentItems/getProductsInOrders?name=${searchTerm}&vendor=${vendor}&destination=${destination}`)
+      apiClient.get(encodeURI(`/api/combinedShipmentItems/getProductsInOrders?name=${searchTerm}&vendor=${vendor}&destination=${destination}`))
         .then(result => callback(_.map(result.data.data, obj => (
           {
             value: obj.id,

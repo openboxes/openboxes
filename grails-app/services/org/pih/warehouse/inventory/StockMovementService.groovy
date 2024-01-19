@@ -637,10 +637,12 @@ class StockMovementService {
 
     void removeStockMovementItem(String id) {
         RequisitionItem requisitionItem = RequisitionItem.get(id)
-        ShipmentItem shipmentItem = ShipmentItem.get(id)
         if (requisitionItem) {
             removeRequisitionItem(requisitionItem)
-        } else {
+            return
+        }
+        ShipmentItem shipmentItem = ShipmentItem.get(id)
+        if (shipmentItem) {
             removeShipmentItem(shipmentItem)
         }
     }
