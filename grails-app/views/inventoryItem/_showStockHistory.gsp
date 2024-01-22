@@ -295,7 +295,7 @@
                             <td  class="middle">
                                 <g:if test="${stockHistoryEntry?.showDetails}">
                                     <g:if test="${stockHistoryEntry?.isInternal}">
-                                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh_small.png' )}" title="${format.metadata(obj:TransactionScope.INTERNAL)}"/>
+                                        <img src="${resource(dir: 'images/icons/silk', file: 'arrow_refresh_small_blue.png' )}" title="${format.metadata(obj:TransactionScope.INTERNAL)}"/>
                                     </g:if>
                                     <g:elseif test="${stockHistoryEntry?.transaction?.transactionType?.transactionCode== TransactionCode.DEBIT}">
                                         <img src="${resource(dir: 'images/icons/silk', file: 'delete.png' )}" title="${format.metadata(obj:stockHistoryEntry?.transaction?.transactionType)}"/>
