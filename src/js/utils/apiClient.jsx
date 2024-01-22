@@ -97,6 +97,11 @@ export const handleError = (error) => {
       });
       break;
     default:
+      // We don't want to spam "network errors" popups
+      // when a user loses the connection, because
+      // we are using the "Lost connection" message
+      // for this, plus we are going to add a visual
+      // indicator for this OBPIH-6088
       if (error?.code === AxiosError.ERR_NETWORK) {
         break;
       }
