@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from 'react';
 
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 
@@ -97,7 +97,7 @@ export const handleError = (error) => {
       });
       break;
     default:
-      if (error?.code === 'ERR_NETWORK') {
+      if (error?.code === AxiosError.ERR_NETWORK) {
         break;
       }
       notification(NotificationType.ERROR_FILLED)({
