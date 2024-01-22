@@ -97,6 +97,9 @@ export const handleError = (error) => {
       });
       break;
     default:
+      if (error?.code === 'ERR_NETWORK') {
+        break;
+      }
       notification(NotificationType.ERROR_FILLED)({
         message: error?.message,
         details: errorMessage || errorMessages,
