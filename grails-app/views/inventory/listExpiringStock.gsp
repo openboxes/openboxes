@@ -52,12 +52,15 @@
 
                         </div>
 
-                        <g:link params="[format:'csv',threshold:params.threshold,category:params.category,status:params.status]"
-                                controller="${controllerName}" action="${actionName}"
-                                class="button">
-                            <img src="${resource(dir:'images/icons/silk',file:'page_excel.png')}" />
-                            &nbsp;<g:message code="default.button.download.label"/></g:link>
+                        <g:link params="[format:'csv', category:params.category, status:params.status]" controller="inventory" action="listExpiringStock" class="button">
+                            <img src="${resource(dir:'images/icons/silk',file:'disk.png')}" alt="${warehouse.message(code: 'default.button.download.label') }" style="vertical-align: middle"/>
+                            &nbsp; <g:message code="default.button.downloadAsCSV.label" default="Download as CSV"/>
+                        </g:link>
 
+                        <g:link params="[format:'csv',category: params.category, status:params.status, withBinLocation: true]" controller="inventory" action="listExpiringStock" class="button">
+                            <img src="${resource(dir:'images/icons/silk',file:'disk.png')}" alt="${warehouse.message(code: 'default.button.download.label') }" style="vertical-align: middle"/>
+                            &nbsp; <g:message code="inventoryItems.downloadWithBinLocation.label" default="Download with Bin Locations"/><span class="ml-1">(.csv)</span>
+                        </g:link>
                     </div>
                 </div>
             </div>
@@ -112,7 +115,7 @@
 
 					<div class="box">
                         <h2>
-                            <warehouse:message code="inventoryItems.expiring.label" default="Expiring inventory items"/> (${inventoryItems.size()} <warehouse:message code="default.results.label" default="Results"/>)
+                            <warehouse:message code="inventoryItems.expiring.label" default="Expiring inventory items"/> (${data.size()} <warehouse:message code="default.results.label" default="Results"/>)
                         </h2>
                         <div class="dialog">
                             <form id="inventoryActionForm" name="inventoryActionForm" action="createTransaction" method="POST">
@@ -132,51 +135,53 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <g:set var="counter" value="${0 }" />
-                                        <g:each var="inventoryItem" in="${inventoryItems}" status="i">
-                                            <g:set var="quantity" value="${0 }"/>
+                                        <g:set var="counter" value="${0}" />
+                                        <g:each var="dataEntry" in="${data}" status="i">
                                             <tr class="${(counter++ % 2) == 0 ? 'even' : 'odd'}">
                                                 <td class="center">
-                                                    <g:checkBox id="${inventoryItem?.id }" name="inventoryItem.id"
-                                                        class="checkbox" style="top:0em;" checked="${false }"
-                                                            value="${inventoryItem?.id }" />
+                                                    <g:checkBox id="${dataEntry.inventoryItem?.id }"
+                                                                name="inventoryItem.id"
+                                                                class="checkbox"
+                                                                style="top:0em;"
+                                                                checked="${false }"
+                                                                value="${dataEntry.inventoryItem?.id}" />
 
                                                 </td>
                                                 <td class="checkable" >
                                                     <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-                                                        ${inventoryItem?.product?.productCode}
+                                                        ${dataEntry.inventoryItem?.product?.productCode}
                                                     </g:link>
 
                                                 </td>
                                                 <td class="checkable" >
                                                     <g:link controller="inventoryItem" action="showStockCard" params="['product.id':inventoryItem?.product?.id]">
-                                                        <format:displayName product="${inventoryItem?.product}" showTooltip="${true}" />
+                                                        <format:displayName product="${dataEntry.inventoryItem?.product}" showTooltip="${true}" />
                                                     </g:link>
 
                                                 </td>
                                                 <td class="checkable left">
-                                                    <span class="fade"><format:category category="${inventoryItem?.product?.category}"/> </span>
+                                                    <span class="fade"><format:category category="${dataEntry.inventoryItem?.product?.category}"/> </span>
 
                                                 </td>
                                                 <td class="checkable" >
                                                     <span class="lotNumber">
-                                                        ${inventoryItem?.lotNumber }
+                                                        ${dataEntry.inventoryItem?.lotNumber }
                                                     </span>
                                                 </td>
                                                 <td class="checkable center" >
                                                     <span class="fade">
-                                                        <g:formatDate date="${inventoryItem?.expirationDate}" format="d MMM yyyy"/>
+                                                        <g:formatDate date="${dataEntry.inventoryItem?.expirationDate}" format="d MMM yyyy"/>
                                                     </span>
                                                 </td>
                                                 <td class="checkable center">
-                                                    ${quantityMap[inventoryItem]}
+                                                    ${dataEntry.quantity}
                                                 </td>
                                                 <td class="checkable center" >
-                                                    ${inventoryItem?.product?.unitOfMeasure?:"EA" }
+                                                    ${dataEntry.inventoryItem?.product?.unitOfMeasure ?: "EA" }
                                                 </td>
                                             </tr>
                                         </g:each>
-                                        <g:unless test="${inventoryItems }">
+                                        <g:unless test="${data}">
                                             <tr>
                                                 <td colspan="8">
                                                     <div class="padded center fade">
