@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from 'react';
 
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert';
 
@@ -97,6 +97,14 @@ export const handleError = (error) => {
       });
       break;
     default:
+      // We don't want to spam "network errors" popups
+      // when a user loses the connection, because
+      // we are using the "Lost connection" message
+      // for this, plus we are going to add a visual
+      // indicator for this OBPIH-6088
+      if (error?.code === AxiosError.ERR_NETWORK) {
+        break;
+      }
       notification(NotificationType.ERROR_FILLED)({
         message: error?.message,
         details: errorMessage || errorMessages,
