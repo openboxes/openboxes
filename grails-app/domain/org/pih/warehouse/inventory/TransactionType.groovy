@@ -39,4 +39,8 @@ class TransactionType implements Serializable {
         String regex = "\\${Constants.LOCALIZED_STRING_SEPARATOR}"
         return name.split(regex)[0] == transactionTypeName.split(regex)[0]
     }
+
+    Boolean isAdjustment() {
+        compareName("Adjustment")
+    }
 }
