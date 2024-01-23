@@ -40,7 +40,8 @@ class TransactionType implements Serializable {
         return name.split(regex)[0] == transactionTypeName.split(regex)[0]
     }
 
+    // Checking whether the transaction type is adjustment for displaying the appropriate icon on the stock history page
     Boolean isAdjustment() {
-        compareName("Adjustment")
+        compareName(Constants.ADJUSTMENT)
     }
 }

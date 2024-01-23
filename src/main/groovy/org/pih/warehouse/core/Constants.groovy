@@ -151,4 +151,7 @@ class Constants {
 
     // Order number prefix for bin replenishment case
     static final String REPLENISHMENT_PREFIX = "R-"
+
+    // Transaction types
+    static final String ADJUSTMENT = "Adjustment"
 }
