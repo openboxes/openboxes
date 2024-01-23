@@ -119,13 +119,6 @@ class ProductSupplierService {
                 }
                 criteria.addOrder(getOrderDirection("s.name", orderDirection))
                 break
-            case "supplierCode":
-                if (!usedAliases.contains("supplier")) {
-                    criteria.createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
-                    usedAliases.add("supplier")
-                }
-                criteria.addOrder(getOrderDirection("s.code", orderDirection))
-                break
             case "dateCreated":
                 criteria.addOrder(getOrderDirection("dateCreated", orderDirection))
                 break
