@@ -109,6 +109,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
       Header: <Translate id="react.productSupplier.column.supplierCode.label" defaultMessage="Supplier Code" />,
       accessor: 'supplierCode',
       minWidth: 150,
+      sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.supplierProductName.label" defaultMessage="Supplier Product Name" />,
