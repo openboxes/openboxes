@@ -33,8 +33,13 @@
             </div>
 
             <div class="yui-gf">
+                <div class="box p-2">
+                    <g:message
+                            code="report.inventorySummary.instructions.label"
+                            default="In the Inventory Summary, you find a full list of products entered into OpenBoxes along with the current quantity at your location. If you have set stock levels, you will see how the inventory compares to your desired  stock levels. Use this summary and filters to find information about a specific product or group of products, their details, and their current quantity in your location."
+                    />
+                </div>
                 <div class="yui-u first">
-
                     <div class="box">
                         <h2 class="middle"><g:message code="default.filters.label"/></h2>
                         <g:form controller="${controllerName}" action="${actionName}" method="GET">
