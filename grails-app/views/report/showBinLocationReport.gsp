@@ -22,8 +22,13 @@
     </div>
 
     <div class="yui-gf">
+        <div class="box p-2">
+            <g:message
+                    code="report.inventoryDetails.instructions.label"
+                    default="In the Inventory Details report, you find information about the stock at your location for all products of your inventory, including details of the lots in stock with their bin location. Use the filters to exclude “Out of Stock” products. Use this detailed view to find information on a specific product, with Quantities, Lot numbers, and Bin location details."
+            />
+        </div>
         <div class="yui-u first">
-
             <div class="box">
                 <h2 class="middle"><g:message code="default.filters.label"/></h2>
                 <g:form name="showBinLocationReportForm" controller="report" action="showBinLocationReport" method="GET">

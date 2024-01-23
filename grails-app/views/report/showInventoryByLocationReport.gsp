@@ -23,6 +23,12 @@
     </div>
 
     <div class="yui-gf">
+        <div class="box p-2">
+            <g:message
+                    code="report.inventoryByLocation.instructions.label"
+                    default="In the Inventory by Location report, you find information about the inventory across multiple depot locations. Use this summary and filters to find quantities available in stock of a specific product or group of products in multiple locations."
+            />
+        </div>
         <div class="yui-u first">
 
             <div class="box">
