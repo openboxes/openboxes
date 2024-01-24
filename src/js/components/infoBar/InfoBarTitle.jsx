@@ -12,15 +12,15 @@ const InfoBarTitle = ({ title, name, hasModalToDisplay }) => {
     <>
       <Translate id={title?.label} defaultMessage={title?.defaultLabel} />
       {hasModalToDisplay && (
-      <span
-        className="read-more-label"
-        onClick={() => dispatch(showInfoBarModal(name))}
-        role="button"
-        onKeyDown={() => dispatch(showInfoBarModal(name))}
-        tabIndex={0}
-      >
-        <Translate id="react.infoBar.readMore.label" defaultMessage="Read more" />
-      </span>
+        <span
+          className="read-more-label"
+          onClick={() => dispatch(showInfoBarModal(name))}
+          role="button"
+          onKeyDown={() => dispatch(showInfoBarModal(name))}
+          tabIndex={0}
+        >
+          <Translate id="react.infoBar.readMore.label" defaultMessage="Read more" />
+        </span>
       )}
     </>
   );
