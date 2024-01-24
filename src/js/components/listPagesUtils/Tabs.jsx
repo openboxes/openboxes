@@ -14,7 +14,9 @@ const Tabs = ({ config }) => {
           key={key}
           className={parsedQueryParams?.tab === key ? 'active-tab' : ''}
           onClick={() => value.onClick?.(key)}
-          role="presentation"
+          role="button"
+          tabIndex={0}
+          onKeyDown={() => value.onClick?.(key)}
         >
           <Translate id={value.label.id} defaultMessage={value.label.defaultMessage} />
         </span>
