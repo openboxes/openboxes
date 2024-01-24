@@ -56,7 +56,7 @@ class ProductSupplierService {
                 createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
                 createAlias("manufacturer", "m", JoinType.LEFT_OUTER_JOIN)
-                usedAliases.addAll(["product", "supplier"])
+                usedAliases.addAll(["product", "supplier", "manufacturer"])
                 or {
                     ilike("p.productCode", "%" + params.searchTerm + "%")
                     ilike("code", "%" + params.searchTerm + "%")
