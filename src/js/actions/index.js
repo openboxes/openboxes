@@ -51,6 +51,7 @@ import genericApi from 'api/services/GenericApi';
 import locationApi from 'api/services/LocationApi';
 import purchaseOrderApi from 'api/services/PurchaseOrderApi';
 import userApi from 'api/services/UserApi';
+import { ORGANIZATION_API } from 'api/urls';
 import RoleType from 'consts/roleType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { mapShipmentTypes } from 'utils/option-utils';
@@ -458,12 +459,17 @@ export const fetchPaymentTerms = () => async (dispatch) => {
   });
 };
 
-export function fetchSuppliers(active = false) {
+export function fetchSuppliers({
+  active = false,
+  sort,
+  order,
+}) {
+  const sortOrderParams = sort && order ? `&sort=${sort}&order=${order}` : '';
   return (dispatch) => {
-    apiClient.get(`/api/organizations?roleType=ROLE_SUPPLIER&active=${active}`)
+    apiClient.get(`${ORGANIZATION_API}?roleType=ROLE_SUPPLIER&active=${active}${sortOrderParams}`)
       .then((res) => {
         if (res.data.data) {
-          const suppliers = res.data.data.map(obj => (
+          const suppliers = res.data.data.map((obj) => (
             {
               id: obj.id,
               value: obj.id,

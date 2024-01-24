@@ -95,7 +95,7 @@ class OrganizationService {
     List getOrganizations(Map params) {
         List roleTypes = params.list("roleType").collect { it as RoleType }
 
-        def organizations = Organization.createCriteria().list(params){
+        def organizations = Organization.createCriteria().list(params) {
             if (params.q) {
                 or {
                     ilike("id", "${params.q}%")
@@ -111,6 +111,9 @@ class OrganizationService {
             }
             if (params.active) {
                 eq('active', true)
+            }
+            if (params.sort && params.order) {
+                order(params.sort, params.order)
             }
         }
         return organizations

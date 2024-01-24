@@ -96,3 +96,6 @@ export const DISABLE_LOCALIZATION = (languageCode) => {
 };
 
 export const GLOBAL_SEARCH = term => `${CONTEXT_PATH}/dashboard/globalSearch?searchTerms=${term}`;
+
+// ORGANIZATIONS
+export const ORGANIZATION_API = `${API}/organizations`;

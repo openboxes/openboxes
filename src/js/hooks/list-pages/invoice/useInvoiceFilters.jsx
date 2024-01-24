@@ -97,7 +97,7 @@ const useInvoiceFilters = ({ setFilterParams }) => {
   useEffect(() => {
     // TODO: If editing organizations is in React,
     //  fetch only if length === 0, as edit would should force refetch anyway
-    dispatch(fetchSuppliers());
+    dispatch(fetchSuppliers({ sort: 'name', order: 'asc' }));
   }, []);
 
   const setFilterValues = useCallback((values) => {
