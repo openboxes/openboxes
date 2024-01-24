@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
 
 import PropTypes from 'prop-types';
+import { RiDownload2Line } from 'react-icons/ri';
 
 import DataTable, { TableCell } from 'components/DataTable';
 import DateCell from 'components/DataTable/DateCell';
+import Button from 'components/form-elements/Button';
 import PreferenceTypeColumn from 'components/productSupplier/PreferenceTypeColumn';
 import { INVENTORY_ITEM_URL } from 'consts/applicationUrls';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
@@ -25,6 +27,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
 
   const {
     getActions,
+    exportProductSuppliers,
   } = useProductSupplierActions({ fireFetchData });
 
   const columns = useMemo(() => [
@@ -104,12 +107,24 @@ const ProductSupplierListTable = ({ filterParams }) => {
       Header: <Translate id="react.productSupplier.column.supplier.label" defaultMessage="Supplier" />,
       accessor: 'supplierName',
       minWidth: 300,
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          tooltip
+        />
+      ),
     },
     {
       Header: <Translate id="react.productSupplier.column.supplierCode.label" defaultMessage="Supplier Code" />,
       accessor: 'supplierCode',
       minWidth: 150,
       sortable: false,
+      Cell: (row) => (
+        <TableCell
+          {...row}
+          tooltip
+        />
+      ),
     },
     {
       Header: <Translate id="react.productSupplier.column.supplierProductName.label" defaultMessage="Supplier Product Name" />,
@@ -149,6 +164,32 @@ const ProductSupplierListTable = ({ filterParams }) => {
           {tableData?.totalCount}
           )
         </span>
+        <div className="btn-group">
+          <Button
+            isDropdown
+            defaultLabel="Export"
+            label="react.default.button.export.label"
+            variant="secondary"
+            EndIcon={<RiDownload2Line />}
+          />
+          <div
+            className="dropdown-menu dropdown-menu-right nav-item padding-8"
+            aria-labelledby="dropdownMenuButton"
+          >
+            <a
+              href="#"
+              className="dropdown-item"
+              onClick={() => exportProductSuppliers()}
+              role="button"
+              tabIndex={0}
+            >
+              <Translate
+                id="react.productSupplier.exportAll.label"
+                defaultMessage="Export All"
+              />
+            </a>
+          </div>
+        </div>
       </ListTableTitleWrapper>
       <DataTable
         manual
