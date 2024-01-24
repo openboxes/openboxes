@@ -14,6 +14,8 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.ProductPrice
 import org.pih.warehouse.core.RatingTypeCode
 
+import java.math.RoundingMode
+
 class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
 
     String id
@@ -160,12 +162,14 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
             productId: product.id,
             productName: product.name,
             code: code,
-            supplierName: supplier?.name,
+            supplierName: supplier?.name + (supplier?.code ? " (${supplier.code})" : ""),
             supplierCode: supplierCode,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
             packageSize: defaultProductPackage ? "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}" : null,
-            packagePrice: defaultProductPackage?.productPrice?.price ?: 0.0,
-            unitPrice: defaultProductPackage?.productPrice ? defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity : 0.0,
+            packagePrice: defaultProductPackage?.productPrice?.price?.setScale(2, RoundingMode.HALF_UP) ?: 0.0,
+            unitPrice: defaultProductPackage?.productPrice
+                    ? (defaultProductPackage?.productPrice?.price / defaultProductPackage?.quantity)?.setScale(2, RoundingMode.HALF_UP)
+                    : 0.0,
             dateCreated: dateCreated,
             active: active
         ]
