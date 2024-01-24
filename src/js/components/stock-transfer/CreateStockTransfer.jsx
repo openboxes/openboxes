@@ -7,8 +7,14 @@ import { withRouter } from 'react-router-dom';
 import ReactTable from 'react-table';
 import selectTableHOC from 'react-table/lib/hoc/selectTable';
 
-import { hideSpinner, showSpinner } from 'actions';
+import {
+  createInfoBar,
+  hideInfoBar,
+  hideSpinner,
+  showSpinner,
+} from 'actions';
 import { STOCK_TRANSFER_URL } from 'consts/applicationUrls';
+import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 import apiClient, { flattenRequest, parseResponse } from 'utils/apiClient';
 import customTreeTableHOC from 'utils/CustomTreeTable';
 import Filter from 'utils/Filter';
@@ -54,6 +60,12 @@ class CreateStockTransfer extends Component {
       this.dataFetched = true;
       this.fetchStockTransferCandidates(this.props.locationId);
     }
+
+    this.props.createInfoBar(InfoBarConfigs[InfoBar.STOCK_TRANSFER_DESCRIPTION]);
+  }
+
+  componentWillUnmount() {
+    this.props.hideInfoBar(InfoBar.STOCK_TRANSFER_DESCRIPTION);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -312,11 +324,16 @@ const mapStateToProps = state => ({
   stockTransferTranslationsFetched: state.session.fetchedTranslations.stockTransfer,
 });
 
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  createInfoBar,
+  hideInfoBar,
+};
+
 export default withRouter(connect(
   mapStateToProps,
-  {
-    showSpinner, hideSpinner,
-  },
+  mapDispatchToProps,
 )(CreateStockTransfer));
 
 CreateStockTransfer.propTypes = {

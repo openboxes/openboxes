@@ -13,6 +13,8 @@ const InfoBar = ({
   name,
   versionLabel,
   title,
+  isCloseable,
+  hasModalToDisplay,
 }) => {
   useTranslation('infoBar');
   const dispatch = useDispatch();
@@ -21,9 +23,9 @@ const InfoBar = ({
     <div className="info-bar">
       <div className="d-flex justify-content-center gap-8 align-items-center">
         <InfoBarVersionBox versionLabel={versionLabel} name={name} />
-        <InfoBarTitle title={title} name={name} />
+        <InfoBarTitle title={title} name={name} hasModalToDisplay={hasModalToDisplay} />
       </div>
-      <RiCloseFill onClick={() => dispatch(closeInfoBar(name))} cursor="pointer" />
+      {isCloseable && <RiCloseFill onClick={() => dispatch(closeInfoBar(name))} cursor="pointer" />}
     </div>
   );
 };
@@ -39,5 +41,13 @@ InfoBar.propTypes = {
   versionLabel: PropTypes.shape({
     label: PropTypes.string.isRequired,
     defaultLabel: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
+  isCloseable: PropTypes.bool,
+  hasModalToDisplay: PropTypes.bool,
+};
+
+InfoBar.defaultProps = {
+  isCloseable: true,
+  hasModalToDisplay: true,
+  versionLabel: null,
 };
