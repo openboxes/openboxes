@@ -582,14 +582,13 @@ class InventoryController {
         List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
         List<Category> categories = inventoryItems?.collect { it.product.category }?.unique()
 
-        List<Map> data
-        if (withBinLocation) {
-            data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
-        } else {
-            data = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
+        List<Map> data = []
+        if (!inventoryItems.isEmpty()) {
+            data = withBinLocation
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
-        data = data.findAll { inventoryItems.contains(it.inventoryItem) }
 
         if (params.format == "csv") {
             def filename = "Expired stock | " + location?.name + ".csv"
@@ -617,14 +616,13 @@ class InventoryController {
             it.name
         }
 
-        List<Map> data
-        if (withBinLocation) {
-            data = productAvailabilityService.getQuantityOnHandByBinLocation(location)
-        } else {
-            data = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
+        List<Map> data = []
+        if (!inventoryItems?.isEmpty()) {
+            data = withBinLocation
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
-        data = data.findAll { inventoryItems.contains(it.inventoryItem) }
 
         if (params.format == "csv") {
             def filename = "Expiring stock | " + location.name + ".csv"

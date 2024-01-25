@@ -17,11 +17,13 @@ import groovy.sql.BatchingStatementWrapper
 import groovy.sql.Sql
 import org.apache.commons.lang.StringEscapeUtils
 import org.hibernate.Criteria
+import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.hibernate.criterion.Subqueries
 import org.hibernate.SQLQuery
+import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
 import org.pih.warehouse.api.AvailableItem
@@ -603,27 +605,28 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    List getQuantityOnHandByBinLocation(Location location) {
-        def data = []
-
-        if (location) {
-            def results = ProductAvailability.executeQuery("""
-						select 
-						    pa.product, 
-						    pa.inventoryItem,
-						    pa.binLocation,
-						    sum(pa.quantityOnHand),
-						    sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
-						from ProductAvailability pa
-						left outer join pa.inventoryItem ii
-						left outer join pa.binLocation bl
-						where pa.location = :location
-						group by pa.product, pa.inventoryItem, pa.binLocation
-						""", [location: location])
-
-            data = collectQuantityOnHandByBinLocation(results)
+    List getQuantityOnHandByBinLocation(Location location, List<InventoryItem> inventoryItems = []) {
+        if (!location) {
+            throw new RuntimeException("Must specify location in order to get quantity on hand")
         }
-        return data
+
+        List results = ProductAvailability.createCriteria().list {
+            createAlias('inventoryItem', 'inventoryItem', JoinType.LEFT_OUTER_JOIN)
+            createAlias('binLocation', 'binLocation', JoinType.LEFT_OUTER_JOIN)
+            projections {
+                groupProperty("product", "product")
+                groupProperty("inventoryItem", "inventoryItem")
+                groupProperty("binLocation", "binLocation")
+                sum("quantityOnHand", "quantityOnHand")
+                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
+            }
+            eq("location", location)
+            if (inventoryItems) {
+                'in'("inventoryItem.id", inventoryItems.id)
+            }
+        }
+
+        return collectQuantityOnHandByBinLocation(results)
     }
 
     List getAvailableQuantityOnHandByBinLocation(Location location) {
@@ -684,22 +687,22 @@ class ProductAvailabilityService {
         return data
     }
 
-    Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location) {
-        def quantityMap = [:]
-        if (location) {
-            def results = ProductAvailability.executeQuery("""
-						select ii, sum(pa.quantityOnHand)
-						from ProductAvailability pa, InventoryItem ii
-						where pa.location = :location
-						and pa.inventoryItem = ii
-						group by ii
-						""", [location: location])
-
-            results.each {
-                quantityMap[it[0]] = it[1]
+    Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {
+        if (!location) {
+            throw new RuntimeException("Must specify location in order to get quantity on hand")
+        }
+        List results = ProductAvailability.createCriteria().list {
+            projections {
+                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+                groupProperty("inventoryItem", "inventoryItem")
+                sum("quantityOnHand", "quantityOnHand")
+            }
+            eq("location", location)
+            if (inventoryItems) {
+                'in'("inventoryItem.id", inventoryItems.id)
             }
         }
-        return quantityMap
+        return results.inject([:]) { map, it -> map << [(it.inventoryItem): it.quantityOnHand] }
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, String productId) {

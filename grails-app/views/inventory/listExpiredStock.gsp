@@ -47,12 +47,21 @@
 							</a>
 						</div>
 
-						<g:link params="[format:'csv',category: params.category]" controller="inventory" action="listExpiredStock" class="button">
+						<g:link
+							params="[format:'csv', category: params.category]"
+							controller="inventory" action="listExpiredStock"
+							class="button"
+						>
 							<img src="${resource(dir:'images/icons/silk',file:'disk.png')}" alt="${warehouse.message(code: 'default.button.download.label') }" style="vertical-align: middle"/>
 							&nbsp; <g:message code="default.button.downloadAsCSV.label" default="Download as CSV"/>
 						</g:link>
 
-						<g:link params="[format:'csv',category: params.category, withBinLocation: true]" controller="inventory" action="listExpiredStock" class="button">
+						<g:link
+							params="[format:'csv', category: params.category, withBinLocation: true]"
+							controller="inventory"
+							action="listExpiredStock"
+							class="button"
+						>
 							<img src="${resource(dir:'images/icons/silk',file:'disk.png')}" alt="${warehouse.message(code: 'default.button.download.label') }" style="vertical-align: middle"/>
 							&nbsp; <g:message code="inventoryItems.downloadWithBinLocation.label" default="Download with Bin Locations"/><span class="ml-1">(.csv)</span>
 						</g:link>
@@ -126,7 +135,7 @@
 													<g:checkBox id="${dataEntry.inventoryItem?.id }"
 																name="inventoryItem.id"
 																class="checkbox"
-																checked="${false }"
+																checked="${false}"
 																value="${dataEntry.inventoryItem?.id}" />
 												</td>
 												<td class="checkable">
