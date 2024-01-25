@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
 import Modal from 'react-modal';
@@ -14,6 +15,16 @@ const PreferenceTypeModal = ({
   modalData,
   productSupplierId,
 }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflowY = 'hidden';
+    }
+
+    return () => {
+      document.body.style.overflowY = 'auto';
+    };
+  }, [isOpen]);
+
   const mappedPreferenceTypes = modalData?.reduce((acc, preferenceType) => {
     const {
       preferenceType: { name },
@@ -70,15 +81,16 @@ const PreferenceTypeModal = ({
             </p>
           </div>
           <div className="preference-type-modal-list">
-            {mappedPreferenceTypes?.preferenceTypes?.map((preferenceType) => (
-              <p key={preferenceType?.destination}>
-                <span className="preference-type-location">
-                  {preferenceType?.destination}
-                  :
-                  {' '}
-                </span>
-                <span>{preferenceType?.name}</span>
-              </p>
+            {_.sortBy(mappedPreferenceTypes?.preferenceTypes,
+              (preferenceType) => preferenceType.destination)?.map((preferenceType) => (
+                <p className="preference-type-modal-list-element" key={preferenceType?.destination}>
+                  <span className="preference-type-location">
+                    {preferenceType?.destination}
+                    :
+                    {' '}
+                  </span>
+                  <span>{preferenceType?.name}</span>
+                </p>
             ))}
           </div>
         </div>
