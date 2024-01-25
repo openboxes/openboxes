@@ -51,18 +51,10 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
   const initializeDefaultFilterValues = async () => {
     // INITIALIZE EMPTY FILTER OBJECT
     const defaultValues = Object.keys(filterFields)
-      .reduce((acc, key) => {
-        if (key === 'active') {
-          return {
-            ...acc,
-            [key]: true,
-          };
-        }
-        return {
-          ...acc,
-          [key]: '',
-        };
-      }, {});
+      .reduce((acc, key) => ({
+        ...acc,
+        [key]: '',
+      }), {});
 
     if (!defaultValues.tab) {
       defaultValues.tab = DETAILS_TAB;
@@ -113,7 +105,7 @@ const useProductSupplierFilters = (ignoreClearFilters) => {
       createdFrom: { name: 'createdFrom' },
       createdTo: { name: 'createdTo' },
       preferenceType: { name: 'preferenceType', accessor: 'id' },
-      active: { name: 'active' },
+      includeInactive: { name: 'includeInactive' },
     };
     const transformedParams = transformFilterParams(values, filterAccessors);
     const queryFilterParams = queryString.stringify(transformedParams);
