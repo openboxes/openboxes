@@ -14,6 +14,8 @@ import {
  *   [BAR_NAME]: {
  *     isModalOpen: boolean,
  *     closed: boolean,
+ *     isCloseable: boolean,
+ *     hasModalToDisplay: boolean,
  *    title: {
  *       label: string,
  *       defaultMessage: string,

@@ -9,7 +9,12 @@ import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
-import { hideSpinner, showSpinner } from 'actions';
+import {
+  createInfoBar,
+  hideInfoBar,
+  hideSpinner,
+  showSpinner,
+} from 'actions';
 import ArrayField from 'components/form-elements/ArrayField';
 import CheckboxField from 'components/form-elements/CheckboxField';
 import LabelField from 'components/form-elements/LabelField';
@@ -21,6 +26,7 @@ import Select from 'utils/Select';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import { InfoBar, InfoBarConfigs } from 'consts/infoBar';
 
 
 const FIELD = {
@@ -199,6 +205,12 @@ class CreateReplenishment extends Component {
       this.fetchStatusOptions();
       this.fetchRequirements(this.props.locationId);
     }
+
+    this.props.createInfoBar(InfoBarConfigs[InfoBar.STOCK_REPLENISHMENT_DESCRIPTION]);
+  }
+
+  componentWillUnmount() {
+    this.props.hideInfoBar(InfoBar.STOCK_REPLENISHMENT_DESCRIPTION);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -401,7 +413,14 @@ const mapStateToProps = state => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(CreateReplenishment);
+const mapDispatchToProps = {
+  showSpinner,
+  hideSpinner,
+  createInfoBar,
+  hideInfoBar,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateReplenishment);
 
 CreateReplenishment.propTypes = {
   initialValues: PropTypes.shape({}),

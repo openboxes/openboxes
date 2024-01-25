@@ -6,27 +6,27 @@ import { useDispatch } from 'react-redux';
 import { showInfoBarModal } from 'actions';
 import Translate from 'utils/Translate';
 
-const InfoBarTitle = ({ title, name }) => {
+const InfoBarTitle = ({ title, name, hasModalToDisplay }) => {
   const dispatch = useDispatch();
   return (
     <>
       <Translate id={title?.label} defaultMessage={title?.defaultLabel} />
-      <span
-        className="read-more-label"
-        onClick={() => dispatch(showInfoBarModal(name))}
-        role="button"
-        onKeyDown={() => dispatch(showInfoBarModal(name))}
-        tabIndex={0}
-      >
-        <Translate id="react.infoBar.readMore.label" defaultMessage="Read more" />
-      </span>
+      {hasModalToDisplay && (
+        <span
+          className="read-more-label"
+          onClick={() => dispatch(showInfoBarModal(name))}
+          role="button"
+          onKeyDown={() => dispatch(showInfoBarModal(name))}
+          tabIndex={0}
+        >
+          <Translate id="react.infoBar.readMore.label" defaultMessage="Read more" />
+        </span>
+      )}
     </>
   );
 };
 
-
 export default InfoBarTitle;
-
 
 InfoBarTitle.propTypes = {
   title: PropTypes.shape({
@@ -34,4 +34,5 @@ InfoBarTitle.propTypes = {
     defaultLabel: PropTypes.string.isRequired,
   }).isRequired,
   name: PropTypes.string.isRequired,
+  hasModalToDisplay: PropTypes.bool.isRequired,
 };

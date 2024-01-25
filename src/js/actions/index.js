@@ -624,13 +624,19 @@ export const fetchLocationTypes = config => async (dispatch) => {
 };
 
 export const createInfoBar = ({
-  name, versionLabel, title,
+  name,
+  versionLabel,
+  title,
+  isCloseable,
+  hasModalToDisplay,
 }) => ({
   type: ADD_INFO_BAR,
   payload: {
     name,
     versionLabel,
     title,
+    isCloseable,
+    hasModalToDisplay,
     show: true,
   },
 });
