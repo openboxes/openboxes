@@ -78,12 +78,12 @@ export default {
       filterElement: true,
     },
   },
-  active: {
+  includeInactive: {
     type: CheckboxField,
     attributes: {
       withLabel: true,
       label: 'react.productSupplier.filters.active.placeholder.label',
-      defaultMessage: 'Show only active',
+      defaultMessage: 'Include inactive',
       filterElement: true,
     },
   },

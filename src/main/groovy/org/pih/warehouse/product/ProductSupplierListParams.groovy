@@ -14,7 +14,7 @@ class ProductSupplierListParams extends PaginationParams {
 
     Date createdTo
 
-    Boolean active
+    Boolean includeInactive
 
     String searchTerm
 

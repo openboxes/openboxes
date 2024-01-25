@@ -23,6 +23,10 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     }
   };
 
+  const exportProductSuppliers = () => {
+    window.location = PRODUCT_SUPPLIER_URL.export();
+  };
+
   const modalLabels = {
     title: {
       label: 'react.productSupplier.deleteConfirmation.title.label',
@@ -76,6 +80,7 @@ const useProductSupplierActions = ({ fireFetchData }) => {
 
   return {
     getActions,
+    exportProductSuppliers,
   };
 };
 

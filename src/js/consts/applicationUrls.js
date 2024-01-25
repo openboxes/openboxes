@@ -131,6 +131,7 @@ const PRODUCT_SUPPLIER_URL = {
   base: `${CONTEXT_PATH}/productSupplier`,
   create: () => `${PRODUCT_SUPPLIER_URL.base}/create`,
   edit: (id) => `${PRODUCT_SUPPLIER_URL.base}/edit/${id}`,
+  export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
 };
 
 export {
