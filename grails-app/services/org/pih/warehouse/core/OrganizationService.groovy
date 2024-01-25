@@ -112,8 +112,8 @@ class OrganizationService {
             if (params.active) {
                 eq('active', true)
             }
-            if (params.sort && params.order) {
-                order(params.sort, params.order)
+            if (params.sort == "name") {
+                order("name", params.order ?: "asc")
             }
         }
         return organizations
