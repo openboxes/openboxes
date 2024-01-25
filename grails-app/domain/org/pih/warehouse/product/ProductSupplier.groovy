@@ -157,12 +157,19 @@ class ProductSupplier implements Serializable, Comparable<ProductSupplier> {
     Map toJson() {
         [
             id: id,
-            productCode: product.productCode,
             name: name,
-            productId: product.id,
-            productName: product.name,
+            product: [
+                id: product.id,
+                name: product.name,
+                productCode: product.productCode
+            ],
             code: code,
-            supplierName: supplier?.name + (supplier?.code ? " (${supplier.code})" : ""),
+            supplier: [
+                name: supplier?.name,
+                displayName: supplier?.name
+                        ? supplier.name + (supplier?.code ? " (${supplier.code})" : "")
+                        : ""
+            ],
             supplierCode: supplierCode,
             productSupplierPreferences: productSupplierPreferences.collect { it.toJson() },
             packageSize: defaultProductPackage ? "${defaultProductPackage?.uom?.code}/${defaultProductPackage?.quantity}" : null,

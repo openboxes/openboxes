@@ -97,14 +97,14 @@ class ProductSupplierService {
 
     private static void getSortOrder(String sort, String orderDirection, Criteria criteria, Set<String> usedAliases) {
         switch (sort) {
-            case "productCode":
+            case "product.productCode":
                 if (!usedAliases.contains("product")) {
                     criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                     usedAliases.add("product")
                 }
                 criteria.addOrder(getOrderDirection("p.productCode", orderDirection))
                 break
-            case "productName":
+            case "product.name":
                 if (!usedAliases.contains("product")) {
                     criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                     usedAliases.add("product")
@@ -114,7 +114,7 @@ class ProductSupplierService {
             case "code":
                 criteria.addOrder(getOrderDirection("code", orderDirection))
                 break
-            case "supplierName":
+            case "supplier.displayName":
                 if (!usedAliases.contains("supplier")) {
                     criteria.createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
                     usedAliases.add("supplier")

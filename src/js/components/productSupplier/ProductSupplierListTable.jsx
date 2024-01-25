@@ -51,13 +51,13 @@ const ProductSupplierListTable = ({ filterParams }) => {
     },
     {
       Header: <Translate id="react.productSupplier.column.productCode.label" defaultMessage="Product Code" />,
-      accessor: 'productCode',
+      accessor: 'product.productCode',
       width: 160,
       fixed: 'left',
     },
     {
       Header: <Translate id="react.productSupplier.column.productName.label" defaultMessage="Product Name" />,
-      accessor: 'productName',
+      accessor: 'product.name',
       minWidth: 350,
       fixed: 'left',
       Cell: (row) =>
@@ -65,7 +65,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
           <TableCell
             {...row}
             tooltip
-            link={INVENTORY_ITEM_URL.showStockCard(row.original.productId)}
+            link={INVENTORY_ITEM_URL.showStockCard(row.original.product.id)}
           />
         ),
     },
@@ -105,7 +105,7 @@ const ProductSupplierListTable = ({ filterParams }) => {
     },
     {
       Header: <Translate id="react.productSupplier.column.supplier.label" defaultMessage="Supplier" />,
-      accessor: 'supplierName',
+      accessor: 'supplier.displayName',
       minWidth: 300,
       Cell: (row) => (
         <TableCell
