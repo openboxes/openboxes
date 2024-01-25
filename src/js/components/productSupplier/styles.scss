@@ -39,6 +39,7 @@
   }
 
   .preference-type-location {
+    font-weight: 400;
     color: var(--gray-400);
   }
 
@@ -51,7 +52,15 @@
 
     .preference-type-modal-list {
       overflow-y: auto;
-      max-height: 310px;
+      max-height: 340px;
+
+      .preference-type-modal-list-element {
+        margin-bottom: 2px;
+
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
     }
 
     p {
