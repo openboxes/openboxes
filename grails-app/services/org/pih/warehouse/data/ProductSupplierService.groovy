@@ -73,8 +73,8 @@ class ProductSupplierService {
             if (params.product) {
                 eq("product.id", params.product)
             }
-            if (params.active != null) {
-                eq("active", params.active)
+            if (!params.includeInactive) {
+                eq("active", true)
             }
             if (params.supplier) {
                 eq("supplier.id", params.supplier)
