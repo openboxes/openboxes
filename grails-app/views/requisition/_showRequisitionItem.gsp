@@ -82,31 +82,39 @@
         <g:if test="${requisitionItem?.isCanceled()}">
             <div class="canceled">
                 <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                    <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
-                    <g:renderHandlingIcons product="${requisitionItem?.product}" />
+                    <cache:block key="${requisitionItem?.id}">
+                        <format:displayNameWithColor product="${requisitionItem?.product}" showTooltip="${true}" />
+                        <g:renderHandlingIcons product="${requisitionItem?.product}" />
+                    </cache:block>
                 </g:link>
             </div>
         </g:if>
         <g:elseif test="${requisitionItem?.isSubstituted()}">
             <div class="canceled">
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
-                <g:renderHandlingIcons product="${requisitionItem?.product}" />
+                <cache:block key="${requisitionItem?.id}">
+                    <format:displayNameWithColor product="${requisitionItem?.product}" showTooltip="${true}" />
+                    <g:renderHandlingIcons product="${requisitionItem?.product}" />
+                </cache:block>
             </g:link>
             </div>
             <g:each var="substitutionItem" in="${requisitionItem.substitutionItems}">
                 <div>
                     <g:link controller="inventoryItem" action="showStockCard" id="${substitutionItem?.product?.id}">
-                        <format:displayName product="${substitutionItem?.product}" showTooltip="${true}" />
-                        <g:renderHandlingIcons product="${substitutionItem?.product}" />
+                        <cache:block key="${requisitionItem?.id}">
+                            <format:displayNameWithColor product="${substitutionItem?.product}" showTooltip="${true}" />
+                            <g:renderHandlingIcons product="${substitutionItem?.product}" />
+                        </cache:block>
                     </g:link>
                 </div>
             </g:each>
         </g:elseif>
         <g:else>
             <g:link controller="inventoryItem" action="showStockCard" id="${requisitionItem?.product?.id}">
-                <format:displayName product="${requisitionItem?.product}" showTooltip="${true}" />
-                <g:renderHandlingIcons product="${requisitionItem?.product}" />
+                <cache:block key="${requisitionItem?.id}">
+                    <format:displayNameWithColor product="${requisitionItem?.product}" showTooltip="${true}" />
+                    <g:renderHandlingIcons product="${requisitionItem?.product}" />
+                </cache:block>
             </g:link>
         </g:else>
     </td>

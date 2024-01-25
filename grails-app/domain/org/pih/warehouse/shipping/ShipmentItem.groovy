@@ -257,7 +257,7 @@ class ShipmentItem implements Comparable, Serializable {
     }
 
     Integer getQuantityInvoiced() {
-        return invoiceItems?.sum { it.quantity ?: 0 }
+        return invoiceItems?.sum { it.quantity ?: 0 } ?: 0
     }
 
     /**

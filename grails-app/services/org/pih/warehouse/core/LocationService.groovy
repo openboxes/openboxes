@@ -487,6 +487,7 @@ class LocationService {
 
     List getOrderSuppliers(Location currentLocation) {
         def locations = Location.createCriteria().list() {
+            eq("active", true)
             organization {
                 roles {
                     eq("roleType", RoleType.ROLE_SUPPLIER)

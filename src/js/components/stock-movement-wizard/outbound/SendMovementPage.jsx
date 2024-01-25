@@ -9,6 +9,7 @@ import Dropzone from 'react-dropzone';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from "react-router-dom";
 import Alert from 'react-s-alert';
 import { Tooltip } from 'react-tippy';
 
@@ -215,6 +216,7 @@ const FIELDS = {
           flexWidth: 7 + (isBoxNameEmpty ? 3 : 0) + (isPalletNameEmpty ? 3 : 0),
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
+          color: fieldValue?.color,
         }),
         attributes: {
           className: 'text-left',
@@ -572,7 +574,8 @@ class SendMovementPage extends Component {
             this.removeFiles(_.map(files, file => file.name));
             this.prepareRequestAndSubmitStockMovement(values);
           })
-          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')));
+          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.filesError.label', 'Error occured during files upload!')))
+          .finally(() => this.props.hideSpinner());
       } else if (files.length === 1) {
         this.sendFile(files[0])
           .then(() => {
@@ -580,7 +583,8 @@ class SendMovementPage extends Component {
             this.removeFile(files[0].name);
             this.prepareRequestAndSubmitStockMovement(values);
           })
-          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')));
+          .catch(() => Alert.error(this.props.translate('react.stockMovement.alert.fileError.label', 'Error occured during file upload!')))
+          .finally(() => this.props.hideSpinner());
       } else {
         this.prepareRequestAndSubmitStockMovement(values);
       }
@@ -967,7 +971,7 @@ const mapStateToProps = state => ({
   minimumExpirationDate: state.session.minimumExpirationDate,
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage);
+export default withRouter(connect(mapStateToProps, { showSpinner, hideSpinner })(SendMovementPage));
 
 SendMovementPage.propTypes = {
   /** Initial component's data */

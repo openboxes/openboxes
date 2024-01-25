@@ -118,8 +118,9 @@ const AD_HOCK_FIELDS = {
             </Tooltip>
           ),
         },
-        getDynamicAttr: ({ subfield }) => ({
+        getDynamicAttr: ({ fieldValue, subfield }) => ({
           className: subfield ? 'text-center' : 'text-left ml-1',
+          color: fieldValue?.color,
         }),
       },
       quantityOnHandRequesting: {
@@ -418,6 +419,7 @@ const STOCKLIST_FIELDS_PUSH_TYPE = {
           className: subfield ? 'text-center' : 'text-left ml-1',
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
+          color: fieldValue?.color,
         }),
       },
       quantityOnStocklist: {
@@ -716,6 +718,7 @@ const STOCKLIST_FIELDS_PULL_TYPE = {
           className: subfield ? 'text-center' : 'text-left ml-1',
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
+          color: fieldValue?.color,
         }),
       },
       demandPerReplenishmentPeriod: {

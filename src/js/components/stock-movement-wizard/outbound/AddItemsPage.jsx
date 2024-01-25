@@ -38,6 +38,7 @@ import NotificationType from 'consts/notificationTypes';
 import RowSaveStatus from 'consts/rowSaveStatus';
 import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
+import requestsQueue from 'utils/requestsQueue';
 import RowSaveIconIndicator from 'utils/RowSaveIconIndicator';
 import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
@@ -372,6 +373,7 @@ class AddItemsPage extends Component {
     this.debouncedSave = _.debounce(() => {
       this.saveRequisitionItemsInCurrentStep(this.state.values.lineItems, false);
     }, 1000);
+    this.requestsQueue = requestsQueue();
   }
 
 
@@ -868,7 +870,7 @@ class AddItemsPage extends Component {
    * @param {boolean} withStateChange
    * @public
    */
-  saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
+  async saveRequisitionItemsInCurrentStep(itemCandidatesToSave, withStateChange = true) {
     // We filter out items which were already sent to save
     const filteredCandidates = itemCandidatesToSave
       .filter(item => item.rowSaveStatus !== RowSaveStatus.SAVING);
@@ -888,7 +890,7 @@ class AddItemsPage extends Component {
         });
       }
 
-      return apiClient.post(updateItemsUrl, payload)
+      const saveItemsRequest = (data) => () => apiClient.post(updateItemsUrl, data)
         .then((resp) => {
           const { lineItems } = resp.data.data;
           const lineItemsBackendData = _.map(lineItems, val => ({ ...val, disabled: true }));
@@ -903,37 +905,43 @@ class AddItemsPage extends Component {
             // TODO: Add new api endpoints in StockMovementItemApiController
             // for POST and PUT (create and update) that returns only updated items data
             // and separate autosave logic from save button logic
-            const savedItemsProductCodes = lineItemsBackendData.map(item => item.productCode);
-            const savedItemsIds = lineItemsBackendData.map(item => item.id);
+            const savedItemsIds = data?.lineItems?.map(item => item.id);
+            const backendResponseIds = lineItemsBackendData.map(item => item.id);
+            const backendResponseProductCodes = lineItemsBackendData.map(item => item.productCode);
             // We are sending item by item to API. Here we have to find
             // newly saved item to replace its equivalent in state
             const itemToChange = _.last(_.differenceBy(lineItemsBackendData, itemCandidatesToSave, 'id'));
             const lineItemsAfterSave = this.state.values.lineItems.map((item) => {
               if (
-                parseInt(item.quantityRequested, 10) === 0 &&
-                (item.rowSaveStatus === RowSaveStatus.SAVING ||
-                  item.rowSaveStatus === RowSaveStatus.SAVED ||
-                  !item.rowSaveStatus) &&
-                !_.includes(savedItemsIds, item.id)
+                parseInt(item.quantityRequested, 10) === 0
+                && (item.rowSaveStatus === RowSaveStatus.SAVING
+                  || item.rowSaveStatus === RowSaveStatus.SAVED
+                  || !item.rowSaveStatus)
+                && _.includes(savedItemsIds, item.id)
               ) {
                 return { ..._.omit(item, ['id', 'statusCode']), disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
               // In this case we check if we're editing item
               // We don't have to disable edited item, because this
               // line is disabled by default
+              const savedIds = item?.id ? savedItemsIds : backendResponseIds;
               if (
-                _.includes(savedItemsIds, item.id) &&
-                item.rowSaveStatus !== RowSaveStatus.ERROR
+                _.includes(savedIds, item.id)
+                && item.rowSaveStatus !== RowSaveStatus.ERROR
               ) {
-                return { ...item, rowSaveStatus: RowSaveStatus.SAVED };
+                const editedItem = lineItemsBackendData.find(savedItem => savedItem.id === item.id)
+                return { ...editedItem, rowSaveStatus: RowSaveStatus.SAVED };
               }
+
               if (
-                _.includes(savedItemsProductCodes, item.product?.productCode)
+                itemToChange
+                && _.includes(backendResponseProductCodes, item.product?.productCode)
                 && parseInt(item.quantityRequested, 10) > 0
                 && item.rowSaveStatus === RowSaveStatus.SAVING
               ) {
                 return { ...itemToChange, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
               }
+
               return item;
             });
 
@@ -987,12 +995,21 @@ class AddItemsPage extends Component {
           }
           return Promise.reject(new Error(this.props.translate('react.stockMovement.error.saveRequisitionItems.label', 'Could not save requisition items')));
         });
+
+      if (this.props.isAutosaveEnabled) {
+        this.requestsQueue.enqueueRequest(
+          saveItemsRequest(payload),
+        );
+      } else {
+        await saveItemsRequest(payload)();
+      }
     }
+
     this.setState(previousState => ({
       values: {
         ...previousState.values,
         lineItems: previousState.values.lineItems.map((item) => {
-          if (parseInt(item.quantityRequested, 10) === 0) {
+          if (parseInt(item.quantityRequested, 10) === 0 && !item?.id) {
             return { ...item, disabled: true, rowSaveStatus: RowSaveStatus.SAVED };
           }
           return item;

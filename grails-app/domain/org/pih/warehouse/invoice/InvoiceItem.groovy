@@ -93,12 +93,17 @@ class InvoiceItem implements Serializable {
             Integer originalQuantityInvoiced = obj.getPersistentValue('quantity')
             ShipmentItem shipmentItem = obj?.shipmentItem
             if (originalQuantityInvoiced != null && shipmentItem) {
-                // An invoice item has a valid quantity when the new quantity,
-                // summed with the already invoiced quantity from all of the invoiced items,
-                // subtracting the old quantity of the current invoice item is lower than the shipment item quantity
-                Boolean isValid = quantity + (shipmentItem?.quantityInvoiced - originalQuantityInvoiced) <= shipmentItem?.quantity
+                // get quantity invoiced "outside" current invoice item (using the new quantity in the calculation)
+                Integer quantityInvoicedOutside = shipmentItem.quantityInvoiced - quantity
+                // get quantity shipped in uom (because shipmentItem.quantity is in "standard" uom, and invoiceItem.quantity is in uom)
+                Integer quantityShippedInUom = (shipmentItem.quantity / shipmentItem.quantityPerUom) as Integer
+                // An invoice item has a valid quantity when the new quantity is less or equal to the
+                // quantity available to invoice (quantity shipped in uom - quantity invoiced "outside" this invoice item)
+                Integer quantityAvailableToInvoice = quantityShippedInUom - quantityInvoicedOutside
+                Boolean isValid = quantity <= quantityAvailableToInvoice
                 return isValid ? true : ['invoiceItem.invalidQuantity.label']
             }
+
             return true
         }) // min = 0 for canceled items
         quantityUom(nullable: true)

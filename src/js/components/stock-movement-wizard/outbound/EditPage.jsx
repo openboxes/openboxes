@@ -8,6 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
 import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import { fetchReasonCodes, hideSpinner, showSpinner } from 'actions';
@@ -88,6 +89,7 @@ const FIELDS = {
           formatValue: formatProductDisplayName,
         },
         getDynamicAttr: ({ subfield, fieldValue }) => ({
+          color: fieldValue?.color,
           className: subfield ? 'text-center' : 'text-left ml-1',
           showValueTooltip: !!fieldValue?.displayNames?.default,
           tooltipValue: fieldValue?.name,
@@ -981,9 +983,9 @@ const mapStateToProps = state => ({
   currentLocale: state.session.activeLanguage,
 });
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   fetchReasonCodes, showSpinner, hideSpinner,
-})(EditItemsPage);
+})(EditItemsPage));
 
 EditItemsPage.propTypes = {
   /** Initial component's data */

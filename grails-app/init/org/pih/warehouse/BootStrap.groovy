@@ -293,6 +293,7 @@ class BootStrap {
                 "inventoryItem.id"      : picklistItem.inventoryItem?.id,
                 "product.name"          : picklistItem?.inventoryItem?.product?.name,
                 "product.displayName"   : picklistItem?.inventoryItem?.product?.displayName,
+                "product.color"         : picklistItem?.inventoryItem?.product?.color,
                 "productCode"           : picklistItem?.inventoryItem?.product?.productCode,
                 lotNumber               : picklistItem?.inventoryItem?.lotNumber,
                 expirationDate          : picklistItem?.inventoryItem?.expirationDate?.format("MM/dd/yyyy"),
