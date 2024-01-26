@@ -325,7 +325,7 @@ class AddItemsPage extends Component {
   }
 
   async nextPage(formValues) {
-    const status = this.state.inboundReturn.status === StockTransferStatus.PLACED
+    const status = this.state.inboundReturn.status !== StockTransferStatus.PLACED
       ? StockTransferStatus.PLACED
       : null;
     this.saveStockTransferInCurrentStep(formValues, status)
