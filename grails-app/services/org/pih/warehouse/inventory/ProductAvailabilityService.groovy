@@ -605,26 +605,27 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    List getQuantityOnHandByBinLocation(Location location, List<InventoryItem> inventoryItems = []) {
+    List getQuantityOnHandByBinLocation(Location location, List<InventoryItem> inventoryItems) {
         if (!location) {
-            throw new RuntimeException("Must specify location in order to get quantity on hand")
+            return []
         }
-
-        List results = ProductAvailability.createCriteria().list {
-            createAlias('inventoryItem', 'inventoryItem', JoinType.LEFT_OUTER_JOIN)
-            createAlias('binLocation', 'binLocation', JoinType.LEFT_OUTER_JOIN)
-            projections {
-                groupProperty("product", "product")
-                groupProperty("inventoryItem", "inventoryItem")
-                groupProperty("binLocation", "binLocation")
-                sum("quantityOnHand", "quantityOnHand")
-                sum("quantityAvailableToPromise", "quantityAvailableToPromise")
-            }
-            eq("location", location)
-            if (inventoryItems) {
-                'in'("inventoryItem.id", inventoryItems.id)
-            }
+        Map arguments = [ location: location ]
+        if (inventoryItems) {
+            arguments.inventoryItems = inventoryItems.id
         }
+        def results = ProductAvailability.executeQuery("""
+                    select 
+                        pa.product, 
+                        pa.inventoryItem,
+                        pa.binLocation,
+                        sum(pa.quantityOnHand),
+                        sum(case when pa.quantityAvailableToPromise > 0 then pa.quantityAvailableToPromise else 0 end)
+                    from ProductAvailability pa
+                    left outer join pa.inventoryItem ii
+                    left outer join pa.binLocation bl
+                    where pa.location = :location""" +
+                "${inventoryItems ? " and pa.inventoryItem.id in (:inventoryItems) " : " "}" +
+                """group by pa.product, pa.inventoryItem, pa.binLocation""", arguments)
 
         return collectQuantityOnHandByBinLocation(results)
     }
@@ -689,7 +690,7 @@ class ProductAvailabilityService {
 
     Map<InventoryItem, Integer> getQuantityOnHandByInventoryItem(Location location, List<InventoryItem> inventoryItems = []) {
         if (!location) {
-            throw new RuntimeException("Must specify location in order to get quantity on hand")
+            return [:]
         }
         List results = ProductAvailability.createCriteria().list {
             projections {
