@@ -39,4 +39,15 @@ class TransactionType implements Serializable {
         String regex = "\\${Constants.LOCALIZED_STRING_SEPARATOR}"
         return name.split(regex)[0] == transactionTypeName.split(regex)[0]
     }
+
+    // Checking whether the transaction type is adjustment for
+    // displaying the appropriate icon on the stock history page.
+    // To determine if a transaction is type of adjustment
+    // we have to check it's name using compareName,
+    // because it's saved as a "localized string", so it has
+    // to be split by localized string separator
+    // and then compared
+    Boolean isAdjustment() {
+        compareName(Constants.ADJUSTMENT)
+    }
 }
