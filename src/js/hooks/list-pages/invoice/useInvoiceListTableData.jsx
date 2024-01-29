@@ -61,12 +61,23 @@ const useInvoiceListTableData = (filterParams) => {
     }
   };
 
+  const downloadInvoiceLineDetails = async () => {
+    try {
+      dispatch(showSpinner());
+      const params = _.omit(tableData.currentParams, 'offset', 'max');
+      await invoiceApi.downloadInvoiceLineDetails(params);
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
   return {
     tableRef,
     tableData,
     loading,
     onFetchHandler,
     downloadInvoices,
+    downloadInvoiceLineDetails,
   };
 };
 

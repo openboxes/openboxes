@@ -33,6 +33,7 @@ const InvoiceListTable = ({
     loading,
     onFetchHandler,
     downloadInvoices,
+    downloadInvoiceLineDetails,
   } = useInvoiceListTableData(filterParams);
 
   // List of all actions for invoice rows
@@ -145,7 +146,7 @@ const InvoiceListTable = ({
             <button
               type="button"
               className="dropdown-item"
-              onClick={() => downloadInvoices()}
+              onClick={downloadInvoices}
             >
               <Translate
                 id="react.invoice.export.invoice.label"
@@ -155,8 +156,7 @@ const InvoiceListTable = ({
             <button
               type="button"
               className="dropdown-item"
-              onClick={() => {}}
-              disabled
+              onClick={downloadInvoiceLineDetails}
             >
               <Translate
                 id="react.invoice.export.invoiceLineDetails.label"
