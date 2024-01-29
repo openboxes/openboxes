@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceList
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.invoice.InvoiceStatus
@@ -127,8 +128,23 @@ class InvoiceApiController {
         return invoice
     }
 
+    def getAllInvoiceItems() {
+        def location = Location.get(session.warehouse.id)
+        params.partyFromId = location?.organization?.id
+        List<InvoiceList> invoices = invoiceService.getInvoices(params)
+        List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(invoices.invoice, params.max, params.offset)
+
+        if (params.format == "csv") {
+            CSVPrinter csv = invoiceService.getInvoiceItemsCsv(invoiceItems)
+            response.setHeader("Content-disposition", "attachment; filename=\"Invoices Details-${new Date().format("MM/dd/yyyy")}.csv\"")
+            render(contentType: "text/csv", text: csv.out.toString())
+            return
+        }
+        render([data: invoiceItems, totalCount: invoiceItems.totalCount ?: invoiceItems.size()] as JSON)
+    }
+
     def getInvoiceItems() {
-        List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(params.id, params.max, params.offset)
+        List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItemsByInvoice(params.id, params.max, params.offset)
         render([data: invoiceItems, totalCount: invoiceItems.totalCount?:invoiceItems.size()] as JSON)
     }
 

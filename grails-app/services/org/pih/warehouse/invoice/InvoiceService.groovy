@@ -30,7 +30,7 @@ class InvoiceService {
     def authService
     def identifierService
 
-    def getInvoices(Map params) {
+    List<InvoiceList> getInvoices(Map params) {
         // Parse pagination parameters
         Integer max = params.max ? params.int("max") : (params.format == "csv" ? null : 10)
         Integer offset = params.offset ? params.int("offset") : (params.format == "csv" ? null : 0)
@@ -73,25 +73,33 @@ class InvoiceService {
         }
     }
 
-    def getInvoiceItems(String id, String max, String offset) {
-        Invoice invoice = Invoice.get(id)
-
-        if (!invoice) {
+    def getInvoiceItems(List<Invoice> invoices, String max, String offset) {
+        if (!invoices) {
             return []
         }
 
         List <InvoiceItem> invoiceItems
         if (max != null && offset != null) {
             invoiceItems = InvoiceItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
-                eq("invoice", invoice)
+                invoice {
+                    'in'("id", invoices.id)
+                }
             }
         } else {
             invoiceItems = InvoiceItem.createCriteria().list() {
-                eq("invoice", invoice)
+                invoice {
+                    'in'("id", invoices.id)
+                }
             }
         }
 
         return invoiceItems
+    }
+
+    def getInvoiceItemsByInvoice(String id, String max, String offset) {
+        Invoice invoice = Invoice.get(id)
+
+        return getInvoiceItems([invoice], max, offset)
     }
 
     def getInvoiceItemCandidates(String id, List orderNumbers, List shipmentNumbers) {
@@ -456,6 +464,50 @@ class InvoiceService {
                 invoiceListItem?.vendorInvoiceNumber,
                 invoiceListItem?.invoice?.totalValue,
                 invoiceListItem?.currency,
+            )
+        }
+        return csv
+    }
+
+    CSVPrinter getInvoiceItemsCsv(List<InvoiceItem> invoiceItems) {
+        CSVPrinter csv = CSVUtils.getCSVPrinter()
+        csv.printRecord(
+                "Invoice Number",
+                "Vendor Invoice Number",
+                "Vendor",
+                "Currency",
+                "Status",
+                "Buyer Organization",
+                "Invoice Type",
+                "Code",
+                "Name",
+                "Order Number",
+                "GL Account",
+                "Budget Code",
+                "Quantity",
+                "Quantity per UoM",
+                "Amount",
+                "Total Amount",
+        )
+
+        invoiceItems?.each { InvoiceItem invoiceItem ->
+            csv.printRecord(
+                    invoiceItem.invoice?.invoiceNumber,
+                    invoiceItem.invoice?.vendorInvoiceNumber,
+                    "${invoiceItem.invoice?.party?.code} ${invoiceItem.invoice?.party?.name}",
+                    invoiceItem.invoice?.currencyUom.name,
+                    invoiceItem.invoice?.status?.name(),
+                    "${invoiceItem.invoice?.partyFrom?.code} ${invoiceItem.invoice?.partyFrom?.name}",
+                    invoiceItem.invoice?.invoiceType?.code?.name() ?: "INVOICE",
+                    invoiceItem.product?.productCode ?: "all",
+                    invoiceItem?.orderAdjustment ? invoiceItem?.description : invoiceItem.product?.name,
+                    invoiceItem.order?.orderNumber,
+                    invoiceItem.glAccount?.name,
+                    invoiceItem.budgetCode?.name,
+                    invoiceItem?.quantity,
+                    invoiceItem?.quantityPerUom,
+                    invoiceItem?.unitPrice ?: 0,
+                    invoiceItem?.totalAmount ?: 0,
             )
         }
         return csv

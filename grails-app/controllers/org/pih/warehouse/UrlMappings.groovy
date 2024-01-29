@@ -440,6 +440,11 @@ class UrlMappings {
         }
 
         // Invoice API
+        "/api/invoices/items"(parseRequest: true) {
+            controller = "invoiceApi"
+            action = [GET: "getAllInvoiceItems"]
+        }
+
         "/api/invoices/$id/items"(parseRequest: true) {
             controller = "invoiceApi"
             action = [POST: "updateItems", GET: "getInvoiceItems"]
