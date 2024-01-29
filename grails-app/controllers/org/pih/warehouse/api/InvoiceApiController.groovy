@@ -136,7 +136,7 @@ class InvoiceApiController {
 
         if (params.format == "csv") {
             CSVPrinter csv = invoiceService.getInvoiceItemsCsv(invoiceItems)
-            response.setHeader("Content-disposition", "attachment; filename=\"Invoices Details-${new Date().format("MM/dd/yyyy")}.csv\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"Invoices Line Details -${new Date().format("MM/dd/yyyy")}.csv\"")
             render(contentType: "text/csv", text: csv.out.toString())
             return
         }
