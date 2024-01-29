@@ -73,7 +73,7 @@ class InvoiceService {
         }
     }
 
-    def getInvoiceItems(List<Invoice> invoices, String max, String offset) {
+    List<InvoiceItem> getInvoiceItems(List<Invoice> invoices, String max, String offset) {
         if (!invoices) {
             return []
         }
@@ -96,7 +96,7 @@ class InvoiceService {
         return invoiceItems
     }
 
-    def getInvoiceItemsByInvoice(String id, String max, String offset) {
+    List<InvoiceItem> getInvoiceItemsByInvoice(String id, String max, String offset) {
         Invoice invoice = Invoice.get(id)
 
         return getInvoiceItems([invoice], max, offset)

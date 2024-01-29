@@ -129,7 +129,7 @@ class InvoiceApiController {
     }
 
     def getAllInvoiceItems() {
-        def location = Location.get(session.warehouse.id)
+        Location location = Location.get(session.warehouse.id)
         params.partyFromId = location?.organization?.id
         List<InvoiceList> invoices = invoiceService.getInvoices(params)
         List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(invoices.invoice, params.max, params.offset)
