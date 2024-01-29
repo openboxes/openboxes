@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -12,23 +12,30 @@ import 'components/Filter/FilterStyles.scss';
 import 'components/form-elements/FilterSelectField.scss';
 
 const Dropdown = ({
-  children, style, inputContainerRec,
+  children,
+  style,
+  inputContainerRec,
+  hasOptions,
 }) => {
   const dropdownRef = useRef(null);
   // if current dropdown width is smaller than the input container
   // then change dropdown width to the same width as the input container
-  const currentDropdownWidth = dropdownRef.current?.offsetWidth;
-  const inputContainerWidth = inputContainerRec?.width;
-  const dropdownWidth = inputContainerWidth > currentDropdownWidth
-    ? inputContainerWidth
-    : currentDropdownWidth;
+  const [drpWidth, setDtrWidth] = useState(undefined);
+  useEffect(() => {
+    const currentDropdownWidth = dropdownRef.current?.offsetWidth;
+    const inputContainerWidth = inputContainerRec?.width;
+    if (inputContainerWidth > currentDropdownWidth) {
+      setDtrWidth(inputContainerWidth);
+    }
+  }, [hasOptions]);
+
   return (
     <div
       ref={dropdownRef}
       className="filter-select__dropdown"
       style={{
         ...style,
-        width: dropdownWidth,
+        width: drpWidth,
         left: inputContainerRec.left,
         top: inputContainerRec?.bottom,
       }}
@@ -51,6 +58,7 @@ Dropdown.propTypes = {
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
   }).isRequired,
+  hasOptions: PropTypes.bool.isRequired,
 };
 
 Dropdown.defaultProps = {
@@ -66,7 +74,10 @@ const Menu = (props) => {
       target={inputContainer}
       container={document.getElementById('root')}
     >
-      <Dropdown inputContainerRec={inputContainer.getBoundingClientRect()} >
+      <Dropdown
+        inputContainerRec={inputContainer.getBoundingClientRect()}
+        hasOptions={!!props.options.length}
+      >
         <div className="filter-select__custom-option" {...props.innerProps}>
           {props.children}
         </div>
