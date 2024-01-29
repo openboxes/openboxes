@@ -1,5 +1,6 @@
+import _ from 'lodash';
+
 import ActivityCode from 'consts/activityCode';
-import RoleType from 'consts/roleType';
 import StockMovementStatus from 'consts/stockMovementStatus';
 import { supports } from 'utils/supportedActivitiesUtils';
 
@@ -44,11 +45,10 @@ const canEditRequest = (currentUser, request, location) => {
 
 export const hasRole = (user, role) => user?.roles?.includes(role);
 
-// To have permissions for product source list actions
-// user has to be at least admin and has product manager permissions
-export const hasPermissionsToProductSourceActions = (user, isAdmin) => {
-  const hasProductManagerPermission = hasRole(user, RoleType.ROLE_PRODUCT_MANAGER);
-  return hasProductManagerPermission && isAdmin;
-};
+export const hasPermissions = ({
+  user,
+  roles,
+  minimumRequiredRole,
+}) => _.every(roles, (role) => hasRole(user, role)) && minimumRequiredRole;
 
 export default canEditRequest;

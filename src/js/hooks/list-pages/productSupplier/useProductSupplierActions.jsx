@@ -5,8 +5,9 @@ import { useSelector } from 'react-redux';
 
 import productSupplierApi from 'api/services/ProductSupplierApi';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
+import RoleType from 'consts/roleType';
 import confirmationModal from 'utils/confirmationModalUtils';
-import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
+import { hasPermissions } from 'utils/permissionUtils';
 import notification from 'components/Layout/notifications/notification';
 import NotificationType from 'consts/notificationTypes';
 import translate from 'utils/Translate';
@@ -72,23 +73,27 @@ const useProductSupplierActions = ({ fireFetchData }) => {
     });
   };
 
-  const getActions = useCallback((productSupplierId) => (hasPermissionsToProductSourceActions(currentUser, isAdmin) ? [
-    {
-      defaultLabel: 'Edit',
-      label: 'react.productSupplier.edit.label',
-      leftIcon: <RiPencilLine />,
-      onClick: () => {
-        window.location = PRODUCT_SUPPLIER_URL.edit(productSupplierId);
+  const getActions = useCallback((productSupplierId) => (hasPermissions({
+    user: currentUser,
+    roles: [RoleType.ROLE_PRODUCT_MANAGER],
+    minimumRequiredRole: isAdmin,
+  }) ? [
+      {
+        defaultLabel: 'Edit',
+        label: 'react.productSupplier.edit.label',
+        leftIcon: <RiPencilLine />,
+        onClick: () => {
+          window.location = PRODUCT_SUPPLIER_URL.edit(productSupplierId);
+        },
       },
-    },
-    {
-      defaultLabel: 'Delete Product Source',
-      label: 'react.productSupplier.delete.label',
-      leftIcon: <RiDeleteBinLine />,
-      variant: 'danger',
-      onClick: () => openConfirmationModal(productSupplierId),
-    },
-  ] : []), [currentUser, isAdmin]);
+      {
+        defaultLabel: 'Delete Product Source',
+        label: 'react.productSupplier.delete.label',
+        leftIcon: <RiDeleteBinLine />,
+        variant: 'danger',
+        onClick: () => openConfirmationModal(productSupplierId),
+      },
+    ] : []), [currentUser, isAdmin]);
 
   return {
     getActions,
