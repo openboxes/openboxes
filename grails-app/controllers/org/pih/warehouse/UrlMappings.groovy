@@ -856,7 +856,7 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
         "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
-        "500"(controller: "errors", action: "handleSqlIntegrityConstraintViolationException", exception: SQLIntegrityConstraintViolationException)
+        "500"(controller: "errors", action: "handleConstraintViolation", exception: SQLIntegrityConstraintViolationException)
         "/"(controller: "dashboard", action: "index")
     }
 

@@ -114,7 +114,7 @@ class ErrorsController {
         render(view: "/error")
     }
 
-    def handleSqlIntegrityConstraintViolationException() {
+    def handleConstraintViolation() {
         if (RequestUtil.isAjax(request)) {
             if (request?.method == HttpMethod.DELETE.name()) {
                 String message = g.message(
@@ -122,12 +122,12 @@ class ErrorsController {
                         default: "Resource could not be deleted because of an existing association"
                 )
 
-                render([ errorCode: 500, errorMessages: [message]] as JSON)
+                render([errorCode: 500, errorMessage: message] as JSON)
                 return
             }
 
             Throwable root = ExceptionUtils.getRootCause(request.getAttribute('exception'))
-            render([errorCode: 500, errorsMessages: [root.getMessage()]])
+            render([errorCode: 500, errorMessage: root.getMessage()])
         }
 
         render(view: '/error')
