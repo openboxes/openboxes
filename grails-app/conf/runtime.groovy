@@ -137,7 +137,7 @@ openboxes {
             defaultLabel = "Analytics"
             menuItems = [
                 // TODO: Add option to include label 'beta'
-                [label: "inventory.view.label", defaultLabel: "Inventory Browser", href: "/inventoryBrowser/index"],
+                [label: "inventory.browser.label", defaultLabel: "Inventory Browser", href: "/inventoryBrowser/index"],
                 [label: "inventory.snapshot.label", defaultLabel: "Inventory Snapshots", href: "/snapshot/list"],
                 [label: "consumption.report.label", defaultLabel: "Consumption Report", href: "/consumption/list"]
             ]
