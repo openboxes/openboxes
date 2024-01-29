@@ -137,7 +137,7 @@ openboxes {
             defaultLabel = "Analytics"
             menuItems = [
                 // TODO: Add option to include label 'beta'
-                [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/inventoryBrowser/index"],
+                [label: "inventory.browser.label", defaultLabel: "Inventory Browser", href: "/inventoryBrowser/index"],
                 [label: "inventory.snapshot.label", defaultLabel: "Inventory Snapshots", href: "/snapshot/list"],
                 [label: "consumption.report.label", defaultLabel: "Consumption Report", href: "/consumption/list"]
             ]
@@ -149,22 +149,23 @@ openboxes {
             requiredActivitiesAny = [ActivityCode.MANAGE_INVENTORY]
             subsections = [
                 [
-                    label: "inventory.browse.label",
-                    defaultLabel: "Browse Inventory",
+                    label: "inventory.view.label",
+                    defaultLabel: "View Inventory",
                     menuItems: [
-                        [label: "inventory.browse.label", defaultLabel: "Browse Inventory", href: "/inventory/browse?resetSearch=true"],
+                        [label: "inventory.browser.label", defaultLabel: "Inventory Browser", href: "/inventory/browse?resetSearch=true"],
+                        [label: "report.inventorySummary.label", defaultLabel: "Inventory Summary Report", href: "/inventory/listInStock"],
+                        [label: "report.inventoryDetails.label", defaultLabel: "Inventory Details Report", href: "/report/showBinLocationReport"],
+                        [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/report/showInventoryByLocationReport"],
                         // TODO: (Future improvement) Probably further options should be generated dynamicaly (with item count in bracket)...
                     ],
                 ],
                 [
-                    label: "inventory.manage.label",
-                    defaultLabel: "Manage Inventory",
+                    label: "inventory.transactions.label",
+                    defaultLabel: "Inventory Transaction",
                     menuItems: [
-                        [label: "inventory.manage.label", defaultLabel: "Manage Inventory", href: "/inventory/manage"],
-                        [label: "inventory.import.label", defaultLabel: "Import Inventory", href: "/batch/importData?type=inventory&execution=e1s1"],
-                        [label: "inventory.createStockTransfer.label", defaultLabel: "Create Stock Transfer", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/create"],
+                        [label: "inventory.transferStockInternally.label", defaultLabel: "Transfer stock internally", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/create"],
+                        [label: "inventory.createReplenishment.label", defaultLabel: "Replenish picking bins", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/create"],
                         [label: "inventory.listStockTransfers.label", defaultLabel: "List Stock Transfers", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/stockTransfer/list"],
-                        [label: "inventory.createReplenishment.label", defaultLabel: "Create Replenishment", requiredActivitiesAll: ActivityCode.binTrackingList(), href: "/replenishment/create"]
                     ]
                 ]
             ]
@@ -279,8 +280,8 @@ openboxes {
                     label: "report.inventoryReports.label",
                     defaultLabel: "Inventory Reports",
                     menuItems: [
-                        [label: "report.inStockReport.label", defaultLabel: "In Stock Report", href: "/inventory/listInStock"],
-                        [label: "report.binLocationReport.label", defaultLabel: "Bin Location Report", href: "/report/showBinLocationReport"],
+                        [label: "report.inventorySummary.label", defaultLabel: "Inventory Summary Report", href: "/inventory/listInStock"],
+                        [label: "report.inventoryDetails.label", defaultLabel: "Inventory Details Report", href: "/report/showBinLocationReport"],
                         [label: "report.expiredStockReport.label", defaultLabel: "Expired Stock Report", href: "/inventory/listExpiredStock"],
                         [label: "report.expiringStockReport.label", defaultLabel: "Expiring Stock Report", href: "/inventory/listExpiringStock"],
                         [label: "report.inventoryByLocationReport.label", defaultLabel: "Inventory By Location Report", href: "/report/showInventoryByLocationReport"],
