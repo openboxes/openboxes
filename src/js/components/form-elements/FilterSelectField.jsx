@@ -20,12 +20,12 @@ const Dropdown = ({
   const dropdownRef = useRef(null);
   // if current dropdown width is smaller than the input container
   // then change dropdown width to the same width as the input container
-  const [drpWidth, setDtrWidth] = useState(undefined);
+  const [dropdownWidth, setDropdownWidth] = useState(undefined);
   useEffect(() => {
     const currentDropdownWidth = dropdownRef.current?.offsetWidth;
     const inputContainerWidth = inputContainerRec?.width;
     if (inputContainerWidth > currentDropdownWidth) {
-      setDtrWidth(inputContainerWidth);
+      setDropdownWidth(inputContainerWidth);
     }
   }, [hasOptions]);
 
@@ -35,7 +35,7 @@ const Dropdown = ({
       className="filter-select__dropdown"
       style={{
         ...style,
-        width: drpWidth,
+        width: dropdownWidth,
         left: inputContainerRec.left,
         top: inputContainerRec?.bottom,
       }}
