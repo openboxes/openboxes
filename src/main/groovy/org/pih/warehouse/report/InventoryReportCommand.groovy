@@ -22,6 +22,7 @@ class InventoryReportCommand implements Validateable {
     Date endDate
     Category category
     Category rootCategory
+    String status
 
     Boolean includeChildren
     Boolean hideInactiveProducts
