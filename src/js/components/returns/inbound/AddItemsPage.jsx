@@ -463,7 +463,7 @@ class AddItemsPage extends Component {
         return;
       }
     }
-    await this.saveStockTransfer(values.returnItems, null);
+    await this.saveStockTransferInCurrentStep(values);
     this.props.previousPage(this.state.inboundReturn);
   }
 
