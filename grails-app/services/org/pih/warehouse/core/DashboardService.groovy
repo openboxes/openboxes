@@ -147,7 +147,7 @@ class DashboardService {
      * @param location
      * @return
      */
-    List getExpiredStock(Category category, Location location) {
+    List getExpiredStock(Category category, Location location, Date startDate, Date endDate) {
 
         long startTime = System.currentTimeMillis()
 
@@ -163,6 +163,14 @@ class DashboardService {
             expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
         }
 
+        if (startDate) {
+            expiredStock = expiredStock.findAll { item -> item?.expirationDate >= startDate }
+        }
+
+        if (endDate) {
+            expiredStock = expiredStock.findAll { item -> item?.expirationDate <= endDate }
+        }
+
         log.debug "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return expiredStock
 
@@ -175,7 +183,7 @@ class DashboardService {
      * @param threshold the threshold filter
      * @return a list of inventory items
      */
-    List getExpiringStock(Category category, Location location, String expirationStatus) {
+    List getExpiringStock(Category category, Location location, String expirationStatus, Date startDate, Date endDate) {
         long startTime = System.currentTimeMillis()
 
         def today = new Date()
@@ -186,6 +194,14 @@ class DashboardService {
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
         if (category) {
             expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
+        }
+
+        if (startDate) {
+            expiringStock = expiringStock.findAll { item -> item?.expirationDate >= startDate }
+        }
+
+        if (endDate) {
+            expiringStock = expiringStock.findAll { item -> item?.expirationDate <= endDate }
         }
 
         if (expirationStatus) {

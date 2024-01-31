@@ -29,6 +29,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.report.InventoryReportCommand
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -574,9 +575,8 @@ class InventoryController {
     }
 
 
-    def listExpiredStock() {
-        Location location = Location.get(session.warehouse.id)
-        Category categorySelected = Category.get(params.category)
+    def listExpiredStock(InventoryReportCommand command) {
+        command.location = Location.get(session.warehouse.id)
         Boolean withBinLocation = params.boolean("withBinLocation")
 
         List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
@@ -600,15 +600,13 @@ class InventoryController {
         [
                 data: data,
                 categories: categories,
-                categorySelected: categorySelected,
+                command: command,
         ]
     }
 
 
-    def listExpiringStock() {
-        String expirationStatus = params.status
-        Location location = Location.get(session.warehouse.id)
-        Category category = Category.get(params.category)
+    def listExpiringStock(InventoryReportCommand command) {
+        command.location = Location.get(session.warehouse.id)
         Boolean withBinLocation = params.boolean("withBinLocation")
 
         List<InventoryItem> inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
@@ -634,8 +632,7 @@ class InventoryController {
         [
                 data: data,
                 categories: categories,
-                categorySelected: category,
-                expirationStatus: expirationStatus,
+                command: command
         ]
     }
 
