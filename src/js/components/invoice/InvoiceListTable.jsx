@@ -146,7 +146,7 @@ const InvoiceListTable = ({
             <button
               type="button"
               className="dropdown-item"
-              onClick={downloadInvoices}
+              onClick={() => downloadInvoices()}
             >
               <Translate
                 id="react.invoice.export.invoice.label"
@@ -156,7 +156,7 @@ const InvoiceListTable = ({
             <button
               type="button"
               className="dropdown-item"
-              onClick={downloadInvoiceLineDetails}
+              onClick={() => downloadInvoiceLineDetails()}
             >
               <Translate
                 id="react.invoice.export.invoiceLineDetails.label"

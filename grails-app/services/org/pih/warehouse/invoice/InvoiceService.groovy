@@ -10,6 +10,7 @@
 package org.pih.warehouse.invoice
 
 import grails.gorm.transactions.Transactional
+import grails.util.Holders
 import org.apache.commons.csv.CSVPrinter
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.UnitOfMeasure
@@ -470,6 +471,8 @@ class InvoiceService {
     }
 
     CSVPrinter getInvoiceItemsCsv(List<InvoiceItem> invoiceItems) {
+        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
+
         CSVPrinter csv = CSVUtils.getCSVPrinter()
         csv.printRecord(
                 "Invoice Number",
@@ -498,8 +501,8 @@ class InvoiceService {
                     invoiceItem.invoice?.currencyUom.name,
                     invoiceItem.invoice?.status?.name(),
                     "${invoiceItem.invoice?.partyFrom?.code} ${invoiceItem.invoice?.partyFrom?.name}",
-                    invoiceItem.invoice?.invoiceType?.code?.name() ?: "INVOICE",
-                    invoiceItem.product?.productCode ?: "all",
+                    invoiceItem.invoice?.invoiceType?.code?.name() ?: InvoiceTypeCode.INVOICE.name(),
+                    invoiceItem.product?.productCode ?: g.message(code:'default.all.label', default: 'all'),
                     invoiceItem?.orderAdjustment ? invoiceItem?.description : invoiceItem.product?.name,
                     invoiceItem.order?.orderNumber,
                     invoiceItem.glAccount?.name,

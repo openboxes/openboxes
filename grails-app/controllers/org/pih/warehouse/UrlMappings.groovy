@@ -440,11 +440,6 @@ class UrlMappings {
         }
 
         // Invoice API
-        "/api/invoices/items"(parseRequest: true) {
-            controller = "invoiceApi"
-            action = [GET: "getAllInvoiceItems"]
-        }
-
         "/api/invoices/$id/items"(parseRequest: true) {
             controller = "invoiceApi"
             action = [POST: "updateItems", GET: "getInvoiceItems"]
@@ -493,6 +488,11 @@ class UrlMappings {
         "/api/invoiceTypeCodes"(parseRequest: true) {
             controller = { "invoiceApi" }
             action = [GET: "invoiceTypeCodes"]
+        }
+
+        "/api/invoiceItems"(parseRequest: true) {
+            controller = "invoiceApi"
+            action = [GET: "getAllInvoiceItems"]
         }
 
         // TODO: Investigate the proper way to handle validation as a REST resource
