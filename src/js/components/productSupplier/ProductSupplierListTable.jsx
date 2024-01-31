@@ -82,25 +82,25 @@ const ProductSupplierListTable = ({ filterParams }) => {
           productSupplierPreferences={row.original.productSupplierPreferences}
         />
       ),
-      minWidth: 250,
+      minWidth: 180,
       sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.defaultPackSize.label" defaultMessage="Default Pack Size" />,
       accessor: 'packageSize',
-      minWidth: 250,
+      minWidth: 180,
       sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.packagePrice.label" defaultMessage="Package Price" />,
       accessor: 'packagePrice',
-      minWidth: 200,
+      minWidth: 180,
       sortable: false,
     },
     {
       Header: <Translate id="react.productSupplier.column.eachPrice.label" defaultMessage="Each Price" />,
       accessor: 'unitPrice',
-      minWidth: 150,
+      minWidth: 180,
       sortable: false,
     },
     {
