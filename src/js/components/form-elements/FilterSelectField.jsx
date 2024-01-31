@@ -92,6 +92,8 @@ Menu.propTypes = {
   selectProps: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  options: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string,
+    PropTypes.shape({})])).isRequired,
 };
 
 const Option = props => (
