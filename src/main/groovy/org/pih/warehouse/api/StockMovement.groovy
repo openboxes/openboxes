@@ -58,7 +58,6 @@ class StockMovement implements Validateable{
     String trackingNumber
     String driverName
     String comments
-    List<Comment> requisitionComments
     String currentStatus
     Float totalValue
 
@@ -89,8 +88,7 @@ class StockMovement implements Validateable{
 
     static transients = [
             "electronicType",
-            "pendingApproval",
-            "recentRequisitionComment"
+            "pendingApproval"
     ]
 
     static constraints = {
@@ -118,7 +116,6 @@ class StockMovement implements Validateable{
         trackingNumber(nullable: true)
         driverName(nullable: true)
         comments(nullable: true)
-        requisitionComments(nullable: true)
         totalValue(nullable: true)
         lineItemCount(nullable: true)
 
@@ -183,7 +180,7 @@ class StockMovement implements Validateable{
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
-            recentRequisitionComment: recentRequisitionComment,
+            currentEvent        : requisition.mostRecentEvent,
             requestedBy         : requestedBy,
             lineItems           : lineItems,
             lineItemCount       : lineItemCount,
@@ -208,15 +205,6 @@ class StockMovement implements Validateable{
             requestType         : requestType,
             sourceType          : sourceType?.name,
         ]
-    }
-
-    Comment getRecentRequisitionComment() {
-        if (requisitionComments?.size() > 0) {
-            return requisitionComments?.sort({ a, b ->
-                b.dateCreated <=> a.dateCreated
-            }).iterator().next()
-        }
-        return null
     }
 
     /**
@@ -418,7 +406,6 @@ class StockMovement implements Validateable{
             requisition: requisition,
             shipment: shipment,
             comments: shipment?.additionalInformation,
-            requisitionComments: requisition.comments?.toList(),
             shipmentType: shipment?.shipmentType,
             dateShipped: shipment?.expectedShippingDate,
             expectedDeliveryDate: shipment?.expectedDeliveryDate,

@@ -10,6 +10,7 @@ import { Tooltip } from 'react-tippy';
 import { fetchTranslations } from 'actions';
 import { STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
 import apiClient from 'utils/apiClient';
+import { getCurrentEventComment } from 'utils/list-utils';
 import Translate from 'utils/Translate';
 
 import 'react-table/react-table.css';
@@ -33,24 +34,27 @@ const COLUMNS = [
     headerClassName: 'text-left font-weight-bold px-4 py-3',
     className: 'px-4 py-2',
     maxWidth: 200,
-    Cell: (row) => (
-      <span className="d-flex align-items-center">
-        <span className="d-inline-block text-overflow-ellipsis">
-          {row.original.displayStatus}
+    Cell: (row) => {
+      const comment = getCurrentEventComment(row.original.currentEvent, row.original.statusCode);
+      return (
+        <span className="d-flex align-items-center">
+          <span className="d-inline-block text-overflow-ellipsis">
+            {row.original.displayStatus}
+          </span>
+          {comment && (
+            <Tooltip
+              html={comment}
+              theme="transparent"
+              delay="150"
+              duration="250"
+              hideDelay="50"
+            >
+              <RiStickyNoteFill className="text-warning mr-1" />
+            </Tooltip>
+          )}
         </span>
-        {row.original.recentRequisitionComment && (
-          <Tooltip
-            html={row.original.recentRequisitionComment?.comment}
-            theme="transparent"
-            delay="150"
-            duration="250"
-            hideDelay="50"
-          >
-            <RiStickyNoteFill className="text-warning mr-1" />
-          </Tooltip>
-        )}
-      </span>
-    ),
+      );
+    },
   },
   {
     Header: 'Description',

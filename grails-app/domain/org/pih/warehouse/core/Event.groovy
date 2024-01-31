@@ -54,4 +54,17 @@ class Event implements Comparable, Serializable {
         }
         return diff
     }
+
+    Map toJson() {
+        return [
+                id: id,
+                eventDate: eventDate,
+                eventType: [
+                        name: eventType?.name,
+                        eventCode: eventType?.eventCode?.name(),
+                ],
+                createdBy: createdBy?.name,
+                comment: comment?.comment
+        ]
+    }
 }

@@ -56,6 +56,12 @@ export const transformFilterParams = (filterValues, filterAccessors) => Object.k
 // Transforms value into an Array
 export const getParamList = value => [].concat(value);
 
-
 export const getShipmentTypeTooltip = (translate, shipmentType) =>
   `${translate('react.stockMovement.shipmentType.label', 'Shipment type')}: ${shipmentType ?? 'Default'}`;
+
+export const getCurrentEventComment = (event, currentStatus) => {
+  if (event?.eventType?.eventCode && event?.eventType?.eventCode !== currentStatus) {
+    return null;
+  }
+  return event?.comment;
+};
