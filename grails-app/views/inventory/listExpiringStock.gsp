@@ -89,7 +89,7 @@
 				           		<g:select name="category"  class="chzn-select-deselect"
 												from="${categories}"
 												optionKey="id" optionValue="${{format.category(category:it)}}"
-                                                value="${categorySelected?.id}"
+                                                value="${command.category?.id}"
 												noSelection="['': warehouse.message(code:'default.all.label')]" />
 							</div>
 							<div class="filter-list-item">
@@ -107,10 +107,37 @@
                                             'greaterThan365Days':
                                                     warehouse.message(code:'inventory.listGreaterThan365Days.label',
                                                             args: [365], default: 'Expires after {0} days')]"
-									optionKey="key" optionValue="value" value="${expirationStatus}"
+									optionKey="key" optionValue="value" value="${command.status}"
 									noSelection="['': warehouse.message(code:'default.all.label')]" />
 				           	</div>
-
+                            <div class="filter-list-item">
+                                <label>
+                                    <g:message code="report.expiresAfter.label"
+                                               default="Expires after"
+                                    />
+                                </label>
+                                <g:jqueryDatePicker id="startDate"
+                                                    name="startDate"
+                                                    cssClass="filter"
+                                                    format="MM/dd/yyyy"
+                                                    autocomplete="off"
+                                                    value="${command?.startDate}"
+                                />
+                            </div>
+                            <div class="filter-list-item">
+                                <label>
+                                    <g:message code="report.expiresBefore.label"
+                                               default="Expires before"
+                                    />
+                                </label>
+                                <g:jqueryDatePicker id="endDate"
+                                                    name="endDate"
+                                                    cssClass="filter"
+                                                    format="MM/dd/yyyy"
+                                                    autocomplete="off"
+                                                    value="${command?.endDate}"
+                                />
+                            </div>
 				           	<div class="filter-list-item right">
 								<button name="filter" class="button icon search">
 									<warehouse:message code="default.button.filter.label"/> </button>
