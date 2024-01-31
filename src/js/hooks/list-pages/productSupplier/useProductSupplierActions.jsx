@@ -7,6 +7,9 @@ import productSupplierApi from 'api/services/ProductSupplierApi';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import confirmationModal from 'utils/confirmationModalUtils';
 import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
+import notification from 'components/Layout/notifications/notification';
+import NotificationType from 'consts/notificationTypes';
+import translate from 'utils/Translate';
 
 const useProductSupplierActions = ({ fireFetchData }) => {
   const { currentUser, isAdmin } = useSelector((state) => ({
@@ -17,6 +20,15 @@ const useProductSupplierActions = ({ fireFetchData }) => {
   const deleteProductSupplier = async (onClose, productSupplierId) => {
     try {
       await productSupplierApi.deleteProductSupplier(productSupplierId);
+      notification(NotificationType.SUCCESS)({
+        message: translate({
+          id: 'react.productSupplier.deleted.label',
+          defaultMessage: `Product Source ${productSupplierId} deleted`,
+          data: {
+            id: productSupplierId,
+          },
+        }),
+      });
       fireFetchData?.();
     } finally {
       onClose?.();

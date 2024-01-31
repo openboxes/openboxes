@@ -5,6 +5,8 @@ import org.apache.http.auth.AuthenticationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.requisition.RequisitionSourceType
 
+import java.sql.SQLIntegrityConstraintViolationException
+
 /**
  * Copyright (c) 2012 Partners In Health.  All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -859,6 +861,7 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleNotFound", exception: ObjectNotFoundException)
         "500"(controller: "errors", action: "handleValidationErrors", exception: ValidationException)
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
+        "500"(controller: "errors", action: "handleConstraintViolation", exception: SQLIntegrityConstraintViolationException)
         "/"(controller: "dashboard", action: "index")
     }
 
