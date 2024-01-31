@@ -29,7 +29,7 @@
 
 .modal-content {
   width: auto !important;
-  min-width: 437px;
+  min-width: 400px;
   left: 50% !important;
   transform: translate(-50%);
 
@@ -45,7 +45,7 @@
   }
 
   .preference-type-modal-header {
-    font-size: 32px;
+    font-size: 18px;
   }
 
   .preference-type-modal-list-container {
@@ -53,7 +53,7 @@
 
     .preference-type-modal-list {
       overflow-y: auto;
-      max-height: 340px;
+      max-height: 230px;
 
       .preference-type-modal-list-element {
         margin-bottom: 2px;
@@ -65,7 +65,7 @@
     }
 
     p {
-      font-size: 21px;
+      font-size: 14px;
       margin: 0;
     }
   }

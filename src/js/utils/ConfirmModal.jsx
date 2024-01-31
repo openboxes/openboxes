@@ -8,7 +8,7 @@ import Translate from 'utils/Translate';
 
 import 'utils/utils.scss';
 
-const CustomConfirmModal = ({
+const ConfirmModal = ({
   labels: { title, content },
   onClose,
   buttons,
@@ -50,9 +50,9 @@ const CustomConfirmModal = ({
   </div>
 );
 
-export default CustomConfirmModal;
+export default ConfirmModal;
 
-CustomConfirmModal.propTypes = {
+ConfirmModal.propTypes = {
   labels: PropTypes.shape({
     title: PropTypes.shape({
       label: PropTypes.string,
@@ -73,7 +73,7 @@ CustomConfirmModal.propTypes = {
   })),
 };
 
-CustomConfirmModal.defaultProps = {
+ConfirmModal.defaultProps = {
   labels: {
     title: {
       label: '',

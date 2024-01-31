@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 import Button from 'components/form-elements/Button';
 import ListTitle from 'components/listPagesUtils/ListTitle';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
-import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
+import RoleType from 'consts/roleType';
+import { hasPermissions } from 'utils/permissionUtils';
 import ListHeaderButtonsWrapper from 'wrappers/ListHeaderButtonsWrapper';
 import ListHeaderWrapper from 'wrappers/ListHeaderWrapper';
 
@@ -26,7 +27,11 @@ const ProductSupplierHeader = () => {
       }}
       />
       <ListHeaderButtonsWrapper>
-        {hasPermissionsToProductSourceActions(currentUser, isAdmin) && (
+        {hasPermissions({
+          user: currentUser,
+          minimumRequiredRole: isAdmin,
+          supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
+        }) && (
           <Button
             label="react.productSupplier.createProductSource.label"
             defaultLabel="Create Product Source"
