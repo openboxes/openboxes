@@ -4,9 +4,11 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { RiCloseFill } from 'react-icons/all';
 import Modal from 'react-modal';
+import { useSelector } from 'react-redux';
 
 import Button from 'components/form-elements/Button';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
+import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
 import Translate from 'utils/Translate';
 
 const PreferenceTypeModal = ({
@@ -15,6 +17,14 @@ const PreferenceTypeModal = ({
   modalData,
   productSupplierId,
 }) => {
+  const {
+    currentUser,
+    isAdmin,
+  } = useSelector((state) => ({
+    currentUser: state.session.user,
+    isAdmin: state.session.isUserAdmin,
+  }));
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflowY = 'hidden';
@@ -95,11 +105,13 @@ const PreferenceTypeModal = ({
           </div>
         </div>
         <div className="d-flex justify-content-end mt-3">
-          <Button
-            defaultLabel="Edit"
-            label="react.productSupplier.edit.label"
-            onClick={() => redirectToEditProductSource(productSupplierId)}
-          />
+          {hasPermissionsToProductSourceActions(currentUser, isAdmin) && (
+            <Button
+              defaultLabel="Edit"
+              label="react.productSupplier.edit.label"
+              onClick={() => redirectToEditProductSource(productSupplierId)}
+            />
+          )}
         </div>
       </div>
     </Modal>

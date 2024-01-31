@@ -13,6 +13,7 @@ import grails.converters.JSON
 import grails.core.GrailsApplication
 import org.grails.exceptions.ExceptionUtils
 import org.pih.warehouse.RequestUtil
+import org.springframework.http.HttpMethod
 import org.springframework.validation.BeanPropertyBindingResult
 import util.ConfigHelper
 
@@ -113,6 +114,24 @@ class ErrorsController {
         render(view: "/error")
     }
 
+    def handleConstraintViolation() {
+        if (RequestUtil.isAjax(request)) {
+            if (request?.method == HttpMethod.DELETE.name()) {
+                String message = g.message(
+                        code: "errors.existingAssociation.message",
+                        default: "Resource could not be deleted because of an existing association"
+                )
+
+                render([errorCode: 500, errorMessage: message] as JSON)
+                return
+            }
+
+            Throwable root = ExceptionUtils.getRootCause(request.getAttribute('exception'))
+            render([errorCode: 500, errorMessage: root.getMessage()])
+        }
+
+        render(view: '/error')
+    }
 
     def sendFeedback() {
         def enabled = Boolean.valueOf(grailsApplication.config.openboxes.mail.feedback.enabled ?: true)
