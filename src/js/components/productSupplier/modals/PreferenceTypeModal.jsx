@@ -8,7 +8,8 @@ import { useSelector } from 'react-redux';
 
 import Button from 'components/form-elements/Button';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
-import { hasPermissionsToProductSourceActions } from 'utils/permissionUtils';
+import RoleType from 'consts/roleType';
+import { hasPermissions } from 'utils/permissionUtils';
 import Translate from 'utils/Translate';
 
 const PreferenceTypeModal = ({
@@ -105,7 +106,11 @@ const PreferenceTypeModal = ({
           </div>
         </div>
         <div className="d-flex justify-content-end mt-3">
-          {hasPermissionsToProductSourceActions(currentUser, isAdmin) && (
+          {hasPermissions({
+            user: currentUser,
+            minimumRequiredRole: isAdmin,
+            supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
+          }) && (
             <Button
               defaultLabel="Edit"
               label="react.productSupplier.edit.label"
