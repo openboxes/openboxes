@@ -47,8 +47,8 @@ export const hasRole = (user, role) => user?.roles?.includes(role);
 
 export const hasPermissions = ({
   user,
-  roles,
   minimumRequiredRole,
-}) => _.every(roles, (role) => hasRole(user, role)) && minimumRequiredRole;
+  supplementalRoles,
+}) => _.every(supplementalRoles, (role) => hasRole(user, role)) && minimumRequiredRole;
 
 export default canEditRequest;

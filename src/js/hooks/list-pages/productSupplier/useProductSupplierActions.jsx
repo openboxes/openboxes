@@ -75,8 +75,8 @@ const useProductSupplierActions = ({ fireFetchData }) => {
 
   const getActions = useCallback((productSupplierId) => (hasPermissions({
     user: currentUser,
-    roles: [RoleType.ROLE_PRODUCT_MANAGER],
     minimumRequiredRole: isAdmin,
+    supplementalRoles: [RoleType.ROLE_PRODUCT_MANAGER],
   }) ? [
       {
         defaultLabel: 'Edit',
