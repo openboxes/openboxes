@@ -33,6 +33,7 @@ import org.pih.warehouse.api.StocklistItem
 import org.pih.warehouse.api.SubstitutionItem
 import org.pih.warehouse.api.SuggestedItem
 import org.pih.warehouse.core.Address
+import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.Location
@@ -595,6 +596,10 @@ class BootStrap {
 
         JSON.registerObjectMarshaller(InvoiceItemCandidate) { InvoiceItemCandidate invoiceItemCandidate ->
             return invoiceItemCandidate.toJson()
+        }
+
+        JSON.registerObjectMarshaller(Event) { Event event ->
+            return event.toJson()
         }
     }
 

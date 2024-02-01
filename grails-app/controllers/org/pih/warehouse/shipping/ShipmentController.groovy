@@ -888,13 +888,9 @@ class ShipmentController {
 
 
     def saveComment() {
-        def shipmentInstance = Shipment.get(params.shipmentId)
-        def recipient = (params.recipientId) ? User.get(params.recipientId) : null
-        def comment = new Comment(comment: params.comment, sender: session.user, recipient: recipient)
-        if (shipmentInstance) {
-            shipmentInstance.addToComments(comment).save(flush: true)
-            flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.comment, shipmentInstance.name])}"
-        }
+        User recipient = User.get(params.recipientId)
+        shipmentService.addShipmentComment(params.shipmentId, params.comment, session.user, recipient)
+        flash.message = "${warehouse.message(code: 'shipping.addedCommentToShipment.message', args: [params.comment, params.shipmentId])}"
         redirect(action: 'showDetails', id: params.shipmentId)
     }
 

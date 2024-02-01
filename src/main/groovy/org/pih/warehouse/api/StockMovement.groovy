@@ -5,6 +5,7 @@ import org.apache.commons.collections.list.LazyList
 import grails.util.Holders
 import grails.validation.Validateable
 import org.pih.warehouse.core.ActivityCode
+import org.pih.warehouse.core.Comment
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
@@ -179,6 +180,7 @@ class StockMovement implements Validateable{
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
+            currentEvent        : requisition.mostRecentEvent,
             requestedBy         : requestedBy,
             lineItems           : lineItems,
             lineItemCount       : lineItemCount,

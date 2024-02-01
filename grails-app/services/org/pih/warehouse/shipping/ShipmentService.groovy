@@ -18,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.hibernate.FetchMode
+import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.api.StockTransfer
 import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Comment
@@ -2375,5 +2376,16 @@ class ShipmentService {
             shipment.removeFromReferenceNumbers(referenceNumber)
         }
         return referenceNumber
+    }
+
+    Comment addShipmentComment(String shipmentId, String content, User sender, User recipient) {
+        Shipment shipmentInstance = Shipment.get(shipmentId)
+        if (!shipmentInstance) {
+            throw new ObjectNotFoundException("Could not locate shipment with ID " + shipmentId)
+        }
+        Comment comment = new Comment(comment: content, sender: sender, recipient: recipient)
+        comment.save()
+        shipmentInstance.addToComments(comment)
+        return comment
     }
 }
