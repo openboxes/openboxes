@@ -180,7 +180,7 @@ class StockMovement implements Validateable{
             trackingNumber      : trackingNumber,
             driverName          : driverName,
             comments            : comments,
-            currentEvent        : requisition.mostRecentEvent,
+            currentEvent        : requisition?.mostRecentEvent,
             requestedBy         : requestedBy,
             lineItems           : lineItems,
             lineItemCount       : lineItemCount,
