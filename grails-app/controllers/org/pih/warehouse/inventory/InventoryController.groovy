@@ -575,49 +575,68 @@ class InventoryController {
 
 
     def listExpiredStock() {
-        def location = Location.get(session.warehouse.id)
-        def categorySelected = (params.category) ? Category.get(params.category) : null
-        def inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
-        def categories = inventoryItems?.collect { it.product.category }?.unique()
-        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
-        def expiredStockMap = [:]
-        inventoryItems.each { inventoryItem ->
-            expiredStockMap[inventoryItem] = quantityMap[inventoryItem]
+        Location location = Location.get(session.warehouse.id)
+        Category categorySelected = Category.get(params.category)
+        Boolean withBinLocation = params.boolean("withBinLocation")
+
+        List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
+        List<Category> categories = inventoryItems?.collect { it.product.category }?.unique()
+
+        List<Map> data = []
+        if (!inventoryItems.isEmpty()) {
+            data = withBinLocation
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
+                    .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
+
         if (params.format == "csv") {
             def filename = "Expired stock | " + location?.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForInventoryMap(expiredStockMap, [:]))
+            render(contentType: "text/csv", text: getCsvForInventoryMap(data, withBinLocation))
             return
         }
 
-        [inventoryItems: inventoryItems, quantityMap: quantityMap, categories: categories, categorySelected: categorySelected]
+        [
+                data: data,
+                categories: categories,
+                categorySelected: categorySelected,
+        ]
     }
 
 
     def listExpiringStock() {
-        def expirationStatus = params.status
-        def location = Location.get(session.warehouse.id)
-        def category = (params.category) ? Category.get(params.category) : null
-        def inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
-        def categories = inventoryItems?.collect { it?.product?.category }?.unique().sort {
+        String expirationStatus = params.status
+        Location location = Location.get(session.warehouse.id)
+        Category category = Category.get(params.category)
+        Boolean withBinLocation = params.boolean("withBinLocation")
+
+        List<InventoryItem> inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
+        List<Category> categories = inventoryItems?.collect { it?.product?.category }?.unique().sort {
             it.name
         }
-        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
-        def expiringStockMap = [:]
-        inventoryItems.each { inventoryItem ->
-            expiringStockMap[inventoryItem] = quantityMap[inventoryItem]
+
+        List<Map> data = []
+        if (!inventoryItems?.isEmpty()) {
+            data = withBinLocation
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
+                    .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
 
         if (params.format == "csv") {
             def filename = "Expiring stock | " + location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForInventoryMap(expiringStockMap, [:]))
+            render(contentType: "text/csv", text: getCsvForInventoryMap(data, withBinLocation))
             return
         }
 
-        [inventoryItems  : inventoryItems, quantityMap: quantityMap, categories: categories,
-         categorySelected: category, expirationStatus: expirationStatus]
+        [
+                data: data,
+                categories: categories,
+                categorySelected: category,
+                expirationStatus: expirationStatus,
+        ]
     }
 
     def exportLatestInventoryDate() {
@@ -1349,7 +1368,7 @@ class InventoryController {
         return dates
     }
 
-    private def getCsvForInventoryMap(map, statusMap) {
+    private def getCsvForInventoryMap(List<Map> data, Boolean includeBinLocation = false) {
         def csv = ""
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.status.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.productCode.label')}" + '"' + ","
@@ -1359,7 +1378,9 @@ class InventoryController {
         csv += '"' + "${warehouse.message(code: 'product.productFamily.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'category.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'product.tags.label', default: 'Tags')}" + '"' + ","
-        csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
+        if (includeBinLocation) {
+            csv += '"' + "${warehouse.message(code: 'inventoryLevel.binLocation.label')}" + '"' + ","
+        }
         csv += '"' + "${warehouse.message(code: 'product.unitOfMeasure.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.minQuantity.label')}" + '"' + ","
         csv += '"' + "${warehouse.message(code: 'inventoryLevel.reorderQuantity.label')}" + '"' + ","
@@ -1372,33 +1393,35 @@ class InventoryController {
 
         def hasRoleFinance = userService.hasRoleFinance(session.user)
 
-        map.each { inventoryItem, quantity ->
+        data.each { it ->
 
-            def product = inventoryItem?.product
-            def inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
-            def totalValue = (product?.pricePerUnit ?: 0) * (quantity ?: 0)
-            def statusMessage = inventoryLevel?.statusMessage(quantity ?: 0)
-
-            if (!statusMessage) {
-                def status = quantity > 0 ? "IN_STOCK" : "STOCKOUT"
-                statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status)}"
+            Product product = it.inventoryItem?.product
+            InventoryLevel inventoryLevel = product?.getInventoryLevel(session.warehouse.id)
+            BigDecimal quantity = it.quantity ?: 0
+            BigDecimal totalValue = (product?.pricePerUnit ?: 0) * (quantity)
+            String status = inventoryLevel?.statusMessage(quantity as Long)
+            if (!status) {
+                status = quantity > 0 ? "IN_STOCK" : "STOCK_OUT"
             }
+            String statusMessage = "${warehouse.message(code: 'enum.InventoryLevelStatusCsv.' + status, default: status)}"
 
             csv += '"' + (statusMessage ?: "") + '"' + ","
             csv += '"' + (product.productCode ?: "") + '"' + ","
             csv += StringEscapeUtils.escapeCsv(product?.displayNameWithLocaleCode ?: "") + ","
-            csv += StringEscapeUtils.escapeCsv(inventoryItem?.lotNumber ?: "") + ","
-            csv += '"' + formatDate(date: inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
+            csv += StringEscapeUtils.escapeCsv(it.inventoryItem?.lotNumber ?: "") + ","
+            csv += '"' + formatDate(date: it.inventoryItem?.expirationDate, format: 'dd/MM/yyyy') + '"' + ","
             csv += '"' + (product?.productFamily?.name ?: "") + '"' + ','
             csv += StringEscapeUtils.escapeCsv(product?.category?.name ?: "") + ","
             csv += '"' + (product?.tagsToString() ?: "") + '"' + ","
-            csv += '"' + (inventoryLevel?.binLocation ?: "") + '"' + ","
+            if (includeBinLocation) {
+                csv += '"' + (it.binLocation ?: "") + '"' + ","
+            }
             csv += '"' + (product?.unitOfMeasure ?: "") + '"' + ","
             csv += (inventoryLevel?.minQuantity ?: "") + ","
             csv += (inventoryLevel?.reorderQuantity ?: "") + ","
             csv += (inventoryLevel?.maxQuantity ?: "") + ","
             csv += (inventoryLevel?.forecastQuantity ?: "") + ","
-            csv += '' + (quantity ?: "0") + '' + ","
+            csv += '' + quantity + '' + ","
             csv += (hasRoleFinance ? (product?.pricePerUnit ?: "") : "") + ","
             csv += (hasRoleFinance ? (totalValue ?: "") : "")
             csv += "\n"
