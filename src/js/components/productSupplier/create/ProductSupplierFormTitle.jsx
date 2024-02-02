@@ -1,13 +1,14 @@
 import React from 'react';
 
+import { getTranslate } from 'react-localize-redux';
+import { useSelector } from 'react-redux';
+
 import useProductSupplierData from 'hooks/list-pages/productSupplier/useProductSupplierData';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 import '../styles.scss';
-import { useSelector } from 'react-redux';
-import { translateWithDefaultMessage } from 'utils/Translate';
-import { getTranslate } from 'react-localize-redux';
 
-const CreateProductSupplierTitle = () => {
+const ProductSupplierFormTitle = () => {
   const { productSupplier } = useProductSupplierData();
 
   const { translate } = useSelector(state => ({
@@ -33,4 +34,4 @@ const CreateProductSupplierTitle = () => {
   );
 };
 
-export default CreateProductSupplierTitle;
+export default ProductSupplierFormTitle;

@@ -3,7 +3,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Button from 'components/form-elements/Button';
-import CreateProductSupplierTitle from 'components/productSupplier/create/CreateProductSupplierTitle';
+import ProductSupplierFormTitle from 'components/productSupplier/create/ProductSupplierFormTitle';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import useProductSupplierActions from 'hooks/list-pages/productSupplier/useProductSupplierActions';
 import useProductSupplierData from 'hooks/list-pages/productSupplier/useProductSupplierData';
@@ -11,7 +11,7 @@ import RedirectButton from 'utils/RedirectButton';
 import HeaderButtonsWrapper from 'wrappers/HeaderButtonsWrapper';
 import HeaderWrapper from 'wrappers/HeaderWrapper';
 
-const CreateProductSupplierHeader = () => {
+const ProductSupplierFormHeader = () => {
   const history = useHistory();
   const { productSupplier } = useProductSupplierData();
 
@@ -55,10 +55,10 @@ const CreateProductSupplierHeader = () => {
             />
           </HeaderButtonsWrapper>
         </div>
-        <CreateProductSupplierTitle />
+        <ProductSupplierFormTitle />
       </div>
     </HeaderWrapper>
   );
 };
 
-export default CreateProductSupplierHeader;
+export default ProductSupplierFormHeader;

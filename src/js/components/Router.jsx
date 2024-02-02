@@ -165,7 +165,7 @@ const AsyncProductSupplierList = Loadable({
 });
 
 const AsyncProductSupplierCreatePage = Loadable({
-  loader: () => import('components/productSupplier/create/CreateProductSupplier'),
+  loader: () => import('components/productSupplier/create/ProductSupplierForm'),
   loading: Loading,
 });
 
