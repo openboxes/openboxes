@@ -9,7 +9,7 @@ import { DETAILS_TAB } from 'consts/productSupplierList';
 import useProductSupplierFilters from 'hooks/list-pages/productSupplier/useProductSupplierFilters';
 import useQueryParams from 'hooks/useQueryParams';
 import useTranslation from 'hooks/useTranslation';
-import ListWrapper from 'wrappers/ListWrapper';
+import PageWrapper from 'wrappers/PageWrapper';
 
 import './styles.scss';
 
@@ -27,7 +27,7 @@ const ProductSupplierList = () => {
   } = useProductSupplierFilters(ignoreClearFilters);
 
   return (
-    <ListWrapper>
+    <PageWrapper>
       <ProductSupplierHeader />
       <ProductSupplierTabs />
       <ProductSupplierListFilters
@@ -38,7 +38,7 @@ const ProductSupplierList = () => {
       />
       {parsedQueryParams?.tab === DETAILS_TAB
         && <ProductSupplierListTable filterParams={filterParams} />}
-    </ListWrapper>
+    </PageWrapper>
   );
 };
 
