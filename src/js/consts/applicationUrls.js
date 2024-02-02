@@ -129,8 +129,9 @@ const CATEGORY_URL = {
 
 const PRODUCT_SUPPLIER_URL = {
   base: `${CONTEXT_PATH}/productSupplier`,
+  list: () => `${PRODUCT_SUPPLIER_URL.base}/list`,
   create: () => `${PRODUCT_SUPPLIER_URL.base}/create`,
-  edit: (id) => `${PRODUCT_SUPPLIER_URL.base}/edit/${id}`,
+  edit: (id) => `${PRODUCT_SUPPLIER_URL.base}/create/${id}`,
   export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
 };
 

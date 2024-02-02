@@ -120,6 +120,18 @@ class ProductSupplierController {
         }
     }
 
+    def edit() {
+        def productSupplierInstance = ProductSupplier.get(params.id)
+        Location location = Location.get(session.warehouse.id)
+        ProductSupplierPreference preference = productSupplierInstance?.productSupplierPreferences?.find {it.destinationParty == location.organization }
+        if (!productSupplierInstance) {
+            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productSupplier.label', default: 'ProductSupplier'), params.id])}"
+            redirect(action: "list")
+        } else {
+            return [productSupplierInstance: productSupplierInstance, preferenceType: preference?.preferenceType, defaultPreferenceType: productSupplierInstance?.globalProductSupplierPreference?.preferenceType]
+        }
+    }
+
     def update() {
         def productSupplierInstance = productSupplierGormService.get(params.id)
         Location location = Location.get(session.warehouse.id)
