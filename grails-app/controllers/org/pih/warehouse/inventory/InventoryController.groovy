@@ -579,19 +579,19 @@ class InventoryController {
         command.location = Location.get(session.warehouse.id)
         Boolean withBinLocation = params.boolean("withBinLocation")
 
-        List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
+        List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(command)
         List<Category> categories = inventoryItems?.collect { it.product.category }?.unique()
 
         List<Map> data = []
         if (!inventoryItems.isEmpty()) {
             data = withBinLocation
-                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
-                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(command.location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(command.location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
 
         if (params.format == "csv") {
-            def filename = "Expired stock | " + location?.name + ".csv"
+            def filename = "Expired stock | " + command.location?.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForInventoryMap(data, withBinLocation))
             return
@@ -609,7 +609,7 @@ class InventoryController {
         command.location = Location.get(session.warehouse.id)
         Boolean withBinLocation = params.boolean("withBinLocation")
 
-        List<InventoryItem> inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
+        List<InventoryItem> inventoryItems = dashboardService.getExpiringStock(command)
         List<Category> categories = inventoryItems?.collect { it?.product?.category }?.unique().sort {
             it.name
         }
@@ -617,13 +617,13 @@ class InventoryController {
         List<Map> data = []
         if (!inventoryItems?.isEmpty()) {
             data = withBinLocation
-                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
-                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(command.location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(command.location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
 
         if (params.format == "csv") {
-            def filename = "Expiring stock | " + location.name + ".csv"
+            def filename = "Expiring stock | " + command.location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForInventoryMap(data, withBinLocation))
             return

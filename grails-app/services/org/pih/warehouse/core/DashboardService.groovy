@@ -18,6 +18,7 @@ import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.report.InventoryReportCommand
 import org.pih.warehouse.requisition.RequisitionItem
 
 import java.sql.Timestamp
@@ -147,7 +148,7 @@ class DashboardService {
      * @param location
      * @return
      */
-    List getExpiredStock(Category category, Location location, Date startDate, Date endDate) {
+    List getExpiredStock(InventoryReportCommand command) {
 
         long startTime = System.currentTimeMillis()
 
@@ -155,20 +156,20 @@ class DashboardService {
         def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc'])
 
         Map<InventoryItem, Integer> quantityMap =
-                productAvailabilityService.getQuantityOnHandByInventoryItem(location)
+                productAvailabilityService.getQuantityOnHandByInventoryItem(command.location)
         expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
 
         // FIXME poor man's filter
-        if (category) {
-            expiredStock = expiredStock.findAll { item -> item?.product?.category == category }
+        if (command.category) {
+            expiredStock = expiredStock.findAll { item -> item?.product?.category == command.category }
         }
 
-        if (startDate) {
-            expiredStock = expiredStock.findAll { item -> item?.expirationDate >= startDate }
+        if (command.startDate) {
+            expiredStock = expiredStock.findAll { item -> item?.expirationDate >= command.startDate }
         }
 
-        if (endDate) {
-            expiredStock = expiredStock.findAll { item -> item?.expirationDate <= endDate }
+        if (command.endDate) {
+            expiredStock = expiredStock.findAll { item -> item?.expirationDate <= command.endDate }
         }
 
         log.debug "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
@@ -183,40 +184,40 @@ class DashboardService {
      * @param threshold the threshold filter
      * @return a list of inventory items
      */
-    List getExpiringStock(Category category, Location location, String expirationStatus, Date startDate, Date endDate) {
+    List getExpiringStock(InventoryReportCommand command) {
         long startTime = System.currentTimeMillis()
 
         def today = new Date()
         today.clearTime()
         // Get all stock expiring ever (we'll filter later)
         def expiringStock = InventoryItem.findAllByExpirationDateGreaterThanEquals(today + 1, [sort: 'expirationDate', order: 'asc'])
-        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(location)
+        def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(command.location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
-        if (category) {
-            expiringStock = expiringStock.findAll { item -> item?.product?.category == category }
+        if (command.category) {
+            expiringStock = expiringStock.findAll { item -> item?.product?.category == command.category }
         }
 
-        if (startDate) {
-            expiringStock = expiringStock.findAll { item -> item?.expirationDate >= startDate }
+        if (command.startDate) {
+            expiringStock = expiringStock.findAll { item -> item?.expirationDate >= command.startDate }
         }
 
-        if (endDate) {
-            expiringStock = expiringStock.findAll { item -> item?.expirationDate <= endDate }
+        if (command.endDate) {
+            expiringStock = expiringStock.findAll { item -> item?.expirationDate <= command.endDate }
         }
 
-        if (expirationStatus) {
+        if (command.status) {
             def daysToExpiry = [30, 60, 90, 180, 365]
 
             expiringStock = expiringStock.findAll { inventoryItem ->
-                if (expirationStatus == "greaterThan365Days") {
+                if (command.status == "greaterThan365Days") {
                     inventoryItem.expirationDate - today > 365
-                } else if (expirationStatus == "expired") {
+                } else if (command.status == "expired") {
                     inventoryItem.expirationDate - today <= 0
                 } else inventoryItem
             }
 
             daysToExpiry.each { day ->
-                if (expirationStatus == "within${day}Days") {
+                if (command.status == "within${day}Days") {
                     expiringStock = expiringStock.findAll { inventoryItem ->
                         inventoryItem.expirationDate - today <= day
                     }
