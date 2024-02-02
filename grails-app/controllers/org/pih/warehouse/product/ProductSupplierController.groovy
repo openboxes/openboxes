@@ -15,7 +15,10 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.pih.warehouse.core.EntityTypeCode
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.PreferenceType
+import org.pih.warehouse.data.ProductSupplierService
+
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import org.pih.warehouse.core.ProductPrice
@@ -26,6 +29,7 @@ class ProductSupplierController {
     def documentService
     def identifierService
     ProductSupplierDataService productSupplierGormService
+    ProductSupplierService productSupplierService
 
     static allowedMethods = [save: "POST", update: "POST", delete: ["GET", "POST"]]
 
@@ -71,8 +75,8 @@ class ProductSupplierController {
         updateAttributes(productSupplierInstance, params)
 
         if (!productSupplierInstance.code) {
-            String prefix = productSupplierInstance?.product?.productCode
-            productSupplierInstance.code = identifierService.generateProductSupplierIdentifier(prefix)
+            Organization organization = Organization.read(params.supplier)
+            productSupplierService.assignSourceCode(productSupplierInstance, organization)
         }
 
         if (params.defaultPreferenceType) {

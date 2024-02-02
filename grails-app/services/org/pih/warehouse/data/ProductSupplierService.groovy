@@ -59,7 +59,8 @@ class ProductSupplierService {
         productSupplier.ratingTypeCode = ratingTypeCode
         productSupplier.productCode = params["legacyProductCode"]
         productSupplier.product = product
-        productSupplier.supplier = supplierName ? Organization.findByName(supplierName) : null
+        Organization supplier = supplierName ? Organization.findByName(supplierName) : null
+        productSupplier.supplier = supplier
         productSupplier.manufacturer = manufacturerName ? Organization.findByName(manufacturerName) : null
         productSupplier.supplierCode = supplierCode ? supplierCode : null
         productSupplier.manufacturerCode = manufacturerCode ? manufacturerCode : null
@@ -135,10 +136,14 @@ class ProductSupplierService {
         }
 
         if (!productSupplier.code) {
-            String prefix = productSupplier?.product?.productCode
-            productSupplier.code = identifierService.generateProductSupplierIdentifier(prefix)
+            assignSourceCode(productSupplier, supplier)
         }
         return productSupplier
+    }
+
+    void assignSourceCode(ProductSupplier productSupplier, Organization organization) {
+        String prefix = productSupplier?.product?.productCode
+        productSupplier.code = identifierService.generateProductSupplierIdentifier(prefix, organization?.code)
     }
 
     def getOrCreateNew(Map params, boolean forceCreate) {
