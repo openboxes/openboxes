@@ -18,6 +18,7 @@ import org.pih.warehouse.core.Organization
 import org.pih.warehouse.invoice.Invoice
 import org.pih.warehouse.invoice.InvoiceItemCandidate
 import org.pih.warehouse.invoice.InvoiceItem
+import org.pih.warehouse.invoice.InvoiceList
 import org.pih.warehouse.invoice.InvoiceType
 import org.pih.warehouse.invoice.InvoiceTypeCode
 import org.pih.warehouse.invoice.InvoiceStatus
@@ -29,12 +30,19 @@ class InvoiceApiController {
     def invoiceService
 
     def list() {
-        def location = Location.get(session.warehouse.id)
+        Location location = Location.get(session.warehouse.id)
         params.partyFromId = location?.organization?.id
-        def invoices = invoiceService.getInvoices(params)
+        Boolean includeInvoiceItems = params.boolean("invoiceItems", false)
+
+        List<InvoiceList> invoices = invoiceService.getInvoices(params, includeInvoiceItems)
+
         if (params.format == "csv") {
-            CSVPrinter csv = invoiceService.getInvoicesCsv(invoices)
-            response.setHeader("Content-disposition", "attachment; filename=\"Invoices-${new Date().format("MM/dd/yyyy")}.csv\"")
+            CSVPrinter csv = includeInvoiceItems
+                    ? invoiceService.getInvoiceItemsCsv(invoices.invoice.invoiceItems.flatten())
+                    : invoiceService.getInvoicesCsv(invoices)
+
+            String name = includeInvoiceItems ? "Invoice Items" : "Invoices"
+            response.setHeader("Content-disposition", "attachment; filename=\"${name}-${new Date().format("MM/dd/yyyy")}.csv\"")
             render(contentType: "text/csv", text: csv.out.toString())
             return
         }

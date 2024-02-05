@@ -51,10 +51,13 @@ const useInvoiceListTableData = (filterParams) => {
 
   const dispatch = useDispatch();
 
-  const downloadInvoices = async () => {
+  const downloadInvoices = async (invoiceItems = false) => {
     try {
       dispatch(showSpinner());
-      const params = _.omit(tableData.currentParams, 'offset', 'max');
+      const params = {
+        ..._.omit(tableData.currentParams, 'offset', 'max'),
+        invoiceItems,
+      };
       await invoiceApi.downloadInvoices(params);
     } finally {
       dispatch(hideSpinner());

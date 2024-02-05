@@ -155,8 +155,7 @@ const InvoiceListTable = ({
             <button
               type="button"
               className="dropdown-item"
-              onClick={() => {}}
-              disabled
+              onClick={() => downloadInvoices(true)}
             >
               <Translate
                 id="react.invoice.export.invoiceLineDetails.label"

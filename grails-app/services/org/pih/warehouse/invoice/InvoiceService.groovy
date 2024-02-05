@@ -9,8 +9,12 @@
  **/
 package org.pih.warehouse.invoice
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import org.apache.commons.csv.CSVPrinter
+import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.hibernate.FetchMode
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.CSVUtils
@@ -29,16 +33,28 @@ class InvoiceService {
 
     def authService
     def identifierService
+    GrailsApplication grailsApplication
 
-    def getInvoices(Map params) {
+    ApplicationTagLib getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
+
+    List<InvoiceList> getInvoices(Map params, Boolean fetchItemsEagerly = false) {
         // Parse pagination parameters
-        Integer max = params.max ? params.int("max") : (params.format == "csv" ? null : 10)
-        Integer offset = params.offset ? params.int("offset") : (params.format == "csv" ? null : 0)
+        Integer max = params.format == "csv" ? null : params.int("max", 10)
+        Integer offset = params.format == "csv" ? null : params.int("offset", 0)
 
         // Parse date parameters
         params.dateInvoiced = params.dateInvoiced ? Date.parse("MM/dd/yyyy", params.dateInvoiced) : null
 
         return InvoiceList.createCriteria().list(max: max, offset: offset) {
+            resultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+
+            if (fetchItemsEagerly) {
+                fetchMode("invoice", FetchMode.JOIN)
+                fetchMode("invoice.invoiceItems", FetchMode.JOIN)
+            }
+
             eq("partyFromId", params.partyFromId)
 
             if (params.invoiceNumber) {
@@ -73,7 +89,7 @@ class InvoiceService {
         }
     }
 
-    def getInvoiceItems(String id, String max, String offset) {
+    List<InvoiceItem> getInvoiceItems(String id, String max, String offset) {
         Invoice invoice = Invoice.get(id)
 
         if (!invoice) {
@@ -456,6 +472,50 @@ class InvoiceService {
                 invoiceListItem?.vendorInvoiceNumber,
                 invoiceListItem?.invoice?.totalValue,
                 invoiceListItem?.currency,
+            )
+        }
+        return csv
+    }
+
+    CSVPrinter getInvoiceItemsCsv(List<InvoiceItem> invoiceItems) {
+        CSVPrinter csv = CSVUtils.getCSVPrinter()
+        csv.printRecord(
+                "Invoice Number",
+                "Vendor Invoice Number",
+                "Vendor",
+                "Currency",
+                "Status",
+                "Buyer Organization",
+                "Invoice Type",
+                "Code",
+                "Name",
+                "Order Number",
+                "GL Account",
+                "Budget Code",
+                "Quantity",
+                "Quantity per UoM",
+                "Amount",
+                "Total Amount",
+        )
+
+        invoiceItems?.each { InvoiceItem invoiceItem ->
+            csv.printRecord(
+                    invoiceItem.invoice?.invoiceNumber,
+                    invoiceItem.invoice?.vendorInvoiceNumber,
+                    "${invoiceItem.invoice?.party?.code} ${invoiceItem.invoice?.party?.name}",
+                    invoiceItem.invoice?.currencyUom.name,
+                    invoiceItem.invoice?.status?.name(),
+                    "${invoiceItem.invoice?.partyFrom?.code} ${invoiceItem.invoice?.partyFrom?.name}",
+                    invoiceItem.invoice?.invoiceType?.code?.name() ?: InvoiceTypeCode.INVOICE.name(),
+                    invoiceItem.product?.productCode ?: applicationTagLib.message(code:'default.all.label', default: 'all'),
+                    invoiceItem?.orderAdjustment ? invoiceItem?.description : invoiceItem.product?.name,
+                    invoiceItem.order?.orderNumber,
+                    invoiceItem.glAccount?.name,
+                    invoiceItem.budgetCode?.name,
+                    invoiceItem?.quantity,
+                    invoiceItem?.quantityPerUom,
+                    invoiceItem?.unitPrice ?: 0,
+                    invoiceItem?.totalAmount ?: 0,
             )
         }
         return csv
