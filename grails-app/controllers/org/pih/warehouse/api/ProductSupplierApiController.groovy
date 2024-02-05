@@ -2,7 +2,6 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.hibernate.ObjectNotFoundException
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierListParams
