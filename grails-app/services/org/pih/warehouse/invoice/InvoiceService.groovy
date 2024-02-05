@@ -9,9 +9,12 @@
  **/
 package org.pih.warehouse.invoice
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.util.Holders
 import org.apache.commons.csv.CSVPrinter
+import org.grails.plugins.web.taglib.ApplicationTagLib
+import org.hibernate.FetchMode
+import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.UnitOfMeasure
 import org.pih.warehouse.importer.CSVUtils
@@ -30,16 +33,28 @@ class InvoiceService {
 
     def authService
     def identifierService
+    GrailsApplication grailsApplication
 
-    List<InvoiceList> getInvoices(Map params) {
+    ApplicationTagLib getApplicationTagLib() {
+        return grailsApplication.mainContext.getBean(ApplicationTagLib)
+    }
+
+    List<InvoiceList> getInvoices(Map params, Boolean fetchItemsEagerly = false) {
         // Parse pagination parameters
-        Integer max = params.max ? params.int("max") : (params.format == "csv" ? null : 10)
-        Integer offset = params.offset ? params.int("offset") : (params.format == "csv" ? null : 0)
+        Integer max = params.format == "csv" ? null : params.int("max", 10)
+        Integer offset = params.format == "csv" ? null : params.int("offset", 0)
 
         // Parse date parameters
         params.dateInvoiced = params.dateInvoiced ? Date.parse("MM/dd/yyyy", params.dateInvoiced) : null
 
         return InvoiceList.createCriteria().list(max: max, offset: offset) {
+            resultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+
+            if (fetchItemsEagerly) {
+                fetchMode("invoice", FetchMode.JOIN)
+                fetchMode("invoice.invoiceItems", FetchMode.JOIN)
+            }
+
             eq("partyFromId", params.partyFromId)
 
             if (params.invoiceNumber) {
@@ -74,33 +89,25 @@ class InvoiceService {
         }
     }
 
-    List<InvoiceItem> getInvoiceItems(List<Invoice> invoices, String max, String offset) {
-        if (!invoices) {
+    List<InvoiceItem> getInvoiceItems(String id, String max, String offset) {
+        Invoice invoice = Invoice.get(id)
+
+        if (!invoice) {
             return []
         }
 
         List <InvoiceItem> invoiceItems
         if (max != null && offset != null) {
             invoiceItems = InvoiceItem.createCriteria().list(max: max.toInteger(), offset: offset.toInteger()) {
-                invoice {
-                    'in'("id", invoices.id)
-                }
+                eq("invoice", invoice)
             }
         } else {
             invoiceItems = InvoiceItem.createCriteria().list() {
-                invoice {
-                    'in'("id", invoices.id)
-                }
+                eq("invoice", invoice)
             }
         }
 
         return invoiceItems
-    }
-
-    List<InvoiceItem> getInvoiceItemsByInvoice(String id, String max, String offset) {
-        Invoice invoice = Invoice.get(id)
-
-        return getInvoiceItems([invoice], max, offset)
     }
 
     def getInvoiceItemCandidates(String id, List orderNumbers, List shipmentNumbers) {
@@ -471,8 +478,6 @@ class InvoiceService {
     }
 
     CSVPrinter getInvoiceItemsCsv(List<InvoiceItem> invoiceItems) {
-        def g = Holders.grailsApplication.mainContext.getBean('org.grails.plugins.web.taglib.ApplicationTagLib')
-
         CSVPrinter csv = CSVUtils.getCSVPrinter()
         csv.printRecord(
                 "Invoice Number",
@@ -502,7 +507,7 @@ class InvoiceService {
                     invoiceItem.invoice?.status?.name(),
                     "${invoiceItem.invoice?.partyFrom?.code} ${invoiceItem.invoice?.partyFrom?.name}",
                     invoiceItem.invoice?.invoiceType?.code?.name() ?: InvoiceTypeCode.INVOICE.name(),
-                    invoiceItem.product?.productCode ?: g.message(code:'default.all.label', default: 'all'),
+                    invoiceItem.product?.productCode ?: applicationTagLib.message(code:'default.all.label', default: 'all'),
                     invoiceItem?.orderAdjustment ? invoiceItem?.description : invoiceItem.product?.name,
                     invoiceItem.order?.orderNumber,
                     invoiceItem.glAccount?.name,

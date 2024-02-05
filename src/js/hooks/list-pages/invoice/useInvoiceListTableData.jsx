@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
 import invoiceApi from 'api/services/InvoiceApi';
-import invoiceItemApi from 'api/services/InvoiceItemApi';
 import { INVOICE_API } from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
 
@@ -52,21 +51,14 @@ const useInvoiceListTableData = (filterParams) => {
 
   const dispatch = useDispatch();
 
-  const downloadInvoices = async () => {
+  const downloadInvoices = async (invoiceItems = false) => {
     try {
       dispatch(showSpinner());
-      const params = _.omit(tableData.currentParams, 'offset', 'max');
+      const params = {
+        ..._.omit(tableData.currentParams, 'offset', 'max'),
+        invoiceItems,
+      };
       await invoiceApi.downloadInvoices(params);
-    } finally {
-      dispatch(hideSpinner());
-    }
-  };
-
-  const downloadInvoiceLineDetails = async () => {
-    try {
-      dispatch(showSpinner());
-      const params = _.omit(tableData.currentParams, 'offset', 'max');
-      await invoiceItemApi.downloadInvoiceLineDetails(params);
     } finally {
       dispatch(hideSpinner());
     }
@@ -78,7 +70,6 @@ const useInvoiceListTableData = (filterParams) => {
     loading,
     onFetchHandler,
     downloadInvoices,
-    downloadInvoiceLineDetails,
   };
 };
 

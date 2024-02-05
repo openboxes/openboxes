@@ -30,12 +30,19 @@ class InvoiceApiController {
     def invoiceService
 
     def list() {
-        def location = Location.get(session.warehouse.id)
+        Location location = Location.get(session.warehouse.id)
         params.partyFromId = location?.organization?.id
-        def invoices = invoiceService.getInvoices(params)
+        Boolean includeInvoiceItems = params.boolean("invoiceItems", false)
+
+        List<InvoiceList> invoices = invoiceService.getInvoices(params, includeInvoiceItems)
+
         if (params.format == "csv") {
-            CSVPrinter csv = invoiceService.getInvoicesCsv(invoices)
-            response.setHeader("Content-disposition", "attachment; filename=\"Invoices-${new Date().format("MM/dd/yyyy")}.csv\"")
+            CSVPrinter csv = includeInvoiceItems
+                    ? invoiceService.getInvoiceItemsCsv(invoices.invoice.invoiceItems.flatten())
+                    : invoiceService.getInvoicesCsv(invoices)
+
+            String name = includeInvoiceItems ? "Invoice Items" : "Invoices"
+            response.setHeader("Content-disposition", "attachment; filename=\"${name}-${new Date().format("MM/dd/yyyy")}.csv\"")
             render(contentType: "text/csv", text: csv.out.toString())
             return
         }
@@ -128,23 +135,8 @@ class InvoiceApiController {
         return invoice
     }
 
-    def getAllInvoiceItems() {
-        Location location = Location.get(session.warehouse.id)
-        params.partyFromId = location?.organization?.id
-        List<InvoiceList> invoices = invoiceService.getInvoices(params)
-        List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(invoices.invoice, params.max, params.offset)
-
-        if (params.format == "csv") {
-            CSVPrinter csv = invoiceService.getInvoiceItemsCsv(invoiceItems)
-            response.setHeader("Content-disposition", "attachment; filename=\"Invoices Line Details -${new Date().format("MM/dd/yyyy")}.csv\"")
-            render(contentType: "text/csv", text: csv.out.toString())
-            return
-        }
-        render([data: invoiceItems, totalCount: invoiceItems.totalCount ?: invoiceItems.size()] as JSON)
-    }
-
     def getInvoiceItems() {
-        List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItemsByInvoice(params.id, params.max, params.offset)
+        List<InvoiceItem> invoiceItems = invoiceService.getInvoiceItems(params.id, params.max, params.offset)
         render([data: invoiceItems, totalCount: invoiceItems.totalCount?:invoiceItems.size()] as JSON)
     }
 
