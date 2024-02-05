@@ -605,7 +605,7 @@ class ProductAvailabilityService {
         return quantityMap
     }
 
-    List getQuantityOnHandByBinLocation(Location location, List<InventoryItem> inventoryItems) {
+    List getQuantityOnHandByBinLocation(Location location, List<InventoryItem> inventoryItems = []) {
         if (!location) {
             return []
         }
