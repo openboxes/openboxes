@@ -364,8 +364,10 @@ class AddItemsPage extends Component {
   validate(values) {
     const errors = {};
     errors.invoiceItems = [];
-
     _.forEach(values?.invoiceItems, (item, key) => {
+      if (_.isNil(_.get(item, 'quantity'))) {
+        errors.invoiceItems[key] = { quantity: 'react.invoice.error.enterQuantity.label' };
+      }
       if (_.has(item, 'isValid') && !item.isValid) {
         errors.invoiceItems[key] = { quantity: item?.errorMessage };
       }
@@ -472,7 +474,7 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
-                  disabled={invalid}
+                  disabled={invalid || !values.invoiceItems?.length}
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 >
