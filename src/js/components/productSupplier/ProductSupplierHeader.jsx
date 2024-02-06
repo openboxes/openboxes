@@ -7,8 +7,8 @@ import ListTitle from 'components/listPagesUtils/ListTitle';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
 import RoleType from 'consts/roleType';
 import { hasPermissions } from 'utils/permissionUtils';
-import ListHeaderButtonsWrapper from 'wrappers/ListHeaderButtonsWrapper';
-import ListHeaderWrapper from 'wrappers/ListHeaderWrapper';
+import HeaderButtonsWrapper from 'wrappers/HeaderButtonsWrapper';
+import HeaderWrapper from 'wrappers/HeaderWrapper';
 
 const ProductSupplierHeader = () => {
   const {
@@ -20,13 +20,13 @@ const ProductSupplierHeader = () => {
   }));
 
   return (
-    <ListHeaderWrapper>
+    <HeaderWrapper>
       <ListTitle label={{
         id: 'react.productSupplier.header.label',
         defaultMessage: 'Product Sources List',
       }}
       />
-      <ListHeaderButtonsWrapper>
+      <HeaderButtonsWrapper>
         {hasPermissions({
           user: currentUser,
           minimumRequiredRole: isAdmin,
@@ -40,8 +40,8 @@ const ProductSupplierHeader = () => {
             }}
           />
         )}
-      </ListHeaderButtonsWrapper>
-    </ListHeaderWrapper>
+      </HeaderButtonsWrapper>
+    </HeaderWrapper>
   );
 };
 

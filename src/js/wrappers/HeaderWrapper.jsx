@@ -2,19 +2,19 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const ListHeaderWrapper = ({ children, className }) => (
+const HeaderWrapper = ({ children, className }) => (
   <div className={`d-flex list-page-header ${className}`}>
     {children}
   </div>
 );
 
-export default ListHeaderWrapper;
+export default HeaderWrapper;
 
-ListHeaderWrapper.propTypes = {
+HeaderWrapper.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
 };
 
-ListHeaderWrapper.defaultProps = {
+HeaderWrapper.defaultProps = {
   className: '',
 };
