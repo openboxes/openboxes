@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import Translate from 'utils/Translate';
@@ -13,6 +14,7 @@ const Switch = ({
   ...fieldProps
 }) => {
   const [value, changeValue] = useState(defaultValue);
+  const toggleId = _.uniqueId();
 
   const onChangeValue = () => {
     changeValue((previousValue) => {
@@ -23,9 +25,9 @@ const Switch = ({
 
   return (
     <div className="switch-container">
-      <label htmlFor="toggle" className="switch">
+      <label htmlFor={`toggle-${toggleId}`} className="switch">
         <input
-          id="toggle"
+          id={`toggle-${toggleId}`}
           type="checkbox"
           defaultChecked={value}
           onChange={onChangeValue}
