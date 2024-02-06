@@ -1,0 +1,58 @@
+@mixin slider-image($image) {
+  background-image: url($image);
+  background-size: cover;
+}
+
+#switch-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 58px;
+    height: 32px;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--blue-200);
+    transition: 0.4s;
+    border-radius: 34px;
+
+    &:before {
+      content: '';
+      position: absolute;
+      height: 29px;
+      width: 29px;
+      left: 2px;
+      bottom: 2px;
+      transition: 0.4s;
+      @include slider-image("/openboxes/static/images/close-circle-fill.svg")
+    }
+
+    &:before {
+      border-radius: 50%;
+    }
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+    @include slider-image("/openboxes/static/images/checkbox-circle-fill.svg")
+  }
+
+  #switch-title {
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
