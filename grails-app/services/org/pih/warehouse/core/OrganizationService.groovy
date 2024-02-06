@@ -10,7 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
-import grails.validation.ValidationException
+import org.apache.commons.lang.StringUtils
 
 @Transactional
 class OrganizationService {
@@ -44,19 +44,25 @@ class OrganizationService {
         return findOrCreateOrganization(name, code, [])
     }
 
-    Organization findOrCreateOrganization(String name, String code, List<RoleType> roleTypes) {
-        Organization organization = org.pih.warehouse.core.Organization.find {
-            or {
-                and {
-                    eq("code", code)
-                    ne("code", "")
-                }
-                and {
-                    eq("name", name)
-                    ne("name", "")
-                }
-            }
+    Organization findOrganization(String name, String code) {
+        Organization organization = Organization.createCriteria().get {
+            eq("code", code)
+            ne("code", StringUtils.EMPTY)
+            isNotNull("code")
         }
+        if (!organization) {
+            organization = Organization.createCriteria().list(max: 1) {
+                eq("name", name)
+                ne("name", StringUtils.EMPTY)
+                isNotNull("name")
+                order("dateCreated", "asc")
+            }[0]
+        }
+        return organization
+    }
+
+    Organization findOrCreateOrganization(String name, String code, List<RoleType> roleTypes) {
+        Organization organization = findOrganization(name, code)
         if (!organization) {
             organization = new Organization()
             organization.name = name
