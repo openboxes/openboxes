@@ -3,7 +3,7 @@
   background-size: cover;
 }
 
-#switch-container {
+.switch-container {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -50,7 +50,7 @@
     @include slider-image("/openboxes/static/images/checkbox-circle-fill.svg")
   }
 
-  #switch-title {
+  .switch-title {
     margin-bottom: 5px;
     font-size: 14px;
     font-weight: 500;

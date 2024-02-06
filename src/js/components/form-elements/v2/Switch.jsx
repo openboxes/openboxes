@@ -6,7 +6,12 @@ import Translate from 'utils/Translate';
 
 import './style.scss';
 
-const Switch = ({ defaultValue, titles, onChange }) => {
+const Switch = ({
+  defaultValue,
+  titles,
+  onChange,
+  ...fieldProps
+}) => {
   const [value, changeValue] = useState(defaultValue);
 
   const onChangeValue = () => {
@@ -17,17 +22,18 @@ const Switch = ({ defaultValue, titles, onChange }) => {
   };
 
   return (
-    <div id="switch-container">
+    <div className="switch-container">
       <label htmlFor="toggle" className="switch">
         <input
           id="toggle"
           type="checkbox"
           defaultChecked={value}
           onChange={onChangeValue}
+          {...fieldProps}
         />
         <div className="slider" />
       </label>
-      <div id="switch-title">
+      <div className="switch-title">
         {value
           ? (
             <Translate
