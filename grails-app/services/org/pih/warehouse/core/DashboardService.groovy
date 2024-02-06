@@ -11,6 +11,7 @@ package org.pih.warehouse.core
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.csv.CSVWriter
+import org.hibernate.sql.JoinType
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.inventory.InventoryLevel
 import org.pih.warehouse.inventory.InventoryStatus
@@ -152,25 +153,30 @@ class DashboardService {
 
         long startTime = System.currentTimeMillis()
 
-        // Stock that has already expired
-        def expiredStock = InventoryItem.findAllByExpirationDateLessThan(new Date(), [sort: 'expirationDate', order: 'desc'])
+        List<InventoryItem> expiredStock = InventoryItem.createCriteria().list {
+            createAlias("product", "product", JoinType.LEFT_OUTER_JOIN)
+
+            lt("expirationDate", new Date())
+
+            if (command.category) {
+                eq("product.category", command.category)
+            }
+
+            if (command.startDate) {
+                ge("expirationDate", command.startDate)
+            }
+
+            if (command.endDate) {
+                le("expirationDate", command.endDate)
+            }
+
+            order("expirationDate", "desc")
+        }
 
         Map<InventoryItem, Integer> quantityMap =
                 productAvailabilityService.getQuantityOnHandByInventoryItem(command.location)
         expiredStock = expiredStock.findAll { quantityMap[it] > 0 }
 
-        // FIXME poor man's filter
-        if (command.category) {
-            expiredStock = expiredStock.findAll { item -> item?.product?.category == command.category }
-        }
-
-        if (command.startDate) {
-            expiredStock = expiredStock.findAll { item -> item?.expirationDate >= command.startDate }
-        }
-
-        if (command.endDate) {
-            expiredStock = expiredStock.findAll { item -> item?.expirationDate <= command.endDate }
-        }
 
         log.debug "Get expired stock: " + (System.currentTimeMillis() - startTime) + " ms"
         return expiredStock
@@ -187,23 +193,31 @@ class DashboardService {
     List getExpiringStock(InventoryReportCommand command) {
         long startTime = System.currentTimeMillis()
 
-        def today = new Date()
+        Date today = new Date()
         today.clearTime()
         // Get all stock expiring ever (we'll filter later)
-        def expiringStock = InventoryItem.findAllByExpirationDateGreaterThanEquals(today + 1, [sort: 'expirationDate', order: 'asc'])
+        List<InventoryItem> expiringStock = InventoryItem.createCriteria().list {
+            createAlias("product", "product", JoinType.LEFT_OUTER_JOIN)
+
+            ge("expirationDate", today + 1)
+
+            if (command.category) {
+                eq("product.category", command.category)
+            }
+
+            if (command.startDate) {
+                ge("expirationDate", command.startDate)
+            }
+
+            if (command.endDate) {
+                le("expirationDate", command.endDate)
+            }
+
+            order("expirationDate", "asc")
+        }
+
         def quantityMap = productAvailabilityService.getQuantityOnHandByInventoryItem(command.location)
         expiringStock = expiringStock.findAll { quantityMap[it] > 0 }
-        if (command.category) {
-            expiringStock = expiringStock.findAll { item -> item?.product?.category == command.category }
-        }
-
-        if (command.startDate) {
-            expiringStock = expiringStock.findAll { item -> item?.expirationDate >= command.startDate }
-        }
-
-        if (command.endDate) {
-            expiringStock = expiringStock.findAll { item -> item?.expirationDate <= command.endDate }
-        }
 
         if (command.status) {
             def daysToExpiry = [30, 60, 90, 180, 365]
