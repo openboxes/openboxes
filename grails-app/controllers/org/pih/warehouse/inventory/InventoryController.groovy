@@ -29,6 +29,7 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.DateUtil
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.report.InventoryReportCommand
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
@@ -574,24 +575,23 @@ class InventoryController {
     }
 
 
-    def listExpiredStock() {
-        Location location = Location.get(session.warehouse.id)
-        Category categorySelected = Category.get(params.category)
+    def listExpiredStock(InventoryReportCommand command) {
+        command.location = Location.get(session.warehouse.id)
         Boolean withBinLocation = params.boolean("withBinLocation")
 
-        List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(categorySelected, location)
+        List<InventoryItem> inventoryItems = dashboardService.getExpiredStock(command)
         List<Category> categories = inventoryItems?.collect { it.product.category }?.unique()
 
         List<Map> data = []
         if (!inventoryItems.isEmpty()) {
             data = withBinLocation
-                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
-                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(command.location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(command.location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
 
         if (params.format == "csv") {
-            def filename = "Expired stock | " + location?.name + ".csv"
+            def filename = "Expired stock | " + command.location?.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForInventoryMap(data, withBinLocation))
             return
@@ -600,18 +600,16 @@ class InventoryController {
         [
                 data: data,
                 categories: categories,
-                categorySelected: categorySelected,
+                command: command,
         ]
     }
 
 
-    def listExpiringStock() {
-        String expirationStatus = params.status
-        Location location = Location.get(session.warehouse.id)
-        Category category = Category.get(params.category)
+    def listExpiringStock(InventoryReportCommand command) {
+        command.location = Location.get(session.warehouse.id)
         Boolean withBinLocation = params.boolean("withBinLocation")
 
-        List<InventoryItem> inventoryItems = dashboardService.getExpiringStock(category, location, expirationStatus)
+        List<InventoryItem> inventoryItems = dashboardService.getExpiringStock(command)
         List<Category> categories = inventoryItems?.collect { it?.product?.category }?.unique().sort {
             it.name
         }
@@ -619,13 +617,13 @@ class InventoryController {
         List<Map> data = []
         if (!inventoryItems?.isEmpty()) {
             data = withBinLocation
-                    ? productAvailabilityService.getQuantityOnHandByBinLocation(location, inventoryItems)
-                    : productAvailabilityService.getQuantityOnHandByInventoryItem(location, inventoryItems)
+                    ? productAvailabilityService.getQuantityOnHandByBinLocation(command.location, inventoryItems)
+                    : productAvailabilityService.getQuantityOnHandByInventoryItem(command.location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
 
         if (params.format == "csv") {
-            def filename = "Expiring stock | " + location.name + ".csv"
+            def filename = "Expiring stock | " + command.location.name + ".csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
             render(contentType: "text/csv", text: getCsvForInventoryMap(data, withBinLocation))
             return
@@ -634,8 +632,7 @@ class InventoryController {
         [
                 data: data,
                 categories: categories,
-                categorySelected: category,
-                expirationStatus: expirationStatus,
+                command: command
         ]
     }
 

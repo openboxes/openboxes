@@ -86,10 +86,42 @@
 		          			<div class="filter-list-item">
 		           				<label><warehouse:message code="category.label"/></label>
 		           				%{-- not sure what the ${{...}} in optionValue means: it may need to be de-escaped. OBPIH-5506 --}%
-				           		<g:select name="category" class="chzn-select-deselect"
-												from="${categories}"
-												optionKey="id" optionValue="${{format.category(category:it)}}" value="${categorySelected?.id}"
-												noSelection="['': warehouse.message(code:'default.all.label')]" />
+				           		<g:select name="category"
+										  class="chzn-select-deselect"
+										  from="${categories}"
+										  optionKey="id"
+										  optionValue="${{format.category(category:it)}}"
+										  value="${command?.category?.id}"
+										  noSelection="['': warehouse.message(code:'default.all.label')]"
+								/>
+							</div>
+							<div class="filter-list-item">
+								<label>
+									<g:message code="report.expiresAfter.label"
+											   default="Expires after"
+									/>
+								</label>
+								<g:jqueryDatePicker id="startDate"
+													name="startDate"
+													cssClass="filter"
+													format="MM/dd/yyyy"
+													autocomplete="off"
+													value="${command?.startDate}"
+								/>
+							</div>
+							<div class="filter-list-item">
+								<label>
+									<g:message code="report.expiresBefore.label"
+											   default="Expires before"
+									/>
+								</label>
+								<g:jqueryDatePicker id="endDate"
+													name="endDate"
+													cssClass="filter"
+													format="MM/dd/yyyy"
+													autocomplete="off"
+													value="${command.endDate}"
+								/>
 							</div>
 							<div class="filter-list-item">
 								<button name="filter" class="button icon search">
