@@ -1031,6 +1031,18 @@ div.search-input:focus-within {
   color: white;
 }
 
+.danger-outline-button {
+  @extend %button-base;
+
+  background-color: white;
+  color: var(--color-red);
+  border: solid 1px var(--color-red);
+
+  &:hover {
+    background: var(--red-100);
+  }
+}
+
 .secondary-button {
   @extend %button-base;
 

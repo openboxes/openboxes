@@ -4,12 +4,12 @@ import { RiDeleteBinLine, RiPencilLine } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
 
 import productSupplierApi from 'api/services/ProductSupplierApi';
+import notification from 'components/Layout/notifications/notification';
 import { PRODUCT_SUPPLIER_URL } from 'consts/applicationUrls';
+import NotificationType from 'consts/notificationTypes';
 import RoleType from 'consts/roleType';
 import confirmationModal from 'utils/confirmationModalUtils';
 import { hasPermissions } from 'utils/permissionUtils';
-import notification from 'components/Layout/notifications/notification';
-import NotificationType from 'consts/notificationTypes';
 import translate from 'utils/Translate';
 
 const useProductSupplierActions = ({ fireFetchData }) => {
@@ -98,6 +98,7 @@ const useProductSupplierActions = ({ fireFetchData }) => {
   return {
     getActions,
     exportProductSuppliers,
+    openConfirmationModal,
   };
 };
 

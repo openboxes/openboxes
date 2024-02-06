@@ -42,9 +42,7 @@ class ProductSupplierController {
     }
 
     def create() {
-        def productSupplierInstance = new ProductSupplier()
-        productSupplierInstance.properties = params
-        return [productSupplierInstance: productSupplierInstance]
+        render(view: "/common/react")
     }
 
     def save() {
