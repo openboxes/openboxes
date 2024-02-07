@@ -10,6 +10,7 @@
 package org.pih.warehouse.data
 
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.Criterion
@@ -29,7 +30,7 @@ import org.pih.warehouse.product.ProductPackage
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierDataService
 
-import org.pih.warehouse.product.ProductSupplierListParams
+import org.pih.warehouse.product.ProductSupplierFilterCommand
 import org.pih.warehouse.product.ProductSupplierPreference
 
 import java.text.SimpleDateFormat
@@ -46,12 +47,15 @@ class ProductSupplierService {
     ProductSupplierDataService productSupplierGormService
 
 
-    List<ProductSupplier> getProductSuppliers(ProductSupplierListParams params) {
+    List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand params) {
+        if (params.hasErrors()) {
+            throw new ValidationException("Invalid params", params.errors)
+        }
         // Store added aliases to avoid duplicate alias exceptions for product and supplier
         // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
         Set<String> usedAliases = new HashSet<>()
 
-        return ProductSupplier.createCriteria().list(max: params.max, offset: params.offset) {
+        return ProductSupplier.createCriteria().list(params.getPaginationParams()) {
             if (params.searchTerm) {
                 createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
