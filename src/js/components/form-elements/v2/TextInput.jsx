@@ -51,7 +51,7 @@ TextInput.propTypes = {
   button: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
-    function: PropTypes.func.isRequired,
+    onClick: PropTypes.func.isRequired,
   }),
   // Indicator whether the field should be disabled
   disabled: PropTypes.bool,

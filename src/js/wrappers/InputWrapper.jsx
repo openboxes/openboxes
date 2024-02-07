@@ -35,9 +35,9 @@ const InputWrapper = ({
       </div>
       {button && (
       <div
-        onClick={button.function}
+        onClick={button.onClick}
         role="presentation"
-        className="input-wrapper-redirect"
+        className="input-wrapper-button"
       >
         <Translate id={button.id} defaultMessage={button.defaultMessage} />
       </div>
@@ -67,11 +67,11 @@ InputWrapper.propTypes = {
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
-  // Hyperlink on the right side above the input
+  // Button on the right side above the input
   button: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
-    function: PropTypes.func.isRequired,
+    onClick: PropTypes.func.isRequired,
   }),
   // Message displayed under the input
   errorMessage: PropTypes.string,
