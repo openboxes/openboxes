@@ -10,7 +10,7 @@ const TextInput = ({
   title,
   tooltip,
   required,
-  redirect,
+  button,
   disabled,
   errorMessage,
   placeholder,
@@ -20,7 +20,7 @@ const TextInput = ({
     title={title}
     tooltip={tooltip}
     required={required}
-    redirect={redirect}
+    button={button}
     errorMessage={errorMessage}
   >
     <input
@@ -47,11 +47,11 @@ TextInput.propTypes = {
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
   }),
-  // Hyperlink on the right side above the input
-  redirect: PropTypes.shape({
+  // Button on the right side above the input
+  button: PropTypes.shape({
     id: PropTypes.string.isRequired,
     defaultMessage: PropTypes.string.isRequired,
-    redirectTo: PropTypes.string.isRequired,
+    function: PropTypes.func.isRequired,
   }),
   // Indicator whether the field should be disabled
   disabled: PropTypes.bool,
@@ -66,7 +66,7 @@ TextInput.defaultProps = {
   tooltip: null,
   required: false,
   title: null,
-  redirect: null,
+  button: null,
   errorMessage: null,
   disabled: false,
   placeholder: '',
