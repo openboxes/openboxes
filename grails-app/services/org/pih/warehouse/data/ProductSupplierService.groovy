@@ -47,54 +47,54 @@ class ProductSupplierService {
     ProductSupplierDataService productSupplierGormService
 
 
-    List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand params) {
-        if (params.hasErrors()) {
-            throw new ValidationException("Invalid params", params.errors)
+    List<ProductSupplier> getProductSuppliers(ProductSupplierFilterCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid params", command.errors)
         }
         // Store added aliases to avoid duplicate alias exceptions for product and supplier
         // This could happen when params.searchTerm and e.g. sort by productCode/productName is applied
         Set<String> usedAliases = new HashSet<>()
 
-        return ProductSupplier.createCriteria().list(params.getPaginationParams()) {
-            if (params.searchTerm) {
+        return ProductSupplier.createCriteria().list(command.paginationParams) {
+            if (command.searchTerm) {
                 createAlias("product", "p", JoinType.LEFT_OUTER_JOIN)
                 createAlias("supplier", "s", JoinType.LEFT_OUTER_JOIN)
                 createAlias("manufacturer", "m", JoinType.LEFT_OUTER_JOIN)
                 usedAliases.addAll(["product", "supplier", "manufacturer"])
                 or {
-                    ilike("p.productCode", "%" + params.searchTerm + "%")
-                    ilike("code", "%" + params.searchTerm + "%")
-                    ilike("s.code", "%" + params.searchTerm + "%")
-                    ilike("name", "%" + params.searchTerm + "%")
-                    ilike("supplierCode", "%" + params.searchTerm + "%")
-                    ilike("supplierName", "%" + params.searchTerm + "%")
-                    ilike("manufacturerCode", "%" + params.searchTerm + "%")
-                    ilike("manufacturerName", "%" + params.searchTerm + "%")
-                    ilike("m.name", "%" + params.searchTerm + "%")
-                    ilike("productCode", "%" + params.searchTerm + "%")
+                    ilike("p.productCode", "%" + command.searchTerm + "%")
+                    ilike("code", "%" + command.searchTerm + "%")
+                    ilike("s.code", "%" + command.searchTerm + "%")
+                    ilike("name", "%" + command.searchTerm + "%")
+                    ilike("supplierCode", "%" + command.searchTerm + "%")
+                    ilike("supplierName", "%" + command.searchTerm + "%")
+                    ilike("manufacturerCode", "%" + command.searchTerm + "%")
+                    ilike("manufacturerName", "%" + command.searchTerm + "%")
+                    ilike("m.name", "%" + command.searchTerm + "%")
+                    ilike("productCode", "%" + command.searchTerm + "%")
                 }
             }
-            if (params.product) {
-                eq("product.id", params.product)
+            if (command.product) {
+                eq("product.id", command.product)
             }
-            if (!params.includeInactive) {
+            if (!command.includeInactive) {
                 eq("active", true)
             }
-            if (params.supplier) {
-                eq("supplier.id", params.supplier)
+            if (command.supplier) {
+                eq("supplier.id", command.supplier)
             }
-            if (params.preferenceType) {
-                add(getPreferenceTypeCriteria(params.preferenceType))
+            if (command.preferenceType) {
+                add(getPreferenceTypeCriteria(command.preferenceType))
             }
-            if (params.createdFrom) {
-                ge("dateCreated", params.createdFrom)
+            if (command.createdFrom) {
+                ge("dateCreated", command.createdFrom)
             }
-            if (params.createdTo) {
-                lte("dateCreated", params.createdTo)
+            if (command.createdTo) {
+                lte("dateCreated", command.createdTo)
             }
-            if (params.sort) {
-                String orderDirection = params.order ?: "asc"
-                getSortOrder(params.sort, orderDirection, delegate, usedAliases)
+            if (command.sort) {
+                String orderDirection = command.order ?: "asc"
+                getSortOrder(command.sort, orderDirection, delegate, usedAliases)
             }
         }
     }
