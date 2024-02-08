@@ -78,7 +78,7 @@
   }
 }
 
-input {
+input, div {
 
   &.has-errors {
     border: 1px solid var(--color-red);
