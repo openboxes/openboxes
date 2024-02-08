@@ -34,6 +34,8 @@ export const STOCK_TRANSFER_REMOVE_ALL_ITEMS = id => `${STOCK_TRANSFER_BY_ID(id)
 
 // INVOICE
 export const INVOICE_API = `${API}/invoices`;
+export const INVOICE_ITEMS = id => `${INVOICE_API}/${id}/items`;
+export const REMOVE_INVOICE_ITEM = id => `${INVOICE_API}/${id}/removeItem`;
 
 // INVOICE ITEM
 export const INVOICE_ITEM_API = `${API}/invoiceItems`;
