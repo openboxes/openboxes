@@ -106,6 +106,10 @@ input {
   .form-element-input {
     position: relative;
     display: flex;
+
+    &.disabled {
+      background-color: var(--blue-100);
+    }
   }
 
   .form-element-icons-wrapper {

@@ -9,14 +9,22 @@ const DateFieldInput = forwardRef(({
   value,
   placeholder,
   onClear,
+  className,
+  disabled,
   ...props
 }, ref) => (
   <div
+    className={`${disabled ? 'disabled' : ''} ${className}`}
     ref={ref}
     {...props}
   >
     <span>{value || placeholder}</span>
-    <span className="form-element-icons-wrapper">{value ? <RiCloseLine onClick={onClear} /> : <RiCalendarLine />}</span>
+    {!disabled
+      && (
+      <span className="form-element-icons-wrapper">
+        {value ? <RiCloseLine onClick={onClear} /> : <RiCalendarLine />}
+      </span>
+      )}
   </div>
 ));
 
@@ -26,9 +34,12 @@ DateFieldInput.propTypes = {
   value: PropTypes.string,
   placeholder: PropTypes.string,
   onClear: PropTypes.func.isRequired,
+  className: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 };
 
 DateFieldInput.defaultProps = {
   value: null,
   placeholder: '',
+  disabled: false,
 };
