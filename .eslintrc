@@ -21,8 +21,11 @@
     "airbnb"
   ],
   "rules": {
-    "arrow-parens": "warn",
-    "implicit-arrow-linebreak": "warn",
+    "arrow-parens": "error",
+    "implicit-arrow-linebreak": "off",
+    "react/destructuring-assignment": "warn",
+    "react/jsx-props-no-spreading": "warn",
+    "react/sort-comp": "off",
     "import/named": 2,
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
@@ -34,7 +37,7 @@
       "required": "id",
       "allowChildren": false
     }],
-    "operator-linebreak": "warn",
+    "operator-linebreak": "off",
     "simple-import-sort/imports": [
       "error",
       {
