@@ -25,7 +25,7 @@ const TextInput = ({
   >
     <input
       disabled={disabled}
-      className={`text-input ${errorMessage ? 'has-errors' : ''}`}
+      className={`form-element-input ${errorMessage ? 'has-errors' : ''}`}
       placeholder={placeholder}
       {...fieldProps}
     />
