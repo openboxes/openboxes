@@ -163,7 +163,7 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate)
+                ge("expirationDate", command.startDate + 1)
             }
 
             if (command.endDate) {
@@ -206,7 +206,7 @@ class DashboardService {
             }
 
             if (command.startDate) {
-                ge("expirationDate", command.startDate)
+                ge("expirationDate", command.startDate + 1)
             }
 
             if (command.endDate) {
