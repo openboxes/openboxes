@@ -17,6 +17,8 @@ const DateFieldInput = forwardRef(({
     className={`${disabled ? 'disabled' : ''} ${className}`}
     ref={ref}
     {...props}
+    tabIndex="0"
+    role="button"
   >
     <span>{value || placeholder}</span>
     {!disabled
