@@ -21,7 +21,7 @@
     "airbnb"
   ],
   "rules": {
-    "arrow-parens": "error",
+    "arrow-parens": "warn",
     "implicit-arrow-linebreak": "off",
     "react/destructuring-assignment": "warn",
     "react/jsx-props-no-spreading": "warn",
