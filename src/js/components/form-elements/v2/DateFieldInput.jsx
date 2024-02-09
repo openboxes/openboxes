@@ -15,8 +15,8 @@ const DateFieldInput = forwardRef(({
 }, ref) => (
   <div
     className={`${disabled ? 'disabled' : ''} ${className}`}
-    ref={ref}
     {...props}
+    ref={ref}
     tabIndex="0"
     role="button"
   >
@@ -36,7 +36,7 @@ DateFieldInput.propTypes = {
   value: PropTypes.string,
   placeholder: PropTypes.string,
   onClear: PropTypes.func.isRequired,
-  className: PropTypes.string.isRequired,
+  className: PropTypes.string,
   disabled: PropTypes.bool,
 };
 
@@ -44,4 +44,5 @@ DateFieldInput.defaultProps = {
   value: null,
   placeholder: '',
   disabled: false,
+  className: '',
 };
