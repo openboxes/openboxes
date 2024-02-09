@@ -19,9 +19,10 @@ const DateField = ({
   placeholder,
   button,
   className,
+  defaultValue,
   ...fieldProps
 }) => {
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(defaultValue);
 
   const onChange = (pickedDate) => setDate(moment(pickedDate, DateFormat.MM_DD_YYYY));
 
@@ -85,6 +86,7 @@ DateField.propTypes = {
   // Text displayed within input field
   placeholder: PropTypes.string,
   className: PropTypes.string,
+  defaultValue: PropTypes.string,
 };
 
 DateField.defaultProps = {
@@ -96,4 +98,5 @@ DateField.defaultProps = {
   disabled: false,
   placeholder: '',
   className: '',
+  defaultValue: null,
 };

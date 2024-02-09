@@ -12,23 +12,31 @@ const DateFieldInput = forwardRef(({
   className,
   disabled,
   ...props
-}, ref) => (
-  <div
-    className={`${disabled ? 'disabled' : ''} ${className}`}
-    {...props}
-    ref={ref}
-    tabIndex="0"
-    role="button"
-  >
-    <span>{value || placeholder}</span>
-    {!disabled
-      && (
-      <span className="form-element-icons-wrapper">
-        {value ? <RiCloseLine onClick={onClear} /> : <RiCalendarLine />}
-      </span>
-      )}
-  </div>
-));
+}, ref) => {
+  const disabledProps = disabled ? {
+    className: `disabled ${className}`,
+  } : {
+    className,
+    tabIndex: 0,
+    role: 'button',
+  };
+
+  return (
+    <div
+      {...props}
+      {...disabledProps}
+      ref={ref}
+    >
+      <span>{value || placeholder}</span>
+      {!disabled
+        && (
+          <span className="form-element-icons-wrapper">
+            {value ? <RiCloseLine onClick={onClear} /> : <RiCalendarLine />}
+          </span>
+        )}
+    </div>
+  );
+});
 
 export default DateFieldInput;
 
