@@ -395,7 +395,7 @@ class AddItemsPage extends Component {
     const errors = {};
     errors.invoiceItems = [];
     _.forEach(values?.invoiceItems, (item, key) => {
-      if (_.isNil(_.get(item, 'quantity'))) {
+      if (_.isNil(item?.quantity)) {
         errors.invoiceItems[key] = { quantity: 'react.invoice.error.enterQuantity.label' };
       }
       if (_.has(item, 'isValid') && !item.isValid) {
