@@ -13,6 +13,7 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.sql.Sql
 import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.criterion.Criterion
 import org.hibernate.criterion.DetachedCriteria
 import org.hibernate.criterion.Order
@@ -31,6 +32,8 @@ import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierDataService
 
 import org.pih.warehouse.product.ProductSupplierFilterCommand
+import org.pih.warehouse.product.ProductSupplierDetailsCommand
+import org.pih.warehouse.product.ProductSupplierListParams
 import org.pih.warehouse.product.ProductSupplierPreference
 
 import java.text.SimpleDateFormat
@@ -354,5 +357,37 @@ class ProductSupplierService {
 
     void delete(String productSupplierId) {
         productSupplierGormService.delete(productSupplierId)
+    }
+
+    private static void validateProductSupplierDetails(ProductSupplierDetailsCommand command) {
+        if (command.hasErrors()) {
+            throw new ValidationException("Invalid product source", command.errors)
+        }
+    }
+
+    ProductSupplier saveDetails(ProductSupplierDetailsCommand command) {
+        validateProductSupplierDetails(command)
+        ProductSupplier productSupplier = new ProductSupplier(command.properties)
+        // TODO: To be replaced by a generic method created in OBPIH-6017 after merging into develop
+        if (!productSupplier.code) {
+            productSupplier.code =
+                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+        }
+        return productSupplierGormService.save(productSupplier)
+    }
+
+    ProductSupplier updateDetails(ProductSupplierDetailsCommand command, String productSupplierId) {
+        validateProductSupplierDetails(command)
+        ProductSupplier productSupplier = productSupplierGormService.get(productSupplierId)
+        if (!productSupplier) {
+            throw new ObjectNotFoundException(productSupplierId, ProductSupplier.class.toString())
+        }
+        productSupplier.properties = command.properties
+        // TODO: To be replaced by a generic method created in OBPIH-6017 after merging into develop
+        if (!productSupplier.code) {
+            productSupplier.code =
+                identifierService.generateProductSupplierIdentifier(command?.product?.productCode, command?.supplier?.code)
+        }
+        return productSupplier
     }
 }

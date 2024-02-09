@@ -5,6 +5,9 @@ import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierFilterCommand
+import org.pih.warehouse.product.ProductSupplierDetailsCommand
+import org.pih.warehouse.product.ProductSupplierListParams
+import org.springframework.http.HttpStatus
 
 class ProductSupplierApiController {
 
@@ -27,5 +30,18 @@ class ProductSupplierApiController {
     def delete() {
         productSupplierService.delete(params.id)
         render status: 204
+    }
+
+    def create(ProductSupplierDetailsCommand productSupplierCommand) {
+        ProductSupplier productSupplier = productSupplierService.saveDetails(productSupplierCommand)
+
+        response.status = HttpStatus.CREATED.value()
+        render([data: productSupplier.toJson()] as JSON)
+    }
+
+    def update(ProductSupplierDetailsCommand productSupplierDetailsCommand) {
+        ProductSupplier updatedProductSupplier = productSupplierService.updateDetails(productSupplierDetailsCommand, params.id)
+
+        render([data: updatedProductSupplier.toJson()] as JSON)
     }
 }
