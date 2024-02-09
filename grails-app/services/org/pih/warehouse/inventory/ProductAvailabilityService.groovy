@@ -630,8 +630,13 @@ class ProductAvailabilityService {
         return collectQuantityOnHandByBinLocation(results)
     }
 
-    List getAvailableQuantityOnHandByBinLocation(Location location) {
+    List getAvailableQuantityOnHandByBinLocation(Location location, List<InventoryItem> inventoryItems = []) {
         def data = []
+
+        Map arguments = [ location: location ]
+        if (inventoryItems) {
+            arguments.inventoryItems = inventoryItems.id
+        }
 
         if (location) {
             def results = ProductAvailability.executeQuery("""
@@ -644,9 +649,9 @@ class ProductAvailabilityService {
 						from ProductAvailability pa
 						left outer join pa.inventoryItem ii
 						left outer join pa.binLocation bl
-						where pa.location = :location and pa.quantityOnHand > 0
-						group by pa.product, pa.inventoryItem, pa.binLocation
-						""", [location: location])
+						where pa.location = :location and pa.quantityOnHand > 0""" +
+                        "${inventoryItems ? " and pa.inventoryItem.id in (:inventoryItems) " : " "}" +
+						"""group by pa.product, pa.inventoryItem, pa.binLocation""", arguments)
 
             data = collectQuantityOnHandByBinLocation(results)
         }
