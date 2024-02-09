@@ -6,7 +6,6 @@ import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.product.ProductSupplier
 import org.pih.warehouse.product.ProductSupplierFilterCommand
 import org.pih.warehouse.product.ProductSupplierDetailsCommand
-import org.pih.warehouse.product.ProductSupplierListParams
 import org.springframework.http.HttpStatus
 
 class ProductSupplierApiController {
