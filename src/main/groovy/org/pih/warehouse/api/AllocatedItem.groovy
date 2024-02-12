@@ -1,8 +1,9 @@
-package org.pih.warehouse.inventory
+package org.pih.warehouse.api
 
 import org.pih.warehouse.core.Location
+import org.pih.warehouse.inventory.InventoryItem
 
-class QuantityPickedByLocationAndProductDto {
+class AllocatedItem {
     Location binLocation
     InventoryItem inventoryItem
     Integer quantityAllocated

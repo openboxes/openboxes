@@ -846,9 +846,9 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    List<QuantityByBinLocationDto> getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
+    List<BinLocationItem> getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
 
-        List<QuantityByBinLocationDto> binLocations = []
+        List<BinLocationItem> binLocations = []
 
         def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
 
@@ -863,7 +863,7 @@ class InventoryService implements ApplicationContextAware {
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantity != 0 || includeOutOfStock) {
                         binLocations.add(
-                            new QuantityByBinLocationDto([
+                            new BinLocationItem([
                                 id               : binLocation?.id,
                                 status           : status(quantity),
                                 value            : value,

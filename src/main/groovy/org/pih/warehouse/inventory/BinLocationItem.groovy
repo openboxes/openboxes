@@ -4,7 +4,7 @@ import org.pih.warehouse.core.Location
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
-class QuantityByBinLocationDto implements Comparable<QuantityByBinLocationDto> {
+class BinLocationItem implements Comparable<BinLocationItem> {
     String id
 
     String status
@@ -24,7 +24,7 @@ class QuantityByBinLocationDto implements Comparable<QuantityByBinLocationDto> {
     Boolean isOnHold
 
     @Override
-    int compareTo(QuantityByBinLocationDto obj) {
+    int compareTo(BinLocationItem obj) {
         inventoryItem?.expirationDate <=> obj?.inventoryItem?.expirationDate
                 ?: binLocation?.name <=> obj?.binLocation?.name
     }
