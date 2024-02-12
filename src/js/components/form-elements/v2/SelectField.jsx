@@ -20,6 +20,7 @@ const SelectField = ({
   loadOptions,
   defaultValue,
   multiple,
+  onChange,
   ...fieldProps
 }) => {
   const [value, setValue] = useState(defaultValue);
@@ -31,7 +32,8 @@ const SelectField = ({
     options,
   };
 
-  const onChange = (selectedOption) => {
+  const onChangeValue = (selectedOption) => {
+    onChange?.(selectedOption);
     setValue(selectedOption);
   };
 
@@ -48,7 +50,7 @@ const SelectField = ({
         disabled={disabled}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={onChangeValue}
         multi={multiple}
         {...asyncProps}
         {...fieldProps}
@@ -95,6 +97,8 @@ SelectField.propTypes = {
   defaultValue: PropTypes.string,
   // Indicator whether we should be able to choose multiple options
   multiple: PropTypes.bool,
+  // Function triggered on change
+  onChange: PropTypes.func,
 };
 
 SelectField.defaultProps = {
@@ -110,4 +114,5 @@ SelectField.defaultProps = {
   loadOptions: () => [],
   defaultValue: null,
   multiple: false,
+  onChange: () => {},
 };
