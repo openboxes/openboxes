@@ -14,9 +14,9 @@ const DateFieldInput = forwardRef(({
   ...props
 }, ref) => {
   const disabledProps = disabled ? {
-    className: `disabled ${className}`,
+    className: `disabled ${className} date-field-input`,
   } : {
-    className,
+    className: `${className} date-field-input`,
     tabIndex: 0,
     role: 'button',
   };
