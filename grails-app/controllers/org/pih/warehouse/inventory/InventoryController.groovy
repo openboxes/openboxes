@@ -585,7 +585,7 @@ class InventoryController {
         List<Map> data = []
         if (!inventoryItems.isEmpty()) {
             data = withBinLocation
-                    ? productAvailabilityService.getQuantityOnHandByBinLocation(command.location, inventoryItems)
+                    ? productAvailabilityService.getAvailableQuantityOnHandByBinLocation(command.location, inventoryItems)
                     : productAvailabilityService.getQuantityOnHandByInventoryItem(command.location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
@@ -617,7 +617,7 @@ class InventoryController {
         List<Map> data = []
         if (!inventoryItems?.isEmpty()) {
             data = withBinLocation
-                    ? productAvailabilityService.getQuantityOnHandByBinLocation(command.location, inventoryItems)
+                    ? productAvailabilityService.getAvailableQuantityOnHandByBinLocation(command.location, inventoryItems)
                     : productAvailabilityService.getQuantityOnHandByInventoryItem(command.location, inventoryItems)
                     .collect{ key, val -> [ inventoryItem: key, quantity: val ] }
         }
