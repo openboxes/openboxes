@@ -89,6 +89,7 @@
     <logger name="org.hibernate.internal" level="warn" />
     <logger name="org.hibernate.loader" level="info" /><!-- use 'debug' to see every select call -->
     <logger name="org.hibernate.mapping" level="info" />
+    <logger name="org.hibernate.orm.deprecation" level="error" /> <!-- use 'error' to hide all warnings, see: OBGM-358 -->
     <logger name="org.hibernate.persister" level="info" />
     <logger name="org.hibernate.query" level="info" />
     <logger name="org.hibernate.resource" level="info" />
