@@ -31,13 +31,8 @@ class ProductSupplierDetailsCommand implements Validateable {
     String productCode
 
     static constraints = {
-        code(nullable: true)
-        manufacturer(nullable: true)
-        ratingTypeCode(nullable: true)
-        description(nullable: true)
-        manufacturerCode(nullable: true)
-        brandName(nullable: true)
-        productCode(nullable: true)
-        active(nullable: true)
+        importFrom ProductSupplier
+        supplier(nullable: false)
+        supplierCode(nullable: false)
     }
 }
