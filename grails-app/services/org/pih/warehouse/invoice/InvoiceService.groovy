@@ -212,17 +212,25 @@ class InvoiceService {
 
     def updateItems(Invoice invoice, List items) {
         items.each { item ->
-            InvoiceItem invoiceItem = InvoiceItem.get(item.id)
+            InvoiceItem invoiceItem = invoice.invoiceItems?.find{ it.id == item?.id }
+            // update existing invoice item
             if (invoiceItem) {
-                invoiceItem.quantity = item.quantity
-            } else {
-                InvoiceItemCandidate candidateItem = InvoiceItemCandidate.get(item.id)
-                if (!candidateItem) {
-                    throw new IllegalArgumentException("No Invoice Item Candidate found with ID ${item.id}")
+                if (item.quantity > 0) {
+                    invoiceItem.quantity = item.quantity
+                } else {
+                    removeInvoiceItem(invoiceItem.id)
                 }
-                invoiceItem = createFromInvoiceItemCandidate(candidateItem)
-                invoiceItem.quantity = item.quantityToInvoice
-                invoice.addToInvoiceItems(invoiceItem)
+            } else {
+                // create new invoice item from candidate
+                if (item.quantityToInvoice > 0) {
+                    InvoiceItemCandidate candidateItem = InvoiceItemCandidate.get(item.id)
+                    if (!candidateItem) {
+                        throw new IllegalArgumentException("No Invoice Item Candidate found with ID ${item.id}")
+                    }
+                    invoiceItem = createFromInvoiceItemCandidate(candidateItem)
+                    invoiceItem.quantity = item.quantityToInvoice
+                    invoice.addToInvoiceItems(invoiceItem)
+                }
             }
         }
 

@@ -4,22 +4,24 @@ import arrayMutators from 'final-form-arrays';
 import update from 'immutability-helper';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
+import { confirmAlert } from 'react-confirm-alert';
 import { Form } from 'react-final-form';
+import { getTranslate } from 'react-localize-redux';
 import { connect } from 'react-redux';
 
 import { hideSpinner, showSpinner } from 'actions';
+import invoiceApi from 'api/services/InvoiceApi';
+import invoiceItemApi from 'api/services/InvoiceItemApi';
 import ArrayField from 'components/form-elements/ArrayField';
 import ButtonField from 'components/form-elements/ButtonField';
 import LabelField from 'components/form-elements/LabelField';
 import TextField from 'components/form-elements/TextField';
 import InvoiceItemsModal from 'components/invoice/InvoiceItemsModal';
 import { INVOICE_URL, ORDER_URL, STOCK_MOVEMENT_URL } from 'consts/applicationUrls';
-import apiClient from 'utils/apiClient';
 import { renderFormField } from 'utils/form-utils';
 import { getInvoiceDescription } from 'utils/form-values-utils';
 import accountingFormat from 'utils/number-utils';
-import Translate from 'utils/Translate';
-import invoiceItemApi from 'api/services/InvoiceItemApi';
+import Translate, { translateWithDefaultMessage } from 'utils/Translate';
 
 const DELETE_BUTTON_FIELD = {
   type: ButtonField,
@@ -202,6 +204,7 @@ class AddItemsPage extends Component {
     this.updateRow = this.updateRow.bind(this);
     this.saveInvoiceItems = this.saveInvoiceItems.bind(this);
     this.validateInvoiceItem = this.validateInvoiceItem.bind(this);
+    this.confirmSave = this.confirmSave.bind(this);
 
     this.debouncedInvoiceItemValidation = _.debounce(this.validateInvoiceItem, 1000);
   }
@@ -253,8 +256,12 @@ class AddItemsPage extends Component {
     this.setState({
       isFirstPageLoaded: true,
     });
-    const url = `/api/invoices/${this.state.values.id}/items?offset=${startIndex}&max=${this.props.pageSize}`;
-    apiClient.get(url)
+    invoiceApi.getInvoiceItems(this.state.values.id, {
+      params: {
+        offset: startIndex,
+        max: this.props.pageSize,
+      },
+    })
       .then((response) => {
         this.setInvoiceItems(response, startIndex);
       });
@@ -295,7 +302,6 @@ class AddItemsPage extends Component {
    * @public
    */
   saveInvoiceItems(values) {
-    const url = `/api/invoices/${this.state.values.id}/items`;
     const payload = {
       id: values.id,
       invoiceItems: _.map(values.invoiceItems, item => ({
@@ -304,10 +310,29 @@ class AddItemsPage extends Component {
       })),
     };
     if (payload.invoiceItems.length) {
-      return apiClient.post(url, payload)
+      return invoiceApi.saveInvoiceItems(this.state.values.id, payload)
         .catch(() => Promise.reject(new Error('react.invoice.error.saveInvoiceItems.label')));
     }
     return Promise.resolve();
+  }
+
+  confirmSave(onConfirm) {
+    confirmAlert({
+      title: this.props.translate('react.invoice.message.confirmSave.label', 'Confirm save'),
+      message: this.props.translate(
+        'react.invoice.confirmSave.message',
+        'Are you sure you want to save? There are some lines with empty or zero quantity, those lines will be deleted.',
+      ),
+      buttons: [
+        {
+          label: this.props.translate('react.default.yes.label', 'Yes'),
+          onClick: onConfirm,
+        },
+        {
+          label: this.props.translate('react.default.no.label', 'No'),
+        },
+      ],
+    });
   }
 
   /**
@@ -316,9 +341,14 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(values) {
-    this.saveInvoiceItems(values).then(() => {
-      this.props.nextPage(values);
-    });
+    const hasZeros = _.some(values.invoiceItems, (item) => _.parseInt(item.quantity) === 0);
+    if (hasZeros) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(values).then(() => this.props.nextPage(values));
+      });
+    } else {
+      this.saveInvoiceItems(values).then(() => this.props.nextPage(values));
+    }
   }
 
   /**
@@ -338,10 +368,10 @@ class AddItemsPage extends Component {
    * @public
    */
   removeItem(itemId, values, index) {
-    const removeItemsUrl = `/api/invoices/${itemId}/removeItem`;
     const item = values.invoiceItems[index];
     const newTotalValue = parseFloat(this.state.values.totalValue) - parseFloat(item.totalAmount);
-    return apiClient.delete(removeItemsUrl)
+
+    return invoiceApi.removeInvoiceItem(itemId)
       .then(() => {
         this.setState({
           values: {
@@ -364,8 +394,10 @@ class AddItemsPage extends Component {
   validate(values) {
     const errors = {};
     errors.invoiceItems = [];
-
     _.forEach(values?.invoiceItems, (item, key) => {
+      if (_.isNil(item?.quantity)) {
+        errors.invoiceItems[key] = { quantity: 'react.invoice.error.enterQuantity.label' };
+      }
       if (_.has(item, 'isValid') && !item.isValid) {
         errors.invoiceItems[key] = { quantity: item?.errorMessage };
       }
@@ -472,7 +504,7 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
-                  disabled={invalid}
+                  disabled={invalid || !values.invoiceItems?.length}
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 >
@@ -489,6 +521,7 @@ class AddItemsPage extends Component {
 
 const mapStateToProps = state => ({
   pageSize: state.session.pageSize,
+  translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
 export default (connect(mapStateToProps, { showSpinner, hideSpinner })(AddItemsPage));
@@ -506,4 +539,5 @@ AddItemsPage.propTypes = {
   showSpinner: PropTypes.func.isRequired,
   /** Function called when data has loaded */
   hideSpinner: PropTypes.func.isRequired,
+  translate: PropTypes.func.isRequired,
 };
