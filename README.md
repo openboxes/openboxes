@@ -14,6 +14,16 @@ OpenBoxes
 
 OpenBoxes is an Open Source Inventory and Supply Chain Management System. The initial implementation of OpenBoxes will occur at Partners In Health-supported facilities in Haiti.
 
+ 
+---
+# WARNING:
+
+This is 0.8.x (Java 7 + Grails 1.3.9) version of application. This branch is long living branch that will only receive 
+some occasional hotfixes and some critical security updates. For current 0.9.x (Java 8 + Grails 3.3.16) development see
+[develop](https://github.com/openboxes/openboxes/tree/develop) branch.
+ 
+---
+
 ## Contributors
 
 ### Code Contributors
