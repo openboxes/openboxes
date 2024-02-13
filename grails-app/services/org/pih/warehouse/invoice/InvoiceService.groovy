@@ -211,10 +211,8 @@ class InvoiceService {
     }
 
     def updateItems(Invoice invoice, List items) {
-        List<InvoiceItem> currentInvoiceItems = InvoiceItem.findAllByInvoice(invoice)
-
         items.each { item ->
-            InvoiceItem invoiceItem = currentInvoiceItems.find{ it.id == item?.id }
+            InvoiceItem invoiceItem = invoice.invoiceItems?.find{ it.id == item?.id }
             // update existing invoice item
             if (invoiceItem) {
                 if (item.quantity > 0) {
