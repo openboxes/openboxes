@@ -31,8 +31,8 @@ class ProductSupplierApiController {
         render status: 204
     }
 
-    def create(ProductSupplierDetailsCommand productSupplierCommand) {
-        ProductSupplier productSupplier = productSupplierService.saveDetails(productSupplierCommand)
+    def create(ProductSupplierDetailsCommand productSupplierDetailsCommand) {
+        ProductSupplier productSupplier = productSupplierService.saveDetails(productSupplierDetailsCommand)
 
         response.status = HttpStatus.CREATED.value()
         render([data: productSupplier.toJson()] as JSON)
