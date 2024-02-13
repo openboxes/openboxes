@@ -9,6 +9,7 @@
  **/
 package org.pih.warehouse.inventory
 
+import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.criterion.CriteriaSpecification
@@ -40,6 +41,8 @@ class InventoryService implements ApplicationContextAware {
 
     def sessionFactory
     def persistenceInterceptor
+    GrailsApplication grailsApplication
+    TransactionEntryDataService transactionEntryDataService
 
     def authService
     def dataService
@@ -586,7 +589,7 @@ class InventoryService implements ApplicationContextAware {
      * @return
      */
     Map getQuantityByProductAndInventoryItemMap(List<TransactionEntry> entries, Boolean useBinLocation) {
-        def startTime = System.currentTimeMillis()
+        long startTime = System.currentTimeMillis()
         def quantityMap = [:]
 
         def reachedInventoryTransaction = [:]
@@ -606,10 +609,10 @@ class InventoryService implements ApplicationContextAware {
                 // There are cases where the transaction entry might be null, so we need to check for this edge case
                 if (transactionEntry) {
 
-                    def inventoryItem = transactionEntry.inventoryItem
-                    def product = inventoryItem.product
-                    def transaction = transactionEntry.transaction
-                    def binLocation = transactionEntry.binLocation
+                    InventoryItem inventoryItem = transactionEntry.inventoryItem
+                    Product product = inventoryItem.product
+                    Transaction transaction = transactionEntry.transaction
+                    Location binLocation = transactionEntry.binLocation
 
                     // first see if this is an entry we can skip (because we've already reached a product inventory transaction
                     // for this product, or a inventory transaction for this inventory item)
@@ -639,38 +642,43 @@ class InventoryService implements ApplicationContextAware {
                         }
 
                         // now update quantity as necessary
-                        def transactionCode = transactionEntry.transaction.transactionType.transactionCode
-                        if (transactionCode == TransactionCode.CREDIT) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] += transactionEntry.quantity
-                            }
-                        } else if (transactionCode == TransactionCode.DEBIT) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] -= transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] -= transactionEntry.quantity
-                            }
-                        } else if (transactionCode == TransactionCode.INVENTORY) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] += transactionEntry.quantity
-                            }
-                            // mark that we are done with this inventory item (after this transaction)
-                            if (!reachedInventoryTransaction[product]) {
-                                reachedInventoryTransaction[product] = [:]
-                            }
-                            reachedInventoryTransaction[product][inventoryItem] = transaction
-                        } else if (transactionCode == TransactionCode.PRODUCT_INVENTORY) {
-                            if (useBinLocation) {
-                                quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
-                            } else {
-                                quantityMap[product][inventoryItem] += transactionEntry.quantity
-                            }
-                            // mark that we are done with this product (after this transaction)
-                            reachedProductInventoryTransaction[product] = transaction
+                        TransactionCode transactionCode = transactionEntry.transaction.transactionType.transactionCode
+                        switch (transactionCode) {
+                            case TransactionCode.CREDIT:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] += transactionEntry.quantity
+                                }
+                                break
+                            case TransactionCode.DEBIT:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] -= transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] -= transactionEntry.quantity
+                                }
+                                break
+                            case TransactionCode.INVENTORY:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] += transactionEntry.quantity
+                                }
+                                // mark that we are done with this inventory item (after this transaction)
+                                if (!reachedInventoryTransaction[product]) {
+                                    reachedInventoryTransaction[product] = [:]
+                                }
+                                reachedInventoryTransaction[product][inventoryItem] = transaction
+                                break
+                            case TransactionCode.PRODUCT_INVENTORY:
+                                if (useBinLocation) {
+                                    quantityMap[product][inventoryItem][binLocation] += transactionEntry.quantity
+                                } else {
+                                    quantityMap[product][inventoryItem] += transactionEntry.quantity
+                                }
+                                // mark that we are done with this product (after this transaction)
+                                reachedProductInventoryTransaction[product] = transaction
+                                break
                         }
                     }
                 }
@@ -838,9 +846,9 @@ class InventoryService implements ApplicationContextAware {
      * @param entries
      * @return
      */
-    List getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
+    List<BinLocationItem> getQuantityByBinLocation(List<TransactionEntry> entries, boolean includeOutOfStock) {
 
-        def binLocations = []
+        List<BinLocationItem> binLocations = []
 
         def status = { quantity -> quantity > 0 ? "inStock" : "outOfStock" }
 
@@ -854,28 +862,25 @@ class InventoryService implements ApplicationContextAware {
 
                     // Exclude bin locations with quantity 0 (include negative quantity for data quality purposes)
                     if (quantity != 0 || includeOutOfStock) {
-                        binLocations << [
-                            id               : binLocation?.id,
-                            status           : status(quantity),
-                            value            : value,
-                            category         : product.category,
-                            product          : product,
-                            inventoryItem    : inventoryItem,
-                            binLocation      : binLocation,
-                            quantity         : quantity,
-                            isOnHold         : binLocation?.isOnHold()
-                        ]
+                        binLocations.add(
+                            new BinLocationItem([
+                                id               : binLocation?.id,
+                                status           : status(quantity),
+                                value            : value,
+                                category         : product.category,
+                                product          : product,
+                                inventoryItem    : inventoryItem,
+                                binLocation      : binLocation,
+                                quantity         : quantity,
+                                isOnHold         : binLocation?.isOnHold()
+                            ]))
                     }
                 }
             }
         }
 
         // Sort by expiration date, then bin location
-        binLocations = binLocations.sort { a, b ->
-            a?.inventoryItem?.expirationDate <=> b?.inventoryItem?.expirationDate ?: a?.binLocation?.name <=> b.binLocation?.name
-        }
-
-        return binLocations
+        return binLocations.sort()
     }
 
     /**
@@ -3086,8 +3091,9 @@ class InventoryService implements ApplicationContextAware {
     }
 
     List getBinLocationDetails(Location location) {
-        List transactionEntries = getTransactionEntriesByLocation(location)
+        List<TransactionEntry> transactionEntries = getTransactionEntriesByLocation(location)
         return getQuantityByBinLocation(transactionEntries, true)
+
     }
 
     List getBinLocationDetails(Location location, Date date) {
@@ -3116,26 +3122,15 @@ class InventoryService implements ApplicationContextAware {
         return results
     }
 
-    List getTransactionEntriesByLocation(Location location) {
+    List<TransactionEntry> getTransactionEntriesByLocation(Location location) {
         def startTime = System.currentTimeMillis()
 
         if (!location?.inventory) {
             throw new RuntimeException("Location must have an inventory")
         }
-
-        def transactions = Transaction.createCriteria().list {
-            // eager fetch transaction and transaction type
-            fetchMode("transactionType", org.hibernate.FetchMode.JOIN)
-            // FIXME OBGM-211
-            //fetchMode("inboundTransfer", org.hibernate.FetchMode.JOIN)
-            //fetchMode("outboundTransfer", org.hibernate.FetchMode.JOIN)
-
-            eq("inventory", location.inventory)
-            order("transactionDate", "asc")
-            order("dateCreated", "asc")
-        }
-
-        return transactions*.transactionEntries.flatten()
+        List<TransactionEntry> transactionEntries = transactionEntryDataService.findAllByLocation(location)
+        log.debug("Transaction entries fetched in: " + (System.currentTimeMillis() - startTime) + " ms")
+        return transactionEntries
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, Product product) {

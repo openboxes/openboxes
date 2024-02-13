@@ -26,6 +26,7 @@ import org.hibernate.SQLQuery
 import org.hibernate.sql.JoinType
 import org.hibernate.type.StandardBasicTypes
 import org.pih.warehouse.PaginatedList
+import org.pih.warehouse.api.AllocatedItem
 import org.pih.warehouse.api.AvailableItem
 import org.pih.warehouse.core.ApplicationExceptionEvent
 import org.pih.warehouse.core.Constants
@@ -191,13 +192,14 @@ class ProductAvailabilityService {
     }
 
     def calculateBinLocations(Location location, Product product) {
-        def binLocations
+        List<BinLocationItem> binLocations
         if (product) {
             binLocations = inventoryService.getProductQuantityByBinLocation(location, product, Boolean.TRUE)
         } else {
             binLocations = inventoryService.getBinLocationDetails(location)
         }
-        def picked = getQuantityPickedByProductAndLocation(location, product)
+        List<AllocatedItem> picked =
+                getQuantityPickedByProductAndLocation(location, product)
         return transformBinLocations(binLocations, picked)
     }
 
@@ -221,7 +223,7 @@ class ProductAvailabilityService {
      *  2. Picklist items from pending orders (outbound returns) with origin being provided location.
      *     (IMPORTANT: Outbound returns can have picked items with RECALLED lots and bins with HOLD_STOCK activity)
      * */
-    def getQuantityPickedByProductAndLocation(Location location, Product product) {
+    List<AllocatedItem> getQuantityPickedByProductAndLocation(Location location, Product product) {
         def query = """
             SELECT 
                 bin_location_id as bin_location_id, 
@@ -281,14 +283,13 @@ class ProductAvailabilityService {
                 .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
                 .list()
 
-        results = results.collect { result ->
-            [
+        return results.collect { result ->
+            new AllocatedItem([
                     binLocation      : Location.load(result["bin_location_id"]),
                     inventoryItem    : InventoryItem.load(result["inventory_item_id"]),
                     quantityAllocated: result["quantity_allocated"]
-            ]
+            ])
         }
-        return results
     }
 
     boolean saveProductAvailability(Location location, Product product, List binLocations, Boolean forceRefresh) {
@@ -360,17 +361,25 @@ class ProductAvailabilityService {
         return insertStatement
     }
 
-    def transformBinLocations(List binLocations, List pickedItems) {
-        def binLocationsTransformed = binLocations.collect {
+    def transformBinLocations(List<BinLocationItem> binLocations, List<AllocatedItem> pickedItems) {
+        long startTime = System.currentTimeMillis()
+        // Group picked items by inventory item/bin location pair to use the advantage of O(1) for read operations of Map
+        // instead of O(n) for List in the collect below (OBGM-508)
+        Map<List<String>, List<AllocatedItem>> pickedItemsGrouped =
+                pickedItems.groupBy{ [it.inventoryItem.id, it.binLocation?.id ]}
+        List<Map<String, Object>> binLocationsTransformed = binLocations.collect { it ->
             [
                 product          : [id: it?.product?.id, productCode: it?.product?.productCode, name: it?.product?.name],
                 inventoryItem    : [id: it?.inventoryItem?.id, lotNumber: it?.inventoryItem?.lotNumber, expirationDate: it?.inventoryItem?.expirationDate],
                 binLocation      : [id: it?.binLocation?.id, name: it?.binLocation?.name],
                 quantity         : it.quantity,
-                quantityAllocated: pickedItems ? (pickedItems.findAll { row -> row.binLocation == it?.binLocation && row.inventoryItem == it?.inventoryItem }?.sum { it.quantityAllocated } ?: 0) : 0,
-                quantityOnHold   : it?.binLocation?.isOnHold() || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
+                quantityAllocated: pickedItems
+                        ? (pickedItemsGrouped[[it.inventoryItem?.id, it.binLocation?.id]]?.sum{ AllocatedItem  val -> val.quantityAllocated } ?: 0)
+                        : 0,
+                quantityOnHold   : it?.isOnHold || it?.inventoryItem?.lotStatus == LotStatusCode.RECALLED ? it.quantity : 0
             ]
         }
+        log.debug("Collecting inside transformBinLocations took: " + (System.currentTimeMillis() - startTime) + " ms")
 
         // Attempting to prevent deadlock due to gap locks
         binLocationsTransformed = binLocationsTransformed.sort { a, b ->
