@@ -44,6 +44,7 @@ const SelectField = ({
       button={{ ...button, onClick: () => button.onClick(value) }}
       tooltip={tooltip}
       required={required}
+      className="select-wrapper-container"
     >
       <Select
         className={`form-element-select ${errorMessage ? 'has-errors' : ''}`}

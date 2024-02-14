@@ -15,8 +15,9 @@ const InputWrapper = ({
   button,
   title,
   errorMessage,
+  className,
 }) => (
-  <div className="input-wrapper-container">
+  <div className={`input-wrapper-container ${className}`}>
     <div>
       <div className="input-wrapper-title">
         {title && <Translate id={title?.id} defaultMessage={title?.defaultMessage} />}
@@ -75,6 +76,7 @@ InputWrapper.propTypes = {
   }),
   // Message displayed under the input
   errorMessage: PropTypes.string,
+  className: PropTypes.string,
 };
 
 InputWrapper.defaultProps = {
@@ -83,4 +85,5 @@ InputWrapper.defaultProps = {
   title: null,
   button: null,
   errorMessage: null,
+  className: '',
 };

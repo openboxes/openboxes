@@ -8,6 +8,8 @@ import DateFieldInput from 'components/form-elements/v2/DateFieldInput';
 import { DateFormat, TimeFormat } from 'consts/timeFormat';
 import InputWrapper from 'wrappers/InputWrapper';
 
+import 'react-datepicker/dist/react-datepicker.css';
+import 'components/form-elements/DateFilter/DateFilter.scss';
 import './style.scss';
 
 const DateField = ({
@@ -24,7 +26,7 @@ const DateField = ({
 }) => {
   const [date, setDate] = useState(defaultValue);
 
-  const onChange = (pickedDate) => setDate(moment(pickedDate, DateFormat.MM_DD_YYYY));
+  const onChange = (pickedDate) => setDate(moment(pickedDate, DateFormat.MMM_DD_YYYY));
 
   const onClear = () => setDate(null);
 
@@ -41,7 +43,7 @@ const DateField = ({
         className={`form-element-input ${errorMessage ? 'has-errors' : ''} ${className}`}
         dropdownMode="scroll"
         onChange={onChange}
-        dateFormat={DateFormat.MM_DD_YYYY}
+        dateFormat={DateFormat.MMM_DD_YYYY}
         timeFormat={TimeFormat.HH_MM}
         disabled={disabled}
         selected={date}
