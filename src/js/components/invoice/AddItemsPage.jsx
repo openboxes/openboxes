@@ -341,8 +341,7 @@ class AddItemsPage extends Component {
    * @public
    */
   nextPage(values) {
-    const hasZeros = _.some(values.invoiceItems, (item) => _.parseInt(item.quantity) === 0);
-    if (hasZeros) {
+    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
       this.confirmSave(() => {
         this.saveInvoiceItems(values).then(() => this.props.nextPage(values));
       });
@@ -357,9 +356,13 @@ class AddItemsPage extends Component {
    * @public
    */
   previousPage(values) {
-    this.saveInvoiceItems(values).then(() => {
-      this.props.previousPage(values);
-    });
+    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(values).then(() => this.props.previousPage(values));
+      });
+    } else {
+      this.saveInvoiceItems(values).then(() => this.props.previousPage(values));
+    }
   }
 
   /**
@@ -447,6 +450,14 @@ class AddItemsPage extends Component {
       .catch(() => this.props.hideSpinner());
   }
 
+  someItemsHaveZeroQuantity(invoiceItems) {
+    return _.some(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
+  }
+
+  allItemsHaveZeroQuantity(invoiceItems) {
+    return _.every(invoiceItems, (item) => _.parseInt(item.quantity) === 0);
+  }
+
   render() {
     return (
       <Form
@@ -504,7 +515,11 @@ class AddItemsPage extends Component {
                   <Translate id="react.default.button.previous.label" defaultMessage="Previous" />
                 </button>
                 <button
-                  disabled={invalid || !values.invoiceItems?.length}
+                  disabled={
+                    invalid
+                    || !values.invoiceItems?.length
+                    || this.allItemsHaveZeroQuantity(values.invoiceItems)
+                }
                   onClick={() => this.nextPage(values)}
                   className="btn btn-outline-primary btn-form float-right btn-xs"
                 >
