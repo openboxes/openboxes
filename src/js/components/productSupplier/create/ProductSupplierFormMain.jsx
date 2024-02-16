@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 
 import DetailsSection from 'components/productSupplier/create/sections/DetailsSection';
 
-import 'components/form-elements/DateFilter/DateFilter.scss';
-import 'react-datepicker/dist/react-datepicker.css';
 import './styles.scss';
 
 const ProductSupplierFormMain = ({ formProps }) => {
