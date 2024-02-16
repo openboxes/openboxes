@@ -190,10 +190,9 @@ class InvoiceItemsModal extends Component {
   }
 
   onOpen() {
-    this.props.onOpen().then(() => {
-      this.setState(INITIAL_STATE, () => {
-        this.fetchInvoiceItemCandidates();
-      });
+    this.props.onOpen?.();
+    this.setState(INITIAL_STATE, () => {
+      this.fetchInvoiceItemCandidates();
     });
   }
 

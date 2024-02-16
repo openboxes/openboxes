@@ -53,11 +53,10 @@ const FIELDS = {
     loadMoreRows: ({ loadMoreRows }) => loadMoreRows(),
     isFirstPageLoaded: ({ isFirstPageLoaded }) => isFirstPageLoaded,
     // eslint-disable-next-line react/prop-types
-    addButton: ({ values, loadMoreRows, saveInvoiceItems }) => (
+    addButton: ({ values, loadMoreRows }) => (
       <InvoiceItemsModal
         btnOpenText="react.default.button.addLines.label"
         btnOpenDefaultText="Add lines"
-        onOpen={() => saveInvoiceItems(values)}
         invoiceId={values.id}
         onResponse={loadMoreRows}
       >
@@ -442,12 +441,30 @@ class AddItemsPage extends Component {
     }
   }
 
+  save(values) {
+    if (this.someItemsHaveZeroQuantity(values.invoiceItems)) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(values).then(() => {
+          this.loadMoreRows({ startIndex: 0 });
+        });
+      });
+    } else {
+      return this.saveInvoiceItems(values);
+    }
+  }
+
   saveAndExit(formValues) {
-    this.saveInvoiceItems(formValues)
-      .then(() => {
+    if (this.someItemsHaveZeroQuantity(formValues.invoiceItems)) {
+      this.confirmSave(() => {
+        this.saveInvoiceItems(formValues).then(() => {
+          window.location = INVOICE_URL.show(formValues.id);
+        });
+      });
+    } else {
+      this.saveInvoiceItems(formValues).then(() => {
         window.location = INVOICE_URL.show(formValues.id);
-      })
-      .catch(() => this.props.hideSpinner());
+      });
+    }
   }
 
   someItemsHaveZeroQuantity(invoiceItems) {
@@ -472,7 +489,7 @@ class AddItemsPage extends Component {
                 type="button"
                 className="btn btn-outline-secondary float-right btn-form btn-xs"
                 disabled={invalid}
-                onClick={() => this.saveInvoiceItems(values)}
+                onClick={() => this.save(values)}
               >
                 <span><i className="fa fa-floppy-o pr-2" /><Translate id="react.default.button.save.label" defaultMessage="Save" /></span>
               </button>
@@ -497,7 +514,6 @@ class AddItemsPage extends Component {
                     updateTotalCount: this.updateTotalCount,
                     removeItem: this.removeItem,
                     updateRow: this.updateRow,
-                    saveInvoiceItems: this.saveInvoiceItems,
                     validateInvoiceItem: this.validateInvoiceItem,
                     debouncedInvoiceItemValidation: this.debouncedInvoiceItemValidation,
                   }))}
