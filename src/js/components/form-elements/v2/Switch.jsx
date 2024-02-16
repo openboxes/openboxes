@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -13,7 +13,7 @@ const Switch = ({
   onChange,
   ...fieldProps
 }) => {
-  const [value, changeValue] = useState(defaultValue);
+  const [value, changeValue] = useState(fieldProps?.value ?? defaultValue);
   const toggleId = _.uniqueId();
 
   const onChangeValue = () => {
@@ -23,6 +23,12 @@ const Switch = ({
     });
   };
 
+  useEffect(() => {
+    if (_.isBoolean(fieldProps?.value)) {
+      changeValue(fieldProps?.value);
+    }
+  }, [fieldProps?.value]);
+
   return (
     <div className="switch-container">
       <label htmlFor={`toggle-${toggleId}`} className="switch">
@@ -31,6 +37,7 @@ const Switch = ({
           type="checkbox"
           defaultChecked={value}
           onChange={onChangeValue}
+          checked={value}
           {...fieldProps}
         />
         <div className="slider" />
